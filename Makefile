@@ -295,28 +295,28 @@ build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/io.o: src/stdlib/io.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/random.o: src/stdlib/random.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/bits.o build/platform/number.o
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 
 ############################################################
