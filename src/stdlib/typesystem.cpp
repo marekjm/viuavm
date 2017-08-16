@@ -43,7 +43,7 @@ static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::ker
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
-    vector<string> ic = frame->arguments->at(0)->inheritancechain();
+    auto ic = frame->arguments->at(0)->inheritancechain();
     auto icv = make_unique<viua::types::Vector>();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
@@ -60,7 +60,7 @@ static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
     }
 
     viua::types::Value* object = frame->arguments->at(0);
-    vector<string> ic = object->bases();
+    auto ic = object->bases();
     auto icv = make_unique<viua::types::Vector>();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
