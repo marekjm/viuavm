@@ -24,15 +24,14 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <unistd.h>
 #include <utility>
 #include <vector>
 #include <viua/assembler/frontend/parser.h>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
-#include <viua/front/asm.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
 #include <viua/version.h>
