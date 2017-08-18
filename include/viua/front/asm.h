@@ -44,20 +44,6 @@ struct compilationflags_t {
 };
 
 
-const std::string COLOR_FG_RED = "\x1b[38;5;1m";
-const std::string COLOR_FG_YELLOW = "\x1b[38;5;3m";
-const std::string COLOR_FG_CYAN = "\x1b[38;5;6m";
-const std::string COLOR_FG_LIGHT_GREEN = "\x1b[38;5;10m";
-const std::string COLOR_FG_LIGHT_YELLOW = "\x1b[38;5;11m";
-const std::string COLOR_FG_WHITE = "\x1b[38;5;15m";
-const std::string COLOR_FG_GREEN_1 = "\x1b[38;5;46m";
-const std::string COLOR_FG_RED_1 = "\x1b[38;5;196m";
-const std::string COLOR_FG_ORANGE_RED_1 = "\x1b[38;5;202m";
-const std::string ATTR_RESET = "\x1b[0m";
-
-std::string send_control_seq(const std::string&);
-
-
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
