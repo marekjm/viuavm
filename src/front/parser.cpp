@@ -103,8 +103,38 @@ static string read_file(ifstream& in) {
     return source_in.str();
 }
 
+static auto invalid_syntax(const vector<Token>& tokens, const string message) -> InvalidSyntax {
+    auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
+    for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1}; i < tokens.size(); ++i) {
+        invalid_syntax_error.add(tokens.at(i));
+    }
+    return invalid_syntax_error;
+}
 
-static auto display_result(const ParsedSource&) -> void {}
+static auto analyse_ress_instructions(const ParsedSource& source) -> void {
+    for (const auto& fn : source.functions) {
+        for (const auto& line : fn.body) {
+            const auto instruction =
+                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+            if (instruction->opcode != RESS) {
+                continue;
+            }
+            const auto label =
+                dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
+            if (not label) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                     "illegal operand for 'ress' instruction");
+            }
+            if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+            }
+        }
+    }
+}
+static auto analyse(const ParsedSource& source) -> void { analyse_ress_instructions(source); }
 
 
 int main(int argc, char* argv[]) {
@@ -181,7 +211,7 @@ int main(int argc, char* argv[]) {
 
     try {
         auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
-        display_result(parsed_source);
+        analyse(parsed_source);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
