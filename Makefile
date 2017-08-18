@@ -256,7 +256,7 @@ build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instructio
 build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o build/assembler/frontend/parser.o
+build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o build/assembler/frontend/parser.o build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o
@@ -343,6 +343,9 @@ build/cg/tools.o: src/cg/tools.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/assembler/frontend/parser.o: src/assembler/frontend/parser.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
