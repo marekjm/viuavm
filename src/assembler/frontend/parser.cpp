@@ -353,6 +353,7 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
         if (tokens.at(i) == ".function:") {
             InstructionsBlock ib;
             i += parse_function(vector_view<Token>(tokens, i), ib);
+            parsed.functions.push_back(std::move(ib));
         } else if (tokens.at(i) == ".block:") {
             InstructionsBlock ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
