@@ -32,7 +32,7 @@ using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 auto viua::assembler::frontend::parser::Operand::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
 
 auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<Token> tokens, string& value)
-    -> const decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{1};
 
     if (tokens.at(i) == "}") {
@@ -51,7 +51,7 @@ auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<
 }
 auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token> tokens,
                                                          decltype(InstructionsBlock::attributes) & attributes)
-    -> const decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i) != "[[") {
@@ -86,8 +86,8 @@ auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token
 }
 
 auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> tokens,
-                                                      unique_ptr<Operand>& operand) -> const
-    decltype(tokens)::size_type {
+                                                      unique_ptr<Operand>& operand)
+    -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();
@@ -318,7 +318,7 @@ auto viua::assembler::frontend::parser::parse_block_body(const vector_view<Token
 }
 
 auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> const decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     cerr << "parsing function" << endl;
@@ -335,11 +335,11 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
     return i;
 }
 auto viua::assembler::frontend::parser::parse_closure(const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> const decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type {
     return parse_function(tokens, ib);
 }
 auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> const decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type {
     return parse_function(tokens, ib);
 }
 
