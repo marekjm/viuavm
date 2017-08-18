@@ -137,12 +137,11 @@ namespace viua {
 
 
                 auto parse_attribute_value(const vector_view<viua::cg::lex::Token> tokens, std::string&)
-                    -> const decltype(tokens)::size_type;
+                    -> decltype(tokens)::size_type;
                 auto parse_attributes(const vector_view<viua::cg::lex::Token> tokens,
-                                      std::map<std::string, std::string>&) -> const
-                    decltype(tokens)::size_type;
+                                      std::map<std::string, std::string>&) -> decltype(tokens)::size_type;
                 auto parse_operand(const vector_view<viua::cg::lex::Token> tokens, std::unique_ptr<Operand>&)
-                    -> const decltype(tokens)::size_type;
+                    -> decltype(tokens)::size_type;
                 auto mnemonic_to_opcode(const std::string mnemonic) -> OPCODE;
                 auto parse_instruction(const vector_view<viua::cg::lex::Token> tokens,
                                        std::unique_ptr<Instruction>&) -> decltype(tokens)::size_type;
@@ -153,11 +152,11 @@ namespace viua {
                 auto parse_block_body(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
                     -> decltype(tokens)::size_type;
                 auto parse_function(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
-                    -> const decltype(tokens)::size_type;
+                    -> decltype(tokens)::size_type;
                 auto parse_closure(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
-                    -> const decltype(tokens)::size_type;
-                auto parse_block(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&) -> const
-                    decltype(tokens)::size_type;
+                    -> decltype(tokens)::size_type;
+                auto parse_block(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
+                    -> decltype(tokens)::size_type;
                 auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;
             }
         }
