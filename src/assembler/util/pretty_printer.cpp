@@ -64,6 +64,11 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
         const auto& each = tokens.at(i++);
         bool match = error.match(each);
 
+        if (each == "\n") {
+            cout << send_control_seq(ATTR_RESET);
+            break;
+        }
+
         if (match) {
             cout << send_control_seq(COLOR_FG_RED_1);
         }
@@ -76,10 +81,6 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 
         if (match) {
             cout << send_control_seq(ATTR_RESET);
-        }
-
-        if (each == "\n") {
-            break;
         }
     }
 
