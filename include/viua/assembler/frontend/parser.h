@@ -117,6 +117,8 @@ namespace viua {
 
                     std::vector<InstructionsBlock> blocks;
                     std::vector<viua::cg::lex::Token> block_signatures;
+
+                    bool as_library = false;
                 };
 
 

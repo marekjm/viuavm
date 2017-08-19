@@ -43,6 +43,8 @@ bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
+bool AS_LIB = false;
+
 
 using namespace viua::assembler::frontend::parser;
 using Token = viua::cg::lex::Token;
@@ -79,15 +81,10 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "-V, --version            - show version\n"
              << "    "
              << "-h, --help               - display this message\n"
-             // misc options
-             << "    "
-             << "    --size               - calculate and display compiled bytecode size\n"
-             << "    "
-             << "    --raw                - dump raw token list\n"
-             << "    "
-             << "    --ws                 - reduce whitespace and remove comments\n"
-             << "    "
-             << "    --dirs               - reduce directives\n";
+             << "    ";
+
+        // compilation options
+        cout << "-c, --lib                - assemble as a library\n";
     }
 
     return (show_help or show_version);
@@ -156,6 +153,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
+        } else if (option == "--lib" or option == "-c") {
+            AS_LIB = true;
+            continue;
         } else if (str::startswith(option, "-")) {
             cerr << "error: unknown option: " << option << endl;
             return 1;
@@ -211,6 +211,7 @@ int main(int argc, char* argv[]) {
 
     try {
         auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        parsed_source.as_library = AS_LIB;
         analyse(parsed_source);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
