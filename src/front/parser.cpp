@@ -108,7 +108,7 @@ static auto invalid_syntax(const vector<Token>& tokens, const string message) ->
     return invalid_syntax_error;
 }
 
-static auto analyse_ress_instructions(const ParsedSource& source) -> void {
+static auto verify_ress_instructions(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
         try {
             for (const auto& line : fn.body) {
@@ -141,7 +141,7 @@ static auto analyse_ress_instructions(const ParsedSource& source) -> void {
         }
     }
 }
-static auto analyse_block_endings(const ParsedSource& source) -> void {
+static auto verify_block_endings(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
         try {
             auto last_instruction =
@@ -161,9 +161,9 @@ static auto analyse_block_endings(const ParsedSource& source) -> void {
         }
     }
 }
-static auto analyse(const ParsedSource& source) -> void {
-    analyse_ress_instructions(source);
-    analyse_block_endings(source);
+static auto verify(const ParsedSource& source) -> void {
+    verify_ress_instructions(source);
+    verify_block_endings(source);
 }
 
 
@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
     try {
         auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
-        analyse(parsed_source);
+        verify(parsed_source);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
