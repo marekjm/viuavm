@@ -328,6 +328,10 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
     cerr << "  name: " << tokens.at(i).str() << endl;
     ib.name = tokens.at(i);
     ++i;  // skip name
+
+    if (tokens.at(i) != "\n") {
+        throw InvalidSyntax(tokens.at(i), "unexpected token after function name");
+    }
     ++i;  // skip newline
 
     i += parse_block_body(vector_view<Token>(tokens, i), ib);
@@ -350,6 +354,10 @@ auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tok
     ib.name = tokens.at(i);
 
     ++i;  // skip name
+
+    if (tokens.at(i) != "\n") {
+        throw InvalidSyntax(tokens.at(i), "unexpected token after block name");
+    }
     ++i;  // skip newline
 
     i += parse_block_body(vector_view<Token>(tokens, i), ib);
