@@ -176,6 +176,31 @@ static auto verify_block_tries(const ParsedSource& source) -> void {
         }
     }
 }
+static auto verify_block_catches(const ParsedSource& source) -> void {
+    for (const auto& fn : source.functions) {
+        try {
+            for (const auto& line : fn.body) {
+                auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+                if (not instruction) {
+                    continue;
+                }
+                if (instruction->opcode != CATCH) {
+                    continue;
+                }
+                auto block_name = instruction->tokens.at(2);
+
+                if (not is_defined_block_name(source, block_name)) {
+                    throw InvalidSyntax(block_name,
+                                        ("cannot catch using undefined block: " + block_name.str()))
+                        .add(instruction->tokens.at(0));
+                }
+            }
+        } catch (InvalidSyntax& e) {
+            throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+        }
+    }
+}
 static auto verify_block_endings(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
         try {
@@ -199,6 +224,7 @@ static auto verify_block_endings(const ParsedSource& source) -> void {
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
     verify_block_tries(source);
+    verify_block_catches(source);
     verify_block_endings(source);
 }
 
