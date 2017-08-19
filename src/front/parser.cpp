@@ -141,6 +141,18 @@ static auto verify_ress_instructions(const ParsedSource& source) -> void {
         }
     }
 }
+static auto is_defined_block_name(const ParsedSource& source, const string name) -> bool {
+    auto is_undefined = (source.blocks.end() ==
+                         find_if(source.blocks.begin(), source.blocks.end(),
+                                 [name](const InstructionsBlock& ib) -> bool { return (ib.name == name); }));
+    if (is_undefined) {
+        is_undefined =
+            (source.block_signatures.end() ==
+             find_if(source.block_signatures.begin(), source.block_signatures.end(),
+                     [name](const Token& block_name) -> bool { return (block_name.str() == name); }));
+    }
+    return (not is_undefined);
+}
 static auto verify_block_tries(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
         try {
@@ -153,20 +165,8 @@ static auto verify_block_tries(const ParsedSource& source) -> void {
                     continue;
                 }
                 auto block_name = instruction->tokens.at(1);
-                auto is_undefined =
-                    (source.blocks.end() == find_if(source.blocks.begin(), source.blocks.end(),
-                                                    [block_name](const InstructionsBlock& ib) -> bool {
-                                                        return (ib.name == block_name.str());
-                                                    }));
-                if (is_undefined) {
-                    is_undefined = (source.block_signatures.end() ==
-                                    find_if(source.block_signatures.begin(), source.block_signatures.end(),
-                                            [block_name](const Token& name) -> bool {
-                                                return (name.str() == block_name.str());
-                                            }));
-                }
 
-                if (is_undefined) {
+                if (not is_defined_block_name(source, block_name)) {
                     throw InvalidSyntax(block_name, ("cannot enter undefined block: " + block_name.str()));
                 }
             }
