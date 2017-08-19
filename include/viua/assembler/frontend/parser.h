@@ -111,6 +111,7 @@ namespace viua {
 
                 struct InstructionsBlock {
                     viua::cg::lex::Token name;
+                    viua::cg::lex::Token ending_token;
                     std::map<std::string, std::string> attributes;
                     std::vector<std::unique_ptr<Line>> body;
                 };

@@ -320,6 +320,10 @@ auto viua::assembler::frontend::parser::parse_block_body(const vector_view<Token
         i += parse_line(vector_view<Token>(tokens, i), line);
         instructions_block.body.push_back(std::move(line));
     }
+    if (tokens.at(i) != ".end") {
+        throw InvalidSyntax(tokens.at(i), "no '.end' at the end of a block");
+    }
+    instructions_block.ending_token = tokens.at(i);
 
     return i;
 }
