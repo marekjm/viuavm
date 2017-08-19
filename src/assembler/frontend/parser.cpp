@@ -404,9 +404,11 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
         } else if (tokens.at(i) == ".block:") {
             InstructionsBlock ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
+            parsed.blocks.push_back(std::move(ib));
         } else if (tokens.at(i) == ".closure:") {
             InstructionsBlock ib;
             i += parse_closure(vector_view<Token>(tokens, i), ib);
+            parsed.functions.push_back(std::move(ib));
         } else if (tokens.at(i) == ".signature:") {
             ++i;
             if (tokens.at(i) == "\n") {
