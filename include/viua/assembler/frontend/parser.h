@@ -94,6 +94,10 @@ namespace viua {
                 };
 
                 struct Line {
+                    std::vector<viua::cg::lex::Token> tokens;
+
+                    auto add(viua::cg::lex::Token) -> void;
+
                     virtual ~Line() = default;
                 };
                 struct Directive : public Line {

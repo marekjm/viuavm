@@ -31,6 +31,8 @@ using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
 auto viua::assembler::frontend::parser::Operand::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
 
+auto viua::assembler::frontend::parser::Line::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
+
 auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<Token> tokens, string& value)
     -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{1};
@@ -300,6 +302,11 @@ auto viua::assembler::frontend::parser::parse_line(const vector_view<Token> toke
         i = parse_instruction(vector_view<Token>(tokens, 0), instruction);
         line = std::move(instruction);
     }
+
+    for (auto j = decltype(i){0}; j < i; ++j) {
+        line->add(tokens.at(j));
+    }
+
     return i;
 }
 
