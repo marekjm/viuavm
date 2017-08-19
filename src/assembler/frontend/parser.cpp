@@ -327,6 +327,14 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
 
     cerr << "  name: " << tokens.at(i).str() << endl;
     ib.name = tokens.at(i);
+
+    if (not::assembler::utils::isValidFunctionName(ib.name)) {
+        throw InvalidSyntax(ib.name, ("invalid function name: " + ib.name.str()));
+    }
+    if (::assembler::utils::getFunctionArity(ib.name) == -1) {
+        throw InvalidSyntax(ib.name, ("function with undefined arity: " + ib.name.str()));
+    }
+
     ++i;  // skip name
 
     if (tokens.at(i) != "\n") {
