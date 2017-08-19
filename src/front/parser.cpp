@@ -128,6 +128,7 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
         }
     }
 }
+
 static auto verify_ress_instructions(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
         for (const auto& line : ib.body) {
@@ -219,11 +220,62 @@ static auto verify_block_endings(const ParsedSource& src) -> void {
         }
     });
 }
+static auto verify_frame_balance(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        int balance = 0;
+        Token previous_frame_spawned;
+
+        for (const auto& line : ib.body) {
+            auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+
+            auto opcode = instruction->opcode;
+            if (not(opcode == CALL or opcode == TAILCALL or opcode == DEFER or opcode == PROCESS or
+                    opcode == FRAME or opcode == MSG or opcode == RETURN or opcode == LEAVE or
+                    opcode == THROW)) {
+                continue;
+            }
+
+            switch (opcode) {
+                case CALL:
+                case TAILCALL:
+                case DEFER:
+                case PROCESS:
+                case MSG:
+                    --balance;
+                    break;
+                case FRAME:
+                default:
+                    ++balance;
+                    break;
+            }
+
+            if (balance < 0) {
+                throw InvalidSyntax(instruction->tokens.at(0),
+                                    ("call with '" + instruction->tokens.at(0).str() + "' without a frame"));
+            }
+
+            if (balance > 1) {
+                throw viua::cg::lex::TracedSyntaxError()
+                    .append(InvalidSyntax(instruction->tokens.at(0), "excess frame spawned"))
+                    .append(InvalidSyntax(previous_frame_spawned, "unused frame:"));
+            }
+
+            if (opcode == FRAME) {
+                previous_frame_spawned = instruction->tokens.at(0);
+            }
+        }
+    });
+}
+
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
     verify_block_tries(source);
     verify_block_catches(source);
     verify_block_endings(source);
+    verify_frame_balance(source);
 }
 
 
