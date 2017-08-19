@@ -1,7 +1,7 @@
 CXX_STANDARD=c++17
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
-TRAVIS_CI_CLANG=clang++-3.9
+TRAVIS_CI_CLANG=clang++-4.0
 TRAVIS_CI_GCC=g++-6
 
 GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
