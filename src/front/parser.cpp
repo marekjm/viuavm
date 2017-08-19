@@ -141,7 +141,30 @@ static auto analyse_ress_instructions(const ParsedSource& source) -> void {
         }
     }
 }
-static auto analyse(const ParsedSource& source) -> void { analyse_ress_instructions(source); }
+static auto analyse_block_endings(const ParsedSource& source) -> void {
+    for (const auto& fn : source.functions) {
+        try {
+            auto last_instruction =
+                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(fn.body.back().get());
+            if (not last_instruction) {
+                throw invalid_syntax(fn.body.back()->tokens, "invalid end of block: expected mnemonic");
+            }
+            auto opcode = last_instruction->opcode;
+            if (not(opcode == RETURN or opcode == TAILCALL or opcode == HALT)) {
+                throw viua::cg::lex::InvalidSyntax(
+                    last_instruction->tokens.at(0),
+                    "invalid last mnemonic: expected one of: return, tailcall or halt");
+            }
+        } catch (InvalidSyntax& e) {
+            throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+        }
+    }
+}
+static auto analyse(const ParsedSource& source) -> void {
+    analyse_ress_instructions(source);
+    analyse_block_endings(source);
+}
 
 
 int main(int argc, char* argv[]) {
