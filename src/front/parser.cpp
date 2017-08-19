@@ -141,6 +141,41 @@ static auto verify_ress_instructions(const ParsedSource& source) -> void {
         }
     }
 }
+static auto verify_block_tries(const ParsedSource& source) -> void {
+    for (const auto& fn : source.functions) {
+        try {
+            for (const auto& line : fn.body) {
+                auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+                if (not instruction) {
+                    continue;
+                }
+                if (instruction->opcode != ENTER) {
+                    continue;
+                }
+                auto block_name = instruction->tokens.at(1);
+                auto is_undefined =
+                    (source.blocks.end() == find_if(source.blocks.begin(), source.blocks.end(),
+                                                    [block_name](const InstructionsBlock& ib) -> bool {
+                                                        return (ib.name == block_name.str());
+                                                    }));
+                if (is_undefined) {
+                    is_undefined = (source.block_signatures.end() ==
+                                    find_if(source.block_signatures.begin(), source.block_signatures.end(),
+                                            [block_name](const Token& name) -> bool {
+                                                return (name.str() == block_name.str());
+                                            }));
+                }
+
+                if (is_undefined) {
+                    throw InvalidSyntax(block_name, ("cannot enter undefined block: " + block_name.str()));
+                }
+            }
+        } catch (InvalidSyntax& e) {
+            throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+        }
+    }
+}
 static auto verify_block_endings(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
         try {
@@ -163,6 +198,7 @@ static auto verify_block_endings(const ParsedSource& source) -> void {
 }
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
+    verify_block_tries(source);
     verify_block_endings(source);
 }
 
