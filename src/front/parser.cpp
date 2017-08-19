@@ -108,38 +108,52 @@ static auto invalid_syntax(const vector<Token>& tokens, const string message) ->
     return invalid_syntax_error;
 }
 
-static auto verify_ress_instructions(const ParsedSource& source) -> void {
+using Verifier = auto (*)(const ParsedSource&, const InstructionsBlock&) -> void;
+
+static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> void {
     for (const auto& fn : source.functions) {
         try {
-            for (const auto& line : fn.body) {
-                const auto instruction =
-                    dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
-                if (not instruction) {
-                    continue;
-                }
-                if (instruction->opcode != RESS) {
-                    continue;
-                }
-                const auto label = dynamic_cast<viua::assembler::frontend::parser::Label*>(
-                    instruction->operands.at(0).get());
-                if (not label) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                         "illegal operand for 'ress' instruction");
-                }
-                if (not(label->content == "global" or label->content == "static" or
-                        label->content == "local")) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
-                }
-                if (label->content == "global" and source.as_library) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                         "global register set used by a library function");
-                }
-            }
+            verifier(source, fn);
         } catch (InvalidSyntax& e) {
             throw viua::cg::lex::TracedSyntaxError().append(e).append(
                 InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
     }
+    for (const auto& bl : source.blocks) {
+        try {
+            verifier(source, bl);
+        } catch (InvalidSyntax& e) {
+            throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                InvalidSyntax(bl.name, ("in block " + bl.name.str())));
+        }
+    }
+}
+static auto verify_ress_instructions(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
+        for (const auto& line : ib.body) {
+            const auto instruction =
+                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+            if (instruction->opcode != RESS) {
+                continue;
+            }
+            const auto label =
+                dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
+            if (not label) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                     "illegal operand for 'ress' instruction");
+            }
+            if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+            }
+            if (label->content == "global" and source.as_library) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                     "global register set used by a library function");
+            }
+        }
+    });
 }
 static auto is_defined_block_name(const ParsedSource& source, const string name) -> bool {
     auto is_undefined = (source.blocks.end() ==
@@ -153,73 +167,57 @@ static auto is_defined_block_name(const ParsedSource& source, const string name)
     }
     return (not is_undefined);
 }
-static auto verify_block_tries(const ParsedSource& source) -> void {
-    for (const auto& fn : source.functions) {
-        try {
-            for (const auto& line : fn.body) {
-                auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
-                if (not instruction) {
-                    continue;
-                }
-                if (instruction->opcode != ENTER) {
-                    continue;
-                }
-                auto block_name = instruction->tokens.at(1);
+static auto verify_block_tries(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
+        for (const auto& line : ib.body) {
+            auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+            if (instruction->opcode != ENTER) {
+                continue;
+            }
+            auto block_name = instruction->tokens.at(1);
 
-                if (not is_defined_block_name(source, block_name)) {
-                    throw InvalidSyntax(block_name, ("cannot enter undefined block: " + block_name.str()));
-                }
+            if (not is_defined_block_name(source, block_name)) {
+                throw InvalidSyntax(block_name, ("cannot enter undefined block: " + block_name.str()));
             }
-        } catch (InvalidSyntax& e) {
-            throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
-    }
+    });
 }
-static auto verify_block_catches(const ParsedSource& source) -> void {
-    for (const auto& fn : source.functions) {
-        try {
-            for (const auto& line : fn.body) {
-                auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
-                if (not instruction) {
-                    continue;
-                }
-                if (instruction->opcode != CATCH) {
-                    continue;
-                }
-                auto block_name = instruction->tokens.at(2);
+static auto verify_block_catches(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
+        for (const auto& line : ib.body) {
+            auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+            if (instruction->opcode != CATCH) {
+                continue;
+            }
+            auto block_name = instruction->tokens.at(2);
 
-                if (not is_defined_block_name(source, block_name)) {
-                    throw InvalidSyntax(block_name,
-                                        ("cannot catch using undefined block: " + block_name.str()))
-                        .add(instruction->tokens.at(0));
-                }
+            if (not is_defined_block_name(source, block_name)) {
+                throw InvalidSyntax(block_name, ("cannot catch using undefined block: " + block_name.str()))
+                    .add(instruction->tokens.at(0));
             }
-        } catch (InvalidSyntax& e) {
-            throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
-    }
+    });
 }
-static auto verify_block_endings(const ParsedSource& source) -> void {
-    for (const auto& fn : source.functions) {
-        try {
-            auto last_instruction =
-                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(fn.body.back().get());
-            if (not last_instruction) {
-                throw invalid_syntax(fn.body.back()->tokens, "invalid end of block: expected mnemonic");
-            }
-            auto opcode = last_instruction->opcode;
-            if (not(opcode == RETURN or opcode == TAILCALL or opcode == HALT)) {
-                throw viua::cg::lex::InvalidSyntax(
-                    last_instruction->tokens.at(0),
-                    "invalid last mnemonic: expected one of: return, tailcall or halt");
-            }
-        } catch (InvalidSyntax& e) {
-            throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+static auto verify_block_endings(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        auto last_instruction =
+            dynamic_cast<viua::assembler::frontend::parser::Instruction*>(ib.body.back().get());
+        if (not last_instruction) {
+            throw invalid_syntax(ib.body.back()->tokens, "invalid end of block: expected mnemonic");
         }
-    }
+        auto opcode = last_instruction->opcode;
+        if (not(opcode == RETURN or opcode == TAILCALL or opcode == HALT)) {
+            throw viua::cg::lex::InvalidSyntax(
+                last_instruction->tokens.at(0),
+                "invalid last mnemonic: expected one of: return, tailcall or halt");
+        }
+    });
 }
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
