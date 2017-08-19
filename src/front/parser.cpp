@@ -110,24 +110,30 @@ static auto invalid_syntax(const vector<Token>& tokens, const string message) ->
 
 static auto analyse_ress_instructions(const ParsedSource& source) -> void {
     for (const auto& fn : source.functions) {
-        for (const auto& line : fn.body) {
-            const auto instruction =
-                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
-            if (not instruction) {
-                continue;
+        try {
+            for (const auto& line : fn.body) {
+                const auto instruction =
+                    dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+                if (not instruction) {
+                    continue;
+                }
+                if (instruction->opcode != RESS) {
+                    continue;
+                }
+                const auto label = dynamic_cast<viua::assembler::frontend::parser::Label*>(
+                    instruction->operands.at(0).get());
+                if (not label) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "illegal operand for 'ress' instruction");
+                }
+                if (not(label->content == "global" or label->content == "static" or
+                        label->content == "local")) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+                }
             }
-            if (instruction->opcode != RESS) {
-                continue;
-            }
-            const auto label =
-                dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
-            if (not label) {
-                throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                     "illegal operand for 'ress' instruction");
-            }
-            if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
-                throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
-            }
+        } catch (InvalidSyntax& e) {
+            throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
     }
 }
