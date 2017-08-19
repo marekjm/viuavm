@@ -343,6 +343,9 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
     ++i;  // skip newline
 
     i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    if (not ib.body.size()) {
+        throw InvalidSyntax(ib.name, ("function with empty body: " + ib.name.str()));
+    }
 
     return i;
 }
@@ -369,6 +372,9 @@ auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tok
     ++i;  // skip newline
 
     i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    if (not ib.body.size()) {
+        throw InvalidSyntax(ib.name, ("block with empty body: " + ib.name.str()));
+    }
 
     return i;
 }
