@@ -340,7 +340,21 @@ auto viua::assembler::frontend::parser::parse_closure(const vector_view<Token> t
 }
 auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tokens, InstructionsBlock& ib)
     -> decltype(tokens)::size_type {
-    return parse_function(tokens, ib);
+    auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
+
+    cerr << "parsing block" << endl;
+
+    i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
+
+    cerr << "  name: " << tokens.at(i).str() << endl;
+    ib.name = tokens.at(i);
+
+    ++i;  // skip name
+    ++i;  // skip newline
+
+    i += parse_block_body(vector_view<Token>(tokens, i), ib);
+
+    return i;
 }
 
 auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> ParsedSource {
