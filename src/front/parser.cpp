@@ -130,6 +130,10 @@ static auto analyse_ress_instructions(const ParsedSource& source) -> void {
                         label->content == "local")) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
                 }
+                if (label->content == "global" and source.as_library) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "global register set used by a library function");
+                }
             }
         } catch (InvalidSyntax& e) {
             throw viua::cg::lex::TracedSyntaxError().append(e).append(
