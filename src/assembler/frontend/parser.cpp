@@ -171,13 +171,6 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(void_literal);
-    } else if (str::isid(tok) and not OP_MNEMONICS.count(tok)) {
-        auto label = make_unique<Label>();
-        label->content = tokens.at(i);
-        label->add(tokens.at(i));
-        ++i;
-
-        operand = std::move(label);
     } else if (::assembler::utils::isValidFunctionName(tok)) {
         auto fn_name_literal = make_unique<FunctionNameLiteral>();
         fn_name_literal->content = tokens.at(i);
@@ -185,6 +178,13 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(fn_name_literal);
+    } else if (str::isid(tok) and not OP_MNEMONICS.count(tok)) {
+        auto label = make_unique<Label>();
+        label->content = tokens.at(i);
+        label->add(tokens.at(i));
+        ++i;
+
+        operand = std::move(label);
     } else if (str::is_atom_literal(tok)) {
         auto atom_literal = make_unique<AtomLiteral>();
         atom_literal->content = tokens.at(i);
