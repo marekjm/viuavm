@@ -264,6 +264,12 @@ static auto verify_frame_balance(const ParsedSource& src) -> void {
                     .append(InvalidSyntax(previous_frame_spawned, "unused frame:"));
             }
 
+            if ((opcode == RETURN or opcode == LEAVE or opcode == THROW) and balance > 0) {
+                throw viua::cg::lex::TracedSyntaxError()
+                    .append(InvalidSyntax(instruction->tokens.at(0), "leftover frame:"))
+                    .append(InvalidSyntax(previous_frame_spawned, "spawned here:"));
+            }
+
             if (opcode == FRAME) {
                 previous_frame_spawned = instruction->tokens.at(0);
             }
