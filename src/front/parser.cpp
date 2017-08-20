@@ -49,6 +49,7 @@ bool AS_LIB = false;
 using namespace viua::assembler::frontend::parser;
 using viua::cg::lex::Token;
 using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::TracedSyntaxError;
 
 
 template<class T>
@@ -117,6 +118,8 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
         } catch (InvalidSyntax& e) {
             throw viua::cg::lex::TracedSyntaxError().append(e).append(
                 InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+        } catch (TracedSyntaxError& e) {
+            throw e.append(InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
     }
     for (const auto& bl : source.blocks) {
@@ -125,6 +128,8 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
         } catch (InvalidSyntax& e) {
             throw viua::cg::lex::TracedSyntaxError().append(e).append(
                 InvalidSyntax(bl.name, ("in block " + bl.name.str())));
+        } catch (TracedSyntaxError& e) {
+            throw e.append(InvalidSyntax(bl.name, ("in block " + bl.name.str())));
         }
     }
 }
