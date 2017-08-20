@@ -247,8 +247,9 @@ static auto verify_frame_balance(const ParsedSource& src) -> void {
                     --balance;
                     break;
                 case FRAME:
-                default:
                     ++balance;
+                    break;
+                default:
                     break;
             }
 
