@@ -284,6 +284,7 @@ static auto verify_frame_balance(const ParsedSource& src) -> void {
 static auto verify_function_call_arities(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         int frame_parameters_count = 0;
+        Token frame_spawned_here;
         for (const auto& line : ib.body) {
             auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
             if (not instruction) {
@@ -305,6 +306,7 @@ static auto verify_function_call_arities(const ParsedSource& src) -> void {
                 } else {
                     frame_parameters_count = -1;
                 }
+                frame_spawned_here = instruction->tokens.at(0);
                 continue;
             }
 
@@ -343,7 +345,9 @@ static auto verify_function_call_arities(const ParsedSource& src) -> void {
                 ostringstream report;
                 report << "invalid number of parameters in call to function " << function_name
                        << ": expected " << arity << ", got " << frame_parameters_count;
-                throw InvalidSyntax(operand->tokens.at(0), report.str());
+                throw viua::cg::lex::TracedSyntaxError()
+                    .append(InvalidSyntax(operand->tokens.at(0), report.str()))
+                    .append(InvalidSyntax(frame_spawned_here, "from frame spawned here"));
             }
         }
     });
