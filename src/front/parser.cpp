@@ -281,6 +281,73 @@ static auto verify_frame_balance(const ParsedSource& src) -> void {
         }
     });
 }
+static auto verify_function_call_arities(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        int frame_parameters_count = 0;
+        for (const auto& line : ib.body) {
+            auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+
+            auto opcode = instruction->opcode;
+            if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER or opcode == FRAME)) {
+                continue;
+            }
+
+            if (opcode == FRAME) {
+                if (dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(
+                        instruction->operands.at(0).get())) {
+                    frame_parameters_count = static_cast<decltype(frame_parameters_count)>(
+                        dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(
+                            instruction->operands.at(0).get())
+                            ->index);
+                } else {
+                    frame_parameters_count = -1;
+                }
+                continue;
+            }
+
+            viua::assembler::frontend::parser::Operand* operand = nullptr;
+            Token operand_token;
+            if (opcode == CALL or opcode == PROCESS) {
+                operand = instruction->operands.at(1).get();
+            } else if (opcode == DEFER) {
+                operand = instruction->operands.at(0).get();
+            }
+
+            if (dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(operand)) {
+                // OK, but can't be verified at this time
+                // FIXME verifier should look around and see if it maybe can check if the function has
+                // correct arity; in some cases it should be possible (if the function was assigned inside
+                // the block being analysed)
+                continue;
+            }
+
+            string function_name;
+            using viua::assembler::frontend::parser::AtomLiteral;
+            using viua::assembler::frontend::parser::FunctionNameLiteral;
+            if (auto name_from_atom = dynamic_cast<AtomLiteral*>(operand); name_from_atom) {
+                function_name = name_from_atom->content;
+            } else if (auto name_from_fn = dynamic_cast<FunctionNameLiteral*>(operand); name_from_fn) {
+                function_name = name_from_fn->content;
+            } else {
+                throw InvalidSyntax(operand->tokens.at(0),
+                                    "invalid operand: expected function name, atom, or register index")
+                    .add(instruction->tokens.at(0));
+            }
+
+            auto arity = ::assembler::utils::getFunctionArity(function_name);
+
+            if (arity >= 0 and arity != frame_parameters_count) {
+                ostringstream report;
+                report << "invalid number of parameters in call to function " << function_name
+                       << ": expected " << arity << ", got " << frame_parameters_count;
+                throw InvalidSyntax(operand->tokens.at(0), report.str());
+            }
+        }
+    });
+}
 
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
@@ -288,6 +355,7 @@ static auto verify(const ParsedSource& source) -> void {
     verify_block_catches(source);
     verify_block_endings(source);
     verify_frame_balance(source);
+    verify_function_call_arities(source);
 }
 
 
