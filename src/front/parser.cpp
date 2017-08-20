@@ -47,8 +47,8 @@ bool AS_LIB = false;
 
 
 using namespace viua::assembler::frontend::parser;
-using Token = viua::cg::lex::Token;
-using InvalidSyntax = viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Token;
+using viua::cg::lex::InvalidSyntax;
 
 
 template<class T>
