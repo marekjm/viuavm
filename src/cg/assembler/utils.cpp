@@ -44,7 +44,7 @@ int assembler::utils::getFunctionArity(const string& function_name) {
     auto sz = parts[1].str().size();
     if (sz > 1) {
         ssub_match a = parts[1];
-        arity = stoi(a.str().substr(1));  // cut of the '/' before converting to integer
+        arity = stoi(a.str().substr(1));  // cut off the '/' before converting to integer
     } else if (sz == 1) {
         arity = -2;
     }
