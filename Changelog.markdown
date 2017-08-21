@@ -45,6 +45,7 @@ There are several categories of change:
   functions the assembler can use
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
 - enhancement: C++ standard used for Viua VM development was updated to C++17
+- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
 
 
 ----
