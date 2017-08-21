@@ -1342,7 +1342,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:21:13: error: use of empty register: 1")
 
     def testVinsertEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', "./sample/asm/static_analysis_errors/vinsert_empties_registers.asm:22:11: error: print of empty register: 1")
+        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', "./sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: print of empty register: 1")
 
     def testVinsertOfEmptyRegister(self):
         runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', "./sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:22: error: vinsert from empty register: 1")

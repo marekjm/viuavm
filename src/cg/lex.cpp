@@ -477,7 +477,7 @@ namespace viua {
                         }
 
                         if (input_tokens.at(i + 1).str() == "\n") {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "void");
                         }
                     } else if (token == "vpush") {
                         tokens.push_back(token);

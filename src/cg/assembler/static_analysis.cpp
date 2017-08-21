@@ -446,7 +446,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vinsert" or token == "vpush") {
+        } else if (token == "vpush") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -454,6 +454,21 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
                                   (token.str() + " into empty register"));
             check_use_of_register(body_tokens, source, i, registers, named_registers,
                                   (token.str() + " from empty register"));
+            erase_register(registers, named_registers, body_tokens.at(source), token);
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "vinsert") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+            TokenIndex index = source + 2;
+
+            check_use_of_register(body_tokens, target, i, registers, named_registers,
+                                  (token.str() + " into empty register"));
+            check_use_of_register(body_tokens, source, i, registers, named_registers,
+                                  (token.str() + " from empty register"));
+            check_use_of_register(body_tokens, index, i, registers, named_registers,
+                                  (token.str() + " index from empty register"));
             erase_register(registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);

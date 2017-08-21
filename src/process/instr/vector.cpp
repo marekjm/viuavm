@@ -85,8 +85,16 @@ viua::internals::types::byte* viua::process::Process::opvinsert(viua::internals:
         object = source->give();
     }
 
-    viua::internals::types::register_index position_operand_index = 0;
-    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::types::Integer* index_operand = nullptr;
+    int64_t position_operand_index = 0;
+
+    if (not viua::bytecode::decoder::operands::is_void(addr)) {
+        tie(addr, index_operand) =
+            viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+        position_operand_index = index_operand->as_integer();
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
 
     vector_operand->insert(position_operand_index, std::move(object));
 

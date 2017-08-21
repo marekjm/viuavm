@@ -48,6 +48,7 @@ There are several categories of change:
 - fix: when displaying errors newlines are no longer underlined
 - feature: new `viua-parser` (`build/bin/vm/parser`) tool providing vastly enhanced SA when compared with
   the older one available in `viua-asm` (`build/bin/vm/asm`)
+- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
 
 
 ----

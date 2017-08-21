@@ -21,7 +21,8 @@
     vec (.name: %iota container)
     ptr (.name: %iota pointer) (istore (.name: %iota value) 0)
 
-    vinsert %container *pointer
+    izero %0 local
+    vinsert %container *pointer %0 local
     print %container
     print %value
 
