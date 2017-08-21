@@ -113,7 +113,7 @@
     .mark: begin_loop
     .name: 4 tmp
     vpop %tmp %source
-    vinsert %source %tmp @counter_up
+    vinsert %source %tmp %counter_up
 
     idec %limit
     idec %counter_down
