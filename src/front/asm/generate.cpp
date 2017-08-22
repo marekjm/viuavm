@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tokenizer.h>
@@ -37,6 +38,13 @@ using namespace std;
 
 using viua::util::memory::aligned_write;
 using viua::util::memory::aligned_read;
+
+using viua::assembler::util::pretty_printer::send_control_seq;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::COLOR_FG_YELLOW;
+using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
+using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
+using viua::assembler::util::pretty_printer::ATTR_RESET;
 
 
 extern bool VERBOSE;

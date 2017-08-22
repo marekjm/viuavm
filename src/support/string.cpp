@@ -86,6 +86,50 @@ namespace str {
         return regex_match(s, hexadecimal_number);
     }
 
+    auto is_binary_literal(const string s) -> bool {
+        static regex binary_literal{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
+        return regex_match(s, binary_literal);
+    }
+
+    auto is_boolean_literal(const string s) -> bool { return (s == "true" or s == "false"); }
+
+    auto is_void(const string s) -> bool { return (s == "void"); }
+
+    auto is_atom_literal(const string s) -> bool {
+        /*
+         * This seemingly naive check is sufficient, as this function should only
+         * be called after the source code already lexed (and the lexer ensures that
+         * strings are properly closed and escaped so it is sufficient to check
+         * for opening and closing quotes here).
+         */
+        return (s.at(0) == '\'' and s.at(s.size() - 1) == '\'');
+    }
+
+    auto is_text_literal(const string s) -> bool {
+        /*
+         * Same as with with is_atom_literal().
+         */
+        return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
+    }
+
+    auto is_timeout_literal(const string s) -> bool {
+        if (s == "infinity") {
+            return true;
+        }
+
+        const auto size = s.size();
+        if (size < 2) {
+            return false;
+        }
+        if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 2))) {
+            return true;
+        }
+        if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
+            return true;
+        }
+        return false;
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
@@ -110,7 +154,7 @@ namespace str {
     bool isid(const std::string& s) {
         /*  Returns true if s is a valid identifier.
          */
-        static regex identifier("^[a-zA-Z_][a-zA-Z0-9_]*$");
+        static regex identifier("^[a-zA-Z_][:/a-zA-Z0-9_]*$");
         return regex_match(s, identifier);
     }
 

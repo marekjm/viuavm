@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 
 namespace str {
@@ -36,6 +36,13 @@ namespace str {
     bool ishex(const std::string& s, bool negatives = true);
     bool isfloat(const std::string& s, bool negatives = true);
     bool isid(const std::string& s);
+
+    auto is_binary_literal(const std::string) -> bool;
+    auto is_boolean_literal(const std::string) -> bool;
+    auto is_void(const std::string) -> bool;
+    auto is_atom_literal(const std::string) -> bool;
+    auto is_text_literal(const std::string) -> bool;
+    auto is_timeout_literal(const std::string s) -> bool;
 
     std::string sub(const std::string& s, std::string::size_type b = 0, long int e = -1);
 
@@ -49,7 +56,7 @@ namespace str {
         std::ostringstream oss;
         for (decltype(sz) i = 0; i < sz; ++i) {
             oss << seq[i];
-            if (i < (sz-1)) {
+            if (i < (sz - 1)) {
                 oss << delim;
             }
         }
@@ -67,7 +74,7 @@ namespace str {
     std::string lstrip(const std::string& s);
 
     std::string::size_type lshare(const std::string& s, const std::string& w);
-    bool contains(const std::string&s, const char c);
+    bool contains(const std::string& s, const char c);
 
     std::string enquote(const std::string&, const char = '"');
     std::string strdecode(const std::string&);

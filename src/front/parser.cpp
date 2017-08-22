@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,8 +21,15 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <map>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
+#include <viua/assembler/frontend/parser.h>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
+#include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
 #include <viua/support/env.h>
@@ -37,6 +44,7 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
+using namespace viua::assembler::frontend::parser;
 using Token = viua::cg::lex::Token;
 using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
@@ -52,27 +60,6 @@ static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::siz
     }
 
     return enumerated_vector;
-}
-
-static void encode_json(const string& filename, const vector<Token>& tokens) {
-    cout << "{";
-    cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
-    cout << str::enquote("tokens") << ": [";
-
-    const auto limit = tokens.size();
-    for (const auto& t : enumerate(tokens)) {
-        cout << "{";
-        cout << str::enquote("line") << ": " << t.second.line() << ", ";
-        cout << str::enquote("character") << ": " << t.second.character() << ", ";
-        cout << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << ", ";
-        cout << str::enquote("original") << ": " << str::enquote(str::strencode(t.second.original()));
-        cout << '}';
-        if (t.first + 1 < limit) {
-            cout << ", ";
-        }
-    }
-
-    cout << "]}\n";
 }
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
@@ -116,25 +103,39 @@ static string read_file(ifstream& in) {
     return source_in.str();
 }
 
-static bool DISPLAY_SIZE = false;
-static bool DISPLAY_RAW = false;
-static bool MANUAL_REDUCING = false;
-static bool REDUCE_WHITESPACE = false;
-static bool REDUCE_DIRECTIVES = false;
-
-static void display_results(const string& filename, const vector<Token>& tokens) {
-    if (DISPLAY_SIZE) {
-        try {
-            cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
-        } catch (const InvalidSyntax& e) {
-            cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
-            cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
-        }
-        return;
+static auto invalid_syntax(const vector<Token>& tokens, const string message) -> InvalidSyntax {
+    auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
+    for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1}; i < tokens.size(); ++i) {
+        invalid_syntax_error.add(tokens.at(i));
     }
-
-    encode_json(filename, tokens);
+    return invalid_syntax_error;
 }
+
+static auto analyse_ress_instructions(const ParsedSource& source) -> void {
+    for (const auto& fn : source.functions) {
+        for (const auto& line : fn.body) {
+            const auto instruction =
+                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+            if (not instruction) {
+                continue;
+            }
+            if (instruction->opcode != RESS) {
+                continue;
+            }
+            const auto label =
+                dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
+            if (not label) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                     "illegal operand for 'ress' instruction");
+            }
+            if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+            }
+        }
+    }
+}
+static auto analyse(const ParsedSource& source) -> void { analyse_ress_instructions(source); }
+
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
@@ -154,21 +155,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
-            continue;
-        } else if (option == "--size") {
-            DISPLAY_SIZE = true;
-            continue;
-        } else if (option == "--raw") {
-            DISPLAY_RAW = true;
-            MANUAL_REDUCING = true;
-            continue;
-        } else if (option == "--ws") {
-            REDUCE_WHITESPACE = true;
-            MANUAL_REDUCING = true;
-            continue;
-        } else if (option == "--dirs") {
-            REDUCE_DIRECTIVES = true;
-            MANUAL_REDUCING = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cerr << "error: unknown option: " << option << endl;
@@ -208,42 +194,31 @@ int main(int argc, char* argv[]) {
 
     string source = read_file(in);
 
+    auto raw_tokens = viua::cg::lex::tokenise(source);
     vector<Token> tokens;
+    vector<Token> normalised_tokens;
+
     try {
-        tokens = viua::cg::lex::tokenise(source);
-        if (not MANUAL_REDUCING) {
-            tokens = viua::cg::lex::normalise(viua::cg::lex::cook(tokens));
-        }
-        if (MANUAL_REDUCING) {
-            if (REDUCE_WHITESPACE or REDUCE_DIRECTIVES) {
-                tokens = viua::cg::lex::remove_spaces(tokens);
-                tokens = viua::cg::lex::remove_comments(tokens);
-                tokens = viua::cg::lex::reduce_newlines(tokens);
-            }
-            if (REDUCE_DIRECTIVES) {
-                tokens = reduce_function_directive(tokens);
-                tokens = reduce_closure_directive(tokens);
-                tokens = reduce_end_directive(tokens);
-                tokens = reduce_double_colon(tokens);
-                tokens = reduce_function_signatures(tokens);
-                tokens = reduce_names(tokens);
-                tokens = reduce_signature_directive(tokens);
-                tokens = reduce_bsignature_directive(tokens);
-                tokens = reduce_block_directive(tokens);
-                tokens = reduce_info_directive(tokens);
-                tokens = reduce_name_directive(tokens);
-                tokens = reduce_import_directive(tokens);
-                tokens = reduce_mark_directive(tokens);
-            }
-        }
-    } catch (const InvalidSyntax& e) {
-        string message = e.what();
-        cerr << filename << ':' << e.line_number + 1 << ':' << e.character_in_line + 1
-             << ": error: " << (message.size() ? message : "invalid syntax") << endl;
+        tokens = viua::cg::lex::cook(raw_tokens);
+        normalised_tokens = normalise(tokens);
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
 
-    display_results(filename, tokens);
+    try {
+        auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        analyse(parsed_source);
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    }
 
     return 0;
 }

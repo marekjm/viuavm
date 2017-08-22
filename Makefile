@@ -1,7 +1,7 @@
 CXX_STANDARD=c++17
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
-TRAVIS_CI_CLANG=clang++-3.9
+TRAVIS_CI_CLANG=clang++-4.0
 TRAVIS_CI_GCC=g++-6
 
 GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
@@ -49,7 +49,7 @@ LIBDL ?= -ldl
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/opcodes.bin platform stdlib
+all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser build/bin/opcodes.bin platform stdlib
 
 remake: clean all
 
@@ -244,19 +244,22 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/value.o build/types/pointer.o build/cg/disassembler/disassembler.o
+build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/value.o build/types/pointer.o build/cg/disassembler/disassembler.o build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LIBDL) -lpthread
 
 build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/value.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
-build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
+build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o
+build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o build/assembler/frontend/parser.o build/assembler/util/pretty_printer.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+
+build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 
@@ -337,6 +340,12 @@ build/cg/lex.o: src/cg/lex.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/cg/tools.o: src/cg/tools.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/assembler/frontend/parser.o: src/assembler/frontend/parser.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 

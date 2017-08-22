@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tokenizer.h>
@@ -37,6 +38,11 @@ using namespace std;
 
 extern bool DEBUG;
 extern bool SCREAM;
+
+using viua::assembler::util::pretty_printer::send_control_seq;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
+using viua::assembler::util::pretty_printer::ATTR_RESET;
 
 
 using Token = viua::cg::lex::Token;

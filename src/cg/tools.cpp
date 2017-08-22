@@ -35,24 +35,6 @@ using bytecode_size_type = viua::internals::types::bytecode_size;
 namespace viua {
     namespace cg {
         namespace tools {
-            static auto looks_like_timeout(const Token& token) -> bool {
-                string s = token;
-                if (s == "infinity") {
-                    return true;
-                }
-
-                const auto size = s.size();
-                if (size < 2) {
-                    return false;
-                }
-                if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 2))) {
-                    return true;
-                }
-                if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
-                    return true;
-                }
-                return false;
-            }
             static auto size_of_register_index_operand_with_rs_type(const TokenVector& tokens,
                                                                     TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
@@ -896,7 +878,7 @@ namespace viua {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
 
-                if (looks_like_timeout(tokens.at(i))) {
+                if (str::is_timeout_literal(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
@@ -915,7 +897,7 @@ namespace viua {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
 
-                if (looks_like_timeout(tokens.at(i))) {
+                if (str::is_timeout_literal(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
