@@ -292,7 +292,8 @@ static auto verify_function_call_arities(const ParsedSource& src) -> void {
             }
 
             auto opcode = instruction->opcode;
-            if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER or opcode == FRAME)) {
+            if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER or opcode == MSG or
+                    opcode == FRAME)) {
                 continue;
             }
 
@@ -312,7 +313,7 @@ static auto verify_function_call_arities(const ParsedSource& src) -> void {
 
             viua::assembler::frontend::parser::Operand* operand = nullptr;
             Token operand_token;
-            if (opcode == CALL or opcode == PROCESS) {
+            if (opcode == CALL or opcode == PROCESS or opcode == MSG) {
                 operand = instruction->operands.at(1).get();
             } else if (opcode == DEFER) {
                 operand = instruction->operands.at(0).get();
