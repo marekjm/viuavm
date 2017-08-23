@@ -353,6 +353,97 @@ static auto verify_function_call_arities(const ParsedSource& src) -> void {
         }
     });
 }
+static auto verify_frames_have_no_gaps(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        unsigned long frame_parameters_count = 0;
+        bool detected_frame_parameters_count = false;
+        bool slot_index_detection_is_reliable = true;
+        viua::assembler::frontend::parser::Instruction* last_frame;
+
+        vector<bool> filled_slots;
+        vector<Token> pass_lines;
+
+        for (const auto& line : ib.body) {
+            auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+
+            if (not instruction) {
+                continue;
+            }
+
+            auto opcode = instruction->opcode;
+            if (not(opcode == CALL or opcode == PROCESS or opcode == MSG or opcode == DEFER or
+                    opcode == FRAME or opcode == PARAM or opcode == PAMV)) {
+                continue;
+            }
+
+            if (opcode == FRAME) {
+                last_frame = instruction;
+
+                auto frame_parameters_no_token = last_frame->operands.at(0)->tokens.at(0);
+                if (str::isnum(frame_parameters_no_token.str().substr(1))) {
+                    frame_parameters_count = stoul(frame_parameters_no_token.str().substr(1));
+                    filled_slots.clear();
+                    pass_lines.clear();
+                    filled_slots.resize(frame_parameters_count, false);
+                    pass_lines.resize(frame_parameters_count);
+                    detected_frame_parameters_count = true;
+                } else {
+                    detected_frame_parameters_count = false;
+                }
+                slot_index_detection_is_reliable = true;
+                continue;
+            }
+
+            if (opcode == PARAM or opcode == PAMV) {
+                unsigned long slot_index = 0;
+                bool detected_slot_index = false;
+
+                auto parameter_index_token = instruction->operands.at(0)->tokens.at(0);
+                if (parameter_index_token.str().at(0) == '@') {
+                    slot_index_detection_is_reliable = false;
+                }
+                if (parameter_index_token.str().at(0) == '%' and
+                    str::isnum(parameter_index_token.str().substr(1))) {
+                    slot_index = stoul(parameter_index_token.str().substr(1));
+                    detected_slot_index = true;
+                }
+
+                if (detected_slot_index and detected_frame_parameters_count and
+                    slot_index >= frame_parameters_count) {
+                    ostringstream report;
+                    report << "pass to parameter slot " << slot_index << " in frame with only "
+                           << frame_parameters_count << " slots available";
+                    throw viua::cg::lex::InvalidSyntax(instruction->tokens.at(0), report.str());
+                }
+                if (detected_slot_index and detected_frame_parameters_count) {
+                    if (filled_slots[slot_index]) {
+                        throw TracedSyntaxError()
+                            .append(InvalidSyntax(instruction->tokens.at(0),
+                                                  "double pass to parameter slot " + to_string(slot_index))
+
+                                        .add(instruction->operands.at(0)->tokens.at(0)))
+                            .append(InvalidSyntax(pass_lines[slot_index], "first pass at"));
+                    }
+                    filled_slots[slot_index] = true;
+                    pass_lines[slot_index] = instruction->tokens.at(0);
+                }
+
+                continue;
+            }
+
+            if (slot_index_detection_is_reliable) {
+                for (auto j = decltype(frame_parameters_count){0}; j < frame_parameters_count; ++j) {
+                    if (not filled_slots[j]) {
+                        throw TracedSyntaxError()
+                            .append(InvalidSyntax(last_frame->tokens.at(0), "gap in frame"))
+                            .append(InvalidSyntax(instruction->tokens.at(0),
+                                                  ("slot " + to_string(j) + " left empty at")));
+                    }
+                }
+            }
+        }
+    });
+}
 
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
@@ -361,6 +452,7 @@ static auto verify(const ParsedSource& source) -> void {
     verify_block_endings(source);
     verify_frame_balance(source);
     verify_function_call_arities(source);
+    verify_frames_have_no_gaps(source);
 }
 
 
