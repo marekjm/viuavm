@@ -445,6 +445,235 @@ static auto verify_frames_have_no_gaps(const ParsedSource& src) -> void {
     });
 }
 
+using InstructionIndex = decltype(viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
+static auto validate_jump(const Token token, const string& extracted_jump,
+                          const InstructionIndex function_instruction_counter,
+                          vector<pair<Token, InstructionIndex>>& forward_jumps,
+                          vector<pair<Token, string>>& deferred_marker_jumps,
+                          const map<string, InstructionIndex>& jump_targets) -> void {
+    long int target = -1;
+    if (str::isnum(extracted_jump, false)) {
+        target = stoi(extracted_jump);
+    } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
+        int jump_offset = stoi(extracted_jump.substr(1));
+        if (jump_offset == 0) {
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
+        }
+        target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump)) {
+        int jump_offset = stoi(extracted_jump);
+        if (jump_offset == 0) {
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
+        }
+        target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
+        target = stoi(extracted_jump.substr(1));
+        if (target < 0) {
+            throw viua::cg::lex::InvalidSyntax(token, "absolute jump with negative value");
+        }
+        if (target == 0 and function_instruction_counter == 0) {
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
+        }
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else if (str::ishex(extracted_jump)) {
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else {
+        if (jump_targets.count(extracted_jump) == 0) {
+            deferred_marker_jumps.emplace_back(token, extracted_jump);
+            return;
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            target = jump_targets.at(extracted_jump) + 1;
+        }
+    }
+
+    if (target < 0) {
+        throw viua::cg::lex::InvalidSyntax(token, "backward out-of-range jump");
+    }
+    if (static_cast<InstructionIndex>(target) == function_instruction_counter) {
+        throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
+    }
+    if (static_cast<InstructionIndex>(target) > function_instruction_counter) {
+        forward_jumps.emplace_back(token, target);
+    }
+}
+static auto verify_forward_jumps(const InstructionIndex function_instruction_counter,
+                                 const vector<pair<Token, InstructionIndex>>& forward_jumps) -> void {
+    for (auto jmp : forward_jumps) {
+        if (jmp.second > function_instruction_counter) {
+            throw viua::cg::lex::InvalidSyntax(jmp.first, "forward out-of-range jump");
+        }
+    }
+}
+static auto validate_jump_pair(
+    const Token& branch_token, const Token& when_true, const Token& when_false,
+    InstructionIndex function_instruction_counter,
+    vector<tuple<Token, Token, Token, InstructionIndex>>& deferred_jump_pair_checks,
+    const map<string, InstructionIndex>& jump_targets) -> void {
+    if (when_true.str() == when_false.str()) {
+        throw viua::cg::lex::InvalidSyntax(branch_token,
+                                           "useless branch: both targets point to the same instruction");
+    }
+
+    InstructionIndex true_target = 0, false_target = 0;
+    if (str::isnum(when_true, false)) {
+        true_target = stoi(when_true);
+    } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
+        int jump_offset = stoi(when_true.str().substr(1));
+        true_target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
+        int jump_offset = stoi(when_true);
+        true_target = (function_instruction_counter + jump_offset);
+    } else if (str::ishex(when_true) or str::startswith(when_true, ".")) {
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else {
+        if (jump_targets.count(when_true) == 0) {
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false,
+                                                   function_instruction_counter);
+            return;
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            true_target = jump_targets.at(when_true) + 1;
+        }
+    }
+
+    if (str::isnum(when_false, false)) {
+        false_target = stoi(when_false);
+    } else if (str::startswith(when_false, "+") and str::isnum(when_false.str().substr(1))) {
+        int jump_offset = stoi(when_false.str().substr(1));
+        false_target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
+        int jump_offset = stoi(when_false);
+        false_target = (function_instruction_counter + jump_offset);
+    } else if (str::ishex(when_false) or str::startswith(when_true, ".")) {
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else {
+        if (jump_targets.count(when_false) == 0) {
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false,
+                                                   function_instruction_counter);
+            return;
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            false_target = jump_targets.at(when_false) + 1;
+        }
+    }
+
+    if (true_target == false_target) {
+        throw viua::cg::lex::InvalidSyntax(branch_token,
+                                           "useless branch: both targets point to the same instruction");
+    }
+}
+static auto verify_deferred_jump_pairs(
+    const vector<tuple<Token, Token, Token, InstructionIndex>>& deferred_jump_pair_checks,
+    const map<string, InstructionIndex>& jump_targets) -> void {
+    for (const auto& each : deferred_jump_pair_checks) {
+        InstructionIndex function_instruction_counter = 0;
+        Token branch_token, when_true, when_false;
+        tie(branch_token, when_true, when_false, function_instruction_counter) = each;
+
+        InstructionIndex true_target = 0, false_target = 0;
+        if (str::isnum(when_true, false)) {
+            true_target = stoi(when_true);
+        } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
+            int jump_offset = stoi(when_true.str().substr(1));
+            true_target = (function_instruction_counter + jump_offset);
+        } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
+            int jump_offset = stoi(when_true);
+            true_target = (function_instruction_counter + jump_offset);
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            true_target = jump_targets.at(when_true) + 1;
+        }
+
+        if (str::isnum(when_false, false)) {
+            false_target = stoi(when_false);
+        } else if (str::startswith(when_false, "+") and str::isnum(when_false.str().substr(1))) {
+            int jump_offset = stoi(when_false.str().substr(1));
+            false_target = (function_instruction_counter + jump_offset);
+        } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
+            int jump_offset = stoi(when_false);
+            false_target = (function_instruction_counter + jump_offset);
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            false_target = jump_targets.at(when_false) + 1;
+        }
+
+        if (true_target == false_target) {
+            throw viua::cg::lex::InvalidSyntax(branch_token,
+                                               "useless branch: both targets point to the same instruction");
+        }
+    }
+}
+static auto verify_marker_jumps(const InstructionIndex function_instruction_counter,
+                                const vector<pair<Token, string>>& deferred_marker_jumps,
+                                const map<string, InstructionIndex>& jump_targets) -> void {
+    for (auto jmp : deferred_marker_jumps) {
+        if (jump_targets.count(jmp.second) == 0) {
+            throw viua::cg::lex::InvalidSyntax(jmp.first, ("jump to unrecognised marker: " + jmp.second));
+        }
+        if (jump_targets.at(jmp.second) > function_instruction_counter) {
+            throw viua::cg::lex::InvalidSyntax(jmp.first, "marker out-of-range jump");
+        }
+    }
+}
+static auto verify_jumps_are_in_range(const ParsedSource& src) -> void {
+    verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        auto function_instruction_counter = InstructionIndex{0};
+        map<string, decltype(function_instruction_counter)> jump_targets;
+        vector<pair<Token, InstructionIndex>> forward_jumps;
+        vector<pair<Token, string>> deferred_marker_jumps;
+        vector<tuple<Token, Token, Token, InstructionIndex>> deferred_jump_pair_checks;
+
+        for (const auto& line : ib.body) {
+            auto mnemonic = line->tokens.at(0);
+            if (mnemonic.str().at(0) != '.') {
+                ++function_instruction_counter;
+            }
+
+            if (not(mnemonic == "jump" or mnemonic == "if" or mnemonic == ".mark:")) {
+                continue;
+            }
+
+            using viua::assembler::frontend::parser::Directive;
+            using viua::assembler::frontend::parser::Instruction;
+            if (mnemonic == "jump") {
+                validate_jump(line->tokens.at(1), line->tokens.at(1), function_instruction_counter,
+                              forward_jumps, deferred_marker_jumps, jump_targets);
+            } else if (auto op = dynamic_cast<Instruction*>(line.get()); op and op->opcode == IF) {
+                Token when_true = op->operands.at(1)->tokens.at(0);
+                Token when_false = op->operands.at(2)->tokens.at(0);
+
+                validate_jump(when_true, when_true, function_instruction_counter, forward_jumps,
+                              deferred_marker_jumps, jump_targets);
+                validate_jump(when_false, when_false, function_instruction_counter, forward_jumps,
+                              deferred_marker_jumps, jump_targets);
+                validate_jump_pair(line->tokens.at(0), when_true, when_false, function_instruction_counter,
+                                   deferred_jump_pair_checks, jump_targets);
+            } else if (auto mark = dynamic_cast<Directive*>(line.get());
+                       mark and mark->directive == ".mark:") {
+                jump_targets[mark->operands.at(0)] = function_instruction_counter;
+            }
+        }
+
+        verify_forward_jumps(function_instruction_counter, forward_jumps);
+        verify_marker_jumps(function_instruction_counter, deferred_marker_jumps, jump_targets);
+        verify_deferred_jump_pairs(deferred_jump_pair_checks, jump_targets);
+    });
+}
+
 static auto verify(const ParsedSource& source) -> void {
     verify_ress_instructions(source);
     verify_block_tries(source);
@@ -453,6 +682,7 @@ static auto verify(const ParsedSource& source) -> void {
     verify_frame_balance(source);
     verify_function_call_arities(source);
     verify_frames_have_no_gaps(source);
+    verify_jumps_are_in_range(source);
 }
 
 
