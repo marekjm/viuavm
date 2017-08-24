@@ -75,7 +75,6 @@ auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected ',' or '{' or ']]'");
         }
 
-        cerr << "  attribute: " << key << '{' << value << '}' << endl;
         attributes[key] = value;
     }
     ++i;  // skip ']]'
@@ -93,7 +92,6 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();
-    cerr << "    operand: " << tok << endl;
 
     if (tok.at(0) == '%' or tok.at(0) == '*' or tok.at(0) == '@') {
         auto ri = make_unique<RegisterIndex>();
@@ -239,7 +237,6 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected mnemonic");
     }
 
-    cerr << "  mnemonic: " << tokens.at(i).str() << endl;
     instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
 
     try {
@@ -266,7 +263,6 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
         throw viua::cg::lex::InvalidSyntax(tokens.at(0), "no '.end' between definitions");
     }
 
-    cerr << "  directive: " << tokens.at(i).str() << endl;
     directive->directive = tokens.at(i++);
 
     if (tokens.at(0) == ".iota:") {
@@ -332,11 +328,8 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
     -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
-    cerr << "parsing function" << endl;
-
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
 
-    cerr << "  name: " << tokens.at(i).str() << endl;
     ib.name = tokens.at(i);
 
     if (not::assembler::utils::isValidFunctionName(ib.name)) {
@@ -368,11 +361,8 @@ auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tok
     -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
-    cerr << "parsing block" << endl;
-
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
 
-    cerr << "  name: " << tokens.at(i).str() << endl;
     ib.name = tokens.at(i);
 
     ++i;  // skip name
