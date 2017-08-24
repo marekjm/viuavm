@@ -60,6 +60,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
     }
     cout << ' ';
 
+    bool has_matched = false;
     while (i < tokens.size()) {
         const auto& each = tokens.at(i++);
         bool match = error.match(each);
@@ -73,8 +74,28 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
             cout << send_control_seq(COLOR_FG_RED_1);
         }
 
-        char c = (match ? '^' : ' ');
+        char c = (match ? (has_matched ? '~' : '^') : ' ');
+
         len = each.str().size();
+
+        /*
+         * A singular decrement, and underlining character switch if neccessary.
+         * Doing the check outside the loop to add significance to the fact that only the first
+         * character of the underline is '^' and all subsequent ones are '~'.
+         * We want underlining to look line this:
+         *
+         *      some tokens to underline
+         *           ^~~~~~
+         *
+         * This 'if' below is just for the first '^' character.
+         * The loop is for the string of '~'.
+         */
+        if (len--) {
+            cout << c;
+            if (match) {
+                c = '~';
+            }
+        }
         while (len--) {
             cout << c;
         }
