@@ -155,9 +155,9 @@ auto viua::assembler::frontend::static_analyser::verify_block_endings(const Pars
         }
         auto opcode = last_instruction->opcode;
         if (not(opcode == LEAVE or opcode == RETURN or opcode == TAILCALL)) {
-            throw viua::cg::lex::InvalidSyntax(
-                last_instruction->tokens.at(0),
-                "invalid last mnemonic: expected one of: leave, return, or tailcall");
+            // FIXME throw more specific error (i.e. with different message for blocks and functions)
+            throw viua::cg::lex::InvalidSyntax(last_instruction->tokens.at(0), "invalid last mnemonic")
+                .note("expected one of: leave, return, or tailcall");
         }
     });
 }

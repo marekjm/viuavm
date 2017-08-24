@@ -30,9 +30,9 @@ using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::TracedSyntaxError;
 
 
-auto viua::assembler::frontend::parser::Operand::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
+auto viua::assembler::frontend::parser::Operand::add(Token t) -> void { tokens.push_back(t); }
 
-auto viua::assembler::frontend::parser::Line::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
+auto viua::assembler::frontend::parser::Line::add(Token t) -> void { tokens.push_back(t); }
 
 auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<Token> tokens, string& value)
     -> decltype(tokens)::size_type {
@@ -46,7 +46,7 @@ auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<
     }
 
     if (tokens.at(i) != "}") {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected '}'");
+        throw InvalidSyntax(tokens.at(i), "expected '}'");
     }
     ++i;
 
@@ -73,7 +73,7 @@ auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token
         } else if (tokens.at(i) == "]]") {
             // do nothing
         } else {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected ',' or '{' or ']]'");
+            throw InvalidSyntax(tokens.at(i), "expected ',' or '{' or ']]'");
         }
 
         attributes[key] = value;
@@ -221,7 +221,7 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
 
         operand = std::move(offset);
     } else {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
+        throw InvalidSyntax(tokens.at(i), "invalid operand");
     }
 
     return i;
@@ -243,10 +243,10 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i).str().at(0) == '.') {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected mnemonic");
+        throw InvalidSyntax(tokens.at(i), "expected mnemonic");
     }
     if (not OP_MNEMONICS.count(tokens.at(i).str())) {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unknown instruction");
+        throw InvalidSyntax(tokens.at(i), "unknown instruction");
     }
 
     instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
@@ -258,7 +258,7 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
             instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
-    } catch (viua::cg::lex::InvalidSyntax& e) { throw e.add(tokens.at(0)); }
+    } catch (InvalidSyntax& e) { throw e.add(tokens.at(0)); }
 
     return i;
 }
@@ -268,23 +268,23 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(0), "unknown directive");
+        throw InvalidSyntax(tokens.at(0), "unknown directive");
     }
 
     if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:" or tokens.at(0) == ".closure:") {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(0), "no '.end' between definitions");
+        throw InvalidSyntax(tokens.at(0), "no '.end' between definitions");
     }
 
     directive->directive = tokens.at(i++);
 
     if (tokens.at(0) == ".iota:") {
         if (not str::isnum(tokens.at(i), false)) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected a positive integer");
+            throw InvalidSyntax(tokens.at(i), "expected a positive integer");
         }
         directive->operands.push_back(tokens.at(i++));
     } else if (tokens.at(0) == ".mark:") {
         if (not str::isid(tokens.at(i))) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid marker");
+            throw InvalidSyntax(tokens.at(i), "invalid marker");
         }
         directive->operands.push_back(tokens.at(i++));
     } else if (tokens.at(0) == ".unused:") {
@@ -292,7 +292,7 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
     }
 
     if (tokens.at(i) != "\n") {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "extra parameters to a directive").add(tokens.at(0));
+        throw InvalidSyntax(tokens.at(i), "extra parameters to a directive").add(tokens.at(0));
     }
     ++i;  // skip newline
 
@@ -437,11 +437,11 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
             }
             parsed.block_signatures.push_back(tokens.at(i++));
         } else if (tokens.at(i).str().at(0) == '.') {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "illegal directive")
+            throw InvalidSyntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
         } else {
-            throw viua::cg::lex::InvalidSyntax(
-                tokens.at(i), "expected a function or a block definition (or signature), or a newline");
+            throw InvalidSyntax(tokens.at(i),
+                                "expected a function or a block definition (or signature), or a newline");
         }
     }
 
