@@ -21,6 +21,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
@@ -253,11 +254,12 @@ int main(int argc, char* argv[]) {
 
     auto source = read_file(filename);
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced;
+    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced, normalised_tokens;
     try {
         cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
         cooked_tokens_without_names_replaced =
             viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
+        normalised_tokens = viua::cg::lex::normalise(viua::cg::lex::cook(raw_tokens));
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -291,22 +293,9 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     try {
-        assembler::verify::directives(cooked_tokens_without_names_replaced);
-        assembler::verify::instructions(cooked_tokens_without_names_replaced);
-        assembler::verify::ressInstructions(cooked_tokens_without_names_replaced, AS_LIB);
-        assembler::verify::functionNames(cooked_tokens_without_names_replaced);
-        assembler::verify::functionBodiesAreNonempty(cooked_tokens_without_names_replaced);
-        assembler::verify::blockTries(cooked_tokens_without_names_replaced, blocks.names, blocks.signatures);
-        assembler::verify::blockCatches(cooked_tokens_without_names_replaced, blocks.names,
-                                        blocks.signatures);
-        assembler::verify::frameBalance(cooked_tokens_without_names_replaced);
-        assembler::verify::functionCallArities(cooked_tokens_without_names_replaced);
-        assembler::verify::msgArities(cooked_tokens_without_names_replaced);
-        assembler::verify::functionsEndWithReturn(cooked_tokens_without_names_replaced);
-        assembler::verify::blockBodiesAreNonempty(cooked_tokens_without_names_replaced);
-        assembler::verify::jumpsAreInRange(cooked_tokens_without_names_replaced);
-        assembler::verify::framesHaveNoGaps(cooked_tokens_without_names_replaced);
-        assembler::verify::blocksEndWithFinishingInstruction(cooked_tokens_without_names_replaced);
+        auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        parsed_source.as_library = AS_LIB;
+        viua::assembler::frontend::static_analyser::verify(parsed_source);
         if (PERFORM_STATIC_ANALYSIS) {
             assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced,
                                                               blocks.tokens, DEBUG);
