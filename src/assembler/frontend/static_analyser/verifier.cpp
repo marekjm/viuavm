@@ -293,7 +293,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                 report << "invalid number of parameters in call to function " << function_name
                        << ": expected " << arity << ", got " << frame_parameters_count;
                 throw viua::cg::lex::TracedSyntaxError()
-                    .append(InvalidSyntax(operand->tokens.at(0), report.str()))
+                    .append(InvalidSyntax(instruction->tokens.at(0), report.str()).add(operand->tokens.at(0)))
                     .append(InvalidSyntax(frame_spawned_here, "from frame spawned here"));
             }
         }
