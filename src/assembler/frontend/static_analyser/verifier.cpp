@@ -154,10 +154,10 @@ auto viua::assembler::frontend::static_analyser::verify_block_endings(const Pars
             throw invalid_syntax(ib.body.back()->tokens, "invalid end of block: expected mnemonic");
         }
         auto opcode = last_instruction->opcode;
-        if (not(opcode == LEAVE or opcode == RETURN or opcode == TAILCALL or opcode == HALT)) {
+        if (not(opcode == LEAVE or opcode == RETURN or opcode == TAILCALL)) {
             throw viua::cg::lex::InvalidSyntax(
                 last_instruction->tokens.at(0),
-                "invalid last mnemonic: expected one of: leave, return, tailcall or halt");
+                "invalid last mnemonic: expected one of: leave, return, or tailcall");
         }
     });
 }
