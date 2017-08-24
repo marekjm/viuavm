@@ -40,6 +40,9 @@ static auto invalid_syntax(const vector<Token>& tokens, const string message) ->
 using Verifier = auto (*)(const ParsedSource&, const InstructionsBlock&) -> void;
 static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> void {
     for (const auto& fn : source.functions) {
+        if (fn.attributes.count("no_sa")) {
+            continue;
+        }
         try {
             verifier(source, fn);
         } catch (InvalidSyntax& e) {
@@ -50,6 +53,9 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
         }
     }
     for (const auto& bl : source.blocks) {
+        if (bl.attributes.count("no_sa")) {
+            continue;
+        }
         try {
             verifier(source, bl);
         } catch (InvalidSyntax& e) {
