@@ -438,6 +438,10 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
             parsed.block_signatures.push_back(tokens.at(i++));
         } else if (tokens.at(i) == ".end") {
             throw InvalidSyntax(tokens.at(i), "stray .end marker");
+        } else if (tokens.at(i) == ".info:") {
+            // FIXME add meta information to parsed source
+            // for now just skip key and value
+            i += 2;
         } else if (tokens.at(i).str().at(0) == '.') {
             throw InvalidSyntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
