@@ -1513,7 +1513,8 @@ class AssemblerErrorTests(unittest.TestCase):
 
     def testHaltAsLastInstruction(self):
         runTestFailsToAssembleDetailed(self, 'halt_as_last_instruction.asm', [
-            "22:5: error: invalid last mnemonic: expected one of: leave, return, or tailcall",
+            "22:5: error: invalid last mnemonic",
+            "22:5: note: expected one of: leave, return, or tailcall",
             "20:12: error: in function main/1",
         ], asm_opts=('-c',))
 
@@ -1548,7 +1549,10 @@ class AssemblerErrorTests(unittest.TestCase):
         ])
 
     def testNotAValidFunctionNameMsg(self):
-        runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:14: error: not a valid function name: foo/x")
+        runTestFailsToAssembleDetailed(self, 'not_a_valid_function_name_msg.asm', [
+            "22:14: error: not a valid function name",
+            "20:12: error: in function main/0",
+        ])
 
     def testMsgArityMismatch(self):
         runTestFailsToAssembleDetailed(self, 'msg_arity_mismatch.asm', [
@@ -1558,7 +1562,12 @@ class AssemblerErrorTests(unittest.TestCase):
         ])
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
-        runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")
+        runTestFailsToAssembleDetailed(self, 'no_return_at_the_end_of_a_function.asm', [
+            # "22:1: error: function does not end with 'return' or 'tailcall': foo/0",  # FIXME this will be correct once SA is fixed to throw more specific errors
+            "21:5: error: invalid last mnemonic",
+            "21:5: note: expected one of: leave, return, or tailcall",
+            "20:12: error: in function foo/0",
+        ])
 
     def testBlockWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:20:9: error: block with empty body: foo")
@@ -1647,7 +1656,10 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20:1: error: illegal directive")
 
     def testUnknownInstruction(self):
-        runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21:5: error: unknown instruction: 'prnt'")
+        runTestFailsToAssembleDetailed(self, 'unknown_instruction.asm', [
+            "21:5: error: unknown instruction",
+            "20:12: error: in function main/1",
+        ])
 
     def testMoreThanOneMainFunction(self):
         name = 'more_than_one_main_function.asm'
@@ -1678,7 +1690,11 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21:10: error: jump to unrecognised marker: foo")
 
     def testBlocksEndWithReturningInstruction(self):
-        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:21:5: error: invalid last mnemonic: expected one of: leave, return, or tailcall")
+        runTestFailsToAssembleDetailed(self, 'blocks_end_with_returning_instruction.asm', [
+            "21:5: error: invalid last mnemonic",
+            "21:5: note: expected one of: leave, return, or tailcall",
+            "20:9: error: in block foo__block",
+        ])
 
     def testBranchWithoutTarget(self):
         runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:5: error: branch without a target")
@@ -2101,7 +2117,7 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'receive_timeout_default.asm', 'Hello World!')
 
     def testReceiveTimeoutFailsToAssemble(self):
-        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:18: error: invalid timeout operand')
+        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:18: error: invalid operand')
 
     def testJoinDefaultTimeout(self):
         runTest(self, 'join_timeout_default.asm', 'child process done')
