@@ -25,6 +25,8 @@ using namespace std;
 
 
 regex assembler::utils::getFunctionNameRegex() {
+    // FIXME function names *MUST* end with '/' to avoid ambiguity when determining whether a token
+    // is a function name, or a label
     return regex{"(?:::)?[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z_][a-zA-Z0-9_]*)*(?:(/[0-9]*)?)?"};
 }
 
