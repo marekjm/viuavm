@@ -83,14 +83,16 @@ auto viua::assembler::frontend::static_analyser::verify_ress_instructions(const 
                 dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
             if (not label) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                     "illegal operand for 'ress' instruction");
+                                     "illegal operand for 'ress' instruction")
+                    .note("expected register set name");
             }
             if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
             }
             if (label->content == "global" and source.as_library) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                     "global register set used by a library function");
+                                     "global register set used by a library function")
+                    .note("library functions may only use 'local' and 'static' register sets");
             }
         }
     });
@@ -200,13 +202,13 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(const Pars
             if (balance > 1) {
                 throw viua::cg::lex::TracedSyntaxError()
                     .append(InvalidSyntax(instruction->tokens.at(0), "excess frame spawned"))
-                    .append(InvalidSyntax(previous_frame_spawned, "unused frame:"));
+                    .append(InvalidSyntax(previous_frame_spawned, "").note("unused frame:"));
             }
 
             if ((opcode == RETURN or opcode == LEAVE or opcode == THROW) and balance > 0) {
                 throw viua::cg::lex::TracedSyntaxError()
                     .append(InvalidSyntax(instruction->tokens.at(0), "lost frame at:"))
-                    .append(InvalidSyntax(previous_frame_spawned, "spawned here:"));
+                    .append(InvalidSyntax(previous_frame_spawned, "").note("spawned here:"));
             }
 
             if (opcode == FRAME) {
@@ -357,7 +359,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(cons
                                                   "double pass to parameter slot " + to_string(slot_index))
 
                                         .add(instruction->operands.at(0)->tokens.at(0)))
-                            .append(InvalidSyntax(pass_lines[slot_index], "first pass at"));
+                            .append(InvalidSyntax(pass_lines[slot_index], "").note("first pass at"))
+                            .append(InvalidSyntax(last_frame->tokens.at(0), "").note("in frame spawned at"));
                     }
                     filled_slots[slot_index] = true;
                     pass_lines[slot_index] = instruction->tokens.at(0);
