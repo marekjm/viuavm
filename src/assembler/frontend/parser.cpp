@@ -25,8 +25,9 @@
 using namespace std;
 
 
-using Token = viua::cg::lex::Token;
-using InvalidSyntax = viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Token;
+using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::TracedSyntaxError;
 
 
 auto viua::assembler::frontend::parser::Operand::add(viua::cg::lex::Token t) -> void { tokens.push_back(t); }
@@ -357,7 +358,12 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
     }
     ++i;  // skip newline
 
-    i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    try {
+        i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError().append(e).append(InvalidSyntax(ib.name, ("in function " + ib.name.str())));
+    }
+
     if (not ib.body.size()) {
         throw InvalidSyntax(ib.name, ("function with empty body: " + ib.name.str()));
     }
@@ -383,7 +389,12 @@ auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tok
     }
     ++i;  // skip newline
 
-    i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    try {
+        i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError().append(e).append(InvalidSyntax(ib.name, ("in block " + ib.name.str())));
+    }
+
     if (not ib.body.size()) {
         throw InvalidSyntax(ib.name, ("block with empty body: " + ib.name.str()));
     }
