@@ -241,8 +241,11 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
     -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
-    if (not OP_MNEMONICS.count(tokens.at(i).str())) {
+    if (tokens.at(i).str().at(0) == '.') {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected mnemonic");
+    }
+    if (not OP_MNEMONICS.count(tokens.at(i).str())) {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unknown instruction");
     }
 
     instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
