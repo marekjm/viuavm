@@ -159,10 +159,12 @@ auto viua::assembler::util::pretty_printer::display_context_line(const vector<vi
 }
 auto viua::assembler::util::pretty_printer::display_error_header(const viua::cg::lex::InvalidSyntax& error,
                                                                  const string& filename) -> void {
-    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
-         << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
-    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << error.what()
-         << endl;
+    if (error.str().size()) {
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
+             << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": "
+             << error.what() << endl;
+    }
     if (error.notes().size()) {
         for (const auto& note : error.notes()) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
