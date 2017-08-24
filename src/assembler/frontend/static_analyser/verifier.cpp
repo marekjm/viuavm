@@ -279,6 +279,13 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                                     "invalid operand: expected function name, atom, or register index");
             }
 
+            if (opcode == MSG and frame_parameters_count == 0) {
+                throw InvalidSyntax(instruction->tokens.at(0),
+                                    "invalid number of parameters in dynamic dispatch")
+                    .note("expected at least 1 parameter, got 0")
+                    .add(operand->tokens.at(0));
+            }
+
             auto arity = ::assembler::utils::getFunctionArity(function_name);
 
             if (arity >= 0 and arity != frame_parameters_count) {
