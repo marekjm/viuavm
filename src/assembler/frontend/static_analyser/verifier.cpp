@@ -578,7 +578,9 @@ static auto verify_marker_jumps(const InstructionIndex function_instruction_coun
 }
 auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
-        auto function_instruction_counter = InstructionIndex{0};
+        auto function_instruction_counter =
+            static_cast<InstructionIndex>(-1);  // XXX start from maximum value, and wrap to zero when
+                                                // incremented for first instruction; this is a hack
         map<string, decltype(function_instruction_counter)> jump_targets;
         vector<pair<Token, InstructionIndex>> forward_jumps;
         vector<pair<Token, string>> deferred_marker_jumps;
