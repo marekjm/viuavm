@@ -163,6 +163,14 @@ auto viua::assembler::util::pretty_printer::display_error_header(const viua::cg:
          << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
     cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << error.what()
          << endl;
+    if (error.notes().size()) {
+        for (const auto& note : error.notes()) {
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
+                 << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
+            cout << send_control_seq(COLOR_FG_CYAN) << "note" << send_control_seq(ATTR_RESET) << ": " << note
+                 << endl;
+        }
+    }
 }
 auto viua::assembler::util::pretty_printer::display_error_location(const vector<viua::cg::lex::Token>& tokens,
                                                                    const viua::cg::lex::InvalidSyntax error)
