@@ -1512,31 +1512,50 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'no_end_between_defs.asm', "./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function")
 
     def testHaltAsLastInstruction(self):
-        runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23:1: error: function does not end with 'return' or 'tailcall': main/1")
+        runTestFailsToAssembleDetailed(self, 'halt_as_last_instruction.asm', [
+            "22:5: error: invalid last mnemonic: expected one of: leave, return, or tailcall",
+            "20:12: error: in function main/1",
+        ], asm_opts=('-c',))
 
     def testArityError(self):
-        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:5: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
+        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:5: error: invalid number of parameters in call to function foo/1: expected 1, got 0")
 
     def testIsNotAValidFunctionName(self):
-        runTestFailsToAssemble(self, 'is_not_a_valid_function_name.asm', "./sample/asm/errors/is_not_a_valid_function_name.asm:26:10: error: not a valid function name: foo/x")
+        runTestFailsToAssembleDetailed(self, 'is_not_a_valid_function_name.asm', [
+            "26:10: error: not a valid function name",
+            "24:12: error: in function main/0",
+        ])
 
     def testFrameWithGaps(self):
-        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:5: error: gap in frame defined at line 25, slot 1 left empty")
+        runTestFailsToAssembleDetailed(self, 'frame_with_gaps.asm', [
+            "25:5: error: gap in frame",
+            "28:5: error: slot 1 left empty at",
+            "24:12: error: in function main/0",
+        ])
 
     def testPassingParameterToASlotWithTooHighIndex(self):
         runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26:5: error: pass to parameter slot 3 in frame with only 3 slots available")
 
     def testDoublePassing(self):
-        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
+        # FIXME test for all lines of traced error
+        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2")
 
     def testMsgRequiresAtLeastOneParameter(self):
-        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:5: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
+        runTestFailsToAssembleDetailed(self, 'msg_requires_at_least_one_parameter.asm', [
+            "22:5: error: invalid number of parameters in dynamic dispatch",
+            "22:5: note: expected at least 1 parameter, got 0",
+            "20:12: error: in function main/1",
+        ])
 
     def testNotAValidFunctionNameMsg(self):
         runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:14: error: not a valid function name: foo/x")
 
     def testMsgArityMismatch(self):
-        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:5: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
+        runTestFailsToAssembleDetailed(self, 'msg_arity_mismatch.asm', [
+            "22:5: error: invalid number of parameters in call to function add/2: expected 2, got 1",
+            "21:5: error: from frame spawned here",
+            "20:12: error: in function main/1",
+        ])
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
         runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")
@@ -1559,31 +1578,36 @@ class AssemblerErrorTests(unittest.TestCase):
     def testExcessFrameSpawned(self):
         runTestFailsToAssembleDetailed(self, 'excess_frame_spawned.asm', [
             "27:5: error: excess frame spawned",
-            "26:5: error: unused frame:",
+            "26:5: note: unused frame:",
+            "25:12: error: in function another_valid/0",
         ])
 
     def testLeftoverFrameTriggeredByReturn(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_return.asm', [
-            "23:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "23:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testLeftoverFrameTriggeredByThrow(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_throw.asm', [
-            "22:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "22:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testLeftoverFrameTriggeredByLeave(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_leave.asm', [
-            "22:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "22:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:9: error: in block foo",
         ])
 
     def testLeftoverFrameTriggeredByEnd(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_end.asm', [
-            "24:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "24:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testCallWithoutAFrame(self):
@@ -1599,10 +1623,19 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:5: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
-        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:10: error: illegal register set name in ress instruction 'foo' in function main/1")
+        runTestFailsToAssembleDetailed(self, 'invalid_ress_instruction.asm', [
+            # "21:10: error: illegal register set name",  # FIXME this will be the correct line after function names are *REQUIRED* to end with '/'
+            "21:10: error: illegal operand for 'ress' instruction",
+            "21:10: note: expected register set name",
+            "20:12: error: in function main/1",
+        ])
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
-        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:10: error: global registers used in library function foo/0", asm_opts=('-c',))
+        runTestFailsToAssembleDetailed(self, 'global_rs_used_in_lib.asm', [
+            "21:10: error: global register set used by a library function",
+            "21:10: note: library functions may only use 'local' and 'static' register sets",
+            "20:12: error: in function foo/0",
+        ], asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:20:12: error: function with empty body: foo/0")
@@ -1645,7 +1678,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21:10: error: jump to unrecognised marker: foo")
 
     def testBlocksEndWithReturningInstruction(self):
-        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return, tailcall or halt) at the end of block: foo__block")
+        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:21:5: error: invalid last mnemonic: expected one of: leave, return, or tailcall")
 
     def testBranchWithoutTarget(self):
         runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:5: error: branch without a target")
