@@ -52,13 +52,33 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
                                                                   decltype(tokens.size()) i,
                                                                   const viua::cg::lex::InvalidSyntax& error)
     -> void {
-    cout << "     ";
+    /*
+     * Indent is needed to align an aside note correctly.
+     * The aside note is a additional piece of text that is attached to the first underlined token, and
+     * servers as additional comment for the error or note.
+     */
+    ostringstream indent;
 
+    /*
+     * Remember to increase the indent also.
+     */
+    cout << "     ";
+    indent << "     ";
+
+    /*
+     * Account for width of the stringified line number when indenting error lines.
+     */
     auto len = str::stringify((error.line() + 1), false).size();
     while (len--) {
         cout << ' ';
+        indent << ' ';
     }
+
+    /*
+     * Insert additional space between line number and source code listing to aid readability.
+     */
     cout << ' ';
+    indent << ' ';
 
     bool has_matched = false;
     while (i < tokens.size()) {
@@ -75,6 +95,15 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
         }
 
         char c = (match ? (has_matched ? '~' : '^') : ' ');
+
+        /*
+         * Indentation for the aside should be increased as long as there is no match.
+         * After first token matched we have our indent and must not increase it further.
+         */
+        has_matched = (has_matched or match);
+        if (not has_matched) {
+            indent << ' ';
+        }
 
         len = each.str().size();
 
@@ -106,6 +135,12 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
     }
 
     cout << '\n';
+
+    if (error.aside().size()) {
+        cout << indent.str();
+        cout << send_control_seq(COLOR_FG_RED_1) << '^' << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' '
+             << error.aside() << send_control_seq(ATTR_RESET) << endl;
+    }
 }
 auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua::cg::lex::Token>& tokens,
                                                                const viua::cg::lex::InvalidSyntax& error,
