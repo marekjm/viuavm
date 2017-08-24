@@ -414,6 +414,9 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
                 throw InvalidSyntax(tokens.at(i - 1), "missing block name");
             }
             parsed.block_signatures.push_back(tokens.at(i++));
+        } else if (tokens.at(i).str().at(0) == '.') {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "illegal directive")
+                .note("expected a function or block definition (or signature)");
         } else {
             throw viua::cg::lex::InvalidSyntax(
                 tokens.at(i), "expected a function or a block definition (or signature), or a newline");
