@@ -169,6 +169,14 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(void_literal);
+    } else if (str::is_register_set_name(tok)) {
+        auto label = make_unique<Label>();  // FIXME use a special type for register set names, not
+                                            // the 'Label' type - register set names are not really labels
+        label->content = tokens.at(i);
+        label->add(tokens.at(i));
+        ++i;
+
+        operand = std::move(label);
     } else if (::assembler::utils::isValidFunctionName(tok)) {
         auto fn_name_literal = make_unique<FunctionNameLiteral>();
         fn_name_literal->content = tokens.at(i);
