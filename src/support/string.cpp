@@ -130,6 +130,10 @@ namespace str {
         return false;
     }
 
+    auto is_register_set_name(const string s) -> bool {
+        return (s == "local" or s == "static" or s == "global" or s == "current");
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`

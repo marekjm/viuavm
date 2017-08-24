@@ -43,6 +43,7 @@ namespace str {
     auto is_atom_literal(const std::string) -> bool;
     auto is_text_literal(const std::string) -> bool;
     auto is_timeout_literal(const std::string s) -> bool;
+    auto is_register_set_name(const std::string) -> bool;
 
     std::string sub(const std::string& s, std::string::size_type b = 0, long int e = -1);
 
