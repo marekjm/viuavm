@@ -276,8 +276,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                     .add(instruction->tokens.at(0));
             } else {
                 throw InvalidSyntax(operand->tokens.at(0),
-                                    "invalid operand: expected function name, atom, or register index")
-                    .add(instruction->tokens.at(0));
+                                    "invalid operand: expected function name, atom, or register index");
             }
 
             auto arity = ::assembler::utils::getFunctionArity(function_name);
