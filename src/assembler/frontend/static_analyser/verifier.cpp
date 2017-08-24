@@ -271,6 +271,9 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                 function_name = name_from_atom->content;
             } else if (auto name_from_fn = dynamic_cast<FunctionNameLiteral*>(operand); name_from_fn) {
                 function_name = name_from_fn->content;
+            } else if (auto label = dynamic_cast<Label*>(operand); label) {
+                throw InvalidSyntax(operand->tokens.at(0), "not a valid function name")
+                    .add(instruction->tokens.at(0));
             } else {
                 throw InvalidSyntax(operand->tokens.at(0),
                                     "invalid operand: expected function name, atom, or register index")
