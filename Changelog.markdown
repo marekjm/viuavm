@@ -46,8 +46,8 @@ There are several categories of change:
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
 - enhancement: C++ standard used for Viua VM development was updated to C++17
 - fix: when displaying errors newlines are no longer underlined
-- feature: new `viua-parser` (`build/bin/vm/parser`) tool providing vastly enhanced SA when compared with
-  the older one available in `viua-asm` (`build/bin/vm/asm`)
+- feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
+  compared with the older one
 - fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
 
 
