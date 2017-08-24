@@ -76,6 +76,12 @@ namespace viua {
                 return *this;
             }
 
+            auto InvalidSyntax::note(string n) -> InvalidSyntax& {
+                attached_notes.push_back(n);
+                return *this;
+            }
+            auto InvalidSyntax::notes() const -> const decltype(attached_notes) & { return attached_notes; }
+
             InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct)
                 : line_number(ln), character_in_line(ch), content(ct) {}
             InvalidSyntax::InvalidSyntax(Token t, string m)

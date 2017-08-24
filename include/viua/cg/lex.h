@@ -60,6 +60,7 @@ namespace viua {
                 std::string message;
 
                 std::vector<Token> tokens;
+                std::vector<std::string> attached_notes;
 
                 const char* what() const;
 
@@ -68,6 +69,9 @@ namespace viua {
                 auto match(Token) const -> bool;
 
                 auto add(Token) -> InvalidSyntax&;
+
+                auto note(std::string) -> InvalidSyntax&;
+                auto notes() const -> const decltype(attached_notes) &;
 
                 InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");
