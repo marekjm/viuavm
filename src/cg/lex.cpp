@@ -53,7 +53,8 @@ namespace viua {
                   character_in_line(character_) {}
             Token::Token() : Token(0, 0, "") {}
 
-            const char* InvalidSyntax::what() const { return message.c_str(); }
+            auto InvalidSyntax::what() const -> const char* { return message.c_str(); }
+            auto InvalidSyntax::str() const -> string { return message; }
 
             auto InvalidSyntax::line() const -> decltype(line_number) { return line_number; }
             auto InvalidSyntax::character() const -> decltype(character_in_line) { return character_in_line; }

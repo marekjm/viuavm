@@ -63,7 +63,8 @@ namespace viua {
                 std::vector<std::string> attached_notes;
                 std::string aside_note;
 
-                const char* what() const;
+                auto what() const -> const char*;
+                auto str() const -> std::string;
 
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
