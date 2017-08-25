@@ -25,12 +25,12 @@ addons:
         packages:
             - openssl
             - python3
-            - gcc-6
-            - g++-6
+            - gcc-7
+            - g++-7
             - valgrind
             - bc
             - clang-4.0
 
 install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
     - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
