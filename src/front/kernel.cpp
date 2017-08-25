@@ -87,7 +87,7 @@ static bool usage(const string program, const vector<string>& args) {
     }
 
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM viua::kernel::Kernel, version ";
+        cout << "Viua VM kernel, version ";
     }
     if (show_help or show_version or show_info) {
         cout << VERSION << '.' << MICRO;
