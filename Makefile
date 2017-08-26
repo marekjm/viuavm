@@ -11,8 +11,14 @@ GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize
 
 
 # These are generic flags that should be used for compiling Viua VM.
-GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
-CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
+GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef \
+				 -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
+				 -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls \
+				 -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual \
+				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
+CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default \
+			   -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g \
+			   -I./include
 GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
 
 
@@ -28,7 +34,9 @@ ifeq ($(CXX), g++)
 COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), g++-7)
-COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
+COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow \
+			   -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align \
+			   -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
 SANITISER_FLAGS=-fsanitize=undefined
 else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
@@ -48,7 +56,13 @@ CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
-VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o build/process/instr/text.o build/process/instr/bool.o build/process/instr/bits.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o build/process/instr/struct.o build/process/instr/atom.o
+VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o \
+				   build/process/instr/concurrency.o build/process/instr/linking.o \
+				   build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o \
+				   build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o \
+				   build/process/instr/text.o build/process/instr/bool.o build/process/instr/bits.o \
+				   build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o \
+				   build/process/instr/object.o build/process/instr/struct.o build/process/instr/atom.o
 
 
 PREFIX=/usr/local
@@ -64,7 +78,8 @@ LDLIBS=-ldl -lpthread
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser build/bin/opcodes.bin platform stdlib
+all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser \
+	build/bin/opcodes.bin platform stdlib
 
 what:
 	@echo "compiler:  $(CXX)"
@@ -126,7 +141,9 @@ uninstall:
 
 ############################################################
 # PLATFORM OBJECT FILES
-platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o build/platform/value.o build/platform/pointer.o build/platform/bits.o
+platform: build/platform/exception.o build/platform/string.o build/platform/vector.o \
+	build/platform/registerset.o build/platform/support_string.o build/platform/reference.o \
+	build/platform/value.o build/platform/pointer.o build/platform/bits.o
 
 build/platform/exception.o: src/types/exception.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/exception.o src/types/exception.cpp
@@ -179,28 +196,34 @@ build/test/World.so: build/test/World.o
 build/test/printer.o: sample/asm/external/printer.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/printer.o ./sample/asm/external/printer.cpp
 
-build/test/printer.so: build/test/printer.o build/platform/registerset.o build/platform/value.o build/platform/exception.o
+build/test/printer.so: build/test/printer.o build/platform/registerset.o build/platform/value.o \
+	build/platform/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/sleeper.o: sample/asm/external/sleeper.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/sleeper.o ./sample/asm/external/sleeper.cpp
 
-build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/platform/value.o build/platform/exception.o
+build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/platform/value.o \
+	build/platform/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/math.o:  sample/asm/external/math.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
 
-build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o build/platform/number.o
+build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o \
+	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o \
+	build/platform/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/throwing.o:  sample/asm/external/throwing.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $^
 
-build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/number.o
+build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o \
+	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
-compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so build/test/sleeper.so
+compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so \
+	build/test/sleeper.so
 
 test: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis compile-test stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
@@ -265,22 +288,53 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registerset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/value.o build/types/pointer.o build/cg/disassembler/disassembler.o build/assembler/util/pretty_printer.o build/cg/lex.o
+build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o \
+	build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o \
+	build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registerset.o \
+	build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o \
+	build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o \
+	build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o \
+	build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o \
+	build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o \
+	build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o \
+	build/types/value.o build/types/pointer.o build/cg/disassembler/disassembler.o \
+	build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registerset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/boolean.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/value.o build/types/pointer.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o \
+	build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o \
+	build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o \
+	build/kernel/registerset.o build/kernel/frame.o build/loader.o build/machine.o \
+	build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o \
+	build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/boolean.o \
+	build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o \
+	build/types/struct.o build/types/number.o build/types/integer.o build/types/bits.o build/types/float.o \
+	build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o \
+	build/types/process.o build/types/value.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o build/assembler/util/pretty_printer.o
+build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o \
+	build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o \
+	build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o \
+	build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o \
+	build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o \
+	build/support/env.o build/cg/assembler/binary_literals.o build/assembler/frontend/parser.o \
+	build/assembler/frontend/static_analyser/verifier.o build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
+build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o \
+	build/support/env.o build/cg/assembler/binary_literals.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o build/assembler/util/pretty_printer.o
+build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o \
+	build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o \
+	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
+	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o build/assembler/util/pretty_printer.o build/cg/lex.o
+build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o \
+	build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o \
+	build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 
@@ -289,7 +343,8 @@ build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembl
 build/scheduler/vps.o: src/scheduler/vps.cpp build/process.o build/process/stack.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h include/viua/kernel/frame.h build/scheduler/vps.o
+build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h \
+	include/viua/kernel/frame.h build/scheduler/vps.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/kernel/registerset.o: src/kernel/registerset.cpp include/viua/kernel/registerset.h
@@ -304,7 +359,8 @@ build/bytecode/decoder/operands.o: src/bytecode/decoder/operands.cpp
 
 ############################################################
 # STANDARD LIBRARY
-standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib build/stdlib/std/misc.vlib
+standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib \
+	build/stdlib/std/misc.vlib
 
 stdlib: build/bin/vm/asm standardlibrary
 	$(MAKE) build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so build/stdlib/kitchensink.so
@@ -330,16 +386,25 @@ build/stdlib/random.o: src/stdlib/random.cpp
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/bits.o build/platform/number.o
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o \
+	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
+	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/bits.o \
+	build/platform/number.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o
+build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o \
+	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
+	build/platform/value.o build/platform/pointer.o build/platform/integer.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o
+build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o \
+	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
+	build/platform/value.o build/platform/pointer.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o
+build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o \
+	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
+	build/platform/value.o build/platform/pointer.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 
