@@ -400,9 +400,9 @@ static auto validate_jump(const Token token, const string& extracted_jump,
                           vector<pair<Token, InstructionIndex>>& forward_jumps,
                           vector<pair<Token, string>>& deferred_marker_jumps,
                           const map<string, InstructionIndex>& jump_targets) -> void {
-    long int target = -1;
+    auto target = InstructionIndex{0};
     if (str::isnum(extracted_jump, false)) {
-        target = stoi(extracted_jump);
+        target = stoul(extracted_jump);
     } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1), false)) {
         auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
@@ -433,13 +433,10 @@ static auto validate_jump(const Token token, const string& extracted_jump,
         }
     }
 
-    if (target < 0) {
-        throw viua::cg::lex::InvalidSyntax(token, "backward out-of-range jump");
-    }
-    if (static_cast<InstructionIndex>(target) == function_instruction_counter) {
+    if (target == function_instruction_counter) {
         throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
     }
-    if (static_cast<InstructionIndex>(target) > function_instruction_counter) {
+    if (target > function_instruction_counter) {
         forward_jumps.emplace_back(token, target);
     }
 }
