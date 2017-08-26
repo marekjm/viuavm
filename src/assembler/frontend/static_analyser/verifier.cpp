@@ -512,6 +512,22 @@ static auto validate_jump_pair(
                                            "useless branch: both targets point to the same instruction");
     }
 }
+static auto calculate_jump_target(const InstructionIndex instruction_counter, const Token jump,
+                                  const map<string, InstructionIndex>& jump_targets) -> InstructionIndex {
+    InstructionIndex target = 0;
+    if (str::isnum(jump, false)) {
+        target = stoul(jump);
+    } else if (str::startswith(jump, "+") and str::isnum(jump.str().substr(1), false)) {
+        target = (instruction_counter + stoul(jump.str().substr(1)));
+    } else if (str::startswith(jump, "-") and str::isnum(jump.str().substr(1), false)) {
+        target = (instruction_counter - stoul(jump.str().substr(1)));
+    } else {
+        // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+        // a .mark: directive immediately follows .function: declaration
+        target = jump_targets.at(jump) + 1;
+    }
+    return target;
+}
 static auto verify_deferred_jump_pairs(
     const vector<tuple<Token, Token, Token, InstructionIndex>>& deferred_jump_pair_checks,
     const map<string, InstructionIndex>& jump_targets) -> void {
@@ -520,34 +536,8 @@ static auto verify_deferred_jump_pairs(
         Token branch_token, when_true, when_false;
         tie(branch_token, when_true, when_false, function_instruction_counter) = each;
 
-        InstructionIndex true_target = 0, false_target = 0;
-        if (str::isnum(when_true, false)) {
-            true_target = stoi(when_true);
-        } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
-            int jump_offset = stoi(when_true.str().substr(1));
-            true_target = (function_instruction_counter + jump_offset);
-        } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
-            int jump_offset = stoi(when_true);
-            true_target = (function_instruction_counter + jump_offset);
-        } else {
-            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
-            // a .mark: directive immediately follows .function: declaration
-            true_target = jump_targets.at(when_true) + 1;
-        }
-
-        if (str::isnum(when_false, false)) {
-            false_target = stoi(when_false);
-        } else if (str::startswith(when_false, "+") and str::isnum(when_false.str().substr(1))) {
-            int jump_offset = stoi(when_false.str().substr(1));
-            false_target = (function_instruction_counter + jump_offset);
-        } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
-            int jump_offset = stoi(when_false);
-            false_target = (function_instruction_counter + jump_offset);
-        } else {
-            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
-            // a .mark: directive immediately follows .function: declaration
-            false_target = jump_targets.at(when_false) + 1;
-        }
+        auto true_target = calculate_jump_target(function_instruction_counter, when_true, jump_targets);
+        auto false_target = calculate_jump_target(function_instruction_counter, when_false, jump_targets);
 
         if (true_target == false_target) {
             throw viua::cg::lex::InvalidSyntax(branch_token,
