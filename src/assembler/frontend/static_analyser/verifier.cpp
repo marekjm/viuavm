@@ -23,6 +23,8 @@
 #include <viua/support/string.h>
 using namespace std;
 using namespace viua::assembler::frontend::parser;
+
+
 using viua::cg::lex::Token;
 using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::TracedSyntaxError;
@@ -402,17 +404,20 @@ static auto validate_jump(const Token token, const string& extracted_jump,
     if (str::isnum(extracted_jump, false)) {
         target = stoi(extracted_jump);
     } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
-        int jump_offset = stoi(extracted_jump.substr(1));
+        auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         target = (function_instruction_counter + jump_offset);
-    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump)) {
-        int jump_offset = stoi(extracted_jump);
+    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump.substr(1))) {
+        auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
-        target = (function_instruction_counter + jump_offset);
+        if (jump_offset > function_instruction_counter) {
+            throw InvalidSyntax(token, "backward out-of-range jump");
+        }
+        target = (function_instruction_counter - jump_offset);
     } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
         target = stoi(extracted_jump.substr(1));
         if (target < 0) {
