@@ -4,10 +4,6 @@
 CXX_STANDARD=c++17
 
 
-TRAVIS_CI_CLANG=clang++-4.0
-TRAVIS_CI_GCC=g++-7
-
-
 GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
 CLANG_SANITISER_FLAGS=  -fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
 # No -fsanitize=address for GCC because of too many false positives.
@@ -31,13 +27,13 @@ COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 ifeq ($(CXX), g++)
 COMPILER_FLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
 SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
-else ifeq ($(CXX), $(TRAVIS_CI_GCC))
+else ifeq ($(CXX), g++7)
 COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
 SANITISER_FLAGS=-fsanitize=undefined
-else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
+else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 CXX_STANDARD=c++1z
-else ifeq ($(CXX), clang++)
+else ifeq ($(CXX), clang++-4.0)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-5.0)
@@ -45,6 +41,7 @@ COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 CXX_STANDARD=c++1z
 endif
 
+# Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
 CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS)
 
 CXXOPTIMIZATIONFLAGS=-O0
