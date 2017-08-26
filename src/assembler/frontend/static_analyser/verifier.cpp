@@ -418,17 +418,6 @@ static auto validate_jump(const Token token, const string& extracted_jump,
             throw InvalidSyntax(token, "backward out-of-range jump");
         }
         target = (function_instruction_counter - jump_offset);
-    } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
-        target = stoi(extracted_jump.substr(1));
-        if (target < 0) {
-            throw viua::cg::lex::InvalidSyntax(token, "absolute jump with negative value");
-        }
-        if (target == 0 and function_instruction_counter == 0) {
-            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
-        }
-        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
-        // this is a FIXME: add check for absolute jumps
-        return;
     } else if (str::ishex(extracted_jump)) {
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
