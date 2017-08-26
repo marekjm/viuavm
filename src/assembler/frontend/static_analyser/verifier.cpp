@@ -403,13 +403,13 @@ static auto validate_jump(const Token token, const string& extracted_jump,
     long int target = -1;
     if (str::isnum(extracted_jump, false)) {
         target = stoi(extracted_jump);
-    } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
+    } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1), false)) {
         auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         target = (function_instruction_counter + jump_offset);
-    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump.substr(1))) {
+    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump.substr(1), false)) {
         auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
