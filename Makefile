@@ -1,34 +1,51 @@
+# Clang does not yet recognise -std=c++17 option, and
+# needs -std=c++1z.
+# See http://clang.llvm.org/cxx_status.html for details.
 CXX_STANDARD=c++17
-#CLANG_SANITIZE_FLAGS=-fsanitize=thread
+
 
 TRAVIS_CI_CLANG=clang++-4.0
 TRAVIS_CI_GCC=g++-7
 
-GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
-CLANG_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
-GCC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak
+
+GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
+CLANG_SANITISER_FLAGS=  -fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
+# No -fsanitize=address for GCC because of too many false positives.
+GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize=leak
+
 
 # These are generic flags that should be used for compiling Viua VM.
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include $(GENERIC_SANITISER_FLAGS)
+GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
+CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
+GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
 
-# Clang does not yet recognise -std=c++17 option, and
-# needs -std=c++1z.
-# See http://clang.llvm.org/cxx_status.html for details.
-CLANG_CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+
+SANITISER_FLAGS=$(GENERIC_SANITISER_FLAGS)
+COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
+
 
 # For different compilers (and for TravisCI) compiler flags should be overridden, because
 # of throwing too many false positives or being unsupported.
+# If any compiler that should be treated specially is detected CXXFLAGS is adjusted for its (compiler's) needs;
+# otherwise, generic CXXFLAGS are used.
 ifeq ($(CXX), g++)
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include $(GCC_SANITISER_FLAGS)
+COMPILER_FLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
+SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), $(TRAVIS_CI_GCC))
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include -fsanitize=undefined
+COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
+SANITISER_FLAGS=-fsanitize=undefined
 else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
-CXXFLAGS=$(CLANG_CXXFLAGS)
+COMPILER_FLAGS=$(CLANG_CXXFLAGS)
+CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++)
-CXXFLAGS=$(CLANG_CXXFLAGS)
+COMPILER_FLAGS=$(CLANG_CXXFLAGS)
+CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-5.0)
-CXXFLAGS=$(CLANG_CXXFLAGS)
+COMPILER_FLAGS=$(CLANG_CXXFLAGS)
+CXX_STANDARD=c++1z
 endif
+
+CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS)
 
 CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
@@ -51,6 +68,12 @@ LIBDL ?= -ldl
 ############################################################
 # BASICS
 all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser build/bin/opcodes.bin platform stdlib
+
+what:
+	@echo "compiler:  $(CXX)"
+	@echo "standard:  $(CXX_STANDARD)"
+	@echo "sanitiser: $(SANITISER_FLAGS)"
+	@echo "flags:     $(CXXFLAGS)"
 
 remake: clean all
 
