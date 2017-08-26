@@ -1,36 +1,44 @@
 language: cpp
 
-compiler:
-    - gcc
-    - clang
-
-os:
-    - linux
-
-matrix:
-    allow_failures:
-        - os: osx
-
 dist: trusty
 sudo: false
 
-env:
-    - ASAN_OPTIONS=detect_odr_violation=0
+matrix:
+    include:
+        -
+            os: linux
+            compiler: gcc
+            addons:
+                apt:
+                    sources:
+                        - ubuntu-toolchain-r-test
+                    packages:
+                        - python3
+                        - gcc-7
+                        - g++-7
+                        - valgrind
+                        - bc
+            env:
+                - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+                - ASAN_OPTIONS=detect_odr_violation=0
+        -
+            os: linux
+            compiler: clang
+            addons:
+                apt:
+                    sources:
+                        - ubuntu-toolchain-r-test
+                        - llvm-toolchain-trusty-4.0
+                    packages:
+                        - python3
+                        - gcc-6
+                        - g++-6
+                        - valgrind
+                        - bc
+                        - clang-4.0
+            env:
+                - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+                - ASAN_OPTIONS=detect_odr_violation=0
 
-addons:
-    apt:
-        sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-        packages:
-            - openssl
-            - python3
-            - gcc-7
-            - g++-7
-            - valgrind
-            - bc
-            - clang-4.0
-
-install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
+before_install:
+    - eval "${MATRIX_EVAL}"
