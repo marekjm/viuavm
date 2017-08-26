@@ -11,6 +11,11 @@ GCC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=lea
 # These are generic flags that should be used for compiling Viua VM.
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include $(GENERIC_SANITISER_FLAGS)
 
+# Clang does not yet recognise -std=c++17 option, and
+# needs -std=c++1z.
+# See http://clang.llvm.org/cxx_status.html for details.
+CLANG_CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+
 # For different compilers (and for TravisCI) compiler flags should be overridden, because
 # of throwing too many false positives or being unsupported.
 ifeq ($(CXX), g++)
@@ -18,15 +23,11 @@ CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dt
 else ifeq ($(CXX), $(TRAVIS_CI_GCC))
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include -fsanitize=undefined
 else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
-# Clang does not yet recognise -std=c++17 option, and
-# needs -std=c++1z.
-# See http://clang.llvm.org/cxx_status.html for details.
-CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+CXXFLAGS=$(CLANG_CXXFLAGS)
 else ifeq ($(CXX), clang++)
-# Clang does not yet recognise -std=c++17 option, and
-# needs -std=c++1z.
-# See http://clang.llvm.org/cxx_status.html for details.
-CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+CXXFLAGS=$(CLANG_CXXFLAGS)
+else ifeq ($(CXX), clang++-5)
+CXXFLAGS=$(CLANG_CXXFLAGS)
 endif
 
 CXXOPTIMIZATIONFLAGS=-O0
