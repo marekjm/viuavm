@@ -467,7 +467,7 @@ static auto validate_jump_pair(
     } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
         int jump_offset = stoi(when_true);
         true_target = (function_instruction_counter + jump_offset);
-    } else if (str::ishex(when_true) or str::startswith(when_true, ".")) {
+    } else if (str::ishex(when_true)) {
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
         return;
@@ -491,7 +491,7 @@ static auto validate_jump_pair(
     } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
         int jump_offset = stoi(when_false);
         false_target = (function_instruction_counter + jump_offset);
-    } else if (str::ishex(when_false) or str::startswith(when_true, ".")) {
+    } else if (str::ishex(when_false)) {
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
         return;
