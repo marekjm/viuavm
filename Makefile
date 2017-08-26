@@ -26,7 +26,7 @@ else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
 CXXFLAGS=$(CLANG_CXXFLAGS)
 else ifeq ($(CXX), clang++)
 CXXFLAGS=$(CLANG_CXXFLAGS)
-else ifeq ($(CXX), clang++-5)
+else ifeq ($(CXX), clang++-5.0)
 CXXFLAGS=$(CLANG_CXXFLAGS)
 endif
 
