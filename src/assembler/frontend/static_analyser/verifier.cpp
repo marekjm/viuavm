@@ -460,13 +460,13 @@ static auto validate_jump_pair(
 
     InstructionIndex true_target = 0, false_target = 0;
     if (str::isnum(when_true, false)) {
-        true_target = stoi(when_true);
-    } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
-        int jump_offset = stoi(when_true.str().substr(1));
+        true_target = stoul(when_true);
+    } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1), false)) {
+        InstructionIndex jump_offset = stoul(when_true.str().substr(1));
         true_target = (function_instruction_counter + jump_offset);
-    } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
-        int jump_offset = stoi(when_true);
-        true_target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(when_true, "-") and str::isnum(when_true.str().substr(1), false)) {
+        InstructionIndex jump_offset = stoul(when_true);
+        true_target = (function_instruction_counter - jump_offset);
     } else if (str::ishex(when_true)) {
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
