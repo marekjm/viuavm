@@ -454,27 +454,6 @@ build/process/dispatch.o: src/process/dispatch.cpp
 build/process/instr/%.o: src/process/instr/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/process/instr/general.o: src/process/instr/general.cpp
-build/process/instr/registers.o: src/process/instr/registers.cpp
-build/process/instr/calls.o: src/process/instr/calls.cpp build/process.o
-build/process/instr/concurrency.o: src/process/instr/concurrency.cpp build/process.o
-build/process/instr/linking.o: src/process/instr/linking.cpp build/process.o
-build/process/instr/tcmechanism.o: src/process/instr/tcmechanism.cpp
-build/process/instr/closure.o: src/process/instr/closure.cpp
-build/process/instr/int.o: src/process/instr/int.cpp
-build/process/instr/float.o: src/process/instr/float.cpp
-build/process/instr/arithmetic.o: src/process/instr/arithmetic.cpp
-build/process/instr/str.o: src/process/instr/str.cpp
-build/process/instr/text.o: src/process/instr/text.cpp
-build/process/instr/bool.o: src/process/instr/bool.cpp
-build/process/instr/bits.o: src/process/instr/bits.cpp build/process.o
-build/process/instr/cast.o: src/process/instr/cast.cpp
-build/process/instr/vector.o: src/process/instr/vector.cpp
-build/process/instr/prototype.o: src/process/instr/prototype.cpp
-build/process/instr/object.o: src/process/instr/object.cpp
-build/process/instr/struct.o: src/process/instr/struct.cpp
-build/process/instr/atom.o: src/process/instr/atom.cpp
-
 
 ############################################################
 # UTILITY MODULES
@@ -483,10 +462,6 @@ build/printutils.o: src/printutils.cpp
 
 build/support/%.o: src/support/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/support/string.o: src/support/string.cpp
-build/support/pointer.o: src/support/pointer.cpp
-build/support/env.o: src/support/env.cpp
 
 
 ############################################################
