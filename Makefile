@@ -160,41 +160,25 @@ build/platform/support/string.o: src/support/string.cpp
 
 ############################################################
 # TESTING
-build/test/World.o: sample/asm/external/World.cpp
+build/test/%.o: sample/asm/external/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
-build/test/World.so: build/test/World.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $<
-
-build/test/printer.o: sample/asm/external/printer.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
+build/test/%.so: build/test/%.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/printer.so: build/test/printer.o build/platform/kernel/registerset.o build/platform/types/value.o \
 	build/platform/types/exception.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
-
-build/test/sleeper.o: sample/asm/external/sleeper.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/sleeper.so: build/test/sleeper.o build/platform/kernel/registerset.o build/platform/types/value.o \
 	build/platform/types/exception.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
-
-build/test/math.o:  sample/asm/external/math.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/math.so: build/test/math.o build/platform/kernel/registerset.o build/platform/types/exception.o \
 	build/platform/types/value.o build/platform/types/pointer.o build/platform/types/integer.o \
 	build/platform/types/float.o build/platform/types/number.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
-
-build/test/throwing.o:  sample/asm/external/throwing.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $^
 
 build/test/throwing.so: build/test/throwing.o build/platform/kernel/registerset.o \
 	build/platform/types/exception.o build/platform/types/value.o build/platform/types/pointer.o \
 	build/platform/types/integer.o build/platform/types/number.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so \
 	build/test/sleeper.so
