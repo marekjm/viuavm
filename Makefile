@@ -320,23 +320,14 @@ build/bytecode/decoder/operands.o: src/bytecode/decoder/operands.cpp
 standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib \
 	build/stdlib/std/misc.vlib
 
-stdlib: build/bin/vm/asm standardlibrary
-	$(MAKE) build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so build/stdlib/kitchensink.so
+stdlib: build/bin/vm/asm standardlibrary build/stdlib/typesystem.so build/stdlib/io.so \
+	build/stdlib/random.so build/stdlib/kitchensink.so
 
 build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
 	./build/bin/vm/asm --lib -o $@ $<
 
-build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
-build/stdlib/std/functional.vlib: src/stdlib/viua/functional.asm build/bin/vm/asm
-build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm build/bin/vm/asm
-
 build/stdlib/%.o: src/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
-build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
-build/stdlib/io.o: src/stdlib/io.cpp
-build/stdlib/random.o: src/stdlib/random.cpp
-build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 
 build/stdlib/%.so: build/stdlib/%.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
