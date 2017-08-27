@@ -141,47 +141,50 @@ uninstall:
 
 ############################################################
 # PLATFORM OBJECT FILES
-platform: build/platform/exception.o build/platform/string.o build/platform/vector.o \
-	build/platform/registerset.o build/platform/support_string.o build/platform/reference.o \
-	build/platform/value.o build/platform/pointer.o build/platform/bits.o
+platform: build/platform/types/exception.o build/platform/types/value.o build/platform/types/pointer.o \
+	build/platform/types/number.o build/platform/types/integer.o build/platform/types/bits.o \
+	build/platform/types/float.o build/platform/types/string.o build/platform/types/text.o \
+	build/platform/types/vector.o build/platform/types/reference.o \
+	build/platform/kernel/registerset.o \
+	build/platform/support/string.o
 
-build/platform/exception.o: src/types/exception.cpp
+build/platform/types/exception.o: src/types/exception.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/value.o: src/types/value.cpp
+build/platform/types/value.o: src/types/value.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/pointer.o: src/types/pointer.cpp
+build/platform/types/pointer.o: src/types/pointer.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/number.o: src/types/number.cpp
+build/platform/types/number.o: src/types/number.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $^
 
-build/platform/integer.o: src/types/integer.cpp
+build/platform/types/integer.o: src/types/integer.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/bits.o: src/types/bits.cpp
+build/platform/types/bits.o: src/types/bits.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/float.o: src/types/float.cpp
+build/platform/types/float.o: src/types/float.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/string.o: src/types/string.cpp
+build/platform/types/string.o: src/types/string.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/text.o: src/types/text.cpp
+build/platform/types/text.o: src/types/text.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/vector.o: src/types/vector.cpp
+build/platform/types/vector.o: src/types/vector.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/reference.o: src/types/reference.cpp
+build/platform/types/reference.o: src/types/reference.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/registerset.o: src/kernel/registerset.cpp
+build/platform/kernel/registerset.o: src/kernel/registerset.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-build/platform/support_string.o: src/support/string.cpp
+build/platform/support/string.o: src/support/string.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 
@@ -196,30 +199,31 @@ build/test/World.so: build/test/World.o
 build/test/printer.o: sample/asm/external/printer.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
-build/test/printer.so: build/test/printer.o build/platform/registerset.o build/platform/value.o \
-	build/platform/exception.o
+build/test/printer.so: build/test/printer.o build/platform/kernel/registerset.o build/platform/types/value.o \
+	build/platform/types/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/sleeper.o: sample/asm/external/sleeper.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
-build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/platform/value.o \
-	build/platform/exception.o
+build/test/sleeper.so: build/test/sleeper.o build/platform/kernel/registerset.o build/platform/types/value.o \
+	build/platform/types/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/math.o:  sample/asm/external/math.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
-build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o \
-	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o \
-	build/platform/number.o
+build/test/math.so: build/test/math.o build/platform/kernel/registerset.o build/platform/types/exception.o \
+	build/platform/types/value.o build/platform/types/pointer.o build/platform/types/integer.o \
+	build/platform/types/float.o build/platform/types/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/throwing.o:  sample/asm/external/throwing.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $^
 
-build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o \
-	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/number.o
+build/test/throwing.so: build/test/throwing.o build/platform/kernel/registerset.o \
+	build/platform/types/exception.o build/platform/types/value.o build/platform/types/pointer.o \
+	build/platform/types/integer.o build/platform/types/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so \
@@ -386,25 +390,25 @@ build/stdlib/random.o: src/stdlib/random.cpp
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o \
-	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
-	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/bits.o \
-	build/platform/number.o
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/types/exception.o \
+	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
+	build/platform/types/pointer.o build/platform/types/integer.o build/platform/types/bits.o \
+	build/platform/types/number.o build/platform/kernel/registerset.o build/platform/support/string.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o \
-	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
-	build/platform/value.o build/platform/pointer.o build/platform/integer.o
+build/stdlib/io.so: build/stdlib/io.o build/platform/types/exception.o build/platform/types/vector.o \
+	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
+	build/platform/types/integer.o build/platform/kernel/registerset.o build/platform/support/string.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o \
-	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
-	build/platform/value.o build/platform/pointer.o
+build/stdlib/random.so: build/stdlib/random.o build/platform/types/exception.o build/platform/types/vector.o \
+	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
+	build/platform/kernel/registerset.o build/platform/support/string.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
-build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o \
-	build/platform/registerset.o build/platform/support_string.o build/platform/string.o \
-	build/platform/value.o build/platform/pointer.o
+build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/types/exception.o \
+	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
+	build/platform/types/pointer.o build/platform/kernel/registerset.o build/platform/support/string.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 
