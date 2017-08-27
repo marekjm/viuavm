@@ -416,25 +416,8 @@ build/bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h inc
 
 ############################################################
 # TYPE MODULES
-build/types/%.o: src/types/%.cpp
+build/types/%.o: src/types/%.cpp include/viua/types/%.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/types/boolean.o: src/types/boolean.cpp include/viua/types/boolean.h
-build/types/vector.o: src/types/vector.cpp include/viua/types/vector.h
-build/types/closure.o: src/types/closure.cpp include/viua/types/closure.h
-build/types/string.o: src/types/string.cpp include/viua/types/string.h
-build/types/struct.o: src/types/struct.cpp include/viua/types/struct.h
-build/types/number.o: src/types/number.cpp include/viua/types/number.h
-build/types/integer.o: src/types/integer.cpp include/viua/types/integer.h
-build/types/bits.o: src/types/bits.cpp include/viua/types/bits.h
-build/types/float.o: src/types/float.cpp include/viua/types/float.h
-build/types/exception.o: src/types/exception.cpp include/viua/types/exception.h
-build/types/prototype.o: src/types/prototype.cpp include/viua/types/prototype.h
-build/types/object.o: src/types/object.cpp include/viua/types/object.h
-build/types/value.o: src/types/value.cpp include/viua/types/value.h
-build/types/pointer.o: src/types/pointer.cpp include/viua/types/pointer.h
-build/types/reference.o: src/types/reference.cpp include/viua/types/reference.h
-build/types/process.o: src/types/process.cpp include/viua/types/process.h
 
 
 ############################################################
