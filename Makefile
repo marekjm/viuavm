@@ -415,30 +415,6 @@ build/bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h inc
 
 
 ############################################################
-# CODE GENERATION
-build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/tokenizer/tokenize.o: src/cg/tokenizer/tokenize.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/lex.o: src/cg/lex.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/tools.o: src/cg/tools.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/assembler/frontend/parser.o: src/assembler/frontend/parser.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/assembler/frontend/static_analyser/verifier.o: src/assembler/frontend/static_analyser/verifier.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
-############################################################
 # TYPE MODULES
 build/types/%.o: src/types/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
@@ -515,6 +491,13 @@ build/support/env.o: src/support/env.cpp
 
 ############################################################
 # CODE AND BYTECODE GENERATION
+build/assembler/%.o: src/assembler/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/assembler/frontend/parser.o: src/assembler/frontend/parser.cpp
+build/assembler/frontend/static_analyser/verifier.o: src/assembler/frontend/static_analyser/verifier.cpp
+build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
+
 build/program.o: src/program.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
@@ -524,6 +507,10 @@ build/programinstructions.o: src/programinstructions.cpp
 build/cg/%.o: src/cg/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
+build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
+build/cg/tokenizer/tokenize.o: src/cg/tokenizer/tokenize.cpp
+build/cg/lex.o: src/cg/lex.cpp
+build/cg/tools.o: src/cg/tools.cpp
 build/cg/assembler/operands.o: src/cg/assembler/operands.cpp
 build/cg/assembler/binary_literals.o: src/cg/assembler/binary_literals.cpp
 build/cg/assembler/codeextract.o: src/cg/assembler/codeextract.cpp
