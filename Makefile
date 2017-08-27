@@ -315,7 +315,7 @@ build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o \
 	build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o \
-	build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o \
+	build/cg/assembler/operands.o build/cg/assembler/codeextract.o build/cg/lex.o build/cg/tools.o \
 	build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o \
 	build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o \
 	build/support/env.o build/cg/assembler/binary_literals.o build/assembler/frontend/parser.o \
@@ -530,7 +530,7 @@ build/cg/assembler/operands.o: src/cg/assembler/operands.cpp
 build/cg/assembler/binary_literals.o: src/cg/assembler/binary_literals.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cg/assembler/ce.o: src/cg/assembler/codeextract.cpp
+build/cg/assembler/codeextract.o: src/cg/assembler/codeextract.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/cg/assembler/verify.o: src/cg/assembler/verify.cpp
