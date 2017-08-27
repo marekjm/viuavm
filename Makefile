@@ -148,37 +148,7 @@ platform: build/platform/types/exception.o build/platform/types/value.o build/pl
 	build/platform/kernel/registerset.o \
 	build/platform/support/string.o
 
-build/platform/types/exception.o: src/types/exception.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/value.o: src/types/value.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/pointer.o: src/types/pointer.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/number.o: src/types/number.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $^
-
-build/platform/types/integer.o: src/types/integer.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/bits.o: src/types/bits.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/float.o: src/types/float.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/string.o: src/types/string.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/text.o: src/types/text.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/vector.o: src/types/vector.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/types/reference.o: src/types/reference.cpp
+build/platform/types/%.o: src/types/%.cpp include/viua/types/%.h
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/kernel/registerset.o: src/kernel/registerset.cpp
