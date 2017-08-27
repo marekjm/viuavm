@@ -394,10 +394,6 @@ build/support/%.o: src/support/%.cpp
 build/assembler/%.o: src/assembler/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/assembler/frontend/parser.o: src/assembler/frontend/parser.cpp
-build/assembler/frontend/static_analyser/verifier.o: src/assembler/frontend/static_analyser/verifier.cpp
-build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
-
 build/program.o: src/program.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
@@ -406,18 +402,6 @@ build/programinstructions.o: src/programinstructions.cpp
 
 build/cg/%.o: src/cg/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
-build/cg/tokenizer/tokenize.o: src/cg/tokenizer/tokenize.cpp
-build/cg/lex.o: src/cg/lex.cpp
-build/cg/tools.o: src/cg/tools.cpp
-build/cg/assembler/operands.o: src/cg/assembler/operands.cpp
-build/cg/assembler/binary_literals.o: src/cg/assembler/binary_literals.cpp
-build/cg/assembler/codeextract.o: src/cg/assembler/codeextract.cpp
-build/cg/assembler/verify.o: src/cg/assembler/verify.cpp
-build/cg/assembler/static_analysis.o: src/cg/assembler/static_analysis.cpp
-build/cg/assembler/utils.o: src/cg/assembler/utils.cpp
-build/cg/bytecode/instructions.o: src/cg/bytecode/instructions.cpp
 
 
 ############################################################
