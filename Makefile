@@ -295,6 +295,11 @@ build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
 build/stdlib/%.o: src/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
+####
+#### Fix for Travis CI.
+#### Once GNU Make is upgraded to 4.2 or later, these targets will not
+#### be needed.
+####
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
@@ -306,6 +311,9 @@ build/stdlib/random.o: src/stdlib/random.cpp
 
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+####
+#### End of fix for Travis CI.
+####
 
 build/stdlib/%.so: build/stdlib/%.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
