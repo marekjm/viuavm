@@ -505,7 +505,7 @@ build/process/instr/atom.o: src/process/instr/atom.cpp
 build/printutils.o: src/printutils.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/support/%.p: src/support/%.cpp
+build/support/%.o: src/support/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/support/string.o: src/support/string.cpp
