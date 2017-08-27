@@ -148,9 +148,6 @@ platform: build/platform/types/exception.o build/platform/types/value.o build/pl
 	build/platform/kernel/registerset.o \
 	build/platform/support/string.o
 
-build/platform/types/%.o: src/types/%.cpp include/viua/types/%.h
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
 build/platform/kernel/registerset.o: src/kernel/registerset.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
@@ -160,12 +157,6 @@ build/platform/support/string.o: src/support/string.cpp
 
 ############################################################
 # TESTING
-build/test/%.o: sample/asm/external/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
-
-build/test/%.so: build/test/%.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
-
 build/test/printer.so: build/test/printer.o build/platform/kernel/registerset.o build/platform/types/value.o \
 	build/platform/types/exception.o
 
@@ -206,7 +197,16 @@ tools: build/bin/tools/log-shortener
 
 
 ############################################################
-# VIRTUAL MACHINE CODE
+# RULES
+build/platform/types/%.o: src/types/%.cpp include/viua/types/%.h
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
+
+build/test/%.o: sample/asm/external/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
+
+build/test/%.so: build/test/%.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
+
 build/front/asm/%.o: src/front/asm/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
@@ -216,6 +216,39 @@ build/front/%.o: src/front/%.cpp
 build/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
+build/scheduler/%.o: src/scheduler/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
+
+build/kernel/%.o: src/kernel/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
+	./build/bin/vm/asm --lib -o $@ $<
+
+build/stdlib/%.o: src/stdlib/%.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/%.so: build/stdlib/%.o
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
+
+build/types/%.o: src/types/%.cpp include/viua/types/%.h
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/process/instr/%.o: src/process/instr/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/support/%.o: src/support/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/assembler/%.o: src/assembler/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/cg/%.o: src/cg/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+
+############################################################
+# VIRTUAL MACHINE CODE
 build/bin/vm/kernel: build/front/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o \
 	build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o \
 	build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registerset.o \
@@ -269,12 +302,6 @@ build/bin/vm/dis: build/front/dis.o build/loader.o build/machine.o build/cg/disa
 
 ############################################################
 # OBJECTS COMMON FOR DEBUGGER AND KERNEL COMPILATION
-build/scheduler/%.o: src/scheduler/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/kernel/%.o: src/kernel/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h \
 	include/viua/kernel/frame.h build/scheduler/vps.o
 build/kernel/registerset.o: src/kernel/registerset.cpp include/viua/kernel/registerset.h
@@ -288,12 +315,6 @@ standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/
 
 stdlib: build/bin/vm/asm standardlibrary build/stdlib/typesystem.so build/stdlib/io.so \
 	build/stdlib/random.so build/stdlib/kitchensink.so
-
-build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
-	./build/bin/vm/asm --lib -o $@ $<
-
-build/stdlib/%.o: src/stdlib/%.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 ####
 #### Fix for Travis CI.
@@ -314,9 +335,6 @@ build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 ####
 #### End of fix for Travis CI.
 ####
-
-build/stdlib/%.so: build/stdlib/%.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/types/exception.o \
 	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
@@ -340,33 +358,6 @@ build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/types/exc
 # OPCODE LISTER PROGRAM
 build/bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h include/viua/bytecode/maps.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -o $@ $<
-
-
-############################################################
-# TYPE MODULES
-build/types/%.o: src/types/%.cpp include/viua/types/%.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
-############################################################
-# KERNEL, INSTRUCTION DISPATCH AND IMPLEMENTATION MODULES
-build/process/instr/%.o: src/process/instr/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
-############################################################
-# UTILITY MODULES
-build/support/%.o: src/support/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
-############################################################
-# CODE AND BYTECODE GENERATION
-build/assembler/%.o: src/assembler/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/%.o: src/cg/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 ############################################################
