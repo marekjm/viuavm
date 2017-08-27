@@ -521,28 +521,16 @@ build/program.o: src/program.cpp
 build/programinstructions.o: src/programinstructions.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
+build/cg/%.o: src/cg/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/cg/assembler/operands.o: src/cg/assembler/operands.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/assembler/binary_literals.o: src/cg/assembler/binary_literals.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/assembler/codeextract.o: src/cg/assembler/codeextract.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/assembler/verify.o: src/cg/assembler/verify.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/assembler/static_analysis.o: src/cg/assembler/static_analysis.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/assembler/utils.o: src/cg/assembler/utils.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
 build/cg/bytecode/instructions.o: src/cg/bytecode/instructions.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 ############################################################
