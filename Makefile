@@ -505,14 +505,12 @@ build/process/instr/atom.o: src/process/instr/atom.cpp
 build/printutils.o: src/printutils.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
+build/support/%.p: src/support/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
 build/support/string.o: src/support/string.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/support/pointer.o: src/support/pointer.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/support/env.o: src/support/env.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 ############################################################
