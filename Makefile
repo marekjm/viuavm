@@ -207,35 +207,16 @@ tools: build/bin/tools/log-shortener
 
 ############################################################
 # VIRTUAL MACHINE CODE
-build/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
+build/front/asm/%.o: src/front/asm/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/asm/gather.o: src/front/asm/gather.cpp include/viua/front/asm.h
+build/front/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
+build/front/asm/gather.o: src/front/asm/gather.cpp include/viua/front/asm.h
+build/front/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h include/viua/machine.h
+build/front/asm/assemble_instruction.o: src/front/asm/assemble_instruction.cpp
+
+build/front/%.o: src/front/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h include/viua/machine.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/asm/assemble_instruction.o: src/front/asm/assemble_instruction.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/asm.o: src/front/asm.cpp build/cg/assembler/verify.o include/viua/front/asm.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/kernel.o: src/front/kernel.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/dis.o: src/front/dis.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/wdb.o: src/front/wdb.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/scheduler/ffi/request.o: src/scheduler/ffi/request.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/scheduler/ffi/scheduler.o: src/scheduler/ffi/scheduler.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
 build/assert.o: src/assert.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
@@ -246,7 +227,7 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o \
+build/bin/vm/kernel: build/front/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o \
 	build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o \
 	build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registerset.o \
 	build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o \
@@ -259,7 +240,7 @@ build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o 
 	build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o \
+build/bin/vm/vdb: build/front/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o \
 	build/front/vm.o build/assert.o build/process.o build/process/stack.o build/pid.o \
 	build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o \
 	build/kernel/registerset.o build/kernel/frame.o build/loader.o build/machine.o \
@@ -271,26 +252,27 @@ build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/
 	build/types/process.o build/types/value.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o \
-	build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o \
-	build/cg/assembler/operands.o build/cg/assembler/codeextract.o build/cg/lex.o build/cg/tools.o \
-	build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o \
-	build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o \
-	build/support/env.o build/cg/assembler/binary_literals.o build/assembler/frontend/parser.o \
-	build/assembler/frontend/static_analyser/verifier.o build/assembler/util/pretty_printer.o
+build/bin/vm/asm: build/front/asm.o build/front/asm/generate.o build/front/asm/assemble_instruction.o \
+	build/front/asm/gather.o build/front/asm/decode.o build/program.o build/programinstructions.o \
+	build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
+	build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o \
+	build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o \
+	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
+	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
+	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o \
+build/bin/vm/lex: build/front/lexer.o build/cg/lex.o build/cg/tools.o build/support/string.o \
 	build/support/env.o build/cg/assembler/binary_literals.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o \
+build/bin/vm/parser: build/front/parser.o build/cg/lex.o build/cg/tools.o build/support/string.o \
 	build/support/env.o build/cg/assembler/binary_literals.o build/cg/assembler/utils.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
-build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o \
+build/bin/vm/dis: build/front/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o \
 	build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o \
 	build/assembler/util/pretty_printer.o build/cg/lex.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
@@ -298,18 +280,16 @@ build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembl
 
 ############################################################
 # OBJECTS COMMON FOR DEBUGGER AND KERNEL COMPILATION
-build/scheduler/vps.o: src/scheduler/vps.cpp build/process.o build/process/stack.o
+build/scheduler/%.o: src/scheduler/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
+
+build/kernel/%.o: src/kernel/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h \
 	include/viua/kernel/frame.h build/scheduler/vps.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/kernel/registerset.o: src/kernel/registerset.cpp include/viua/kernel/registerset.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/kernel/frame.o: src/kernel/frame.cpp include/viua/kernel/frame.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/bytecode/decoder/operands.o: src/bytecode/decoder/operands.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
