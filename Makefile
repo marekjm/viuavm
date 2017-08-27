@@ -323,47 +323,40 @@ standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/
 stdlib: build/bin/vm/asm standardlibrary
 	$(MAKE) build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so build/stdlib/kitchensink.so
 
+build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
+	./build/bin/vm/asm --lib -o $@ $<
+
 build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
-	./build/bin/vm/asm --lib -o $@ $<
-
 build/stdlib/std/functional.vlib: src/stdlib/viua/functional.asm build/bin/vm/asm
-	./build/bin/vm/asm --lib -o $@ $<
-
 build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm build/bin/vm/asm
-	./build/bin/vm/asm --lib -o $@ $<
+
+build/stdlib/%.o: src/stdlib/%.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
 build/stdlib/io.o: src/stdlib/io.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
 build/stdlib/random.o: src/stdlib/random.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/%.so: build/stdlib/%.o
+	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/types/exception.o \
 	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
 	build/platform/types/pointer.o build/platform/types/integer.o build/platform/types/bits.o \
 	build/platform/types/number.o build/platform/kernel/registerset.o build/platform/support/string.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/io.so: build/stdlib/io.o build/platform/types/exception.o build/platform/types/vector.o \
 	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
 	build/platform/types/integer.o build/platform/kernel/registerset.o build/platform/support/string.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/random.so: build/stdlib/random.o build/platform/types/exception.o build/platform/types/vector.o \
 	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
 	build/platform/kernel/registerset.o build/platform/support/string.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/types/exception.o \
 	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
 	build/platform/types/pointer.o build/platform/kernel/registerset.o build/platform/support/string.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 
 ############################################################
