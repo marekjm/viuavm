@@ -210,22 +210,11 @@ tools: build/bin/tools/log-shortener
 build/front/asm/%.o: src/front/asm/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/front/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
-build/front/asm/gather.o: src/front/asm/gather.cpp include/viua/front/asm.h
-build/front/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h include/viua/machine.h
-build/front/asm/assemble_instruction.o: src/front/asm/assemble_instruction.cpp
-
 build/front/%.o: src/front/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/assert.o: src/assert.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/front/vm.o: src/front/vm.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/machine.o: src/machine.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
+build/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/bin/vm/kernel: build/front/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o \
 	build/assert.o build/process.o build/process/stack.o build/pid.o build/process/dispatch.o \
@@ -291,9 +280,6 @@ build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h includ
 build/kernel/registerset.o: src/kernel/registerset.cpp include/viua/kernel/registerset.h
 build/kernel/frame.o: src/kernel/frame.cpp include/viua/kernel/frame.h
 
-build/bytecode/decoder/operands.o: src/bytecode/decoder/operands.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 
 ############################################################
 # STANDARD LIBRARY
@@ -344,27 +330,12 @@ build/types/%.o: src/types/%.cpp include/viua/types/%.h
 
 ############################################################
 # KERNEL, INSTRUCTION DISPATCH AND IMPLEMENTATION MODULES
-build/pid.o: src/pid.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/process.o: src/process.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/process/stack.o: src/process/stack.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/process/dispatch.o: src/process/dispatch.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/process/instr/%.o: src/process/instr/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 ############################################################
 # UTILITY MODULES
-build/printutils.o: src/printutils.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/support/%.o: src/support/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
@@ -374,19 +345,7 @@ build/support/%.o: src/support/%.cpp
 build/assembler/%.o: src/assembler/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/program.o: src/program.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/programinstructions.o: src/programinstructions.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/cg/%.o: src/cg/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-
-############################################################
-# MISC MODULES
-build/loader.o: src/loader.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
