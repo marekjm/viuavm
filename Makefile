@@ -295,6 +295,18 @@ build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
 build/stdlib/%.o: src/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
+build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/io.o: src/stdlib/io.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/random.o: src/stdlib/random.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
 build/stdlib/%.so: build/stdlib/%.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
