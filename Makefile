@@ -146,69 +146,69 @@ platform: build/platform/exception.o build/platform/string.o build/platform/vect
 	build/platform/value.o build/platform/pointer.o build/platform/bits.o
 
 build/platform/exception.o: src/types/exception.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/exception.o src/types/exception.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/value.o: src/types/value.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/value.o src/types/value.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/pointer.o: src/types/pointer.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/pointer.o src/types/pointer.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/number.o: src/types/number.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $^
 
 build/platform/integer.o: src/types/integer.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/integer.o src/types/integer.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/bits.o: src/types/bits.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/bits.o src/types/bits.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/float.o: src/types/float.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/float.o src/types/float.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/string.o: src/types/string.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/string.o src/types/string.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/text.o: src/types/text.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/text.o src/types/text.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/vector.o: src/types/vector.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/vector.o src/types/vector.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/reference.o: src/types/reference.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/reference.o src/types/reference.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/registerset.o: src/kernel/registerset.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/registerset.o src/kernel/registerset.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 build/platform/support_string.o: src/support/string.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/support_string.o src/support/string.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 
 ############################################################
 # TESTING
 build/test/World.o: sample/asm/external/World.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/World.o ./sample/asm/external/World.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/World.so: build/test/World.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o build/test/World.so build/test/World.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $<
 
 build/test/printer.o: sample/asm/external/printer.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/printer.o ./sample/asm/external/printer.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/printer.so: build/test/printer.o build/platform/registerset.o build/platform/value.o \
 	build/platform/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/sleeper.o: sample/asm/external/sleeper.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/sleeper.o ./sample/asm/external/sleeper.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/platform/value.o \
 	build/platform/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/math.o:  sample/asm/external/math.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
 build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o \
 	build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o \
