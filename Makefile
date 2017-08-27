@@ -440,62 +440,25 @@ build/assembler/util/pretty_printer.o: src/assembler/util/pretty_printer.cpp
 
 ############################################################
 # TYPE MODULES
+build/types/%.o: src/types/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
 build/types/boolean.o: src/types/boolean.cpp include/viua/types/boolean.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/vector.o: src/types/vector.cpp include/viua/types/vector.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/closure.o: src/types/closure.cpp include/viua/types/closure.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/types/function.o: src/types/function.cpp include/viua/types/function.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/string.o: src/types/string.cpp include/viua/types/string.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/types/text.o: src/types/text.cpp include/viua/types/text.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/types/atom.o: src/types/atom.cpp include/viua/types/atom.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/struct.o: src/types/struct.cpp include/viua/types/struct.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/number.o: src/types/number.cpp include/viua/types/number.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/integer.o: src/types/integer.cpp include/viua/types/integer.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/bits.o: src/types/bits.cpp include/viua/types/bits.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/float.o: src/types/float.cpp include/viua/types/float.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/exception.o: src/types/exception.cpp include/viua/types/exception.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/prototype.o: src/types/prototype.cpp include/viua/types/prototype.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/object.o: src/types/object.cpp include/viua/types/object.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/value.o: src/types/value.cpp include/viua/types/value.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/pointer.o: src/types/pointer.cpp include/viua/types/pointer.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/reference.o: src/types/reference.cpp include/viua/types/reference.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
 build/types/process.o: src/types/process.cpp include/viua/types/process.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 ############################################################
