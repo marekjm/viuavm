@@ -30,6 +30,10 @@ using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::TracedSyntaxError;
 
 
+// This value is completely arbitrary.
+const auto max_distance_for_misspelled_ids = str::LevenshteinDistance{4};
+
+
 auto viua::assembler::frontend::parser::Operand::add(Token t) -> void { tokens.push_back(t); }
 
 auto viua::assembler::frontend::parser::Line::add(Token t) -> void { tokens.push_back(t); }
@@ -244,6 +248,11 @@ static auto get_mnemonics() -> vector<string> {
     }
     return mnemonics;
 }
+static auto get_directives() -> vector<string> {
+    return {
+        ".end", ".function:", ".closure:", ".block:", ".iota:", ".mark:", ".name:", ".unused:",
+    };
+}
 auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Token> tokens,
                                                           unique_ptr<Instruction>& instruction)
     -> decltype(tokens)::size_type {
@@ -254,8 +263,8 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
     }
     if (not OP_MNEMONICS.count(tokens.at(i).str())) {
         auto error = InvalidSyntax(tokens.at(i), "unknown instruction");
-        auto max_distance = str::LevenshteinDistance{4};  // this value is completely arbitrary
-        if (auto suggestion = str::levenshtein_best(tokens.at(i), get_mnemonics(), max_distance);
+        if (auto suggestion =
+                str::levenshtein_best(tokens.at(i), get_mnemonics(), max_distance_for_misspelled_ids);
             suggestion.first) {
             error.aside("did you mean '" + suggestion.second + "'?");
         }
@@ -281,7 +290,13 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
-        throw InvalidSyntax(tokens.at(0), "unknown directive");
+        auto error = InvalidSyntax(tokens.at(0), "unknown directive");
+        if (auto suggestion =
+                str::levenshtein_best(tokens.at(i), get_directives(), max_distance_for_misspelled_ids);
+            suggestion.first) {
+            error.aside("did you mean '" + suggestion.second + "'?");
+        }
+        throw error;
     }
 
     if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:" or tokens.at(0) == ".closure:") {
