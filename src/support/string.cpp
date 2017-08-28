@@ -318,6 +318,75 @@ namespace str {
     }
 
 
+    auto levenshtein(const string source, const string target) -> LevenshteinDistance {
+        if (not source.size()) {
+            return target.size();
+        }
+        if (not target.size()) {
+            return source.size();
+        }
+
+        vector<vector<LevenshteinDistance>> distance_matrix;
+
+        distance_matrix.reserve(source.size());
+        for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+            decltype(distance_matrix)::value_type row;
+            row.reserve(target.size());
+            for (auto j = LevenshteinDistance{0}; j < target.size() + 1; ++j) {
+                row.push_back(0);
+            }
+            distance_matrix.push_back(std::move(row));
+        }
+        for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+            distance_matrix.at(i).at(0) = i;
+        }
+        for (auto i = LevenshteinDistance{0}; i < target.size() + 1; ++i) {
+            distance_matrix.at(0).at(i) = i;
+        }
+
+        for (auto i = LevenshteinDistance{1}; i < source.size() + 1; ++i) {
+            for (auto j = LevenshteinDistance{1}; j < target.size() + 1; ++j) {
+                auto cost = LevenshteinDistance{0};
+
+                cost = (source.at(i - 1) != target.at(j - 1));
+
+                auto deletion = distance_matrix.at(i - 1).at(j) + 1;
+                auto insertion = distance_matrix.at(i).at(j - 1) + 1;
+                auto substitution = distance_matrix.at(i - 1).at(j - 1) + cost;
+
+                distance_matrix.at(i).at(j) = min(min(deletion, insertion), substitution);
+            }
+        }
+
+        return distance_matrix.at(source.size() - 1).at(target.size() - 1);
+    }
+    auto levenshtein_filter(const string source, const vector<string>& candidates,
+                            const LevenshteinDistance limit) -> vector<DistancePair> {
+        vector<DistancePair> matched;
+
+        for (const auto each : candidates) {
+            if (auto distance = levenshtein(source, each); distance <= limit) {
+                matched.emplace_back(distance, each);
+            }
+        }
+
+        return matched;
+    }
+    auto levenshtein_best(const string source, const vector<string>& candidates,
+                          const LevenshteinDistance limit) -> DistancePair {
+        auto best = DistancePair{0, source};
+
+        for (const auto each : levenshtein_filter(source, candidates, limit)) {
+            if ((not best.first) or each.first < best.first) {
+                best = each;
+                continue;
+            }
+        }
+
+        return best;
+    }
+
+
     string enquote(const string& s, const char closing) {
         /** Enquote the string.
          */

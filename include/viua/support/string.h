@@ -77,6 +77,14 @@ namespace str {
     std::string::size_type lshare(const std::string& s, const std::string& w);
     bool contains(const std::string& s, const char c);
 
+    using LevenshteinDistance = std::string::size_type;
+    using DistancePair = std::pair<LevenshteinDistance, std::string>;
+    auto levenshtein(const std::string, const std::string) -> LevenshteinDistance;
+    auto levenshtein_filter(const std::string, const std::vector<std::string>&, const LevenshteinDistance)
+        -> std::vector<DistancePair>;
+    auto levenshtein_best(const std::string, const std::vector<std::string>&, const LevenshteinDistance)
+        -> DistancePair;
+
     std::string enquote(const std::string&, const char = '"');
     std::string strdecode(const std::string&);
     std::string strencode(const std::string&);
