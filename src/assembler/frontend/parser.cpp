@@ -237,6 +237,13 @@ auto viua::assembler::frontend::parser::mnemonic_to_opcode(const string mnemonic
     }
     return opcode;
 }
+static auto get_mnemonics() -> vector<string> {
+    vector<string> mnemonics;
+    for (const auto each : OP_NAMES) {
+        mnemonics.push_back(std::move(each.second));
+    }
+    return mnemonics;
+}
 auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Token> tokens,
                                                           unique_ptr<Instruction>& instruction)
     -> decltype(tokens)::size_type {
@@ -246,7 +253,13 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
         throw InvalidSyntax(tokens.at(i), "expected mnemonic");
     }
     if (not OP_MNEMONICS.count(tokens.at(i).str())) {
-        throw InvalidSyntax(tokens.at(i), "unknown instruction");
+        auto error = InvalidSyntax(tokens.at(i), "unknown instruction");
+        auto max_distance = str::LevenshteinDistance{4};  // this value is completely arbitrary
+        if (auto suggestion = str::levenshtein_best(tokens.at(i), get_mnemonics(), max_distance);
+            suggestion.first) {
+            error.aside("did you mean '" + suggestion.second + "'?");
+        }
+        throw error;
     }
 
     instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
