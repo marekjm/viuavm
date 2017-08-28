@@ -28,6 +28,8 @@ using namespace std;
 using viua::cg::lex::Token;
 using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::TracedSyntaxError;
+using viua::internals::AccessSpecifier;
+using viua::internals::RegisterSets;
 
 
 // This value is completely arbitrary.
@@ -115,13 +117,13 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
 
         auto has_rss = true;
         if (tokens.at(i) == "current") {
-            ri->rss = RegisterSetSpecifier::CURRENT;
+            ri->rss = RegisterSets::CURRENT;
         } else if (tokens.at(i) == "local") {
-            ri->rss = RegisterSetSpecifier::LOCAL;
+            ri->rss = RegisterSets::LOCAL;
         } else if (tokens.at(i) == "static") {
-            ri->rss = RegisterSetSpecifier::STATIC;
+            ri->rss = RegisterSets::STATIC;
         } else if (tokens.at(i) == "global") {
-            ri->rss = RegisterSetSpecifier::GLOBAL;
+            ri->rss = RegisterSets::GLOBAL;
         } else {
             /*
              * This is just for 'arg' instruction's special-case, where

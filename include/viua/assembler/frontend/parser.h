@@ -26,6 +26,7 @@
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/operand_types.h>
 #include <viua/cg/lex.h>
 
 
@@ -33,18 +34,6 @@ namespace viua {
     namespace assembler {
         namespace frontend {
             namespace parser {
-                enum class AccessSpecifier {
-                    DIRECT,
-                    REGISTER_INDIRECT,
-                    POINTER_DEREFERENCE,
-                };
-
-                enum class RegisterSetSpecifier {
-                    CURRENT,
-                    LOCAL,
-                    STATIC,
-                    GLOBAL,
-                };
                 struct Operand {
                     std::vector<viua::cg::lex::Token> tokens;
 
@@ -54,9 +43,9 @@ namespace viua {
                 };
 
                 struct RegisterIndex : public Operand {
-                    AccessSpecifier as;
+                    viua::internals::AccessSpecifier as;
                     viua::internals::types::register_index index;
-                    RegisterSetSpecifier rss;
+                    viua::internals::RegisterSets rss;
                 };
                 struct InstructionBlockName : public Operand {};
                 struct BitsLiteral : public Operand {

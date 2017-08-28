@@ -39,6 +39,8 @@ namespace viua {
                 auto verify_jumps_are_in_range(const parser::ParsedSource&) -> void;
 
                 auto verify(const parser::ParsedSource&) -> void;
+
+                auto check_register_usage(const parser::ParsedSource&) -> void;
             }
         }
     }
