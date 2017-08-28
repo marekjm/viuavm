@@ -49,6 +49,7 @@ There are several categories of change:
 - feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
   compared with the older one
 - fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
+- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
 
 
 ----
