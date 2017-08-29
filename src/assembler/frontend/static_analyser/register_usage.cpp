@@ -165,7 +165,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         RegisterUsageProfile register_usage_profile;
 
-        for (const auto& line[[gnu::unused]] : ib.body) {
+        for (const auto& line : ib.body) {
             auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
             if (not instruction) {
                 continue;
