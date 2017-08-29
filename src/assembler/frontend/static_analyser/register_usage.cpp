@@ -222,6 +222,16 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::TEXT;
                 register_usage_profile.define(val, operand->tokens.at(0));
+            } else if (opcode == PRINT) {
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'print'")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+
+                register_usage_profile.use(Register(*operand), operand->tokens.at(0));
             }
         }
 
