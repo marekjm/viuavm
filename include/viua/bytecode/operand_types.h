@@ -74,6 +74,8 @@ namespace viua {
             VOID,
 
             INTEGER,
+
+            TEXT,
         };
     }
 }
