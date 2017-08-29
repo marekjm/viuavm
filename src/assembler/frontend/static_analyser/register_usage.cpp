@@ -204,8 +204,27 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
-                check_use_of_register(register_usage_profile, *lhs);
                 check_use_of_register(register_usage_profile, *rhs);
+                check_use_of_register(register_usage_profile, *lhs);
+
+                if (register_usage_profile.at(Register(*lhs)).second !=
+                    viua::internals::ValueTypes::INTEGER) {
+                    throw TracedSyntaxError{}
+                        .append(
+                            InvalidSyntax(lhs->tokens.at(0), "invalid type of value contained in register")
+                                .note("expected integer"))
+                        .append(InvalidSyntax(register_usage_profile.defined_where(Register(*lhs)), "")
+                                    .note("defined here"));
+                }
+                if (register_usage_profile.at(Register(*rhs)).second !=
+                    viua::internals::ValueTypes::INTEGER) {
+                    throw TracedSyntaxError{}
+                        .append(
+                            InvalidSyntax(rhs->tokens.at(0), "invalid type of value contained in register")
+                                .note("expected integer"))
+                        .append(InvalidSyntax(register_usage_profile.defined_where(Register(*rhs)), "")
+                                    .note("defined here"));
+                }
 
                 auto val = Register(*result);
                 val.value_type = register_usage_profile.at(*lhs).second;
