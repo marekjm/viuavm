@@ -176,7 +176,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
             if (opcode == ISTORE) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'istore'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
 
@@ -188,19 +188,21 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
             } else if (opcode == SUB) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'sub'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'sub'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid left-hand side operand")
                         .note("expected register index");
                 }
 
                 auto rhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not rhs) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'sub'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid right-hand side operand")
                         .note("expected register index");
                 }
 
@@ -232,7 +234,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
             } else if (opcode == TEXT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'text'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
 
@@ -244,7 +246,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand for 'print'")
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
 
