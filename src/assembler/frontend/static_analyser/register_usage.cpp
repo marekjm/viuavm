@@ -185,7 +185,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
-            } else if (opcode == SUB) {
+            } else if (opcode == ADD or opcode == SUB or opcode == MUL or opcode == DIV or opcode == LT or
+                       opcode == LTE or opcode == GT or opcode == GTE or opcode == EQ) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
