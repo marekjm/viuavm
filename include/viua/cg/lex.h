@@ -43,7 +43,7 @@ namespace viua {
                 auto original() const -> decltype(original_content);
                 auto original(std::string) -> void;
 
-                auto ends() const -> decltype(character_in_line);
+                auto ends(const bool = false) const -> decltype(character_in_line);
 
                 bool operator==(const std::string& s) const;
                 bool operator!=(const std::string& s) const;

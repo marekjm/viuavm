@@ -37,8 +37,8 @@ namespace viua {
             auto Token::original() const -> decltype(original_content) { return original_content; }
             auto Token::original(string s) -> void { original_content = s; }
 
-            auto Token::ends() const -> decltype(character_in_line) {
-                return (character_in_line + content.size());
+            auto Token::ends(const bool as_original) const -> decltype(character_in_line) {
+                return (character_in_line + (as_original ? original_content : content).size());
             }
 
             bool Token::operator==(const string& s) const { return (content == s); }
@@ -64,8 +64,10 @@ namespace viua {
                     if (token.line() == each.line() and token.character() == each.character()) {
                         return true;
                     }
-                    if (token.line() == each.line() and token.character() >= each.character() and
-                        token.ends() <= each.ends()) {
+                    if (token.line() != each.line()) {
+                        continue;
+                    }
+                    if (token.character() >= each.character() and token.ends(true) <= each.ends(true)) {
                         return true;
                     }
                 }
@@ -2473,15 +2475,15 @@ namespace viua {
                     } else if (token.str().at(0) == '@' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(),
                                             ("@" + names.at(token.str().substr(1))));
-                        tokens.back().original(token.str().substr(1));
+                        tokens.back().original(token.str());
                     } else if (token.str().at(0) == '*' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(),
                                             ("*" + names.at(token.str().substr(1))));
-                        tokens.back().original(token.str().substr(1));
+                        tokens.back().original(token.str());
                     } else if (token.str().at(0) == '%' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(),
                                             ("%" + names.at(token.str().substr(1))));
-                        tokens.back().original(token.str().substr(1));
+                        tokens.back().original(token.str());
                     } else {
                         tokens.push_back(token);
                     }
