@@ -158,9 +158,15 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
 
 static auto check_use_of_register(RegisterUsageProfile& rup,
                                   viua::assembler::frontend::parser::RegisterIndex r) {
-    cerr << "check_use_of_register: " << r.index << endl;
     if (not rup.defined(Register(r))) {
-        throw InvalidSyntax(r.tokens.at(0), ("use of empty register: " + to_string(r.index)));
+        ostringstream msg;
+        msg << "use of empty register " << str::enquote(to_string(r.index));
+        if (rup.index_to_name.count(r.index)) {
+            msg << " (named " << str::enquote(rup.index_to_name.at(r.index)) << ')';
+        } else {
+            msg << " (not named)";
+        }
+        throw InvalidSyntax(r.tokens.at(0), msg.str());
     }
     rup.use(Register(r), r.tokens.at(0));
 }
@@ -281,8 +287,16 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
         for (const auto& each : register_usage_profile) {
             if (not register_usage_profile.used(each.first)) {
-                throw InvalidSyntax(each.second.first,
-                                    ("unused value in register " + to_string(each.first.index)));
+                ostringstream msg;
+                msg << "unused value in register " << str::enquote(to_string(each.first.index));
+                if (register_usage_profile.index_to_name.count(each.first.index)) {
+                    msg << " (named "
+                        << str::enquote(register_usage_profile.index_to_name.at(each.first.index)) << ')';
+                } else {
+                    msg << " (not named)";
+                }
+
+                throw InvalidSyntax(each.second.first, msg.str());
             }
         }
     });
