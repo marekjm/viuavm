@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <map>
 #include <set>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/bytecode/operand_types.h>
@@ -103,6 +104,9 @@ class RegisterUsageProfile {
     set<Register> maybe_unused_registers;
 
   public:
+    map<string, viua::internals::types::register_index> name_to_index;
+    map<viua::internals::types::register_index, string> index_to_name;
+
     auto defined(const Register r) const -> bool { return defined_registers.count(r); }
     auto defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
 
@@ -164,6 +168,24 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         RegisterUsageProfile register_usage_profile;
+
+        for (const auto& line : ib.body) {
+            auto directive = dynamic_cast<viua::assembler::frontend::parser::Directive*>(line.get());
+            if (not directive) {
+                continue;
+            }
+
+            if (directive->directive != ".name:") {
+                continue;
+            }
+
+            auto index =
+                static_cast<viua::internals::types::register_index>(stoul(directive->operands.at(0)));
+            auto name = directive->operands.at(1);
+
+            register_usage_profile.name_to_index[name] = index;
+            register_usage_profile.index_to_name[index] = name;
+        }
 
         for (const auto& line : ib.body) {
             auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
