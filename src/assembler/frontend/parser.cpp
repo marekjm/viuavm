@@ -112,6 +112,10 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         }
         ri->add(tokens.at(i));  // add index token
 
+        if (not str::isnum(tok.substr(1), false)) {
+            throw InvalidSyntax(tokens.at(0), "undeclared register name: " + tok.substr(1));
+        }
+
         ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
         ++i;
 
