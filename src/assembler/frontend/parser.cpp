@@ -323,6 +323,9 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
         directive->operands.push_back(tokens.at(i++));
     } else if (tokens.at(0) == ".unused:") {
         directive->operands.push_back(tokens.at(i++));
+    } else if (tokens.at(0) == ".name:") {
+        directive->operands.push_back(tokens.at(i++));
+        directive->operands.push_back(tokens.at(i++));
     }
 
     if (tokens.at(i) != "\n") {
