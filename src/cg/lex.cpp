@@ -2465,7 +2465,11 @@ namespace viua {
                         }
 
                         names[name] = index;
-                        i += 2;
+
+                        tokens.push_back(token);
+                        tokens.push_back(input_tokens.at(++i));
+                        tokens.push_back(input_tokens.at(++i));
+
                         continue;
                     }
 
