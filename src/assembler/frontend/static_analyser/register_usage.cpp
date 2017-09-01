@@ -156,8 +156,26 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
     }
 }
 
+template<typename K, typename V> static auto keys_of(const map<K, V>& m) -> vector<K> {
+    vector<K> keys;
+
+    for (const auto& each : m) {
+        keys.push_back(each.first);
+    }
+
+    return keys;
+}
 static auto check_use_of_register(RegisterUsageProfile& rup,
                                   viua::assembler::frontend::parser::RegisterIndex r) {
+    if (not r.resolved) {
+        auto error = InvalidSyntax(r.tokens.at(0), "unresolved name");
+        if (auto suggestion =
+                str::levenshtein_best(r.tokens.at(0).str().substr(1), keys_of(rup.name_to_index), 4);
+            suggestion.first) {
+            error.aside("did you mean '" + suggestion.second + "'?");
+        }
+        throw error;
+    }
     if (not rup.defined(Register(r))) {
         ostringstream msg;
         msg << "use of empty register " << str::enquote(to_string(r.index));

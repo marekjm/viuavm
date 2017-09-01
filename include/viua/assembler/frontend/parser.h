@@ -46,6 +46,7 @@ namespace viua {
                     viua::internals::AccessSpecifier as;
                     viua::internals::types::register_index index;
                     viua::internals::RegisterSets rss;
+                    bool resolved = false;
                 };
                 struct InstructionBlockName : public Operand {};
                 struct BitsLiteral : public Operand {

@@ -113,10 +113,16 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ri->add(tokens.at(i));  // add index token
 
         if (not str::isnum(tok.substr(1), false)) {
-            throw InvalidSyntax(tokens.at(0), "undeclared register name: " + tok.substr(1));
+            // Throw this error during register usage analysis, when we have a full map of names
+            // built so "did you mean...?" note can be provided.
+            // Mark the register index as unresolved to prevent it from being accidentally used.
+            // throw InvalidSyntax(tokens.at(0), "undeclared register name: " + tok.substr(1));
+            ri->resolved = false;
+        } else {
+            ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
+            ri->resolved = true;
         }
 
-        ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
         ++i;
 
         auto has_rss = true;
