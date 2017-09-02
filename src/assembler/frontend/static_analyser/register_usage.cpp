@@ -712,6 +712,36 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == TEXTCONCAT) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not lhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid left-hand side operand")
+                        .note("expected register index");
+                }
+
+                auto rhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not rhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid right-hand side operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *lhs);
+                check_use_of_register(register_usage_profile, *rhs);
+
+                assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile, *rhs);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::TEXT;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
