@@ -295,6 +295,16 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
+            } else if (opcode == IINC or opcode == IDEC) {
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
+                                                                              *operand);
             } else if (opcode == ADD or opcode == SUB or opcode == MUL or opcode == DIV) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
