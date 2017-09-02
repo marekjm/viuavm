@@ -459,6 +459,14 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
         }
 
         for (const auto& each : register_usage_profile) {
+            if (not each.first.index) {
+                /*
+                 * Registers with index 0 do not take part in the "unused" analysis, because
+                 * they are used to store return values of functions.
+                 * This means that they *MUST* be defined, but *MAY* stay unused.
+                 */
+                continue;
+            }
             if (not register_usage_profile.used(each.first)) {
                 ostringstream msg;
                 msg << "unused value in register " << str::enquote(to_string(each.first.index));
