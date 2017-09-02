@@ -176,8 +176,7 @@ template<typename K, typename V> static auto keys_of(const map<K, V>& m) -> vect
 
     return keys;
 }
-static auto check_use_of_register(RegisterUsageProfile& rup,
-                                  viua::assembler::frontend::parser::RegisterIndex r) {
+static auto check_if_name_resolved(const RegisterUsageProfile& rup, const RegisterIndex r) -> void {
     if (not r.resolved) {
         auto error = InvalidSyntax(r.tokens.at(0), "unresolved name");
         if (auto suggestion =
@@ -188,6 +187,10 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
         }
         throw error;
     }
+}
+static auto check_use_of_register(RegisterUsageProfile& rup,
+                                  viua::assembler::frontend::parser::RegisterIndex r) {
+    check_if_name_resolved(rup, r);
     if (not rup.defined(Register(r))) {
         ostringstream msg;
         msg << "use of empty register " << str::enquote(to_string(r.index));
@@ -300,6 +303,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *operand);
+
                 auto val = Register{};
                 val.index = operand->index;
                 val.register_set = operand->rss;
@@ -311,6 +316,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *operand);
 
                 auto val = Register{};
                 val.index = operand->index;
@@ -324,6 +331,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *operand);
+
                 check_use_of_register(register_usage_profile, *operand);
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *operand);
@@ -333,6 +342,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *operand);
 
                 auto val = Register{};
                 val.index = operand->index;
@@ -345,6 +356,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not operand) {
@@ -367,6 +380,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -386,6 +401,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not operand) {
@@ -407,6 +424,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -426,6 +445,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
@@ -457,6 +478,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens,
@@ -487,6 +510,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *operand);
+
                 auto val = Register{};
                 val.index = operand->index;
                 val.register_set = operand->rss;
@@ -499,6 +524,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
@@ -530,6 +557,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *operand);
+
                 auto val = Register{};
                 val.index = operand->index;
                 val.register_set = operand->rss;
@@ -542,6 +571,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
@@ -573,6 +604,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not source) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -600,6 +633,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not source) {
@@ -639,6 +674,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -658,6 +695,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
@@ -689,6 +728,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
+                check_if_name_resolved(register_usage_profile, *result);
+
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens,
@@ -718,6 +759,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index");
                 }
+
+                check_if_name_resolved(register_usage_profile, *result);
 
                 auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
                 if (not lhs) {
@@ -762,6 +805,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                         .note("expected register index or void");
                 }
+
+                check_if_name_resolved(register_usage_profile, *target);
 
                 auto val = Register(*target);
                 register_usage_profile.define(val, target->tokens.at(0));
