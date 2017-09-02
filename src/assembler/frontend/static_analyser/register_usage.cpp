@@ -288,8 +288,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .note("expected register index");
                 }
 
-                check_use_of_register(register_usage_profile, *rhs);
                 check_use_of_register(register_usage_profile, *lhs);
+                check_use_of_register(register_usage_profile, *rhs);
 
                 check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
                 check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
