@@ -213,6 +213,10 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
 
 using ValueTypes = viua::internals::ValueTypes;
 using ValueTypesType = viua::internals::ValueTypesType;
+static auto operator|(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+    // FIXME find out if it is possible to remove the outermost static_cast<>
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) | static_cast<ValueTypesType>(rhs));
+}
 static auto operator&(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) & static_cast<ValueTypesType>(rhs));
@@ -885,6 +889,27 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 auto val = Register(*target);
                 register_usage_profile.define(val, target->tokens.at(0));
+            } else if (opcode == PTR) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+
+                auto val = Register(*result);
+                val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
+                                  viua::internals::ValueTypes::POINTER);
+                register_usage_profile.define(val, result->tokens.at(0));
             }
         }
 

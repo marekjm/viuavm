@@ -112,6 +112,8 @@ namespace viua {
             STRING = 1 << 6,
 
             VECTOR = 1 << 7,
+
+            POINTER = 1 << 15,
         };
     }
 }
