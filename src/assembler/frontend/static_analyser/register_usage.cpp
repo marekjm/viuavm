@@ -243,7 +243,8 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         return;
     }
 
-    if (actual_type != expected_type) {
+    if (not(static_cast<viua::internals::ValueTypesType>(actual_type) &
+            static_cast<viua::internals::ValueTypesType>(expected_type))) {
         auto error =
             TracedSyntaxError{}
                 .append(
