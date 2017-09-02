@@ -76,6 +76,7 @@ namespace viua {
 
             INTEGER = 1 << 2,
             FLOAT = 1 << 3,
+            NUMBER = (INTEGER | FLOAT),
 
             BOOLEAN = 1 << 4,
 
