@@ -81,6 +81,8 @@ namespace viua {
             BOOLEAN = 1 << 4,
 
             TEXT = 1 << 5,
+
+            STRING = 1 << 6,
         };
     }
 }
