@@ -172,7 +172,8 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
         if (auto suggestion =
                 str::levenshtein_best(r.tokens.at(0).str().substr(1), keys_of(rup.name_to_index), 4);
             suggestion.first) {
-            error.aside("did you mean '" + suggestion.second + "'?");
+            error.aside("did you mean '" + suggestion.second + "' (name of " +
+                        to_string(rup.name_to_index.at(suggestion.second)) + ")?");
         }
         throw error;
     }
