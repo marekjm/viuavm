@@ -1520,6 +1520,14 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testFstoreStoresFloats(self):
+        runTestFailsToAssembleDetailed(self, 'fstore_stores_floats.asm', [
+            '22:10: error: invalid type of value contained in register',
+            '22:10: note: expected integer, got float',
+            '21:12: note: register defined here',
+            '20:12: error: in function main/0',
+        ])
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
