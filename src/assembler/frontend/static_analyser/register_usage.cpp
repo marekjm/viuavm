@@ -887,7 +887,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
             }
             if (not register_usage_profile.used(each.first)) {
                 ostringstream msg;
-                msg << "unused value in register " << str::enquote(to_string(each.first.index));
+                msg << "unused " + to_string(each.second.second.value_type) + " in register "
+                    << str::enquote(to_string(each.first.index));
                 if (register_usage_profile.index_to_name.count(each.first.index)) {
                     msg << " (named "
                         << str::enquote(register_usage_profile.index_to_name.at(each.first.index)) << ')';
