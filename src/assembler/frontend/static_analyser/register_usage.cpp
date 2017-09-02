@@ -47,6 +47,7 @@ struct Register {
     viua::internals::types::register_index index{0};
     viua::internals::RegisterSets register_set = viua::internals::RegisterSets::LOCAL;
     viua::internals::ValueTypes value_type = viua::internals::ValueTypes::UNDEFINED;
+    pair<bool, Token> inferred = {false, {}};
 
     auto operator<(const Register& that) const -> bool {
         if (register_set < that.register_set) {
@@ -74,7 +75,7 @@ class RegisterUsageProfile {
      *      text %1 local "Hello World!"    ; register 1 is defined, and
      *                                      ; the defining token is '%1'
      */
-    map<Register, pair<Token, viua::internals::ValueTypes>> defined_registers;
+    map<Register, pair<Token, Register>> defined_registers;
 
     /*
      * Maps a register to the token marking the last place a register
@@ -114,7 +115,14 @@ class RegisterUsageProfile {
     auto defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
 
     auto define(const Register r, const Token t) -> void {
-        defined_registers.insert_or_assign(r, pair(t, r.value_type));
+        defined_registers.insert_or_assign(r, pair(t, r));
+    }
+
+    auto infer(const Register r, const viua::internals::ValueTypes value_type_id, const Token& t) -> void {
+        auto reg = at(r);
+        reg.second.value_type = value_type_id;
+        reg.second.inferred = {true, t};
+        define(reg.second, reg.first);
     }
 
     auto use(const Register r, const Token t) -> void { used_registers[r] = t; }
@@ -215,15 +223,29 @@ static auto to_string(const viua::internals::ValueTypes value_type_id) -> string
 }
 
 template<viua::internals::ValueTypes expected_type>
-static auto check_type_of_register(const RegisterUsageProfile& register_usage_profile,
-                                   const RegisterIndex& register_index) -> void {
-    if (auto actual_type = register_usage_profile.at(Register(register_index)).second;
-        actual_type != expected_type) {
-        throw TracedSyntaxError{}
-            .append(InvalidSyntax(register_index.tokens.at(0), "invalid type of value contained in register")
+static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile,
+                                    const RegisterIndex& register_index) -> void {
+    auto actual_type = register_usage_profile.at(Register(register_index)).second.value_type;
+
+    if (actual_type == viua::internals::ValueTypes::UNDEFINED) {
+        cerr << "type of register " << Register(register_index).index
+             << " is " + to_string(actual_type) + ": inferring it to " << to_string(expected_type) << endl;
+        register_usage_profile.infer(Register(register_index), expected_type, register_index.tokens.at(0));
+        return;
+    }
+
+    if (actual_type != expected_type) {
+        auto error =
+            TracedSyntaxError{}
+                .append(
+                    InvalidSyntax(register_index.tokens.at(0), "invalid type of value contained in register")
                         .note("expected " + to_string(expected_type) + ", got " + to_string(actual_type)))
-            .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
-                        .note("defined here"));
+                .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
+                            .note("register defined here"));
+        if (auto r = register_usage_profile.at(Register(register_index)).second; r.inferred.first) {
+            error.append(InvalidSyntax(r.inferred.second, "").note("type inferred here"));
+        }
+        throw error;
     }
 }
 
