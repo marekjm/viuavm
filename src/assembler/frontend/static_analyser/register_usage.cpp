@@ -193,6 +193,37 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
     rup.use(Register(r), r.tokens.at(0));
 }
 
+auto value_type_names = map<viua::internals::ValueTypes, string>{
+    {
+        viua::internals::ValueTypes::UNDEFINED, "undefined"s,
+    },
+    {
+        viua::internals::ValueTypes::VOID, "void"s,
+    },
+    {
+        viua::internals::ValueTypes::INTEGER, "integer"s,
+    },
+    {
+        viua::internals::ValueTypes::TEXT, "text"s,
+    },
+};
+static auto to_string(const viua::internals::ValueTypes value_type_id) -> string {
+    return value_type_names.at(value_type_id);
+}
+
+template<viua::internals::ValueTypes expected_type>
+static auto check_type_of_register(const RegisterUsageProfile& register_usage_profile,
+                                   const RegisterIndex& register_index) -> void {
+    if (auto actual_type = register_usage_profile.at(Register(register_index)).second;
+        actual_type != expected_type) {
+        throw TracedSyntaxError{}
+            .append(InvalidSyntax(register_index.tokens.at(0), "invalid type of value contained in register")
+                        .note("expected " + to_string(expected_type) + ", got " + to_string(actual_type)))
+            .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
+                        .note("defined here"));
+    }
+}
+
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         RegisterUsageProfile register_usage_profile;
@@ -260,24 +291,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 check_use_of_register(register_usage_profile, *rhs);
                 check_use_of_register(register_usage_profile, *lhs);
 
-                if (register_usage_profile.at(Register(*lhs)).second !=
-                    viua::internals::ValueTypes::INTEGER) {
-                    throw TracedSyntaxError{}
-                        .append(
-                            InvalidSyntax(lhs->tokens.at(0), "invalid type of value contained in register")
-                                .note("expected integer"))
-                        .append(InvalidSyntax(register_usage_profile.defined_where(Register(*lhs)), "")
-                                    .note("defined here"));
-                }
-                if (register_usage_profile.at(Register(*rhs)).second !=
-                    viua::internals::ValueTypes::INTEGER) {
-                    throw TracedSyntaxError{}
-                        .append(
-                            InvalidSyntax(rhs->tokens.at(0), "invalid type of value contained in register")
-                                .note("expected integer"))
-                        .append(InvalidSyntax(register_usage_profile.defined_where(Register(*rhs)), "")
-                                    .note("defined here"));
-                }
+                check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
+                check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
 
                 auto val = Register(*result);
                 val.value_type = register_usage_profile.at(*lhs).second;
@@ -293,6 +308,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.index = operand->index;
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::TEXT;
+
                 register_usage_profile.define(val, operand->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
