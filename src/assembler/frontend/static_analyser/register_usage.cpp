@@ -632,6 +632,26 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::TEXT;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == TEXTLENGTH) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+
+                assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile, *operand);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::INTEGER;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
