@@ -79,7 +79,7 @@ namespace viua {
 
             BOOLEAN = 1 << 4,
 
-            TEXT,
+            TEXT = 1 << 5,
         };
     }
 }
