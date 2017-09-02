@@ -283,7 +283,19 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
             using viua::assembler::frontend::parser::RegisterIndex;
             auto opcode = instruction->opcode;
-            if (opcode == ISTORE) {
+            if (opcode == IZERO) {
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto val = Register{};
+                val.index = operand->index;
+                val.register_set = operand->rss;
+                val.value_type = viua::internals::ValueTypes::INTEGER;
+                register_usage_profile.define(val, operand->tokens.at(0));
+            } else if (opcode == ISTORE) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
