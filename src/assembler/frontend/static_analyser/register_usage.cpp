@@ -295,8 +295,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
-            } else if (opcode == ADD or opcode == SUB or opcode == MUL or opcode == DIV or opcode == LT or
-                       opcode == LTE or opcode == GT or opcode == GTE or opcode == EQ) {
+            } else if (opcode == ADD or opcode == SUB or opcode == MUL or opcode == DIV) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -320,11 +319,41 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 check_use_of_register(register_usage_profile, *lhs);
                 check_use_of_register(register_usage_profile, *rhs);
 
-                check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
-                check_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
 
                 auto val = Register(*result);
-                val.value_type = register_usage_profile.at(*lhs).second;
+                val.value_type = register_usage_profile.at(*lhs).second.value_type;
+                register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == LT or opcode == LTE or opcode == GT or opcode == GTE or opcode == EQ) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not lhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid left-hand side operand")
+                        .note("expected register index");
+                }
+
+                auto rhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not rhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid right-hand side operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *lhs);
+                check_use_of_register(register_usage_profile, *rhs);
+
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == TEXT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
