@@ -213,6 +213,10 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
 
 using ValueTypes = viua::internals::ValueTypes;
 using ValueTypesType = viua::internals::ValueTypesType;
+static auto operator&(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+    // FIXME find out if it is possible to remove the outermost static_cast<>
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) & static_cast<ValueTypesType>(rhs));
+}
 
 auto value_type_names = map<ValueTypes, string>{
     {
@@ -265,8 +269,7 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         return;
     }
 
-    if (not(static_cast<ValueTypesType>(actual_type) &
-            static_cast<ValueTypesType>(expected_type))) {
+    if (not(actual_type & expected_type)) {
         auto error =
             TracedSyntaxError{}
                 .append(
