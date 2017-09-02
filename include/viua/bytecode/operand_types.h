@@ -110,6 +110,8 @@ namespace viua {
              * FIXME DEPRECATED
              */
             STRING = 1 << 6,
+
+            VECTOR = 1 << 7,
         };
     }
 }

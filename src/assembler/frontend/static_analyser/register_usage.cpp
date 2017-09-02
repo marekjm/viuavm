@@ -229,6 +229,9 @@ auto value_type_names = map<viua::internals::ValueTypes, string>{
     {
         viua::internals::ValueTypes::STRING, "string"s,
     },
+    {
+        ValueTypes::VECTOR, "vector"s,
+    },
 };
 static auto to_string(const viua::internals::ValueTypes value_type_id) -> string {
     return value_type_names.at(value_type_id);
