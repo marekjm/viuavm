@@ -388,6 +388,19 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 check_use_of_register(register_usage_profile, *operand);
 
                 register_usage_profile.use(Register(*operand), operand->tokens.at(0));
+            } else if (opcode == ARG) {
+                if (dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
+                    continue;
+                }
+
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+
+                auto val = Register(*target);
+                register_usage_profile.define(val, target->tokens.at(0));
             }
         }
 
