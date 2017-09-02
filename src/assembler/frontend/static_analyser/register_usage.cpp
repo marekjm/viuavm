@@ -211,36 +211,39 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
     rup.use(Register(r), r.tokens.at(0));
 }
 
-auto value_type_names = map<viua::internals::ValueTypes, string>{
+using ValueTypes = viua::internals::ValueTypes;
+using ValueTypesType = viua::internals::ValueTypesType;
+
+auto value_type_names = map<ValueTypes, string>{
     {
-        viua::internals::ValueTypes::UNDEFINED, "undefined"s,
+        ValueTypes::UNDEFINED, "undefined"s,
     },
     {
-        viua::internals::ValueTypes::VOID, "void"s,
+        ValueTypes::VOID, "void"s,
     },
     {
-        viua::internals::ValueTypes::INTEGER, "integer"s,
+        ValueTypes::INTEGER, "integer"s,
     },
     {
-        viua::internals::ValueTypes::FLOAT, "float"s,
+        ValueTypes::FLOAT, "float"s,
     },
     {
-        viua::internals::ValueTypes::NUMBER, "number"s,
+        ValueTypes::NUMBER, "number"s,
     },
     {
-        viua::internals::ValueTypes::BOOLEAN, "boolean"s,
+        ValueTypes::BOOLEAN, "boolean"s,
     },
     {
-        viua::internals::ValueTypes::TEXT, "text"s,
+        ValueTypes::TEXT, "text"s,
     },
     {
-        viua::internals::ValueTypes::STRING, "string"s,
+        ValueTypes::STRING, "string"s,
     },
     {
         ValueTypes::VECTOR, "vector"s,
     },
 };
-static auto to_string(const viua::internals::ValueTypes value_type_id) -> string {
+static auto to_string(ValueTypes value_type_id) -> string {
     return value_type_names.at(value_type_id);
 }
 
@@ -249,15 +252,15 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
                                     const RegisterIndex& register_index) -> void {
     auto actual_type = register_usage_profile.at(Register(register_index)).second.value_type;
 
-    if (actual_type == viua::internals::ValueTypes::UNDEFINED) {
+    if (actual_type == ValueTypes::UNDEFINED) {
         cerr << "type of register " << Register(register_index).index
              << " is " + to_string(actual_type) + ": inferring it to " << to_string(expected_type) << endl;
         register_usage_profile.infer(Register(register_index), expected_type, register_index.tokens.at(0));
         return;
     }
 
-    if (not(static_cast<viua::internals::ValueTypesType>(actual_type) &
-            static_cast<viua::internals::ValueTypesType>(expected_type))) {
+    if (not(static_cast<ValueTypesType>(actual_type) &
+            static_cast<ValueTypesType>(expected_type))) {
         auto error =
             TracedSyntaxError{}
                 .append(
