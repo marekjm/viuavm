@@ -480,6 +480,19 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == STRSTORE) {
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto val = Register{};
+                val.index = operand->index;
+                val.register_set = operand->rss;
+                val.value_type = viua::internals::ValueTypes::STRING;
+
+                register_usage_profile.define(val, operand->tokens.at(0));
             } else if (opcode == STREQ) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
