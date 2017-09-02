@@ -1509,6 +1509,17 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testAllowComparingIntegersAndFloats(self):
+        runTest(self, 'allow_comparing_integers_and_floats.asm', 'true')
+
+    def testPreventComparingNumbersAndText(self):
+        runTestFailsToAssembleDetailed(self, 'prevent_comparing_numbers_and_text.asm', [
+            '28:40: error: invalid type of value contained in register',
+            '28:40: note: expected number, got text',
+            '26:10: note: register defined here',
+            '20:12: error: in function main/0',
+        ])
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
