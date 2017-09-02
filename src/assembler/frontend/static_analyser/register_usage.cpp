@@ -212,10 +212,19 @@ auto value_type_names = map<viua::internals::ValueTypes, string>{
         viua::internals::ValueTypes::INTEGER, "integer"s,
     },
     {
+        viua::internals::ValueTypes::FLOAT, "float"s,
+    },
+    {
+        viua::internals::ValueTypes::NUMBER, "number"s,
+    },
+    {
         viua::internals::ValueTypes::BOOLEAN, "boolean"s,
     },
     {
         viua::internals::ValueTypes::TEXT, "text"s,
+    },
+    {
+        viua::internals::ValueTypes::STRING, "string"s,
     },
 };
 static auto to_string(const viua::internals::ValueTypes value_type_id) -> string {
