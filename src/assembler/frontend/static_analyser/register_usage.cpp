@@ -266,7 +266,9 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
                 .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
                             .note("register defined here"));
         if (auto r = register_usage_profile.at(Register(register_index)).second; r.inferred.first) {
-            error.append(InvalidSyntax(r.inferred.second, "").note("type inferred here"));
+            error.append(InvalidSyntax(r.inferred.second, "")
+                             .note("type inferred here")
+                             .aside("deduced type is '" + to_string(r.value_type) + "'"));
         }
         throw error;
     }
