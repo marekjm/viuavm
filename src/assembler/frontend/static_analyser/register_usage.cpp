@@ -57,6 +57,9 @@ struct Register {
         }
         return false;
     }
+    auto operator==(const Register& that) const -> bool {
+        return (register_set == that.register_set) and (index == that.index);
+    }
 
     Register() = default;
     Register(const viua::assembler::frontend::parser::RegisterIndex& ri)
