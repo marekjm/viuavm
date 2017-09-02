@@ -75,6 +75,8 @@ namespace viua {
 
             INTEGER,
 
+            BOOLEAN,
+
             TEXT,
         };
     }

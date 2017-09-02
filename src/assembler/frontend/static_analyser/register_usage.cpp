@@ -204,6 +204,9 @@ auto value_type_names = map<viua::internals::ValueTypes, string>{
         viua::internals::ValueTypes::INTEGER, "integer"s,
     },
     {
+        viua::internals::ValueTypes::BOOLEAN, "boolean"s,
+    },
+    {
         viua::internals::ValueTypes::TEXT, "text"s,
     },
 };
