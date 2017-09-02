@@ -241,8 +241,12 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 continue;
             }
 
-            auto index =
-                static_cast<viua::internals::types::register_index>(stoul(directive->operands.at(0)));
+            // FIXME create strip_access_type_marker() function to implement this if
+            auto idx = directive->operands.at(0);
+            if (idx.at(0) == '%' or idx.at(0) == '*' or idx.at(0) == '@') {
+                idx = idx.substr(1);
+            }
+            auto index = static_cast<viua::internals::types::register_index>(stoul(idx));
             auto name = directive->operands.at(1);
 
             register_usage_profile.name_to_index[name] = index;
