@@ -594,6 +594,44 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::TEXT;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == TEXTSUB) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto key_begin = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not key_begin) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto key_end = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not key_end) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                check_use_of_register(register_usage_profile, *key_begin);
+                check_use_of_register(register_usage_profile, *key_end);
+
+                assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
+                                                                              *key_begin);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
+                                                                              *key_end);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::TEXT;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
