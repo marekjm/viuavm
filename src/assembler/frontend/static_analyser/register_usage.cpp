@@ -114,7 +114,7 @@ class RegisterUsageProfile {
     auto defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
 
     auto define(const Register r, const Token t) -> void {
-        defined_registers.emplace(r, pair(t, r.value_type));
+        defined_registers.insert_or_assign(r, pair(t, r.value_type));
     }
 
     auto use(const Register r, const Token t) -> void { used_registers[r] = t; }
