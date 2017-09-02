@@ -304,9 +304,9 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
     }
 
     if (actual_type == ValueTypes::UNDEFINED) {
-        cerr << "type of register " << Register(register_index).index
-             << " is " + to_string(actual_type) + ": inferring it to " << to_string(expected_type) << endl;
-        register_usage_profile.infer(Register(register_index), expected_type, register_index.tokens.at(0));
+        auto inferred_type =
+            (expected_type | (access_via_pointer_dereference ? ValueTypes::POINTER : ValueTypes::UNDEFINED));
+        register_usage_profile.infer(Register(register_index), inferred_type, register_index.tokens.at(0));
         return;
     }
 
