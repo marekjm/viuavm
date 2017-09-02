@@ -1497,6 +1497,19 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm', "./sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:21:5: error: main function uses invalid register set to return a value: static")
 
 
+class StaticAnalysis(unittest.TestCase):
+    PATH = './sample/static_analysis'
+
+    def testIzeroCreatesInteger(self):
+        runTest(self, 'izero_creates_integer.asm', '1')
+
+    def testIzeroReportedAsUnused(self):
+        runTestFailsToAssembleDetailed(self, 'izero_reported_as_unused.asm', [
+            '21:11: error: unused value in register "1" (not named)',
+            '20:12: error: in function main/0',
+        ])
+
+
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
