@@ -71,11 +71,12 @@ namespace viua {
 
         enum class ValueTypes {
             UNDEFINED = 0,
-            VOID,
+            VOID = 1 << 0,
 
-            INTEGER,
+            INTEGER = 1 << 2,
+            FLOAT = 1 << 3,
 
-            BOOLEAN,
+            BOOLEAN = 1 << 4,
 
             TEXT,
         };
