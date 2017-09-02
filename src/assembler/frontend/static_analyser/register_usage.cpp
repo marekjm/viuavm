@@ -216,7 +216,13 @@ using ValueTypesType = viua::internals::ValueTypesType;
 
 auto value_type_names = map<ValueTypes, string>{
     {
-        ValueTypes::UNDEFINED, "undefined"s,
+        /*
+         * Making this "value" instead of "undefined" lets us build error messages for unused registers.
+         * They "unused value" can become "unused number" or "unused boolean", and
+         * if the SA could not infer the type for the value we will not print a "unused undefined" (what
+         * would that even mean?) message, but "unused value".
+         */
+        ValueTypes::UNDEFINED, "value"s,
     },
     {
         ValueTypes::VOID, "void"s,
