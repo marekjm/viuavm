@@ -444,8 +444,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 check_use_of_register(register_usage_profile, *lhs);
                 check_use_of_register(register_usage_profile, *rhs);
 
-                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
-                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
+                assert_type_of_register<viua::internals::ValueTypes::NUMBER>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::NUMBER>(register_usage_profile, *rhs);
 
                 auto val = Register(*result);
                 val.value_type = register_usage_profile.at(*lhs).second.value_type;
@@ -474,8 +474,8 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 check_use_of_register(register_usage_profile, *lhs);
                 check_use_of_register(register_usage_profile, *rhs);
 
-                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *lhs);
-                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *rhs);
+                assert_type_of_register<viua::internals::ValueTypes::NUMBER>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::NUMBER>(register_usage_profile, *rhs);
 
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::BOOLEAN;
