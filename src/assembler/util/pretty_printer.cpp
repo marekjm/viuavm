@@ -102,7 +102,9 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
          */
         has_matched = (has_matched or match);
         if (not has_matched) {
-            indent << ' ';
+            for (auto j = each.str().size(); j; --j) {
+                indent << ' ';
+            }
         }
 
         len = each.str().size();
