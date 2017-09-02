@@ -132,6 +132,13 @@ class RegisterUsageProfile {
         return defined_registers.at(r);
     }
 
+    void erase(const Register r, const Token& token) {
+        erased_registers.emplace(r, token);
+        defined_registers.erase(defined_registers.find(r));
+    }
+    bool erased(const Register r) { return (erased_registers.count(r) == 1); }
+    Token erased_by(const Register r) { return erased_registers.at(r); }
+
     auto begin() const -> decltype(defined_registers.begin()) { return defined_registers.begin(); }
     auto end() const -> decltype(defined_registers.end()) { return defined_registers.end(); }
 };
