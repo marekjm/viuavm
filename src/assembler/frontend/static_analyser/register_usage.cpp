@@ -221,6 +221,10 @@ static auto operator&(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes 
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) & static_cast<ValueTypesType>(rhs));
 }
+static auto operator^(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+    // FIXME find out if it is possible to remove the outermost static_cast<>
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) ^ static_cast<ValueTypesType>(rhs));
+}
 
 auto value_type_names = map<ValueTypes, string>{
     {
@@ -258,7 +262,12 @@ auto value_type_names = map<ValueTypes, string>{
     },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
-    return value_type_names.at(value_type_id);
+    auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
+    if (has_pointer) {
+        value_type_id = (value_type_id ^ ValueTypes::POINTER);
+    }
+
+    return (has_pointer ? "pointer to "s : ""s) + value_type_names.at(value_type_id);
 }
 
 template<viua::internals::ValueTypes expected_type>
