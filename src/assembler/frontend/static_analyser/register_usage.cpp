@@ -811,6 +811,43 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::VECTOR;
                 register_usage_profile.define(val, operand->tokens.at(0));
+            } else if (opcode == VINSERT) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *result);
+                assert_type_of_register<viua::internals::ValueTypes::VECTOR>(register_usage_profile, *result);
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto key = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not key) {
+                    if (not dynamic_cast<VoidLiteral*>(instruction->operands.at(2).get())) {
+                        throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
+                            .note("expected register index or void");
+                    }
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                if (key) {
+                    check_use_of_register(register_usage_profile, *key);
+                }
+
+                if (key) {
+                    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
+                                                                                  *key);
+                }
+
+                if (source->as == viua::internals::AccessSpecifier::DIRECT) {
+                    register_usage_profile.erase(Register(*source), instruction->tokens.at(0));
+                }
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
