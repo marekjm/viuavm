@@ -69,7 +69,8 @@ namespace viua {
             POINTER_DEREFERENCE,
         };
 
-        enum class ValueTypes {
+        using ValueTypesType = uint16_t;
+        enum class ValueTypes : ValueTypesType {
             UNDEFINED = 0,
             VOID = 1 << 0,
 
