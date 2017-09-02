@@ -225,6 +225,7 @@ static auto operator^(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes 
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) ^ static_cast<ValueTypesType>(rhs));
 }
+static auto operator!(const ValueTypes v) -> bool { return not static_cast<ValueTypesType>(v); }
 
 auto value_type_names = map<ValueTypes, string>{
     {
@@ -274,6 +275,33 @@ template<viua::internals::ValueTypes expected_type>
 static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile,
                                     const RegisterIndex& register_index) -> void {
     auto actual_type = register_usage_profile.at(Register(register_index)).second.value_type;
+
+    auto access_via_pointer_dereference =
+        (register_index.as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE);
+    if (access_via_pointer_dereference) {
+        /*
+         * Throw only if the type is not UNDEFINED.
+         * If the type is UNDEFINED let the inferencer do its job.
+         */
+        if ((actual_type != ValueTypes::UNDEFINED) and not(actual_type & ValueTypes::POINTER)) {
+            auto error =
+                TracedSyntaxError{}
+                    .append(InvalidSyntax(register_index.tokens.at(0),
+                                          "invalid type of value contained in register for this access type")
+                                .note("need pointer, got " + to_string(actual_type)))
+                    .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
+                                .note("register defined here"));
+            throw error;
+        }
+
+        /*
+         * Modify types only if they are defined.
+         * Tinkering with UNDEFINEDs will prevent inferencer from kicking in.
+         */
+        if (actual_type != ValueTypes::UNDEFINED) {
+            actual_type = (actual_type ^ ValueTypes::POINTER);
+        }
+    }
 
     if (actual_type == ValueTypes::UNDEFINED) {
         cerr << "type of register " << Register(register_index).index
