@@ -1507,7 +1507,7 @@ class StaticAnalysis(unittest.TestCase):
 
     def testIzeroReportedAsUnused(self):
         runTestFailsToAssembleDetailed(self, 'izero_reported_as_unused.asm', [
-            '21:11: error: unused value in register "1" (not named)',
+            '21:11: error: unused integer in register "1" (not named)',
             '20:12: error: in function main/0',
         ])
 
