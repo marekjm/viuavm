@@ -52,6 +52,7 @@ bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
 bool REPORT_BYTECODE_SIZE = false;
 bool PERFORM_STATIC_ANALYSIS = true;
+bool USE_NEW_SA = false;
 bool SHOW_META = false;
 
 bool VERBOSE = false;
@@ -121,7 +122,9 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    --meta               - display information embedded in source code and exit\n"
              << "    "
              << "    --no-sa              - disable static checking of register accesses (use in case of "
-                "false positives)\n";
+                "false positives)\n"
+             << "    --new-sa             - use new static analyser (more precise, with better features, but "
+                "without coverage of all instructions yet)\n";
     }
 
     return (show_help or show_version);
@@ -189,6 +192,9 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--no-sa") {
             PERFORM_STATIC_ANALYSIS = false;
+            continue;
+        } else if (option == "--new-sa") {
+            USE_NEW_SA = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
@@ -296,11 +302,14 @@ int main(int argc, char* argv[]) {
         auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
-        viua::assembler::frontend::static_analyser::check_register_usage(parsed_source);
-        /* if (PERFORM_STATIC_ANALYSIS) { */
-        /*     assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced, */
-        /*                                                       blocks.tokens, DEBUG); */
-        /* } */
+        if (PERFORM_STATIC_ANALYSIS) {
+            if (USE_NEW_SA) {
+                viua::assembler::frontend::static_analyser::check_register_usage(parsed_source);
+            } else {
+                assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced,
+                                                                  blocks.tokens, DEBUG);
+            }
+        }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;

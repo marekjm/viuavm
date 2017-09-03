@@ -47,7 +47,7 @@ There are several categories of change:
 - enhancement: C++ standard used for Viua VM development was updated to C++17
 - fix: when displaying errors newlines are no longer underlined
 - feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
-  compared with the older one
+  compared with the older one (enabled with `--new-sa` flag)
 - fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
 - feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
 
