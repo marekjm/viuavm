@@ -1528,12 +1528,36 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testVinsertErasesDirectlyAccessedRegisters(self):
+        runTestFailsToAssembleDetailed(self, 'vinsert_erases_directly_accessed_registers.asm', [
+            '26:11: error: use of empty register "1" (not named)',
+            '24:5: note: erased here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testDoesNotEraseDereferencedSources(self):
+        runTestSplitlines(self, 'vinsert_does_not_erase_dereferenced_sources.asm', [
+            '1',
+            '[1]',
+            'IntegerPointer',
+        ])
+
     def testInferringTypesForArgs(self):
         runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
             '32:22: error: invalid type of value contained in register',
             '32:22: note: expected text, got integer',
             '23:9: note: register defined here',
             '25:10: note: type inferred here',
+            '20:12: error: in function main/1',
+        ])
+
+    def testInferenceIncludesPointeredTypes(self):
+        runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
+            '26:19: error: invalid type of value contained in register',
+            '26:19: note: expected text, got pointer to integer',
+            '21:9: note: register defined here',
+            '23:10: note: type inferred here',
+            '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
         ])
 
