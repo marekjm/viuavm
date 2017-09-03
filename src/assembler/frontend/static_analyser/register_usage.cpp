@@ -315,6 +315,9 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         return;
     }
 
+    if (expected_type == ValueTypes::UNDEFINED) {
+        return;
+    }
     if (not(actual_type & expected_type)) {
         auto error =
             TracedSyntaxError{}
@@ -914,6 +917,12 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 }
 
                 check_use_of_register(register_usage_profile, *operand);
+
+                // This type assertion is here because we can infer the register to contain a pointer, and
+                // even if we can't be sure if it's a pointer to text or integer, the fact that a register
+                // holds a *pointer* is valuable on its own.
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *operand);
 
                 register_usage_profile.use(Register(*operand), operand->tokens.at(0));
             } else if (opcode == ARG) {
