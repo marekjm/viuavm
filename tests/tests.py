@@ -428,7 +428,9 @@ def runTestFailsToAssembleDetailed(self, name, expected_output, asm_opts=()):
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
     self.assertEqual(1, exit_code)
-    lines = map(lambda l: l[len(assembly_path)+1:], filter(lambda l: l.startswith(assembly_path), output.strip().splitlines()))
+    lines = map(lambda l: (l[len(assembly_path)+1:] if l.startswith(assembly_path) else l),
+            filter(lambda l: (l.startswith(assembly_path) or l.lstrip().startswith('^ ')),
+                output.strip().splitlines()))
     self.assertEqual(list(lines), expected_output)
 
 
