@@ -1074,6 +1074,20 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 check_if_name_resolved(register_usage_profile, *target);
 
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    if (not dynamic_cast<BitsLiteral*>(instruction->operands.at(1).get())) {
+                        throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                            .note("expected register index or bits literal");
+                    }
+                }
+
+                if (source) {
+                    check_use_of_register(register_usage_profile, *source);
+                    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
+                                                                                  *source);
+                }
+
                 auto val = Register{};
                 val.index = target->index;
                 val.register_set = target->rss;
