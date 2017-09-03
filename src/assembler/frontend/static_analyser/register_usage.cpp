@@ -897,6 +897,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 }
 
                 check_use_of_register(register_usage_profile, *source);
+
                 if (key) {
                     check_use_of_register(register_usage_profile, *key);
                 }
@@ -909,6 +910,25 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 if (source->as == viua::internals::AccessSpecifier::DIRECT) {
                     register_usage_profile.erase(Register(*source), instruction->tokens.at(0));
                 }
+            } else if (opcode == VLEN) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::VECTOR>(register_usage_profile, *source);
+
+                auto val = Register(*result);
+                val.value_type = ValueTypes::INTEGER;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
