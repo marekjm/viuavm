@@ -266,6 +266,9 @@ auto value_type_names = map<ValueTypes, string>{
     {
         ValueTypes::VECTOR, "vector"s,
     },
+    {
+        ValueTypes::BITS, "bits"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
@@ -1062,6 +1065,20 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == BITS) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *target);
+
+                auto val = Register{};
+                val.index = target->index;
+                val.register_set = target->rss;
+                val.value_type = viua::internals::ValueTypes::BITS;
+                register_usage_profile.define(val, target->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {

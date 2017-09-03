@@ -113,6 +113,8 @@ namespace viua {
 
             VECTOR = 1 << 7,
 
+            BITS = 1 << 8,
+
             POINTER = 1 << 15,
         };
     }
