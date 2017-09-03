@@ -24,8 +24,6 @@
 
     vec %3 local
     stoi %2 local %1 local
-    ;istore %1 local 42
-    ;ptr %2 local %1 local
 
     izero %0 local
     return
