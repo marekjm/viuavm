@@ -25,7 +25,6 @@
     iinc *3 local
 
     vinsert %2 local *3 local void
-    ;vinsert %2 local %3 local void
 
     print %1 local
     print %2 local
