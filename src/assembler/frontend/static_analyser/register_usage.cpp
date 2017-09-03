@@ -335,6 +335,13 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
     }
 }
 
+static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile, RegisterIndex* r,
+                                   viua::assembler::frontend::parser::Instruction* instruction) {
+    if (r->as == viua::internals::AccessSpecifier::DIRECT) {
+        register_usage_profile.erase(Register(*r), instruction->tokens.at(0));
+    }
+}
+
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         RegisterUsageProfile register_usage_profile;
@@ -900,16 +907,11 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 if (key) {
                     check_use_of_register(register_usage_profile, *key);
-                }
-
-                if (key) {
                     assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                                   *key);
                 }
 
-                if (source->as == viua::internals::AccessSpecifier::DIRECT) {
-                    register_usage_profile.erase(Register(*source), instruction->tokens.at(0));
-                }
+                erase_if_direct_access(register_usage_profile, source, instruction);
             } else if (opcode == VLEN) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
