@@ -966,6 +966,34 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     auto val = Register(*result);
                     register_usage_profile.define(val, result->tokens.at(0));
                 }
+            } else if (opcode == VAT) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::VECTOR>(register_usage_profile, *source);
+
+                auto key = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not key) {
+                    throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+
+                check_use_of_register(register_usage_profile, *key);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *key);
+
+                auto val = Register(*result);
+                val.value_type = ValueTypes::POINTER;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == VLEN) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
