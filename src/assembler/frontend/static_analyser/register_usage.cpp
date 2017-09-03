@@ -205,7 +205,13 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
         } else {
             msg << " (not named)";
         }
-        throw InvalidSyntax(r.tokens.at(0), msg.str());
+        auto error = TracedSyntaxError{}.append(InvalidSyntax(r.tokens.at(0), msg.str()));
+
+        if (rup.erased(Register(r))) {
+            error.append(InvalidSyntax(rup.erased_where(Register(r)), "").note("erased here:"));
+        }
+
+        throw error;
     }
     rup.use(Register(r), r.tokens.at(0));
 }
