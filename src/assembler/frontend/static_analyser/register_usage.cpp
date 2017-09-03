@@ -112,7 +112,7 @@ class RegisterUsageProfile {
     map<viua::internals::types::register_index, string> index_to_name;
 
     auto define(const Register r, const Token t) -> void {
-        defined_registers.insert_or_assign(r, pair(t, r));
+        defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
     }
     auto defined(const Register r) const -> bool { return defined_registers.count(r); }
     auto defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
