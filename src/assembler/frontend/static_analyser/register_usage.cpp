@@ -912,6 +912,24 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 }
 
                 erase_if_direct_access(register_usage_profile, source, instruction);
+            } else if (opcode == VPUSH) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target);
+                assert_type_of_register<viua::internals::ValueTypes::VECTOR>(register_usage_profile, *target);
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                erase_if_direct_access(register_usage_profile, source, instruction);
             } else if (opcode == VLEN) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
