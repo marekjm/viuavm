@@ -1564,6 +1564,26 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/1',
         ])
 
+    def testPartialPointernessInference(self):
+        runTestFailsToAssembleDetailed(self, 'partial_pointerness_inference.asm', [
+            '47:13: error: invalid type of value contained in register',
+            '47:13: note: expected vector, got pointer to value',
+            '24:9: note: register defined here',
+            '33:11: note: type inferred here',
+            '                  ^ deduced type is \'pointer to value\'',
+            '20:12: error: in function main/1',
+        ])
+
+    def testInferenceIncludesPointeredTypes(self):
+        runTestFailsToAssembleDetailed(self, 'two_stage_pointerness_inference.asm', [
+            '50:13: error: invalid type of value contained in register',
+            '50:13: note: expected vector, got integer',
+            '24:9: note: register defined here',
+            '42:10: note: type inferred here',
+            '                 ^ deduced type is \'pointer to integer\'',
+            '20:12: error: in function main/1',
+        ])
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
