@@ -1746,6 +1746,7 @@ class AssemblerErrorTests(unittest.TestCase):
     def testUnknownInstruction(self):
         runTestFailsToAssembleDetailed(self, 'unknown_instruction.asm', [
             "21:5: error: unknown instruction",
+            "            ^ did you mean 'print'?",
             "20:12: error: in function main/1",
         ])
 
@@ -1874,6 +1875,7 @@ class AssemblerErrorTests(unittest.TestCase):
     def testInvalidRegisterIndexInName(self):
         runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name.asm', [
             '21:12: error: invalid register index: a_name := "a"',
+            '                   ^       ',
         ])
 
 
