@@ -1550,6 +1550,7 @@ class StaticAnalysis(unittest.TestCase):
             '32:22: note: expected text, got integer',
             '23:9: note: register defined here',
             '25:10: note: type inferred here',
+            '                 ^ deduced type is \'integer\'',
             '20:12: error: in function main/1',
         ])
 
