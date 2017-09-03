@@ -286,12 +286,14 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
         assembly_opts = ()
     if expected_output is None and expected_error is None and custom_assert is None:
         raise TypeError('`expected_output`, `expected_error`, and `custom_assert` cannot all be None')
+
+    asm_flags = (assembly_opts + getattr(self, 'ASM_FLAGS', ()))
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     if assembly_opts is None:
         assemble(assembly_path, compiled_path)
     else:
-        assemble(assembly_path, compiled_path, opts=assembly_opts)
+        assemble(assembly_path, compiled_path, opts=asm_flags)
     if not FLAG_TEST_ONLY_ASSEMBLING:
         excode, output, error = run(compiled_path, expected_exit_code, pipe_error = (expected_error is not None))
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
@@ -319,7 +321,7 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     if assembly_opts is None:
         assemble(disasm_path, compiled_disasm_path)
     else:
-        assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
+        assemble(disasm_path, compiled_disasm_path, opts=asm_flags)
 
     source_assembly_output = b''
     disasm_assembly_output = b''
@@ -426,7 +428,8 @@ def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
 def runTestFailsToAssembleDetailed(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
+    asm_flags = (asm_opts + getattr(self, 'ASM_FLAGS', ()))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_flags)
     self.assertEqual(1, exit_code)
     lines = map(lambda l: (l[len(assembly_path)+1:] if l.startswith(assembly_path) else l),
             filter(lambda l: (l.startswith(assembly_path) or l.lstrip().startswith('^ ')),
@@ -1501,6 +1504,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
 class StaticAnalysis(unittest.TestCase):
     PATH = './sample/static_analysis'
+    ASM_FLAGS = ('--new-sa',)
 
     def testIzeroCreatesInteger(self):
         runTest(self, 'izero_creates_integer.asm', '1')
