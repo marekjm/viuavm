@@ -1348,6 +1348,20 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 register_usage_profile.define(val_target, target->tokens.at(0));
                 register_usage_profile.define(val_source, source->tokens.at(0));
+            } else if (opcode == DELETE) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target);
+                if (target->as != viua::internals::AccessSpecifier::DIRECT) {
+                    throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+                        .note("can only delete using direct access mode")
+                        .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+                }
+                register_usage_profile.erase(Register(*target), instruction->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
