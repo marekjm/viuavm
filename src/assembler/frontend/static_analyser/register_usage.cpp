@@ -1260,6 +1260,48 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *target);
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *offset);
+            } else if (opcode == COPY) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *source);
+
+                auto val = Register(*target);
+                val.value_type = register_usage_profile.at(*source).second.value_type;
+                register_usage_profile.define(val, target->tokens.at(0));
+            } else if (opcode == MOVE) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *source);
+
+                auto val = Register(*target);
+                val.value_type = register_usage_profile.at(*source).second.value_type;
+                register_usage_profile.define(val, target->tokens.at(0));
+
+                erase_if_direct_access(register_usage_profile, source, instruction);
             } else if (opcode == PTR) {
                 auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not result) {
@@ -1281,6 +1323,31 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
                                   viua::internals::ValueTypes::POINTER);
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == SWAP) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *source);
+
+                auto val_target = Register(*target);
+                val_target.value_type = register_usage_profile.at(*source).second.value_type;
+
+                auto val_source = Register(*source);
+                val_source.value_type = register_usage_profile.at(*target).second.value_type;
+
+                register_usage_profile.define(val_target, target->tokens.at(0));
+                register_usage_profile.define(val_source, source->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
