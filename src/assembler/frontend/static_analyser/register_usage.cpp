@@ -1201,7 +1201,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto value = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
                 if (not value) {
                     if (not dynamic_cast<BooleanLiteral*>(instruction->operands.at(2).get())) {
-                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid side operand")
+                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                             .note("expected register index or boolean literal");
                     }
                 }
