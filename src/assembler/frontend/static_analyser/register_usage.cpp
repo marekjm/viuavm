@@ -1260,6 +1260,27 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *target);
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *offset);
+            } else if (opcode == PTR) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+
+                auto val = Register(*result);
+                val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
+                                  viua::internals::ValueTypes::POINTER);
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
@@ -1291,27 +1312,6 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 auto val = Register(*target);
                 register_usage_profile.define(val, target->tokens.at(0));
-            } else if (opcode == PTR) {
-                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
-                if (not result) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *result);
-
-                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
-                if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *operand);
-
-                auto val = Register(*result);
-                val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
-                                  viua::internals::ValueTypes::POINTER);
-                register_usage_profile.define(val, result->tokens.at(0));
             }
         }
 
