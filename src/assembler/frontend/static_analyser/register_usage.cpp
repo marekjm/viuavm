@@ -1147,6 +1147,67 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*result);
                 val.value_type = ValueTypes::VECTOR;
                 register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == BITAT) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto key = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not key) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid side operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                check_use_of_register(register_usage_profile, *key);
+
+                assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *key);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::BOOLEAN;
+                register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == BITSET) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target);
+                assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *target);
+
+                auto index = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not index) {
+                    if (not dynamic_cast<BitsLiteral*>(instruction->operands.at(1).get())) {
+                        throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                            .note("expected register index or bits literal");
+                    }
+                }
+
+                check_use_of_register(register_usage_profile, *index);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *index);
+
+                auto value = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not value) {
+                    if (not dynamic_cast<BooleanLiteral*>(instruction->operands.at(2).get())) {
+                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid side operand")
+                            .note("expected register index or boolean literal");
+                    }
+                }
+
+                check_use_of_register(register_usage_profile, *value);
+                assert_type_of_register<viua::internals::ValueTypes::BOOLEAN>(register_usage_profile, *value);
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
