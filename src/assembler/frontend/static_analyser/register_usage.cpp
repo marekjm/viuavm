@@ -1093,6 +1093,60 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 val.register_set = target->rss;
                 val.value_type = viua::internals::ValueTypes::BITS;
                 register_usage_profile.define(val, target->tokens.at(0));
+            } else if (opcode == BITAND or opcode == BITOR or opcode == BITXOR) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto lhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not lhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid left-hand side operand")
+                        .note("expected register index");
+                }
+
+                auto rhs = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not rhs) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens,
+                                         "invalid right-hand side operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *lhs);
+                check_use_of_register(register_usage_profile, *rhs);
+
+                assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *lhs);
+                assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *rhs);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::BITS;
+                register_usage_profile.define(val, result->tokens.at(0));
+            } else if (opcode == BITNOT) {
+                auto result = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not result) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *operand);
+
+                assert_type_of_register<ValueTypes::VECTOR>(register_usage_profile, *operand);
+
+                auto val = Register(*result);
+                val.value_type = ValueTypes::VECTOR;
+                register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
