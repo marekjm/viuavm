@@ -1362,6 +1362,28 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                         .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
                 }
                 register_usage_profile.erase(Register(*target), instruction->tokens.at(0));
+            } else if (opcode == ISNULL) {
+                auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+                    throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
+                        .note("can only check using direct access mode")
+                        .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+                }
+
+                auto val = Register(*target);
+                val.value_type = ValueTypes::BOOLEAN;
+                register_usage_profile.define(val, target->tokens.at(0));
             } else if (opcode == PRINT) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
