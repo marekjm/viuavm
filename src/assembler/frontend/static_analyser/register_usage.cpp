@@ -1384,7 +1384,7 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 auto val = Register(*target);
                 val.value_type = ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, target->tokens.at(0));
-            } else if (opcode == PRINT) {
+            } else if (opcode == PRINT or opcode == ECHO) {
                 auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
