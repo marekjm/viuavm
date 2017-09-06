@@ -115,6 +115,10 @@ namespace viua {
 
             BITS = 1 << 8,
 
+            FUNCTION = 1 << 9,
+            CLOSURE = 1 << 10,
+            INVOCABLE = (FUNCTION | CLOSURE),
+
             POINTER = 1 << 15,
         };
     }

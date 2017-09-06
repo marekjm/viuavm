@@ -269,6 +269,15 @@ auto value_type_names = map<ValueTypes, string>{
     {
         ValueTypes::BITS, "bits"s,
     },
+    {
+        ValueTypes::CLOSURE, "closure"s,
+    },
+    {
+        ValueTypes::FUNCTION, "function"s,
+    },
+    {
+        ValueTypes::INVOCABLE, "invocable"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
