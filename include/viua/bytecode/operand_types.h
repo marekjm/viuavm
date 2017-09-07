@@ -119,6 +119,8 @@ namespace viua {
             CLOSURE = 1 << 10,
             INVOCABLE = (FUNCTION | CLOSURE),
 
+            ATOM = 1 << 11,
+
             POINTER = 1 << 15,
         };
     }

@@ -278,6 +278,9 @@ auto value_type_names = map<ValueTypes, string>{
     {
         ValueTypes::INVOCABLE, "invocable"s,
     },
+    {
+        ValueTypes::ATOM, "atom"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
@@ -1450,6 +1453,27 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 auto val = Register(*target);
                 register_usage_profile.define(val, target->tokens.at(0));
+            } else if (opcode == ATOM) {
+                auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *operand);
+
+                auto source = dynamic_cast<AtomLiteral*>(instruction->operands.at(1).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected atom literal");
+                }
+
+                auto val = Register{};
+                val.index = operand->index;
+                val.register_set = operand->rss;
+                val.value_type = ValueTypes::ATOM;
+
+                register_usage_profile.define(val, operand->tokens.at(0));
             }
         }
 
