@@ -1536,7 +1536,7 @@ class StaticAnalysis(unittest.TestCase):
 
     def testVinsertErasesDirectlyAccessedRegisters(self):
         runTestFailsToAssembleDetailed(self, 'vinsert_erases_directly_accessed_registers.asm', [
-            '26:11: error: use of empty register "1" (not named)',
+            '26:11: error: use of empty local register "1" (not named)',
             '24:5: note: erased here:',
             '20:12: error: in function main/0',
         ])
