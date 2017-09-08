@@ -1460,6 +1460,34 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 register_usage_profile.use(Register(*operand), operand->tokens.at(0));
             } else if (opcode == CAPTURE) {
+                auto closure = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+                if (not closure) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *closure);
+                assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile,
+                                                                              *closure);
+
+                // this index is not verified because it is used as *the* index to use when
+                // putting a value inside the closure
+                auto index = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+                if (not index) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *source);
+
                 // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
             } else if (opcode == CAPTURECOPY) {
                 // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
