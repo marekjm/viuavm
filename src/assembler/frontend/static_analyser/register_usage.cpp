@@ -67,6 +67,18 @@ struct Register {
         : index(ri.index), register_set(ri.rss) {}
 };
 
+struct Closure {
+    string name;
+    map<Register, pair<Token, Register>> defined_registers;
+
+    auto define(const Register r, const Token t) -> void {
+        defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
+    }
+
+    Closure() : name("") {}
+    Closure(string n) : name(n) {}
+};
+
 class RegisterUsageProfile {
     /*
      * Maps a register to the token that "defined" the register.
@@ -402,13 +414,10 @@ static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile,
     }
 }
 
-static auto check_register_usage_for_instruction_block(const ParsedSource&, const InstructionsBlock& ib)
-    -> void {
-    if (ib.closure) {
-        return;
-    }
-
-    RegisterUsageProfile register_usage_profile;
+static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
+                                                            const ParsedSource& ps,
+                                                            const InstructionsBlock& ib) -> void {
+    map<Register, Closure> created_closures;
 
     for (const auto& line : ib.body) {
         auto directive = dynamic_cast<viua::assembler::frontend::parser::Directive*>(line.get());
@@ -1460,7 +1469,11 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
             check_use_of_register(register_usage_profile, *source);
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-            // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
+            auto val = Register{};
+            val.index = index->index;
+            val.register_set = RegisterSets::LOCAL;
+            val.value_type = register_usage_profile.at(*source).second.value_type;
+            created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
         } else if (opcode == CAPTURECOPY) {
             auto closure = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not closure) {
@@ -1488,7 +1501,11 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
             check_use_of_register(register_usage_profile, *source);
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-            // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
+            auto val = Register{};
+            val.index = index->index;
+            val.register_set = RegisterSets::LOCAL;
+            val.value_type = register_usage_profile.at(*source).second.value_type;
+            created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
         } else if (opcode == CAPTUREMOVE) {
             auto closure = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not closure) {
@@ -1515,9 +1532,14 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
 
             check_use_of_register(register_usage_profile, *source);
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
-            erase_if_direct_access(register_usage_profile, source, instruction);
 
-            // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
+            auto val = Register{};
+            val.index = index->index;
+            val.register_set = RegisterSets::LOCAL;
+            val.value_type = register_usage_profile.at(*source).second.value_type;
+            created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
+
+            erase_if_direct_access(register_usage_profile, source, instruction);
         } else if (opcode == CLOSURE) {
             auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not target) {
@@ -1527,7 +1549,8 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
 
             check_if_name_resolved(register_usage_profile, *target);
 
-            if (not dynamic_cast<FunctionNameLiteral*>(instruction->operands.at(1).get())) {
+            auto fn = dynamic_cast<FunctionNameLiteral*>(instruction->operands.at(1).get());
+            if (not fn) {
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
                     .note("expected function name literal");
             }
@@ -1542,6 +1565,8 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
             auto val = Register{*target};
             val.value_type = ValueTypes::CLOSURE;
             register_usage_profile.define(val, target->tokens.at(0));
+
+            created_closures[val] = Closure{fn->content};
         } else if (opcode == FUNCTION) {
             auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not target) {
@@ -1651,6 +1676,37 @@ static auto check_register_usage_for_instruction_block(const ParsedSource&, cons
             throw InvalidSyntax(each.second.first, msg.str());
         }
     }
+
+    for (const auto& each : created_closures) {
+        RegisterUsageProfile closure_register_usage_profile;
+        const auto& fn = *find_if(ps.functions.begin(), ps.functions.end(),
+                                  [&each](const InstructionsBlock& b) { return b.name == each.second.name; });
+        for (auto& captured_value : each.second.defined_registers) {
+            closure_register_usage_profile.define(captured_value.second.second, captured_value.second.first);
+        }
+        try {
+            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn);
+        } catch (InvalidSyntax& e) {
+            throw TracedSyntaxError{}
+                .append(e)
+                .append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
+                                      "when instantiated here:"});
+        } catch (TracedSyntaxError& e) {
+            throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
+                                      "when instantiated here:"});
+        }
+    }
+}
+static auto check_register_usage_for_instruction_block(const ParsedSource& ps, const InstructionsBlock& ib)
+    -> void {
+    if (ib.closure) {
+        return;
+    }
+
+    RegisterUsageProfile register_usage_profile;
+    check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib);
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, check_register_usage_for_instruction_block);
