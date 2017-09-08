@@ -1588,6 +1588,24 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/1',
         ])
 
+    def testClosureCapturesByMoveMakeInaccessible(self):
+        runTestFailsToAssembleDetailed(self, 'closure_captures_by_move_make_inaccessible.asm', [
+            '34:11: error: use of empty local register "2" (not named)',
+            '29:5: note: erased here:',
+            '25:12: error: in function main/0',
+        ])
+
+    def testClosureCapturesInvalidType(self):
+        runTestFailsToAssembleDetailed(self, 'closure_captures_invalid_type.asm', [
+            '21:10: error: invalid type of value contained in register',
+            '21:10: note: expected integer, got text',
+            '30:26: note: register defined here',
+            '20:11: error: in a closure defined here:',
+            '27:13: error: when instantiated here:',
+            '26:12: error: in function main/0',
+        ])
+
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
