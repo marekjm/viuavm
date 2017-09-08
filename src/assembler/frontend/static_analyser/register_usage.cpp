@@ -1459,6 +1459,12 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                                                                                 *operand);
 
                 register_usage_profile.use(Register(*operand), operand->tokens.at(0));
+            } else if (opcode == CAPTURE) {
+                // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
+            } else if (opcode == CAPTURECOPY) {
+                // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
+            } else if (opcode == CAPTUREMOVE) {
+                // FIXME closure objects must be created by CLOSURE opcode and mutated by capture instructions
             } else if (opcode == CLOSURE) {
                 auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
                 if (not target) {
@@ -1472,6 +1478,13 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                     throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
                         .note("expected function name literal");
                 }
+
+                /*
+                 * FIXME The SA should switch to verification of the closure after it has been
+                 * created and all required values captured.
+                 * The SA will need some guidance to discover the precise moment at which it can
+                 * start checking the closure for correctness.
+                 */
 
                 auto val = Register{*target};
                 val.value_type = ValueTypes::CLOSURE;
