@@ -143,6 +143,21 @@ class RegisterUsageProfile {
 };
 
 
+using viua::internals::RegisterSets;
+auto register_set_names = map<RegisterSets, string>{
+    {
+        RegisterSets::GLOBAL, "global"s,
+    },
+    {
+        RegisterSets::STATIC, "static"s,
+    },
+    {
+        RegisterSets::LOCAL, "local"s,
+    },
+};
+static auto to_string(RegisterSets register_set_id) { return register_set_names.at(register_set_id); }
+
+
 using Verifier = auto (*)(const ParsedSource&, const InstructionsBlock&) -> void;
 static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> void {
     for (const auto& fn : source.functions) {
@@ -199,7 +214,7 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
     check_if_name_resolved(rup, r);
     if (not rup.defined(Register(r))) {
         ostringstream msg;
-        msg << "use of empty register " << str::enquote(to_string(r.index));
+        msg << "use of empty " + to_string(r.rss) + " register " << str::enquote(to_string(r.index));
         if (rup.index_to_name.count(r.index)) {
             msg << " (named " << str::enquote(rup.index_to_name.at(r.index)) << ')';
         } else {
