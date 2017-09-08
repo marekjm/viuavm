@@ -414,11 +414,8 @@ static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile,
     }
 }
 
-static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
-                                                            const ParsedSource& ps,
-                                                            const InstructionsBlock& ib) -> void {
-    map<Register, Closure> created_closures;
-
+static auto map_names_to_register_indexes(RegisterUsageProfile& register_usage_profile,
+                                          const InstructionsBlock& ib) -> void {
     for (const auto& line : ib.body) {
         auto directive = dynamic_cast<viua::assembler::frontend::parser::Directive*>(line.get());
         if (not directive) {
@@ -440,6 +437,66 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
         register_usage_profile.name_to_index[name] = index;
         register_usage_profile.index_to_name[index] = name;
     }
+}
+static auto check_for_unused_registers(const RegisterUsageProfile& register_usage_profile) -> void {
+    for (const auto& each : register_usage_profile) {
+        if (not each.first.index) {
+            /*
+             * Registers with index 0 do not take part in the "unused" analysis, because
+             * they are used to store return values of functions.
+             * This means that they *MUST* be defined, but *MAY* stay unused.
+             */
+            continue;
+        }
+        if (not register_usage_profile.used(each.first)) {
+            ostringstream msg;
+            msg << "unused " + to_string(each.second.second.value_type) + " in register "
+                << str::enquote(to_string(each.first.index));
+            if (register_usage_profile.index_to_name.count(each.first.index)) {
+                msg << " (named " << str::enquote(register_usage_profile.index_to_name.at(each.first.index))
+                    << ')';
+            } else {
+                msg << " (not named)";
+            }
+
+            throw InvalidSyntax(each.second.first, msg.str());
+        }
+    }
+}
+static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
+                                                            const ParsedSource& ps,
+                                                            const InstructionsBlock& ib) -> void;
+static auto check_closure_instantiations(const RegisterUsageProfile& register_usage_profile,
+                                         const ParsedSource& ps,
+                                         const map<Register, Closure>& created_closures) -> void {
+    for (const auto& each : created_closures) {
+        RegisterUsageProfile closure_register_usage_profile;
+        const auto& fn = *find_if(ps.functions.begin(), ps.functions.end(),
+                                  [&each](const InstructionsBlock& b) { return b.name == each.second.name; });
+        for (auto& captured_value : each.second.defined_registers) {
+            closure_register_usage_profile.define(captured_value.second.second, captured_value.second.first);
+        }
+        try {
+            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn);
+        } catch (InvalidSyntax& e) {
+            throw TracedSyntaxError{}
+                .append(e)
+                .append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
+                                      "when instantiated here:"});
+        } catch (TracedSyntaxError& e) {
+            throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
+                                      "when instantiated here:"});
+        }
+    }
+}
+static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
+                                                            const ParsedSource& ps,
+                                                            const InstructionsBlock& ib) -> void {
+    map<Register, Closure> created_closures;
+
+    map_names_to_register_indexes(register_usage_profile, ib);
 
     for (const auto& line : ib.body) {
         auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
@@ -1653,51 +1710,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
         }
     }
 
-    for (const auto& each : register_usage_profile) {
-        if (not each.first.index) {
-            /*
-             * Registers with index 0 do not take part in the "unused" analysis, because
-             * they are used to store return values of functions.
-             * This means that they *MUST* be defined, but *MAY* stay unused.
-             */
-            continue;
-        }
-        if (not register_usage_profile.used(each.first)) {
-            ostringstream msg;
-            msg << "unused " + to_string(each.second.second.value_type) + " in register "
-                << str::enquote(to_string(each.first.index));
-            if (register_usage_profile.index_to_name.count(each.first.index)) {
-                msg << " (named " << str::enquote(register_usage_profile.index_to_name.at(each.first.index))
-                    << ')';
-            } else {
-                msg << " (not named)";
-            }
-
-            throw InvalidSyntax(each.second.first, msg.str());
-        }
-    }
-
-    for (const auto& each : created_closures) {
-        RegisterUsageProfile closure_register_usage_profile;
-        const auto& fn = *find_if(ps.functions.begin(), ps.functions.end(),
-                                  [&each](const InstructionsBlock& b) { return b.name == each.second.name; });
-        for (auto& captured_value : each.second.defined_registers) {
-            closure_register_usage_profile.define(captured_value.second.second, captured_value.second.first);
-        }
-        try {
-            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn);
-        } catch (InvalidSyntax& e) {
-            throw TracedSyntaxError{}
-                .append(e)
-                .append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
-                                      "when instantiated here:"});
-        } catch (TracedSyntaxError& e) {
-            throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
-                                      "when instantiated here:"});
-        }
-    }
+    check_for_unused_registers(register_usage_profile);
+    check_closure_instantiations(register_usage_profile, ps, created_closures);
 }
 static auto check_register_usage_for_instruction_block(const ParsedSource& ps, const InstructionsBlock& ib)
     -> void {
