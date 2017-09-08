@@ -1605,6 +1605,19 @@ class StaticAnalysis(unittest.TestCase):
             '26:12: error: in function main/0',
         ])
 
+    def testNestedClosureInvalidTypeError(self):
+        runTestFailsToAssembleDetailed(self, 'nested_closure_invalid_type_error.asm', [
+            '25:10: error: invalid type of value contained in register',
+            '25:10: note: expected integer, got text',
+            '36:26: note: register defined here',
+            '20:11: error: in a closure defined here:',
+            '32:13: error: when instantiated here:',
+            '30:11: error: in a closure defined here:',
+            '46:13: error: when instantiated here:',
+            '44:12: error: in function main/1',
+        ])
+
+
 
 
 class AssemblerErrorTests(unittest.TestCase):
