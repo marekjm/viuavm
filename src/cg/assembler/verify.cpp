@@ -104,6 +104,12 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
         }
 
         string function = tokens.at(i + 3);
+
+        if (not assembler::utils::isValidFunctionName(function)) {
+            // we don't have a valid function name here, let's defer to SA to catch the error (?)
+            continue;
+        }
+
         bool is_undefined =
             (find(function_names.begin(), function_names.end(), function) == function_names.end());
         // if function is undefined, check if we got a signature for it

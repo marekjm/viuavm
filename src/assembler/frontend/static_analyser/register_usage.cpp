@@ -1423,6 +1423,11 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
 
                 check_if_name_resolved(register_usage_profile, *target);
 
+                if (not dynamic_cast<FunctionNameLiteral*>(instruction->operands.at(1).get())) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected function name literal");
+                }
+
                 auto val = Register{*target};
                 val.value_type = ValueTypes::CLOSURE;
                 register_usage_profile.define(val, target->tokens.at(0));
@@ -1434,6 +1439,11 @@ auto viua::assembler::frontend::static_analyser::check_register_usage(const Pars
                 }
 
                 check_if_name_resolved(register_usage_profile, *target);
+
+                if (not dynamic_cast<FunctionNameLiteral*>(instruction->operands.at(1).get())) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected function name literal");
+                }
 
                 auto val = Register{*target};
                 val.value_type = ValueTypes::FUNCTION;
