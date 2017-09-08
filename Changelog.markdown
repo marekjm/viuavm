@@ -49,7 +49,10 @@ There are several categories of change:
 - feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
   compared with the older one (enabled with `--new-sa` flag)
 - fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
-- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
+- feature: SA provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
+- feature: SA provides "did you mean" notes for empty registers (e.g. "did you mean static register 1?" when
+  empty local register 1 is used)
+- feature: SA checks closure instantiations
 
 
 ----
