@@ -209,6 +209,34 @@ static auto check_if_name_resolved(const RegisterUsageProfile& rup, const Regist
         throw error;
     }
 }
+static auto maybe_mistyped_register_set_helper(RegisterUsageProfile& rup,
+                                               viua::assembler::frontend::parser::RegisterIndex r,
+                                               TracedSyntaxError& error, RegisterSets rs_id) -> bool {
+    if (r.rss != rs_id) {
+        auto val = Register{};
+        val.index = r.index;
+        val.register_set = rs_id;
+        if (rup.defined(val)) {
+            error.errors.back().aside("did you mean " + to_string(rs_id) + " register " + to_string(r.index) +
+                                      "?");
+            error.append(
+                InvalidSyntax(rup.defined_where(val), "")
+                    .note(to_string(rs_id) + " register " + to_string(r.index) + " was defined here"));
+            return true;
+        }
+    }
+    return false;
+}
+static auto maybe_mistyped_register_set(RegisterUsageProfile& rup,
+                                        viua::assembler::frontend::parser::RegisterIndex r,
+                                        TracedSyntaxError& error) -> void {
+    if (maybe_mistyped_register_set_helper(rup, r, error, RegisterSets::LOCAL)) {
+        return;
+    }
+    if (maybe_mistyped_register_set_helper(rup, r, error, RegisterSets::STATIC)) {
+        return;
+    }
+}
 static auto check_use_of_register(RegisterUsageProfile& rup,
                                   viua::assembler::frontend::parser::RegisterIndex r) {
     check_if_name_resolved(rup, r);
@@ -225,6 +253,8 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
         if (rup.erased(Register(r))) {
             error.append(InvalidSyntax(rup.erased_where(Register(r)), "").note("erased here:"));
         }
+
+        maybe_mistyped_register_set(rup, r, error);
 
         throw error;
     }
