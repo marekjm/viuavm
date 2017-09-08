@@ -404,6 +404,10 @@ static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile,
 
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        if (ib.closure) {
+            return;
+        }
+
         RegisterUsageProfile register_usage_profile;
 
         for (const auto& line : ib.body) {

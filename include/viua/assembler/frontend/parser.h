@@ -104,6 +104,7 @@ namespace viua {
                     viua::cg::lex::Token ending_token;
                     std::map<std::string, std::string> attributes;
                     std::vector<std::unique_ptr<Line>> body;
+                    bool closure = false;
                 };
 
                 struct ParsedSource {

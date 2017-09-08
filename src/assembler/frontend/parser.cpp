@@ -415,7 +415,38 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
 }
 auto viua::assembler::frontend::parser::parse_closure(const vector_view<Token> tokens, InstructionsBlock& ib)
     -> decltype(tokens)::size_type {
-    return parse_function(tokens, ib);
+    auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
+
+    i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
+
+    ib.closure = true;
+    ib.name = tokens.at(i);
+
+    if (not::assembler::utils::isValidFunctionName(ib.name)) {
+        throw InvalidSyntax(ib.name, ("invalid function name: " + ib.name.str()));
+    }
+    if (::assembler::utils::getFunctionArity(ib.name) == -1) {
+        throw InvalidSyntax(ib.name, ("function with undefined arity: " + ib.name.str()));
+    }
+
+    ++i;  // skip name
+
+    if (tokens.at(i) != "\n") {
+        throw InvalidSyntax(tokens.at(i), "unexpected token after function name");
+    }
+    ++i;  // skip newline
+
+    try {
+        i += parse_block_body(vector_view<Token>(tokens, i), ib);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError().append(e).append(InvalidSyntax(ib.name, ("in function " + ib.name.str())));
+    }
+
+    if (not ib.body.size()) {
+        throw InvalidSyntax(ib.name, ("function with empty body: " + ib.name.str()));
+    }
+
+    return i;
 }
 auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tokens, InstructionsBlock& ib)
     -> decltype(tokens)::size_type {
