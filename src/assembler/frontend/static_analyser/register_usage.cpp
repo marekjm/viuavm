@@ -1651,6 +1651,13 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
+            if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+                auto r = *target;
+                r.rss = viua::internals::RegisterSets::LOCAL;
+                check_use_of_register(register_usage_profile, r);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
+            }
+
             auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
             if (not source) {
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
@@ -1664,6 +1671,12 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             if (not target) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                     .note("expected register index");
+            }
+            if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+                auto r = *target;
+                r.rss = viua::internals::RegisterSets::LOCAL;
+                check_use_of_register(register_usage_profile, r);
+                assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
             }
 
             auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
