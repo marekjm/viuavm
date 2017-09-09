@@ -1641,6 +1641,41 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             auto val = Register{*target};
             val.value_type = ValueTypes::FUNCTION;
             register_usage_profile.define(val, target->tokens.at(0));
+        } else if (opcode == FRAME) {
+            // do nothing, FRAMEs do not modify registers;
+            // also, frame balance and arity is handled by verifier which runs before SA
+        } else if (opcode == PARAM) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+        } else if (opcode == PAMV) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+
+            erase_if_direct_access(register_usage_profile, source, instruction);
         } else if (opcode == ARG) {
             if (dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
                 continue;
