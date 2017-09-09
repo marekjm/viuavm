@@ -1676,6 +1676,33 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
             erase_if_direct_access(register_usage_profile, source, instruction);
+        } else if (opcode == CALL) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                if (not dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+            }
+
+            if (target) {
+                check_if_name_resolved(register_usage_profile, *target);
+            }
+
+            auto fn = instruction->operands.at(1).get();
+            if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+                (not dynamic_cast<RegisterIndex*>(fn))) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected function name or atom literal");
+            }
+            if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+                check_use_of_register(register_usage_profile, *r);
+                assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+            }
+
+            if (target) {
+                register_usage_profile.define(Register{*target}, target->tokens.at(0));
+            }
         } else if (opcode == ARG) {
             if (dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
                 continue;

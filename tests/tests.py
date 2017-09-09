@@ -1617,6 +1617,13 @@ class StaticAnalysis(unittest.TestCase):
             '44:12: error: in function main/1',
         ])
 
+    def testCallToInvalidType(self):
+        runTestFailsToAssembleDetailed(self, 'call_to_invalid_type.asm', [
+            '33:15: error: invalid type of value contained in register',
+            '33:15: note: expected invocable, got text',
+            '29:10: note: register defined here',
+            '27:12: error: in function main/1',
+        ])
 
 
 
