@@ -1633,6 +1633,14 @@ class StaticAnalysis(unittest.TestCase):
             '27:12: error: in function main/1',
         ])
 
+    def testInvalidTypeForIndirectParameterPass(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_type_for_indirect_parameter_pass.asm', [
+            '32:10: error: invalid type of value contained in register',
+            '32:10: note: expected integer, got text',
+            '29:10: note: register defined here',
+            '26:12: error: in function main/1',
+        ])
+
 
 
 class AssemblerErrorTests(unittest.TestCase):
