@@ -1797,6 +1797,20 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.value_type = ValueTypes::PID;
                 register_usage_profile.define(val, target->tokens.at(0));
             }
+        } else if (opcode == SELF) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                if (not dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+            }
+
+            check_if_name_resolved(register_usage_profile, *target);
+
+            auto val = Register{*target};
+            val.value_type = ValueTypes::PID;
+            register_usage_profile.define(val, target->tokens.at(0));
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
