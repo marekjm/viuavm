@@ -1876,6 +1876,32 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             // FIXME TODO
         } else if (opcode == IF) {
             // FIXME TODO
+        } else if (opcode == THROW) {
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+            erase_if_direct_access(register_usage_profile, source, instruction);
+
+            /*
+             * If we reached a throw instruction there is no reason to continue analysing instructions, as
+             * at runtime the execution of the function would stop.
+             */
+            try {
+                check_for_unused_registers(register_usage_profile);
+                check_closure_instantiations(register_usage_profile, ps, created_closures);
+            } catch (InvalidSyntax& e) {
+                throw TracedSyntaxError{}.append(e).append(
+                    InvalidSyntax{instruction->tokens.at(0), "after a throw here:"});
+            } catch (TracedSyntaxError& e) {
+                throw e.append(InvalidSyntax{instruction->tokens.at(0), "after a throw here:"});
+            }
+
+            return;
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
