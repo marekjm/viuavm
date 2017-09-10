@@ -1873,9 +1873,9 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected function name or atom literal");
             }
         } else if (opcode == JUMP) {
-            // FIXME TODO
+            // FIXME TODO SA after a jump
         } else if (opcode == IF) {
-            // FIXME TODO
+            // FIXME TODO SA for different branch targets
         } else if (opcode == THROW) {
             auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not source) {
@@ -1903,7 +1903,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             return;
         } else if (opcode == CATCH) {
-            // do nothing
+            // FIXME TODO SA for entered blocks
         } else if (opcode == DRAW) {
             auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not target) {
@@ -1915,7 +1915,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
         } else if (opcode == TRY) {
             // do nothing
         } else if (opcode == ENTER) {
-            // do nothing
+            // FIXME TODO SA for entered blocks
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
