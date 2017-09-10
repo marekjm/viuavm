@@ -1706,7 +1706,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
                 (not dynamic_cast<RegisterIndex*>(fn))) {
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                    .note("expected function name or atom literal");
+                    .note("expected function name, atom literal, or register index");
             }
             if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
                 check_use_of_register(register_usage_profile, *r);
@@ -1721,7 +1721,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
                 (not dynamic_cast<RegisterIndex*>(fn))) {
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                    .note("expected function name or atom literal");
+                    .note("expected function name, atom literal, or register index");
             }
             if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
                 check_use_of_register(register_usage_profile, *r);
