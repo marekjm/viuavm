@@ -1866,6 +1866,12 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             auto val = Register{*target};
             register_usage_profile.define(val, target->tokens.at(0));
+        } else if (opcode == WATCHDOG) {
+            auto fn = instruction->operands.at(0).get();
+            if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected function name or atom literal");
+            }
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
