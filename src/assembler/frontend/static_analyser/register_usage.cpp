@@ -1872,6 +1872,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
                     .note("expected function name or atom literal");
             }
+        } else if (opcode == JUMP) {
+            // FIXME TODO
+        } else if (opcode == IF) {
+            // FIXME TODO
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
