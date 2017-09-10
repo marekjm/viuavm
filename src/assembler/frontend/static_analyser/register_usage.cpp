@@ -1833,6 +1833,25 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             check_use_of_register(register_usage_profile, *source);
             assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *source);
+        } else if (opcode == SEND) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *target);
+            assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
+
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *target);
+            erase_if_direct_access(register_usage_profile, source, instruction);
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
