@@ -1833,6 +1833,9 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             check_use_of_register(register_usage_profile, *source);
             assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *source);
+
+            auto val = Register{*target};
+            register_usage_profile.define(val, target->tokens.at(0));
         } else if (opcode == SEND) {
             auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not target) {
