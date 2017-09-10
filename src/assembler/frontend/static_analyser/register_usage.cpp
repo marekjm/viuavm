@@ -1918,6 +1918,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             // FIXME TODO SA for entered blocks
         } else if (opcode == LEAVE) {
             // do nothing
+        } else if (opcode == IMPORT) {
+            // do nothing
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
