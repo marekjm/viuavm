@@ -1979,6 +1979,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             // FIXME TODO
         } else if (opcode == STRUCTKEYS) {
             // FIXME TODO
+        } else if (opcode == RETURN) {
+            // do nothing
+        } else if (opcode == HALT) {
+            // do nothing
         }
     }
 
