@@ -338,6 +338,9 @@ auto value_type_names = map<ValueTypes, string>{
     {
         ValueTypes::ATOM, "atom"s,
     },
+    {
+        ValueTypes::PID, "pid"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
@@ -1765,6 +1768,35 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             auto val = Register(*target);
             val.value_type = ValueTypes::INTEGER;
             register_usage_profile.define(val, target->tokens.at(0));
+        } else if (opcode == PROCESS) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                if (not dynamic_cast<VoidLiteral*>(instruction->operands.at(0).get())) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index or void");
+                }
+            }
+
+            if (target) {
+                check_if_name_resolved(register_usage_profile, *target);
+            }
+
+            auto fn = instruction->operands.at(1).get();
+            if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+                (not dynamic_cast<RegisterIndex*>(fn))) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected function name, atom literal, or register index");
+            }
+            if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+                check_use_of_register(register_usage_profile, *r);
+                assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+            }
+
+            if (target) {
+                auto val = Register{*target};
+                val.value_type = ValueTypes::PID;
+                register_usage_profile.define(val, target->tokens.at(0));
+            }
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {

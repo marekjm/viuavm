@@ -121,6 +121,8 @@ namespace viua {
 
             ATOM = 1 << 11,
 
+            PID = 1 << 12,
+
             POINTER = 1 << 15,
         };
     }
