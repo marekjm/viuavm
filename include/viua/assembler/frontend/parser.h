@@ -105,6 +105,8 @@ namespace viua {
                     std::map<std::string, std::string> attributes;
                     std::vector<std::unique_ptr<Line>> body;
                     bool closure = false;
+
+                    using size_type = decltype(body)::size_type;
                 };
 
                 struct ParsedSource {

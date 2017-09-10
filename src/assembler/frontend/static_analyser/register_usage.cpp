@@ -501,7 +501,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
     map_names_to_register_indexes(register_usage_profile, ib);
 
-    for (const auto& line : ib.body) {
+    for (auto i = remove_reference_t<decltype(ib)>::size_type{0}; i < ib.body.size(); ++i) {
+        const auto& line = ib.body.at(i);
         auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
         if (not instruction) {
             continue;
