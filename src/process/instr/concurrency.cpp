@@ -196,8 +196,6 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
     return return_addr;
 }
 viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals::types::byte* addr) {
-    /*  Run watchdog instruction.
-     */
     string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
