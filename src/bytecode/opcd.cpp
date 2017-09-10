@@ -37,8 +37,8 @@ int main() {
     // separate mnemonic from the rest of data
     max_mnemonic_length += 4;
 
-    const string initial_column = "MNEMONIC        ";
-    cout << initial_column << "| OPCODE | HEX OPCODE\n" << endl;
+    const string initial_column = "MNEMONIC            ";
+    cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
 
     max_mnemonic_length =
         (max_mnemonic_length < initial_column.size() ? initial_column.size() : max_mnemonic_length);
@@ -49,9 +49,13 @@ int main() {
             cout << ' ';
         }
         cout << "  ";
-        cout << i.first << (i.first < 10 ? " " : "");
+        cout << i.first;
+        cout << (i.first < 10 ? " " : "");
+        cout << (i.first < 100 ? " " : "");
         cout << "       ";
-        cout << "0x" << hex << i.first << (i.first < 0x10 ? " " : "") << dec;
+        cout << "0x";
+        cout << (i.first < 0x10 ? "0" : "");
+        cout << hex << i.first << dec;
         cout << '\n';
     }
     cout << flush;
