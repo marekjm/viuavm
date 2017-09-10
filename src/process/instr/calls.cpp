@@ -257,7 +257,7 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
-        throw new viua::types::Exception("tail call to undefined function: " + call_name);
+        throw new viua::types::Exception("defer of undefined function: " + call_name);
     }
 
     push_deferred(call_name);
