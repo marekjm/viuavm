@@ -1904,6 +1904,14 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             return;
         } else if (opcode == CATCH) {
             // do nothing
+        } else if (opcode == DRAW) {
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            register_usage_profile.define(Register{*target}, target->tokens.at(0));
         } else if (opcode == ATOM) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
