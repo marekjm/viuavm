@@ -1971,6 +1971,14 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             auto val = Register(*result);
             val.value_type = viua::internals::ValueTypes::BOOLEAN;
             register_usage_profile.define(val, result->tokens.at(0));
+        } else if (opcode == STRUCT) {
+            // FIXME TODO
+        } else if (opcode == STRUCTINSERT) {
+            // FIXME TODO
+        } else if (opcode == STRUCTREMOVE) {
+            // FIXME TODO
+        } else if (opcode == STRUCTKEYS) {
+            // FIXME TODO
         }
     }
 
