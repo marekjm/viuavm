@@ -2050,7 +2050,26 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 register_usage_profile.define(Register{*target}, target->tokens.at(0));
             }
         } else if (opcode == STRUCTKEYS) {
-            // FIXME TODO
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_if_name_resolved(register_usage_profile, *target);
+
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
+
+            auto val = Register{*target};
+            val.value_type = ValueTypes::VECTOR;
+            register_usage_profile.define(val, target->tokens.at(0));
         } else if (opcode == RETURN) {
             // do nothing
         } else if (opcode == HALT) {
