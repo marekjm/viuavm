@@ -1989,7 +1989,32 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             val.value_type = ValueTypes::STRUCT;
             register_usage_profile.define(val, operand->tokens.at(0));
         } else if (opcode == STRUCTINSERT) {
-            // FIXME TODO
+            auto target = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not target) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *target);
+            assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *target);
+
+            auto key = dynamic_cast<RegisterIndex*>(instruction->operands.at(1).get());
+            if (not key) {
+                throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *key);
+            assert_type_of_register<viua::internals::ValueTypes::ATOM>(register_usage_profile, *key);
+
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(2).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_use_of_register(register_usage_profile, *source);
+            erase_if_direct_access(register_usage_profile, source, instruction);
         } else if (opcode == STRUCTREMOVE) {
             // FIXME TODO
         } else if (opcode == STRUCTKEYS) {
