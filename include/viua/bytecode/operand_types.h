@@ -123,6 +123,8 @@ namespace viua {
 
             PID = 1 << 12,
 
+            STRUCT = 1 << 13,
+
             POINTER = 1 << 15,
         };
     }

@@ -341,6 +341,9 @@ auto value_type_names = map<ValueTypes, string>{
     {
         ValueTypes::PID, "pid"s,
     },
+    {
+        ValueTypes::STRUCT, "struct"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
@@ -1974,7 +1977,17 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             val.value_type = viua::internals::ValueTypes::BOOLEAN;
             register_usage_profile.define(val, result->tokens.at(0));
         } else if (opcode == STRUCT) {
-            // FIXME TODO
+            auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not operand) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+
+            check_if_name_resolved(register_usage_profile, *operand);
+
+            auto val = Register{*operand};
+            val.value_type = ValueTypes::STRUCT;
+            register_usage_profile.define(val, operand->tokens.at(0));
         } else if (opcode == STRUCTINSERT) {
             // FIXME TODO
         } else if (opcode == STRUCTREMOVE) {
