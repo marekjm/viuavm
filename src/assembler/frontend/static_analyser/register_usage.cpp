@@ -368,7 +368,8 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
                 TracedSyntaxError{}
                     .append(InvalidSyntax(register_index.tokens.at(0),
                                           "invalid type of value contained in register for this access type")
-                                .note("need pointer, got " + to_string(actual_type)))
+                                .note("need pointer to " + to_string(expected_type) + ", got " +
+                                      to_string(actual_type)))
                     .append(InvalidSyntax(register_usage_profile.defined_where(Register(register_index)), "")
                                 .note("register defined here"));
             throw error;
