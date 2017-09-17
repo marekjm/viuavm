@@ -1641,6 +1641,12 @@ class StaticAnalysis(unittest.TestCase):
             '26:12: error: in function main/1',
         ])
 
+    def testJumpSkippingADefinitionInstruction(self):
+        runTestFailsToAssembleDetailed(self, 'jump_skipping_a_definition_instruction.asm', [
+            '24:11: error: use of empty local register "1" (not named)',
+            '20:12: error: in function main/0',
+        ])
+
 
 
 class AssemblerErrorTests(unittest.TestCase):
