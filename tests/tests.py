@@ -1785,9 +1785,8 @@ class AssemblerErrorTests(unittest.TestCase):
 
     def testInvalidRegisterSetName(self):
         runTestFailsToAssembleDetailed(self, 'invalid_ress_instruction.asm', [
-            # "21:10: error: illegal register set name",  # FIXME this will be the correct line after function names are *REQUIRED* to end with '/'
-            "21:10: error: illegal operand for 'ress' instruction",
-            "21:10: note: expected register set name",
+            "21:10: error: not a register set name",
+            "                 ^ did you mean 'local'?",
             "20:12: error: in function main/1",
         ])
 
