@@ -88,10 +88,23 @@ auto viua::assembler::frontend::static_analyser::verify_ress_instructions(const 
                                      "illegal operand for 'ress' instruction")
                     .note("expected register set name");
             }
-            if (not(label->content == "global" or label->content == "static" or label->content == "local")) {
-                throw invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+
+            auto name = label->content;
+            if (not(name == "global" or name == "static" or name == "local")) {
+                auto error = invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
+                if (auto suggestion = str::levenshtein_best(name,
+                                                            {
+                                                                "global",
+                                                                "static",
+                                                                "local",
+                                                            },
+                                                            4);
+                    suggestion.first) {
+                    error.aside("did you mean '" + suggestion.second + "'?");
+                }
+                throw error;
             }
-            if (label->content == "global" and source.as_library) {
+            if (name == "global" and source.as_library) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens,
                                      "global register set used by a library function")
                     .note("library functions may only use 'local' and 'static' register sets");
