@@ -366,7 +366,7 @@ using viua::assembler::frontend::parser::Directive;
 using InstructionIndex = decltype(viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
 static auto populate_marker_map(InstructionsBlock& instructions_block)
     -> void {
-    // XXX start from maximum value, and wrap to zero when
+    // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
     for (const auto& line : instructions_block.body) {

@@ -474,7 +474,7 @@ static auto validate_jump_pair(const Token& branch_token, const Token& when_true
 }
 auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
-        // XXX start from maximum value, and wrap to zero when
+        // XXX HACK start from maximum value, and wrap to zero when
         // incremented for first instruction; this is a hack
         auto instruction_counter = static_cast<InstructionIndex>(-1);
         auto current_instruction_counter = static_cast<InstructionIndex>(-1);
