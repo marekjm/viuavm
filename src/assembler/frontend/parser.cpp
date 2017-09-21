@@ -361,6 +361,24 @@ auto viua::assembler::frontend::parser::parse_line(const vector_view<Token> toke
     return i;
 }
 
+using viua::assembler::frontend::parser::InstructionsBlock;
+using viua::assembler::frontend::parser::Directive;
+using InstructionIndex = decltype(viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
+static auto populate_marker_map(InstructionsBlock& instructions_block)
+    -> void {
+    // XXX start from maximum value, and wrap to zero when
+    // incremented for first instruction; this is a hack
+    auto instruction_counter = static_cast<InstructionIndex>(-1);
+    for (const auto& line : instructions_block.body) {
+        if (const auto directive = dynamic_cast<Directive*>(line.get()); directive) {
+            if (directive->directive == ".mark:") {
+                instructions_block.marker_map[directive->operands.at(0)] = instruction_counter + 1;
+            }
+        } else {
+            ++instruction_counter;
+        }
+    }
+}
 auto viua::assembler::frontend::parser::parse_block_body(const vector_view<Token> tokens,
                                                          InstructionsBlock& instructions_block)
     -> decltype(tokens)::size_type {
@@ -375,6 +393,8 @@ auto viua::assembler::frontend::parser::parse_block_body(const vector_view<Token
         throw InvalidSyntax(tokens.at(i), "no '.end' at the end of a block");
     }
     instructions_block.ending_token = tokens.at(i);
+
+    populate_marker_map(instructions_block);
 
     return i;
 }

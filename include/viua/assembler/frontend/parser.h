@@ -107,6 +107,8 @@ namespace viua {
                     bool closure = false;
 
                     using size_type = decltype(body)::size_type;
+
+                    std::map<std::string, size_type> marker_map;
                 };
 
                 struct ParsedSource {
