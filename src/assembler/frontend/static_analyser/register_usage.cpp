@@ -1885,7 +1885,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 i += (stoul(offset->tokens.at(0).str().substr(1)) - 1);
                 continue;
             } else if (auto label = dynamic_cast<Label*>(target); label) {
-                cerr << "ok: label: " << label->tokens.at(0).str() << endl;
+                auto jump_target = ib.marker_map.at(label->tokens.at(0));
+                if (jump_target > i) {
+                    i = jump_target;
+                }
             } else {
                 cerr << "OH NOES" << endl;
             }
