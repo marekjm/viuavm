@@ -1881,8 +1881,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             auto target = instruction->operands.at(0).get();
 
             if (auto offset = dynamic_cast<Offset*>(target); offset) {
-                cerr << "ok: offset: " << offset->tokens.at(0).str() << endl;
-                i += (stoul(offset->tokens.at(0).str().substr(1)) - 1);
+                auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                if (jump_target > 0) {
+                    i += jump_target;
+                }
                 continue;
             } else if (auto label = dynamic_cast<Label*>(target); label) {
                 auto jump_target = ib.marker_map.at(label->tokens.at(0));
