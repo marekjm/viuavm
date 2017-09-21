@@ -25,8 +25,8 @@
 using namespace std;
 
 
-using viua::cg::lex::Token;
 using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 using viua::internals::AccessSpecifier;
 using viua::internals::RegisterSets;
