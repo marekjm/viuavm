@@ -1654,6 +1654,13 @@ class AssemblerErrorTests(unittest.TestCase):
     """
     PATH = './sample/asm/errors'
 
+    def testInvalidOperandForJumpInstruction(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_operand_for_jump_instruction.asm', [
+            "21:10: error: invalid operand for jump instruction",
+            "21:10: note: expected a label",
+            "20:12: error: in function main/0",
+        ])
+
     def testDotBeforeEnd(self):
         runTestFailsToAssemble(self, 'no_dot_before_end.asm', "./sample/asm/errors/no_dot_before_end.asm:23:1: error: missing '.' character before 'end'")
 

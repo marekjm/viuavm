@@ -1892,7 +1892,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     i = jump_target;
                 }
             } else {
-                cerr << "OH NOES" << endl;
+                throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
             }
         } else if (opcode == IF) {
             // FIXME TODO SA for different branch targets

@@ -434,14 +434,16 @@ static auto validate_jump(const Token token, const string& extracted_jump,
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
         return stoul(extracted_jump, nullptr, 16);
-    } else {
+    } else if (str::isid(extracted_jump)) {
         if (jump_targets.count(extracted_jump) == 0) {
-            throw viua::cg::lex::InvalidSyntax(token, ("jump to unrecognised marker: " + extracted_jump));
+            throw viua::cg::lex::InvalidSyntax(token, ("xjump to unrecognised marker: " + extracted_jump));
         }
         target = jump_targets.at(extracted_jump);
         if (target > instruction_counter) {
             throw viua::cg::lex::InvalidSyntax(token, "marker out-of-range jump");
         }
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token, "invalid operand for jump instruction").note("expected a label");
     }
 
     if (target == current_instruction_counter) {
