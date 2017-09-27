@@ -185,19 +185,6 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
             throw e.append(InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
     }
-    for (const auto& bl : source.blocks) {
-        if (bl.attributes.count("no_sa")) {
-            continue;
-        }
-        try {
-            verifier(source, bl);
-        } catch (InvalidSyntax& e) {
-            throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                InvalidSyntax(bl.name, ("in block " + bl.name.str())));
-        } catch (TracedSyntaxError& e) {
-            throw e.append(InvalidSyntax(bl.name, ("in block " + bl.name.str())));
-        }
-    }
 }
 
 template<typename K, typename V> static auto keys_of(const map<K, V>& m) -> vector<K> {
