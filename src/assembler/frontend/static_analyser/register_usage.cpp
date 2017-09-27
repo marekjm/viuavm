@@ -1893,7 +1893,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (jump_target > i) {
                     // FIXME use a recursive call and an immediate return instead of messing around with loop
                     // variable
-                    i = static_cast<decltype(i)>(jump_target);
+                    i = jump_target;
                 }
             } else {
                 throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
