@@ -28,8 +28,8 @@ using namespace std;
 using namespace viua::assembler::frontend::parser;
 
 
-using viua::cg::lex::Token;
 using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
 
@@ -158,13 +158,16 @@ class RegisterUsageProfile {
 using viua::internals::RegisterSets;
 auto register_set_names = map<RegisterSets, string>{
     {
-        RegisterSets::GLOBAL, "global"s,
+        RegisterSets::GLOBAL,
+        "global"s,
     },
     {
-        RegisterSets::STATIC, "static"s,
+        RegisterSets::STATIC,
+        "static"s,
     },
     {
-        RegisterSets::LOCAL, "local"s,
+        RegisterSets::LOCAL,
+        "local"s,
     },
 };
 static auto to_string(RegisterSets register_set_id) { return register_set_names.at(register_set_id); }
@@ -284,52 +287,68 @@ auto value_type_names = map<ValueTypes, string>{
          * if the SA could not infer the type for the value we will not print a "unused undefined" (what
          * would that even mean?) message, but "unused value".
          */
-        ValueTypes::UNDEFINED, "value"s,
+        ValueTypes::UNDEFINED,
+        "value"s,
     },
     {
-        ValueTypes::VOID, "void"s,
+        ValueTypes::VOID,
+        "void"s,
     },
     {
-        ValueTypes::INTEGER, "integer"s,
+        ValueTypes::INTEGER,
+        "integer"s,
     },
     {
-        ValueTypes::FLOAT, "float"s,
+        ValueTypes::FLOAT,
+        "float"s,
     },
     {
-        ValueTypes::NUMBER, "number"s,
+        ValueTypes::NUMBER,
+        "number"s,
     },
     {
-        ValueTypes::BOOLEAN, "boolean"s,
+        ValueTypes::BOOLEAN,
+        "boolean"s,
     },
     {
-        ValueTypes::TEXT, "text"s,
+        ValueTypes::TEXT,
+        "text"s,
     },
     {
-        ValueTypes::STRING, "string"s,
+        ValueTypes::STRING,
+        "string"s,
     },
     {
-        ValueTypes::VECTOR, "vector"s,
+        ValueTypes::VECTOR,
+        "vector"s,
     },
     {
-        ValueTypes::BITS, "bits"s,
+        ValueTypes::BITS,
+        "bits"s,
     },
     {
-        ValueTypes::CLOSURE, "closure"s,
+        ValueTypes::CLOSURE,
+        "closure"s,
     },
     {
-        ValueTypes::FUNCTION, "function"s,
+        ValueTypes::FUNCTION,
+        "function"s,
     },
     {
-        ValueTypes::INVOCABLE, "invocable"s,
+        ValueTypes::INVOCABLE,
+        "invocable"s,
     },
     {
-        ValueTypes::ATOM, "atom"s,
+        ValueTypes::ATOM,
+        "atom"s,
     },
     {
-        ValueTypes::PID, "pid"s,
+        ValueTypes::PID,
+        "pid"s,
     },
     {
-        ValueTypes::STRUCT, "struct"s,
+        ValueTypes::STRUCT,
+        "struct"s,
     },
 };
 static auto to_string(ValueTypes value_type_id) -> string {

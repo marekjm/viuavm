@@ -565,9 +565,10 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
-                check_block_body(body_tokens, in_block_offset(body_tokens, i + 1, copied_registers,
-                                                              copied_named_registers),
-                                 copied_registers, copied_named_registers, block_bodies, debug);
+                check_block_body(
+                    body_tokens,
+                    in_block_offset(body_tokens, i + 1, copied_registers, copied_named_registers),
+                    copied_registers, copied_named_registers, block_bodies, debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 // do not fail yet, because the value may be used by false branch
                 // save the error for later
@@ -582,9 +583,10 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
-                check_block_body(body_tokens, in_block_offset(body_tokens, i + 2, copied_registers,
-                                                              copied_named_registers),
-                                 copied_registers, copied_named_registers, block_bodies, debug);
+                check_block_body(
+                    body_tokens,
+                    in_block_offset(body_tokens, i + 2, copied_registers, copied_named_registers),
+                    copied_registers, copied_named_registers, block_bodies, debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 if (register_with_unused_value == e.what()) {
                     throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(

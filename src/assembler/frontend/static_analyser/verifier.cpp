@@ -443,7 +443,8 @@ static auto validate_jump(const Token token, const string& extracted_jump,
             throw viua::cg::lex::InvalidSyntax(token, "marker out-of-range jump");
         }
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, "invalid operand for jump instruction").note("expected a label");
+        throw viua::cg::lex::InvalidSyntax(token, "invalid operand for jump instruction")
+            .note("expected a label");
     }
 
     if (target == current_instruction_counter) {

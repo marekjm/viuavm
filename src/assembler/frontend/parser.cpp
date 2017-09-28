@@ -361,11 +361,10 @@ auto viua::assembler::frontend::parser::parse_line(const vector_view<Token> toke
     return i;
 }
 
-using viua::assembler::frontend::parser::InstructionsBlock;
 using viua::assembler::frontend::parser::Directive;
+using viua::assembler::frontend::parser::InstructionsBlock;
 using InstructionIndex = decltype(viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
-static auto populate_marker_map(InstructionsBlock& instructions_block)
-    -> void {
+static auto populate_marker_map(InstructionsBlock& instructions_block) -> void {
     // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
