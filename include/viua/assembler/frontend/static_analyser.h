@@ -41,9 +41,9 @@ namespace viua {
                 auto verify(const parser::ParsedSource&) -> void;
 
                 auto check_register_usage(const parser::ParsedSource&) -> void;
-            }
-        }
-    }
-}
+            }  // namespace static_analyser
+        }      // namespace frontend
+    }          // namespace assembler
+}  // namespace viua
 
 #endif

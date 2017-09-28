@@ -160,10 +160,10 @@ namespace viua {
                 auto parse_block(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
                     -> decltype(tokens)::size_type;
                 auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;
-            }
-        }
-    }
-}
+            }  // namespace parser
+        }      // namespace frontend
+    }          // namespace assembler
+}  // namespace viua
 
 
 #endif
