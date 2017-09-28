@@ -476,9 +476,10 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
         }
     }
 }
-static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
-                                                            const ParsedSource& ps,
-                                                            const InstructionsBlock& ib) -> void;
+using InstructionIndex = InstructionsBlock::size_type;
+static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile&, const ParsedSource&,
+                                                            const InstructionsBlock&, InstructionIndex)
+    -> void;
 static auto check_closure_instantiations(const RegisterUsageProfile& register_usage_profile,
                                          const ParsedSource& ps,
                                          const map<Register, Closure>& created_closures) -> void {
@@ -490,7 +491,7 @@ static auto check_closure_instantiations(const RegisterUsageProfile& register_us
             closure_register_usage_profile.define(captured_value.second.second, captured_value.second.first);
         }
         try {
-            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn);
+            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn, 0);
         } catch (InvalidSyntax& e) {
             throw TracedSyntaxError{}
                 .append(e)
@@ -504,14 +505,16 @@ static auto check_closure_instantiations(const RegisterUsageProfile& register_us
         }
     }
 }
+
 static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
                                                             const ParsedSource& ps,
-                                                            const InstructionsBlock& ib) -> void {
+                                                            const InstructionsBlock& ib, InstructionIndex i)
+    -> void {
     map<Register, Closure> created_closures;
 
     map_names_to_register_indexes(register_usage_profile, ib);
 
-    for (auto i = remove_reference_t<decltype(ib)>::size_type{0}; i < ib.body.size(); ++i) {
+    for (; i < ib.body.size(); ++i) {
         const auto& line = ib.body.at(i);
         auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
         if (not instruction) {
@@ -2115,7 +2118,7 @@ static auto check_register_usage_for_instruction_block(const ParsedSource& ps, c
     }
 
     RegisterUsageProfile register_usage_profile;
-    check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib);
+    check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, 0);
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, check_register_usage_for_instruction_block);
