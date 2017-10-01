@@ -46,13 +46,13 @@ There are several categories of change:
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
 - enhancement: C++ standard used for Viua VM development was updated to C++17
 - fix: when displaying errors newlines are no longer underlined
+- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
 - feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
   compared with the older one (enabled with `--new-sa` flag)
-- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
-- feature: SA provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
-- feature: SA provides "did you mean" notes for empty registers (e.g. "did you mean static register 1?" when
-  empty local register 1 is used)
-- feature: SA checks closure instantiations
+- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
+- feature: static analyser is now able to check closure instantiations
+- feature: static analuser is now strict about the types being used consitently, and features some mild form
+  of type inference to keep track of types of the values the program it compiles is using
 
 
 ----
