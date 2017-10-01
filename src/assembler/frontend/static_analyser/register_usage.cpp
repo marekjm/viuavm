@@ -1936,10 +1936,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             auto jump_target_if_true = InstructionIndex{0};
             if (auto offset = dynamic_cast<Offset*>(instruction->operands.at(1).get()); offset) {
-                auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                auto jump_target = stol(offset->tokens.at(0).str().substr(1));
                 if (jump_target > 0) {
                     jump_target_if_true =
-                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target), ib);
+                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target) - 1, ib);
                 } else {
                     // XXX FIXME Checking backward jumps is tricky, beware of loops.
                     continue;
@@ -1959,10 +1959,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
             auto jump_target_if_false = InstructionIndex{0};
             if (auto offset = dynamic_cast<Offset*>(instruction->operands.at(2).get()); offset) {
-                auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                auto jump_target = stol(offset->tokens.at(0).str().substr(1));
                 if (jump_target > 0) {
                     jump_target_if_false =
-                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target), ib);
+                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target) - 1, ib);
                 } else {
                     // XXX FIXME Checking backward jumps is tricky, beware of loops.
                     continue;
