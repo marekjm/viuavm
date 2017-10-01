@@ -421,7 +421,8 @@ def runTestReportsException(self, name, expected_output, assembly_opts=None):
 def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
+    asm_flags = (asm_opts + getattr(self, 'ASM_FLAGS', ()))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_flags)
     self.assertEqual(1, exit_code)
     self.assertEqual(output.strip().splitlines()[0], expected_output)
 
