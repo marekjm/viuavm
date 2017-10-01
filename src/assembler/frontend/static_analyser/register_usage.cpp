@@ -1543,6 +1543,14 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
             }
 
+            if (register_usage_profile.defined(Register{*source})) {
+                throw TracedSyntaxError{}
+                    .append(
+                        InvalidSyntax{source->tokens.at(0), "useless check, register will always be defined"})
+                    .append(InvalidSyntax{register_usage_profile.defined_where(Register{*source})}.note(
+                        "register is defined here"));
+            }
+
             auto val = Register(*target);
             val.value_type = ValueTypes::BOOLEAN;
             register_usage_profile.define(val, target->tokens.at(0));
