@@ -444,7 +444,7 @@ static auto validate_jump(const Token token, const string& extracted_jump,
         }
     } else {
         throw viua::cg::lex::InvalidSyntax(token, "invalid operand for jump instruction")
-            .note("expected a label");
+            .note("expected a label or an offset");
     }
 
     if (target == current_instruction_counter) {
