@@ -249,8 +249,10 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
                                   const string error_core_msg = "use of") {
     check_if_name_resolved(rup, r);
     if (not rup.defined(Register(r))) {
+        auto empty_or_erased = (rup.erased(Register(r)) ? "erased"s : "empty"s);
+
         ostringstream msg;
-        msg << error_core_msg << " empty " << to_string(r.rss) << " register "
+        msg << error_core_msg << ' ' << empty_or_erased << ' ' << to_string(r.rss) << " register "
             << str::enquote(to_string(r.index));
         if (rup.index_to_name.count(r.index)) {
             msg << " (named " << str::enquote(rup.index_to_name.at(r.index)) << ')';
