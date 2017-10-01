@@ -2274,6 +2274,7 @@ static auto check_register_usage_for_instruction_block(const ParsedSource& ps, c
     }
 
     RegisterUsageProfile register_usage_profile;
+    map_names_to_register_indexes(register_usage_profile, ib);
     check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, 0);
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
