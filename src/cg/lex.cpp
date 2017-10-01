@@ -920,6 +920,9 @@ namespace viua {
                             target_register_set = tokens.back();
                         }
 
+                        if (input_tokens.at(i + 1) == "\n") {
+                            throw InvalidSyntax{input_tokens.at(i+1), "missing second operand"}.add(token);
+                        }
                         tokens.push_back(input_tokens.at(++i));
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(),
