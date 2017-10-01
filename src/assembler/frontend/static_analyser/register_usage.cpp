@@ -480,8 +480,6 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
             if (register_usage_profile.index_to_name.count(each.first.index)) {
                 msg << " (named " << str::enquote(register_usage_profile.index_to_name.at(each.first.index))
                     << ')';
-            } else {
-                msg << " (not named)";
             }
 
             throw InvalidSyntax(each.second.first, msg.str());
