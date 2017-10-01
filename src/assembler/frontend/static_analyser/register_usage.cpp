@@ -245,11 +245,13 @@ static auto maybe_mistyped_register_set(RegisterUsageProfile& rup,
     }
 }
 static auto check_use_of_register(RegisterUsageProfile& rup,
-                                  viua::assembler::frontend::parser::RegisterIndex r) {
+                                  viua::assembler::frontend::parser::RegisterIndex r,
+                                  const string error_core_msg = "use of") {
     check_if_name_resolved(rup, r);
     if (not rup.defined(Register(r))) {
         ostringstream msg;
-        msg << "use of empty " + to_string(r.rss) + " register " << str::enquote(to_string(r.index));
+        msg << error_core_msg << " empty " << to_string(r.rss) << " register "
+            << str::enquote(to_string(r.index));
         if (rup.index_to_name.count(r.index)) {
             msg << " (named " << str::enquote(rup.index_to_name.at(r.index)) << ')';
         } else {
