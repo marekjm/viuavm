@@ -1427,7 +1427,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "copy from");
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
             auto val = Register(*target);
@@ -1446,7 +1446,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "move from");
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
             auto val = Register(*target);
@@ -1469,7 +1469,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *operand);
+            check_use_of_register(register_usage_profile, *operand, "pointer from");
 
             auto val = Register(*result);
             val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
@@ -1506,7 +1506,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *target);
+            check_use_of_register(register_usage_profile, *target, "delete of");
             if (target->as != viua::internals::AccessSpecifier::DIRECT) {
                 throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
                     .note("can only delete using direct access mode")
@@ -1762,7 +1762,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected function name, atom literal, or register index");
             }
             if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                check_use_of_register(register_usage_profile, *r);
+                check_use_of_register(register_usage_profile, *r, "call from");
                 assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
             }
 
@@ -1893,7 +1893,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *target);
+            check_use_of_register(register_usage_profile, *target, "send target from");
             assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
 
             auto source = get_operand<RegisterIndex>(*instruction, 1);
@@ -1902,7 +1902,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "send from");
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *target);
             erase_if_direct_access(register_usage_profile, source, instruction);
         } else if (opcode == RECEIVE) {
@@ -1949,7 +1949,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                     .note("expected register index");
             }
-            check_use_of_register(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "branch depends on");
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
             auto jump_target_if_true = InstructionIndex{0};
@@ -2043,7 +2043,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "throw from");
             assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
             erase_if_direct_access(register_usage_profile, source, instruction);
 
