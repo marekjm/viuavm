@@ -454,6 +454,11 @@ static auto map_names_to_register_indexes(RegisterUsageProfile& register_usage_p
         auto index = static_cast<viua::internals::types::register_index>(stoul(idx));
         auto name = directive->operands.at(1);
 
+        if (register_usage_profile.name_to_index.count(name)) {
+            throw InvalidSyntax{directive->tokens.at(2), "register name already taken: " + name}.add(
+                directive->tokens.at(0));
+        }
+
         register_usage_profile.name_to_index[name] = index;
         register_usage_profile.index_to_name[index] = name;
     }
@@ -497,7 +502,9 @@ static auto check_closure_instantiations(const RegisterUsageProfile& register_us
         for (auto& captured_value : each.second.defined_registers) {
             closure_register_usage_profile.define(captured_value.second.second, captured_value.second.first);
         }
+
         try {
+            map_names_to_register_indexes(closure_register_usage_profile, fn);
             check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn, 0);
         } catch (InvalidSyntax& e) {
             throw TracedSyntaxError{}
@@ -541,8 +548,6 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                                                             const InstructionsBlock& ib, InstructionIndex i)
     -> void {
     map<Register, Closure> created_closures;
-
-    map_names_to_register_indexes(register_usage_profile, ib);
 
     for (; i < ib.body.size(); ++i) {
         const auto& line = ib.body.at(i);
