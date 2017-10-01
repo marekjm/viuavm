@@ -254,8 +254,6 @@ static auto check_use_of_register(RegisterUsageProfile& rup,
             << str::enquote(to_string(r.index));
         if (rup.index_to_name.count(r.index)) {
             msg << " (named " << str::enquote(rup.index_to_name.at(r.index)) << ')';
-        } else {
-            msg << " (not named)";
         }
         auto error = TracedSyntaxError{}.append(InvalidSyntax(r.tokens.at(0), msg.str()));
 
