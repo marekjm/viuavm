@@ -1482,14 +1482,25 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     .note("expected register index");
             }
 
+            check_use_of_register(register_usage_profile, *target, "swap with");
+            if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+                throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+                    .note("can only swap using direct access mode")
+                    .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+            }
+
             auto source = get_operand<RegisterIndex>(*instruction, 1);
             if (not source) {
                 throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
                     .note("expected register index");
             }
 
-            check_use_of_register(register_usage_profile, *source);
-            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+            check_use_of_register(register_usage_profile, *source, "swap with");
+            if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+                throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
+                    .note("can only swap using direct access mode")
+                    .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+            }
 
             auto val_target = Register(*target);
             val_target.value_type = register_usage_profile.at(*source).second.value_type;
