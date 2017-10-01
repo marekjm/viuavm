@@ -532,7 +532,6 @@ static auto get_line_index_of_instruction(const InstructionIndex n, const Instru
     }
     return i;
 }
-// FIXME Always use this function to extract operands.
 template<typename T>
 static auto get_operand(viua::assembler::frontend::parser::Instruction const& instruction,
                         size_t operand_index) -> T* {
