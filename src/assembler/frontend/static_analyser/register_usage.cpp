@@ -158,6 +158,11 @@ class RegisterUsageProfile {
 using viua::internals::RegisterSets;
 auto register_set_names = map<RegisterSets, string>{
     {
+        // FIXME 'current' as a register set name should be deprecated.
+        RegisterSets::CURRENT,
+        "current"s,
+    },
+    {
         RegisterSets::GLOBAL,
         "global"s,
     },
