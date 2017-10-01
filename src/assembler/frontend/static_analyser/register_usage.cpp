@@ -511,6 +511,18 @@ static auto check_closure_instantiations(const RegisterUsageProfile& register_us
     }
 }
 
+static auto get_line_index_of_instruction(const InstructionIndex n, const InstructionsBlock& ib)
+    -> InstructionIndex {
+    auto left = n;
+    auto i = InstructionIndex{0};
+    for (; left and i < ib.body.size(); ++i) {
+        auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(ib.body.at(i).get());
+        if (instruction) {
+            --left;
+        }
+    }
+    return i;
+}
 static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
                                                             const ParsedSource& ps,
                                                             const InstructionsBlock& ib, InstructionIndex i)
@@ -528,6 +540,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
         using viua::assembler::frontend::parser::RegisterIndex;
         auto opcode = instruction->opcode;
+
         if (opcode == IZERO) {
             auto operand = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not operand) {
@@ -1913,7 +1926,88 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
             }
         } else if (opcode == IF) {
-            // FIXME TODO SA for different branch targets
+            auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
+            if (not source) {
+                throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                    .note("expected register index");
+            }
+            check_use_of_register(register_usage_profile, *source);
+            assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+
+            auto jump_target_if_true = InstructionIndex{0};
+            if (auto offset = dynamic_cast<Offset*>(instruction->operands.at(1).get()); offset) {
+                auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                if (jump_target > 0) {
+                    jump_target_if_true =
+                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target), ib);
+                } else {
+                    // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                    continue;
+                }
+            } else if (auto label = dynamic_cast<Label*>(instruction->operands.at(1).get()); label) {
+                auto jump_target = get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+                if (jump_target > i) {
+                    jump_target_if_true = jump_target;
+                } else {
+                    // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                    continue;
+                }
+            } else {
+                throw InvalidSyntax(instruction->operands.at(1)->tokens.at(0),
+                                    "invalid operand for jump instruction");
+            }
+
+            auto jump_target_if_false = InstructionIndex{0};
+            if (auto offset = dynamic_cast<Offset*>(instruction->operands.at(2).get()); offset) {
+                auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                if (jump_target > 0) {
+                    jump_target_if_false =
+                        get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target), ib);
+                } else {
+                    // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                    continue;
+                }
+            } else if (auto label = dynamic_cast<Label*>(instruction->operands.at(2).get()); label) {
+                auto jump_target = get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+                if (jump_target > i) {
+                    jump_target_if_false = jump_target;
+                } else {
+                    // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                    continue;
+                }
+            } else {
+                throw InvalidSyntax(instruction->operands.at(2)->tokens.at(0),
+                                    "invalid operand for jump instruction");
+            }
+
+            try {
+                RegisterUsageProfile register_usage_profile_if_true = register_usage_profile;
+                check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
+                                                                jump_target_if_true);
+            } catch (InvalidSyntax& e) {
+                throw TracedSyntaxError{}.append(e).append(
+                    InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
+                        instruction->operands.at(1)->tokens.at(0)));
+            } catch (TracedSyntaxError& e) {
+                throw e.append(InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
+                    instruction->operands.at(1)->tokens.at(0)));
+            }
+
+            try {
+                RegisterUsageProfile register_usage_profile_if_false = register_usage_profile;
+                check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
+                                                                jump_target_if_false);
+            } catch (InvalidSyntax& e) {
+                throw TracedSyntaxError{}.append(e).append(
+                    InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
+                        instruction->operands.at(2)->tokens.at(0)));
+            } catch (TracedSyntaxError& e) {
+                throw e.append(
+                    InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
+                        instruction->operands.at(2)->tokens.at(0)));
+            }
+
+            break;
         } else if (opcode == THROW) {
             auto source = dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get());
             if (not source) {
