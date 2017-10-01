@@ -1647,6 +1647,13 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testInvalidAccessTypeForSwap(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_access_type_for_swap.asm', [
+            '24:19: error: invalid access mode',
+            '24:19: note: can only swap using direct access mode',
+            '20:12: error: in function main/0',
+        ])
+
 
 
 class AssemblerErrorTests(unittest.TestCase):
