@@ -543,6 +543,16 @@ static auto get_operand(viua::assembler::frontend::parser::Instruction const& in
     T* operand = dynamic_cast<T*>(instruction.operands.at(operand_index).get());
     return operand;
 }
+template<typename T>
+static auto get_input_operand(viua::assembler::frontend::parser::Instruction const& instruction,
+                              size_t operand_index) -> T* {
+    auto operand = get_operand<T>(instruction, operand_index);
+    if ((not operand) and dynamic_cast<VoidLiteral*>(instruction.operands.at(operand_index).get())) {
+        throw InvalidSyntax{instruction.operands.at(operand_index)->tokens.at(0),
+                            "use of void as input register"};
+    }
+    return operand;
+}
 static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
                                                             const ParsedSource& ps,
                                                             const InstructionsBlock& ib, InstructionIndex i)
@@ -1557,7 +1567,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
         } else if (opcode == RESS) {
             // do nothing
         } else if (opcode == PRINT or opcode == ECHO) {
-            auto operand = get_operand<RegisterIndex>(*instruction, 0);
+            auto operand = get_input_operand<RegisterIndex>(*instruction, 0);
             if (not operand) {
                 throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
                     .note("expected register index");
