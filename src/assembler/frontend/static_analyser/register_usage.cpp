@@ -428,7 +428,7 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
 }
 
 static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile, RegisterIndex* r,
-                                   viua::assembler::frontend::parser::Instruction* instruction) {
+                                   viua::assembler::frontend::parser::Instruction const* const instruction) {
     if (r->as == viua::internals::AccessSpecifier::DIRECT) {
         register_usage_profile.erase(Register(*r), instruction->tokens.at(0));
     }
