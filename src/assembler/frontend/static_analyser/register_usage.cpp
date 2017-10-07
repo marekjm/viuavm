@@ -2087,7 +2087,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 try {
                     RegisterUsageProfile register_usage_profile_if_true = register_usage_profile;
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
-                                                                    jump_target_if_true);
+                                                                    jump_target_if_true, mnemonic_counter);
                 } catch (InvalidSyntax& e) {
                     throw TracedSyntaxError{}.append(e).append(
                         InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
@@ -2101,7 +2101,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 try {
                     RegisterUsageProfile register_usage_profile_if_false = register_usage_profile;
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
-                                                                    jump_target_if_false);
+                                                                    jump_target_if_false, mnemonic_counter);
                 } catch (InvalidSyntax& e) {
                     throw TracedSyntaxError{}.append(e).append(
                         InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
