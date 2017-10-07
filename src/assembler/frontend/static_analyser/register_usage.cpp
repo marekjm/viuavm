@@ -2031,17 +2031,13 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto jump_target_if_true = InstructionIndex{0};
                 if (auto offset = get_operand<Offset>(*instruction, 1); offset) {
                     auto jump_target = stol(offset->tokens.at(0).str().substr(1));
-                    cerr << "[sa:if:branch:true:target:pre] jump_target = " << jump_target << " ("
-                         << i + jump_target - 1 << ')' << endl;
                     if (jump_target > 0) {
                         jump_target_if_true = get_line_index_of_instruction(
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        cerr << "OH NOES 0" << endl;
                         continue;
                     }
-                    cerr << "[sa:if:branch:true:target:post] jump_target = " << jump_target_if_true << endl;
                 } else if (auto label = get_operand<Label>(*instruction, 1); label) {
                     auto jump_target =
                         get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
@@ -2049,7 +2045,6 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         jump_target_if_true = jump_target;
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        cerr << "OH NOES 1" << endl;
                         continue;
                     }
                 } else {
@@ -2060,17 +2055,13 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto jump_target_if_false = InstructionIndex{0};
                 if (auto offset = get_operand<Offset>(*instruction, 2); offset) {
                     auto jump_target = stol(offset->tokens.at(0).str().substr(1));
-                    cerr << "[sa:if:branch:false:target:pre] jump_target = " << jump_target << " ("
-                         << i + jump_target - 1 << ')' << endl;
                     if (jump_target > 0) {
                         jump_target_if_false = get_line_index_of_instruction(
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        cerr << "OH NOES 2" << endl;
                         continue;
                     }
-                    cerr << "[sa:if:branch:false:target:post] jump_target = " << jump_target_if_false << endl;
                 } else if (auto label = get_operand<Label>(*instruction, 2); label) {
                     auto jump_target =
                         get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
@@ -2078,7 +2069,6 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         jump_target_if_false = jump_target;
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        cerr << "OH NOES 3" << endl;
                         continue;
                     }
                 } else {
