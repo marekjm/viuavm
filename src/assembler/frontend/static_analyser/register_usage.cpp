@@ -2047,6 +2047,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
                         continue;
                     }
+                } else if (str::ishex(instruction->operands.at(1)->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                    continue;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(1)->tokens.at(0),
                                         "invalid operand for jump instruction");
@@ -2071,6 +2075,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
                         continue;
                     }
+                } else if (str::ishex(instruction->operands.at(2)->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                    continue;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(2)->tokens.at(0),
                                         "invalid operand for jump instruction");
