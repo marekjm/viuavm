@@ -488,8 +488,8 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
 }
 using InstructionIndex = InstructionsBlock::size_type;
 static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile&, const ParsedSource&,
-                                                            const InstructionsBlock&, InstructionIndex)
-    -> void;
+                                                            const InstructionsBlock&, InstructionIndex,
+                                                            InstructionIndex) -> void;
 static auto check_closure_instantiations(const RegisterUsageProfile& register_usage_profile,
                                          const ParsedSource& ps,
                                          const map<Register, Closure>& created_closures) -> void {
@@ -503,7 +503,8 @@ static auto check_closure_instantiations(const RegisterUsageProfile& register_us
 
         try {
             map_names_to_register_indexes(closure_register_usage_profile, fn);
-            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn, 0);
+            check_register_usage_for_instruction_block_impl(closure_register_usage_profile, ps, fn, 0,
+                                                            static_cast<InstructionIndex>(-1));
         } catch (InvalidSyntax& e) {
             throw TracedSyntaxError{}
                 .append(e)
@@ -552,8 +553,8 @@ static auto get_input_operand(viua::assembler::frontend::parser::Instruction con
 }
 static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
                                                             const ParsedSource& ps,
-                                                            const InstructionsBlock& ib, InstructionIndex i)
-    -> void {
+                                                            const InstructionsBlock& ib, InstructionIndex i,
+                                                            InstructionIndex mnemonic_counter) -> void {
     map<Register, Closure> created_closures;
 
     for (; i < ib.body.size(); ++i) {
@@ -562,6 +563,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
         if (not instruction) {
             continue;
         }
+        ++mnemonic_counter;
 
         using viua::assembler::frontend::parser::RegisterIndex;
         auto opcode = instruction->opcode;
@@ -2028,8 +2030,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     cerr << "[sa:if:branch:true:target:pre] jump_target = " << jump_target << " ("
                          << i + jump_target - 1 << ')' << endl;
                     if (jump_target > 0) {
-                        jump_target_if_true =
-                            get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target) - 1, ib);
+                        jump_target_if_true = get_line_index_of_instruction(
+                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
                         cerr << "OH NOES 0" << endl;
@@ -2057,8 +2059,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     cerr << "[sa:if:branch:false:target:pre] jump_target = " << jump_target << " ("
                          << i + jump_target - 1 << ')' << endl;
                     if (jump_target > 0) {
-                        jump_target_if_false =
-                            get_line_index_of_instruction(i + static_cast<decltype(i)>(jump_target) - 1, ib);
+                        jump_target_if_false = get_line_index_of_instruction(
+                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
                         cerr << "OH NOES 2" << endl;
@@ -2328,7 +2330,8 @@ static auto check_register_usage_for_instruction_block(const ParsedSource& ps, c
 
     RegisterUsageProfile register_usage_profile;
     map_names_to_register_indexes(register_usage_profile, ib);
-    check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, 0);
+    check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, 0,
+                                                    static_cast<InstructionIndex>(-1));
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(const ParsedSource& src) -> void {
     verify_wrapper(src, check_register_usage_for_instruction_block);
