@@ -20,7 +20,7 @@
 .function: main/0
     bits (.name: %iota bitstring) local 0b0
 
-    if %bitstring +1 after_first
+    if %bitstring local +1 after_first
     print (text %iota local "OH NOES") local
     .mark: after_first
 
