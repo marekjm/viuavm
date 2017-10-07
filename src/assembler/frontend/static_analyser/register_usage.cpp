@@ -2112,7 +2112,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                             instruction->operands.at(2)->tokens.at(0)));
                 }
 
-                break;
+
+                return;
             } else if (opcode == THROW) {
                 auto source = get_operand<RegisterIndex>(*instruction, 0);
                 if (not source) {
