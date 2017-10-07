@@ -52,7 +52,7 @@ bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
 bool REPORT_BYTECODE_SIZE = false;
 bool PERFORM_STATIC_ANALYSIS = true;
-bool USE_NEW_SA = false;
+bool USE_NEW_SA = true;
 bool SHOW_META = false;
 
 bool VERBOSE = false;
