@@ -685,7 +685,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 check_use_of_register(register_usage_profile, *operand);
 
-                assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile, *operand);
+                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile,
+                                                                             *operand);
 
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::INTEGER;
