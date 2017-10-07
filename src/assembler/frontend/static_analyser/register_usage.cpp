@@ -2310,9 +2310,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             } else if (opcode == HALT) {
                 // do nothing
             }
-        } catch (InvalidSyntax& e) {
-            throw e.add(instruction->tokens.at(0));
-        } catch (TracedSyntaxError& e) {
+        } catch (InvalidSyntax& e) { throw e.add(instruction->tokens.at(0)); } catch (TracedSyntaxError& e) {
             e.errors.at(0).add(instruction->tokens.at(0));
             throw e;
         }
