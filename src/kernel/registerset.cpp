@@ -52,6 +52,7 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register::give() {
 
 void viua::kernel::Register::swap(Register& that) {
     value.swap(that.value);
+    // FIXME are masks still used?
     auto tmp = mask;
     mask = that.mask;
     that.mask = tmp;
