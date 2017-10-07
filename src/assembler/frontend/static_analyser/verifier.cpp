@@ -249,13 +249,11 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                 continue;
             }
 
+            using viua::assembler::frontend::parser::RegisterIndex;
             if (opcode == FRAME) {
-                if (dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(
-                        instruction->operands.at(0).get())) {
+                if (dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get())) {
                     frame_parameters_count = static_cast<decltype(frame_parameters_count)>(
-                        dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(
-                            instruction->operands.at(0).get())
-                            ->index);
+                        dynamic_cast<RegisterIndex*>(instruction->operands.at(0).get())->index);
                 } else {
                     frame_parameters_count = -1;
                 }
@@ -271,7 +269,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                 operand = instruction->operands.at(0).get();
             }
 
-            if (dynamic_cast<viua::assembler::frontend::parser::RegisterIndex*>(operand)) {
+            if (dynamic_cast<RegisterIndex*>(operand)) {
                 // OK, but can't be verified at this time
                 // FIXME verifier should look around and see if it maybe can check if the function has
                 // correct arity; in some cases it should be possible (if the function was assigned inside
