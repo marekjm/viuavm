@@ -242,6 +242,10 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         throw InvalidSyntax(tokens.at(i), "invalid operand");
     }
 
+    if (tokens.at(i) == "[[") {
+        i += parse_attributes(vector_view<Token>(tokens, i), operand->attributes);
+    }
+
     return i;
 }
 

@@ -36,6 +36,7 @@ namespace viua {
             namespace parser {
                 struct Operand {
                     std::vector<viua::cg::lex::Token> tokens;
+                    std::map<std::string, std::string> attributes;
 
                     auto add(viua::cg::lex::Token) -> void;
 
