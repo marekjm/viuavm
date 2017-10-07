@@ -1397,8 +1397,11 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     }
                 }
 
-                check_use_of_register(register_usage_profile, *value);
-                assert_type_of_register<viua::internals::ValueTypes::BOOLEAN>(register_usage_profile, *value);
+                if (value) {
+                    check_use_of_register(register_usage_profile, *value);
+                    assert_type_of_register<viua::internals::ValueTypes::BOOLEAN>(register_usage_profile,
+                                                                                  *value);
+                }
             } else if (opcode == SHL or opcode == SHR or opcode == ASHL or opcode == ASHR) {
                 auto result = get_operand<RegisterIndex>(*instruction, 0);
                 if (not result) {
