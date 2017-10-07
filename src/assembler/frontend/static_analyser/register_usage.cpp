@@ -1333,10 +1333,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 check_use_of_register(register_usage_profile, *operand);
 
-                assert_type_of_register<ValueTypes::VECTOR>(register_usage_profile, *operand);
+                assert_type_of_register<ValueTypes::BITS>(register_usage_profile, *operand);
 
                 auto val = Register(*result);
-                val.value_type = ValueTypes::VECTOR;
+                val.value_type = ValueTypes::BITS;
                 register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == BITAT) {
                 auto result = get_operand<RegisterIndex>(*instruction, 0);
