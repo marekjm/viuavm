@@ -473,6 +473,7 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
              */
             continue;
         }
+        // FIXME Implement the .unused: directive, and [[maybe_unused]] attribute (later).
         if (not register_usage_profile.used(each.first)) {
             ostringstream msg;
             msg << "unused " + to_string(each.second.second.value_type) + " in register "
