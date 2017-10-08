@@ -163,8 +163,16 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         if (tokens[i] == looking_for) {
             ++i;  // skip directive
+
+            if (tokens.at(i) == "[[") {
+                while (tokens.at(++i) != "]]") {
+                }
+                ++i;  // skip closing ]]
+            }
+
             name = tokens[i];
             ++i;  // skip name
+
             ++i;  // skip '\n' token
             while (i < tokens.size() and tokens[i].str() != ".end") {
                 if (tokens[i] == looking_for) {
