@@ -84,6 +84,7 @@ namespace viua {
 
             struct UnusedValue : public InvalidSyntax {
                 UnusedValue(Token);
+                UnusedValue(Token, std::string);
             };
 
             struct TracedSyntaxError {

@@ -482,7 +482,7 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
                     << ')';
             }
 
-            throw InvalidSyntax(each.second.first, msg.str());
+            throw viua::cg::lex::UnusedValue(each.second.first, msg.str());
         }
     }
 }

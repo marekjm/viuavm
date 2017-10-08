@@ -101,6 +101,9 @@ namespace viua {
             UnusedValue::UnusedValue(Token token)
                 : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
+            UnusedValue::UnusedValue(Token token, string s)
+                : InvalidSyntax(token, s) {}
+
             const char* TracedSyntaxError::what() const { return errors.front().what(); }
 
             auto TracedSyntaxError::line() const -> decltype(errors.front().line()) {
