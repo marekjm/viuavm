@@ -2085,10 +2085,16 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                                         "invalid operand for jump instruction");
                 }
 
+                string register_with_unused_value;
+
                 try {
                     RegisterUsageProfile register_usage_profile_if_true = register_usage_profile;
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
                                                                     jump_target_if_true, mnemonic_counter);
+                } catch (viua::cg::lex::UnusedValue& e) {
+                    // Do not fail yet, because the value may be used by false branch.
+                    // Save the error for later rethrowing.
+                    register_with_unused_value = e.what();
                 } catch (InvalidSyntax& e) {
                     throw TracedSyntaxError{}.append(e).append(
                         InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
@@ -2103,6 +2109,18 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     RegisterUsageProfile register_usage_profile_if_false = register_usage_profile;
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
                                                                     jump_target_if_false, mnemonic_counter);
+                } catch (viua::cg::lex::UnusedValue& e) {
+                    if (register_with_unused_value == e.what()) {
+                        throw TracedSyntaxError{}.append(e).append(
+                            InvalidSyntax{instruction->tokens.at(0), "after taking either branch:"});
+                    } else {
+                        /*
+                         * If an error was throw for a different register it means that the register that
+                         * was unused in true branch was used in the false one (so no errror), and
+                         * the register for which the false branch threw was used in the true one (so no
+                         * error either).
+                         */
+                    }
                 } catch (InvalidSyntax& e) {
                     throw TracedSyntaxError{}.append(e).append(
                         InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
