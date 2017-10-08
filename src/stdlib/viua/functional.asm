@@ -170,7 +170,9 @@
     delete (draw %4)
     leave
 .end
-.function: std::functional::apply/2
+; FIXME Remove the no_sa attribute after the new SA is able to handle this function.
+; This will require implementing going down through entered blocks.
+.function: [[no_sa]] std::functional::apply/2
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
