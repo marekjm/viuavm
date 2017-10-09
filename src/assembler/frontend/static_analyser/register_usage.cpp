@@ -2020,6 +2020,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         // loop variable
                         i = jump_target;
                     }
+                } else if (str::ishex(target->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                    return;
                 } else {
                     throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
                 }
