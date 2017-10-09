@@ -1984,14 +1984,18 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             } else if (opcode == RECEIVE) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
+                    if (not get_operand<VoidLiteral>(*instruction, 0)) {
+                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                            .note("expected register index or void");
+                    }
                 }
 
-                check_if_name_resolved(register_usage_profile, *target);
+                if (target) {
+                    check_if_name_resolved(register_usage_profile, *target);
 
-                auto val = Register{*target};
-                register_usage_profile.define(val, target->tokens.at(0));
+                    auto val = Register{*target};
+                    register_usage_profile.define(val, target->tokens.at(0));
+                }
             } else if (opcode == WATCHDOG) {
                 auto fn = instruction->operands.at(0).get();
                 if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
