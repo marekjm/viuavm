@@ -23,14 +23,14 @@
 .end
 
 .function: throwing/0
-    throw (istore %1 local 666)
+    throw (istore %1 local 666) local
     return
 .end
 
 .function: unfortunate/0
     text %1 local "Hello World before stack unwinding!"
 
-    frame ^[(pamv %0 (ptr %2 local %1 local))]
+    frame ^[(pamv %0 (ptr %2 local %1 local) local)]
     defer print_me/1
 
     frame %0
