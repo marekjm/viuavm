@@ -2345,7 +2345,20 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.value_type = ValueTypes::VECTOR;
                 register_usage_profile.define(val, target->tokens.at(0));
             } else if (opcode == NEW) {
-                // TODO
+                auto operand = get_operand<RegisterIndex>(*instruction, 0);
+                if (not operand) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *operand);
+
+                auto val = Register{};
+                val.index = operand->index;
+                val.register_set = operand->rss;
+                val.value_type = viua::internals::ValueTypes::OBJECT;
+
+                register_usage_profile.define(val, operand->tokens.at(0));
             } else if (opcode == MSG) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
