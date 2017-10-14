@@ -1073,6 +1073,11 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     """
     PATH = './sample/asm/invalid_operand_types'
 
+    # Why --no-sa flag?
+    # Because these tests are for the runtime checks, so if the static analyser will complain
+    # about errors at compile time they will not even get the chance to run...
+    ASM_FLAGS = ('--no-sa',)
+
     def testIADD(self):
         runTestThrowsException(self, 'iadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
