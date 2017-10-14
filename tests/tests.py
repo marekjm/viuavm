@@ -93,6 +93,13 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
+        with open('/tmp/viua_test_suite_last_assembler_failure', 'w') as ofstream:
+            output_option = ('--out', '-o',)
+            def undesirable(x):
+                i, each = x
+                return not ((each in output_option) or (i and asmargs[i-1] in output_option))
+            parts = tuple(map(lambda each: each[1], filter(undesirable, enumerate(asmargs))))
+            ofstream.write(asmargs[0] + ' ' + ' '.join(('-o', '/dev/null',) + parts[1:]) + '\n')
         raise ViuaAssemblerError('{0}: {1}'.format(asm, output.strip()))
     return (output, error, exit_code)
 
