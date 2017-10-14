@@ -2189,6 +2189,14 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 // do nothing
             } else if (opcode == IMPORT) {
                 // do nothing
+            } else if (opcode == CLASS) {
+                // TODO
+            } else if (opcode == DERIVE) {
+                // TODO
+            } else if (opcode == ATTACH) {
+                // TODO
+            } else if (opcode == REGISTER) {
+                // TODO
             } else if (opcode == ATOM) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
@@ -2336,6 +2344,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto val = Register{*target};
                 val.value_type = ValueTypes::VECTOR;
                 register_usage_profile.define(val, target->tokens.at(0));
+            } else if (opcode == NEW) {
+                // TODO
             } else if (opcode == MSG) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
@@ -2364,6 +2374,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (target) {
                     register_usage_profile.define(Register{*target}, target->tokens.at(0));
                 }
+            } else if (opcode == INSERT) {
+                // TODO
+            } else if (opcode == REMOVE) {
+                // TODO
             } else if (opcode == RETURN) {
                 // do nothing
             } else if (opcode == HALT) {
