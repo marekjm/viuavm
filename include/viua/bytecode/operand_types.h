@@ -69,7 +69,7 @@ namespace viua {
             POINTER_DEREFERENCE,
         };
 
-        using ValueTypesType = uint16_t;
+        using ValueTypesType = uint32_t;
         enum class ValueTypes : ValueTypesType {
             /*
              * This is the type that is used when it is not known what type a value actually has.
