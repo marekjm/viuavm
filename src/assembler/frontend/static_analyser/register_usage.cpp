@@ -357,6 +357,10 @@ auto value_type_names = map<ValueTypes, string>{
         ValueTypes::STRUCT,
         "struct"s,
     },
+    {
+        ValueTypes::OBJECT,
+        "object"s,
+    },
 };
 static auto to_string(ValueTypes value_type_id) -> string {
     auto has_pointer = not not(value_type_id & ValueTypes::POINTER);
