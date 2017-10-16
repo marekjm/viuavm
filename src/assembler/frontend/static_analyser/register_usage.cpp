@@ -2066,7 +2066,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     continue;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(1)->tokens.at(0),
-                                        "invalid operand for jump instruction");
+                                        "invalid operand for if instruction");
                 }
 
                 auto jump_target_if_false = InstructionIndex{0};
@@ -2094,7 +2094,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     continue;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(2)->tokens.at(0),
-                                        "invalid operand for jump instruction");
+                                        "invalid operand for if instruction");
                 }
 
                 string register_with_unused_value;
