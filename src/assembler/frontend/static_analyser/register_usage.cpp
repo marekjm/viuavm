@@ -2010,7 +2010,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto target = instruction->operands.at(0).get();
 
                 if (auto offset = dynamic_cast<Offset*>(target); offset) {
-                    auto jump_target = (stol(offset->tokens.at(0).str().substr(1)) - 1);
+                    auto jump_target = (stol(offset->tokens.at(0)) - 1);
                     if (jump_target > 0) {
                         // FIXME use a recursive call and an immediate return instead of messing around with
                         // loop variable
@@ -2043,7 +2043,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 auto jump_target_if_true = InstructionIndex{0};
                 if (auto offset = get_operand<Offset>(*instruction, 1); offset) {
-                    auto jump_target = stol(offset->tokens.at(0).str().substr(1));
+                    auto jump_target = stol(offset->tokens.at(0));
                     if (jump_target > 0) {
                         jump_target_if_true = get_line_index_of_instruction(
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
@@ -2071,7 +2071,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 auto jump_target_if_false = InstructionIndex{0};
                 if (auto offset = get_operand<Offset>(*instruction, 2); offset) {
-                    auto jump_target = stol(offset->tokens.at(0).str().substr(1));
+                    auto jump_target = stol(offset->tokens.at(0));
                     if (jump_target > 0) {
                         jump_target_if_false = get_line_index_of_instruction(
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
