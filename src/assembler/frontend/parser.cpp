@@ -94,7 +94,8 @@ auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token
 }
 
 auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> tokens,
-                                                      unique_ptr<Operand>& operand)
+                                                      unique_ptr<Operand>& operand,
+                                                      const bool integer_literal_means_offset)
     -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
@@ -161,7 +162,7 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(bits_literal);
-    } else if (str::isnum(tok, true)) {
+    } else if (str::isnum(tok, true) and not integer_literal_means_offset) {
         auto integer_literal = make_unique<IntegerLiteral>();
         integer_literal->content = tokens.at(i);
         integer_literal->add(tokens.at(i));
@@ -231,9 +232,9 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(duration_literal);
-    } else if (tok.at(0) == '+' and str::isnum(tok.substr(1))) {
+    } else if ((tok.at(0) == '+' and str::isnum(tok.substr(1))) or str::isnum(tok, true)) {
         auto offset = make_unique<Offset>();
-        offset->content = tokens.at(i);
+        offset->content = (tok.at(0) == '+' ? tok.substr(1) : tok);
         offset->add(tokens.at(i));
         ++i;
 
@@ -290,11 +291,12 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
     }
 
     instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
+    bool integer_literal_means_offset = (instruction->opcode == JUMP or instruction->opcode == IF);
 
     try {
         while (tokens.at(i) != "\n") {
             unique_ptr<Operand> operand;
-            i += parse_operand(vector_view<Token>(tokens, i), operand);
+            i += parse_operand(vector_view<Token>(tokens, i), operand, integer_literal_means_offset);
             instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
