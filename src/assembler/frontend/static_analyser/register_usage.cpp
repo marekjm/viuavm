@@ -2388,7 +2388,32 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     register_usage_profile.define(Register{*target}, target->tokens.at(0));
                 }
             } else if (opcode == INSERT) {
-                // TODO
+                auto target = get_operand<RegisterIndex>(*instruction, 0);
+                if (not target) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target);
+                assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *target);
+
+                auto key = get_operand<RegisterIndex>(*instruction, 1);
+                if (not key) {
+                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *key);
+                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
+
+                auto source = get_operand<RegisterIndex>(*instruction, 2);
+                if (not source) {
+                    throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                erase_if_direct_access(register_usage_profile, source, instruction);
             } else if (opcode == REMOVE) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
