@@ -124,8 +124,7 @@ namespace viua {
             UnusedValue::UnusedValue(Token token)
                 : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
-            UnusedValue::UnusedValue(Token token, string s)
-                : InvalidSyntax(token, s) {}
+            UnusedValue::UnusedValue(Token token, string s) : InvalidSyntax(token, s) {}
 
             const char* TracedSyntaxError::what() const { return errors.front().what(); }
 
@@ -152,23 +151,48 @@ namespace viua {
                     /*
                      *  Reserved as register set names.
                      */
-                    "local", "static", "global",
+                    "local",
+                    "static",
+                    "global",
 
                     /*
                      * Reserved for future use.
                      */
-                    "auto", "default", "undefined", "null", "void", "iota", "const",
+                    "auto",
+                    "default",
+                    "undefined",
+                    "null",
+                    "void",
+                    "iota",
+                    "const",
 
                     /*
                      * Reserved for future use as boolean literals.
                      */
-                    "true", "false",
+                    "true",
+                    "false",
 
                     /*
                      * Reserved for future use as instruction names.
                      */
-                    "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64",
-                    "float32", "float64", "string", "boolean", "coroutine", "yield", "channel", "publish",
+                    "int",
+                    "int8",
+                    "int16",
+                    "int32",
+                    "int64",
+                    "uint",
+                    "uint8",
+                    "uint16",
+                    "uint32",
+                    "uint64",
+                    "float32",
+                    "float64",
+                    "string",
+                    "boolean",
+                    "coroutine",
+                    "yield",
+                    "channel",
+                    "publish",
                     "subscribe",
                 };
                 return (reserved_keywords.count(s) or OP_MNEMONICS.count(s));
@@ -947,7 +971,7 @@ namespace viua {
                         }
 
                         if (input_tokens.at(i + 1) == "\n") {
-                            throw InvalidSyntax{input_tokens.at(i+1), "missing second operand"}.add(token);
+                            throw InvalidSyntax{input_tokens.at(i + 1), "missing second operand"}.add(token);
                         }
                         tokens.push_back(input_tokens.at(++i));
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -2664,6 +2688,6 @@ namespace viua {
 
                 return tokens;
             }
-        }
-    }
-}
+        }  // namespace lex
+    }      // namespace cg
+}  // namespace viua
