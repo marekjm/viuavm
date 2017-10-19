@@ -108,6 +108,31 @@ static Program& compile(Program& program, const vector<Token>& tokens,
 }
 
 
+static auto strip_attributes(vector<viua::cg::lex::Token> const & tokens) -> vector<viua::cg::lex::Token> {
+        /*
+         * After the codegen is ported to the new parser-driven way, the strip-attributes code will not be
+         * needed.
+         */
+    std::remove_const_t<std::remove_reference_t<decltype(tokens)>> stripped;
+
+    auto in_attributes = false;
+    for (auto const& each : tokens) {
+        if (each == "[[") {
+            in_attributes = true;
+            continue;
+        } else if (each == "]]") {
+            in_attributes = false;
+            continue;
+        }
+        if (in_attributes) {
+            continue;
+        }
+        stripped.push_back(each);
+    }
+
+    return stripped;
+}
+
 static void assemble(Program& program, const vector<Token>& tokens) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
@@ -421,7 +446,7 @@ static viua::internals::types::bytecode_size generate_entry_function(
     return bytes;
 }
 
-void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename,
+void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t& blocks, const string& filename,
               string& compilename, const vector<string>& commandline_given_links,
               const compilationflags_t& flags) {
     //////////////////////////////
@@ -727,7 +752,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, blocks.tokens.at(name));
+            assemble(func, strip_attributes(blocks.tokens.at(name)));
         } catch (const string& e) { throw("in block '" + name + "': " + e); } catch (const char*& e) {
             throw("in block '" + name + "': " + e);
         } catch (const std::out_of_range& e) { throw("in block '" + name + "': " + e.what()); }
@@ -806,7 +831,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, functions.tokens.at(name));
+            assemble(func, strip_attributes(functions.tokens.at(name)));
         } catch (const string& e) {
             string msg = ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name +
                           send_control_seq(ATTR_RESET) + "': " + e);
