@@ -1917,6 +1917,13 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testOverwriteOfUnused(self):
+        runTestFailsToAssembleDetailed(self, 'overwrite_of_unused_value.asm', [
+            '22:12: error: overwrite of unused value:',
+            '21:12: note: unused value defined here:',
+            '20:12: error: in function main/0',
+        ])
+
 
 
 class AssemblerErrorTests(unittest.TestCase):
