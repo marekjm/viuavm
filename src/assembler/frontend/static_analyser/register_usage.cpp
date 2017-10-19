@@ -123,7 +123,7 @@ class RegisterUsageProfile {
     map<string, viua::internals::types::register_index> name_to_index;
     map<viua::internals::types::register_index, string> index_to_name;
 
-    auto define(const Register r, const Token t) -> void;
+    auto define(const Register r, const Token t, bool const = false) -> void;
     auto defined(const Register r) const -> bool;
     auto defined_where(const Register r) const -> Token;
 
@@ -142,7 +142,12 @@ class RegisterUsageProfile {
     auto end() const -> decltype(defined_registers.end());
 };
 
-auto RegisterUsageProfile::define(const Register r, const Token t) -> void {
+auto RegisterUsageProfile::define(const Register r, const Token t, bool const allow_overwrites) -> void {
+    if (defined(r) and not used(r) and not allow_overwrites) {
+        throw TracedSyntaxError{}
+            .append(viua::cg::lex::UnusedValue{t, "overwrite of unused value:"})
+            .append(InvalidSyntax{at(r).first}.note("unused value defined here:"));
+    }
     defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
 }
 auto RegisterUsageProfile::defined(const Register r) const -> bool { return defined_registers.count(r); }
