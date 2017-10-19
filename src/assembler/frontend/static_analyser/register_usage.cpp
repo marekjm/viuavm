@@ -123,36 +123,56 @@ class RegisterUsageProfile {
     map<string, viua::internals::types::register_index> name_to_index;
     map<viua::internals::types::register_index, string> index_to_name;
 
-    auto define(const Register r, const Token t) -> void {
-        defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
-    }
-    auto defined(const Register r) const -> bool { return defined_registers.count(r); }
-    auto defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
+    auto define(const Register r, const Token t) -> void;
+    auto defined(const Register r) const -> bool;
+    auto defined_where(const Register r) const -> Token;
 
-    auto infer(const Register r, const viua::internals::ValueTypes value_type_id, const Token& t) -> void {
-        auto reg = at(r);
-        reg.second.value_type = value_type_id;
-        reg.second.inferred = {true, t};
-        define(reg.second, reg.first);
-    }
+    auto infer(const Register r, const viua::internals::ValueTypes value_type_id, const Token& t) -> void;
 
-    auto use(const Register r, const Token t) -> void { used_registers[r] = t; }
-    auto used(const Register r) const -> bool { return used_registers.count(r); }
+    auto at(const Register r) const -> const decltype(defined_registers)::mapped_type;
 
-    auto at(const Register r) const -> const decltype(defined_registers)::mapped_type {
-        return defined_registers.at(r);
-    }
+    auto used(const Register r) const -> bool;
+    auto use(const Register r, const Token t) -> void;
 
-    auto erase(const Register r, const Token& token) -> void {
-        erased_registers.emplace(r, token);
-        defined_registers.erase(defined_registers.find(r));
-    }
-    auto erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
-    auto erased_where(const Register r) const -> Token { return erased_registers.at(r); }
+    auto erase(const Register r, const Token& token) -> void;
+    auto erased(const Register r) const -> bool;
+    auto erased_where(const Register r) const -> Token;
 
-    auto begin() const -> decltype(defined_registers.begin()) { return defined_registers.begin(); }
-    auto end() const -> decltype(defined_registers.end()) { return defined_registers.end(); }
+    auto begin() const -> decltype(defined_registers.begin());
+    auto end() const -> decltype(defined_registers.end());
 };
+
+auto RegisterUsageProfile::define(const Register r, const Token t) -> void {
+    defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
+}
+auto RegisterUsageProfile::defined(const Register r) const -> bool { return defined_registers.count(r); }
+auto RegisterUsageProfile::defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
+
+auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueTypes value_type_id, const Token& t) -> void {
+    auto reg = at(r);
+    reg.second.value_type = value_type_id;
+    reg.second.inferred = {true, t};
+    define(reg.second, reg.first);
+}
+
+auto RegisterUsageProfile::at(const Register r) const -> const decltype(defined_registers)::mapped_type {
+    return defined_registers.at(r);
+}
+
+auto RegisterUsageProfile::used(const Register r) const -> bool { return used_registers.count(r); }
+auto RegisterUsageProfile::use(const Register r, const Token t) -> void {
+    used_registers[r] = t;
+}
+
+auto RegisterUsageProfile::erase(const Register r, const Token& token) -> void {
+    erased_registers.emplace(r, token);
+    defined_registers.erase(defined_registers.find(r));
+}
+auto RegisterUsageProfile::erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
+auto RegisterUsageProfile::erased_where(const Register r) const -> Token { return erased_registers.at(r); }
+
+auto RegisterUsageProfile::begin() const -> decltype(defined_registers.begin()) { return defined_registers.begin(); }
+auto RegisterUsageProfile::end() const -> decltype(defined_registers.end()) { return defined_registers.end(); }
 
 
 using viua::internals::RegisterSets;
