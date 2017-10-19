@@ -1968,15 +1968,19 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             } else if (opcode == JOIN) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
+                    if (not get_operand<VoidLiteral>(*instruction, 0)) {
+                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                            .note("expected register index or void");
+                    }
                 }
 
-                check_if_name_resolved(register_usage_profile, *target);
-                if (target->as != viua::internals::AccessSpecifier::DIRECT) {
-                    throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                        .note("can only delete using direct access mode")
-                        .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+                if (target) {
+                    check_if_name_resolved(register_usage_profile, *target);
+                    if (target->as != viua::internals::AccessSpecifier::DIRECT) {
+                        throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+                            .note("can only join using direct access mode")
+                            .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+                    }
                 }
 
                 auto source = get_operand<RegisterIndex>(*instruction, 1);
@@ -1988,8 +1992,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 check_use_of_register(register_usage_profile, *source);
                 assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *source);
 
-                auto val = Register{*target};
-                register_usage_profile.define(val, target->tokens.at(0));
+                if (target) {
+                    auto val = Register{*target};
+                    register_usage_profile.define(val, target->tokens.at(0));
+                }
             } else if (opcode == SEND) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
