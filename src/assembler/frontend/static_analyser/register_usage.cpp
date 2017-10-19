@@ -212,10 +212,10 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
         try {
             verifier(source, fn);
         } catch (InvalidSyntax& e) {
-            throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+            throw viua::cg::lex::TracedSyntaxError{}.append(e).append(
+                InvalidSyntax{fn.name, ("in function " + fn.name.str())});
         } catch (TracedSyntaxError& e) {
-            throw e.append(InvalidSyntax(fn.name, ("in function " + fn.name.str())));
+            throw e.append(InvalidSyntax{fn.name, ("in function " + fn.name.str())});
         }
     }
 }
@@ -512,7 +512,7 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
                     << ')';
             }
 
-            throw viua::cg::lex::UnusedValue(each.second.first, msg.str());
+            throw viua::cg::lex::UnusedValue{each.second.first, msg.str()};
         }
     }
 }
