@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    strstore (.name: %iota value) "bar"
-    strstore (.name: %iota key) "foo"
-    insert (new (.name: %iota container) Object) %key %value
+    strstore (.name: %iota value) local "bar"
+    strstore (.name: %iota key) local "foo"
+    insert (new (.name: %iota container) local Object) local %key local %value local
 
-    remove void %container %key
-    print %container
+    remove void %container local %key local
+    print %container local
 
     izero %0 local
     return
