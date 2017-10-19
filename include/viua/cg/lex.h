@@ -62,6 +62,7 @@ namespace viua {
                 std::vector<Token> tokens;
                 std::vector<std::string> attached_notes;
                 std::string aside_note;
+                Token aside_token;
 
                 auto what() const -> const char*;
                 auto str() const -> std::string;
@@ -76,7 +77,9 @@ namespace viua {
                 auto notes() const -> const decltype(attached_notes) &;
 
                 auto aside(std::string) -> InvalidSyntax&;
+                auto aside(Token, std::string) -> InvalidSyntax&;
                 auto aside() const -> std::string;
+                auto match_aside(Token) const -> bool;
 
                 InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");

@@ -100,7 +100,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
          * Indentation for the aside should be increased as long as there is no match.
          * After first token matched we have our indent and must not increase it further.
          */
-        has_matched = (has_matched or match);
+        has_matched = (has_matched or error.match_aside(each));
         if (not has_matched) {
             for (auto j = each.str().size(); j; --j) {
                 indent << ' ';

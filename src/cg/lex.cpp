@@ -89,12 +89,35 @@ namespace viua {
                 aside_note = a;
                 return *this;
             }
+            auto InvalidSyntax::aside(Token t, string a) -> InvalidSyntax& {
+                aside_note = a;
+                aside_token = t;
+                return *this;
+            }
             auto InvalidSyntax::aside() const -> string { return aside_note; }
+
+            auto InvalidSyntax::match_aside(Token token) const -> bool {
+                if (token.line() == aside_token.line() and token.character() == aside_token.character()) {
+                    return true;
+                }
+                if (token.line() != aside_token.line()) {
+                    return false;
+                }
+                if (token.character() >= aside_token.character() and
+                    token.ends(true) <= aside_token.ends(true)) {
+                    return true;
+                }
+                return false;
+            }
 
             InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct)
                 : line_number(ln), character_in_line(ch), content(ct) {}
             InvalidSyntax::InvalidSyntax(Token t, string m)
-                : line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
+                : line_number(t.line()),
+                  character_in_line(t.character()),
+                  content(t.original()),
+                  message(m),
+                  aside_token(t) {
                 add(t);
             }
 
