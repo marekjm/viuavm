@@ -577,7 +577,7 @@ static auto get_input_operand(viua::assembler::frontend::parser::Instruction con
     auto operand = get_operand<T>(instruction, operand_index);
     if ((not operand) and dynamic_cast<VoidLiteral*>(instruction.operands.at(operand_index).get())) {
         throw InvalidSyntax{instruction.operands.at(operand_index)->tokens.at(0),
-                            "use of void as input register"};
+                            "use of void as input register:"};
     }
     return operand;
 }

@@ -1749,7 +1749,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testUseOfVoidAsInputRegister(self):
         runTestFailsToAssembleDetailed(self, 'void_as_input_register.asm', [
-            '26:17: error: use of void as input register',
+            '26:17: error: use of void as input register:',
             '24:12: error: in function main/0',
         ])
 
