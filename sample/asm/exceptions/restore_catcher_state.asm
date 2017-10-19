@@ -19,14 +19,14 @@
 
 .function: tertiary/1
     arg %3 %0
-    istore (.unused: %4) local 300
+    istore %4 local [[maybe_unused]] 300
     throw %3
     return
 .end
 
 .function: secondary/1
     arg %2 %0
-    istore (.unused: %4) local 200
+    istore %4 local [[maybe_unused]] 200
 
     frame ^[(param %0 %2)] %5
     istore %4 local 250
