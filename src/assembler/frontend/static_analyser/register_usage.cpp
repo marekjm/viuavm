@@ -627,6 +627,10 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
+
+                if (operand->attributes.count("maybe_unused")) {
+                    register_usage_profile.use(Register{*operand}, operand->tokens.at(0));
+                }
             } else if (opcode == IINC or opcode == IDEC) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
