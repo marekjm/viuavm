@@ -81,6 +81,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
     indent << ' ';
 
     bool has_matched = false;
+    bool has_matched_for_aside = false;
     while (i < tokens.size()) {
         const auto& each = tokens.at(i++);
         bool match = error.match(each);
@@ -96,12 +97,13 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 
         char c = (match ? (has_matched ? '~' : '^') : ' ');
 
+        has_matched = (has_matched or match);
         /*
-         * Indentation for the aside should be increased as long as there is no match.
-         * After first token matched we have our indent and must not increase it further.
+         * Indentation for the aside should be increased as long as the token the aside is
+         * attached to is not matched.
          */
-        has_matched = (has_matched or error.match_aside(each));
-        if (not has_matched) {
+        has_matched_for_aside = (has_matched_for_aside or error.match_aside(each));
+        if (not has_matched_for_aside) {
             for (auto j = each.str().size(); j; --j) {
                 indent << ' ';
             }
