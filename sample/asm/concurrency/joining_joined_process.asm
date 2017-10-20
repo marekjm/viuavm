@@ -42,10 +42,10 @@
     process %3 local print_lazy/1
 
     ; this is OK
-    join %0 %3 local
+    join void %3 local
 
     ; this throws an exception
-    join %0 %3 local
+    join void %3 local
 
     izero %0 local
     return
