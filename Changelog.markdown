@@ -53,6 +53,8 @@ There are several categories of change:
 - feature: static analyser is now able to check closure instantiations
 - feature: static analuser is now strict about the types being used consitently, and features some mild form
   of type inference to keep track of types of the values the program it compiles is using
+- fix: joining process using `void` register as output fetches the return value of the process being joined
+  actually making it unjoinable
 
 
 ----
