@@ -90,6 +90,14 @@ class RegisterUsageProfile {
     map<Register, pair<Token, Register>> defined_registers;
 
     /*
+     * Registers are "fresh" until they either 1/ cross the boundary of an "if" instruction, or
+     * 2/ are used. After that they are no longer fresh.
+     * Overwriting a fresh register is an error because it means that the previously
+     * defined value is never used.
+     */
+    set<Register> fresh_registers;
+
+    /*
      * Maps a register to the token marking the last place a register
      * has been used.
      * Consider:
@@ -119,6 +127,8 @@ class RegisterUsageProfile {
      */
     set<Register> maybe_unused_registers;
 
+    auto fresh(Register const) const -> bool;
+
   public:
     map<string, viua::internals::types::register_index> name_to_index;
     map<viua::internals::types::register_index, string> index_to_name;
@@ -134,6 +144,8 @@ class RegisterUsageProfile {
     auto used(const Register r) const -> bool;
     auto use(const Register r, const Token t) -> void;
 
+    auto defresh() -> void;
+
     auto erase(const Register r, const Token& token) -> void;
     auto erased(const Register r) const -> bool;
     auto erased_where(const Register r) const -> Token;
@@ -142,13 +154,22 @@ class RegisterUsageProfile {
     auto end() const -> decltype(defined_registers.end());
 };
 
+auto RegisterUsageProfile::fresh(Register const r) const -> bool {
+    return fresh_registers.count(r);
+}
+
+auto RegisterUsageProfile::defresh() -> void {
+    fresh_registers.clear();
+}
+
 auto RegisterUsageProfile::define(const Register r, const Token t, bool const allow_overwrites) -> void {
-    if (defined(r) and not used(r) and not allow_overwrites) {
+    if (defined(r) and fresh(r) and not allow_overwrites) {
         throw TracedSyntaxError{}
             .append(viua::cg::lex::UnusedValue{t, "overwrite of unused value:"})
             .append(InvalidSyntax{at(r).first}.note("unused value defined here:"));
     }
     defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
+    fresh_registers.insert(r);
 }
 auto RegisterUsageProfile::defined(const Register r) const -> bool { return defined_registers.count(r); }
 auto RegisterUsageProfile::defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
@@ -2136,6 +2157,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 try {
                     RegisterUsageProfile register_usage_profile_if_true = register_usage_profile;
+                    register_usage_profile_if_true.defresh();
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
                                                                     jump_target_if_true, mnemonic_counter);
                 } catch (viua::cg::lex::UnusedValue& e) {
@@ -2154,6 +2176,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
 
                 try {
                     RegisterUsageProfile register_usage_profile_if_false = register_usage_profile;
+                    register_usage_profile_if_false.defresh();
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
                                                                     jump_target_if_false, mnemonic_counter);
                 } catch (viua::cg::lex::UnusedValue& e) {
