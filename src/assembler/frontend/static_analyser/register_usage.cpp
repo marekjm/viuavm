@@ -177,7 +177,12 @@ auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueT
     auto reg = at(r);
     reg.second.value_type = value_type_id;
     reg.second.inferred = {true, t};
+
+    auto was_fresh = fresh(r);
     define(reg.second, reg.first);
+    if (not was_fresh) {
+        fresh_registers.erase(r);
+    }
 }
 
 auto RegisterUsageProfile::at(const Register r) const -> const decltype(defined_registers)::mapped_type {
