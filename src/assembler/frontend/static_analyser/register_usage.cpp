@@ -188,6 +188,7 @@ auto RegisterUsageProfile::at(const Register r) const -> const decltype(defined_
 auto RegisterUsageProfile::used(const Register r) const -> bool { return used_registers.count(r); }
 auto RegisterUsageProfile::use(const Register r, const Token t) -> void {
     used_registers[r] = t;
+    fresh_registers.erase(r);
 }
 
 auto RegisterUsageProfile::erase(const Register r, const Token& token) -> void {
