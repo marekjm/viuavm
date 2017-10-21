@@ -2109,7 +2109,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        continue;
+                        return;
                     }
                 } else if (auto label = get_operand<Label>(*instruction, 1); label) {
                     auto jump_target =
@@ -2123,7 +2123,9 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 } else if (str::ishex(instruction->operands.at(1)->tokens.at(0))) {
                     // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
                     // Do not check them now, but this should be fixed in the future.
-                    continue;
+                    // FIXME Return now and abort further checking of this block or risk throwing *many*
+                    // false positives.
+                    return;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(1)->tokens.at(0),
                                         "invalid operand for if instruction");
@@ -2137,7 +2139,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
                     } else {
                         // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        continue;
+                        return;
                     }
                 } else if (auto label = get_operand<Label>(*instruction, 2); label) {
                     auto jump_target =
@@ -2151,7 +2153,9 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 } else if (str::ishex(instruction->operands.at(2)->tokens.at(0))) {
                     // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
                     // Do not check them now, but this should be fixed in the future.
-                    continue;
+                    // FIXME Return now and abort further checking of this block or risk throwing *many*
+                    // false positives.
+                    return;
                 } else {
                     throw InvalidSyntax(instruction->operands.at(2)->tokens.at(0),
                                         "invalid operand for if instruction");
