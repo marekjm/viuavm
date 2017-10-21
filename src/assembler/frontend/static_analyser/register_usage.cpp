@@ -154,13 +154,9 @@ class RegisterUsageProfile {
     auto end() const -> decltype(defined_registers.end());
 };
 
-auto RegisterUsageProfile::fresh(Register const r) const -> bool {
-    return fresh_registers.count(r);
-}
+auto RegisterUsageProfile::fresh(Register const r) const -> bool { return fresh_registers.count(r); }
 
-auto RegisterUsageProfile::defresh() -> void {
-    fresh_registers.clear();
-}
+auto RegisterUsageProfile::defresh() -> void { fresh_registers.clear(); }
 
 auto RegisterUsageProfile::define(const Register r, const Token t, bool const allow_overwrites) -> void {
     if (defined(r) and fresh(r) and not allow_overwrites) {
@@ -172,9 +168,12 @@ auto RegisterUsageProfile::define(const Register r, const Token t, bool const al
     fresh_registers.insert(r);
 }
 auto RegisterUsageProfile::defined(const Register r) const -> bool { return defined_registers.count(r); }
-auto RegisterUsageProfile::defined_where(const Register r) const -> Token { return defined_registers.at(r).first; }
+auto RegisterUsageProfile::defined_where(const Register r) const -> Token {
+    return defined_registers.at(r).first;
+}
 
-auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueTypes value_type_id, const Token& t) -> void {
+auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueTypes value_type_id,
+                                 const Token& t) -> void {
     auto reg = at(r);
     reg.second.value_type = value_type_id;
     reg.second.inferred = {true, t};
@@ -198,8 +197,12 @@ auto RegisterUsageProfile::erase(const Register r, const Token& token) -> void {
 auto RegisterUsageProfile::erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
 auto RegisterUsageProfile::erased_where(const Register r) const -> Token { return erased_registers.at(r); }
 
-auto RegisterUsageProfile::begin() const -> decltype(defined_registers.begin()) { return defined_registers.begin(); }
-auto RegisterUsageProfile::end() const -> decltype(defined_registers.end()) { return defined_registers.end(); }
+auto RegisterUsageProfile::begin() const -> decltype(defined_registers.begin()) {
+    return defined_registers.begin();
+}
+auto RegisterUsageProfile::end() const -> decltype(defined_registers.end()) {
+    return defined_registers.end();
+}
 
 
 using viua::internals::RegisterSets;
