@@ -151,6 +151,9 @@ namespace str {
                 break;
             }
         }
+        if (dot == -1) {
+            return false;
+        }
         is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, (static_cast<unsigned>(dot) + 1)));
         return is;
     }
