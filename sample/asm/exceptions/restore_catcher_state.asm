@@ -37,7 +37,7 @@
 .end
 
 .function: main/1
-    istore %4 local 50
+    istore %4 local [[maybe_unused]] 50
 
     try
     catch "Integer" .block: handle_integer
@@ -47,7 +47,7 @@
         leave
     .end
     enter .block: main_block
-        istore %4 local 100
+        istore %4 local [[maybe_unused]] 100
 
         frame ^[(param %0 (istore %1 42))] %5
         call secondary/1
