@@ -2279,9 +2279,33 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
             } else if (opcode == TRY) {
                 // do nothing
             } else if (opcode == ENTER) {
-                // FIXME TODO SA for entered blocks
+                auto const label = get_operand<Label>(*instruction, 0);
+                if (not label) {
+                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
+                        .note("expected a block name");
+                }
+
+                auto const block_name = label->tokens.at(0).str();
+
+                try {
+                    check_register_usage_for_instruction_block_impl(register_usage_profile, ps,
+                                                                    ps.block(block_name), 0, 0);
+                } catch (InvalidSyntax& e) {
+                    throw TracedSyntaxError{}.append(e).append(
+                        InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
+                } catch (TracedSyntaxError& e) {
+                    throw e.append(InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
+                }
             } else if (opcode == LEAVE) {
-                // do nothing
+                /*
+                 * Just return.
+                 * Since blocks are never entered independently (and only in context of some other frame, we
+                 * will use that "outer" frame to check for unused values, etc.
+                 *
+                 * This may lead to less-than-stellar readability for some errors; e.g. when a value is
+                 * defined inside a block, but is used neither inside it not in the surrounding frame.
+                 */
+                return;
             } else if (opcode == IMPORT) {
                 // do nothing
             } else if (opcode == CLASS) {
