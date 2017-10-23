@@ -120,6 +120,8 @@ namespace viua {
                     std::vector<viua::cg::lex::Token> block_signatures;
 
                     bool as_library = false;
+
+                    auto block(std::string const) const -> InstructionsBlock const&;
                 };
 
 

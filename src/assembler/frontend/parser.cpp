@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <stdexcept>
 #include <viua/assembler/frontend/parser.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
@@ -34,6 +35,17 @@ using viua::internals::RegisterSets;
 
 // This value is completely arbitrary.
 const auto max_distance_for_misspelled_ids = str::LevenshteinDistance{4};
+
+
+auto viua::assembler::frontend::parser::ParsedSource::block(string const name) const
+    -> InstructionsBlock const& {
+    for (auto const& each : blocks) {
+        if (each.name == name) {
+            return each;
+        }
+    }
+    throw out_of_range(name);
+}
 
 
 auto viua::assembler::frontend::parser::Operand::add(Token t) -> void { tokens.push_back(t); }
