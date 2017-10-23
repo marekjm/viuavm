@@ -29,7 +29,7 @@
     istore %4 local [[maybe_unused]] 200
 
     frame ^[(param %0 %2)] %5
-    istore %4 local 250
+    istore %4 local [[maybe_unused]] 250
     call tertiary/1
 
     istore %4 local 225
