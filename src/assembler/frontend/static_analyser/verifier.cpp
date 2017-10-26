@@ -100,7 +100,7 @@ auto viua::assembler::frontend::static_analyser::verify_ress_instructions(const 
                                                             },
                                                             4);
                     suggestion.first) {
-                    error.aside("did you mean '" + suggestion.second + "'?");
+                    error.aside(label->tokens.at(0), "did you mean '" + suggestion.second + "'?");
                 }
                 throw error;
             }

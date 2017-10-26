@@ -297,7 +297,7 @@ auto viua::assembler::frontend::parser::parse_instruction(const vector_view<Toke
         if (auto suggestion =
                 str::levenshtein_best(tokens.at(i), get_mnemonics(), max_distance_for_misspelled_ids);
             suggestion.first) {
-            error.aside("did you mean '" + suggestion.second + "'?");
+            error.aside(tokens.at(i), "did you mean '" + suggestion.second + "'?");
         }
         throw error;
     }

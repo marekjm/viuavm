@@ -265,7 +265,7 @@ static auto check_if_name_resolved(const RegisterUsageProfile& rup, const Regist
         if (auto suggestion =
                 str::levenshtein_best(r.tokens.at(0).str().substr(1), keys_of(rup.name_to_index), 4);
             suggestion.first) {
-            error.aside("did you mean '" + suggestion.second + "' (name of " +
+            error.aside(r.tokens.at(0), "did you mean '" + suggestion.second + "' (name of " +
                         to_string(rup.name_to_index.at(suggestion.second)) + ")?");
         }
         throw error;
@@ -279,7 +279,7 @@ static auto maybe_mistyped_register_set_helper(RegisterUsageProfile& rup,
         val.index = r.index;
         val.register_set = rs_id;
         if (rup.defined(val)) {
-            error.errors.back().aside("did you mean " + to_string(rs_id) + " register " + to_string(r.index) +
+            error.errors.back().aside(r.tokens.at(0), "did you mean " + to_string(rs_id) + " register " + to_string(r.index) +
                                       "?");
             error.append(
                 InvalidSyntax(rup.defined_where(val), "")
