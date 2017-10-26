@@ -53,7 +53,7 @@ struct Register {
         if (register_set < that.register_set) {
             return true;
         }
-        if (index < that.index) {
+        if (register_set == that.register_set and index < that.index) {
             return true;
         }
         return false;
