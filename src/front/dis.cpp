@@ -41,10 +41,10 @@
 using namespace std;
 
 
-using viua::assembler::util::pretty_printer::send_control_seq;
+using viua::assembler::util::pretty_printer::ATTR_RESET;
 using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
-using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 // MISC FLAGS

@@ -811,5 +811,5 @@ namespace cg {
             *(addr_ptr++) = HALT;
             return addr_ptr;
         }
-    }
-}
+    }  // namespace bytecode
+}  // namespace cg

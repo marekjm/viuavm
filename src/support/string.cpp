@@ -546,4 +546,4 @@ namespace str {
         oss << ']';
         return oss.str();
     }
-}
+}  // namespace str

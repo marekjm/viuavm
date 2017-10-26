@@ -87,6 +87,6 @@ namespace support {
 
                 return (found ? path : "");
             }
-        }
-    }
-}
+        }  // namespace viua
+    }      // namespace env
+}  // namespace support

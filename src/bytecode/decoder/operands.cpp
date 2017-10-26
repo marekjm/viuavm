@@ -29,8 +29,8 @@
 #include <viua/util/memory.h>
 using namespace std;
 
-using viua::util::memory::load_aligned;
 using viua::util::memory::aligned_read;
+using viua::util::memory::load_aligned;
 
 
 template<class T> static auto extract(viua::internals::types::byte* ip) -> T {

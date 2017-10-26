@@ -428,9 +428,18 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler* sch,
                                 viua::process::Process* pt, const bool enable_tracing)
-    : tracing_enabled(enable_tracing), scheduler(sch), parent_process(pt), global_register_set(nullptr),
-      currently_used_register_set(nullptr), stack(nullptr), finished(false), is_joinable(true),
-      is_suspended(false), process_priority(512), process_id(this), is_hidden(false) {
+    : tracing_enabled(enable_tracing),
+      scheduler(sch),
+      parent_process(pt),
+      global_register_set(nullptr),
+      currently_used_register_set(nullptr),
+      stack(nullptr),
+      finished(false),
+      is_joinable(true),
+      is_suspended(false),
+      process_priority(512),
+      process_id(this),
+      is_hidden(false) {
     global_register_set = make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
     currently_used_register_set = frm->local_register_set.get();
     auto s = make_unique<Stack>(frm->function_name, this, &currently_used_register_set,

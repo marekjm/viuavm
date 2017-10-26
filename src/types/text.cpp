@@ -37,7 +37,7 @@ namespace {
     const uint8_t UTF8_3RD_ROW_NORMALISER = 0b11110000;
     const uint8_t UTF8_4TH_ROW_NORMALISER = 0b11111000;
     const uint8_t UTF8_FILLING_NORMALISER = 0b11000000;
-}
+}  // namespace
 
 static auto is_continuation_byte(uint8_t b) -> bool {
     return ((UTF8_FILLING_NORMALISER & b) == UTF8_FILLING);

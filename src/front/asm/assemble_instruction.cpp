@@ -39,10 +39,10 @@ using namespace std;
 extern bool DEBUG;
 extern bool SCREAM;
 
-using viua::assembler::util::pretty_printer::send_control_seq;
-using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
-using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
 using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 using Token = viua::cg::lex::Token;
@@ -184,8 +184,9 @@ static auto assemble_bit_shift_instruction(Program& program, const vector<Token>
                                                        resolve_rs_type(tokens.at(target + 1)));
     }
 
-    (program.*op)(ret, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                resolve_rs_type(tokens.at(lhs + 1))),
+    (program.*op)(ret,
+                  assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                           resolve_rs_type(tokens.at(lhs + 1))),
                   assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                            resolve_rs_type(tokens.at(rhs + 1))));
 }

@@ -215,9 +215,18 @@ struct State {
     int autoresumes = 0;
 
     State()
-        : breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}), initialised(false),
-          paused(false), finished(false), quit(false), exception_raised(false), exception_type(""),
-          exception_message(""), ticks_left(0), autoresumes(0) {}
+        : breakpoints_byte({}),
+          breakpoints_opcode({}),
+          breakpoints_function({}),
+          initialised(false),
+          paused(false),
+          finished(false),
+          quit(false),
+          exception_raised(false),
+          exception_type(""),
+          exception_message(""),
+          ticks_left(0),
+          autoresumes(0) {}
 };
 
 

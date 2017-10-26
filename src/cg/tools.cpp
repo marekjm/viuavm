@@ -1527,6 +1527,6 @@ namespace viua {
             bytecode_size_type calculate_bytecode_size2(const TokenVector& tokens) {
                 return calculate_bytecode_size_of_first_n_instructions2(tokens, tokens.size());
             }
-        }
-    }
-}
+        }  // namespace tools
+    }      // namespace cg
+}  // namespace viua
