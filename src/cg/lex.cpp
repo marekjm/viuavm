@@ -113,11 +113,7 @@ namespace viua {
             InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct)
                 : line_number(ln), character_in_line(ch), content(ct) {}
             InvalidSyntax::InvalidSyntax(Token t, string m)
-                : line_number(t.line()),
-                  character_in_line(t.character()),
-                  content(t.original()),
-                  message(m),
-                  aside_token(t) {
+                : line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
                 add(t);
             }
 
