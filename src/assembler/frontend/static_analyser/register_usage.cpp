@@ -63,7 +63,7 @@ struct Register {
     }
 
     Register() = default;
-    Register(const viua::assembler::frontend::parser::RegisterIndex& ri)
+    Register(viua::assembler::frontend::parser::RegisterIndex const & ri)
         : index(ri.index), register_set(ri.rss) {}
 };
 
