@@ -99,7 +99,10 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
                 i, each = x
                 return not ((each in output_option) or (i and asmargs[i-1] in output_option))
             parts = tuple(map(lambda each: each[1], filter(undesirable, enumerate(asmargs))))
-            ofstream.write(asmargs[0] + ' ' + ' '.join(('-o', '/dev/null',) + parts[1:]) + '\n')
+            s = (asmargs[0] + ' ' + ' '.join(('-o', '/dev/null',) + parts[1:]))
+            ofstream.write('#!/usr/bin/env bash\n\n')
+            ofstream.write('echo "{}"\n'.format(s))
+            ofstream.write('{}\n'.format(s))
         raise ViuaAssemblerError('{0}: {1}'.format(asm, output.strip()))
     return (output, error, exit_code)
 
