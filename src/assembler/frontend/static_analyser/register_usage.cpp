@@ -2233,9 +2233,18 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                         InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
                             instruction->operands.at(2)->tokens.at(0)));
                 } catch (TracedSyntaxError& e) {
-                    throw e.append(
-                        InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
-                            instruction->operands.at(2)->tokens.at(0)));
+                    if (register_with_unused_value != e.errors.front().what() and string{e.errors.front().what()}.substr(0, 6) == "unused") {
+                        /*
+                         * If an error was thrown for a different register it means that the register that
+                         * was unused in true branch was used in the false one (so no errror), and
+                         * the register for which the false branch threw was used in the true one (so no
+                         * error either).
+                         */
+                    } else {
+                        throw e.append(
+                            InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
+                                instruction->operands.at(2)->tokens.at(0)));
+                    }
                 }
 
                 return;
