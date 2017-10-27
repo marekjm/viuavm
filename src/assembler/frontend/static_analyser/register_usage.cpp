@@ -2551,10 +2551,6 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     }
                 }
 
-                if (target) {
-                    check_use_of_register(register_usage_profile, *target);
-                }
-
                 auto source = get_operand<RegisterIndex>(*instruction, 1);
                 if (not source) {
                     throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
