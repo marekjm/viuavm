@@ -2222,7 +2222,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                             InvalidSyntax{instruction->tokens.at(0), "after taking either branch:"});
                     } else {
                         /*
-                         * If an error was throw for a different register it means that the register that
+                         * If an error was thrown for a different register it means that the register that
                          * was unused in true branch was used in the false one (so no errror), and
                          * the register for which the false branch threw was used in the true one (so no
                          * error either).
