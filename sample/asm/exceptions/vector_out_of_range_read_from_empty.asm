@@ -17,10 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: [[no_sa]] main/0
-    vec %1
-    vat %2 %1 (izero %0 local)
-    print *2
+.function: main/0
+    vec %1 local
+    vat %2 local %1 local (izero %0 local) local
+    print *2 local
 
     izero %0 local
     return
