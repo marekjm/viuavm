@@ -1816,7 +1816,7 @@ class StaticAnalysis(unittest.TestCase):
     def testInferringTypesForArgs(self):
         runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
             '32:22: error: invalid type of value contained in register',
-            '32:22: note: expected text, got integer',
+            '32:22: note: expected string, got integer',
             '23:9: note: register defined here',
             '25:10: note: type inferred here',
             '                 ^ deduced type is \'integer\'',
@@ -1826,7 +1826,7 @@ class StaticAnalysis(unittest.TestCase):
     def testInferenceIncludesPointeredTypes(self):
         runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
             '26:19: error: invalid type of value contained in register',
-            '26:19: note: expected text, got pointer to integer',
+            '26:19: note: expected string, got pointer to integer',
             '21:9: note: register defined here',
             '23:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
