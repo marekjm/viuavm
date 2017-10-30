@@ -494,11 +494,19 @@ viua::internals::types::bytecode_size assemble_instruction(
         TokenIndex source = target + 2;
         TokenIndex position = source + 2;
 
+        int_op position_op;
+        if (tokens.at(position) == "void") {
+            position_op = assembler::operands::getint(resolveregister(tokens.at(position)));
+        } else {
+            position_op = assembler::operands::getint_with_rs_type(resolveregister(tokens.at(position)),
+                                                                   resolve_rs_type(tokens.at(position + 1)));
+        }
+
         program.opvinsert(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
                                                                    resolve_rs_type(tokens.at(target + 1))),
                           assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)),
                                                                    resolve_rs_type(tokens.at(source + 1))),
-                          assembler::operands::getint(resolveregister(tokens.at(position))));
+                          position_op);
     } else if (tokens.at(i) == "vpush") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
