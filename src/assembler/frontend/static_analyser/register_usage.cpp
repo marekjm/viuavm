@@ -1622,7 +1622,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
                     throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
                         .note("can only swap using direct access mode")
-                        .aside(target->tokens.at(0), "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+                        .aside(target->tokens.at(0),
+                               "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
                 }
 
                 auto source = get_operand<RegisterIndex>(*instruction, 1);
@@ -1635,7 +1636,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
                     throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
                         .note("can only swap using direct access mode")
-                        .aside(source->tokens.at(0), "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+                        .aside(source->tokens.at(0),
+                               "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
                 }
 
                 auto val_target = Register(*target);
