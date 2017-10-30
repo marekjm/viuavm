@@ -1562,11 +1562,11 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 }
 
                 check_use_of_register(register_usage_profile, *source, "copy from");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                auto type_of_source = assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
                                                                                 *source);
 
                 auto val = Register(*target);
-                val.value_type = register_usage_profile.at(*source).second.value_type;
+                val.value_type = type_of_source;
                 register_usage_profile.define(val, target->tokens.at(0));
             } else if (opcode == MOVE) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
