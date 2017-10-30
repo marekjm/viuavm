@@ -1769,7 +1769,6 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
 class StaticAnalysis(unittest.TestCase):
     PATH = './sample/static_analysis'
-    ASM_FLAGS = ('--new-sa',)
 
     def testIzeroCreatesInteger(self):
         runTest(self, 'izero_creates_integer.asm', '1')
