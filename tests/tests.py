@@ -1843,7 +1843,7 @@ class StaticAnalysis(unittest.TestCase):
             '20:12: error: in function main/1',
         ])
 
-    def testInferenceIncludesPointeredTypes(self):
+    def testTwoStagePointernessInference(self):
         runTestFailsToAssembleDetailed(self, 'two_stage_pointerness_inference.asm', [
             '50:13: error: invalid type of value contained in register',
             '50:13: note: expected vector, got integer',
