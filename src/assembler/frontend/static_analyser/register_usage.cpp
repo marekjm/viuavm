@@ -426,9 +426,12 @@ static auto to_string(ValueTypes value_type_id) -> string {
     return (has_pointer ? "pointer to "s : ""s) + value_type_names.at(value_type_id);
 }
 
+static auto depointerise_type_if_needed(ValueTypes const t, bool const access_via_pointer_dereference) -> ValueTypes {
+    return (access_via_pointer_dereference ? (t ^ ValueTypes::POINTER) : t);
+}
 template<viua::internals::ValueTypes expected_type>
 static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile,
-                                    const RegisterIndex& register_index) -> void {
+                                    const RegisterIndex& register_index) -> ValueTypes {
     auto actual_type = register_usage_profile.at(Register(register_index)).second.value_type;
 
     auto access_via_pointer_dereference =
@@ -463,11 +466,11 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         auto inferred_type =
             (expected_type | (access_via_pointer_dereference ? ValueTypes::POINTER : ValueTypes::UNDEFINED));
         register_usage_profile.infer(Register(register_index), inferred_type, register_index.tokens.at(0));
-        return;
+        return depointerise_type_if_needed(inferred_type, access_via_pointer_dereference);
     }
 
     if (expected_type == ValueTypes::UNDEFINED) {
-        return;
+        return depointerise_type_if_needed(actual_type, access_via_pointer_dereference);
     }
     if (not(actual_type & expected_type)) {
         auto error =
@@ -484,6 +487,8 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         }
         throw error;
     }
+
+    return depointerise_type_if_needed(actual_type, access_via_pointer_dereference);
 }
 
 static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile, RegisterIndex* r,
