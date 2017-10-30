@@ -2109,6 +2109,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                     continue;
                 } else if (auto label = dynamic_cast<Label*>(target); label) {
                     auto jump_target = ib.marker_map.at(label->tokens.at(0));
+                    jump_target = get_line_index_of_instruction(jump_target, ib);
                     if (jump_target > i) {
                         // FIXME use a recursive call and an immediate return instead of messing around with
                         // loop variable
