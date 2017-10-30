@@ -21,11 +21,11 @@
     .name: %iota hello_world
 
     text %hello_world local "Hello World!"
-    print (textlength %iota local %hello_world local)
+    print (textlength %iota local %hello_world local) local
 
-    -- "Witaj Świecie!" means "Hello World!" in Polish
+    ; "Witaj Świecie!" means "Hello World!" in Polish
     text %hello_world local "Witaj Świecie!"
-    print (textlength %iota local %hello_world local)
+    print (textlength %iota local %hello_world local) local
 
     izero %0 local
     return

@@ -19,15 +19,15 @@
 
 .function: main/0
     .name: %iota a_vector
-    vec %a_vector
-    vpush %a_vector (istore %0 0)
-    vpush %a_vector (istore %0 1)
-    vpush %a_vector (istore %0 2)
-    vpush %a_vector (istore %0 3)
+    vec %a_vector local
+    vpush %a_vector local (istore %0 0)
+    vpush %a_vector local (istore %0 1)
+    vpush %a_vector local (istore %0 2)
+    vpush %a_vector local (istore %0 3)
 
     .name: %iota an_index
-    istore %an_index 5
-    vinsert %a_vector (istore %0 4) %an_index
+    istore %an_index local 5
+    vinsert %a_vector local (istore %0 local 4) local %an_index local
 
     izero %0 local
     return

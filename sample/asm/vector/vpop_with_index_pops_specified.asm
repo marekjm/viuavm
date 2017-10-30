@@ -20,8 +20,8 @@
 .function: main/0
     vec (.name: %iota v) local
 
-    vpush %v (istore %iota local 0)
-    vpush %v (istore %iota local 1)
+    vpush %v local (istore %iota local 0) local
+    vpush %v local (istore %iota local 1) local
 
     istore (.name: %iota index) local 0
 

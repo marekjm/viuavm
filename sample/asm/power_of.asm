@@ -36,7 +36,7 @@
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    if (not (eq %4 (arg %exponent %1) (izero %zero))) algorithm
+    if (not (eq %4 (arg %exponent %1) (izero %zero))) algorithm +1
     istore %result 1
     jump final
 

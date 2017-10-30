@@ -28,7 +28,7 @@
     atom %value local 'bar'
     structinsert %container local %key local %value local
 
-    print (structkeys %iota local %container local)
+    print (structkeys %iota local %container local) local
 
     izero %0 local
     return
