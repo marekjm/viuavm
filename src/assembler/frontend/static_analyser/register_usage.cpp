@@ -2107,7 +2107,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto target = instruction->operands.at(0).get();
 
                 if (auto offset = dynamic_cast<Offset*>(target); offset) {
-                    auto jump_target = (stol(offset->tokens.at(0)) - 1);
+                    auto jump_target = stol(offset->tokens.at(0));
                     if (jump_target > 0) {
                         i = get_line_index_of_instruction(
                             mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
