@@ -1233,6 +1233,8 @@ class PrototypeSystemTests(unittest.TestCase):
     """
     PATH = './sample/asm/prototype'
 
+    ASM_FLAGS = ('--no-sa',)
+
     def testSimplePrototypeRegistrationAndInstantation(self):
         runTestSplitlines(self, 'simple.asm', ["Prototype for Custom", "Custom#{}"])
 
