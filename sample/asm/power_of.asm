@@ -49,7 +49,7 @@
     copy %result %base
 
     .mark: loop
-    if (lt %4 %counter %exponent) 12 final
+    if (lt %4 %counter %exponent) +1 final
     mul %result %result %base
     nop
     iinc %counter
