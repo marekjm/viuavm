@@ -480,7 +480,7 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
         if (auto r = register_usage_profile.at(Register(register_index)).second; r.inferred.first) {
             error.append(InvalidSyntax(r.inferred.second, "")
                              .note("type inferred here")
-                             .aside("deduced type is '" + to_string(r.value_type) + "'"));
+                             .aside(r.inferred.second, "deduced type is '" + to_string(r.value_type) + "'"));
         }
         throw error;
     }
@@ -1617,7 +1617,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
                     throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
                         .note("can only swap using direct access mode")
-                        .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+                        .aside(target->tokens.at(0), "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
                 }
 
                 auto source = get_operand<RegisterIndex>(*instruction, 1);
@@ -1630,7 +1630,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
                     throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
                         .note("can only swap using direct access mode")
-                        .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+                        .aside(source->tokens.at(0), "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
                 }
 
                 auto val_target = Register(*target);
