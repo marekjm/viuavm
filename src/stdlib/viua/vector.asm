@@ -100,26 +100,26 @@
     ; copying).
     ;
     .name: 0 source
-    arg %source %0
+    arg %source local %0
 
     .name: 1 counter_down
-    vlen %counter_down %source
-    idec %counter_down
+    vlen %counter_down local %source local
+    idec %counter_down local
     .name: 2 counter_up
-    izero %counter_up
+    izero %counter_up local
     .name: 3 limit
-    copy %limit %counter_down
+    copy %limit local %counter_down local
 
     .mark: begin_loop
     .name: 4 tmp
-    vpop %tmp %source
-    vinsert %source %tmp %counter_up
+    vpop %tmp local %source local
+    vinsert %source local %tmp local %counter_up local
 
-    idec %limit
-    idec %counter_down
-    iinc %counter_up
+    idec %limit local
+    idec %counter_down local
+    iinc %counter_up local
 
-    if %limit begin_loop
+    if %limit local begin_loop
     .mark: end_loop
 
     return
