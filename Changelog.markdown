@@ -55,6 +55,7 @@ There are several categories of change:
   of type inference to keep track of types of the values the program it compiles is using
 - fix: joining process using `void` register as output fetches the return value of the process being joined
   actually making it unjoinable
+- bic: rename `strstore` to `string`
 
 
 ----

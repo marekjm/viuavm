@@ -12,43 +12,43 @@
   fstore %3 local 7
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "7 mod 4 = 3 : ")
+  echo (string %1 local "7 mod 4 = 3 : ")
   print %2 local
   fstore %2 local 4
   fstore %3 local -7
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "-7 mod 4 = 1 : ")
+  echo (string %1 local "-7 mod 4 = 1 : ")
   print %2 local
   fstore %2 local -4
   fstore %3 local 7
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "7 mod -4 = -1 : ")
+  echo (string %1 local "7 mod -4 = -1 : ")
   print %2 local
   fstore %2 local -4
   fstore %3 local -7
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "-7 mod -4 = -3 : ")
+  echo (string %1 local "-7 mod -4 = -3 : ")
   print %2 local
   fstore %2 local 4.2
   fstore %3 local -7
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "-7 mod 4.2 = 1.4 : ")
+  echo (string %1 local "-7 mod 4.2 = 1.4 : ")
   print %2 local
   fstore %2 local 4
   fstore %3 local -7.6
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "-7.6 mod 4 = 0.4 : ")
+  echo (string %1 local "-7.6 mod 4 = 0.4 : ")
   print %2 local
   fstore %2 local 4.2
   fstore %3 local -7.6
   frame ^[(param %0 %3 local) (param %1 %2 local)]
   call %2 mod/2
-  echo (strstore %1 local "-7.6 mod 4.2 = 0.8 : ")
+  echo (string %1 local "-7.6 mod 4.2 = 0.8 : ")
   print %2 local
   izero %0 local
   return
@@ -69,7 +69,7 @@
   arg %arg1 %1
   ; arg1 <> 0
   if (not (eq %tmp_bool %arg1 (fstore %tmp_float 0))) mod_not_zero
-  throw (strstore %tmp_str "modulo by zero")
+  throw (string %tmp_str "modulo by zero")
   .mark: mod_not_zero
   ; if (arg1 > 0) then result in (0, arg1)
   ; if (arg1 < 0) then result in (arg1, 0)

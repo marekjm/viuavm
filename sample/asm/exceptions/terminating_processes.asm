@@ -44,7 +44,7 @@
 
     ; print hello to the screen to show that the process #n just finished running
     ; where #n is the "ID" assigned by the caller
-    echo (strstore %1 "Hello World from process ")
+    echo (string %1 "Hello World from process ")
     print (arg %1 %0)
 
     return

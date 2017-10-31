@@ -19,7 +19,7 @@
 
 .function: consumer/0
     print (receive %2)
-    print (strstore %1 "consumer/0: exiting")
+    print (string %1 "consumer/0: exiting")
     return
 .end
 
@@ -31,7 +31,7 @@
     frame %0
     call %2 std::io::getline/0
 
-    print (strstore %1 "producer/1: exiting")
+    print (string %1 "producer/1: exiting")
 
     frame ^[(param %0 (arg %3 %0)) (param %1 %2)]
     msg void pass/2

@@ -27,7 +27,7 @@
     vec %format_args (arg %1 %0) %1
 
     .name: 1 format_string
-    strstore %format_string "Hello #{0}!\n"
+    string %format_string "Hello #{0}!\n"
 
     frame ^[(param %0 %format_string) (param %1 %format_args)]
     msg %3 format/

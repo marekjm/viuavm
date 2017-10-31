@@ -20,7 +20,7 @@ For example, take a look at the following program:
 
 ```
 .function: hello_world/0
-    print (strstore 1 "Hello World!")
+    print (string 1 "Hello World!")
     return
 .end
 ```

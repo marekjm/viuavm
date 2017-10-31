@@ -30,21 +30,21 @@
 .end
 
 .function: fn_base/1
-    echo (strstore %1 "Good day from ")
+    echo (string %1 "Good day from ")
     frame ^[(param %0 (arg %2 %0))]
     print (call %3 typesystem::typeof/1)
     return
 .end
 
 .function: fn_derived/1
-    echo (strstore %1 "Hello from ")
+    echo (string %1 "Hello from ")
     frame ^[(param %0 (arg %2 %0))]
     print (call %3 typesystem::typeof/1)
     return
 .end
 
 .function: fn_more_derived/1
-    echo (strstore %1 "Hi from ")
+    echo (string %1 "Hi from ")
     frame ^[(param %0 (arg %2 %0))]
     print (call %3 typesystem::typeof/1)
     return
@@ -70,7 +70,7 @@
     msg void hello/1
 
     ; print an empty line
-    print (strstore %3 "")
+    print (string %3 "")
 
     ; create a MoreDerived object and
     ; call methods on it

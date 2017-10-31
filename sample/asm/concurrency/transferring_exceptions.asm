@@ -29,9 +29,9 @@
 .end
 
 .block: handle_process_exception
-    echo (strstore %3 "exception transferred from process ")
+    echo (string %3 "exception transferred from process ")
     echo %1
-    echo (strstore %3 ": ")
+    echo (string %3 ": ")
     print (draw %3)
     leave
 .end
@@ -40,7 +40,7 @@
     frame %0
     process %1 run_in_a_process/0
 
-    send %1 (strstore %2 "Hello exception transferring World!")
+    send %1 (string %2 "Hello exception transferring World!")
 
     try
     catch "String" handle_process_exception

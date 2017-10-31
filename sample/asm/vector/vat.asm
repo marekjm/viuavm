@@ -21,7 +21,7 @@
     vec (.name: %iota a_vector)
     print (vlen (.name: %iota length) %a_vector)
 
-    vpush %a_vector (strstore %iota "Hello World!")
+    vpush %a_vector (string %iota "Hello World!")
     print (vlen %length %a_vector)
 
     vat (.name: %iota something) %a_vector (istore %iota -1)

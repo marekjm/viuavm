@@ -19,7 +19,7 @@
 
 .function: main/1
     fstore %1 1.0
-    strstore %2 "Hello World!"
+    string %2 "Hello World!"
     mul %3 %1 %2
     print %3
 

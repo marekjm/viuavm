@@ -19,14 +19,14 @@
 
 .function: watchdog_process/0
     .mark: watchdog_start
-    throw (remove %4 (arg %1 %0) (strstore %3 "function"))
+    throw (remove %4 (arg %1 %0) (string %3 "function"))
 
-    ;frame ^[(param 0 (ptr 2 1)) (param 1 (strstore 3 "function"))]
+    ;frame ^[(param 0 (ptr 2 1)) (param 1 (string 3 "function"))]
     ;msg 4 get
 
-    ;echo (strstore 5 "process spawned with <")
+    ;echo (string 5 "process spawned with <")
     ;echo 4
-    ;print (strstore 5 "> died")
+    ;print (string 5 "> died")
 
     ;jump watchdog_start
 

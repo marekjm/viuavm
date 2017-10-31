@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    strstore %1 local "42"
+    string %1 local "42"
     istore %2 local 27
 
     stoi %3 local %1

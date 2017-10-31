@@ -401,7 +401,7 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_strstore(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_string(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
 
@@ -1247,9 +1247,9 @@ namespace viua {
                     } else if (tokens.at(i) == "eq") {
                         ++i;
                         tie(increase, i) = size_of_eq(tokens, i);
-                    } else if (tokens.at(i) == "strstore") {
+                    } else if (tokens.at(i) == "string") {
                         ++i;
-                        tie(increase, i) = size_of_strstore(tokens, i);
+                        tie(increase, i) = size_of_string(tokens, i);
                     } else if (tokens.at(i) == "text") {
                         ++i;
                         tie(increase, i) = size_of_text(tokens, i);

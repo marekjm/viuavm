@@ -21,16 +21,16 @@
     arg (.name: %iota death_message) %0
 
     .name: %iota exception
-    remove %exception %1 (strstore %exception "exception")
+    remove %exception %1 (string %exception "exception")
 
     .name: %iota aborted_function
-    remove %aborted_function %1 (strstore %aborted_function "function")
+    remove %aborted_function %1 (string %aborted_function "function")
 
-    echo (strstore (.name: %iota message) "process spawned with <")
+    echo (string (.name: %iota message) "process spawned with <")
     echo %aborted_function
-    echo (strstore %message "> killed by >>>")
+    echo (string %message "> killed by >>>")
     echo %exception
-    print (strstore %message "<<<")
+    print (string %message "<<<")
 
     return
 .end

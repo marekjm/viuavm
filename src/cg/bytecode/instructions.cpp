@@ -256,9 +256,9 @@ namespace cg {
             return emit_instruction_alu(addr_ptr, EQ, target, lhs, rhs);
         }
 
-        viua::internals::types::byte* opstrstore(viua::internals::types::byte* addr_ptr, int_op reg,
+        viua::internals::types::byte* opstring(viua::internals::types::byte* addr_ptr, int_op reg,
                                                  string s) {
-            *(addr_ptr++) = STRSTORE;
+            *(addr_ptr++) = STRING;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size() - 2), OT_STRING);
         }

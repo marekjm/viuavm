@@ -26,7 +26,7 @@
     print %2
 
     .name: 3 key
-    strstore %key "foo"
+    string %key "foo"
 
     ; insert and remove
     ; just to test move semantics

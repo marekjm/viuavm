@@ -21,7 +21,7 @@
     jump after
 
     .mark: here
-    print (strstore %1 "Hello World!")
+    print (string %1 "Hello World!")
 
     .mark: after
     if (not (not (izero %0))) here -5

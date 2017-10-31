@@ -148,10 +148,10 @@ Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opstrstore(int_op reg, string s) {
-    /*  Inserts strstore instruction.
+Program& Program::opstring(int_op reg, string s) {
+    /*  Inserts string instruction.
      */
-    addr_ptr = cg::bytecode::opstrstore(addr_ptr, reg, s);
+    addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
 

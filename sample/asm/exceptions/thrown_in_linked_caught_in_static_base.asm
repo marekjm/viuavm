@@ -26,14 +26,14 @@
 .end
 .block: handle_Integer
     draw %1
-    echo (strstore %2 "looks ")
+    echo (string %2 "looks ")
 
     if %1 +2
-    strstore %2 "truthy"
-    strstore %2 "falsey"
+    string %2 "truthy"
+    string %2 "falsey"
 
     echo %2
-    echo (strstore %2 ": ")
+    echo (string %2 ": ")
     print %1
 
     leave

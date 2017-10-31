@@ -2305,7 +2305,7 @@ class KeywordDefaultTests(unittest.TestCase):
         runTest(self, 'fstore.asm', '0.000000')
 
     def testDefaultInStrstore(self):
-        runTest(self, 'strstore.asm', 'default:')
+        runTest(self, 'string.asm', 'default:')
 
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):

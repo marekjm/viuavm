@@ -847,7 +847,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
-            } else if (opcode == STRSTORE) {
+            } else if (opcode == STRING) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")

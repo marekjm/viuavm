@@ -32,7 +32,7 @@
 .function: will_be_killed_by_a_runaway_exception/0
     istore %1 80
 
-    strstore %3 "iterations left: "
+    string %3 "iterations left: "
 
     .mark: __will_be_killed_by_a_runaway_exception_begin_while_0
     if %1 +1 __will_be_killed_by_a_runaway_exception_end_while_1
@@ -41,7 +41,7 @@
     jump __will_be_killed_by_a_runaway_exception_begin_while_0
     .mark: __will_be_killed_by_a_runaway_exception_end_while_1
 
-    throw (strstore %2 "Hello runaway World!")
+    throw (string %2 "Hello runaway World!")
 
     return
 .end
@@ -71,7 +71,7 @@
 .function: main/1
     watchdog supervisor_function/0
 
-    print (strstore %3 "main/1 exiting")
+    print (string %3 "main/1 exiting")
     izero %0 local
     return
 .end

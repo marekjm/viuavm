@@ -22,8 +22,8 @@ First, an example:
 
 ```
 .function: example_function
-    print (strstore 1 "Hello World from example function!")
-    echo (strstore 1 "First parameter: ")
+    print (string 1 "Hello World from example function!")
+    echo (string 1 "First parameter: ")
     echo (arg 2 0)
     end
 .end

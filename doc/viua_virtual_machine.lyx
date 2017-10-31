@@ -1354,7 +1354,7 @@ Instructions implementing string support in Viua VM.
 \end_layout
 
 \begin_layout Subsubsection
-strstore
+string
 \end_layout
 
 \begin_layout Paragraph
@@ -1364,7 +1364,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-strstore <target register> <string>
+string <target register> <string>
 \end_layout
 
 \begin_layout Paragraph

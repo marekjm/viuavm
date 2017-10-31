@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    prnt (strstore "Hello World!")
+    prnt (string "Hello World!")
     izero %0 local
     return
 .end

@@ -38,7 +38,7 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (strstore %1 local "Hello concurrent World! (1)") local)]
+    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
     process %3 local print_lazy/1
 
     ; this is OK

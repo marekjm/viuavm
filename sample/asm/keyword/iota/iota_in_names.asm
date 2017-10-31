@@ -21,7 +21,7 @@
     .name: %iota hello_world 
     .name: %iota forty_two
 
-    strstore %hello_world "Hello World!"
+    string %hello_world "Hello World!"
     istore %forty_two 42
 
     print %1 ; should print "Hello World!"

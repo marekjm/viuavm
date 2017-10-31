@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    print (strstore %1 "sample vector program")
+    print (string %1 "sample vector program")
 
     vpush (vec %2) 1
     print (vpop %4 %2)

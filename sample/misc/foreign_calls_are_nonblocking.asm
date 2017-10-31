@@ -21,18 +21,18 @@
 .signature: std::misc::cycle/1
 
 .function: run_in_a_process/0
-    print (strstore %1 "worker process: starting...")
+    print (string %1 "worker process: starting...")
 
     frame ^[(pamv %0 (istore %1 524288))]
     call std::misc::cycle/1
 
-    print (strstore %1 "worker process: started")
+    print (string %1 "worker process: started")
     print (receive %1)
 
     frame ^[(pamv %0 (istore %1 524288))]
     call std::misc::cycle/1
 
-    print (strstore %1 "worker process: stopped")
+    print (string %1 "worker process: stopped")
     return
 .end
 
@@ -42,9 +42,9 @@
 
     frame %0
     process void run_in_a_process/0
-    print (strstore %2 "main/1 detached worker process")
+    print (string %2 "main/1 detached worker process")
 
-    echo (strstore %2 "message to pass: ")
+    echo (string %2 "message to pass: ")
     frame %0
     call %2 std::io::getline/0
 

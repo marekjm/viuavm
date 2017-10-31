@@ -56,7 +56,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "gte",
     "eq",
 
-    "strstore",
+    "string",
     "streq",
 
     "text",
@@ -188,7 +188,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {GTE, "gte"},
     {EQ, "eq"},
 
-    {STRSTORE, "strstore"},
+    {STRING, "string"},
     {STREQ, "streq"},
 
     {TEXT, "text"},

@@ -39,7 +39,7 @@
     enter await_message
 
     if %times next_iteration
-    send %pid (strstore %3 "Hello World!")
+    send %pid (string %3 "Hello World!")
     return
 
     .mark: next_iteration

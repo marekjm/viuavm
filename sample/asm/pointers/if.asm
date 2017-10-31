@@ -24,11 +24,11 @@
     if *pointer yeah nope
 
     .mark: yeah
-    strstore %message "Yeah"
+    string %message "Yeah"
     jump done
 
     .mark: nope
-    strstore %message "Nope"
+    string %message "Nope"
 
     .mark: done
     print %message

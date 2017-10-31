@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    strstore %1 local "Hello World!"
+    string %1 local "Hello World!"
     print %1 local
 
     move %2 static %1 local

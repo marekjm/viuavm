@@ -53,7 +53,7 @@ enum OPCODE : viua::internals::types::byte {
     EQ,
 
     // string instructions
-    STRSTORE,
+    STRING,
     STREQ,
 
     /*

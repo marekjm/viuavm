@@ -24,7 +24,7 @@
 .end
 
 .function: main/1
-    strstore %1 "Hello World!"
+    string %1 "Hello World!"
 
     closure %2 a_closure/0
     capturecopy %2 %1 %1

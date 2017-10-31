@@ -32,18 +32,18 @@
 .function: main/1
     istore %0 99
 
-    strstore %1 " bottles"
-    strstore %2 " of beer"
-    strstore %3 " on the wall"
-    strstore %4 "Take one down, pass it around"
-    strstore %5 ""
-    strstore %6 "No more"
+    string %1 " bottles"
+    string %2 " of beer"
+    string %3 " on the wall"
+    string %4 "Take one down, pass it around"
+    string %5 ""
+    string %6 "No more"
 
     istore %7 1
     jump again
 
 .mark: one_beer
-    strstore %1 " bottle"
+    string %1 " bottle"
 
 .mark: again
 

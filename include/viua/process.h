@@ -292,7 +292,7 @@ namespace viua {
             viua::internals::types::byte* opgte(viua::internals::types::byte*);
             viua::internals::types::byte* opeq(viua::internals::types::byte*);
 
-            viua::internals::types::byte* opstrstore(viua::internals::types::byte*);
+            viua::internals::types::byte* opstring(viua::internals::types::byte*);
 
             viua::internals::types::byte* optext(viua::internals::types::byte*);
             viua::internals::types::byte* optexteq(viua::internals::types::byte*);

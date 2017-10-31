@@ -314,7 +314,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
     ostringstream oss;
     oss << opname;
 
-    if (op == STRSTORE) {
+    if (op == STRING) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         ++ptr;  // for operand type

@@ -152,8 +152,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case EQ:
             addr = opeq(addr + 1);
             break;
-        case STRSTORE:
-            addr = opstrstore(addr + 1);
+        case STRING:
+            addr = opstring(addr + 1);
             break;
         case TEXT:
             addr = optext(addr + 1);

@@ -19,7 +19,7 @@
 
 .function: main/0
     jump after
-    print (strstore %1 "Hello World!")
+    print (string %1 "Hello World!")
     .mark: after
     if (not (izero %1)) 1 -4
 

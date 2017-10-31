@@ -26,7 +26,7 @@
 .function: main/1
     ; create a closure and capture object in register 1 with it
     closure %2 printer_function/0
-    capture %2 %1 (strstore %1 "Hello World!")
+    capture %2 %1 (string %1 "Hello World!")
 
     ; call the closure (should print "Hello World!")
     frame %0

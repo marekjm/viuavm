@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    strstore %1 "Hello World!"
+    string %1 "Hello World!"
     istore %2 1
 
     print %1

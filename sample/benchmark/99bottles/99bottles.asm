@@ -5,7 +5,7 @@
     .end
     enter .block: xreceiver
         receive %1 500ms
-        print (strstore %2 "")
+        print (string %2 "")
         leave
     .end
 
@@ -39,9 +39,9 @@
 
     .name: %iota bottles_format_string
     if (eq %iota %how_many_bottles (istore %iota 1)) +1 +3
-    strstore %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\nNo more bottles on the wall.\n"
+    string %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\nNo more bottles on the wall.\n"
     jump +2
-    strstore %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\n#{1} bottles on the wall.\n"
+    string %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\n#{1} bottles on the wall.\n"
 
     move %0 %bottles_format_string
     return

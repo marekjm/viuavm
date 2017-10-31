@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    strstore (.name: %iota value) local "bar"
-    strstore (.name: %iota key) local "foo"
+    string (.name: %iota value) local "bar"
+    string (.name: %iota key) local "foo"
     insert (new (.name: %iota container) local Object) local %key local %value local
 
     remove void %container local %key local

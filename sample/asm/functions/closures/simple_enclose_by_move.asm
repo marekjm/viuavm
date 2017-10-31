@@ -25,7 +25,7 @@
 
 .function: main/1
     closure %1 a_closure/0
-    capturemove %1 %1 (strstore %2 "Hello World!")
+    capturemove %1 %1 (string %2 "Hello World!")
 
     print (isnull %3 %2)
 

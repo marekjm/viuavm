@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    strstore %iota "Hello World!"
+    string %iota "Hello World!"
     istore %iota 42
 
     print %1 ; should print "Hello World!"

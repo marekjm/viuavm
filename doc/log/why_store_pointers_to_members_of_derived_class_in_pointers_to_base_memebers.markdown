@@ -63,8 +63,8 @@ message is passed to the object, instead of the object being passed to a functio
 ```
 ; non object-oriented way of concatenating strings
 ; passing two strings to a function
-strstore 1 "Hello "
-strstore 2 "World!"
+string 1 "Hello "
+string 2 "World!"
 
 frame ^[(param 0 1) (param 1 2)]
 call 3 concatenate
@@ -74,8 +74,8 @@ print 3
 
 
 ; object-oriented way
-strstore 1 "Hello "
-strstore 2 "World!"
+string 1 "Hello "
+string 2 "World!"
 
 ; the frame still must be created, first parameter is `this`
 frame ^[(param 0 1) (param 1 2)]

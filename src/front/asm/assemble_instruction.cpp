@@ -378,11 +378,11 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                               resolve_rs_type(tokens.at(lhs + 1))),
                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                               resolve_rs_type(tokens.at(rhs + 1))));
-    } else if (tokens.at(i) == "strstore") {
+    } else if (tokens.at(i) == "string") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
 
-        program.opstrstore(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+        program.opstring(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
                                                                     resolve_rs_type(tokens.at(target + 1))),
                            tokens.at(source));
     } else if (tokens.at(i) == "text") {
