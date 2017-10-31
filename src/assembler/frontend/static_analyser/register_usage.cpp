@@ -426,7 +426,8 @@ static auto to_string(ValueTypes value_type_id) -> string {
     return (has_pointer ? "pointer to "s : ""s) + value_type_names.at(value_type_id);
 }
 
-static auto depointerise_type_if_needed(ValueTypes const t, bool const access_via_pointer_dereference) -> ValueTypes {
+static auto depointerise_type_if_needed(ValueTypes const t, bool const access_via_pointer_dereference)
+    -> ValueTypes {
     return (access_via_pointer_dereference ? (t ^ ValueTypes::POINTER) : t);
 }
 template<viua::internals::ValueTypes expected_type>
@@ -1562,8 +1563,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 }
 
                 check_use_of_register(register_usage_profile, *source, "copy from");
-                auto type_of_source = assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+                auto type_of_source = assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+                    register_usage_profile, *source);
 
                 auto val = Register(*target);
                 val.value_type = type_of_source;
