@@ -23,13 +23,13 @@
 .function: run_in_a_process/0
     print (string %1 "worker process: starting...")
 
-    frame ^[(pamv %0 (istore %1 524288))]
+    frame ^[(pamv %0 (integer %1 524288))]
     call std::misc::cycle/1
 
     print (string %1 "worker process: started")
     print (receive %1)
 
-    frame ^[(pamv %0 (istore %1 524288))]
+    frame ^[(pamv %0 (integer %1 524288))]
     call std::misc::cycle/1
 
     print (string %1 "worker process: stopped")

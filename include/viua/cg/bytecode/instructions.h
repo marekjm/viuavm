@@ -67,7 +67,7 @@ namespace cg {
         viua::internals::types::byte* opnop(viua::internals::types::byte*);
 
         viua::internals::types::byte* opizero(viua::internals::types::byte*, int_op);
-        viua::internals::types::byte* opistore(viua::internals::types::byte*, int_op, int_op);
+        viua::internals::types::byte* opinteger(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opiinc(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opidec(viua::internals::types::byte*, int_op);
 

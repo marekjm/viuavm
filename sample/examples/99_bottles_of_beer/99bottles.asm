@@ -30,7 +30,7 @@
 ;
 
 .function: main/1
-    istore %0 99
+    integer %0 99
 
     string %1 " bottles"
     string %2 " of beer"
@@ -39,7 +39,7 @@
     string %5 ""
     string %6 "No more"
 
-    istore %7 1
+    integer %7 1
     jump again
 
 .mark: one_beer

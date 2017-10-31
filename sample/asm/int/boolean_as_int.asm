@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    istore (.name: %iota forty_two) 42
-    istore (.name: %iota sixty_nine) 69
+    integer (.name: %iota forty_two) 42
+    integer (.name: %iota sixty_nine) 69
 
     lt (.name: %iota compared) %forty_two %sixty_nine
 

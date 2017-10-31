@@ -36,7 +36,7 @@
     vec %1
 
     ; create a value to be bound in both closures
-    istore %2 42
+    integer %2 42
 
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
@@ -65,8 +65,8 @@
     vat (.name: %iota printer_closure) %the_closures (izero %iota)
     call void *printer_closure
 
-    frame ^[(param %0 (istore %iota 69))]
-    vat (.name: %iota setter_closure) %the_closures (istore %iota 1)
+    frame ^[(param %0 (integer %iota 69))]
+    vat (.name: %iota setter_closure) %the_closures (integer %iota 1)
     call void *setter_closure
 
     frame %0

@@ -41,7 +41,7 @@
     ; deduces the type of value to be 'pointer to integer'.
     iinc *1 local
 
-    istore %2 local 42
+    integer %2 local 42
 
     ; The SA will throw an error here.
     ; Value in register one is accessed with the assumption that it contains a

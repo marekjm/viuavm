@@ -24,8 +24,8 @@
     fstore %1 0.0001
 
     ; generate false
-    istore %2 0
-    istore %3 1
+    integer %2 0
+    integer %3 1
     eq %2 %2 %3
 
     ; check

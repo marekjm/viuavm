@@ -24,7 +24,7 @@
 .end
 
 .function: bar/0
-    throw (istore %iota 42)
+    throw (integer %iota 42)
     return
 .end
 

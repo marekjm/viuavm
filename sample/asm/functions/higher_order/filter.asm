@@ -19,7 +19,7 @@
 
 .function: is_divisible_by_2/1
     arg %1 %0
-    istore %2 2
+    integer %2 2
 
     .mark: loop_begin
     if (lt %3 %1 %2) loop_end +1
@@ -82,11 +82,11 @@
 .end
 
 .function: main/1
-    vpush (vec %1) (istore %2 1)
-    vpush %1 (istore %2 2)
-    vpush %1 (istore %2 3)
-    vpush %1 (istore %2 4)
-    vpush %1 (istore %2 5)
+    vpush (vec %1) (integer %2 1)
+    vpush %1 (integer %2 2)
+    vpush %1 (integer %2 3)
+    vpush %1 (integer %2 4)
+    vpush %1 (integer %2 5)
 
     print %1
 

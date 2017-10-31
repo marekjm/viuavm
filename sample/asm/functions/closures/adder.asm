@@ -41,19 +41,19 @@
 .function: main/1
     ; create the adder function
     .name: 2 add_three
-    frame ^[(param %0 (istore %1 3))]
+    frame ^[(param %0 (integer %1 3))]
     call %add_three make_adder/1
 
     ; add_three(2)
-    frame ^[(param %0 (istore %3 2))]
+    frame ^[(param %0 (integer %3 2))]
     print (call %4 %add_three)
 
     ; add_three(5)
-    frame ^[(param %0 (istore %3 5))]
+    frame ^[(param %0 (integer %3 5))]
     print (call %4 %add_three)
 
     ; add_three(13)
-    frame ^[(param %0 (istore %3 13))]
+    frame ^[(param %0 (integer %3 13))]
     print (call %4 %add_three)
 
     izero %0 local

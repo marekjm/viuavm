@@ -26,7 +26,7 @@
     .name: %iota a_closure
     .name: %iota an_int
 
-    istore %an_int 42
+    integer %an_int 42
 
     closure %a_closure closure/0
     capturemove %a_closure %1 %an_int

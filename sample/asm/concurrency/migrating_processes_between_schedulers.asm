@@ -20,7 +20,7 @@
 .signature: std::misc::cycle/1
 
 .function: print_hello/1
-    frame ^[(pamv %0 (istore %1 64))]
+    frame ^[(pamv %0 (integer %1 64))]
     call std::misc::cycle/1
 
     .name: 2 format_args
@@ -79,7 +79,7 @@
     import "std::misc"
 
     .name: 1 limit
-    istore %limit 64
+    integer %limit 64
     frame ^[(pamv %0 %limit)]
     call spawn_processes/1
 

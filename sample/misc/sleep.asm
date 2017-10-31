@@ -22,7 +22,7 @@
 .function: main/1
     import "kitchensink"
 
-    frame ^[(param %0 (istore %0 2))]
+    frame ^[(param %0 (integer %0 2))]
     call std::kitchensink::sleep/1
 
     izero %0 local

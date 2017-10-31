@@ -115,7 +115,7 @@ class RegisterUsageProfile {
      *
      *      text %1 local "Hello World!"    ; register 1 is defined
      *      delete %1 local                 ; register 1 is erased
-     *      istore %1 local 42              ; register 1 is defined again
+     *      integer %1 local 42              ; register 1 is defined again
      */
     map<Register, Token> erased_registers;
 
@@ -648,7 +648,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
-            } else if (opcode == ISTORE) {
+            } else if (opcode == INTEGER) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")

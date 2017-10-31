@@ -34,7 +34,7 @@
     frame %0
     defer foo/0
 
-    throw (istore %1 local 42) local
+    throw (integer %1 local 42) local
 
     izero %0 local
     return

@@ -31,8 +31,8 @@
     echo %exception
     print (string %message "<<<")
 
-    copy (.name: %iota i) *(vat %i %parameters (istore %iota 1))
-    frame ^[(param %0 *(vat %message %parameters (istore %iota 0))) (param %1 (iinc %i))]
+    copy (.name: %iota i) *(vat %i %parameters (integer %iota 1))
+    frame ^[(param %0 *(vat %message %parameters (integer %iota 0))) (param %1 (iinc %i))]
     process void a_division_executing_process/2
 
     return
@@ -41,17 +41,17 @@
 .function: a_detached_concurrent_process/0
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (istore %1 32))]
+    frame ^[(pamv %0 (integer %1 32))]
     call std::misc::cycle/1
 
     print (string %1 "Hello World (from detached process)!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
     print (string %1 "Hello World (from detached process) after a runaway exception!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
     frame ^[(pamv %0 (string %1 "a_detached_concurrent_process"))]
@@ -73,7 +73,7 @@
 .function: a_division_executing_process/2
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (istore %1 128))]
+    frame ^[(pamv %0 (integer %1 128))]
     call std::misc::cycle/1
 
     .name: 1 divide_what
@@ -126,7 +126,7 @@
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (istore %3 42)) (param %1 (istore %4 0))]
+    frame ^[(param %0 (integer %3 42)) (param %1 (integer %4 0))]
     process void a_division_executing_process/2
 
     frame %0

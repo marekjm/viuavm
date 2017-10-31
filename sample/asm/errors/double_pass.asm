@@ -23,7 +23,7 @@
 
 .function: main/0
     frame %3
-    param %0 (istore %1 1)
+    param %0 (integer %1 1)
     param %1 %1
     param %2 %1
     pamv %2 %1

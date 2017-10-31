@@ -1,6 +1,6 @@
 .function: main/0
     string %1 "answer to life"
-    istore %2 42
+    integer %2 42
 
     vec %3 %1 %2
 

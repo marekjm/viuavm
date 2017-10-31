@@ -37,15 +37,15 @@ Program& Program::opizero(int_op regno) {
     return (*this);
 }
 
-Program& Program::opistore(int_op regno, int_op i) {
-    /*  Inserts istore instruction to bytecode.
+Program& Program::opinteger(int_op regno, int_op i) {
+    /*  Inserts integer instruction to bytecode.
      *
      *  :params:
      *
      *  regno:int - register number
      *  i:int     - value to store
      */
-    addr_ptr = cg::bytecode::opistore(addr_ptr, regno, i);
+    addr_ptr = cg::bytecode::opinteger(addr_ptr, regno, i);
     return (*this);
 }
 

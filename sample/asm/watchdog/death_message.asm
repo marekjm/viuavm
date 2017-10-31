@@ -32,17 +32,17 @@
 .end
 
 .function: a_detached_concurrent_process/0
-    frame ^[(pamv %0 (istore %1 32))]
+    frame ^[(pamv %0 (integer %1 32))]
     call std::misc::cycle/1
 
     print (string %1 "Hello World (from detached process)!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
     print (string %1 "Hello World (from detached process) after a runaway exception!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
     frame ^[(pamv %0 (string %1 "a_detached_concurrent_process"))]
@@ -52,7 +52,7 @@
 .end
 
 .function: a_joined_concurrent_process/0
-    frame ^[(pamv %0 (istore %1 128))]
+    frame ^[(pamv %0 (integer %1 128))]
     call std::misc::cycle/1
 
     print (string %1 "Hello World (from joined process)!")

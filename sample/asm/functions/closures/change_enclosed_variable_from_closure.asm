@@ -19,7 +19,7 @@
 
 .function: variable_changing_function/0
     ; expects register 1 to be an captured object
-    istore %1 42
+    integer %1 42
     return
 .end
 

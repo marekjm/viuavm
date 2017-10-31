@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    istore %1 1
+    integer %1 1
     string %2 "Hello World!"
     sub %3 %1 %2
     print %3

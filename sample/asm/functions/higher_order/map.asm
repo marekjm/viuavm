@@ -85,11 +85,11 @@
     ; applies function square/1(int) to 5 and
     ; prints the result
 
-    vpush (vec %1) (istore %2 1)
-    vpush %1 (istore %2 2)
-    vpush %1 (istore %2 3)
-    vpush %1 (istore %2 4)
-    vpush %1 (istore %2 5)
+    vpush (vec %1) (integer %2 1)
+    vpush %1 (integer %2 2)
+    vpush %1 (integer %2 3)
+    vpush %1 (integer %2 4)
+    vpush %1 (integer %2 5)
 
     print %1
 

@@ -29,7 +29,7 @@ enum OPCODE : viua::internals::types::byte {
 
     // integer instructions
     IZERO,
-    ISTORE,
+    INTEGER,
     IINC,
     IDEC,
 

@@ -101,8 +101,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case IZERO:
             addr = opizero(addr + 1);
             break;
-        case ISTORE:
-            addr = opistore(addr + 1);
+        case INTEGER:
+            addr = opinteger(addr + 1);
             break;
         case IINC:
             addr = opiinc(addr + 1);

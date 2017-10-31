@@ -30,7 +30,7 @@
 .end
 
 .function: will_be_killed_by_a_runaway_exception/0
-    istore %1 80
+    integer %1 80
 
     string %3 "iterations left: "
 
@@ -53,8 +53,8 @@
     arg %counter %0
 
     .name: 4 i
-    sub %counter %counter (istore %i 9)
-    div %counter %counter (istore %i 2)
+    sub %counter %counter (integer %i 9)
+    div %counter %counter (integer %i 2)
 
     .name: 2 zero
     izero %zero

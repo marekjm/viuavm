@@ -29,7 +29,7 @@
 .end
 
 .function: baz
-    istore %1 42
+    integer %1 42
     frame %0
     call bar
     return

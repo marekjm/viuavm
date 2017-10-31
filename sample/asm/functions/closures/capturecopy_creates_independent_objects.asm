@@ -35,7 +35,7 @@
     call void %2
 
     ; this should not affect the object captured a "a_closure"
-    print (istore %1 42)
+    print (integer %1 42)
 
     ; call the closure
     frame %0

@@ -21,7 +21,7 @@
     .name: %iota counter
     .name: %iota limit
     izero %counter
-    istore %limit 4
+    integer %limit 4
 
     send (arg %iota %0) (self %iota)
 

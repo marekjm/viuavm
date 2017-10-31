@@ -23,7 +23,7 @@
 .end
 
 .function: bar/0
-    print (istore %1 local 42) local
+    print (integer %1 local 42) local
     return
 .end
 

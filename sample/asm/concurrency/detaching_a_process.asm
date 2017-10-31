@@ -19,7 +19,7 @@
 
 .function: running_detached/0
     izero (.name: %iota counter)
-    istore (.name: %iota limit) 4
+    integer (.name: %iota limit) 4
     string (.name: %iota report_text_format) "Hello World! (from long-running detached process) #{0}"
 
     .mark: loop

@@ -1,6 +1,6 @@
 .function: main/0
     string %2 "answer to life"
-    istore %3 42
+    integer %3 42
 
     -- this would pack outside of available
     -- register %set index range

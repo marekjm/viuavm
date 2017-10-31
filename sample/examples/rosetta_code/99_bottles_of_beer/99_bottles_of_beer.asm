@@ -23,7 +23,7 @@
 
     .name: %iota bottles_of_beer
     ; support for "1 bottle of beer" and "N bottles of beer"
-    if (eq %iota %number_of_bottles (istore %iota 1)) +1 +3
+    if (eq %iota %number_of_bottles (integer %iota 1)) +1 +3
     text %bottles_of_beer " bottle of beer"
     jump +2
     text %bottles_of_beer " bottles of beer"
@@ -116,7 +116,7 @@
 
 .function: main/0
     .name: %iota total_number_of_bottles
-    istore %total_number_of_bottles 9
+    integer %total_number_of_bottles 9
 
     frame ^[(pamv %0 %total_number_of_bottles)]
     call void bottles_of_beer/1

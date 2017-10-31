@@ -33,8 +33,8 @@
     call void %2
 
     ; store 42 in register 1, keep in mind that register 1 holds a reference so
-    ; the istore will rebind the reference - it will now point to Integer(42)
-    istore %1 42
+    ; the integer will rebind the reference - it will now point to Integer(42)
+    integer %1 42
 
     ; call the closure (should print "42")
     frame %0

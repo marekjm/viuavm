@@ -19,10 +19,10 @@
 
 .function: main/0
     jump +2             ; the jump will take execution to print, skipping
-                        ; the istore
-    istore %1 local 42
+                        ; the integer
+    integer %1 local 42
     print %1 local      ; the `%1 local` register is empty, due to the fact
-                        ; that istore was skipped
+                        ; that integer was skipped
 
     izero %0 local
     return

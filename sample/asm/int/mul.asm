@@ -20,9 +20,9 @@
 ; This script tests integer multiplication.
 
 .function: main/1
-    istore %1 4
-    istore %2 4
-    istore %3 -15
+    integer %1 4
+    integer %2 4
+    integer %3 -15
     mul %4 %1 %2
     add %3 %4 %3
     print %3

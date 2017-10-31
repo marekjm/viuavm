@@ -30,7 +30,7 @@ using namespace std;
 
 static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_integers = false) {
     /*  This function is used to register numbers when a register is accessed, e.g.
-     *  in `istore` instruction or in `branch` in condition operand.
+     *  in `integer` instruction or in `branch` in condition operand.
      *
      *  This function MUST return string as teh result is further passed to assembler::operands::getint()
      * function which *expects* string.

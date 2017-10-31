@@ -13,8 +13,8 @@ Basic form of print instruction is `print 1`, and it prints any value at registe
 However, consider following example:
 
 ```
-istore 1 16
-istore 2 1
+integer 1 16
+integer 2 1
 
 print  1
 print @2

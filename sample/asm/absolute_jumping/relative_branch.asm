@@ -22,7 +22,7 @@
     .name: 2 condition
 
     string %text_to_print "Hello World"
-    istore %condition 42
+    integer %condition 42
 
     if %condition +2 +1
     string %text_to_print "Goodby World, you fail this test"

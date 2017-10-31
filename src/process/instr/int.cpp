@@ -38,7 +38,7 @@ viua::internals::types::byte* viua::process::Process::opizero(viua::internals::t
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opistore(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opinteger(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 

@@ -29,7 +29,7 @@ First, an example:
 .end
 
 .function: main
-    frame ^[(param 0 (istore 1 42)) (param 1 (istore 2 64))]
+    frame ^[(param 0 (integer 1 42)) (param 1 (integer 2 64))]
     call example_function
 
     izero 0
@@ -166,7 +166,7 @@ This would be too bug-prone as one misused `delete` could crash the machine, con
 .end
 
 .function: main
-    istore 1 42
+    integer 1 42
     ptr 2 1
 
     ; here, the pass-by-value is used on the *pointer*; the object pointed to does not change
@@ -204,7 +204,7 @@ Example:
 
 ```
 .function: main
-    istore 1 42
+    integer 1 42
 
     ; store pointer to Integer at register 1 in register 2
     ptr 2 1

@@ -1923,8 +1923,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testOverwriteOfUnused(self):
         runTestFailsToAssembleDetailed(self, 'overwrite_of_unused_value.asm', [
-            '22:12: error: overwrite of unused value:',
-            '21:12: note: unused value defined here:',
+            '22:13: error: overwrite of unused value:',
+            '21:13: note: unused value defined here:',
             '20:12: error: in function main/0',
         ])
 
@@ -2299,7 +2299,7 @@ class KeywordDefaultTests(unittest.TestCase):
         runTest(self, 'call.asm', '')
 
     def testDefaultInIstore(self):
-        runTest(self, 'istore.asm', '0')
+        runTest(self, 'integer.asm', '0')
 
     def testDefaultInFstore(self):
         runTest(self, 'fstore.asm', '0.000000')
@@ -2657,7 +2657,7 @@ class AtomTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'comparing_with_different_type.asm', [
             '24:40: error: invalid type of value contained in register',
             '24:40: note: expected atom, got integer',
-            '22:20: note: register defined here',
+            '22:21: note: register defined here',
             '20:12: error: in function main/0',
         ])
 

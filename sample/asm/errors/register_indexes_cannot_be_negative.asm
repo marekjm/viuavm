@@ -19,7 +19,7 @@
 
 .function: main/0
     string %1 "Hello World!"
-    istore %2 1
+    integer %2 1
 
     print %1
     print %2

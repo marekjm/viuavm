@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    frame ^[(pamv %0 (istore %1 0))]
+    frame ^[(pamv %0 (integer %1 0))]
     msg void add/2
 
     izero %0 local

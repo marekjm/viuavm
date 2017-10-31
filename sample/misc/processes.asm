@@ -61,10 +61,10 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (istore %1 100000))]
+    frame ^[(param %0 (integer %1 100000))]
     process %1 process_spawner/1
 
-    frame ^[(param %0 %1) (param %1 (istore %2 512))]
+    frame ^[(param %0 %1) (param %1 (integer %2 512))]
     msg void setPriority/2
 
     join %0 %1

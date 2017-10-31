@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (istore (.name: %iota o) 0)
+    ptr (.name: %iota pointer) (integer (.name: %iota o) 0)
 
     .name: %iota message
     if *pointer yeah nope

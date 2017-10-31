@@ -73,15 +73,15 @@
 
 .function: main/1
     ; create the vector
-    vpush (vec %1) (istore %2 20)
-    vpush %1 (istore %3 16)
-    vpush %1 (istore %4 8)
-    vpush %1 (istore %5 -2)
+    vpush (vec %1) (integer %2 20)
+    vpush %1 (integer %3 16)
+    vpush %1 (integer %4 8)
+    vpush %1 (integer %5 -2)
 
-    istore %2 20
-    istore %3 16
-    istore %4 8
-    istore %5 -2
+    integer %2 20
+    integer %3 16
+    integer %4 8
+    integer %5 -2
 
     ; call sum/4() function
     frame ^[(param %0 %2) (param %1 %3) (param %2 %4) (param %3 %5)]

@@ -56,6 +56,7 @@ There are several categories of change:
 - fix: joining process using `void` register as output fetches the return value of the process being joined
   actually making it unjoinable
 - bic: rename `strstore` to `string`
+- bic: rename `istore` to `integer`
 
 
 ----

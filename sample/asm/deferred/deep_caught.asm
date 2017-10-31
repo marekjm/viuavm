@@ -26,7 +26,7 @@
     frame %0
     defer by_quux/0
 
-    throw (istore %iota 666)
+    throw (integer %iota 666)
 
     return
 .end

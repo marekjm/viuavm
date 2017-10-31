@@ -85,8 +85,8 @@
     arg (.name: %iota counter) %0
 
     .name: iota i
-    sub %counter %counter (istore %i 9)
-    div %counter %counter (istore %i 2)
+    sub %counter %counter (integer %i 9)
+    div %counter %counter (integer %i 2)
 
     izero (.name: %iota zero)
 

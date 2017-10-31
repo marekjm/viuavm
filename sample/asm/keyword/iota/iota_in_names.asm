@@ -22,7 +22,7 @@
     .name: %iota forty_two
 
     string %hello_world "Hello World!"
-    istore %forty_two 42
+    integer %forty_two 42
 
     print %1 ; should print "Hello World!"
     print %2 ; should print 42

@@ -271,7 +271,7 @@ namespace viua {
             /*  Methods implementing individual instructions.
              */
             viua::internals::types::byte* opizero(viua::internals::types::byte*);
-            viua::internals::types::byte* opistore(viua::internals::types::byte*);
+            viua::internals::types::byte* opinteger(viua::internals::types::byte*);
             viua::internals::types::byte* opiinc(viua::internals::types::byte*);
             viua::internals::types::byte* opidec(viua::internals::types::byte*);
 

@@ -19,7 +19,7 @@
 
 .function: main/0
     vec (.name: %iota container)
-    ptr (.name: %iota pointer) (istore (.name: %iota value) 0)
+    ptr (.name: %iota pointer) (integer (.name: %iota value) 0)
 
     vpush %container *pointer
     print %container

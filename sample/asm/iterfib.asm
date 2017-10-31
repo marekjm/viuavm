@@ -24,12 +24,12 @@
 
     .name: %iota minus_one
     .name: %iota minus_two
-    istore %minus_one -1
-    istore %minus_two -2
+    integer %minus_one -1
+    integer %minus_two -2
 
     .name: %iota tmp
     if (not (isnull %tmp %vector)) logic
-    vpush (vpush (vec %vector) (istore %tmp 1)) (istore %tmp 1)
+    vpush (vpush (vec %vector) (integer %tmp 1)) (integer %tmp 1)
 
     .mark: logic
 
@@ -53,7 +53,7 @@
     ; expected result is 1134903170
 
     .name: 2 result
-    frame ^[(param %0 (istore %1 45))]
+    frame ^[(param %0 (integer %1 45))]
     print (call %result iterfib/1)
 
     izero %0 local

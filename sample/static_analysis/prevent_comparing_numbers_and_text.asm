@@ -22,7 +22,7 @@
     .name: iota a_text
     .name: iota result
 
-    istore %an_integer local 42
+    integer %an_integer local 42
     text %a_text local "42"
 
     eq %result local %an_integer local %a_text local

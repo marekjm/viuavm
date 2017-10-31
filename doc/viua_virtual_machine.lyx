@@ -597,7 +597,7 @@ Store integer 0 in given register.
 \end_layout
 
 \begin_layout Subsubsection
-istore
+integer
 \end_layout
 
 \begin_layout Paragraph
@@ -607,7 +607,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-istore <register> <integer operand>
+integer <register> <integer operand>
 \end_layout
 
 \begin_layout Paragraph
@@ -3250,7 +3250,7 @@ If an instruction takes plain integer as its operand and this integer is
 \begin_inset Quotes eld
 \end_inset
 
-istore 1 42
+integer 1 42
 \begin_inset Quotes erd
 \end_inset
 
@@ -3258,7 +3258,7 @@ istore 1 42
 \begin_inset Quotes eld
 \end_inset
 
-istore 1 @42
+integer 1 @42
 \begin_inset Quotes erd
 \end_inset
 
@@ -4691,7 +4691,7 @@ status open
 
 \begin_layout Plain Layout
 
-    istore 1 42
+    integer 1 42
 \end_layout
 
 \begin_layout Plain Layout
@@ -5053,7 +5053,7 @@ status open
 
 \begin_layout Plain Layout
 
-	istore 1 42
+	integer 1 42
 \end_layout
 
 \begin_layout Plain Layout
@@ -5063,7 +5063,7 @@ status open
 
 \begin_layout Plain Layout
 
-	istore 1 69
+	integer 1 69
 \end_layout
 
 \begin_layout Plain Layout
@@ -5288,7 +5288,7 @@ status open
 
 \begin_layout Plain Layout
 
-	istore 1 42
+	integer 1 42
 \end_layout
 
 \begin_layout Plain Layout

@@ -22,12 +22,12 @@
 .function: will_be_terminated/0
     ; wait for some time before throwing to display the stack trace roughly
     ; in the middle of output
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
     ; it does not really matter what is thrown here, as long as it is not
     ; caught and causes the process to crash
-    throw (istore %1 42)
+    throw (integer %1 42)
 
     return
 .end
@@ -59,7 +59,7 @@
     if (isnull %2 %process_counter) +1 already_initialised
     ; initialisation to -1 makes later code simpler as there is no need
     ; to special-case the first call to preserve the zero
-    istore %process_counter -1
+    integer %process_counter -1
 
     .mark: already_initialised
     iinc %process_counter
@@ -95,25 +95,25 @@
     ;
     ; make the processes run for varying periods of time by
     ; giving them different numbers of cycles to burn though
-    frame ^[(pamv %0 (istore %1 1000))]
+    frame ^[(pamv %0 (integer %1 1000))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 100))]
+    frame ^[(pamv %0 (integer %1 100))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 400))]
+    frame ^[(pamv %0 (integer %1 400))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 600))]
+    frame ^[(pamv %0 (integer %1 600))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 128))]
+    frame ^[(pamv %0 (integer %1 128))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 64))]
+    frame ^[(pamv %0 (integer %1 64))]
     call spawn_process/1
 
-    frame ^[(pamv %0 (istore %1 312))]
+    frame ^[(pamv %0 (integer %1 312))]
     call spawn_process/1
 
     ; all the processes are detached

@@ -165,9 +165,9 @@ namespace cg {
             return insert_ri_operand(addr_ptr, regno);
         }
 
-        viua::internals::types::byte* opistore(viua::internals::types::byte* addr_ptr, int_op regno,
+        viua::internals::types::byte* opinteger(viua::internals::types::byte* addr_ptr, int_op regno,
                                                int_op i) {
-            *(addr_ptr++) = ISTORE;
+            *(addr_ptr++) = INTEGER;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
 
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;

@@ -19,7 +19,7 @@
 
 .function: main/0
     ptr (.name: %iota pointer) (vec (.name: %iota container))
-    istore (.name: %iota value) 0
+    integer (.name: %iota value) 0
 
     izero %0 local
     vinsert *pointer %value %0 local

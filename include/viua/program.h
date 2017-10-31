@@ -65,7 +65,7 @@ class Program {
     Program& opnop();
 
     Program& opizero(int_op);
-    Program& opistore(int_op, int_op);
+    Program& opinteger(int_op, int_op);
     Program& opiinc(int_op);
     Program& opidec(int_op);
 

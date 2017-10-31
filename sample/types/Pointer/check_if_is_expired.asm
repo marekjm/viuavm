@@ -28,7 +28,7 @@
 .end
 
 .function: main/1
-    istore %1 42
+    integer %1 42
     ptr %2 %1
 
     frame ^[(param %0 %2)]

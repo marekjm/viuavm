@@ -1196,7 +1196,7 @@ namespace viua {
                     } else if (tokens.at(i) == "izero") {
                         ++i;
                         tie(increase, i) = size_of_izero(tokens, i);
-                    } else if (tokens.at(i) == "istore") {
+                    } else if (tokens.at(i) == "integer") {
                         ++i;
                         tie(increase, i) = size_of_istore(tokens, i);
                     } else if (tokens.at(i) == "iinc") {

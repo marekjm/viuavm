@@ -25,7 +25,7 @@
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (eq %4 %number (istore %3 0)) finish
+    if (eq %4 %number (integer %3 0)) finish
 
     frame ^[(param %0 %number) (param %1 %result)]
     call %result factorial/2
@@ -39,9 +39,9 @@
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial
-    istore %number 8
+    integer %number 8
     ; store result (starts with 1)
-    istore %result 1
+    integer %result 1
 
     ; create frame for two parameters:
     ; * first is a copy of the number

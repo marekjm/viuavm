@@ -24,7 +24,7 @@
 
 .function: main/1
     ress global
-    istore %1 42
+    integer %1 42
 
     ; FIXME: static checking of capture* and closure combos to ensure that
     ; there is always a closure before any "closing" happens

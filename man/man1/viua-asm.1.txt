@@ -88,12 +88,12 @@ the source digestible for the bytecode generator.
 
 For example, it rewrites this code:
 
-    frame ^[(pamv 0 (istore 1 42)) (param 1 (string 1 "Hello World!"))]
+    frame ^[(pamv 0 (integer 1 42)) (param 1 (string 1 "Hello World!"))]
 
 to this:
 
     frame 2
-    istore 1 42
+    integer 1 42
     pamv 0 1
     string 1 "Hello World!"
     param 1 1

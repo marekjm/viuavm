@@ -21,10 +21,10 @@
     frame ^[(param %0 (string %1 "Hello, World!"))]
     print (msg %4 substr/)
 
-    frame ^[(param %0 (string %1 "Hello, World!")) (param %1 (istore %2 0)) (param %2 (istore %3 5))]
+    frame ^[(param %0 (string %1 "Hello, World!")) (param %1 (integer %2 0)) (param %2 (integer %3 5))]
     print (msg %4 substr/)
 
-    frame ^[(param %0 (string %1 "Hello, World!")) (param %1 (istore %2 7))]
+    frame ^[(param %0 (string %1 "Hello, World!")) (param %1 (integer %2 7))]
     print (msg %4 substr/)
 
     izero %0 local

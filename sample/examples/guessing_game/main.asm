@@ -28,7 +28,7 @@
 .block: failed_to_convert
     echo (string %10 "guess: exception: ")
     print (draw %9)
-    istore %3 -1
+    integer %3 -1
     leave
 .end
 
@@ -38,7 +38,7 @@
     import "io"
 
     ; random integer between 1 and 100
-    frame ^[(param %0 (istore %2 1)) (param %1 (istore %2 101))]
+    frame ^[(param %0 (integer %2 1)) (param %1 (integer %2 101))]
     call %1 std::random::randint
 
     ; enter zero to abort the game

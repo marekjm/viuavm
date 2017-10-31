@@ -35,7 +35,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "nop",
 
     "izero",
-    "istore",
+    "integer",
     "iinc",
     "idec",
 
@@ -167,7 +167,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {NOP, "nop"},
 
     {IZERO, "izero"},
-    {ISTORE, "istore"},
+    {INTEGER, "integer"},
     {IINC, "iinc"},
     {IDEC, "idec"},
 
