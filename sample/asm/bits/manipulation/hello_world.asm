@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    print (bits %2 local (istore %1 local 8) local) local
+    print (bits %2 local (integer %1 local 8) local) local
 
     izero %0 local
     return

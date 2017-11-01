@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,13 @@
 ;
 
 .function: main/1
-    ret (istore %1 4)
+    arg %1 local %0
+
+    iinc *1 local
+
+    vector %3 local
+    stoi %2 local %1 local
+
+    izero %0 local
     return
 .end

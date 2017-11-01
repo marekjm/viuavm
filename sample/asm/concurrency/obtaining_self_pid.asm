@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    send (self %1) (strstore %2 "Hello World (from self)!")
+    send (self %1) (string %2 "Hello World (from self)!")
     print (receive %2)
 
     izero %0 local

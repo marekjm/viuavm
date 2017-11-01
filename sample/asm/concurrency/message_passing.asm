@@ -32,7 +32,7 @@
 
     receive %pid 10s
 
-    send %pid (strstore %iota "Hello message passing World!")
+    send %pid (string %iota "Hello message passing World!")
 
     izero %0 local
     return

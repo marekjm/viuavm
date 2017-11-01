@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <viua/program.h>
 #include <viua/cg/lex.h>
+#include <viua/program.h>
 
 
 struct invocables_t {
@@ -44,20 +44,6 @@ struct compilationflags_t {
 };
 
 
-const std::string COLOR_FG_RED = "\x1b[38;5;1m";
-const std::string COLOR_FG_YELLOW = "\x1b[38;5;3m";
-const std::string COLOR_FG_CYAN = "\x1b[38;5;6m";
-const std::string COLOR_FG_LIGHT_GREEN = "\x1b[38;5;10m";
-const std::string COLOR_FG_LIGHT_YELLOW = "\x1b[38;5;11m";
-const std::string COLOR_FG_WHITE = "\x1b[38;5;15m";
-const std::string COLOR_FG_GREEN_1 = "\x1b[38;5;46m";
-const std::string COLOR_FG_RED_1 = "\x1b[38;5;196m";
-const std::string COLOR_FG_ORANGE_RED_1 = "\x1b[38;5;202m";
-const std::string ATTR_RESET = "\x1b[0m";
-
-std::string send_control_seq(const std::string&);
-
-
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
@@ -65,8 +51,12 @@ invocables_t gatherFunctions(const std::vector<viua::cg::lex::Token>&);
 invocables_t gatherBlocks(const std::vector<viua::cg::lex::Token>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<viua::cg::lex::Token>&);
 
-viua::internals::types::bytecode_size assemble_instruction(Program& program, viua::internals::types::bytecode_size& instruction, viua::internals::types::bytecode_size i, const std::vector<viua::cg::lex::Token>& tokens, std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks);
-void generate(std::vector<viua::cg::lex::Token>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
+viua::internals::types::bytecode_size assemble_instruction(
+    Program& program, viua::internals::types::bytecode_size& instruction,
+    viua::internals::types::bytecode_size i, const std::vector<viua::cg::lex::Token>& tokens,
+    std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks);
+void generate(std::vector<viua::cg::lex::Token> const&, invocables_t&, invocables_t&, const std::string&,
+              std::string&, const std::vector<std::string>&, const compilationflags_t&);
 
 
 #endif

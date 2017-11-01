@@ -111,8 +111,9 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         if (scheduler->is_terminated(thrd->pid())) {
             stack->thrown = scheduler->transfer_exception_of(thrd->pid());
         } else {
+            auto result = scheduler->transfer_result_of(thrd->pid());
             if (not target_is_void) {
-                *target = scheduler->transfer_result_of(thrd->pid());
+                *target = std::move(result);
             }
         }
     } else if (timeout_active and (not wait_until_infinity) and
@@ -196,8 +197,6 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
     return return_addr;
 }
 viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals::types::byte* addr) {
-    /*  Run watchdog instruction.
-     */
     string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

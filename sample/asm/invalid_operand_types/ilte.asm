@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    strstore %1 "Hello"
+    string %1 "Hello"
 
     register (class %2 Foo)
     new %2 Foo

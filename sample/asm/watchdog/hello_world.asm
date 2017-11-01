@@ -22,11 +22,11 @@
 
     ;print 1
 
-    remove %4 %1 (strstore %3 "function")
+    remove %4 %1 (string %3 "function")
 
-    echo (strstore %5 "process spawned with <")
+    echo (string %5 "process spawned with <")
     echo %4
-    print (strstore %5 "> died")
+    print (string %5 "> died")
 
     return
 .end
@@ -67,7 +67,7 @@
     nop
     nop
     nop
-    throw (istore %1 42)
+    throw (integer %1 42)
     return
 .end
 

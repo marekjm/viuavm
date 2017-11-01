@@ -165,9 +165,9 @@ namespace cg {
             return insert_ri_operand(addr_ptr, regno);
         }
 
-        viua::internals::types::byte* opistore(viua::internals::types::byte* addr_ptr, int_op regno,
+        viua::internals::types::byte* opinteger(viua::internals::types::byte* addr_ptr, int_op regno,
                                                int_op i) {
-            *(addr_ptr++) = ISTORE;
+            *(addr_ptr++) = INTEGER;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
 
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
@@ -188,9 +188,9 @@ namespace cg {
             return insert_ri_operand(addr_ptr, regno);
         }
 
-        viua::internals::types::byte* opfstore(viua::internals::types::byte* addr_ptr, int_op regno,
+        viua::internals::types::byte* opfloat(viua::internals::types::byte* addr_ptr, int_op regno,
                                                viua::internals::types::plain_float f) {
-            *(addr_ptr++) = FSTORE;
+            *(addr_ptr++) = FLOAT;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
             aligned_write(addr_ptr) = f;
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(addr_ptr);
@@ -256,9 +256,9 @@ namespace cg {
             return emit_instruction_alu(addr_ptr, EQ, target, lhs, rhs);
         }
 
-        viua::internals::types::byte* opstrstore(viua::internals::types::byte* addr_ptr, int_op reg,
+        viua::internals::types::byte* opstring(viua::internals::types::byte* addr_ptr, int_op reg,
                                                  string s) {
-            *(addr_ptr++) = STRSTORE;
+            *(addr_ptr++) = STRING;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size() - 2), OT_STRING);
         }
@@ -303,9 +303,9 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, TEXTCONCAT, target, lhs, rhs);
         }
 
-        viua::internals::types::byte* opvec(viua::internals::types::byte* addr_ptr, int_op index,
+        viua::internals::types::byte* opvector(viua::internals::types::byte* addr_ptr, int_op index,
                                             int_op pack_start_index, int_op pack_length) {
-            *(addr_ptr++) = VEC;
+            *(addr_ptr++) = VECTOR;
             addr_ptr = insert_ri_operand(addr_ptr, index);
             addr_ptr = insert_ri_operand(addr_ptr, pack_start_index);
             return insert_ri_operand(addr_ptr, pack_length);
@@ -833,5 +833,5 @@ namespace cg {
             *(addr_ptr++) = HALT;
             return addr_ptr;
         }
-    }
-}
+    }  // namespace bytecode
+}  // namespace cg

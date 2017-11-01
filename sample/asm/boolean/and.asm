@@ -24,7 +24,7 @@
 
 .function: main/1
     izero %1
-    istore %2 1
+    integer %2 1
 
     frame ^[(param %0 %1)]
     call %1 boolean/1

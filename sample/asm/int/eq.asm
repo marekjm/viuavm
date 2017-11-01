@@ -21,8 +21,8 @@
 ; Its expected output is "true".
 
 .function: main/1
-    istore %1 1
-    istore %2 1
+    integer %1 1
+    integer %2 1
     eq %1 %1 %2
 
     ; should be true

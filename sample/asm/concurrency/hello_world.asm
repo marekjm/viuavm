@@ -33,15 +33,15 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (strstore %1 "Hello concurrent World! (1)"))]
+    frame ^[(param %0 (string %1 "Hello concurrent World! (1)"))]
     process %3 print_lazy/1
 
-    frame ^[(param %0 (strstore %2 "Hello concurrent World! (2)"))]
+    frame ^[(param %0 (string %2 "Hello concurrent World! (2)"))]
     process %4 print_eager/1
 
     ; join processes
-    join %0 %3
-    join %0 %4
+    join void %3
+    join void %4
 
     izero %0 local
     return

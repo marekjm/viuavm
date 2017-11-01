@@ -18,9 +18,9 @@
 ;
 
 .function: run_in_a_process/1
-    echo (strstore %1 "spawned process ")
+    echo (string %1 "spawned process ")
     echo (arg %1 %0)
-    print (strstore %1 " exiting")
+    print (string %1 " exiting")
     return
 .end
 
@@ -51,25 +51,25 @@
 .end
 
 .function: process_spawner/1
-    echo (strstore %2 "process_spawner/1: ")
+    echo (string %2 "process_spawner/1: ")
     .name: 1 limit
     echo (arg %1 %0)
-    print (strstore %2 " processs to launch")
+    print (string %2 " processs to launch")
 
     frame ^[(pamv %0 (izero %3)) (pamv %1 %limit)]
     tailcall spawn_processes/2
 .end
 
 .function: main/1
-    frame ^[(param %0 (istore %1 100000))]
+    frame ^[(param %0 (integer %1 100000))]
     process %1 process_spawner/1
 
-    frame ^[(param %0 %1) (param %1 (istore %2 512))]
+    frame ^[(param %0 %1) (param %1 (integer %2 512))]
     msg void setPriority/2
 
     join %0 %1
 
-    print (strstore %2 "main/1 exited")
+    print (string %2 "main/1 exited")
 
     izero %0 local
     return

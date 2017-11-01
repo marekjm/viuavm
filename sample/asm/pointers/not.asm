@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer_to_a) (istore (.name: %iota a) 0)
+    ptr (.name: %iota pointer_to_a) (integer (.name: %iota a) 0)
 
     print (not %iota *pointer_to_a)
 

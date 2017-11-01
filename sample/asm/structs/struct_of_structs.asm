@@ -21,7 +21,7 @@
     struct (.name: %iota container) local
 
     atom (.name: %iota key) local 'answer'
-    istore (.name: %iota value) local 42
+    integer (.name: %iota value) local 42
     structinsert %container local %key local %value local
 
     move %0 local %container local
@@ -32,7 +32,7 @@
     struct (.name: %iota container) local
 
     atom (.name: %iota key) local 'answer'
-    istore (.name: %iota value) local 666
+    integer (.name: %iota value) local 666
     structinsert %container local %key local %value local
 
     move %0 local %container local
@@ -48,10 +48,10 @@
 
     struct (.name: %iota container) local
 
-    atom (.name: %iota key) 'good'
+    atom (.name: %iota key) local 'good'
     structinsert %container local %key local %good_struct local
 
-    atom %key 'bad'
+    atom %key local 'bad'
     structinsert %container local %key local %bad_struct local
 
     print %container local

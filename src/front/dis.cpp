@@ -26,6 +26,7 @@
 #include <tuple>
 #include <unistd.h>
 #include <vector>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/cg/assembler/assembler.h>
@@ -40,6 +41,12 @@
 using namespace std;
 
 
+using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_RED;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::send_control_seq;
+
+
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
@@ -50,29 +57,6 @@ bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
 bool LINE_BY_LINE = false;
 string SELECTED_FUNCTION = "";
-
-
-string send_control_seq(const string& mode) {
-    static auto is_terminal = isatty(1);
-    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
-
-    bool colorise = is_terminal;
-    if (env_color_flag == "default") {
-        // do nothing; the default is to colorise when printing to teminal and
-        // do not colorise otherwise
-    } else if (env_color_flag == "never") {
-        colorise = false;
-    } else if (env_color_flag == "always") {
-        colorise = true;
-    } else {
-        // unknown value, do nothing
-    }
-
-    if (colorise) {
-        return mode;
-    }
-    return "";
-}
 
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {

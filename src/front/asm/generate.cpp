@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tokenizer.h>
@@ -35,8 +36,15 @@
 #include <viua/util/memory.h>
 using namespace std;
 
-using viua::util::memory::aligned_write;
 using viua::util::memory::aligned_read;
+using viua::util::memory::aligned_write;
+
+using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
+using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::COLOR_FG_YELLOW;
+using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 extern bool VERBOSE;
@@ -99,6 +107,31 @@ static Program& compile(Program& program, const vector<Token>& tokens,
     return program;
 }
 
+
+static auto strip_attributes(vector<viua::cg::lex::Token> const& tokens) -> vector<viua::cg::lex::Token> {
+    /*
+     * After the codegen is ported to the new parser-driven way, the strip-attributes code will not be
+     * needed.
+     */
+    std::remove_const_t<std::remove_reference_t<decltype(tokens)>> stripped;
+
+    auto in_attributes = false;
+    for (auto const& each : tokens) {
+        if (each == "[[") {
+            in_attributes = true;
+            continue;
+        } else if (each == "]]") {
+            in_attributes = false;
+            continue;
+        }
+        if (in_attributes) {
+            continue;
+        }
+        stripped.push_back(each);
+    }
+
+    return stripped;
+}
 
 static void assemble(Program& program, const vector<Token>& tokens) {
     /** Assemble instructions in lines into a program.
@@ -262,7 +295,7 @@ static void check_main_function(const string& main_function, const vector<Token>
     }
     auto last_instruction = main_function_tokens.at(i);
     if (not(last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or
-            last_instruction == "izero" or last_instruction == "istore")) {
+            last_instruction == "izero" or last_instruction == "integer")) {
         throw viua::cg::lex::InvalidSyntax(last_instruction,
                                            ("main function does not return a value: " + main_function));
     }
@@ -413,8 +446,8 @@ static viua::internals::types::bytecode_size generate_entry_function(
     return bytes;
 }
 
-void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename,
-              string& compilename, const vector<string>& commandline_given_links,
+void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t& blocks,
+              const string& filename, string& compilename, const vector<string>& commandline_given_links,
               const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -719,7 +752,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, blocks.tokens.at(name));
+            assemble(func, strip_attributes(blocks.tokens.at(name)));
         } catch (const string& e) { throw("in block '" + name + "': " + e); } catch (const char*& e) {
             throw("in block '" + name + "': " + e);
         } catch (const std::out_of_range& e) { throw("in block '" + name + "': " + e.what()); }
@@ -798,7 +831,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, functions.tokens.at(name));
+            assemble(func, strip_attributes(functions.tokens.at(name)));
         } catch (const string& e) {
             string msg = ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name +
                           send_control_seq(ATTR_RESET) + "': " + e);

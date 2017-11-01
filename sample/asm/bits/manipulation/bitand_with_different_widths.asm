@@ -24,8 +24,8 @@
     print %longer local
     print %shorter local
 
-    print (bitand %iota local %longer local %shorter local)
-    print (bitand %iota local %shorter local %longer local)
+    print (bitand %iota local %longer local %shorter local) local
+    print (bitand %iota local %shorter local %longer local) local
 
     izero %0 local
     return

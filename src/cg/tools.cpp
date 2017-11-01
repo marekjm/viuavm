@@ -35,24 +35,6 @@ using bytecode_size_type = viua::internals::types::bytecode_size;
 namespace viua {
     namespace cg {
         namespace tools {
-            static auto looks_like_timeout(const Token& token) -> bool {
-                string s = token;
-                if (s == "infinity") {
-                    return true;
-                }
-
-                const auto size = s.size();
-                if (size < 2) {
-                    return false;
-                }
-                if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 2))) {
-                    return true;
-                }
-                if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
-                    return true;
-                }
-                return false;
-            }
             static auto size_of_register_index_operand_with_rs_type(const TokenVector& tokens,
                                                                     TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
@@ -423,7 +405,7 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_strstore(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_string(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
 
@@ -916,7 +898,7 @@ namespace viua {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
 
-                if (looks_like_timeout(tokens.at(i))) {
+                if (str::is_timeout_literal(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
@@ -935,7 +917,7 @@ namespace viua {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
 
-                if (looks_like_timeout(tokens.at(i))) {
+                if (str::is_timeout_literal(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
@@ -1234,7 +1216,7 @@ namespace viua {
                     } else if (tokens.at(i) == "izero") {
                         ++i;
                         tie(increase, i) = size_of_izero(tokens, i);
-                    } else if (tokens.at(i) == "istore") {
+                    } else if (tokens.at(i) == "integer") {
                         ++i;
                         tie(increase, i) = size_of_istore(tokens, i);
                     } else if (tokens.at(i) == "iinc") {
@@ -1243,7 +1225,7 @@ namespace viua {
                     } else if (tokens.at(i) == "idec") {
                         ++i;
                         tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "fstore") {
+                    } else if (tokens.at(i) == "float") {
                         ++i;
                         tie(increase, i) = size_of_fstore(tokens, i);
                     } else if (tokens.at(i) == "itof") {
@@ -1285,9 +1267,9 @@ namespace viua {
                     } else if (tokens.at(i) == "eq") {
                         ++i;
                         tie(increase, i) = size_of_eq(tokens, i);
-                    } else if (tokens.at(i) == "strstore") {
+                    } else if (tokens.at(i) == "string") {
                         ++i;
-                        tie(increase, i) = size_of_strstore(tokens, i);
+                        tie(increase, i) = size_of_string(tokens, i);
                     } else if (tokens.at(i) == "text") {
                         ++i;
                         tie(increase, i) = size_of_text(tokens, i);
@@ -1315,7 +1297,7 @@ namespace viua {
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
-                    } else if (tokens.at(i) == "vec") {
+                    } else if (tokens.at(i) == "vector") {
                         ++i;
                         tie(increase, i) = size_of_vec(tokens, i);
                     } else if (tokens.at(i) == "vinsert") {
@@ -1577,6 +1559,6 @@ namespace viua {
             bytecode_size_type calculate_bytecode_size2(const TokenVector& tokens) {
                 return calculate_bytecode_size_of_first_n_instructions2(tokens, tokens.size());
             }
-        }
-    }
-}
+        }  // namespace tools
+    }      // namespace cg
+}  // namespace viua

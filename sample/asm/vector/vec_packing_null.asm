@@ -1,10 +1,10 @@
 .function: main/0
-    strstore %2 "answer to life"
-    istore %3 42
+    string %2 "answer to life"
+    integer %3 42
 
     -- this would pack
     -- the vector inside itself
-    vec %1 %2 %8
+    vector %1 %2 %8
 
     print %1
 

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    istore (.name: %iota value) 42
+    integer (.name: %iota value) 42
 
     if %value +2 go_here
     .mark: go_here

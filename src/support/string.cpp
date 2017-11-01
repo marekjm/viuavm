@@ -86,6 +86,54 @@ namespace str {
         return regex_match(s, hexadecimal_number);
     }
 
+    auto is_binary_literal(const string s) -> bool {
+        static regex binary_literal{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
+        return regex_match(s, binary_literal);
+    }
+
+    auto is_boolean_literal(const string s) -> bool { return (s == "true" or s == "false"); }
+
+    auto is_void(const string s) -> bool { return (s == "void"); }
+
+    auto is_atom_literal(const string s) -> bool {
+        /*
+         * This seemingly naive check is sufficient, as this function should only
+         * be called after the source code already lexed (and the lexer ensures that
+         * strings are properly closed and escaped so it is sufficient to check
+         * for opening and closing quotes here).
+         */
+        return (s.at(0) == '\'' and s.at(s.size() - 1) == '\'');
+    }
+
+    auto is_text_literal(const string s) -> bool {
+        /*
+         * Same as with with is_atom_literal().
+         */
+        return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
+    }
+
+    auto is_timeout_literal(const string s) -> bool {
+        if (s == "infinity") {
+            return true;
+        }
+
+        const auto size = s.size();
+        if (size < 2) {
+            return false;
+        }
+        if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 2))) {
+            return true;
+        }
+        if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
+            return true;
+        }
+        return false;
+    }
+
+    auto is_register_set_name(const string s) -> bool {
+        return (s == "local" or s == "static" or s == "global" or s == "current");
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
@@ -103,6 +151,9 @@ namespace str {
                 break;
             }
         }
+        if (dot == -1) {
+            return false;
+        }
         is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, (static_cast<unsigned>(dot) + 1)));
         return is;
     }
@@ -110,7 +161,7 @@ namespace str {
     bool isid(const std::string& s) {
         /*  Returns true if s is a valid identifier.
          */
-        static regex identifier("^[a-zA-Z_][a-zA-Z0-9_]*$");
+        static regex identifier("^[a-zA-Z_][:/a-zA-Z0-9_]*$");
         return regex_match(s, identifier);
     }
 
@@ -270,6 +321,75 @@ namespace str {
     }
 
 
+    auto levenshtein(const string source, const string target) -> LevenshteinDistance {
+        if (not source.size()) {
+            return target.size();
+        }
+        if (not target.size()) {
+            return source.size();
+        }
+
+        vector<vector<LevenshteinDistance>> distance_matrix;
+
+        distance_matrix.reserve(source.size());
+        for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+            decltype(distance_matrix)::value_type row;
+            row.reserve(target.size());
+            for (auto j = LevenshteinDistance{0}; j < target.size() + 1; ++j) {
+                row.push_back(0);
+            }
+            distance_matrix.push_back(std::move(row));
+        }
+        for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+            distance_matrix.at(i).at(0) = i;
+        }
+        for (auto i = LevenshteinDistance{0}; i < target.size() + 1; ++i) {
+            distance_matrix.at(0).at(i) = i;
+        }
+
+        for (auto i = LevenshteinDistance{1}; i < source.size() + 1; ++i) {
+            for (auto j = LevenshteinDistance{1}; j < target.size() + 1; ++j) {
+                auto cost = LevenshteinDistance{0};
+
+                cost = (source.at(i - 1) != target.at(j - 1));
+
+                auto deletion = distance_matrix.at(i - 1).at(j) + 1;
+                auto insertion = distance_matrix.at(i).at(j - 1) + 1;
+                auto substitution = distance_matrix.at(i - 1).at(j - 1) + cost;
+
+                distance_matrix.at(i).at(j) = min(min(deletion, insertion), substitution);
+            }
+        }
+
+        return distance_matrix.at(source.size() - 1).at(target.size() - 1);
+    }
+    auto levenshtein_filter(const string source, const vector<string>& candidates,
+                            const LevenshteinDistance limit) -> vector<DistancePair> {
+        vector<DistancePair> matched;
+
+        for (const auto each : candidates) {
+            if (auto distance = levenshtein(source, each); distance <= limit) {
+                matched.emplace_back(distance, each);
+            }
+        }
+
+        return matched;
+    }
+    auto levenshtein_best(const string source, const vector<string>& candidates,
+                          const LevenshteinDistance limit) -> DistancePair {
+        auto best = DistancePair{0, source};
+
+        for (const auto each : levenshtein_filter(source, candidates, limit)) {
+            if ((not best.first) or each.first < best.first) {
+                best = each;
+                continue;
+            }
+        }
+
+        return best;
+    }
+
+
     string enquote(const string& s, const char closing) {
         /** Enquote the string.
          */
@@ -426,4 +546,4 @@ namespace str {
         oss << ']';
         return oss.str();
     }
-}
+}  // namespace str

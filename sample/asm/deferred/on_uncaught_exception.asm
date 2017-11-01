@@ -17,12 +17,12 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 .function: foo/0
-    print (text %1 local "Hello deferred Foo!")
+    print (text %1 local "Hello deferred Foo!") local
     return
 .end
 
 .function: bar/0
-    print (text %1 local "Hello deferred Bar!")
+    print (text %1 local "Hello deferred Bar!") local
     return
 .end
 
@@ -34,7 +34,7 @@
     frame %0
     defer foo/0
 
-    throw (istore %1 local 42)
+    throw (integer %1 local 42) local
 
     izero %0 local
     return

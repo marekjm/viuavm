@@ -26,7 +26,7 @@
     frame ^[(pamv %0 (izero %1))]
     call %1 boolean/1
 
-    frame ^[(pamv %0 (istore %2 1))]
+    frame ^[(pamv %0 (integer %2 1))]
     call %2 boolean/1
 
     or %3 %1 %2

@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer_to_a) (istore (.name: %iota a) 23)
-    ptr (.name: %iota pointer_to_b) (istore (.name: %iota b) 19)
+    ptr (.name: %iota pointer_to_a) (integer (.name: %iota a) 23)
+    ptr (.name: %iota pointer_to_b) (integer (.name: %iota b) 19)
 
     add (.name: %iota number) *pointer_to_a *pointer_to_b
     print %number

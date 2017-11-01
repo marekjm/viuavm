@@ -446,7 +446,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vinsert" or token == "vpush") {
+        } else if (token == "vpush") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -454,6 +454,21 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
                                   (token.str() + " into empty register"));
             check_use_of_register(body_tokens, source, i, registers, named_registers,
                                   (token.str() + " from empty register"));
+            erase_register(registers, named_registers, body_tokens.at(source), token);
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "vinsert") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+            TokenIndex index = source + 2;
+
+            check_use_of_register(body_tokens, target, i, registers, named_registers,
+                                  (token.str() + " into empty register"));
+            check_use_of_register(body_tokens, source, i, registers, named_registers,
+                                  (token.str() + " from empty register"));
+            check_use_of_register(body_tokens, index, i, registers, named_registers,
+                                  (token.str() + " index from empty register"));
             erase_register(registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
@@ -550,9 +565,10 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
-                check_block_body(body_tokens, in_block_offset(body_tokens, i + 1, copied_registers,
-                                                              copied_named_registers),
-                                 copied_registers, copied_named_registers, block_bodies, debug);
+                check_block_body(
+                    body_tokens,
+                    in_block_offset(body_tokens, i + 1, copied_registers, copied_named_registers),
+                    copied_registers, copied_named_registers, block_bodies, debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 // do not fail yet, because the value may be used by false branch
                 // save the error for later
@@ -567,9 +583,10 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
-                check_block_body(body_tokens, in_block_offset(body_tokens, i + 2, copied_registers,
-                                                              copied_named_registers),
-                                 copied_registers, copied_named_registers, block_bodies, debug);
+                check_block_body(
+                    body_tokens,
+                    in_block_offset(body_tokens, i + 2, copied_registers, copied_named_registers),
+                    copied_registers, copied_named_registers, block_bodies, debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 if (register_with_unused_value == e.what()) {
                     throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(
@@ -713,8 +730,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vec") {
-            ++i;  // the "vec" token
+        } else if (token == "vector") {
+            ++i;  // the "vector" token
 
             TokenIndex target = i;
             TokenIndex pack_range_start = target + 2;

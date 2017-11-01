@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,8 +29,8 @@
 using namespace std;
 
 
-static void sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                               viua::process::Process*, viua::kernel::Kernel*) {
+static auto sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                               viua::process::Process*, viua::kernel::Kernel*) -> void {
     cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 

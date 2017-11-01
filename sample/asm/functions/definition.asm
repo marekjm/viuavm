@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    istore %1 42
+    integer %1 42
     print %1
     izero %0 local
     return

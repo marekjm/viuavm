@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,8 +28,8 @@
 using namespace std;
 
 
-static void throwing_oh_noes(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                             viua::process::Process*, viua::kernel::Kernel*) {
+static auto throwing_oh_noes(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                             viua::process::Process*, viua::kernel::Kernel*) -> void {
     throw new viua::types::Exception("OH NOES!");
 }
 

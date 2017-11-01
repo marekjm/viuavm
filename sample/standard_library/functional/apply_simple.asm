@@ -18,7 +18,7 @@
 ;
 
 .function: adder/1
-    add %0 (arg %0 %0) (istore %1 21)
+    add %0 (arg %0 %0) (integer %1 21)
     return
 .end
 
@@ -27,7 +27,7 @@
 .function: main/1
     import "std::functional"
 
-    frame ^[(pamv %0 (function %1 adder/1)) (pamv %1 (istore %1 21))]
+    frame ^[(pamv %0 (function %1 adder/1)) (pamv %1 (integer %1 21))]
     call %1 std::functional::apply/2
     print %1
 

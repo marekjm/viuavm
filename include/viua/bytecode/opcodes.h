@@ -29,12 +29,12 @@ enum OPCODE : viua::internals::types::byte {
 
     // integer instructions
     IZERO,
-    ISTORE,
+    INTEGER,
     IINC,
     IDEC,
 
     // float instructions
-    FSTORE,
+    FLOAT,
 
     // numeric conversion instructions
     ITOF,  // convert integer to float
@@ -53,7 +53,7 @@ enum OPCODE : viua::internals::types::byte {
     EQ,
 
     // string instructions
-    STRSTORE,
+    STRING,
     STREQ,
 
     /*
@@ -112,7 +112,7 @@ enum OPCODE : viua::internals::types::byte {
      */
     TEXTCONCAT,
 
-    VEC,
+    VECTOR,
     VINSERT,
     VPUSH,
     VPOP,

@@ -21,12 +21,12 @@
     struct (.name: %iota container) local
 
     atom (.name: %iota key) local 'answer'
-    istore (.name: %iota value) local 666
+    integer (.name: %iota value) local 666
 
     structinsert %container local %key local %value local
     print %container local
 
-    istore %value local 42
+    integer %value local 42
 
     structinsert %container local %key local %value local
     print %container local

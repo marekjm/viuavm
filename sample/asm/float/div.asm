@@ -20,8 +20,8 @@
 ; Test support for float division.
 
 .function: main/1
-    fstore %1 3.14
-    fstore %2 2.0
+    float %1 3.14
+    float %2 2.0
     div %3 %1 %2
     print %3
     izero %0 local

@@ -101,8 +101,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case IZERO:
             addr = opizero(addr + 1);
             break;
-        case ISTORE:
-            addr = opistore(addr + 1);
+        case INTEGER:
+            addr = opinteger(addr + 1);
             break;
         case IINC:
             addr = opiinc(addr + 1);
@@ -110,8 +110,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case IDEC:
             addr = opidec(addr + 1);
             break;
-        case FSTORE:
-            addr = opfstore(addr + 1);
+        case FLOAT:
+            addr = opfloat(addr + 1);
             break;
         case ITOF:
             addr = opitof(addr + 1);
@@ -152,8 +152,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case EQ:
             addr = opeq(addr + 1);
             break;
-        case STRSTORE:
-            addr = opstrstore(addr + 1);
+        case STRING:
+            addr = opstring(addr + 1);
             break;
         case TEXT:
             addr = optext(addr + 1);
@@ -179,8 +179,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TEXTCONCAT:
             addr = optextconcat(addr + 1);
             break;
-        case VEC:
-            addr = opvec(addr + 1);
+        case VECTOR:
+            addr = opvector(addr + 1);
             break;
         case VINSERT:
             addr = opvinsert(addr + 1);

@@ -47,6 +47,19 @@ There are several categories of change:
 - feature: `fixedincrement` and`fixeddecrement` instructions for fixed-width integers/bit strings
 - feature: `fixedadd` instructions for arithmetic on fixed-width integers
 - enhancement: C++ standard used for Viua VM development was updated to C++17
+- fix: when displaying errors newlines are no longer underlined
+- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
+- feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
+  compared with the older one (enabled with `--new-sa` flag)
+- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
+- feature: static analyser is now able to check closure instantiations
+- feature: static analuser is now strict about the types being used consitently, and features some mild form
+  of type inference to keep track of types of the values the program it compiles is using
+- fix: joining process using `void` register as output fetches the return value of the process being joined
+  actually making it unjoinable
+- bic: rename `strstore` to `string`
+- bic: rename `istore` to `integer`
+- bic: rename `fstore` to `float`
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.

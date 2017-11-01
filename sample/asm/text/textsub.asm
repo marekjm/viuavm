@@ -21,8 +21,8 @@
     text (.name: %iota hello_world) local "Hello World!"
     print %hello_world local
 
-    istore (.name: %iota first_index) local 0
-    istore (.name: %iota last_index) local 6
+    integer (.name: %iota first_index) local 0
+    integer (.name: %iota last_index) local 6
 
     textsub (.name: %iota hello) local %hello_world local %first_index local %last_index local
     print %hello local

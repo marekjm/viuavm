@@ -18,26 +18,26 @@
 ;
 
 .function: foo/0
-    print (istore %1 42)
+    print (integer %1 42)
     return
 .end
 
 .function: bar/0
-    print (istore %1 69)
+    print (integer %1 69)
     frame %0
     call void foo/0
     return
 .end
 
 .function: baz/0
-    print (istore %1 1995)
+    print (integer %1 1995)
     frame %0
     call void bar/0
     return
 .end
 
 .function: bay/0
-    print (istore %1 2015)
+    print (integer %1 2015)
     frame %0
     call void baz/0
     return

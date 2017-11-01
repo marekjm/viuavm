@@ -22,7 +22,7 @@
 .function: main/1
     import "build/test/math"
 
-    frame ^[(param %0 (fstore %1 3.0))]
+    frame ^[(param %0 (float %1 3.0))]
     call %2 math::sqrt/1
     print %2
 

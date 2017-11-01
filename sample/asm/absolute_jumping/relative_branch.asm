@@ -21,11 +21,11 @@
     .name: 1 text_to_print
     .name: 2 condition
 
-    strstore %text_to_print "Hello World"
-    istore %condition 42
+    string %text_to_print "Hello World"
+    integer %condition 42
 
     if %condition +2 +1
-    strstore %text_to_print "Goodby World, you fail this test"
+    string %text_to_print "Goodby World, you fail this test"
 
     print %text_to_print
 

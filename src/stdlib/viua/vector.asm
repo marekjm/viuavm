@@ -25,15 +25,15 @@
     .name: 1 limit
     arg %limit %0
 
-    .name: 0 vector
-    vec %vector %3
+    .name: 0 vec
+    vector %vec %3
 
     .name: 3 counter
     .name: 4 to_push
     izero %counter
 
     .mark: begin_loop
-    vpush %vector (copy %to_push %counter)
+    vpush %vec (copy %to_push %counter)
     iinc %counter
     ; reuse 'to_push' register since it's empty
     if (gte %to_push %counter %limit) +1 begin_loop
@@ -52,8 +52,8 @@
     arg %limit %0
     arg %fn %1
 
-    .name: 0 vector
-    vec %vector
+    .name: 0 vec
+    vector %vec
 
     .name: 3 counter
     .name: 4 to_push
@@ -61,7 +61,7 @@
 
     .mark: begin_loop
     frame ^[(pamv %0 (copy %to_push %counter))]
-    vpush %vector (call %to_push %fn)
+    vpush %vec (call %to_push %fn)
     iinc %counter
     ; reuse 'to_push' register since it's empty
     if (gte %to_push %counter %limit) +1 begin_loop
@@ -79,7 +79,7 @@
     .name: 1 source
     .name: 0 result
     arg %source %0
-    vec %result
+    vector %result
 
     .name: 2 counter
     vlen %counter %source
@@ -100,26 +100,26 @@
     ; copying).
     ;
     .name: 0 source
-    arg %source %0
+    arg %source local %0
 
     .name: 1 counter_down
-    vlen %counter_down %source
-    idec %counter_down
+    vlen %counter_down local %source local
+    idec %counter_down local
     .name: 2 counter_up
-    izero %counter_up
+    izero %counter_up local
     .name: 3 limit
-    copy %limit %counter_down
+    copy %limit local %counter_down local
 
     .mark: begin_loop
     .name: 4 tmp
-    vpop %tmp %source
-    vinsert %source %tmp @counter_up
+    vpop %tmp local %source local
+    vinsert %source local %tmp local %counter_up local
 
-    idec %limit
-    idec %counter_down
-    iinc %counter_up
+    idec %limit local
+    idec %counter_down local
+    iinc %counter_up local
 
-    if %limit begin_loop
+    if %limit local begin_loop
     .mark: end_loop
 
     return
@@ -128,9 +128,9 @@
 .function: std::vector::every/2
     ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
     ;
-    .name: 1 vector
+    .name: 1 vec
     .name: 2 fn
-    arg %vector %0
+    arg %vec %0
     arg %fn %1
 
     .name: 0 result
@@ -139,13 +139,13 @@
     .name: 3 limit
     .name: 4 index
     .name: 5 tmp
-    vlen %limit %vector
+    vlen %limit %vec
     izero %index
 
     ; do not loop on zero-length vectors
     if %limit +1 end_loop
     .mark: begin_loop
-    vat %tmp %vector %index
+    vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param %0 *tmp)]
     and %result (call %6 %fn) %result
@@ -162,9 +162,9 @@
 .function: std::vector::any/2
     ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
     ;
-    .name: 1 vector
+    .name: 1 vec
     .name: 2 fn
-    arg %vector %0
+    arg %vec %0
     arg %fn %1
 
     .name: 0 result
@@ -173,13 +173,13 @@
     .name: 3 limit
     .name: 4 index
     .name: 5 tmp
-    vlen %limit %vector
+    vlen %limit %vec
     izero %index
 
     ; do not loop on zero-length vectors
     if %limit +1 end_loop
     .mark: begin_loop
-    vat %tmp %vector %index
+    vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param %0 *tmp)]
     move %result (call %6 %fn)

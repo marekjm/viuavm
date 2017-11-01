@@ -30,7 +30,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opvec(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvector(viua::internals::types::byte* addr) {
     viua::internals::RegisterSets target_rs = viua::internals::RegisterSets::CURRENT;
     viua::internals::types::register_index target_ri = 0;
     tie(addr, target_rs, target_ri) =
@@ -48,14 +48,14 @@ viua::internals::types::byte* viua::process::Process::opvec(viua::internals::typ
         // FIXME vector is inserted into a register after packing, so this exception is not entirely well
         // thought-out
         // allow packing target register
-        throw new viua::types::Exception("vec would pack itself");
+        throw new viua::types::Exception("vector would pack itself");
     }
     if ((pack_start_ri + pack_size) >= currently_used_register_set->size()) {
-        throw new viua::types::Exception("vec: packing outside of register set range");
+        throw new viua::types::Exception("vector: packing outside of register set range");
     }
     for (decltype(pack_size) i = 0; i < pack_size; ++i) {
         if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
-            throw new viua::types::Exception("vec: cannot pack null register");
+            throw new viua::types::Exception("vector: cannot pack null register");
         }
     }
 
@@ -85,8 +85,16 @@ viua::internals::types::byte* viua::process::Process::opvinsert(viua::internals:
         object = source->give();
     }
 
-    viua::internals::types::register_index position_operand_index = 0;
-    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::types::Integer* index_operand = nullptr;
+    int64_t position_operand_index = 0;
+
+    if (not viua::bytecode::decoder::operands::is_void(addr)) {
+        tie(addr, index_operand) =
+            viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+        position_operand_index = index_operand->as_integer();
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
 
     vector_operand->insert(position_operand_index, std::move(object));
 

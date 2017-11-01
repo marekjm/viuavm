@@ -21,11 +21,11 @@
     bits (.name: %iota bitstring) local 0b10011101
     print %bitstring local
 
-    istore (.name: %iota index) local  2
-    print (bitat (.name: %iota bit) local %bitstring local %index local)
+    integer (.name: %iota index) local  2
+    print (bitat (.name: %iota bit) local %bitstring local %index local) local
 
-    istore %index local 1
-    print (bitat %bit local %bitstring local %index local)
+    integer %index local 1
+    print (bitat %bit local %bitstring local %index local) local
 
     izero %0 local
     return

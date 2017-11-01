@@ -28,10 +28,10 @@
 .function: main/1
     import "std::vector"
 
-    frame ^[(param %0 (istore %1 20))]
+    frame ^[(param %0 (integer %1 20))]
     call %2 std::vector::of_ints/1
 
-    vpush %2 (istore %1 -1)
+    vpush %2 (integer %1 -1)
 
     frame ^[(param %0 %2) (pamv %1 (function %4 is_not_negative/1))]
     call %5 std::vector::every/2

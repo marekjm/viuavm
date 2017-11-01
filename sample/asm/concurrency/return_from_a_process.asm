@@ -18,7 +18,7 @@
 ;
 
 .function: run_in_a_process/0
-    istore %0 42
+    integer %0 42
     return
 .end
 

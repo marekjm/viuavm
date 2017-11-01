@@ -33,7 +33,7 @@
     arg %2 %1
 
     ; vector for filtered values
-    vec %3
+    vector %3
 
     ; initial loop counter and
     ; loop termination variable
@@ -121,7 +121,7 @@
     arg %2 %1
 
     ; new vector to store mapped values
-    vec %3
+    vector %3
 
     ; set initial counter value and
     ; loop termination variable
@@ -170,7 +170,9 @@
     delete (draw %4)
     leave
 .end
-.function: std::functional::apply/2
+; FIXME Remove the no_sa attribute after the new SA is able to handle this function.
+; This will require implementing going down through entered blocks.
+.function: [[no_sa]] std::functional::apply/2
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -202,36 +204,36 @@
     ; specified by length of the vector), and calls given function with this
     ; frame
     arg %1 %0
-    arg %2 %1
+    arg %2 local %1
 
     ; take length of the vector
     .name: %4 vector_length
-    vlen %vector_length %2
+    vlen %vector_length local %2 local
     frame @vector_length
 
     ; zero loop counter
     .name: %3 loop_counter
-    izero %loop_counter
+    izero %loop_counter local
     .mark: while_begin
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
     .name: %5 loop_condition
-    gte %loop_condition %loop_counter %vector_length
-    if %loop_condition while_end while_body
+    gte %loop_condition local %loop_counter local %vector_length local
+    if %loop_condition local while_end while_body
 
     .mark: while_body
 
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register
     .name: %7 slot
-    vat %slot %2 @loop_counter
+    vat %slot local %2 local @loop_counter local
 
     ; add parameter
-    param @loop_counter %slot
+    param @loop_counter %slot local
 
     ; loop_counter++
-    iinc %loop_counter
+    iinc %loop_counter local
 
     jump while_begin
 
@@ -239,7 +241,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    call %8 %1
-    move %0 %8
+    call %8 local %1
+    move %0 %8 local
     return
 .end

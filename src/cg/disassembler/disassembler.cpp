@@ -162,52 +162,68 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr,
                                    const viua::internals::types::bits_size size) -> string {
     const static map<uint8_t, char> decodings = {
         {
-            0b0000, '0',
+            0b0000,
+            '0',
         },
         {
-            0b0001, '1',
+            0b0001,
+            '1',
         },
         {
-            0b0010, '2',
+            0b0010,
+            '2',
         },
         {
-            0b0011, '3',
+            0b0011,
+            '3',
         },
         {
-            0b0100, '4',
+            0b0100,
+            '4',
         },
         {
-            0b0101, '5',
+            0b0101,
+            '5',
         },
         {
-            0b0110, '6',
+            0b0110,
+            '6',
         },
         {
-            0b0111, '7',
+            0b0111,
+            '7',
         },
         {
-            0b1000, '8',
+            0b1000,
+            '8',
         },
         {
-            0b1001, '9',
+            0b1001,
+            '9',
         },
         {
-            0b1010, 'a',
+            0b1010,
+            'a',
         },
         {
-            0b1011, 'b',
+            0b1011,
+            'b',
         },
         {
-            0b1100, 'c',
+            0b1100,
+            'c',
         },
         {
-            0b1101, 'd',
+            0b1101,
+            'd',
         },
         {
-            0b1110, 'e',
+            0b1110,
+            'e',
         },
         {
-            0b1111, 'f',
+            0b1111,
+            'f',
         },
     };
 
@@ -298,7 +314,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
     ostringstream oss;
     oss << opname;
 
-    if (op == STRSTORE) {
+    if (op == STRING) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         ++ptr;  // for operand type
@@ -415,13 +431,13 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case STRUCT:
         case WRAPINCREMENT:
         case WRAPDECREMENT:
+        case REGISTER:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
-        case REGISTER:
             ptr = disassemble_ri_operand(oss, ptr);
             break;
-        case ISTORE:
+        case INTEGER:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
 
@@ -514,8 +530,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
             }
 
             break;
-        case VEC:
-        case VINSERT:
+        case VECTOR:
         case VAT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
@@ -537,6 +552,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case TEXTCOMMONPREFIX:
         case TEXTCOMMONSUFFIX:
         case TEXTCONCAT:
+        case VINSERT:
         case VPOP:
         case ATOMEQ:
         case STRUCTINSERT:
@@ -586,7 +602,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
             oss << dec;
 
             break;
-        case FSTORE:
+        case FLOAT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             oss << ' ';

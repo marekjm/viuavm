@@ -24,6 +24,7 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
+#include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/front/asm.h>
@@ -34,31 +35,14 @@
 using namespace std;
 
 
+using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_RED;
+using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::send_control_seq;
+
+
 const char* NOTE_LOADED_ASM =
     "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
-
-
-string send_control_seq(const string& mode) {
-    static auto is_terminal = isatty(1);
-    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
-
-    bool colorise = is_terminal;
-    if (env_color_flag == "default") {
-        // do nothing; the default is to colorise when printing to teminal and
-        // do not colorise otherwise
-    } else if (env_color_flag == "never") {
-        colorise = false;
-    } else if (env_color_flag == "always") {
-        colorise = true;
-    } else {
-        // unknown value, do nothing
-    }
-
-    if (colorise) {
-        return mode;
-    }
-    return "";
-}
 
 
 static bool usage(const string program, const vector<string>& args) {
@@ -103,7 +87,7 @@ static bool usage(const string program, const vector<string>& args) {
     }
 
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM viua::kernel::Kernel, version ";
+        cout << "Viua VM kernel, version ";
     }
     if (show_help or show_version or show_info) {
         cout << VERSION << '.' << MICRO;

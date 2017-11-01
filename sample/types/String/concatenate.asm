@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    frame ^[(param %0 (strstore %1 "Hello ")) (param %1 (strstore %2 "World!"))]
+    frame ^[(param %0 (string %1 "Hello ")) (param %1 (string %2 "World!"))]
     msg %3 concatenate/2
 
     print %1

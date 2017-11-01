@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (strstore (.name: %iota o) "42")
+    ptr (.name: %iota pointer) (string (.name: %iota o) "42")
     print (stoi %iota *pointer)
 
     izero %0 local

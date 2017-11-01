@@ -51,7 +51,7 @@
     nop
     nop
     nop
-    throw (istore %1 42)
+    throw (integer %1 42)
     return
 .end
 

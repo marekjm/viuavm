@@ -48,7 +48,7 @@
 .function: main/0
     .name: 1 result
 
-    istore %result 5
+    integer %result 5
 
     frame ^[(pamv %0 %result)]
     call %result fibonacci/1

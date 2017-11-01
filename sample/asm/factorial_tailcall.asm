@@ -28,7 +28,7 @@
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (eq %4 %number (istore %3 0)) finish
+    if (eq %4 %number (integer %3 0)) finish
 
     ; this frame must be the same as in "main"
     ; result must still be a reference
@@ -43,13 +43,13 @@
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial
-    istore %number 8
+    integer %number 8
 
     ; create frame for two parameters:
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param %0 %number) (pamv %1 (istore %result 1))]
+    frame ^[(param %0 %number) (pamv %1 (integer %result 1))]
     call %result factorial/2
 
     ; print result

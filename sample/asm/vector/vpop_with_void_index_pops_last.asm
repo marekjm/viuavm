@@ -18,10 +18,10 @@
 ;
 
 .function: main/0
-    vec (.name: %iota v) local
+    vector (.name: %iota v) local
 
-    vpush %v (istore %iota local 0)
-    vpush %v (istore %iota local 1)
+    vpush %v local (integer %iota local 0) local
+    vpush %v local (integer %iota local 1) local
 
     vpop void %v local void
     print %v local

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,8 +18,11 @@
 ;
 
 .function: main/0
-    echo (strstore %iota "default: ")
-    print (strstore %iota default)
+    jump +2             ; the jump will take execution to print, skipping
+                        ; the integer
+    integer %1 local 42
+    print %1 local      ; the `%1 local` register is empty, due to the fact
+                        ; that integer was skipped
 
     izero %0 local
     return

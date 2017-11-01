@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    strstore %1 local "Hello local World!"
-    strstore %1 static "Hello static World!"
-    strstore %1 global "Hello global World!"
+    string %1 local "Hello local World!"
+    string %1 static "Hello static World!"
+    string %1 global "Hello global World!"
 
     print %1 local
     print %1 static

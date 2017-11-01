@@ -11,6 +11,13 @@
 > A register-based, parallel virtual machine programmable in custom assembly lookalike language with
 > strong emphasis on reliability, predictability, and concurrency.
 
+#### Building the code
+
+```
+]$ ./configure      # (1) configure the project
+]$ make -j 4        # (2) build it using 4 jobs
+```
+
 #### Hello World in Viua VM
 
 ```

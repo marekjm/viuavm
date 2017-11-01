@@ -32,22 +32,23 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg (.name: %iota fn_to_call) %0
-    arg (.name: %iota parameters_list) %1
+    arg (.name: %iota fn_to_call) local %0
+    arg (.name: %iota parameters_list) local %1
 
     ; take length of the vector
     .name: %iota vector_length
-    vlen %vector_length %2
+    ;vlen %vector_length local %2 local
+    vlen %vector_length local %parameters_list local
     frame @vector_length
 
     ; zero loop counter
     .name: %iota loop_counter
-    izero %loop_counter
+    izero %loop_counter local
     .mark: while_begin
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    if (gte %iota %loop_counter %vector_length) while_end while_body
+    if (gte %iota local %loop_counter local %vector_length local) local while_end while_body
 
     .mark: while_body
 
@@ -55,10 +56,10 @@
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
-    pamv @loop_counter (copy %iota *(vat %slot %parameters_list %loop_counter))
+    pamv @loop_counter (copy %iota local *(vat %slot local %parameters_list local %loop_counter local) local) local
 
     ; loop_counter++
-    iinc %loop_counter
+    iinc %loop_counter local
 
     jump while_begin
 
@@ -66,21 +67,21 @@
 
     ; finally, after the frame is ready
     ; call the function
-    move %0 (call %iota %fn_to_call)
+    move %0 local (call %iota local %fn_to_call local) local
     return
 .end
 
 .function: main/1
     ; create the vector
-    vpush (vec %1) (istore %2 20)
-    vpush %1 (istore %3 16)
-    vpush %1 (istore %4 8)
-    vpush %1 (istore %5 -2)
+    vpush (vector %1) (integer %2 20)
+    vpush %1 (integer %3 16)
+    vpush %1 (integer %4 8)
+    vpush %1 (integer %5 -2)
 
-    istore %2 20
-    istore %3 16
-    istore %4 8
-    istore %5 -2
+    integer %2 20
+    integer %3 16
+    integer %4 8
+    integer %5 -2
 
     ; call sum/4() function
     frame ^[(param %0 %2) (param %1 %3) (param %2 %4) (param %3 %5)]

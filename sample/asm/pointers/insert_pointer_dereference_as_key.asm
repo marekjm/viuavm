@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    strstore (.name: %iota value) "bar"
+    string (.name: %iota value) "bar"
     new (.name: %iota container) Object
-    ptr (.name: %iota pointer) (strstore (.name: %iota key) "foo")
+    ptr (.name: %iota pointer) (string (.name: %iota key) "foo")
 
     insert %container *pointer %value
 

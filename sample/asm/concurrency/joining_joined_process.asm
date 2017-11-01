@@ -38,14 +38,14 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (strstore %1 "Hello concurrent World! (1)"))]
-    process %3 print_lazy/1
+    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
+    process %3 local print_lazy/1
 
     ; this is OK
-    join %0 %3
+    join void %3 local
 
     ; this throws an exception
-    join %0 %3
+    join void %3 local
 
     izero %0 local
     return

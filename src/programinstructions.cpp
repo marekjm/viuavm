@@ -37,15 +37,15 @@ Program& Program::opizero(int_op regno) {
     return (*this);
 }
 
-Program& Program::opistore(int_op regno, int_op i) {
-    /*  Inserts istore instruction to bytecode.
+Program& Program::opinteger(int_op regno, int_op i) {
+    /*  Inserts integer instruction to bytecode.
      *
      *  :params:
      *
      *  regno:int - register number
      *  i:int     - value to store
      */
-    addr_ptr = cg::bytecode::opistore(addr_ptr, regno, i);
+    addr_ptr = cg::bytecode::opinteger(addr_ptr, regno, i);
     return (*this);
 }
 
@@ -63,15 +63,15 @@ Program& Program::opidec(int_op regno) {
     return (*this);
 }
 
-Program& Program::opfstore(int_op regno, viua::internals::types::plain_float f) {
-    /*  Inserts fstore instruction to bytecode.
+Program& Program::opfloat(int_op regno, viua::internals::types::plain_float f) {
+    /*  Inserts float instruction to bytecode.
      *
      *  :params:
      *
      *  regno - register number
      *  f     - value to store
      */
-    addr_ptr = cg::bytecode::opfstore(addr_ptr, regno, f);
+    addr_ptr = cg::bytecode::opfloat(addr_ptr, regno, f);
     return (*this);
 }
 
@@ -148,10 +148,10 @@ Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opstrstore(int_op reg, string s) {
-    /*  Inserts strstore instruction.
+Program& Program::opstring(int_op reg, string s) {
+    /*  Inserts string instruction.
      */
-    addr_ptr = cg::bytecode::opstrstore(addr_ptr, reg, s);
+    addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
 
@@ -195,8 +195,8 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
-    addr_ptr = cg::bytecode::opvec(addr_ptr, index, pack_start_index, pack_length);
+Program& Program::opvector(int_op index, int_op pack_start_index, int_op pack_length) {
+    addr_ptr = cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 

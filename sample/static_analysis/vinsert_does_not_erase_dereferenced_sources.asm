@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,7 +18,17 @@
 ;
 
 .function: main/0
-    print (istore %iota default)
+    izero %1 local
+    vector %2 local
+
+    ptr %3 local %1 local
+    iinc *3 local
+
+    vinsert %2 local *3 local void
+
+    print %1 local
+    print %2 local
+    print %3 local
 
     izero %0 local
     return

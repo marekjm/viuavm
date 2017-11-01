@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    strstore %1 "Hello"
-    strstore %2 "World!"
+    string %1 "Hello"
+    string %2 "World!"
     lt %3 %2 %1
     print %3
 

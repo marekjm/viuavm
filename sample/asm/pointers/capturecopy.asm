@@ -23,7 +23,7 @@
 .end
 
 .function: main/0
-    ptr (.name: %iota pointer) (strstore (.name: %iota o) "Hello World!")
+    ptr (.name: %iota pointer) (string (.name: %iota o) "Hello World!")
 
     closure (.name: %iota cl) printer/0
     capturecopy %cl %1 *pointer

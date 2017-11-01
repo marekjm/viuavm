@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    ress foo
+    ress loacl
 
     izero %0 local
     return

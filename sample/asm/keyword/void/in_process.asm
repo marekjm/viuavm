@@ -18,7 +18,7 @@
 ;
 
 .function: greeter/0
-    print (strstore %iota "Hello World!")
+    print (string %iota "Hello World!")
     return
 .end
 

@@ -24,7 +24,7 @@
 
 .function: main/1
     ; store a number in register
-    istore %1 69
+    integer %1 69
 
     ; create a closure and capture a value by reference
     closure %2 by_reference/0
@@ -35,7 +35,7 @@
     call %3 %2
 
     ; assign different value to it
-    istore %3 42
+    integer %3 42
 
     ; check if return-by-reference is working (should print 42)
     print %1

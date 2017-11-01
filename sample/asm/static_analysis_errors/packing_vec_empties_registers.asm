@@ -18,10 +18,10 @@
 ;
 
 .function: main/0
-    strstore %1 "Hello World!"
-    istore %2 42
+    string %1 "Hello World!"
+    integer %2 42
 
-    vec %3 %1 %2
+    vector %3 %1 %2
 
     print %1
     print %2

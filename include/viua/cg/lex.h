@@ -43,7 +43,7 @@ namespace viua {
                 auto original() const -> decltype(original_content);
                 auto original(std::string) -> void;
 
-                auto ends() const -> decltype(character_in_line);
+                auto ends(const bool = false) const -> decltype(character_in_line);
 
                 bool operator==(const std::string& s) const;
                 bool operator!=(const std::string& s) const;
@@ -60,8 +60,12 @@ namespace viua {
                 std::string message;
 
                 std::vector<Token> tokens;
+                std::vector<std::string> attached_notes;
+                std::string aside_note;
+                Token aside_token;
 
-                const char* what() const;
+                auto what() const -> const char*;
+                auto str() const -> std::string;
 
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
@@ -69,12 +73,21 @@ namespace viua {
 
                 auto add(Token) -> InvalidSyntax&;
 
+                auto note(std::string) -> InvalidSyntax&;
+                auto notes() const -> const decltype(attached_notes) &;
+
+                auto aside(std::string) -> InvalidSyntax&;
+                auto aside(Token, std::string) -> InvalidSyntax&;
+                auto aside() const -> std::string;
+                auto match_aside(Token) const -> bool;
+
                 InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");
             };
 
             struct UnusedValue : public InvalidSyntax {
                 UnusedValue(Token);
+                UnusedValue(Token, std::string);
             };
 
             struct TracedSyntaxError {
@@ -89,11 +102,12 @@ namespace viua {
             };
 
             bool is_reserved_keyword(const std::string&);
-            auto is_mnemonic(const std::string&) -> bool;
+            auto is_mnemonic(std::string const&) -> bool;
             void assert_is_not_reserved_keyword(Token, const std::string&);
 
             std::vector<Token> tokenise(const std::string&);
             std::vector<Token> standardise(std::vector<Token>);
+            auto normalise(std::vector<Token>) -> std::vector<Token>;
 
             template<class T, typename... R> bool adjacent(T first, T second) {
                 if (first.line() != second.line()) {

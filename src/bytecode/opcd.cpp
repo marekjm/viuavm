@@ -36,12 +36,8 @@ int main() {
 
     max_mnemonic_length += 1;
 
-    const string initial_column = "MNEMONIC";
-    cout << initial_column;
-    for (auto j = initial_column.size(); j < (max_mnemonic_length); ++j) {
-        cout << ' ';
-    }
-    cout << "| OPCODE | HEX OPCODE" << endl;
+    const string initial_column = "MNEMONIC            ";
+    cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
 
     max_mnemonic_length =
         (max_mnemonic_length < initial_column.size() ? initial_column.size() : max_mnemonic_length);
@@ -51,6 +47,8 @@ int main() {
         auto mnemonic = string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
+        } else {
+            continue;
         }
 
         cout << mnemonic;
@@ -60,21 +58,14 @@ int main() {
         }
         cout << "| ";
 
-        if (i < 100) {
-            cout << ' ';
-        }
-        if (i < 10) {
-            cout << ' ';
-        }
-        cout << static_cast<int>(i);
-
-        cout << "    | ";
+        cout << "  ";
+        cout << (opcode < 10 ? " " : "");
+        cout << (opcode < 100 ? " " : "");
+        cout << opcode;
+        cout << "       ";
         cout << "0x";
-        if (i < 0x10) {
-            cout << '0';
-        }
-        cout << hex << static_cast<int>(i) << dec;
-
+        cout << (opcode < 0x10 ? "0" : "");
+        cout << hex << opcode << dec;
         cout << '\n';
     }
     return 0;

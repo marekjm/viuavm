@@ -21,7 +21,7 @@
     if (izero %0) here 2
 
     .mark: here
-    print (strstore %1 "Hello World!")
+    print (string %1 "Hello World!")
 
     izero %0 local
     return

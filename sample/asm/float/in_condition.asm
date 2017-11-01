@@ -21,11 +21,11 @@
 ; Basically, it justs tests correctness of the .boolean() method override in Integer objects.
 
 .function: main/1
-    fstore %1 0.0001
+    float %1 0.0001
 
     ; generate false
-    istore %2 0
-    istore %3 1
+    integer %2 0
+    integer %3 1
     eq %2 %2 %3
 
     ; check

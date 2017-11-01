@@ -18,11 +18,11 @@
 ;
 
 .function: main/1
-    strstore %1 "42"
-    istore %2 27
+    string %1 local "42"
+    integer %2 local 27
 
-    stoi %3 %1
-    print (add %3 %2 %3)
+    stoi %3 local %1
+    print (add %3 local %2 local %3 local) local
 
     izero %0 local
     return

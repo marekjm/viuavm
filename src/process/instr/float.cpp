@@ -29,8 +29,8 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opfstore(viua::internals::types::byte* addr) {
-    /*  Run fstore instruction.
+viua::internals::types::byte* viua::process::Process::opfloat(viua::internals::types::byte* addr) {
+    /*  Run float instruction.
      */
     viua::kernel::Register* target = nullptr;
     float value = 0.0;

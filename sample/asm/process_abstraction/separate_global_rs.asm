@@ -69,11 +69,11 @@
 
     ; spawn two independent writer processes
     ; whichever triggers the printer process is not important
-    frame ^[(param %0 %printer_pid) (pamv %1 (strstore %2 "Hello World"))]
+    frame ^[(param %0 %printer_pid) (pamv %1 (string %2 "Hello World"))]
     process void global_writer/2
 
     ; this is the second writer process
-    frame ^[(param %0 %printer_pid) (pamv %1 (strstore %2 "broken"))]
+    frame ^[(param %0 %printer_pid) (pamv %1 (string %2 "broken"))]
     process void global_writer/2
 
     izero %0 local

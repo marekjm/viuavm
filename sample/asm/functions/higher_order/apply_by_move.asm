@@ -44,7 +44,7 @@
 .function: main/1
     ; applies function square/1(int) to 5 and
     ; prints the result
-    istore %1 5
+    integer %1 5
     function %2 square/1
 
     frame ^[(param %0 %2) (pamv %1 %1)]

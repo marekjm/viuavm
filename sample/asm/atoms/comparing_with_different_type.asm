@@ -19,7 +19,7 @@
 
 .function: main/0
     atom (.name: %iota an_atom) local 'an_atom'
-    istore (.name: %iota an_integer) local 42
+    integer (.name: %iota an_integer) local 42
 
     print (atomeq %iota %an_atom local %an_integer local)
 

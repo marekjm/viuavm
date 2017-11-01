@@ -29,7 +29,7 @@
 
     register (class %1 Foo)
 
-    frame ^[(pamv %0 (istore %1 8)) (pamv %1 (function %1 return_integer/1))]
+    frame ^[(pamv %0 (integer %1 8)) (pamv %1 (function %1 return_integer/1))]
     call %1 std::vector::of/2
 
     print %1

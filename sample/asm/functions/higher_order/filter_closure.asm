@@ -39,7 +39,7 @@
 
 .function: is_divisible_by_2/0
     closure %1 is_divisible_by/1
-    capturemove %1 %2 (istore %2 2)
+    capturemove %1 %2 (integer %2 2)
     move %0 %1
     return
 .end
@@ -53,7 +53,7 @@
     arg %2 %1
 
     ; vector for filtered values
-    vec %3
+    vector %3
 
     ; initial loop counter and
     ; loop termination variable
@@ -92,11 +92,11 @@
 .end
 
 .function: main/1
-    vpush (vec %1) (istore %2 1)
-    vpush %1 (istore %2 2)
-    vpush %1 (istore %2 3)
-    vpush %1 (istore %2 4)
-    vpush %1 (istore %2 5)
+    vpush (vector %1) (integer %2 1)
+    vpush %1 (integer %2 2)
+    vpush %1 (integer %2 3)
+    vpush %1 (integer %2 4)
+    vpush %1 (integer %2 5)
 
     print %1
 

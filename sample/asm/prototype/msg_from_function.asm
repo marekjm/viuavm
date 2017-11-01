@@ -18,7 +18,7 @@
 ;
 
 .function: implementation/1
-    print (strstore %1 "Hello World!")
+    print (string %1 "Hello World!")
     return
 .end
 

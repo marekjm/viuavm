@@ -24,8 +24,8 @@
     print %longer local
     print %shorter local
 
-    print (bitxor %iota local %longer local %shorter local)
-    print (bitxor %iota local %shorter local %longer local)
+    print (bitxor %iota local %longer local %shorter local) local
+    print (bitxor %iota local %shorter local %longer local) local
 
     izero %0 local
     return

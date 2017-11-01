@@ -1,8 +1,8 @@
 .function: main/0
-    strstore %1 "answer to life"
-    istore %2 42
+    string %1 "answer to life"
+    integer %2 42
 
-    vec %3 %1 %2
+    vector %3 %1 %2
 
     print %3
 

@@ -18,7 +18,8 @@
 ;
 
 .function: main/0
-    print (fstore %iota default)
+    echo (string %iota "default: ")
+    print (string %iota default)
 
     izero %0 local
     return

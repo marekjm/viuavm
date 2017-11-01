@@ -18,11 +18,11 @@
 ;
 
 .function: main/1
-    class %1 Custom
-    print ^(register %1)
+    class %1 local Custom
+    print ^(register %1 local) local
 
-    new %1 Custom
-    print %1
+    new %1 local Custom
+    print %1 local
 
     izero %0 local
     return

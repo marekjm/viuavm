@@ -119,7 +119,7 @@ In Wudoo assembly language, we would have then to write:
 struct 1 2
 .name: 1 point2d
 
-istore 2 0
+integer 2 0
 accw point2d 0 2
 accw point2d 1 2
 ```
@@ -128,7 +128,7 @@ Now, to explain each instruction:
 
 0.  `struct 1 2`: create a struct in register 1, and make the struct have two fields,
 0.  `.name: 1 point2d`: name register 1 `point2d`
-0.  `istore 2 0`: store 0 in register 2
+0.  `integer 2 0`: store 0 in register 2
 0.  `accw point2d 0 2`: access field in register `point2d` and write to its 0-th field value which is
     in register 2,
 0.  `accw point2d 1 2`: access field in register `point2d` and write to its 0-th field value which is

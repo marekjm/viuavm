@@ -93,6 +93,16 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
+        with open('/tmp/viua_test_suite_last_assembler_failure', 'w') as ofstream:
+            output_option = ('--out', '-o',)
+            def undesirable(x):
+                i, each = x
+                return not ((each in output_option) or (i and asmargs[i-1] in output_option))
+            parts = tuple(map(lambda each: each[1], filter(undesirable, enumerate(asmargs))))
+            s = (asmargs[0] + ' ' + ' '.join(('-o', '/dev/null',) + parts[1:]))
+            ofstream.write('#!/usr/bin/env bash\n\n')
+            ofstream.write('echo "{}"\n'.format(s))
+            ofstream.write('{}\n'.format(s))
         raise ViuaAssemblerError('{0}: {1}'.format(asm, output.strip()))
     return (output, error, exit_code)
 
@@ -286,12 +296,14 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
         assembly_opts = ()
     if expected_output is None and expected_error is None and custom_assert is None:
         raise TypeError('`expected_output`, `expected_error`, and `custom_assert` cannot all be None')
+
+    asm_flags = (assembly_opts + getattr(self, 'ASM_FLAGS', ()))
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     if assembly_opts is None:
         assemble(assembly_path, compiled_path)
     else:
-        assemble(assembly_path, compiled_path, opts=assembly_opts)
+        assemble(assembly_path, compiled_path, opts=asm_flags)
     if not FLAG_TEST_ONLY_ASSEMBLING:
         excode, output, error = run(compiled_path, expected_exit_code, pipe_error = (expected_error is not None))
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
@@ -319,7 +331,7 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     if assembly_opts is None:
         assemble(disasm_path, compiled_disasm_path)
     else:
-        assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
+        assemble(disasm_path, compiled_disasm_path, opts=asm_flags)
 
     source_assembly_output = b''
     disasm_assembly_output = b''
@@ -419,16 +431,20 @@ def runTestReportsException(self, name, expected_output, assembly_opts=None):
 def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
+    asm_flags = (asm_opts + getattr(self, 'ASM_FLAGS', ()))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_flags)
     self.assertEqual(1, exit_code)
     self.assertEqual(output.strip().splitlines()[0], expected_output)
 
 def runTestFailsToAssembleDetailed(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
+    asm_flags = (asm_opts + getattr(self, 'ASM_FLAGS', ()))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_flags)
     self.assertEqual(1, exit_code)
-    lines = map(lambda l: l[len(assembly_path)+1:], filter(lambda l: l.startswith(assembly_path), output.strip().splitlines()))
+    lines = map(lambda l: (l[len(assembly_path)+1:] if l.startswith(assembly_path) else l),
+            filter(lambda l: (l.startswith(assembly_path) or l.lstrip().startswith('^ ')),
+                output.strip().splitlines()))
     self.assertEqual(list(lines), expected_output)
 
 
@@ -766,7 +782,7 @@ class BitsArithmeticTests(unittest.TestCase):
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
-    VEC instruction does not get its own test, but is used in every other vector test
+    VECTOR instruction does not get its own test, but is used in every other vector test
     so it gets pretty good coverage.
     """
     PATH = './sample/asm/vector'
@@ -776,15 +792,15 @@ class VectorInstructionsTests(unittest.TestCase):
 
     def testPackingVecRefusesToPackItself(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vector would pack itself',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToOutOfRegisterSetRange(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vector: packing outside of register set range',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToPackNullRegister(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vector: cannot pack null register',), assembly_opts=('--no-sa',))
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
@@ -1091,6 +1107,11 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     """
     PATH = './sample/asm/invalid_operand_types'
 
+    # Why --no-sa flag?
+    # Because these tests are for the runtime checks, so if the static analyser will complain
+    # about errors at compile time they will not even get the chance to run...
+    ASM_FLAGS = ('--no-sa',)
+
     def testIADD(self):
         runTestThrowsException(self, 'iadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
@@ -1243,6 +1264,8 @@ class PrototypeSystemTests(unittest.TestCase):
     """
     PATH = './sample/asm/prototype'
 
+    ASM_FLAGS = ('--no-sa',)
+
     def testSimplePrototypeRegistrationAndInstantation(self):
         runTestSplitlines(self, 'simple.asm', ["Prototype for Custom", "Custom#{}"])
 
@@ -1291,95 +1314,96 @@ class PrototypeSystemTests(unittest.TestCase):
         runTest(self, 'msg_from_function.asm', 'Hello World!')
 
 
+@unittest.skip('new SA is almost ready')
 class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     PATH = './sample/asm/static_analysis_errors'
 
     def testMoveFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'move_from_empty_register.asm', "./sample/asm/static_analysis_errors/move_from_empty_register.asm:21:13: error: move from empty register: 0")
+        runTestFailsToAssemble(self, 'move_from_empty_register.asm', './sample/asm/static_analysis_errors/move_from_empty_register.asm:21:13: error: move from empty register: 0')
 
     def testCopyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'copy_from_empty_register.asm', "./sample/asm/static_analysis_errors/copy_from_empty_register.asm:21:13: error: copy from empty register: 0")
+        runTestFailsToAssemble(self, 'copy_from_empty_register.asm', './sample/asm/static_analysis_errors/copy_from_empty_register.asm:21:13: error: copy from empty register: 0')
 
     def testDeleteOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'delete_of_empty_register.asm', "./sample/asm/static_analysis_errors/delete_of_empty_register.asm:21:12: error: delete of empty register: 1")
+        runTestFailsToAssemble(self, 'delete_of_empty_register.asm', './sample/asm/static_analysis_errors/delete_of_empty_register.asm:21:12: error: delete of empty register: 1')
 
     def testParameterPassFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'parameter_pass_from_empty_register.asm', "./sample/asm/static_analysis_errors/parameter_pass_from_empty_register.asm:26:14: error: parameter pass from empty register: 1")
+        runTestFailsToAssemble(self, 'parameter_pass_from_empty_register.asm', './sample/asm/static_analysis_errors/parameter_pass_from_empty_register.asm:26:14: error: parameter pass from empty register: 1')
 
     def testParameterMoveFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm', "./sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:26:13: error: parameter move from empty register: 1")
+        runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm', './sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:26:13: error: parameter move from empty register: 1')
 
     def testParameterMoveEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm', "./sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:30:11: error: print of empty register: 1")
+        runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm', './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:30:11: error: print of empty register: 1')
 
     def testSwapWithEmptyFirstRegister(self):
-        runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm', "./sample/asm/static_analysis_errors/swap_with_empty_first_register.asm:21:10: error: swap with empty register: 1")
+        runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm', './sample/asm/static_analysis_errors/swap_with_empty_first_register.asm:21:10: error: swap with empty register: 1')
 
     def testSwapWithEmptySecondRegister(self):
-        runTestFailsToAssemble(self, 'swap_with_empty_second_register.asm', "./sample/asm/static_analysis_errors/swap_with_empty_second_register.asm:22:13: error: swap with empty register: 2")
+        runTestFailsToAssemble(self, 'swap_with_empty_second_register.asm', './sample/asm/static_analysis_errors/swap_with_empty_second_register.asm:22:13: error: swap with empty register: 2')
 
     def testCaptureEmptyRegisterByCopy(self):
-        runTestFailsToAssemble(self, 'capture_empty_register_by_copy.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_copy.asm:21:20: error: closure of empty register: 1")
+        runTestFailsToAssemble(self, 'capture_empty_register_by_copy.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_copy.asm:21:20: error: closure of empty register: 1')
 
     def testCaptureEmptyRegisterByMove(self):
-        runTestFailsToAssemble(self, 'capture_empty_register_by_move.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_move.asm:21:20: error: closure of empty register: 1")
+        runTestFailsToAssemble(self, 'capture_empty_register_by_move.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_move.asm:21:20: error: closure of empty register: 1')
 
     def testCaptureEmptyRegisterByReference(self):
-        runTestFailsToAssemble(self, 'capture_empty_register_by_reference.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_reference.asm:21:16: error: closure of empty register: 1")
+        runTestFailsToAssemble(self, 'capture_empty_register_by_reference.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_reference.asm:21:16: error: closure of empty register: 1')
 
     def testEchoOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'echo_of_empty_register.asm', "./sample/asm/static_analysis_errors/echo_of_empty_register.asm:21:10: error: echo of empty register: 1")
+        runTestFailsToAssemble(self, 'echo_of_empty_register.asm', './sample/asm/static_analysis_errors/echo_of_empty_register.asm:21:10: error: echo of empty register: 1')
 
     def testPrintOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'print_of_empty_register.asm', "./sample/asm/static_analysis_errors/print_of_empty_register.asm:21:11: error: print of empty register: 1")
+        runTestFailsToAssemble(self, 'print_of_empty_register.asm', './sample/asm/static_analysis_errors/print_of_empty_register.asm:21:11: error: print of empty register: 1')
 
     def testBranchDependsOnEmptyRegister(self):
-        runTestFailsToAssemble(self, 'branch_depends_on_empty_register.asm', "./sample/asm/static_analysis_errors/branch_depends_on_empty_register.asm:21:8: error: branch depends on empty register: 1")
+        runTestFailsToAssemble(self, 'branch_depends_on_empty_register.asm', './sample/asm/static_analysis_errors/branch_depends_on_empty_register.asm:21:8: error: branch depends on empty register: 1')
 
     def testPackingVecEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm', "./sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:26:11: error: print of empty register: 1")
+        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm', './sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:26:11: error: print of empty register: 1')
 
     def testPackingEmptyRegister(self):
-        runTestFailsToAssemble(self, 'packing_empty_register.asm', "./sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty register: 4")
+        runTestFailsToAssemble(self, 'packing_empty_register.asm', './sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty register: 4')
 
     def testUseOfEmptyFirstRegisterInAnd(self):
-        runTestFailsToAssemble(self, 'and_use_of_empty_register_1st.asm', "./sample/asm/static_analysis_errors/and_use_of_empty_register_1st.asm:21:12: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_1st.asm', './sample/asm/static_analysis_errors/and_use_of_empty_register_1st.asm:21:12: error: use of empty register: 1')
 
     def testUseOfEmptySecondRegisterInAnd(self):
-        runTestFailsToAssemble(self, 'and_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/and_use_of_empty_register_2nd.asm:22:15: error: use of empty register: 2")
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_2nd.asm', './sample/asm/static_analysis_errors/and_use_of_empty_register_2nd.asm:22:15: error: use of empty register: 2')
 
     def testUseOfEmptyFirstRegisterInOr(self):
-        runTestFailsToAssemble(self, 'or_use_of_empty_register_1st.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_1st.asm:21:11: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_1st.asm', './sample/asm/static_analysis_errors/or_use_of_empty_register_1st.asm:21:11: error: use of empty register: 1')
 
     def testUseOfEmptySecondRegisterInOr(self):
-        runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:14: error: use of empty register: 2")
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', './sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:14: error: use of empty register: 2')
 
     def testIaddOfEmptyRegisters(self):
-        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:12: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', './sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:12: error: use of empty register: 1')
 
     def testNotOfEmptyRegisters(self):
-        runTestFailsToAssemble(self, 'not_of_empty_register.asm', "./sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: not of empty register: 1")
+        runTestFailsToAssemble(self, 'not_of_empty_register.asm', './sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: not of empty register: 1')
 
     def testCastOfEmptyRegistersFtoi(self):
-        runTestFailsToAssemble(self, 'cast_of_empty_register_ftoi.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_ftoi.asm:21:13: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'cast_of_empty_register_ftoi.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_ftoi.asm:21:13: error: use of empty register: 1')
 
     def testCastOfEmptyRegistersItof(self):
-        runTestFailsToAssemble(self, 'cast_of_empty_register_itof.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_itof.asm:21:13: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'cast_of_empty_register_itof.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_itof.asm:21:13: error: use of empty register: 1')
 
     def testCastOfEmptyRegistersStoi(self):
-        runTestFailsToAssemble(self, 'cast_of_empty_register_stoi.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_stoi.asm:21:13: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stoi.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_stoi.asm:21:13: error: use of empty register: 1')
 
     def testCastOfEmptyRegistersStof(self):
-        runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:21:13: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:21:13: error: use of empty register: 1')
 
     def testVinsertEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', "./sample/asm/static_analysis_errors/vinsert_empties_registers.asm:22:11: error: print of empty register: 1")
+        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: print of empty register: 1')
 
     def testVinsertOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', "./sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:22: error: vinsert from empty register: 1")
+        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:22: error: vinsert from empty register: 1')
 
     def testVinsertIntoEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', "./sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: vinsert into empty register: 2")
+        runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: vinsert into empty register: 2')
 
     def testVpushEmptiesRegisters(self):
         runTestFailsToAssemble(self, 'vpush_empties_registers.asm', "./sample/asm/static_analysis_errors/vpush_empties_registers.asm:22:11: error: print of empty register: 1")
@@ -1528,10 +1552,426 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm', "./sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:21:5: error: main function uses invalid register set to return a value: static")
 
 
+class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
+    PATH = './sample/asm/static_analysis_errors'
+    ASM_FLAGS = ('--new-sa',)
+
+    def testMoveFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'move_from_empty_register.asm', './sample/asm/static_analysis_errors/move_from_empty_register.asm:21:13: error: move from empty current register "0"')
+
+    def testCopyFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'copy_from_empty_register.asm', './sample/asm/static_analysis_errors/copy_from_empty_register.asm:21:13: error: copy from empty current register "0"')
+
+    def testDeleteOfEmptyRegister(self):
+        runTestFailsToAssemble(self, 'delete_of_empty_register.asm', './sample/asm/static_analysis_errors/delete_of_empty_register.asm:21:12: error: delete of empty current register "1"')
+
+    def testParameterPassFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'parameter_pass_from_empty_register.asm', './sample/asm/static_analysis_errors/parameter_pass_from_empty_register.asm:26:14: error: use of empty current register "1"')
+
+    def testParameterMoveFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm', './sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:26:13: error: use of empty current register "1"')
+
+    def testParameterMoveEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm', './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:30:11: error: use of erased current register "1"')
+
+    def testSwapWithEmptyFirstRegister(self):
+        runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm', './sample/asm/static_analysis_errors/swap_with_empty_first_register.asm:21:10: error: swap with empty current register "1"')
+
+    def testSwapWithEmptySecondRegister(self):
+        runTestFailsToAssemble(self, 'swap_with_empty_second_register.asm', './sample/asm/static_analysis_errors/swap_with_empty_second_register.asm:22:13: error: swap with empty current register "2"')
+
+    def testCaptureEmptyRegisterByCopy(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_copy.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_copy.asm:21:17: error: use of empty current register "2"')
+
+    def testCaptureEmptyRegisterByMove(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_move.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_move.asm:21:17: error: use of empty current register "2"')
+
+    def testCaptureEmptyRegisterByReference(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_reference.asm', './sample/asm/static_analysis_errors/capture_empty_register_by_reference.asm:21:13: error: use of empty current register "2"')
+
+    def testEchoOfEmptyRegister(self):
+        runTestFailsToAssemble(self, 'echo_of_empty_register.asm', './sample/asm/static_analysis_errors/echo_of_empty_register.asm:21:10: error: use of empty current register "1"')
+
+    def testPrintOfEmptyRegister(self):
+        runTestFailsToAssemble(self, 'print_of_empty_register.asm', './sample/asm/static_analysis_errors/print_of_empty_register.asm:21:11: error: use of empty current register "1"')
+
+    def testBranchDependsOnEmptyRegister(self):
+        runTestFailsToAssemble(self, 'branch_depends_on_empty_register.asm', './sample/asm/static_analysis_errors/branch_depends_on_empty_register.asm:21:8: error: branch depends on empty current register "1"')
+
+    @unittest.skip('FIXME TODO SA for vector instructions not impemented yet')
+    def testPackingVecEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm', './sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:26:11: error: use of empty current register "1"')
+
+    @unittest.skip('FIXME TODO SA for vector instructions not impemented yet')
+    def testPackingEmptyRegister(self):
+        runTestFailsToAssemble(self, 'packing_empty_register.asm', './sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty current register "1"')
+
+    def testUseOfEmptyFirstRegisterInAnd(self):
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_1st.asm', './sample/asm/static_analysis_errors/and_use_of_empty_register_1st.asm:21:12: error: use of empty current register "1"')
+
+    def testUseOfEmptySecondRegisterInAnd(self):
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_2nd.asm', './sample/asm/static_analysis_errors/and_use_of_empty_register_2nd.asm:22:15: error: use of empty current register "2"')
+
+    def testUseOfEmptyFirstRegisterInOr(self):
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_1st.asm', './sample/asm/static_analysis_errors/or_use_of_empty_register_1st.asm:21:11: error: use of empty current register "1"')
+
+    def testUseOfEmptySecondRegisterInOr(self):
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', './sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:14: error: use of empty current register "2"')
+
+    def testIaddOfEmptyRegisters(self):
+        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', './sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:12: error: use of empty current register "1"')
+
+    def testNotOfEmptyRegisters(self):
+        runTestFailsToAssemble(self, 'not_of_empty_register.asm', './sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: use of empty current register "1"')
+
+    def testCastOfEmptyRegistersFtoi(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_ftoi.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_ftoi.asm:21:13: error: use of empty current register "1"')
+
+    def testCastOfEmptyRegistersItof(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_itof.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_itof.asm:21:13: error: use of empty current register "1"')
+
+    def testCastOfEmptyRegistersStoi(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stoi.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_stoi.asm:21:13: error: use of empty current register "1"')
+
+    def testCastOfEmptyRegistersStof(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm', './sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:21:13: error: use of empty current register "1"')
+
+    @unittest.skip('requires Valgrind suppression')
+    def testVinsertEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: use of empty current register "1"')
+
+    def testVinsertOfEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:25: error: use of empty current register "1"')
+
+    def testVinsertIntoEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: use of empty current register "2"')
+
+    def testVpushEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'vpush_empties_registers.asm', './sample/asm/static_analysis_errors/vpush_empties_registers.asm:22:11: error: use of erased current register "1"')
+
+    def testVpushOfEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', './sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:23: error: use of empty current register "1"')
+
+    def testVpushIntoEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vpush_into_empty_register.asm', './sample/asm/static_analysis_errors/vpush_into_empty_register.asm:21:11: error: use of empty current register "2"')
+
+    def testVpopFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vpop_from_empty_register.asm', './sample/asm/static_analysis_errors/vpop_from_empty_register.asm:21:13: error: use of empty current register "1"')
+
+    def testVatOnEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vat_on_empty_register.asm', './sample/asm/static_analysis_errors/vat_on_empty_register.asm:21:12: error: use of empty current register "1"')
+
+    def testVlenOnEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', './sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:13: error: use of empty current register "1"')
+
+    @unittest.skip('deprecated OO instructions')
+    def testInsertIntoEmptyRegister(self):
+        runTestFailsToAssemble(self, 'insert_into_empty_register.asm', './sample/asm/static_analysis_errors/insert_into_empty_register.asm:23:12: error: insert into empty current register "1" (named "target")')
+
+    @unittest.skip('deprecated OO instructions')
+    def testInsertKeyFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'insert_key_from_empty_register.asm', './sample/asm/static_analysis_errors/insert_key_from_empty_register.asm:23:28: error: insert key from empty current register "2" (named "key")')
+
+    @unittest.skip('deprecated OO instructions')
+    def testInsertFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'insert_from_empty_register.asm', './sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:48: error: insert from empty current register "3" (named "value")')
+
+    @unittest.skip('deprecated OO instructions')
+    def testRemoveKeyFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', './sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:41: error: remove key from empty current register "3" (named "key")')
+
+    @unittest.skip('deprecated OO instructions')
+    def testRemoveFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'remove_from_empty_register.asm', './sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:20: error: remove from empty current register "2" (named "source")')
+
+    def testPointerFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', './sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:12: error: pointer from empty current register "1"')
+
+    def testThrowFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'throw_from_empty_register.asm', './sample/asm/static_analysis_errors/throw_from_empty_register.asm:21:11: error: throw from empty current register "1"')
+
+    def testIsnullFailsOnNonemptyRegisters(self):
+        runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', './sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:22: error: useless check, register will always be defined')
+
+    def testFcallFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', './sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:15: error: call from empty current register "1"')
+
+    def testJoinFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'join_from_empty_register.asm', './sample/asm/static_analysis_errors/join_from_empty_register.asm:21:13: error: use of empty current register "1"')
+
+    def testSendTargetFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'send_target_from_empty_register.asm', './sample/asm/static_analysis_errors/send_target_from_empty_register.asm:22:10: error: send target from empty current register "1" (named "pid")')
+
+    def testSendFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'send_from_empty_register.asm', './sample/asm/static_analysis_errors/send_from_empty_register.asm:27:13: error: send from empty current register "2"')
+
+    def testRegisterNameAlreadyTaken(self):
+        runTestFailsToAssemble(self, 'register_name_already_taken.asm', './sample/asm/static_analysis_errors/register_name_already_taken.asm:22:14: error: register name already taken: named_register')
+
+    @unittest.skip('FIXME TODO skip this test for now')
+    def testRegisterUsedBeforeBeingNamed(self):
+        runTestFailsToAssemble(self, 'register_defined_before_being_named.asm', './sample/asm/static_analysis_errors/register_defined_before_being_named.asm:22:12: error: register defined before being named: 1 = named_register')
+
+    def testUselessBranchSimpleMarker(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_marker.asm', './sample/asm/static_analysis_errors/useless_branch_simple_marker.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchSimpleOffset(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_offset.asm', './sample/asm/static_analysis_errors/useless_branch_simple_offset.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchSimpleIndex(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_index.asm', './sample/asm/static_analysis_errors/useless_branch_simple_index.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchMixedIndexOffsetBackward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_index_offset_backward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_index_offset_backward.asm:24:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchMixedIndexOffsetForward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_index_offset_forward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_index_offset_forward.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchMixedMarker(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker.asm', './sample/asm/static_analysis_errors/useless_branch_mixed_marker.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchMixedMarkerIndex(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_index.asm', './sample/asm/static_analysis_errors/useless_branch_mixed_marker_index.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchMixedMarkerOffsetBackward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_offset_backward.asm', './sample/asm/static_analysis_errors/useless_branch_mixed_marker_offset_backward.asm:27:5: error: useless branch: both targets point to the same instruction')
+
+    def testUselessBranchMixedMarkerOffsetForward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_offset_forward.asm', './sample/asm/static_analysis_errors/useless_branch_mixed_marker_offset_forward.asm:21:5: error: useless branch: both targets point to the same instruction')
+
+    def testEmptyRegisterAccessAfterTakingBranchOffsetTrue(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_offset.asm', [
+            '27:11: error: use of erased current register "1" (named "value")',
+            '24:5: note: erased here:',
+            '23:5: error: after taking true branch here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchOffsetFalse(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_offset.asm', [
+            '27:11: error: use of erased current register "1" (named "value")',
+            '25:5: note: erased here:',
+            '23:5: error: after taking false branch here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchMarkerTrue(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_marker.asm', [
+            '27:11: error: use of erased current register "1" (named "value")',
+            '24:5: note: erased here:',
+            '23:5: error: after taking true branch here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchMarkerFalse(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_marker.asm', [
+            '27:11: error: use of erased current register "1" (named "value")',
+            '25:5: note: erased here:',
+            '23:5: error: after taking false branch here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfEmptyFirstOperandInIadd(self):
+        runTestFailsToAssembleDetailed(self, 'use_of_empty_first_operand_in_iadd.asm', [
+            '24:30: error: use of empty current register "1" (named "first")',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfEmptySecondOperandInIadd(self):
+        runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
+            '24:37: error: use of empty current register "2" (named "second")',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfVoidAsInputRegister(self):
+        runTestFailsToAssembleDetailed(self, 'void_as_input_register.asm', [
+            '26:17: error: use of void as input register:',
+            '24:12: error: in function main/0',
+        ])
+
+    def testExpectedOperandFoundNewline(self):
+        runTestFailsToAssembleDetailed(self, 'found_newline.asm', [
+            '21:5: error: not enough operands',
+            '21:5: note: when extracting operand 0',
+            '20:12: error: in function main/0',
+        ])
+
+    def testMainFunctionUsesInvalidRegisterSetToReturn(self):
+        runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm', './sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:21:5: error: main function uses invalid register set to return a value: static')
+
+
+class StaticAnalysis(unittest.TestCase):
+    PATH = './sample/static_analysis'
+
+    def testIzeroCreatesInteger(self):
+        runTest(self, 'izero_creates_integer.asm', '1')
+
+    def testIzeroReportedAsUnused(self):
+        runTestFailsToAssembleDetailed(self, 'izero_reported_as_unused.asm', [
+            '21:11: error: unused integer in register "1"',
+            '20:12: error: in function main/0',
+        ])
+
+    def testAllowComparingIntegersAndFloats(self):
+        runTest(self, 'allow_comparing_integers_and_floats.asm', 'true')
+
+    def testPreventComparingNumbersAndText(self):
+        runTestFailsToAssembleDetailed(self, 'prevent_comparing_numbers_and_text.asm', [
+            '28:40: error: invalid type of value contained in register',
+            '28:40: note: expected number, got text',
+            '26:10: note: register defined here',
+            '20:12: error: in function main/0',
+        ])
+
+    def testFstoreStoresFloats(self):
+        runTestFailsToAssembleDetailed(self, 'fstore_stores_floats.asm', [
+            '22:10: error: invalid type of value contained in register',
+            '22:10: note: expected integer, got float',
+            '21:11: note: register defined here',
+            '20:12: error: in function main/0',
+        ])
+
+    def testVinsertErasesDirectlyAccessedRegisters(self):
+        runTestFailsToAssembleDetailed(self, 'vinsert_erases_directly_accessed_registers.asm', [
+            '26:11: error: use of erased local register "1"',
+            '24:5: note: erased here:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testDoesNotEraseDereferencedSources(self):
+        runTestSplitlines(self, 'vinsert_does_not_erase_dereferenced_sources.asm', [
+            '1',
+            '[1]',
+            'IntegerPointer',
+        ])
+
+    def testInferringTypesForArgs(self):
+        runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
+            '32:22: error: invalid type of value contained in register',
+            '32:22: note: expected string, got integer',
+            '23:9: note: register defined here',
+            '25:10: note: type inferred here',
+            '                 ^ deduced type is \'integer\'',
+            '20:12: error: in function main/1',
+        ])
+
+    def testInferenceIncludesPointeredTypes(self):
+        runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
+            '26:19: error: invalid type of value contained in register',
+            '26:19: note: expected string, got pointer to integer',
+            '21:9: note: register defined here',
+            '23:10: note: type inferred here',
+            '                 ^ deduced type is \'pointer to integer\'',
+            '20:12: error: in function main/1',
+        ])
+
+    def testPartialPointernessInference(self):
+        runTestFailsToAssembleDetailed(self, 'partial_pointerness_inference.asm', [
+            '47:13: error: invalid type of value contained in register',
+            '47:13: note: expected vector, got pointer to value',
+            '24:9: note: register defined here',
+            '33:11: note: type inferred here',
+            '                  ^ deduced type is \'pointer to value\'',
+            '20:12: error: in function main/1',
+        ])
+
+    def testTwoStagePointernessInference(self):
+        runTestFailsToAssembleDetailed(self, 'two_stage_pointerness_inference.asm', [
+            '50:13: error: invalid type of value contained in register',
+            '50:13: note: expected vector, got integer',
+            '24:9: note: register defined here',
+            '42:10: note: type inferred here',
+            '                 ^ deduced type is \'pointer to integer\'',
+            '20:12: error: in function main/1',
+        ])
+
+    def testClosureCapturesByMoveMakeInaccessible(self):
+        runTestFailsToAssembleDetailed(self, 'closure_captures_by_move_make_inaccessible.asm', [
+            '34:11: error: use of erased local register "2"',
+            '29:5: note: erased here:',
+            '25:12: error: in function main/0',
+        ])
+
+    def testClosureCapturesInvalidType(self):
+        runTestFailsToAssembleDetailed(self, 'closure_captures_invalid_type.asm', [
+            '21:10: error: invalid type of value contained in register',
+            '21:10: note: expected integer, got text',
+            '30:26: note: register defined here',
+            '20:11: error: in a closure defined here:',
+            '27:13: error: when instantiated here:',
+            '26:12: error: in function main/0',
+        ])
+
+    def testNestedClosureInvalidTypeError(self):
+        runTestFailsToAssembleDetailed(self, 'nested_closure_invalid_type_error.asm', [
+            '25:10: error: invalid type of value contained in register',
+            '25:10: note: expected integer, got text',
+            '36:26: note: register defined here',
+            '20:11: error: in a closure defined here:',
+            '32:13: error: when instantiated here:',
+            '30:11: error: in a closure defined here:',
+            '46:13: error: when instantiated here:',
+            '44:12: error: in function main/1',
+        ])
+
+    def testCallToInvalidType(self):
+        runTestFailsToAssembleDetailed(self, 'call_to_invalid_type.asm', [
+            '33:15: error: invalid type of value contained in register',
+            '33:15: note: expected invocable, got text',
+            '29:10: note: register defined here',
+            '27:12: error: in function main/1',
+        ])
+
+    def testTailCallToInvalidType(self):
+        runTestFailsToAssembleDetailed(self, 'tailcall_to_invalid_type.asm', [
+            '33:14: error: invalid type of value contained in register',
+            '33:14: note: expected invocable, got text',
+            '29:10: note: register defined here',
+            '27:12: error: in function main/1',
+        ])
+
+    def testInvalidTypeForIndirectParameterPass(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_type_for_indirect_parameter_pass.asm', [
+            '32:10: error: invalid type of value contained in register',
+            '32:10: note: expected integer, got text',
+            '29:10: note: register defined here',
+            '26:12: error: in function main/1',
+        ])
+
+    def testJumpSkippingADefinitionInstruction(self):
+        runTestFailsToAssembleDetailed(self, 'jump_skipping_a_definition_instruction.asm', [
+            '24:11: error: use of empty local register "1"',
+            '20:12: error: in function main/0',
+        ])
+
+    def testInvalidAccessTypeForSwap(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_access_type_for_swap.asm', [
+            '24:19: error: invalid access mode',
+            '24:19: note: can only swap using direct access mode',
+            '                          ^ did you mean \'%2\'?',
+            '20:12: error: in function main/0',
+        ])
+
+    def testOverwriteOfUnused(self):
+        runTestFailsToAssembleDetailed(self, 'overwrite_of_unused_value.asm', [
+            '22:13: error: overwrite of unused value:',
+            '21:13: note: unused value defined here:',
+            '20:12: error: in function main/0',
+        ])
+
+
+
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
     PATH = './sample/asm/errors'
+
+    def testInvalidOperandForJumpInstruction(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_operand_for_jump_instruction.asm', [
+            "21:10: error: invalid operand for jump instruction",
+            "21:10: note: expected a label or an offset",
+            "20:12: error: in function main/0",
+        ])
 
     def testDotBeforeEnd(self):
         runTestFailsToAssemble(self, 'no_dot_before_end.asm', "./sample/asm/errors/no_dot_before_end.asm:23:1: error: missing '.' character before 'end'")
@@ -1543,34 +1983,62 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'no_end_between_defs.asm', "./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function")
 
     def testHaltAsLastInstruction(self):
-        runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23:1: error: function does not end with 'return' or 'tailcall': main/1")
+        runTestFailsToAssembleDetailed(self, 'halt_as_last_instruction.asm', [
+            "22:5: error: invalid last mnemonic",
+            "22:5: note: expected one of: leave, return, or tailcall",
+            "20:12: error: in function main/1",
+        ], asm_opts=('-c',))
 
     def testArityError(self):
-        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:5: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
+        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:5: error: invalid number of parameters in call to function foo/1: expected 1, got 0")
 
     def testIsNotAValidFunctionName(self):
-        runTestFailsToAssemble(self, 'is_not_a_valid_function_name.asm', "./sample/asm/errors/is_not_a_valid_function_name.asm:26:10: error: not a valid function name: foo/x")
+        runTestFailsToAssembleDetailed(self, 'is_not_a_valid_function_name.asm', [
+            "26:10: error: not a valid function name",
+            "24:12: error: in function main/0",
+        ])
 
     def testFrameWithGaps(self):
-        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:5: error: gap in frame defined at line 25, slot 1 left empty")
+        runTestFailsToAssembleDetailed(self, 'frame_with_gaps.asm', [
+            "25:5: error: gap in frame",
+            "28:5: error: slot 1 left empty at",
+            "24:12: error: in function main/0",
+        ])
 
     def testPassingParameterToASlotWithTooHighIndex(self):
         runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26:5: error: pass to parameter slot 3 in frame with only 3 slots available")
 
     def testDoublePassing(self):
-        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
+        # FIXME test for all lines of traced error
+        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2")
 
     def testMsgRequiresAtLeastOneParameter(self):
-        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:5: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
+        runTestFailsToAssembleDetailed(self, 'msg_requires_at_least_one_parameter.asm', [
+            "22:5: error: invalid number of parameters in dynamic dispatch",
+            "22:5: note: expected at least 1 parameter, got 0",
+            "20:12: error: in function main/1",
+        ])
 
     def testNotAValidFunctionNameMsg(self):
-        runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:14: error: not a valid function name: foo/x")
+        runTestFailsToAssembleDetailed(self, 'not_a_valid_function_name_msg.asm', [
+            "22:14: error: not a valid function name",
+            "20:12: error: in function main/0",
+        ])
 
     def testMsgArityMismatch(self):
-        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:5: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
+        runTestFailsToAssembleDetailed(self, 'msg_arity_mismatch.asm', [
+            "22:5: error: invalid number of parameters in call to function add/2: expected 2, got 1",
+            "21:5: error: from frame spawned here",
+            "20:12: error: in function main/1",
+        ])
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
-        runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")
+        runTestFailsToAssembleDetailed(self, 'no_return_at_the_end_of_a_function.asm', [
+            # "22:1: error: function does not end with 'return' or 'tailcall': foo/0",  # FIXME this will be correct once SA is fixed to throw more specific errors
+            "21:5: error: invalid last mnemonic",
+            "21:5: note: expected one of: leave, return, or tailcall",
+            "20:12: error: in function foo/0",
+        ])
 
     def testBlockWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:20:9: error: block with empty body: foo")
@@ -1590,31 +2058,36 @@ class AssemblerErrorTests(unittest.TestCase):
     def testExcessFrameSpawned(self):
         runTestFailsToAssembleDetailed(self, 'excess_frame_spawned.asm', [
             "27:5: error: excess frame spawned",
-            "26:5: error: unused frame:",
+            "26:5: note: unused frame:",
+            "25:12: error: in function another_valid/0",
         ])
 
     def testLeftoverFrameTriggeredByReturn(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_return.asm', [
-            "23:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "23:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testLeftoverFrameTriggeredByThrow(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_throw.asm', [
-            "22:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "22:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testLeftoverFrameTriggeredByLeave(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_leave.asm', [
-            "22:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "22:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:9: error: in block foo",
         ])
 
     def testLeftoverFrameTriggeredByEnd(self):
         runTestFailsToAssembleDetailed(self, 'leftover_frame_end.asm', [
-            "24:5: error: leftover frame:",
-            "21:5: error: spawned here:",
+            "24:5: error: lost frame at:",
+            "21:5: note: spawned here:",
+            "20:12: error: in function main/0",
         ])
 
     def testCallWithoutAFrame(self):
@@ -1630,10 +2103,18 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:5: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
-        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:10: error: illegal register set name in ress instruction 'foo' in function main/1")
+        runTestFailsToAssembleDetailed(self, 'invalid_ress_instruction.asm', [
+            "21:10: error: not a register set name",
+            "                 ^ did you mean 'local'?",
+            "20:12: error: in function main/1",
+        ])
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
-        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:10: error: global registers used in library function foo/0", asm_opts=('-c',))
+        runTestFailsToAssembleDetailed(self, 'global_rs_used_in_lib.asm', [
+            "21:10: error: global register set used by a library function",
+            "21:10: note: library functions may only use 'local' and 'static' register sets",
+            "20:12: error: in function foo/0",
+        ], asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:20:12: error: function with empty body: foo/0")
@@ -1645,7 +2126,11 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20:1: error: illegal directive")
 
     def testUnknownInstruction(self):
-        runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21:5: error: unknown instruction: 'prnt'")
+        runTestFailsToAssembleDetailed(self, 'unknown_instruction.asm', [
+            "21:5: error: unknown instruction",
+            "            ^ did you mean 'print'?",
+            "20:12: error: in function main/1",
+        ])
 
     def testMoreThanOneMainFunction(self):
         name = 'more_than_one_main_function.asm'
@@ -1676,7 +2161,11 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21:10: error: jump to unrecognised marker: foo")
 
     def testBlocksEndWithReturningInstruction(self):
-        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return, tailcall or halt) at the end of block: foo__block")
+        runTestFailsToAssembleDetailed(self, 'blocks_end_with_returning_instruction.asm', [
+            "21:5: error: invalid last mnemonic",
+            "21:5: note: expected one of: leave, return, or tailcall",
+            "20:9: error: in block foo__block",
+        ])
 
     def testBranchWithoutTarget(self):
         runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:5: error: branch without a target")
@@ -1768,6 +2257,7 @@ class AssemblerErrorTests(unittest.TestCase):
     def testInvalidRegisterIndexInName(self):
         runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name.asm', [
             '21:12: error: invalid register index: a_name := "a"',
+            '                   ^       ',
         ])
 
 
@@ -1840,13 +2330,13 @@ class KeywordDefaultTests(unittest.TestCase):
         runTest(self, 'call.asm', '')
 
     def testDefaultInIstore(self):
-        runTest(self, 'istore.asm', '0')
+        runTest(self, 'integer.asm', '0')
 
     def testDefaultInFstore(self):
-        runTest(self, 'fstore.asm', '0.000000')
+        runTest(self, 'float.asm', '0.000000')
 
     def testDefaultInStrstore(self):
-        runTest(self, 'strstore.asm', 'default:')
+        runTest(self, 'string.asm', 'default:')
 
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
@@ -2068,6 +2558,7 @@ class ConcurrencyTests(unittest.TestCase):
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_process.asm', '42')
 
+    @unittest.skip('triggers a memory leak from a path that only allocates stack memory...?')
     def testProcessFromDynamicallyLinkedFunction(self):
         source_lib = 'process_from_linked_fun.asm'
         lib_path = 'test_module.vlib'
@@ -2099,7 +2590,7 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'receive_timeout_default.asm', 'Hello World!')
 
     def testReceiveTimeoutFailsToAssemble(self):
-        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:18: error: invalid timeout operand')
+        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:18: error: invalid operand')
 
     def testJoinDefaultTimeout(self):
         runTest(self, 'join_timeout_default.asm', 'child process done')
@@ -2192,7 +2683,14 @@ class AtomTests(unittest.TestCase):
         runTestSplitlines(self, 'comparing_atoms.asm', ['true', 'false'])
 
     def testComparingWithDifferentType(self):
-        runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
+        # This was before the "new SA".
+        # runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
+        runTestFailsToAssembleDetailed(self, 'comparing_with_different_type.asm', [
+            '24:40: error: invalid type of value contained in register',
+            '24:40: note: expected atom, got integer',
+            '22:21: note: register defined here',
+            '20:12: error: in function main/0',
+        ])
 
 
 class DeferredCallsTests(unittest.TestCase):

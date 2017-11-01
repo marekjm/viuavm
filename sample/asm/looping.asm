@@ -21,8 +21,8 @@
 ; It displays numbers from 0 to 10.
 
 .function: main/1
-    istore %1 0
-    istore %2 10
+    integer %1 0
+    integer %2 10
 
     ; mark the beginning of the loop
     .mark: loop

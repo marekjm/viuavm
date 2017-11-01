@@ -18,14 +18,14 @@
 ;
 
 .function: worker_process/1
-    echo (strstore %1 "Hello from #")
+    echo (string %1 "Hello from #")
     echo (arg %2 %0)
-    print (strstore %1 " worker process!")
+    print (string %1 " worker process!")
     return
 .end
 
 .function: process_spawner/1
-    echo (strstore %1 "number of worker processes: ")
+    echo (string %1 "number of worker processes: ")
 
     .name: 1 limit
     print (arg %limit %0)
@@ -51,7 +51,7 @@
 .signature: std::io::getline/0
 
 .function: get_number_of_processes_to_spawn/0
-    echo (strstore %4 "number of processes to spawn: ")
+    echo (string %4 "number of processes to spawn: ")
     frame %0
     stoi %0 (call %4 std::io::getline/0)
     return

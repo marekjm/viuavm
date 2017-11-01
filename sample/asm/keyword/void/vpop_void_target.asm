@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    vec (.name: %iota container)
+    vector (.name: %iota container)
 
-    vpush %container (istore %iota 0)
+    vpush %container (integer %iota 0)
     vpop void %container void
     print %container
 

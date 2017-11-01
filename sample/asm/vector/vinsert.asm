@@ -18,29 +18,31 @@
 ;
 
 .function: main/1
-    vinsert (vinsert (vinsert (vinsert (vec %1) (strstore %5 "sheep!")) (strstore %2 "Hurr")) (strstore %3 "durr") %1) (strstore %4 "Im'a") %2
+    vector %1 local
 
-    ; this works OK
-    ; this instruction is here for debugging - uncomment it to see the vector
-    ;print 1
+    integer %0 local 0
+    vinsert %1 local (string %5 local "sheep!") local %0 local
+    vinsert %1 local (string %5 local "Hurr") local %0 local
+
+    integer %0 local 1
+    vinsert %1 local (string %5 local "durr") local %0 local
+
+    integer %0 local 2
+    vinsert %1 local (string %5 local "Im'a") local %0 local
 
     .name: 6 len
     .name: 7 counter
 
-    istore %counter 0
-    vlen %len %1
+    integer %counter local 0
+    vlen %len local %1 local
 
     .mark: loop
-    if (lt %8 %counter %len) +1 break
-    print *(vat %9 %1 %counter)
-    iinc %counter
+    if (lt %8 local %counter local %len local) local +1 break
+    print *(vat %9 local %1 local %counter local) local
+    iinc %counter local
     jump loop
 
     .mark: break
-
-    ; see comment for first vector-print
-    ; it is for debugging - this should work without segfault
-    ;print 1
 
     izero %0 local
     return

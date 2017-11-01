@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,9 +28,9 @@
 using namespace std;
 
 
-static void math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == nullptr) {
+static auto math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                      viua::process::Process*, viua::kernel::Kernel*) -> void {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected float as first argument");
     }
     if (frame->arguments->at(0)->type() != "Float") {

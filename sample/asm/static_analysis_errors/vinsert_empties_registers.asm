@@ -18,7 +18,8 @@
 ;
 
 .function: main/0
-    vinsert (vec %2) (izero %1) 0
+    integer %0 local 0
+    vinsert (vector %2) (izero %1) %0 local
     print %1
 
     izero %0 local
