@@ -166,7 +166,7 @@ namespace cg {
         }
 
         viua::internals::types::byte* opinteger(viua::internals::types::byte* addr_ptr, int_op regno,
-                                               int_op i) {
+                                                int_op i) {
             *(addr_ptr++) = INTEGER;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
 
@@ -189,7 +189,7 @@ namespace cg {
         }
 
         viua::internals::types::byte* opfloat(viua::internals::types::byte* addr_ptr, int_op regno,
-                                               viua::internals::types::plain_float f) {
+                                              viua::internals::types::plain_float f) {
             *(addr_ptr++) = FLOAT;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
             aligned_write(addr_ptr) = f;
@@ -256,8 +256,7 @@ namespace cg {
             return emit_instruction_alu(addr_ptr, EQ, target, lhs, rhs);
         }
 
-        viua::internals::types::byte* opstring(viua::internals::types::byte* addr_ptr, int_op reg,
-                                                 string s) {
+        viua::internals::types::byte* opstring(viua::internals::types::byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = STRING;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size() - 2), OT_STRING);
@@ -304,7 +303,7 @@ namespace cg {
         }
 
         viua::internals::types::byte* opvector(viua::internals::types::byte* addr_ptr, int_op index,
-                                            int_op pack_start_index, int_op pack_length) {
+                                               int_op pack_start_index, int_op pack_length) {
             *(addr_ptr++) = VECTOR;
             addr_ptr = insert_ri_operand(addr_ptr, index);
             addr_ptr = insert_ri_operand(addr_ptr, pack_start_index);
@@ -431,25 +430,23 @@ namespace cg {
             return insert_two_ri_instruction(addr_ptr, ROR, target, lhs);
         }
 
-        viua::internals::types::byte* opwrapincrement(viua::internals::types::byte* addr_ptr,
-                                                       int_op target) {
+        viua::internals::types::byte* opwrapincrement(viua::internals::types::byte* addr_ptr, int_op target) {
             *(addr_ptr++) = WRAPINCREMENT;
             return insert_ri_operand(addr_ptr, target);
         }
 
-        viua::internals::types::byte* opwrapdecrement(viua::internals::types::byte* addr_ptr,
-                                                       int_op target) {
+        viua::internals::types::byte* opwrapdecrement(viua::internals::types::byte* addr_ptr, int_op target) {
             *(addr_ptr++) = WRAPDECREMENT;
             return insert_ri_operand(addr_ptr, target);
         }
 
         viua::internals::types::byte* opwrapadd(viua::internals::types::byte* addr_ptr, int_op target,
-                                                 int_op lhs, int_op rhs) {
+                                                int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, WRAPADD, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opwrapmul(viua::internals::types::byte* addr_ptr, int_op target,
-                                                 int_op lhs, int_op rhs) {
+                                                int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, WRAPMUL, target, lhs, rhs);
         }
 

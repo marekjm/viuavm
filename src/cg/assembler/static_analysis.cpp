@@ -826,8 +826,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or token == "lt" or
-                   token == "lte" or token == "gt" or token == "gte" or token == "eq" or
-                   token == "wrapadd" or token == "wrapmul") {
+                   token == "lte" or token == "gt" or token == "gte" or token == "eq" or token == "wrapadd" or
+                   token == "wrapmul") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;

@@ -40,7 +40,8 @@ static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
 
 
 const ForeignFunctionSpec functions[] = {
-    {"os::system", &os_system}, {nullptr, nullptr},
+    {"os::system", &os_system},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }
