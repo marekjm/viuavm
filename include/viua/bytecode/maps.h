@@ -68,7 +68,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "textcommonsuffix",
     "textconcat",
 
-    "vec",
+    "vector",
     "vinsert",
     "vpush",
     "vpop",
@@ -200,7 +200,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {TEXTCOMMONSUFFIX, "textcommonsuffix"},
     {TEXTCONCAT, "textconcat"},
 
-    {VEC, "vec"},
+    {VECTOR, "vector"},
     {VINSERT, "vinsert"},
     {VPUSH, "vpush"},
     {VPOP, "vpop"},

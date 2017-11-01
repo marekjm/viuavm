@@ -126,11 +126,11 @@ string viua::types::Vector::str() const {
 bool viua::types::Vector::boolean() const { return internal_object.size() != 0; }
 
 unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
-    auto vec = make_unique<Vector>();
+    auto v = make_unique<Vector>();
     for (unsigned i = 0; i < internal_object.size(); ++i) {
-        vec->push(internal_object[i]->copy());
+        v->push(internal_object[i]->copy());
     }
-    return std::move(vec);
+    return std::move(v);
 }
 
 vector<unique_ptr<viua::types::Value>>& viua::types::Vector::value() { return internal_object; }

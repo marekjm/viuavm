@@ -478,12 +478,12 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                                       resolve_rs_type(tokens.at(lhs + 1))),
                              assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                                       resolve_rs_type(tokens.at(rhs + 1))));
-    } else if (tokens.at(i) == "vec") {
+    } else if (tokens.at(i) == "vector") {
         TokenIndex target = i + 1;
         TokenIndex pack_range_start = target + 2;
         TokenIndex pack_range_count = pack_range_start + 2;
 
-        program.opvec(
+        program.opvector(
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
                                                      resolve_rs_type(tokens.at(target + 1))),
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(pack_range_start)),

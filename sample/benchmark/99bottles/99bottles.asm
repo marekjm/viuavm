@@ -54,7 +54,7 @@
 
     copy (.name: %iota current_number_of_bottles) how_many_bottles
     idec (copy (.name: %iota one_less) current_number_of_bottles)
-    vec (.name: %iota format_params) current_number_of_bottles 2
+    vector (.name: %iota format_params) current_number_of_bottles 2
 
     frame ^[(param %iota %bottles_format_string) (param %iota %format_params)]
     move %0 (msg %bottles_format_string format/)

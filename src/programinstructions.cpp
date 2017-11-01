@@ -195,8 +195,8 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
-    addr_ptr = cg::bytecode::opvec(addr_ptr, index, pack_start_index, pack_length);
+Program& Program::opvector(int_op index, int_op pack_start_index, int_op pack_length) {
+    addr_ptr = cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 

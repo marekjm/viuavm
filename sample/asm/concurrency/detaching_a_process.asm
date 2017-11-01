@@ -27,7 +27,7 @@
     .name: %iota n
     if (gte %iota %counter %limit) after_loop
 
-    frame ^[(param %iota %report_text_format) (param %iota (vec %format_parameters (copy %n %counter) %1))]
+    frame ^[(param %iota %report_text_format) (param %iota (vector %format_parameters (copy %n %counter) %1))]
     print (msg %iota format/)
 
     iinc %counter

@@ -24,7 +24,7 @@
     call std::misc::cycle/1
 
     .name: 2 format_args
-    vec %format_args (arg %1 %0) %1
+    vector %format_args (arg %1 %0) %1
 
     .name: 1 format_string
     string %format_string "Hello #{0}!\n"

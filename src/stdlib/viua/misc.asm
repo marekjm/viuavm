@@ -40,7 +40,7 @@
     ; makes registers 0, 2, 4 and 4 available to user's code.
 
     ; vector for parameter storing
-    vec %2
+    vector %2
 
     ; loop counter and termination variable
     ; loop counter is the number of parameters current function has been called with

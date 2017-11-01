@@ -751,7 +751,7 @@ class BitsManipulationTests(unittest.TestCase):
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
-    VEC instruction does not get its own test, but is used in every other vector test
+    VECTOR instruction does not get its own test, but is used in every other vector test
     so it gets pretty good coverage.
     """
     PATH = './sample/asm/vector'
@@ -761,15 +761,15 @@ class VectorInstructionsTests(unittest.TestCase):
 
     def testPackingVecRefusesToPackItself(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vector would pack itself',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToOutOfRegisterSetRange(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vector: packing outside of register set range',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToPackNullRegister(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vector: cannot pack null register',), assembly_opts=('--no-sa',))
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
@@ -1610,7 +1610,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: use of empty current register "1"')
 
     def testVinsertOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:22: error: use of empty current register "1"')
+        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:25: error: use of empty current register "1"')
 
     def testVinsertIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: use of empty current register "2"')
@@ -1619,7 +1619,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'vpush_empties_registers.asm', './sample/asm/static_analysis_errors/vpush_empties_registers.asm:22:11: error: use of erased current register "1"')
 
     def testVpushOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', './sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:20: error: use of empty current register "1"')
+        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', './sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:23: error: use of empty current register "1"')
 
     def testVpushIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vpush_into_empty_register.asm', './sample/asm/static_analysis_errors/vpush_into_empty_register.asm:21:11: error: use of empty current register "2"')

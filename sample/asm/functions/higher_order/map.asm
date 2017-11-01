@@ -52,7 +52,7 @@
     arg %2 %1
 
     ; new vector to store mapped values
-    vec %3
+    vector %3
 
     ; set initial counter value and
     ; loop termination variable
@@ -85,7 +85,7 @@
     ; applies function square/1(int) to 5 and
     ; prints the result
 
-    vpush (vec %1) (integer %2 1)
+    vpush (vector %1) (integer %2 1)
     vpush %1 (integer %2 2)
     vpush %1 (integer %2 3)
     vpush %1 (integer %2 4)

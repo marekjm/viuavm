@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    vec %1
+    vector %1
     vpush %1 (integer %3 42)
     vat %2 %1 (integer %4 4)
     print *2

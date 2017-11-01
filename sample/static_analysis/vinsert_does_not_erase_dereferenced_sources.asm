@@ -19,7 +19,7 @@
 
 .function: main/0
     izero %1 local
-    vec %2 local
+    vector %2 local
 
     ptr %3 local %1 local
     iinc *3 local

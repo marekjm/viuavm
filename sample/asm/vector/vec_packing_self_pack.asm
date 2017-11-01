@@ -4,7 +4,7 @@
 
     -- this would pack
     -- the vector inside itself
-    vec %3 %1 %3
+    vector %3 %1 %3
 
     print %3
 

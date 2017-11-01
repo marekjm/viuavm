@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    vec (.name: %iota a_vector)
+    vector (.name: %iota a_vector)
     print (vlen (.name: %iota length) %a_vector)
 
     vpush %a_vector (string %iota "Hello World!")

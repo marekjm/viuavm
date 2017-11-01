@@ -303,9 +303,9 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, TEXTCONCAT, target, lhs, rhs);
         }
 
-        viua::internals::types::byte* opvec(viua::internals::types::byte* addr_ptr, int_op index,
+        viua::internals::types::byte* opvector(viua::internals::types::byte* addr_ptr, int_op index,
                                             int_op pack_start_index, int_op pack_length) {
-            *(addr_ptr++) = VEC;
+            *(addr_ptr++) = VECTOR;
             addr_ptr = insert_ri_operand(addr_ptr, index);
             addr_ptr = insert_ri_operand(addr_ptr, pack_start_index);
             return insert_ri_operand(addr_ptr, pack_length);

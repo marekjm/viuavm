@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (vec (.name: %iota container))
+    ptr (.name: %iota pointer) (vector (.name: %iota container))
     integer (.name: %iota value) 0
 
     izero %0 local

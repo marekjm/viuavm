@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vec (.name: %iota v) local
+    vector (.name: %iota v) local
 
     vpush %v local (integer %iota local 0) local
     vpush %v local (integer %iota local 1) local

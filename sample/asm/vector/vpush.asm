@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    print (vlen %3 (vec %2))
+    print (vlen %3 (vector %2))
 
     vpush %2 (string %1 "Hello World!")
 

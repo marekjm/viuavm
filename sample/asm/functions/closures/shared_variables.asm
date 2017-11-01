@@ -33,7 +33,7 @@
 
 .function: returns_closures/0
     ; create a vector to store closures
-    vec %1
+    vector %1
 
     ; create a value to be bound in both closures
     integer %2 42

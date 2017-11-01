@@ -91,12 +91,12 @@ viua::internals::types::byte* viua::process::Process::opstructkeys(viua::interna
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(addr, this);
 
     auto struct_keys = struct_operand->keys();
-    auto vec = make_unique<viua::types::Vector>();
+    auto keys = make_unique<viua::types::Vector>();
     for (const auto& each : struct_keys) {
-        vec->push(make_unique<viua::types::Atom>(each));
+        keys->push(make_unique<viua::types::Atom>(each));
     }
 
-    *target = std::move(vec);
+    *target = std::move(keys);
 
     return addr;
 }

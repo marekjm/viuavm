@@ -53,7 +53,7 @@
     arg %2 %1
 
     ; vector for filtered values
-    vec %3
+    vector %3
 
     ; initial loop counter and
     ; loop termination variable
@@ -92,7 +92,7 @@
 .end
 
 .function: main/1
-    vpush (vec %1) (integer %2 1)
+    vpush (vector %1) (integer %2 1)
     vpush %1 (integer %2 2)
     vpush %1 (integer %2 3)
     vpush %1 (integer %2 4)

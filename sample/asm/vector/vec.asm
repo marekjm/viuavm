@@ -20,7 +20,7 @@
 .function: main/1
     print (string %1 "sample vector program")
 
-    vpush (vec %2) 1
+    vpush (vector %2) 1
     print (vpop %4 %2)
 
     izero %0 local

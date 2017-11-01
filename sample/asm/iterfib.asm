@@ -18,7 +18,7 @@
 ;
 
 .function: iterfib/1
-    .name: %iota vector
+    .name: %iota vec
 
     ress static
 
@@ -28,8 +28,8 @@
     integer %minus_two -2
 
     .name: %iota tmp
-    if (not (isnull %tmp %vector)) logic
-    vpush (vpush (vec %vector) (integer %tmp 1)) (integer %tmp 1)
+    if (not (isnull %tmp %vec)) logic
+    vpush (vpush (vector %vec) (integer %tmp 1)) (integer %tmp 1)
 
     .mark: logic
 
@@ -39,13 +39,13 @@
 
     .mark: loop
     .name: %iota result
-    if (not (lt %iota (vlen %length %vector) %number)) finished
-    add %result *(vat %iota %vector %minus_one) *(vat %iota %vector %minus_two)
-    vpush %vector %result
+    if (not (lt %iota (vlen %length %vec) %number)) finished
+    add %result *(vat %iota %vec %minus_one) *(vat %iota %vec %minus_two)
+    vpush %vec %result
     jump loop
 
     .mark: finished
-    copy %0 *(vat %iota %vector %minus_one)
+    copy %0 *(vat %iota %vec %minus_one)
     return
 .end
 

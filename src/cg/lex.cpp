@@ -395,7 +395,7 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "vec") {
+                    } else if (token == "vector") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
@@ -1093,7 +1093,7 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "vec") {
+                    } else if (token == "vector") {
                         tokens.push_back(input_tokens.at(++i));
 
                         string target_register_index = tokens.back();

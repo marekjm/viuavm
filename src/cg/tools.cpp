@@ -1277,7 +1277,7 @@ namespace viua {
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
-                    } else if (tokens.at(i) == "vec") {
+                    } else if (tokens.at(i) == "vector") {
                         ++i;
                         tie(increase, i) = size_of_vec(tokens, i);
                     } else if (tokens.at(i) == "vinsert") {

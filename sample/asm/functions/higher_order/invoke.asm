@@ -73,7 +73,7 @@
 
 .function: main/1
     ; create the vector
-    vpush (vec %1) (integer %2 20)
+    vpush (vector %1) (integer %2 20)
     vpush %1 (integer %3 16)
     vpush %1 (integer %4 8)
     vpush %1 (integer %5 -2)

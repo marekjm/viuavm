@@ -303,7 +303,7 @@ namespace viua {
             viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*);
             viua::internals::types::byte* optextconcat(viua::internals::types::byte*);
 
-            viua::internals::types::byte* opvec(viua::internals::types::byte*);
+            viua::internals::types::byte* opvector(viua::internals::types::byte*);
             viua::internals::types::byte* opvinsert(viua::internals::types::byte*);
             viua::internals::types::byte* opvpush(viua::internals::types::byte*);
             viua::internals::types::byte* opvpop(viua::internals::types::byte*);

@@ -20,7 +20,7 @@
 .function: main/1
     integer %1 0
 
-    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vec %2) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) %1
+    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vector %2) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) %1
     print (vlen %3 %2)
 
     izero %0 local

@@ -112,7 +112,7 @@ enum OPCODE : viua::internals::types::byte {
      */
     TEXTCONCAT,
 
-    VEC,
+    VECTOR,
     VINSERT,
     VPUSH,
     VPOP,

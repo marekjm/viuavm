@@ -19,7 +19,7 @@
 
 .function: main/0
     .name: %iota a_vector
-    vec %a_vector local
+    vector %a_vector local
     vpush %a_vector local (integer %0 0)
     vpush %a_vector local (integer %0 1)
     vpush %a_vector local (integer %0 2)

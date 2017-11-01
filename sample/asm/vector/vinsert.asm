@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    vec %1 local
+    vector %1 local
 
     integer %0 local 0
     vinsert %1 local (string %5 local "sheep!") local %0 local

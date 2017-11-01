@@ -99,7 +99,7 @@ class Program {
     Program& optextcommonsuffix(int_op, int_op, int_op);
     Program& optextconcat(int_op, int_op, int_op);
 
-    Program& opvec(int_op, int_op, int_op);
+    Program& opvector(int_op, int_op, int_op);
     Program& opvinsert(int_op, int_op, int_op);
     Program& opvpush(int_op, int_op);
     Program& opvpop(int_op, int_op, int_op);

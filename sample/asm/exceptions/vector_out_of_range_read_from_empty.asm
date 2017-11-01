@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vec %1 local
+    vector %1 local
     vat %2 local %1 local (izero %0 local) local
     print *2 local
 

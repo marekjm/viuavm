@@ -4,7 +4,7 @@
 
     -- this would pack outside of available
     -- register %set index range
-    vec %1 %2 %20
+    vector %1 %2 %20
 
     print %1
 

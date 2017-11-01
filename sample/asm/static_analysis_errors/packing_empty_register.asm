@@ -20,7 +20,7 @@
 .function: main/0
     izero %2
     izero %3
-    vec %1 %2 %4
+    vector %1 %2 %4
 
     izero %0 local
     return
