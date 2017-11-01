@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    fstore %1 1.0
+    float %1 1.0
     string %2 "Hello World!"
     div %3 %2 %1
     print %3

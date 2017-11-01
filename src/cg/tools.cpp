@@ -1205,7 +1205,7 @@ namespace viua {
                     } else if (tokens.at(i) == "idec") {
                         ++i;
                         tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "fstore") {
+                    } else if (tokens.at(i) == "float") {
                         ++i;
                         tie(increase, i) = size_of_fstore(tokens, i);
                     } else if (tokens.at(i) == "itof") {

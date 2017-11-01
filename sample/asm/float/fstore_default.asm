@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    print (fstore %1)
+    print (float %1)
 
     izero %0 local
     return

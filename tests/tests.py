@@ -1796,7 +1796,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'fstore_stores_floats.asm', [
             '22:10: error: invalid type of value contained in register',
             '22:10: note: expected integer, got float',
-            '21:12: note: register defined here',
+            '21:11: note: register defined here',
             '20:12: error: in function main/0',
         ])
 
@@ -2302,7 +2302,7 @@ class KeywordDefaultTests(unittest.TestCase):
         runTest(self, 'integer.asm', '0')
 
     def testDefaultInFstore(self):
-        runTest(self, 'fstore.asm', '0.000000')
+        runTest(self, 'float.asm', '0.000000')
 
     def testDefaultInStrstore(self):
         runTest(self, 'string.asm', 'default:')

@@ -678,7 +678,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 check_use_of_register(register_usage_profile, *operand);
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *operand);
-            } else if (opcode == FSTORE) {
+            } else if (opcode == FLOAT) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")

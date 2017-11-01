@@ -34,7 +34,7 @@ enum OPCODE : viua::internals::types::byte {
     IDEC,
 
     // float instructions
-    FSTORE,
+    FLOAT,
 
     // numeric conversion instructions
     ITOF,  // convert integer to float

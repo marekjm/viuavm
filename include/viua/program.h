@@ -69,7 +69,7 @@ class Program {
     Program& opiinc(int_op);
     Program& opidec(int_op);
 
-    Program& opfstore(int_op, viua::internals::types::plain_float);
+    Program& opfloat(int_op, viua::internals::types::plain_float);
 
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);

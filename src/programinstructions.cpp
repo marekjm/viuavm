@@ -63,15 +63,15 @@ Program& Program::opidec(int_op regno) {
     return (*this);
 }
 
-Program& Program::opfstore(int_op regno, viua::internals::types::plain_float f) {
-    /*  Inserts fstore instruction to bytecode.
+Program& Program::opfloat(int_op regno, viua::internals::types::plain_float f) {
+    /*  Inserts float instruction to bytecode.
      *
      *  :params:
      *
      *  regno - register number
      *  f     - value to store
      */
-    addr_ptr = cg::bytecode::opfstore(addr_ptr, regno, f);
+    addr_ptr = cg::bytecode::opfloat(addr_ptr, regno, f);
     return (*this);
 }
 

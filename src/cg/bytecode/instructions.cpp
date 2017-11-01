@@ -188,9 +188,9 @@ namespace cg {
             return insert_ri_operand(addr_ptr, regno);
         }
 
-        viua::internals::types::byte* opfstore(viua::internals::types::byte* addr_ptr, int_op regno,
+        viua::internals::types::byte* opfloat(viua::internals::types::byte* addr_ptr, int_op regno,
                                                viua::internals::types::plain_float f) {
-            *(addr_ptr++) = FSTORE;
+            *(addr_ptr++) = FLOAT;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
             aligned_write(addr_ptr) = f;
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(addr_ptr);

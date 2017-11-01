@@ -598,7 +598,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
             oss << dec;
 
             break;
-        case FSTORE:
+        case FLOAT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             oss << ' ';

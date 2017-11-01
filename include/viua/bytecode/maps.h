@@ -39,7 +39,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "iinc",
     "idec",
 
-    "fstore",
+    "float",
 
     "itof",
     "ftoi",
@@ -171,7 +171,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {IINC, "iinc"},
     {IDEC, "idec"},
 
-    {FSTORE, "fstore"},
+    {FLOAT, "float"},
 
     {ITOF, "itof"},
     {FTOI, "ftoi"},

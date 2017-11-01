@@ -57,6 +57,7 @@ There are several categories of change:
   actually making it unjoinable
 - bic: rename `strstore` to `string`
 - bic: rename `istore` to `integer`
+- bic: rename `fstore` to `float`
 
 
 ----

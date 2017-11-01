@@ -110,8 +110,8 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case IDEC:
             addr = opidec(addr + 1);
             break;
-        case FSTORE:
-            addr = opfstore(addr + 1);
+        case FLOAT:
+            addr = opfloat(addr + 1);
             break;
         case ITOF:
             addr = opitof(addr + 1);

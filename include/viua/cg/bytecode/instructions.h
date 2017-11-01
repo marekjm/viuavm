@@ -71,7 +71,7 @@ namespace cg {
         viua::internals::types::byte* opiinc(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opidec(viua::internals::types::byte*, int_op);
 
-        viua::internals::types::byte* opfstore(viua::internals::types::byte*, int_op,
+        viua::internals::types::byte* opfloat(viua::internals::types::byte*, int_op,
                                                viua::internals::types::plain_float);
 
         viua::internals::types::byte* opitof(viua::internals::types::byte*, int_op, int_op);
