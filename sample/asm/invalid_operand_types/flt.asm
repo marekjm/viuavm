@@ -21,7 +21,7 @@
     register (class %1 Foo)
     new %1 Foo
 
-    fstore %2 1.0
+    float %2 1.0
 
     lt %3 %1 %2
     print %3

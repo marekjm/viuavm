@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    print (fstore %iota default)
+    print (integer %iota default)
 
     izero %0 local
     return

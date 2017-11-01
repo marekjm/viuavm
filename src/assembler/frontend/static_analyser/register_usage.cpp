@@ -115,7 +115,7 @@ class RegisterUsageProfile {
      *
      *      text %1 local "Hello World!"    ; register 1 is defined
      *      delete %1 local                 ; register 1 is erased
-     *      istore %1 local 42              ; register 1 is defined again
+     *      integer %1 local 42              ; register 1 is defined again
      */
     map<Register, Token> erased_registers;
 
@@ -649,7 +649,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.register_set = operand->rss;
                 val.value_type = viua::internals::ValueTypes::INTEGER;
                 register_usage_profile.define(val, operand->tokens.at(0));
-            } else if (opcode == ISTORE) {
+            } else if (opcode == INTEGER) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -679,7 +679,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 check_use_of_register(register_usage_profile, *operand);
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *operand);
-            } else if (opcode == FSTORE) {
+            } else if (opcode == FLOAT) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -848,7 +848,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
-            } else if (opcode == STRSTORE) {
+            } else if (opcode == STRING) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -1130,7 +1130,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto val = Register(*result);
                 val.value_type = viua::internals::ValueTypes::TEXT;
                 register_usage_profile.define(val, result->tokens.at(0));
-            } else if (opcode == VEC) {
+            } else if (opcode == VECTOR) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")

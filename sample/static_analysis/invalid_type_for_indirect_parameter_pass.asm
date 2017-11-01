@@ -24,7 +24,7 @@
 .end
 
 .function: main/1
-    istore %1 local 42
+    integer %1 local 42
 
     text %2 local "Hello World!"
 

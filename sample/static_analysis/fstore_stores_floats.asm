@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    fstore %1 local 3.14
+    float %1 local 3.14
     idec %1 local
 
     izero %0 local

@@ -22,8 +22,8 @@
     .name: 2 one
 
     ; store zero and one in registers
-    istore %zero 0
-    istore %one 1
+    integer %zero 0
+    integer %one 1
 
     ; swap objects so that register "zero" now contains 1, and
     ; register "one" contains 0

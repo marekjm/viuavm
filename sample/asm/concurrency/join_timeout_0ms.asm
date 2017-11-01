@@ -23,11 +23,11 @@
     frame ^[(pamv %0 %counter)]
     tailcall child_process/1
     .mark: end_this
-    strstore %0 "child process done"
+    string %0 "child process done"
     return
 .end
 .function: child_process/0
-    frame ^[(pamv %0 (istore %1 65536))]
+    frame ^[(pamv %0 (integer %1 65536))]
     tailcall child_process/1
     return
 .end

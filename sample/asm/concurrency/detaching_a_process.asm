@@ -19,15 +19,15 @@
 
 .function: running_detached/0
     izero (.name: %iota counter)
-    istore (.name: %iota limit) 4
-    strstore (.name: %iota report_text_format) "Hello World! (from long-running detached process) #{0}"
+    integer (.name: %iota limit) 4
+    string (.name: %iota report_text_format) "Hello World! (from long-running detached process) #{0}"
 
     .mark: loop
     .name: %iota format_parameters
     .name: %iota n
     if (gte %iota %counter %limit) after_loop
 
-    frame ^[(param %iota %report_text_format) (param %iota (vec %format_parameters (copy %n %counter) %1))]
+    frame ^[(param %iota %report_text_format) (param %iota (vector %format_parameters (copy %n %counter) %1))]
     print (msg %iota format/)
 
     iinc %counter
@@ -59,7 +59,7 @@
     nop
     nop
 
-    print (strstore %3 "main/1 exited")
+    print (string %3 "main/1 exited")
 
     izero %0 local
     return

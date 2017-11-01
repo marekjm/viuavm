@@ -23,7 +23,7 @@
 .end
 
 .function: throwing/0
-    throw (istore %1 local 666) local
+    throw (integer %1 local 666) local
     return
 .end
 

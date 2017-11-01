@@ -69,16 +69,16 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (istore %1 1))]
+    frame ^[(param %0 (integer %1 1))]
     call %2 closure_maker/1
 
-    frame ^[(param %0 (istore %1 2))]
+    frame ^[(param %0 (integer %1 2))]
     call %3 %2
 
-    frame ^[(param %0 (istore %1 3))]
+    frame ^[(param %0 (integer %1 3))]
     call %4 %3
 
-    frame ^[(param %0 (istore %1 4))]
+    frame ^[(param %0 (integer %1 4))]
     print (call %5 %4)
 
     izero %0 local

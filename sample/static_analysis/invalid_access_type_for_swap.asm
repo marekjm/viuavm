@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    istore %1 local 42
+    integer %1 local 42
     text %2 local "Answer"
 
     swap %1 local *2 local

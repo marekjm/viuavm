@@ -22,7 +22,7 @@
     .name: 3 counter
 
     vlen %len (arg %1 %0)
-    istore %counter 0
+    integer %counter 0
 
     .mark: loop
     if (lt %4 %counter %len) +1 break

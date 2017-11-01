@@ -20,7 +20,7 @@
 .function: main/1
     try
     catch "Exception" .block: exception_handler
-        echo (strstore %1 "exception encountered: ")
+        echo (string %1 "exception encountered: ")
         print (draw %2)
         leave
     .end

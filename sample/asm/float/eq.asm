@@ -21,8 +21,8 @@
 ; Its expected output is "true".
 
 .function: main/1
-    fstore %1 0.69
-    fstore %2 0.69
+    float %1 0.69
+    float %2 0.69
     eq %1 %1 %2
 
     ; should be true

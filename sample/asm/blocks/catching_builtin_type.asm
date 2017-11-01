@@ -25,7 +25,7 @@
 .end
 
 .block: main_block
-    istore %1 42
+    integer %1 42
     throw %1
     leave
 .end

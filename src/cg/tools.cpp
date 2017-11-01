@@ -401,7 +401,7 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_strstore(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_string(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
 
@@ -1196,7 +1196,7 @@ namespace viua {
                     } else if (tokens.at(i) == "izero") {
                         ++i;
                         tie(increase, i) = size_of_izero(tokens, i);
-                    } else if (tokens.at(i) == "istore") {
+                    } else if (tokens.at(i) == "integer") {
                         ++i;
                         tie(increase, i) = size_of_istore(tokens, i);
                     } else if (tokens.at(i) == "iinc") {
@@ -1205,7 +1205,7 @@ namespace viua {
                     } else if (tokens.at(i) == "idec") {
                         ++i;
                         tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "fstore") {
+                    } else if (tokens.at(i) == "float") {
                         ++i;
                         tie(increase, i) = size_of_fstore(tokens, i);
                     } else if (tokens.at(i) == "itof") {
@@ -1247,9 +1247,9 @@ namespace viua {
                     } else if (tokens.at(i) == "eq") {
                         ++i;
                         tie(increase, i) = size_of_eq(tokens, i);
-                    } else if (tokens.at(i) == "strstore") {
+                    } else if (tokens.at(i) == "string") {
                         ++i;
-                        tie(increase, i) = size_of_strstore(tokens, i);
+                        tie(increase, i) = size_of_string(tokens, i);
                     } else if (tokens.at(i) == "text") {
                         ++i;
                         tie(increase, i) = size_of_text(tokens, i);
@@ -1277,7 +1277,7 @@ namespace viua {
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
-                    } else if (tokens.at(i) == "vec") {
+                    } else if (tokens.at(i) == "vector") {
                         ++i;
                         tie(increase, i) = size_of_vec(tokens, i);
                     } else if (tokens.at(i) == "vinsert") {

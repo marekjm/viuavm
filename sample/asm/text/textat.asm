@@ -22,7 +22,7 @@
     text %hello_world local "Hello World!"
 
     .name: %iota index
-    istore %index local 6
+    integer %index local 6
 
     .name: %iota got_character
     textat %got_character local %hello_world local %index local

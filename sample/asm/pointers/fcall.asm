@@ -39,7 +39,7 @@
     function (.name: %iota adder) add/2
     function (.name: %iota multipler) multiply/2
 
-    istore (.name: %iota one) 1
+    integer (.name: %iota one) 1
 
     .name: %iota pointer
     .name: %iota result

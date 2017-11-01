@@ -25,7 +25,7 @@
 .end
 
 .function: main/1
-    istore %1 local 42
+    integer %1 local 42
     text %2 local "a_function/1"
 
     frame %1

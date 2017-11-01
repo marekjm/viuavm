@@ -21,12 +21,12 @@
     .name: %iota counter
     .name: %iota limit
     izero %counter
-    istore %limit 4
+    integer %limit 4
 
     send (arg %iota %0) (self %iota)
 
     .name: %iota message
-    strstore %message "Hello World! (from long-running detached process) "
+    string %message "Hello World! (from long-running detached process) "
 
     .mark: loop
     if (gte %iota %counter %limit) after_loop
@@ -65,7 +65,7 @@
     ; this throws, cannot join detached process
     join %0 %1
 
-    print (strstore %3 "main/1 exited")
+    print (string %3 "main/1 exited")
 
     izero %0 local
     return

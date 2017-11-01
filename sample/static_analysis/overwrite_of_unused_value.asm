@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    istore %1 local 42
-    istore %1 local 42
+    integer %1 local 42
+    integer %1 local 42
 
     izero %0 local
     return

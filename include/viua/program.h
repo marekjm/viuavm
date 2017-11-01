@@ -65,11 +65,11 @@ class Program {
     Program& opnop();
 
     Program& opizero(int_op);
-    Program& opistore(int_op, int_op);
+    Program& opinteger(int_op, int_op);
     Program& opiinc(int_op);
     Program& opidec(int_op);
 
-    Program& opfstore(int_op, viua::internals::types::plain_float);
+    Program& opfloat(int_op, viua::internals::types::plain_float);
 
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);
@@ -87,7 +87,7 @@ class Program {
     Program& opgte(int_op, int_op, int_op);
     Program& opeq(int_op, int_op, int_op);
 
-    Program& opstrstore(int_op, std::string);
+    Program& opstring(int_op, std::string);
 
     Program& optext(int_op, std::string);
     Program& optext(int_op, int_op);
@@ -99,7 +99,7 @@ class Program {
     Program& optextcommonsuffix(int_op, int_op, int_op);
     Program& optextconcat(int_op, int_op, int_op);
 
-    Program& opvec(int_op, int_op, int_op);
+    Program& opvector(int_op, int_op, int_op);
     Program& opvinsert(int_op, int_op, int_op);
     Program& opvpush(int_op, int_op);
     Program& opvpop(int_op, int_op, int_op);

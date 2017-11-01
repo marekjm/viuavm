@@ -29,12 +29,12 @@
 .end
 
 .function: Base::saySomething/1
-    print (strstore %1 "Hello Base World!")
+    print (string %1 "Hello Base World!")
     return
 .end
 
 .function: Derived::saySomethingMore/1
-    print (strstore %1 "Hello Derived World!")
+    print (string %1 "Hello Derived World!")
     return
 .end
 

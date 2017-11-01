@@ -19,20 +19,20 @@
 
 .function: watchdog_process/1
     arg (.name: %iota death_message) %0
-    remove (.name: %iota exception) %1 (strstore %exception "exception")
-    remove (.name: %iota aborted_function) %1 (strstore %aborted_function "function")
-    remove (.name: %iota parameters) %1 (strstore %parameters "parameters")
+    remove (.name: %iota exception) %1 (string %exception "exception")
+    remove (.name: %iota aborted_function) %1 (string %aborted_function "function")
+    remove (.name: %iota parameters) %1 (string %parameters "parameters")
 
     .name: %iota message
-    echo (strstore %message "[WARNING] process '")
+    echo (string %message "[WARNING] process '")
     echo %aborted_function
     echo %parameters
-    echo (strstore %message "' killed by >>>")
+    echo (string %message "' killed by >>>")
     echo %exception
-    print (strstore %message "<<<")
+    print (string %message "<<<")
 
-    copy (.name: %iota i) *(vat %i %parameters (istore %iota 1))
-    frame ^[(param %0 *(vat %message %parameters (istore %iota 0))) (param %1 (iinc %i))]
+    copy (.name: %iota i) *(vat %i %parameters (integer %iota 1))
+    frame ^[(param %0 *(vat %message %parameters (integer %iota 0))) (param %1 (iinc %i))]
     process void a_division_executing_process/2
 
     return
@@ -41,20 +41,20 @@
 .function: a_detached_concurrent_process/0
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (istore %1 32))]
+    frame ^[(pamv %0 (integer %1 32))]
     call std::misc::cycle/1
 
-    print (strstore %1 "Hello World (from detached process)!")
+    print (string %1 "Hello World (from detached process)!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
-    print (strstore %1 "Hello World (from detached process) after a runaway exception!")
+    print (string %1 "Hello World (from detached process) after a runaway exception!")
 
-    frame ^[(pamv %0 (istore %1 512))]
+    frame ^[(pamv %0 (integer %1 512))]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (strstore %1 "a_detached_concurrent_process"))]
+    frame ^[(pamv %0 (string %1 "a_detached_concurrent_process"))]
     call log_exiting_detached/1
 
     return
@@ -64,7 +64,7 @@
     arg (.name: %iota divide_what) %0
     arg (.name: %iota divide_by) %1
 
-    strstore (.name: %iota format_string) "#{0} / #{1}"
+    string (.name: %iota format_string) "#{0} / #{1}"
     frame ^[(param %0 %format_string) (param %1 %divide_what) (param %2 %divide_by)]
     move %0 (msg %iota format/)
 
@@ -73,7 +73,7 @@
 .function: a_division_executing_process/2
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (istore %1 128))]
+    frame ^[(pamv %0 (integer %1 128))]
     call std::misc::cycle/1
 
     .name: 1 divide_what
@@ -86,35 +86,35 @@
     izero %zero
 
     if (eq %4 %divide_by %zero) +1 __after_throw
-    throw (strstore %4 "cannot divide by zero")
+    throw (string %4 "cannot divide by zero")
     .mark: __after_throw
 
     div %0 %divide_what %divide_by
     echo %divide_what
-    echo (strstore %4 ' / ')
+    echo (string %4 ' / ')
     echo %divide_by
-    echo (strstore %4 ' = ')
+    echo (string %4 ' = ')
     print %0
 
     return
 .end
 
 .function: log_exiting_main/0
-    print (strstore %2 "process [  main  ]: 'main' exiting")
+    print (string %2 "process [  main  ]: 'main' exiting")
     return
 .end
 .function: log_exiting_detached/1
     arg %1 %0
-    echo (strstore %2 "process [detached]: '")
+    echo (string %2 "process [detached]: '")
     echo %1
-    print (strstore %2 "' exiting")
+    print (string %2 "' exiting")
     return
 .end
 .function: log_exiting_joined/0
     arg %1 %0
-    echo (strstore %2 "process [ joined ]: '")
+    echo (string %2 "process [ joined ]: '")
     echo %1
-    print (strstore %2 "' exiting")
+    print (string %2 "' exiting")
     return
 .end
 
@@ -126,7 +126,7 @@
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (istore %3 42)) (param %1 (istore %4 0))]
+    frame ^[(param %0 (integer %3 42)) (param %1 (integer %4 0))]
     process void a_division_executing_process/2
 
     frame %0

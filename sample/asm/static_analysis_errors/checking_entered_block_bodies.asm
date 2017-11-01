@@ -18,7 +18,7 @@
 ;
 
 .block: a_block
-    strstore %1 "Hello World!"
+    string %1 "Hello World!"
     leave
 .end
 

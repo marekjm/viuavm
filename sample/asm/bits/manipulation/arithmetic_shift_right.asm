@@ -19,7 +19,7 @@
 
 .function: main/0
     bits (.name: %iota bitstring) local 0b10000000000000000000000001100001
-    istore (.name: %iota offset) local 4
+    integer (.name: %iota offset) local 4
 
     print %bitstring local
 

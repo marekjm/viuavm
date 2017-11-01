@@ -39,7 +39,7 @@
     enter await_message
 
     if %times next_iteration
-    send %pid (strstore %3 "Hello World!")
+    send %pid (string %3 "Hello World!")
     return
 
     .mark: next_iteration
@@ -50,7 +50,7 @@
 .end
 
 .function: main/0
-    frame ^[(pamv %iota (istore %1 5)) (pamv %iota (self %1))]
+    frame ^[(pamv %iota (integer %1 5)) (pamv %iota (self %1))]
     process void message_sender/2
 
     print (receive %iota infinity)

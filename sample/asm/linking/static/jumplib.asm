@@ -18,12 +18,12 @@
 ;
 
 .function: jumprint/1
-    if (lt %2 (istore %2 local 42) local (arg %1 local %0) local) lesser +1
-    strstore %3 local ":-)"
+    if (lt %2 (integer %2 local 42) local (arg %1 local %0) local) lesser +1
+    string %3 local ":-)"
     jump +2
 
     .mark: lesser
-    strstore %3 local ":-("
+    string %3 local ":-("
 
     print %1 local
     print %3 local

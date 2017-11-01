@@ -293,8 +293,8 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
     int writes_to = 0;
     viua::internals::types::byte* register_index_ptr = (kernel.executionAt() + 1);
 
-    if (opcode == IZERO or opcode == ISTORE or opcode == IINC or opcode == IDEC or opcode == FSTORE or
-        opcode == BSTORE or opcode == STRSTORE or opcode == VEC or opcode == VINSERT or opcode == VPUSH or
+    if (opcode == IZERO or opcode == INTEGER or opcode == IINC or opcode == IDEC or opcode == FLOAT or
+        opcode == BSTORE or opcode == STRING or opcode == VECTOR or opcode == VINSERT or opcode == VPUSH or
         opcode == BOOL or opcode == NOT or opcode == DELETE or opcode == EMPTY) {
         register_index[0] = *reinterpret_cast<int*>(register_index_ptr + 1);
         writes_to = 1;
@@ -350,8 +350,8 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
     int writes_to = 0;
     viua::internals::types::byte* register_index_ptr = (kernel.executionAt() + 1);
 
-    if (opcode == IZERO or opcode == ISTORE or opcode == IINC or opcode == IDEC or opcode == FSTORE or
-        opcode == BSTORE or opcode == STRSTORE or opcode == VEC or opcode == VINSERT or opcode == VPUSH or
+    if (opcode == IZERO or opcode == INTEGER or opcode == IINC or opcode == IDEC or opcode == FLOAT or
+        opcode == BSTORE or opcode == STRING or opcode == VECTOR or opcode == VINSERT or opcode == VPUSH or
         opcode == BOOL or opcode == NOT or opcode == DELETE or opcode == EMPTY) {
         register_index[0] = *reinterpret_cast<int*>(register_index_ptr + 1);
         writes_to = 1;

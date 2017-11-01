@@ -751,7 +751,7 @@ class BitsManipulationTests(unittest.TestCase):
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
-    VEC instruction does not get its own test, but is used in every other vector test
+    VECTOR instruction does not get its own test, but is used in every other vector test
     so it gets pretty good coverage.
     """
     PATH = './sample/asm/vector'
@@ -761,15 +761,15 @@ class VectorInstructionsTests(unittest.TestCase):
 
     def testPackingVecRefusesToPackItself(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vector would pack itself',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToOutOfRegisterSetRange(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vector: packing outside of register set range',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToPackNullRegister(self):
         # pass --no-sa because we want to test runtime exception
-        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',), assembly_opts=('--no-sa',))
+        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vector: cannot pack null register',), assembly_opts=('--no-sa',))
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
@@ -1610,7 +1610,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: use of empty current register "1"')
 
     def testVinsertOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:22: error: use of empty current register "1"')
+        runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_of_empty_register.asm:21:25: error: use of empty current register "1"')
 
     def testVinsertIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', './sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: use of empty current register "2"')
@@ -1619,7 +1619,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'vpush_empties_registers.asm', './sample/asm/static_analysis_errors/vpush_empties_registers.asm:22:11: error: use of erased current register "1"')
 
     def testVpushOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', './sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:20: error: use of empty current register "1"')
+        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', './sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:23: error: use of empty current register "1"')
 
     def testVpushIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vpush_into_empty_register.asm', './sample/asm/static_analysis_errors/vpush_into_empty_register.asm:21:11: error: use of empty current register "2"')
@@ -1796,7 +1796,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'fstore_stores_floats.asm', [
             '22:10: error: invalid type of value contained in register',
             '22:10: note: expected integer, got float',
-            '21:12: note: register defined here',
+            '21:11: note: register defined here',
             '20:12: error: in function main/0',
         ])
 
@@ -1923,8 +1923,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testOverwriteOfUnused(self):
         runTestFailsToAssembleDetailed(self, 'overwrite_of_unused_value.asm', [
-            '22:12: error: overwrite of unused value:',
-            '21:12: note: unused value defined here:',
+            '22:13: error: overwrite of unused value:',
+            '21:13: note: unused value defined here:',
             '20:12: error: in function main/0',
         ])
 
@@ -2299,13 +2299,13 @@ class KeywordDefaultTests(unittest.TestCase):
         runTest(self, 'call.asm', '')
 
     def testDefaultInIstore(self):
-        runTest(self, 'istore.asm', '0')
+        runTest(self, 'integer.asm', '0')
 
     def testDefaultInFstore(self):
-        runTest(self, 'fstore.asm', '0.000000')
+        runTest(self, 'float.asm', '0.000000')
 
     def testDefaultInStrstore(self):
-        runTest(self, 'strstore.asm', 'default:')
+        runTest(self, 'string.asm', 'default:')
 
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
@@ -2657,7 +2657,7 @@ class AtomTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'comparing_with_different_type.asm', [
             '24:40: error: invalid type of value contained in register',
             '24:40: note: expected atom, got integer',
-            '22:20: note: register defined here',
+            '22:21: note: register defined here',
             '20:12: error: in function main/0',
         ])
 

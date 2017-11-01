@@ -21,8 +21,8 @@
 ; Its expected output is "true".
 
 .function: main/1
-    istore %1 4
-    istore %2 1
+    integer %1 4
+    integer %2 1
     gte %1 %1 %2
     print %1
     izero %0 local

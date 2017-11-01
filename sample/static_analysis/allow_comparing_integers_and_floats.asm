@@ -22,8 +22,8 @@
     .name: iota a_float
     .name: iota result
 
-    istore %an_integer local 42
-    fstore %a_float local 42.0
+    integer %an_integer local 42
+    float %a_float local 42.0
 
     eq %result local %an_integer local %a_float local
     print %result local

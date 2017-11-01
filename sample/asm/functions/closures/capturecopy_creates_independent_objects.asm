@@ -24,7 +24,7 @@
 .end
 
 .function: main/1
-    strstore %1 "Hello World!"
+    string %1 "Hello World!"
 
     closure %2 a_closure/0
     capturecopy %2 %1 %1
@@ -35,7 +35,7 @@
     call void %2
 
     ; this should not affect the object captured a "a_closure"
-    print (istore %1 42)
+    print (integer %1 42)
 
     ; call the closure
     frame %0

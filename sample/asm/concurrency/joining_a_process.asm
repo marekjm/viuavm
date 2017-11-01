@@ -43,10 +43,10 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (strstore %1 "Hello concurrent World! (1)"))]
+    frame ^[(param %0 (string %1 "Hello concurrent World! (1)"))]
     process %3 local print_lazy/1
 
-    frame ^[(param %0 (strstore %2 "Hello concurrent World! (2)"))]
+    frame ^[(param %0 (string %2 "Hello concurrent World! (2)"))]
     process %4 local print_lazy/1
 
     join void %3 local

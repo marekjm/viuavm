@@ -21,10 +21,10 @@
     bits (.name: %iota bitstring) local 0b10000000
     print %bitstring local
 
-    istore (.name: %iota index) local 0
+    integer (.name: %iota index) local 0
     bitset %bitstring local %index local true
 
-    istore %index local 7
+    integer %index local 7
     bitset %bitstring local %index local false
 
     print %bitstring local

@@ -20,7 +20,7 @@
 .signature: typesystem::typeof/1
 
 .function: main/0
-    strstore %1 "Hello World!"
+    string %1 "Hello World!"
     ptr %2 %1
     delete %1
 

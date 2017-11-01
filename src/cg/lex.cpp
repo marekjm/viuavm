@@ -395,7 +395,7 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "vec") {
+                    } else if (token == "vector") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
@@ -762,7 +762,7 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
                                                 "current");
                         }
-                    } else if (token == "istore") {
+                    } else if (token == "integer") {
                         tokens.push_back(token);                 // mnemonic
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -774,7 +774,7 @@ namespace viua {
                                                 "0");
                         }
                         continue;
-                    } else if (token == "fstore") {
+                    } else if (token == "float") {
                         tokens.push_back(token);                 // mnemonic
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -786,7 +786,7 @@ namespace viua {
                                                 "0.0");
                         }
                         continue;
-                    } else if (token == "strstore") {
+                    } else if (token == "string") {
                         tokens.push_back(token);                 // mnemonic
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -1093,7 +1093,7 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "vec") {
+                    } else if (token == "vector") {
                         tokens.push_back(input_tokens.at(++i));
 
                         string target_register_index = tokens.back();
@@ -1435,7 +1435,7 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
                                                 "current");
                         }
-                    } else if (token == "istore") {
+                    } else if (token == "integer") {
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
@@ -1446,7 +1446,7 @@ namespace viua {
                                                 "0");
                         }
                         continue;
-                    } else if (token == "fstore") {
+                    } else if (token == "float") {
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
@@ -1457,7 +1457,7 @@ namespace viua {
                                                 "0.0");
                         }
                         continue;
-                    } else if (token == "strstore") {
+                    } else if (token == "string") {
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
@@ -2374,21 +2374,21 @@ namespace viua {
                         tokens.back().original("default");
                         continue;
                     }
-                    if (match(input_tokens, i, {"istore", "", "default"})) {
+                    if (match(input_tokens, i, {"integer", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
                         tokens.back().original("default");
                         continue;
                     }
-                    if (match(input_tokens, i, {"fstore", "", "default"})) {
+                    if (match(input_tokens, i, {"float", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0.0");
                         tokens.back().original("default");
                         continue;
                     }
-                    if (match(input_tokens, i, {"strstore", "", "default"})) {
+                    if (match(input_tokens, i, {"string", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),

@@ -19,7 +19,7 @@
 
 .function: main/0
     izero %1 local
-    vec %2 local
+    vector %2 local
 
     vinsert %2 local %1 local void
 

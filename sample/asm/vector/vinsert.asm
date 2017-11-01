@@ -18,22 +18,22 @@
 ;
 
 .function: main/1
-    vec %1 local
+    vector %1 local
 
-    istore %0 local 0
-    vinsert %1 local (strstore %5 local "sheep!") local %0 local
-    vinsert %1 local (strstore %5 local "Hurr") local %0 local
+    integer %0 local 0
+    vinsert %1 local (string %5 local "sheep!") local %0 local
+    vinsert %1 local (string %5 local "Hurr") local %0 local
 
-    istore %0 local 1
-    vinsert %1 local (strstore %5 local "durr") local %0 local
+    integer %0 local 1
+    vinsert %1 local (string %5 local "durr") local %0 local
 
-    istore %0 local 2
-    vinsert %1 local (strstore %5 local "Im'a") local %0 local
+    integer %0 local 2
+    vinsert %1 local (string %5 local "Im'a") local %0 local
 
     .name: 6 len
     .name: 7 counter
 
-    istore %counter local 0
+    integer %counter local 0
     vlen %len local %1 local
 
     .mark: loop

@@ -24,7 +24,7 @@
 
 .function: main/0
     closure %1 local a_closure/0
-    istore %2 local 42
+    integer %2 local 42
 
     capturemove %1 local %2 %2 local
 

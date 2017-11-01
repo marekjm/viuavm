@@ -730,8 +730,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vec") {
-            ++i;  // the "vec" token
+        } else if (token == "vector") {
+            ++i;  // the "vector" token
 
             TokenIndex target = i;
             TokenIndex pack_range_start = target + 2;

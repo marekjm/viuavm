@@ -28,12 +28,12 @@
 
     ; these instructions are executed only when 1 register was null
     ; they first setup static counter variable
-    istore %1 0
+    integer %1 0
 
     ; then, switch to local registers and...
     ress local
     ; 1) fake taking counter from static registers (it's zero during first pass anyway)
-    istore %1 0
+    integer %1 0
     ; 2) fetch the argument
     arg %3 %0
     ; 3) jump straight to report mark
@@ -60,7 +60,7 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (istore %1 10))]
+    frame ^[(param %0 (integer %1 10))]
     call void counter/1
     izero %0 local
     return

@@ -26,9 +26,9 @@
 .end
 
 .block: failed_to_convert
-    echo (strstore %10 "guess: exception: ")
+    echo (string %10 "guess: exception: ")
     print (draw %9)
-    istore %3 -1
+    integer %3 -1
     leave
 .end
 
@@ -38,14 +38,14 @@
     import "io"
 
     ; random integer between 1 and 100
-    frame ^[(param %0 (istore %2 1)) (param %1 (istore %2 101))]
+    frame ^[(param %0 (integer %2 1)) (param %1 (integer %2 101))]
     call %1 std::random::randint
 
     ; enter zero to abort the game
     izero %0 local
 
     .mark: take_a_guess
-    strstore %2 "guess the number: "
+    string %2 "guess the number: "
     echo %2
 
     frame %0
@@ -59,19 +59,19 @@
     if (eq %4 %3 %1) correct
 
     if (lt %4 %3 %1) +1 +3
-    strstore %4 "guess: your number is less than the target"
+    string %4 "guess: your number is less than the target"
     jump incorrect
-    strstore %4 "guess: your number is greater than the target"
+    string %4 "guess: your number is greater than the target"
     .mark: incorrect
     print %4
     jump take_a_guess
 
     .mark: correct
-    print (strstore %2 "guess: correct")
+    print (string %2 "guess: correct")
     jump exit
 
     .mark: abort
-    echo (strstore %2 "game aborted: target number was ")
+    echo (string %2 "game aborted: target number was ")
     print %1
 
     .mark: exit

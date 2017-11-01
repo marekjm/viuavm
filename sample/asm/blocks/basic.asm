@@ -18,7 +18,7 @@
 ;
 
 .block: main_block
-    istore %1 42
+    integer %1 42
     leave
 .end
 

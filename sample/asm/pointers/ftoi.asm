@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (fstore (.name: %iota o) 0.00)
+    ptr (.name: %iota pointer) (float (.name: %iota o) 0.00)
     print (ftoi %iota *pointer)
 
     izero %0 local

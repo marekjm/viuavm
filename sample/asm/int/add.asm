@@ -18,15 +18,15 @@
 ;
 
 ; This file test support for add instruction and
-; support for negative numbers in istore.
+; support for negative numbers in integer.
 ; The nagative-numbers thingy is just nice-to-have and not the
 ; true porpose of this script, though.
 
 .function: main/1
-    istore %1 4
-    istore %2 -3
+    integer %1 4
+    integer %2 -3
     add %3 %1 %2
-    istore %4 0
+    integer %4 0
     add %3 %3 %4
     print %3
     izero %0 local

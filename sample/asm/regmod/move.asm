@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    print (move %2 (istore %1 1))
+    print (move %2 (integer %1 1))
 
     izero %0 local
     return

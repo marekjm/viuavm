@@ -33,7 +33,7 @@
     arg %2 %1
 
     ; vector for filtered values
-    vec %3
+    vector %3
 
     ; initial loop counter and
     ; loop termination variable
@@ -121,7 +121,7 @@
     arg %2 %1
 
     ; new vector to store mapped values
-    vec %3
+    vector %3
 
     ; set initial counter value and
     ; loop termination variable

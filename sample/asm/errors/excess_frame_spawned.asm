@@ -23,7 +23,7 @@
 .end
 
 .function: another_valid/0
-    frame ^[(pamv %0 (strstore %1 "Hello World!"))]
+    frame ^[(pamv %0 (string %1 "Hello World!"))]
     frame
     tailcall valid/1
 .end

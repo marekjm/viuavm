@@ -295,7 +295,7 @@ static void check_main_function(const string& main_function, const vector<Token>
     }
     auto last_instruction = main_function_tokens.at(i);
     if (not(last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or
-            last_instruction == "izero" or last_instruction == "istore")) {
+            last_instruction == "izero" or last_instruction == "integer")) {
         throw viua::cg::lex::InvalidSyntax(last_instruction,
                                            ("main function does not return a value: " + main_function));
     }

@@ -22,8 +22,8 @@
     .name: 2 modulo
     .name: 3 result
 
-    istore %number 166737
-    istore %modulo 176
+    integer %number 166737
+    integer %modulo 176
 
     copy %result %number
 

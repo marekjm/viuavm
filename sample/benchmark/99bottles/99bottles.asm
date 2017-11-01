@@ -5,7 +5,7 @@
     .end
     enter .block: xreceiver
         receive %1 500ms
-        print (strstore %2 "")
+        print (string %2 "")
         leave
     .end
 
@@ -38,10 +38,10 @@
     arg (.name: %iota how_many_bottles) 0
 
     .name: %iota bottles_format_string
-    if (eq %iota %how_many_bottles (istore %iota 1)) +1 +3
-    strstore %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\nNo more bottles on the wall.\n"
+    if (eq %iota %how_many_bottles (integer %iota 1)) +1 +3
+    string %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\nNo more bottles on the wall.\n"
     jump +2
-    strstore %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\n#{1} bottles on the wall.\n"
+    string %bottles_format_string "#{0} bottles on the wall,\nTake one down, pass it around,\n#{1} bottles on the wall.\n"
 
     move %0 %bottles_format_string
     return
@@ -54,7 +54,7 @@
 
     copy (.name: %iota current_number_of_bottles) how_many_bottles
     idec (copy (.name: %iota one_less) current_number_of_bottles)
-    vec (.name: %iota format_params) current_number_of_bottles 2
+    vector (.name: %iota format_params) current_number_of_bottles 2
 
     frame ^[(param %iota %bottles_format_string) (param %iota %format_params)]
     move %0 (msg %bottles_format_string format/)

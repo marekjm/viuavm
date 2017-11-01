@@ -22,7 +22,7 @@
     .name: 1 target
     .name: 2 source
     .name: 3 key
-    remove %target %source (strstore %key "key")
+    remove %target %source (string %key "key")
 
     izero %0 local
     return

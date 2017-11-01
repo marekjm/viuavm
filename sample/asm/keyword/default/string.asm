@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    echo (strstore %iota "default: ")
-    print (strstore %iota default)
+    echo (string %iota "default: ")
+    print (string %iota default)
 
     izero %0 local
     return

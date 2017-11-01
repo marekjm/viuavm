@@ -22,7 +22,7 @@
 
     iinc *1 local
 
-    vec %3 local
+    vector %3 local
     stoi %2 local %1 local
 
     izero %0 local

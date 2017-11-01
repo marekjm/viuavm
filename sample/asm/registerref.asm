@@ -21,8 +21,8 @@
 ; integer related instructions.
 
 .function: foo/0
-    istore %1 %16
-    istore %16 1
+    integer %1 %16
+    integer %16 1
 
     print %1
     print @1

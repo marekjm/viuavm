@@ -40,7 +40,7 @@
     ; makes registers 0, 2, 4 and 4 available to user's code.
 
     ; vector for parameter storing
-    vec %2
+    vector %2
 
     ; loop counter and termination variable
     ; loop counter is the number of parameters current function has been called with
@@ -85,8 +85,8 @@
     arg (.name: %iota counter) %0
 
     .name: iota i
-    sub %counter %counter (istore %i 9)
-    div %counter %counter (istore %i 2)
+    sub %counter %counter (integer %i 9)
+    div %counter %counter (integer %i 2)
 
     izero (.name: %iota zero)
 

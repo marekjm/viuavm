@@ -28,7 +28,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opstrstore(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opstring(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
