@@ -57,6 +57,23 @@ static auto binary_increment(vector<bool> const& v) -> pair<bool, vector<bool>> 
 
     return { carry, incremented };
 }
+static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> {
+    auto borrow = false;
+    auto decremented = v;
+
+    for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
+        if (v.at(i)) {
+            decremented.at(i) = false;
+            borrow = false;
+            break;
+        } else {
+            decremented.at(i) = true;
+            borrow = true;
+        }
+    }
+
+    return { borrow, decremented };
+}
 static auto take_twos_complement[[maybe_unused]](vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
@@ -329,21 +346,9 @@ auto viua::types::Bits::increment() -> bool {
 }
 
 auto viua::types::Bits::decrement() -> bool {
-    bool borrow = false;
-
-    for (auto i = size_type{0}; i < size(); ++i) {
-        if (at(i)) {
-            set(i, false);
-            borrow = false;
-            break;
-        }
-        if (not at(i)) {
-            set(i, true);
-            borrow = true;
-        }
-    }
-
-    return borrow;
+    auto result = binary_decrement(underlying_array);
+    underlying_array = std::move(result.second);
+    return result.first;
 }
 
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
