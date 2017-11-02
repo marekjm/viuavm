@@ -55,7 +55,7 @@ static auto binary_increment(vector<bool> const& v) -> pair<bool, vector<bool>> 
         }
     }
 
-    return { carry, incremented };
+    return {carry, incremented};
 }
 static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> {
     auto borrow = false;
@@ -72,7 +72,7 @@ static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> 
         }
     }
 
-    return { borrow, decremented };
+    return {borrow, decremented};
 }
 static auto take_twos_complement[[maybe_unused]](vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
@@ -389,13 +389,9 @@ auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
     return perform_bitwise_logic<bit_xor<bool>>(*this, that);
 }
 
-viua::types::Bits::Bits(vector<bool>&& bs) {
-    underlying_array = std::move(bs);
-}
+viua::types::Bits::Bits(vector<bool>&& bs) { underlying_array = std::move(bs); }
 
-viua::types::Bits::Bits(vector<bool> const & bs) {
-    underlying_array = bs;
-}
+viua::types::Bits::Bits(vector<bool> const& bs) { underlying_array = bs; }
 
 viua::types::Bits::Bits(size_type i) {
     underlying_array.reserve(i);
