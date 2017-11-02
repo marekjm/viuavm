@@ -511,6 +511,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case ASHR:
         case WRAPADD:
         case WRAPMUL:
+        case WRAPDIV:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
