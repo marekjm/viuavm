@@ -130,6 +130,7 @@ class Program {
     Program& opwrapdecrement(int_op);
     Program& opwrapadd(int_op, int_op, int_op);
     Program& opwrapmul(int_op, int_op, int_op);
+    Program& opwrapdiv(int_op, int_op, int_op);
 
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);

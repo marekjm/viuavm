@@ -335,6 +335,11 @@ Program& Program::opwrapmul(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opwrapdiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opwrapdiv(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *

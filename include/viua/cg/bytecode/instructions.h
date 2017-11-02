@@ -135,6 +135,7 @@ namespace cg {
         viua::internals::types::byte* opwrapdecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opwrapadd(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opwrapmul(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opwrapdiv(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opmove(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opcopy(viua::internals::types::byte*, int_op, int_op);
