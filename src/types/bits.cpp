@@ -358,6 +358,9 @@ auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
         binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }
+auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(underlying_array);
+}
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {
     return (size() == that.size() and underlying_array == that.underlying_array);

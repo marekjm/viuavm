@@ -257,6 +257,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case WRAPMUL:
             addr = opwrapmul(addr + 1);
             break;
+        case WRAPDIV:
+            addr = opwrapdiv(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;

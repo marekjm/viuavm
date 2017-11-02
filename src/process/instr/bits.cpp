@@ -282,3 +282,19 @@ viua::internals::types::byte* viua::process::Process::opwrapmul(viua::internals:
 
     return addr;
 }
+
+
+viua::internals::types::byte* viua::process::Process::opwrapdiv(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->wrapdiv(*rhs);
+
+    return addr;
+}
