@@ -319,31 +319,13 @@ auto viua::types::Bits::ror(size_type n) -> void {
 }
 
 auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
-    auto result = make_unique<Bits>(underlying_array.size());
-
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
-        result->set(i, not at(i));
-    }
-
-    return result;
+    return make_unique<Bits>(std::move(binary_inversion(underlying_array)));
 }
 
 auto viua::types::Bits::increment() -> bool {
-    bool carry = true;
-
-    for (auto i = size_type{0}; carry and i < size(); ++i) {
-        if (at(i)) {
-            set(i, false);
-            continue;
-        }
-        if (not at(i)) {
-            set(i, true);
-            carry = false;
-            continue;
-        }
-    }
-
-    return carry;
+    auto result = binary_increment(underlying_array);
+    underlying_array = std::move(result.second);
+    return result.first;
 }
 
 auto viua::types::Bits::decrement() -> bool {
@@ -397,6 +379,10 @@ auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
 
 auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
     return perform_bitwise_logic<bit_xor<bool>>(*this, that);
+}
+
+viua::types::Bits::Bits(vector<bool>&& bs) {
+    underlying_array = std::move(bs);
 }
 
 viua::types::Bits::Bits(vector<bool> const & bs) {
