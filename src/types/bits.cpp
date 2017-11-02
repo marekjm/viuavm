@@ -399,11 +399,8 @@ auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
     return perform_bitwise_logic<bit_xor<bool>>(*this, that);
 }
 
-viua::types::Bits::Bits(const vector<bool>& bs) {
-    underlying_array.reserve(bs.size());
-    for (const auto each : bs) {
-        underlying_array.push_back(each);
-    }
+viua::types::Bits::Bits(vector<bool> const & bs) {
+    underlying_array = bs;
 }
 
 viua::types::Bits::Bits(size_type i) {

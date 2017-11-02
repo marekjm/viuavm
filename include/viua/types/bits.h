@@ -78,7 +78,7 @@ namespace viua {
 
             std::unique_ptr<Value> copy() const override;
 
-            Bits(const std::vector<bool>&);
+            Bits(std::vector<bool> const&);
             Bits(const size_type);
             Bits(const size_type, const uint8_t*);
         };
