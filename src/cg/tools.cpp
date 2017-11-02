@@ -624,19 +624,19 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_fixedincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitsincrement(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_fixeddecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitsdecrement(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_fixedadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitsadd(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_fixedmul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitsmul(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
@@ -1368,16 +1368,16 @@ namespace viua {
                         tie(increase, i) = size_of_ror(tokens, i);
                     } else if (tokens.at(i) == "wrapincrement") {
                         ++i;
-                        tie(increase, i) = size_of_fixedincrement(tokens, i);
+                        tie(increase, i) = size_of_bitsincrement(tokens, i);
                     } else if (tokens.at(i) == "wrapdecrement") {
                         ++i;
-                        tie(increase, i) = size_of_fixeddecrement(tokens, i);
+                        tie(increase, i) = size_of_bitsdecrement(tokens, i);
                     } else if (tokens.at(i) == "wrapadd") {
                         ++i;
-                        tie(increase, i) = size_of_fixedadd(tokens, i);
+                        tie(increase, i) = size_of_bitsadd(tokens, i);
                     } else if (tokens.at(i) == "wrapmul") {
                         ++i;
-                        tie(increase, i) = size_of_fixedmul(tokens, i);
+                        tie(increase, i) = size_of_bitsmul(tokens, i);
                     } else if (tokens.at(i) == "move") {
                         ++i;
                         tie(increase, i) = size_of_move(tokens, i);
