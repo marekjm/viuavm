@@ -213,6 +213,34 @@ auto viua::types::Bits::decrement() -> bool {
 /*
  * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
+static auto binary_inversion(vector<bool> const& v) -> vector<bool> {
+    auto inverted = vector<bool>{};
+    inverted.reserve(v.size());
+
+    for (auto const each : v) {
+        inverted.push_back(not each);
+    }
+
+    return inverted;
+}
+static auto binary_increment(vector<bool> const& v) -> pair<bool, vector<bool>> {
+    auto carry = true;
+    auto incremented = v;
+
+    for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size(); ++i) {
+        if (v.at(i)) {
+            incremented.at(i) = false;
+        } else {
+            incremented.at(i) = true;
+            carry = false;
+        }
+    }
+
+    return { carry, incremented };
+}
+static auto take_twos_complement[[maybe_unused]](vector<bool> const& v) -> vector<bool> {
+    return binary_increment(binary_inversion(v)).second;
+}
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<bool> result;
     auto size_of_result = std::max(lhs.size(), rhs.size());
