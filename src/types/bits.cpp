@@ -187,6 +187,78 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
         intermediates.begin(), intermediates.end(), vector<bool>{},
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
 }
+static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
+    -> pair<vector<bool>, vector<bool>> {
+    auto shifted = vector<bool>{};
+    shifted.reserve(n);
+    for (auto i = decltype(n){0}; i < n; ++i) {
+        shifted.push_back(false);
+    }
+
+    if (n >= v.size()) {
+        for (auto i = decltype(n){0}; i < v.size(); ++i) {
+            shifted.at(i) = v.at(i);
+        }
+        return {shifted, binary_fill_with_zeroes(std::move(v))};
+    }
+
+    for (auto i = decltype(n){0}; i < v.size(); ++i) {
+        auto index_to_set = i;
+        auto index_of_value = i + n;
+        auto index_to_set_in_shifted = i;
+
+        if (index_of_value < v.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_of_value) = padding;
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = padding;
+        }
+    }
+
+    return {shifted, v};
+}
+static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
+    -> pair<vector<bool>, vector<bool>> {
+    auto shifted = vector<bool>{};
+    shifted.reserve(n);
+    for (auto i = decltype(n){0}; i < n; ++i) {
+        shifted.push_back(false);
+    }
+
+    if (n >= v.size()) {
+        for (auto i = decltype(n){0}; i < v.size(); ++i) {
+            shifted.at(shifted.size() - 1 - i) = v.at(v.size() - 1 - i);
+        }
+        return {shifted, binary_fill_with_zeroes(std::move(v))};
+    }
+
+    for (auto i = decltype(n){0}; i < v.size(); ++i) {
+        auto index_to_set = v.size() - i - 1;
+        auto index_of_value = v.size() - n - i - 1;
+        auto index_to_set_in_shifted = n - i - 1;
+
+        if (index_of_value < v.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_of_value) = false;
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = false;
+        }
+    }
+
+    return {shifted, v};
+}
 static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
     -> vector<bool> {
     vector<bool> result;
@@ -241,69 +313,15 @@ auto viua::types::Bits::clear() -> void {
 }
 
 auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
-    auto shifted = make_unique<Bits>(n);
-
-    if (n >= underlying_array.size()) {
-        for (auto i = size_type{0}; i < underlying_array.size(); ++i) {
-            shifted->set((shifted->size() - 1 - i), at(size() - 1 - i));
-        }
-        clear();
-        return shifted;
-    }
-
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
-        auto index_to_set = underlying_array.size() - 1 - i;
-        auto index_of_value = underlying_array.size() - 1 - i - n;
-        auto index_to_set_in_shifted = (n - 1 - i);
-
-        if (index_of_value < underlying_array.size()) {
-            if (index_to_set_in_shifted < n) {
-                shifted->set(index_to_set_in_shifted, at(index_to_set));
-            }
-            set(index_to_set, at(index_of_value));
-            set(index_of_value, false);
-        } else {
-            if (index_to_set_in_shifted < n) {
-                shifted->set(index_to_set_in_shifted, at(index_to_set));
-            }
-            set(index_to_set, false);
-        }
-    }
-
-    return shifted;
+    auto result = binary_shl(underlying_array, n);
+    underlying_array = std::move(result.second);
+    return make_unique<Bits>(result.first);
 }
 
 auto viua::types::Bits::shr(size_type n, const bool padding) -> unique_ptr<Bits> {
-    auto shifted = make_unique<Bits>(n);
-
-    if (n >= underlying_array.size()) {
-        for (auto i = size_type{0}; i < size(); ++i) {
-            shifted->set(i, at(i));
-        }
-        clear();
-        return shifted;
-    }
-
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
-        auto index_to_set = i;
-        auto index_of_value = i + n;
-        auto index_to_set_in_shifted = i;
-
-        if (index_of_value < underlying_array.size()) {
-            if (index_to_set_in_shifted < n) {
-                shifted->set(index_to_set_in_shifted, at(index_to_set));
-            }
-            set(index_to_set, at(index_of_value));
-            set(index_of_value, padding);
-        } else {
-            if (index_to_set_in_shifted < n) {
-                shifted->set(index_to_set_in_shifted, at(index_to_set));
-            }
-            set(index_to_set, padding);
-        }
-    }
-
-    return shifted;
+    auto result = binary_shr(underlying_array, n, padding);
+    underlying_array = std::move(result.second);
+    return make_unique<Bits>(result.first);
 }
 
 auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> { return shr(n, false); }
