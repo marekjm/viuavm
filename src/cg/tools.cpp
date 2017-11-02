@@ -640,6 +640,10 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_bitsdiv(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_move(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
@@ -1378,6 +1382,9 @@ namespace viua {
                     } else if (tokens.at(i) == "wrapmul") {
                         ++i;
                         tie(increase, i) = size_of_bitsmul(tokens, i);
+                    } else if (tokens.at(i) == "wrapdiv") {
+                        ++i;
+                        tie(increase, i) = size_of_bitsdiv(tokens, i);
                     } else if (tokens.at(i) == "move") {
                         ++i;
                         tie(increase, i) = size_of_move(tokens, i);
