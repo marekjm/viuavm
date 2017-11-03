@@ -162,8 +162,17 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
 
     return result;
 }
+static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
+    v.reserve(n);
+    while (v.size() < n) {
+        v.push_back(false);
+    }
+    return v;
+}
 static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
-    return binary_clip(binary_addition(lhs, take_twos_complement(rhs)), lhs.size());
+    return binary_clip(binary_addition(binary_expand(lhs, max(lhs.size(), rhs.size())),
+                                       take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())))),
+                       lhs.size());
 }
 static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<vector<bool>> intermediates;
@@ -285,13 +294,6 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
     }
 
     return {shifted, v};
-}
-static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
-    v.reserve(n);
-    while (v.size() < n) {
-        v.push_back(false);
-    }
-    return v;
 }
 static auto binary_lt(vector<bool> lhs, vector<bool> rhs) -> bool {
     lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
