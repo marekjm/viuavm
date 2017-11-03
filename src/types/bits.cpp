@@ -84,7 +84,7 @@ static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> 
 
     return {borrow, decremented};
 }
-static auto take_twos_complement[[maybe_unused]](vector<bool> const& v) -> vector<bool> {
+static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
@@ -161,6 +161,9 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
     }
 
     return result;
+}
+static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
+    return binary_clip(binary_addition(lhs, take_twos_complement(rhs)), lhs.size());
 }
 static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<vector<bool>> intermediates;
