@@ -187,6 +187,12 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
         intermediates.begin(), intermediates.end(), vector<bool>{},
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
 }
+static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
+    for (auto i = decltype(v)::size_type{0}; i < v.size(); ++i) {
+        v[i] = false;
+    }
+    return v;
+}
 static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
     -> pair<vector<bool>, vector<bool>> {
     auto shifted = vector<bool>{};
