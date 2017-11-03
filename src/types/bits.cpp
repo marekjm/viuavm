@@ -286,6 +286,42 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
 
     return {shifted, v};
 }
+static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
+    v.reserve(n);
+    while (v.size() < n) {
+        v.push_back(false);
+    }
+    return v;
+}
+static auto binary_lt(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = lhs.size(); i; --i) {
+        if (lhs.at(i - 1) < rhs.at(i - 1)) {
+            // definitely lhs < rhs
+            return true;
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+            // totally lhs > rhs
+            return false;
+        }
+    }
+    // probably equal to each other
+    return false;
+}
+static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
+        if (lhs.at(i) != rhs.at(i)) {
+            return false;
+        }
+    }
+
+    // yep, they are equal
+    return true;
+}
 
 
 const string viua::types::Bits::type_name = "Bits";
