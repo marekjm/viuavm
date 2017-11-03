@@ -425,6 +425,9 @@ auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
         binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
+    if (not that.boolean()) {
+        throw new viua::types::Exception("division by zero");
+    }
     return make_unique<Bits>(underlying_array);
 }
 
