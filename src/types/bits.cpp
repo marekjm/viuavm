@@ -187,6 +187,14 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
         intermediates.begin(), intermediates.end(), vector<bool>{},
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
 }
+static auto binary_to_bool(vector<bool> const& v) -> bool {
+    for (auto const each : v) {
+        if (each) {
+            return true;
+        }
+    }
+    return false;
+}
 static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
     for (auto i = decltype(v)::size_type{0}; i < v.size(); ++i) {
         v[i] = false;
@@ -292,12 +300,7 @@ string viua::types::Bits::str() const {
 }
 
 bool viua::types::Bits::boolean() const {
-    for (const auto i : underlying_array) {
-        if (i) {
-            return true;
-        }
-    }
-    return false;
+    return binary_to_bool(underlying_array);
 }
 
 unique_ptr<viua::types::Value> viua::types::Bits::copy() const { return make_unique<Bits>(underlying_array); }
