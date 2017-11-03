@@ -32,6 +32,16 @@ using namespace viua::types;
 /*
  * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
+static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
+    -> vector<bool> {
+    vector<bool> result;
+    result.reserve(width);
+    std::fill_n(std::back_inserter(result), width, false);
+
+    std::copy_n(bits.begin(), std::min(bits.size(), width), result.begin());
+
+    return result;
+}
 static auto binary_inversion(vector<bool> const& v) -> vector<bool> {
     auto inverted = vector<bool>{};
     inverted.reserve(v.size());
@@ -272,16 +282,6 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
     }
 
     return {shifted, v};
-}
-static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
-    -> vector<bool> {
-    vector<bool> result;
-    result.reserve(width);
-    std::fill_n(std::back_inserter(result), width, false);
-
-    std::copy_n(bits.begin(), std::min(bits.size(), width), result.begin());
-
-    return result;
 }
 
 
