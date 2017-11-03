@@ -322,6 +322,25 @@ static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
     // yep, they are equal
     return true;
 }
+static auto binary_division(vector<bool> const & dividend, vector<bool> const & rhs) -> vector<bool> {
+    auto quotinent = vector<bool>{};
+    auto remainder = dividend;
+    auto divisor = rhs;
+
+    quotinent.reserve(remainder.size());
+    std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
+
+    if (binary_eq(divisor, dividend)) {
+        return binary_increment(quotinent).second;
+    }
+
+    while (binary_lt(divisor, remainder)) {
+        remainder = binary_subtraction(remainder, divisor);
+        quotinent = binary_increment(quotinent).second;
+    }
+
+    return quotinent;
+}
 
 
 const string viua::types::Bits::type_name = "Bits";
@@ -428,7 +447,7 @@ auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
     if (not that.boolean()) {
         throw new viua::types::Exception("division by zero");
     }
-    return make_unique<Bits>(underlying_array);
+    return make_unique<Bits>(binary_clip(binary_division(underlying_array, that.underlying_array), size()));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {
