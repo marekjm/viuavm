@@ -766,6 +766,9 @@ class BitsArithmeticTests(unittest.TestCase):
     def testMultiplication(self):
         runTest(self, 'multiplication.asm', '00101000')
 
+    def testDivisionOfSame(self):
+        runTest(self, 'division_of_same.asm', '00000001')
+
     def testMultiplicationCuts(self):
         runTest(self, 'multiplication_cuts_to_width_of_lhs.asm', '11100110')
 
