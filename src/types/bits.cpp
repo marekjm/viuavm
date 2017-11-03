@@ -259,8 +259,7 @@ static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool cons
 
     return {shifted, v};
 }
-static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
-    -> pair<vector<bool>, vector<bool>> {
+static auto binary_shl(vector<bool> v, decltype(v)::size_type const n) -> pair<vector<bool>, vector<bool>> {
     auto shifted = vector<bool>{};
     shifted.reserve(n);
     for (auto i = decltype(n){0}; i < n; ++i) {
@@ -324,7 +323,7 @@ static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
     // yep, they are equal
     return true;
 }
-static auto binary_division(vector<bool> const & dividend, vector<bool> const & rhs) -> vector<bool> {
+static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs) -> vector<bool> {
     auto quotinent = vector<bool>{};
     auto remainder = dividend;
     auto divisor = rhs;
@@ -359,9 +358,7 @@ string viua::types::Bits::str() const {
     return oss.str();
 }
 
-bool viua::types::Bits::boolean() const {
-    return binary_to_bool(underlying_array);
-}
+bool viua::types::Bits::boolean() const { return binary_to_bool(underlying_array); }
 
 unique_ptr<viua::types::Value> viua::types::Bits::copy() const { return make_unique<Bits>(underlying_array); }
 
