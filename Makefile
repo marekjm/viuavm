@@ -224,7 +224,7 @@ build/scheduler/%.o: src/scheduler/%.cpp
 build/kernel/%.o: src/kernel/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/stdlib/std/%.vlib: src/stdlib/viua/%.asm
+build/stdlib/std/%.vlib: src/stdlib/viua/%.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/%.o: src/stdlib/%.cpp
