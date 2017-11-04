@@ -420,7 +420,7 @@ auto viua::types::Bits::ror(size_type n) -> void {
 }
 
 auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
-    return make_unique<Bits>(std::move(binary_inversion(underlying_array)));
+    return make_unique<Bits>(binary_inversion(underlying_array));
 }
 
 auto viua::types::Bits::increment() -> bool {
