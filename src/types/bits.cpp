@@ -32,6 +32,19 @@ using namespace viua::types;
 /*
  * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
+static auto to_string(vector<bool> const& v, bool const with_prefix = false) -> string {
+    ostringstream oss;
+
+    if (with_prefix) {
+        oss << "0b";
+    }
+
+    for (auto i = v.size(); i; --i) {
+        oss << v.at(i - 1);
+    }
+
+    return oss.str();
+}
 static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
     -> vector<bool> {
     vector<bool> result;
@@ -349,13 +362,7 @@ const string viua::types::Bits::type_name = "Bits";
 string viua::types::Bits::type() const { return type_name; }
 
 string viua::types::Bits::str() const {
-    ostringstream oss;
-
-    for (size_type i = underlying_array.size(); i; --i) {
-        oss << underlying_array.at(i - 1);
-    }
-
-    return oss.str();
+    return to_string(underlying_array);
 }
 
 bool viua::types::Bits::boolean() const { return binary_to_bool(underlying_array); }
