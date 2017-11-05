@@ -97,6 +97,9 @@ static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> 
 
     return {borrow, decremented};
 }
+static auto binary_is_negative(vector<bool> const& v) -> bool {
+    return v.at(v.size() - 1);
+}
 static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
@@ -364,9 +367,25 @@ static auto binary_division(vector<bool> const& dividend, vector<bool> const& rh
         return binary_increment(quotinent).second;
     }
 
+    auto negative_divisor = binary_is_negative(divisor);
+    auto negative_dividend = binary_is_negative(dividend);
+    auto negative_quotinent = false;
+
+    if (negative_divisor) {
+        divisor = take_twos_complement(divisor);
+    }
+    if (negative_dividend) {
+        remainder = take_twos_complement(remainder);
+    }
+    negative_quotinent = ((negative_divisor or negative_dividend) and not (negative_divisor and negative_dividend));
+
     while (binary_lte(divisor, remainder)) {
         remainder = binary_subtraction(remainder, divisor);
         quotinent = binary_increment(quotinent).second;
+    }
+
+    if (negative_quotinent) {
+        quotinent = take_twos_complement(quotinent);
     }
 
     return quotinent;
