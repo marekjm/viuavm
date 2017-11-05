@@ -307,7 +307,23 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n) -> pair<v
 
     return {shifted, v};
 }
-static auto binary_lt(vector<bool> lhs, vector<bool> rhs) -> bool {
+static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = lhs.size(); i; --i) {
+        if (lhs.at(i - 1) < rhs.at(i - 1)) {
+            // definitely lhs < rhs
+            return true;
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+            // totally lhs > rhs
+            return false;
+        }
+    }
+    // equal to each other
+    return true;
+}
+static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs) -> bool {
     lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
     rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
 
@@ -348,7 +364,7 @@ static auto binary_division(vector<bool> const& dividend, vector<bool> const& rh
         return binary_increment(quotinent).second;
     }
 
-    while (binary_lt(divisor, remainder)) {
+    while (binary_lte(divisor, remainder)) {
         remainder = binary_subtraction(remainder, divisor);
         quotinent = binary_increment(quotinent).second;
     }
