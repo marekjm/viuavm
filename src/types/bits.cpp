@@ -97,9 +97,7 @@ static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> 
 
     return {borrow, decremented};
 }
-static auto binary_is_negative(vector<bool> const& v) -> bool {
-    return v.at(v.size() - 1);
-}
+static auto binary_is_negative(vector<bool> const& v) -> bool { return v.at(v.size() - 1); }
 static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
@@ -377,7 +375,8 @@ static auto binary_division(vector<bool> const& dividend, vector<bool> const& rh
     if (negative_dividend) {
         remainder = take_twos_complement(remainder);
     }
-    negative_quotinent = ((negative_divisor or negative_dividend) and not (negative_divisor and negative_dividend));
+    negative_quotinent =
+        ((negative_divisor or negative_dividend) and not(negative_divisor and negative_dividend));
 
     while (binary_lte(divisor, remainder)) {
         remainder = binary_subtraction(remainder, divisor);
@@ -396,9 +395,7 @@ const string viua::types::Bits::type_name = "Bits";
 
 string viua::types::Bits::type() const { return type_name; }
 
-string viua::types::Bits::str() const {
-    return to_string(underlying_array);
-}
+string viua::types::Bits::str() const { return to_string(underlying_array); }
 
 bool viua::types::Bits::boolean() const { return binary_to_bool(underlying_array); }
 
