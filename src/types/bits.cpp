@@ -97,10 +97,155 @@ static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> 
 
     return {borrow, decremented};
 }
-static auto binary_is_negative(vector<bool> const& v) -> bool { return v.at(v.size() - 1); }
+static auto binary_is_negative(vector<bool> const& v) -> bool {
+    return v.at(v.size() - 1);
+}
 static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
+static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
+    v.reserve(n);
+    while (v.size() < n) {
+        v.push_back(false);
+    }
+    return v;
+}
+static auto binary_to_bool(vector<bool> const& v) -> bool {
+    for (auto const each : v) {
+        if (each) {
+            return true;
+        }
+    }
+    return false;
+}
+static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
+    for (auto i = decltype(v)::size_type{0}; i < v.size(); ++i) {
+        v[i] = false;
+    }
+    return v;
+}
+
+
+static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = lhs.size(); i; --i) {
+        if (lhs.at(i - 1) < rhs.at(i - 1)) {
+            // definitely lhs < rhs
+            return true;
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+            // totally lhs > rhs
+            return false;
+        }
+    }
+    // equal to each other
+    return true;
+}
+static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = lhs.size(); i; --i) {
+        if (lhs.at(i - 1) < rhs.at(i - 1)) {
+            // definitely lhs < rhs
+            return true;
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+            // totally lhs > rhs
+            return false;
+        }
+    }
+    // probably equal to each other
+    return false;
+}
+static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
+        if (lhs.at(i) != rhs.at(i)) {
+            return false;
+        }
+    }
+
+    // yep, they are equal
+    return true;
+}
+
+
+static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
+    -> pair<vector<bool>, vector<bool>> {
+    auto shifted = vector<bool>{};
+    shifted.reserve(n);
+    for (auto i = decltype(n){0}; i < n; ++i) {
+        shifted.push_back(false);
+    }
+
+    if (n >= v.size()) {
+        for (auto i = decltype(n){0}; i < v.size(); ++i) {
+            shifted.at(i) = v.at(i);
+        }
+        return {shifted, binary_fill_with_zeroes(std::move(v))};
+    }
+
+    for (auto i = decltype(n){0}; i < v.size(); ++i) {
+        auto index_to_set = i;
+        auto index_of_value = i + n;
+        auto index_to_set_in_shifted = i;
+
+        if (index_of_value < v.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_of_value) = padding;
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = padding;
+        }
+    }
+
+    return {shifted, v};
+}
+static auto binary_shl(vector<bool> v, decltype(v)::size_type const n) -> pair<vector<bool>, vector<bool>> {
+    auto shifted = vector<bool>{};
+    shifted.reserve(n);
+    for (auto i = decltype(n){0}; i < n; ++i) {
+        shifted.push_back(false);
+    }
+
+    if (n >= v.size()) {
+        for (auto i = decltype(n){0}; i < v.size(); ++i) {
+            shifted.at(shifted.size() - 1 - i) = v.at(v.size() - 1 - i);
+        }
+        return {shifted, binary_fill_with_zeroes(std::move(v))};
+    }
+
+    for (auto i = decltype(n){0}; i < v.size(); ++i) {
+        auto index_to_set = v.size() - i - 1;
+        auto index_of_value = v.size() - n - i - 1;
+        auto index_to_set_in_shifted = n - i - 1;
+
+        if (index_of_value < v.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_of_value) = false;
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
+            }
+            v.at(index_to_set) = false;
+        }
+    }
+
+    return {shifted, v};
+}
+
+
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<bool> result;
     auto size_of_result = std::max(lhs.size(), rhs.size());
@@ -176,13 +321,6 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
 
     return result;
 }
-static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
-    v.reserve(n);
-    while (v.size() < n) {
-        v.push_back(false);
-    }
-    return v;
-}
 static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
     return binary_clip(binary_addition(binary_expand(lhs, max(lhs.size(), rhs.size())),
                                        take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())))),
@@ -222,136 +360,6 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
     return std::accumulate(
         intermediates.begin(), intermediates.end(), vector<bool>{},
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
-}
-static auto binary_to_bool(vector<bool> const& v) -> bool {
-    for (auto const each : v) {
-        if (each) {
-            return true;
-        }
-    }
-    return false;
-}
-static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
-    for (auto i = decltype(v)::size_type{0}; i < v.size(); ++i) {
-        v[i] = false;
-    }
-    return v;
-}
-static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
-    -> pair<vector<bool>, vector<bool>> {
-    auto shifted = vector<bool>{};
-    shifted.reserve(n);
-    for (auto i = decltype(n){0}; i < n; ++i) {
-        shifted.push_back(false);
-    }
-
-    if (n >= v.size()) {
-        for (auto i = decltype(n){0}; i < v.size(); ++i) {
-            shifted.at(i) = v.at(i);
-        }
-        return {shifted, binary_fill_with_zeroes(std::move(v))};
-    }
-
-    for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set = i;
-        auto index_of_value = i + n;
-        auto index_to_set_in_shifted = i;
-
-        if (index_of_value < v.size()) {
-            if (index_to_set_in_shifted < n) {
-                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
-            }
-            v.at(index_to_set) = v.at(index_of_value);
-            v.at(index_of_value) = padding;
-        } else {
-            if (index_to_set_in_shifted < n) {
-                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
-            }
-            v.at(index_to_set) = padding;
-        }
-    }
-
-    return {shifted, v};
-}
-static auto binary_shl(vector<bool> v, decltype(v)::size_type const n) -> pair<vector<bool>, vector<bool>> {
-    auto shifted = vector<bool>{};
-    shifted.reserve(n);
-    for (auto i = decltype(n){0}; i < n; ++i) {
-        shifted.push_back(false);
-    }
-
-    if (n >= v.size()) {
-        for (auto i = decltype(n){0}; i < v.size(); ++i) {
-            shifted.at(shifted.size() - 1 - i) = v.at(v.size() - 1 - i);
-        }
-        return {shifted, binary_fill_with_zeroes(std::move(v))};
-    }
-
-    for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set = v.size() - i - 1;
-        auto index_of_value = v.size() - n - i - 1;
-        auto index_to_set_in_shifted = n - i - 1;
-
-        if (index_of_value < v.size()) {
-            if (index_to_set_in_shifted < n) {
-                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
-            }
-            v.at(index_to_set) = v.at(index_of_value);
-            v.at(index_of_value) = false;
-        } else {
-            if (index_to_set_in_shifted < n) {
-                shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
-            }
-            v.at(index_to_set) = false;
-        }
-    }
-
-    return {shifted, v};
-}
-static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = lhs.size(); i; --i) {
-        if (lhs.at(i - 1) < rhs.at(i - 1)) {
-            // definitely lhs < rhs
-            return true;
-        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
-            // totally lhs > rhs
-            return false;
-        }
-    }
-    // equal to each other
-    return true;
-}
-static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = lhs.size(); i; --i) {
-        if (lhs.at(i - 1) < rhs.at(i - 1)) {
-            // definitely lhs < rhs
-            return true;
-        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
-            // totally lhs > rhs
-            return false;
-        }
-    }
-    // probably equal to each other
-    return false;
-}
-static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
-        if (lhs.at(i) != rhs.at(i)) {
-            return false;
-        }
-    }
-
-    // yep, they are equal
-    return true;
 }
 static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs) -> vector<bool> {
     auto quotinent = vector<bool>{};
