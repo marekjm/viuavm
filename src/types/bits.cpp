@@ -104,9 +104,10 @@ static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
 static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
+    auto expanding_value = (v.size() ? v.back() : false);
     v.reserve(n);
     while (v.size() < n) {
-        v.push_back(false);
+        v.push_back(expanding_value);
     }
     return v;
 }
