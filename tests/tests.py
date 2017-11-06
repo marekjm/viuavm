@@ -748,8 +748,8 @@ class BitsManipulationTests(unittest.TestCase):
         ])
 
 
-class BitsArithmeticTests(unittest.TestCase):
-    PATH = './sample/asm/bits/arithmetic'
+class BitsWrappingArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/wrapping'
 
     def testAddition(self):
         runTest(self, 'addition.asm', '00001010')
