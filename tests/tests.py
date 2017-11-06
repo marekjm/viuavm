@@ -826,6 +826,25 @@ class BitsWrappingArithmeticTests(unittest.TestCase):
         runTest(self, 'decrement_wraps_to_all_ones.asm', '11111111')
 
 
+class BitsSignedWrappingArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/signed_wrapping'
+
+class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
+
+class BitsSignedCheckedArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/signed_checked'
+
+class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/unsigned_checked'
+
+class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/signed_saturating'
+
+class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
+
+
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
