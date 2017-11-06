@@ -789,6 +789,20 @@ class BitsWrappingArithmeticTests(unittest.TestCase):
             '00000010',
         ])
 
+    def testDivisionMinusFourByTwo(self):
+        runTestSplitlines(self, 'division_minus_four_by_two.asm', [
+            '11111100',
+            '00000010',
+            '11111110',
+        ])
+
+    def testDivisionFourByMinusTwo(self):
+        runTestSplitlines(self, 'division_four_by_minus_two.asm', [
+            '00000100',
+            '11111110',
+            '11111110',
+        ])
+
     def testMultiplicationCuts(self):
         runTest(self, 'multiplication_cuts_to_width_of_lhs.asm', '11100110')
 
