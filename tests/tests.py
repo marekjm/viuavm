@@ -748,6 +748,7 @@ class BitsManipulationTests(unittest.TestCase):
         ])
 
 
+@unittest.skip('this was poorly thought out')
 class BitsWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/wrapping'
 
