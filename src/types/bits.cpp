@@ -45,6 +45,14 @@ static auto to_string(vector<bool> const& v, bool const with_prefix = false) -> 
 
     return oss.str();
 }
+static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
+    auto expanding_value = (v.size() ? v.back() : false);
+    v.reserve(n);
+    while (v.size() < n) {
+        v.push_back(expanding_value);
+    }
+    return v;
+}
 static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
     -> vector<bool> {
     vector<bool> result;
@@ -52,6 +60,7 @@ static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<declty
     std::fill_n(std::back_inserter(result), width, false);
 
     std::copy_n(bits.begin(), std::min(bits.size(), width), result.begin());
+    result = binary_expand(result, width);
 
     return result;
 }
@@ -102,14 +111,6 @@ static auto binary_is_negative(vector<bool> const& v) -> bool {
 }
 static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
     return binary_increment(binary_inversion(v)).second;
-}
-static auto binary_expand(vector<bool> v, decltype(v)::size_type const n) -> vector<bool> {
-    auto expanding_value = (v.size() ? v.back() : false);
-    v.reserve(n);
-    while (v.size() < n) {
-        v.push_back(expanding_value);
-    }
-    return v;
 }
 static auto binary_to_bool(vector<bool> const& v) -> bool {
     for (auto const each : v) {
