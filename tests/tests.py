@@ -760,51 +760,57 @@ class BitsWrappingArithmeticTests(unittest.TestCase):
     def testAdditionExtends(self):
         runTest(self, 'addition_extends_to_width_of_lhs.asm', '1111111100001010')
 
-    def testSubtraction(self):
-        runTest(self, 'subtraction.asm', '00000010')
+    def testAdditionWraps(self):
+        runTest(self, 'addition_wraps.asm', '00000001')
+
+    def testMultiplicationWraps(self):
+        runTest(self, 'multiplication_wraps.asm', '00000001')
 
     def testMultiplication(self):
         runTest(self, 'multiplication.asm', '00101000')
 
-    def testDivisionOfSame(self):
-        runTest(self, 'division_of_same.asm', '00000001')
-
-    def testDivisionSevenByTwo(self):
-        runTest(self, 'division_seven_by_two.asm', '00000011')
-
-    def testDivisionFourByFive(self):
-        runTest(self, 'division_four_by_five.asm', '00000000')
-
-    def testDivisionFourByTwo(self):
-        runTestSplitlines(self, 'division_four_by_two.asm', [
-            '00000100',
-            '00000010',
-            '00000010',
-        ])
-
-    def testDivisionMinusFourByMinusTwo(self):
-        runTestSplitlines(self, 'division_minus_four_by_minus_two.asm', [
-            '11111100',
-            '11111110',
-            '00000010',
-        ])
-
-    def testDivisionMinusFourByTwo(self):
-        runTestSplitlines(self, 'division_minus_four_by_two.asm', [
-            '11111100',
-            '00000010',
-            '11111110',
-        ])
-
-    def testDivisionFourByMinusTwo(self):
-        runTestSplitlines(self, 'division_four_by_minus_two.asm', [
-            '00000100',
-            '11111110',
-            '11111110',
-        ])
-
     def testMultiplicationCuts(self):
         runTest(self, 'multiplication_cuts_to_width_of_lhs.asm', '11100110')
+
+    def testSubtraction(self):
+        runTest(self, 'subtraction.asm', '00000010')
+
+    # def testDivisionOfSame(self):
+    #     runTest(self, 'division_of_same.asm', '00000001')
+
+    # def testDivisionSevenByTwo(self):
+    #     runTest(self, 'division_seven_by_two.asm', '00000011')
+
+    # def testDivisionFourByFive(self):
+    #     runTest(self, 'division_four_by_five.asm', '00000000')
+
+    # def testDivisionFourByTwo(self):
+    #     runTestSplitlines(self, 'division_four_by_two.asm', [
+    #         '00000100',
+    #         '00000010',
+    #         '00000010',
+    #     ])
+
+    # def testDivisionMinusFourByMinusTwo(self):
+    #     runTestSplitlines(self, 'division_minus_four_by_minus_two.asm', [
+    #         '11111100',
+    #         '11111110',
+    #         '00000010',
+    #     ])
+
+    # def testDivisionMinusFourByTwo(self):
+    #     runTestSplitlines(self, 'division_minus_four_by_two.asm', [
+    #         '11111100',
+    #         '00000010',
+    #         '11111110',
+    #     ])
+
+    # def testDivisionFourByMinusTwo(self):
+    #     runTestSplitlines(self, 'division_four_by_minus_two.asm', [
+    #         '00000100',
+    #         '11111110',
+    #         '11111110',
+    #     ])
 
     def testIncrement(self):
         runTest(self, 'increment.asm', '10001100')
