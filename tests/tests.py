@@ -829,6 +829,58 @@ class BitsWrappingArithmeticTests(unittest.TestCase):
 class BitsSignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/signed_wrapping'
 
+    def test_basic_addition(self):
+        runTestSplitlines(self, 'basic_addition.asm', [
+            '00000011',
+            '00000110',
+            '00001001',
+        ])
+
+    def test_overflowing_addition(self):
+        runTestSplitlines(self, 'overflowing_addition.asm', [
+            '01111111',
+            '00000111',
+            '10000110',
+        ])
+
+    def test_maximum_maximum_addition(self):
+        runTestSplitlines(self, 'maximum_maximum_addition.asm', [
+            '01111111',
+            '01111111',
+            '11111110',
+        ])
+
+    def test_minimum_minimum_addition(self):
+        runTestSplitlines(self, 'minimum_minimum_addition.asm', [
+            '10000000',
+            '10000000',
+            '00000000',
+        ])
+
+    def test_maximum_minimum_addition(self):
+        runTestSplitlines(self, 'maximum_minimum_addition.asm', [
+            '01111111',
+            '10000000',
+            '11111111',
+        ])
+
+    def test_minimum_maximum_addition(self):
+        runTestSplitlines(self, 'minimum_maximum_addition.asm', [
+            '10000000',
+            '01111111',
+            '11111111',
+        ])
+
+    def test_maximum_increment(self):
+        runTestSplitlines(self, 'maximum_increment.asm', [
+            '10000000',
+        ])
+
+    def test_minimum_decrement(self):
+        runTestSplitlines(self, 'minimum_decrement.asm', [
+            '01111111',
+        ])
+
 class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
 
