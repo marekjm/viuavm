@@ -350,8 +350,7 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
         }
 
         vector<bool> interm;
-
-        interm.reserve(interm.size() + lhs.size());
+        interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
         std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
