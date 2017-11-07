@@ -965,6 +965,13 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
             '10000000',
         ])
 
+    def test_ones_by_zeroes_multiplication(self):
+        runTestSplitlines(self, 'ones_by_zeroes_multiplication.asm', [
+            '11111111',
+            '00000000',
+            '00000000',
+        ])
+
 class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
 
