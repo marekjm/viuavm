@@ -972,6 +972,65 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_x_x_division(self):
+        runTestSplitlines(self, 'x_x_division.asm', [
+            '00001010',
+            '00001010',
+            '00000001',
+        ])
+
+    def test_maximum_maximum_division(self):
+        runTestSplitlines(self, 'maximum_maximum_division.asm', [
+            '01111111',
+            '01111111',
+            '00000001',
+        ])
+
+    def test_minimum_minimum_division(self):
+        runTestSplitlines(self, 'minimum_minimum_division.asm', [
+            '10000000',
+            '10000000',
+            '00000001',
+        ])
+
+    def test_maximum_minimum_division(self):
+        runTestSplitlines(self, 'maximum_minimum_division.asm', [
+            '01111111',
+            '10000000',
+            '00000000',
+        ])
+
+    def test_minimum_maximum_division(self):
+        runTestSplitlines(self, 'minimum_maximum_division.asm', [
+            '10000000',
+            '01111111',
+            '11111111',
+        ])
+
+    def test_maximum_minus_1_division(self):
+        runTestSplitlines(self, 'maximum_minus_1_division.asm', [
+            '01111111',
+            '11111111',
+            '10000001',
+        ])
+
+    def test_minimum_minus_1_division(self):
+        runTestSplitlines(self, 'minimum_minus_1_division.asm', [
+            '10000000',
+            '11111111',
+            '10000000',
+        ])
+
+    def test_x_zero_division(self):
+        runTestThrowsException(self, 'x_zero_division.asm', ('Exception', 'division by zero',))
+
+    def test_zero_x_division(self):
+        runTestSplitlines(self, 'zero_x_division.asm', [
+            '00000000',
+            '00000001',
+            '00000000',
+        ])
+
 class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
 
