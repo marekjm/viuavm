@@ -930,6 +930,41 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
             '00010010',
         ])
 
+    def test_overflowing_64x2_multiplication(self):
+        runTestSplitlines(self, 'overflowing_64x2_multiplication.asm', [
+            '01000000',
+            '00000010',
+            '10000000',
+        ])
+
+    def test_maximum_maximum_multiplication(self):
+        runTestSplitlines(self, 'maximum_maximum_multiplication.asm', [
+            '01111111',
+            '01111111',
+            '00000001',
+        ])
+
+    def test_minimum_minimum_multiplication(self):
+        runTestSplitlines(self, 'minimum_minimum_multiplication.asm', [
+            '10000000',
+            '10000000',
+            '00000000',
+        ])
+
+    def test_maximum_minimum_multiplication(self):
+        runTestSplitlines(self, 'maximum_minimum_multiplication.asm', [
+            '01111111',
+            '10000000',
+            '10000000',
+        ])
+
+    def test_minimum_maximum_multiplication(self):
+        runTestSplitlines(self, 'minimum_maximum_multiplication.asm', [
+            '10000000',
+            '01111111',
+            '10000000',
+        ])
+
 class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
 
