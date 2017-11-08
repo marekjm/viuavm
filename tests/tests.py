@@ -963,6 +963,16 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
 class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_wrapping'
 
+    def test_maximum_increment(self):
+        runTestSplitlines(self, 'maximum_increment.asm', [
+            '00000000',
+        ])
+
+    def test_minimum_decrement(self):
+        runTestSplitlines(self, 'minimum_decrement.asm', [
+            '11111111',
+        ])
+
 class BitsSignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/signed_checked'
 
