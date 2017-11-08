@@ -972,6 +972,13 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_basic_division(self):
+        runTestSplitlines(self, 'basic_division.asm', [
+            '00010010',
+            '00000010',
+            '00001001',
+        ])
+
     def test_x_x_division(self):
         runTestSplitlines(self, 'x_x_division.asm', [
             '00001010',
