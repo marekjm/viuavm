@@ -30,7 +30,7 @@ using namespace viua::types;
 
 
 /*
- * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
+ * Here's a cool resource for binary arithmetic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
 static auto to_string(vector<bool> const& v, bool const with_prefix = false) -> string {
     ostringstream oss;
@@ -74,44 +74,6 @@ static auto binary_inversion(vector<bool> const& v) -> vector<bool> {
 
     return inverted;
 }
-static auto binary_increment(vector<bool> const& v) -> pair<bool, vector<bool>> {
-    auto carry = true;
-    auto incremented = v;
-
-    for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size(); ++i) {
-        if (v.at(i)) {
-            incremented.at(i) = false;
-        } else {
-            incremented.at(i) = true;
-            carry = false;
-        }
-    }
-
-    return {carry, incremented};
-}
-static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> {
-    auto borrow = false;
-    auto decremented = v;
-
-    for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
-        if (v.at(i)) {
-            decremented.at(i) = false;
-            borrow = false;
-            break;
-        } else {
-            decremented.at(i) = true;
-            borrow = true;
-        }
-    }
-
-    return {borrow, decremented};
-}
-static auto binary_is_negative(vector<bool> const& v) -> bool {
-    return v.at(v.size() - 1);
-}
-static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
-    return binary_increment(binary_inversion(v)).second;
-}
 static auto binary_to_bool(vector<bool> const& v) -> bool {
     for (auto const each : v) {
         if (each) {
@@ -126,53 +88,7 @@ static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
     }
     return v;
 }
-
-
-static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = lhs.size(); i; --i) {
-        if (lhs.at(i - 1) < rhs.at(i - 1)) {
-            // definitely lhs < rhs
-            return true;
-        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
-            // totally lhs > rhs
-            return false;
-        }
-    }
-    // equal to each other
-    return true;
-}
-static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = lhs.size(); i; --i) {
-        if (lhs.at(i - 1) < rhs.at(i - 1)) {
-            // definitely lhs < rhs
-            return true;
-        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
-            // totally lhs > rhs
-            return false;
-        }
-    }
-    // probably equal to each other
-    return false;
-}
-static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-    for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
-        if (lhs.at(i) != rhs.at(i)) {
-            return false;
-        }
-    }
-
-    // yep, they are equal
-    return true;
-}
+static auto binary_is_negative(vector<bool> const& v) -> bool { return v.at(v.size() - 1); }
 
 
 static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
@@ -248,164 +164,257 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n) -> pair<v
 }
 
 
-static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
-    vector<bool> result;
-    auto size_of_result = std::max(lhs.size(), rhs.size());
-    result.reserve(size_of_result + 1);
-    std::fill_n(std::back_inserter(result), size_of_result, false);
+namespace viua {
+    namespace arithmetic {
+        namespace wrapping {
+            static auto binary_increment(vector<bool> const& v) -> pair<bool, vector<bool>> {
+                auto carry = true;
+                auto incremented = v;
 
-    bool carry = false;
+                for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        incremented.at(i) = false;
+                    } else {
+                        incremented.at(i) = true;
+                        carry = false;
+                    }
+                }
 
-    for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-        const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
-        const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+                return {carry, incremented};
+            }
+            static auto binary_decrement(vector<bool> const& v) -> pair<bool, vector<bool>> {
+                auto borrow = false;
+                auto decremented = v;
 
-        /*
-         * lhs + rhs -> 0 + 0 -> 0
-         *
-         * This is the easy case.
-         * Everything is zero, so we just carry the carry into the result at
-         * the current position, and reset the carry flag to zero (it was consumed).
-         */
-        if ((not from_rhs) and (not from_lhs)) {
-            result.at(i) = carry;
-            carry = false;
-            continue;
-        }
+                for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        decremented.at(i) = false;
+                        borrow = false;
+                        break;
+                    } else {
+                        decremented.at(i) = true;
+                        borrow = true;
+                    }
+                }
 
-        /*
-         * lhs + rhs -> 1 + 1 -> 10
-         *
-         * This gives us a zero on current position, and
-         * carry flag in the enabled state.
-         *
-         * If carry was enabled before we have 0 + 1 = 1, so we should
-         * enable bit on current position in the result.
-         * If carry was not enabled we have 0 + 0, so we should
-         * obviously leave the bit disabled in the result.
-         * This means that we can just copy state of the carry flag into
-         * the result bit string on current position.
-         */
-        if (from_rhs and from_lhs) {
-            result.at(i) = carry;
-            carry = true;
-            continue;
-        }
+                return {borrow, decremented};
+            }
+            static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
+                return binary_increment(binary_inversion(v)).second;
+            }
 
-        /*
-         * At this point either the lhs or rhs is enabled, but not both.
-         * So if the carry bit is enabled this gives us 1 + 1 = 10, so
-         * zero should be put in result on the current position, and
-         * carry flag should be enabled.
-         */
-        if (carry) {
-            continue;
-        }
 
-        /*
-         * All other cases.
-         * Either lhs or rhs is enabled, and carry is not.
-         * So this is the 0 + 1 = 1 case.
-         * Easy.
-         * Just enable the bit in the result.
-         */
-        result.at(i) = true;
-    }
+            static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
+                lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+                rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
 
-    /*
-     * If there was a carry during the last operation append it to the result.
-     * Basic binary addition is expanding.
-     * It can be made wrapping, checked, or saturating by "post-processing".
-     */
-    if (carry) {
-        result.push_back(carry);
-    }
+                for (auto i = lhs.size(); i; --i) {
+                    if (lhs.at(i - 1) < rhs.at(i - 1)) {
+                        // definitely lhs < rhs
+                        return true;
+                    } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+                        // totally lhs > rhs
+                        return false;
+                    }
+                }
+                // equal to each other
+                return true;
+            }
+            static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs) -> bool {
+                lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+                rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
 
-    return result;
-}
-static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
-    return binary_clip(binary_addition(binary_expand(lhs, max(lhs.size(), rhs.size())),
-                                       take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())))),
-                       lhs.size());
-}
-static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
-    vector<vector<bool>> intermediates;
-    intermediates.reserve(rhs.size());
+                for (auto i = lhs.size(); i; --i) {
+                    if (lhs.at(i - 1) < rhs.at(i - 1)) {
+                        // definitely lhs < rhs
+                        return true;
+                    } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+                        // totally lhs > rhs
+                        return false;
+                    }
+                }
+                // probably equal to each other
+                return false;
+            }
+            static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
+                lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+                rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
 
-    /*
-     * Make sure the result is *always* has at least one entry (in case the rhs is all zero bits), and
-     * that the results width is *always* the sum of operands' widths.
-     */
-    intermediates.emplace_back(lhs.size() + rhs.size());
+                for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
+                    if (lhs.at(i) != rhs.at(i)) {
+                        return false;
+                    }
+                }
 
-    for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0}; i < rhs.size(); ++i) {
-        if (not rhs.at(i)) {
-            /*
-             * Multiplication by 0 just gives a long string of zeroes.
-             * There is no reason to build all these zero-filled bit strings as
-             * they will only slow things down the road when all the intermediate
-             * bit strings are accumulated.
-             */
-            continue;
-        }
+                // yep, they are equal
+                return true;
+            }
 
-        vector<bool> interm;
-        interm.reserve(i + lhs.size());
-        std::fill_n(std::back_inserter(interm), i, false);
 
-        std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
+            static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
+                vector<bool> result;
+                auto size_of_result = std::max(lhs.size(), rhs.size());
+                result.reserve(size_of_result + 1);
+                std::fill_n(std::back_inserter(result), size_of_result, false);
 
-        intermediates.emplace_back(std::move(interm));
-    }
+                bool carry = false;
 
-    return std::accumulate(
-        intermediates.begin(), intermediates.end(), vector<bool>{},
-        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
-}
-static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs) -> vector<bool> {
-    auto quotinent = vector<bool>{};
-    auto remainder = dividend;
-    auto divisor = rhs;
+                for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
+                    const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+                    const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
 
-    quotinent.reserve(remainder.size());
-    std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
+                    /*
+                     * lhs + rhs -> 0 + 0 -> 0
+                     *
+                     * This is the easy case.
+                     * Everything is zero, so we just carry the carry into the result at
+                     * the current position, and reset the carry flag to zero (it was consumed).
+                     */
+                    if ((not from_rhs) and (not from_lhs)) {
+                        result.at(i) = carry;
+                        carry = false;
+                        continue;
+                    }
 
-    if (binary_eq(divisor, dividend)) {
-        return binary_increment(quotinent).second;
-    }
+                    /*
+                     * lhs + rhs -> 1 + 1 -> 10
+                     *
+                     * This gives us a zero on current position, and
+                     * carry flag in the enabled state.
+                     *
+                     * If carry was enabled before we have 0 + 1 = 1, so we should
+                     * enable bit on current position in the result.
+                     * If carry was not enabled we have 0 + 0, so we should
+                     * obviously leave the bit disabled in the result.
+                     * This means that we can just copy state of the carry flag into
+                     * the result bit string on current position.
+                     */
+                    if (from_rhs and from_lhs) {
+                        result.at(i) = carry;
+                        carry = true;
+                        continue;
+                    }
 
-    auto negative_divisor = binary_is_negative(divisor);
-    auto negative_dividend = binary_is_negative(dividend);
-    auto negative_quotinent = false;
+                    /*
+                     * At this point either the lhs or rhs is enabled, but not both.
+                     * So if the carry bit is enabled this gives us 1 + 1 = 10, so
+                     * zero should be put in result on the current position, and
+                     * carry flag should be enabled.
+                     */
+                    if (carry) {
+                        continue;
+                    }
 
-    if (negative_divisor) {
-        divisor = take_twos_complement(divisor);
-    }
-    if (negative_dividend) {
-        remainder = take_twos_complement(remainder);
-    }
-    negative_quotinent = ((negative_divisor or negative_dividend) and not (negative_divisor and negative_dividend));
+                    /*
+                     * All other cases.
+                     * Either lhs or rhs is enabled, and carry is not.
+                     * So this is the 0 + 1 = 1 case.
+                     * Easy.
+                     * Just enable the bit in the result.
+                     */
+                    result.at(i) = true;
+                }
 
-    while (binary_lte(divisor, remainder)) {
-        remainder = binary_subtraction(remainder, divisor);
-        quotinent = binary_increment(quotinent).second;
-    }
+                /*
+                 * If there was a carry during the last operation append it to the result.
+                 * Basic binary addition is expanding.
+                 * It can be made wrapping, checked, or saturating by "post-processing".
+                 */
+                if (carry) {
+                    result.push_back(carry);
+                }
 
-    if (negative_quotinent) {
-        quotinent = take_twos_complement(quotinent);
-    }
+                return result;
+            }
+            static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
+                return binary_clip(
+                    binary_addition(binary_expand(lhs, max(lhs.size(), rhs.size())),
+                                    take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())))),
+                    lhs.size());
+            }
+            static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs)
+                -> vector<bool> {
+                vector<vector<bool>> intermediates;
+                intermediates.reserve(rhs.size());
 
-    return quotinent;
-}
+                /*
+                 * Make sure the result is *always* has at least one entry (in case the rhs is all zero bits),
+                 * and that the results width is *always* the sum of operands' widths.
+                 */
+                intermediates.emplace_back(lhs.size() + rhs.size());
+
+                for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0}; i < rhs.size(); ++i) {
+                    if (not rhs.at(i)) {
+                        /*
+                         * Multiplication by 0 just gives a long string of zeroes.
+                         * There is no reason to build all these zero-filled bit strings as
+                         * they will only slow things down the road when all the intermediate
+                         * bit strings are accumulated.
+                         */
+                        continue;
+                    }
+
+                    vector<bool> interm;
+                    interm.reserve(i + lhs.size());
+                    std::fill_n(std::back_inserter(interm), i, false);
+
+                    std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
+
+                    intermediates.emplace_back(std::move(interm));
+                }
+
+                return std::accumulate(intermediates.begin(), intermediates.end(), vector<bool>{},
+                                       [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                                           return binary_addition(l, r);
+                                       });
+            }
+            static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs)
+                -> vector<bool> {
+                auto quotinent = vector<bool>{};
+                auto remainder = dividend;
+                auto divisor = rhs;
+
+                quotinent.reserve(remainder.size());
+                std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
+
+                if (binary_eq(divisor, dividend)) {
+                    return binary_increment(quotinent).second;
+                }
+
+                auto negative_divisor = binary_is_negative(divisor);
+                auto negative_dividend = binary_is_negative(dividend);
+                auto negative_quotinent = false;
+
+                if (negative_divisor) {
+                    divisor = take_twos_complement(divisor);
+                }
+                if (negative_dividend) {
+                    remainder = take_twos_complement(remainder);
+                }
+                negative_quotinent =
+                    ((negative_divisor or negative_dividend) and not(negative_divisor and negative_dividend));
+
+                while (binary_lte(divisor, remainder)) {
+                    remainder = binary_subtraction(remainder, divisor);
+                    quotinent = binary_increment(quotinent).second;
+                }
+
+                if (negative_quotinent) {
+                    quotinent = take_twos_complement(quotinent);
+                }
+
+                return quotinent;
+            }
+        }  // namespace wrapping
+    }      // namespace arithmetic
+}  // namespace viua
 
 
 const string viua::types::Bits::type_name = "Bits";
 
 string viua::types::Bits::type() const { return type_name; }
 
-string viua::types::Bits::str() const {
-    return to_string(underlying_array);
-}
+string viua::types::Bits::str() const { return to_string(underlying_array); }
 
 bool viua::types::Bits::boolean() const { return binary_to_bool(underlying_array); }
 
@@ -473,29 +482,31 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::increment() -> bool {
-    auto result = binary_increment(underlying_array);
+    auto result = viua::arithmetic::wrapping::binary_increment(underlying_array);
     underlying_array = std::move(result.second);
     return result.first;
 }
 
 auto viua::types::Bits::decrement() -> bool {
-    auto result = binary_decrement(underlying_array);
+    auto result = viua::arithmetic::wrapping::binary_decrement(underlying_array);
     underlying_array = std::move(result.second);
     return result.first;
 }
 
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_clip(binary_addition(underlying_array, that.underlying_array), size()));
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::wrapping::binary_addition(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
-        binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::wrapping::binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
     if (not that.boolean()) {
         throw new viua::types::Exception("division by zero");
     }
-    return make_unique<Bits>(binary_clip(binary_division(underlying_array, that.underlying_array), size()));
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::wrapping::binary_division(underlying_array, that.underlying_array), size()));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {
