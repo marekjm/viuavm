@@ -431,6 +431,10 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case STRUCT:
         case WRAPINCREMENT:
         case WRAPDECREMENT:
+        case CHECKEDSINCREMENT:
+        case CHECKEDSDECREMENT:
+        case CHECKEDUINCREMENT:
+        case CHECKEDUDECREMENT:
         case REGISTER:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
@@ -512,6 +516,12 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case WRAPADD:
         case WRAPMUL:
         case WRAPDIV:
+        case CHECKEDSADD:
+        case CHECKEDSMUL:
+        case CHECKEDSDIV:
+        case CHECKEDUADD:
+        case CHECKEDUMUL:
+        case CHECKEDUDIV:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
