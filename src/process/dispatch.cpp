@@ -260,6 +260,21 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case WRAPDIV:
             addr = opwrapdiv(addr + 1);
             break;
+        case CHECKEDSINCREMENT:
+            addr = opcheckedsincrement(addr + 1);
+            break;
+        case CHECKEDSDECREMENT:
+            addr = opcheckedsdecrement(addr + 1);
+            break;
+        case CHECKEDSADD:
+            addr = opcheckedsadd(addr + 1);
+            break;
+        case CHECKEDSMUL:
+            addr = opcheckedsmul(addr + 1);
+            break;
+        case CHECKEDSDIV:
+            addr = opcheckedsdiv(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;
