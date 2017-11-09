@@ -113,11 +113,17 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {WRAPMUL, "wrapmul"},
     {WRAPDIV, "wrapdiv"},
 
-    {CHECKEDINCREMENT, "checkedincrement"},
-    {CHECKEDDECREMENT, "checkeddecrement"},
-    {CHECKEDADD, "checkedadd"},
-    {CHECKEDMUL, "checkedmul"},
-    {CHECKEDDIV, "checkeddiv"},
+    {CHECKEDSINCREMENT, "checkedsincrement"},
+    {CHECKEDSDECREMENT, "checkedsdecrement"},
+    {CHECKEDSADD, "checkedsadd"},
+    {CHECKEDSMUL, "checkedsmul"},
+    {CHECKEDSDIV, "checkedsdiv"},
+
+    {CHECKEDUINCREMENT, "checkeduincrement"},
+    {CHECKEDUDECREMENT, "checkedudecrement"},
+    {CHECKEDUADD, "checkeduadd"},
+    {CHECKEDUMUL, "checkedumul"},
+    {CHECKEDUDIV, "checkedudiv"},
 
     {SATURATINGINCREMENT, "saturatingincrement"},
     {SATURATINGDECREMENT, "saturatingdecrement"},

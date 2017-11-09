@@ -238,7 +238,7 @@ enum OPCODE : viua::internals::types::byte {
      * as the left-hand-dise operand.
      * For example:
      *
-     *      checkedmul %result %lhs %rhs
+     *      checkedsmul %result %lhs %rhs
      *
      * produces 8 bit wide value in 'result' register if
      * register 'lhs' contains 8 bit wide value.
@@ -247,11 +247,17 @@ enum OPCODE : viua::internals::types::byte {
      * for the bit width specified by the left-hand side operand an
      * exception is thrown.
      */
-    CHECKEDINCREMENT,
-    CHECKEDDECREMENT,
-    CHECKEDADD,
-    CHECKEDMUL,
-    CHECKEDDIV,
+    CHECKEDSINCREMENT,
+    CHECKEDSDECREMENT,
+    CHECKEDSADD,
+    CHECKEDSMUL,
+    CHECKEDSDIV,
+
+    CHECKEDUINCREMENT,
+    CHECKEDUDECREMENT,
+    CHECKEDUADD,
+    CHECKEDUMUL,
+    CHECKEDUDIV,
 
     /*
      * Fixed-width, sarurating arithmetic operations on bit strings.
