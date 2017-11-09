@@ -224,6 +224,10 @@ enum OPCODE : viua::internals::types::byte {
      *      ----11010010    (removing four most-significant bits)
      *
      *          11010010    (final result)
+     *
+     * Wrapping instructions are provided in only one variant that is suitable
+     * for use with both signed and unsigned integers since their behaviour is
+     * the same (wrap-around on overflow).
      */
     WRAPINCREMENT,
     WRAPDECREMENT,
@@ -244,8 +248,14 @@ enum OPCODE : viua::internals::types::byte {
      * register 'lhs' contains 8 bit wide value.
      *
      * If any checked operation produces a value that is out of range
-     * for the bit width specified by the left-hand side operand an
-     * exception is thrown.
+     * for the bit width specified by the left-hand side operand, or
+     * when the value produced is in range but causes an overflow (as
+     * is the case with signed integers) an exception is thrown.
+     *
+     * Every operation is provided in signed and unsigned variant.
+     * Mnemonics "checked?op" where "?" is "s" stand for "signed", and
+     * where "?" is "u" stand for "unsigned".
+     * For example, "checkedsmul" means "checked signed multiplication".
      */
     CHECKEDSINCREMENT,
     CHECKEDSDECREMENT,
