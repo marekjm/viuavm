@@ -132,6 +132,18 @@ class Program {
     Program& opwrapmul(int_op, int_op, int_op);
     Program& opwrapdiv(int_op, int_op, int_op);
 
+    Program& opcheckedsincrement(int_op);
+    Program& opcheckedsdecrement(int_op);
+    Program& opcheckedsadd(int_op, int_op, int_op);
+    Program& opcheckedsmul(int_op, int_op, int_op);
+    Program& opcheckedsdiv(int_op, int_op, int_op);
+
+    Program& opcheckeduincrement(int_op);
+    Program& opcheckedudecrement(int_op);
+    Program& opcheckeduadd(int_op, int_op, int_op);
+    Program& opcheckedumul(int_op, int_op, int_op);
+    Program& opcheckedudiv(int_op, int_op, int_op);
+
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
