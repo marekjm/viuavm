@@ -191,6 +191,30 @@ static auto assemble_bit_shift_instruction(Program& program, const vector<Token>
                                                            resolve_rs_type(tokens.at(rhs + 1))));
 }
 
+using IncrementOp = Program& (Program::*)(int_op);
+template<IncrementOp const op> static auto assemble_increment_instruction(Program& program,
+        vector<Token> const& tokens, TokenIndex const i) -> void {
+        TokenIndex target = i + 1;
+
+        (program.*op)(assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
+}
+
+using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
+template<ArithmeticOp const op> static auto assemble_arithmetic_instruction(Program& program,
+        vector<Token> const& tokens, TokenIndex const i) -> void {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        (program.*op)(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                   resolve_rs_type(tokens.at(target + 1))),
+                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                   resolve_rs_type(tokens.at(lhs + 1))),
+                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                   resolve_rs_type(tokens.at(rhs + 1))));
+}
+
 static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
@@ -702,48 +726,15 @@ viua::internals::types::bytecode_size assemble_instruction(
                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
                                                                resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "wrapincrement") {
-        TokenIndex target = i + 1;
-
-        program.opwrapincrement(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
+        assemble_increment_instruction<&Program::opwrapincrement>(program, tokens, i);
     } else if (tokens.at(i) == "wrapdecrement") {
-        TokenIndex target = i + 1;
-
-        program.opwrapdecrement(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
+        assemble_increment_instruction<&Program::opwrapdecrement>(program, tokens, i);
     } else if (tokens.at(i) == "wrapadd") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opwrapadd(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                   resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                   resolve_rs_type(tokens.at(lhs + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                   resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_arithmetic_instruction<&Program::opwrapadd>(program, tokens, i);
     } else if (tokens.at(i) == "wrapmul") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opwrapmul(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                   resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                   resolve_rs_type(tokens.at(lhs + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                   resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_arithmetic_instruction<&Program::opwrapmul>(program, tokens, i);
     } else if (tokens.at(i) == "wrapdiv") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opwrapdiv(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                   resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                   resolve_rs_type(tokens.at(lhs + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                   resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_arithmetic_instruction<&Program::opwrapdiv>(program, tokens, i);
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
