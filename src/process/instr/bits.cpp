@@ -240,8 +240,6 @@ viua::internals::types::byte* viua::process::Process::opwrapincrement(viua::inte
 
     return addr;
 }
-
-
 viua::internals::types::byte* viua::process::Process::opwrapdecrement(viua::internals::types::byte* addr) {
     viua::types::Bits* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
@@ -250,8 +248,6 @@ viua::internals::types::byte* viua::process::Process::opwrapdecrement(viua::inte
 
     return addr;
 }
-
-
 viua::internals::types::byte* viua::process::Process::opwrapadd(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -266,8 +262,6 @@ viua::internals::types::byte* viua::process::Process::opwrapadd(viua::internals:
 
     return addr;
 }
-
-
 viua::internals::types::byte* viua::process::Process::opwrapmul(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
