@@ -340,6 +340,56 @@ Program& Program::opwrapdiv(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opcheckedsincrement(int_op target) {
+    addr_ptr = cg::bytecode::opcheckedsincrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opcheckedsdecrement(int_op target) {
+    addr_ptr = cg::bytecode::opcheckedsdecrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opcheckedsadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedsadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckedsmul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedsmul(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckedsdiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedsdiv(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckeduincrement(int_op target) {
+    addr_ptr = cg::bytecode::opcheckeduincrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opcheckedudecrement(int_op target) {
+    addr_ptr = cg::bytecode::opcheckedudecrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opcheckeduadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckeduadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckedumul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedumul(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckedudiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedudiv(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *

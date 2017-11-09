@@ -455,6 +455,55 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, WRAPDIV, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opcheckedsincrement(viua::internals::types::byte* addr_ptr, int_op target) {
+            *(addr_ptr++) = CHECKEDSINCREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opcheckedsdecrement(viua::internals::types::byte* addr_ptr, int_op target) {
+            *(addr_ptr++) = CHECKEDSDECREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opcheckedsadd(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDSADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDSMUL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckedsdiv(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDSDIV, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckeduincrement(viua::internals::types::byte* addr_ptr, int_op target) {
+            *(addr_ptr++) = CHECKEDUINCREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opcheckedudecrement(viua::internals::types::byte* addr_ptr, int_op target) {
+            *(addr_ptr++) = CHECKEDUDECREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDUADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckedumul(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDUMUL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckedudiv(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDUDIV, target, lhs, rhs);
+        }
 
         viua::internals::types::byte* opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
             return insert_two_ri_instruction(addr_ptr, MOVE, a, b);

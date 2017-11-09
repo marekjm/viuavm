@@ -735,6 +735,26 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_arithmetic_instruction<&Program::opwrapmul>(program, tokens, i);
     } else if (tokens.at(i) == "wrapdiv") {
         assemble_arithmetic_instruction<&Program::opwrapdiv>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedsincrement") {
+        assemble_increment_instruction<&Program::opcheckedsincrement>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedsdecrement") {
+        assemble_increment_instruction<&Program::opcheckedsdecrement>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedsadd") {
+        assemble_arithmetic_instruction<&Program::opcheckedsadd>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedsmul") {
+        assemble_arithmetic_instruction<&Program::opcheckedsmul>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedsdiv") {
+        assemble_arithmetic_instruction<&Program::opcheckedsdiv>(program, tokens, i);
+    } else if (tokens.at(i) == "checkeduincrement") {
+        assemble_increment_instruction<&Program::opcheckeduincrement>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedudecrement") {
+        assemble_increment_instruction<&Program::opcheckedudecrement>(program, tokens, i);
+    } else if (tokens.at(i) == "checkeduadd") {
+        assemble_arithmetic_instruction<&Program::opcheckeduadd>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedumul") {
+        assemble_arithmetic_instruction<&Program::opcheckedumul>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedudiv") {
+        assemble_arithmetic_instruction<&Program::opcheckedudiv>(program, tokens, i);
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;

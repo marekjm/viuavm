@@ -644,6 +644,46 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_checkedsincrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_checkedsdecrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_checkedsadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkedsmul(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkedsdiv(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkeduincrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_checkedudecrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_checkeduadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkedumul(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkedudiv(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_move(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
@@ -1385,6 +1425,36 @@ namespace viua {
                     } else if (tokens.at(i) == "wrapdiv") {
                         ++i;
                         tie(increase, i) = size_of_wrapdiv(tokens, i);
+                    } else if (tokens.at(i) == "checkedsincrement") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedsincrement(tokens, i);
+                    } else if (tokens.at(i) == "checkedsdecrement") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedsdecrement(tokens, i);
+                    } else if (tokens.at(i) == "checkedsadd") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedsadd(tokens, i);
+                    } else if (tokens.at(i) == "checkedsmul") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedsmul(tokens, i);
+                    } else if (tokens.at(i) == "checkedsdiv") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedsdiv(tokens, i);
+                    } else if (tokens.at(i) == "checkeduincrement") {
+                        ++i;
+                        tie(increase, i) = size_of_checkeduincrement(tokens, i);
+                    } else if (tokens.at(i) == "checkedudecrement") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedudecrement(tokens, i);
+                    } else if (tokens.at(i) == "checkeduadd") {
+                        ++i;
+                        tie(increase, i) = size_of_checkeduadd(tokens, i);
+                    } else if (tokens.at(i) == "checkedumul") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedumul(tokens, i);
+                    } else if (tokens.at(i) == "checkedudiv") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedudiv(tokens, i);
                     } else if (tokens.at(i) == "move") {
                         ++i;
                         tie(increase, i) = size_of_move(tokens, i);
