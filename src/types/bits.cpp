@@ -407,6 +407,45 @@ namespace viua {
             }
         }  // namespace wrapping
         namespace checked {
+            static auto signed_increment(vector<bool> v) -> vector<bool> {
+                auto carry = true;
+                auto incremented = v;
+
+                for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        incremented.at(i) = false;
+                    } else {
+                        incremented.at(i) = true;
+                        carry = false;
+                    }
+                }
+
+                if ((not binary_is_negative(v)) and binary_is_negative(incremented)) {
+                    throw new Exception("CheckedArithmeticIncrementSignedOverflow");
+                }
+
+                return incremented;
+            }
+            static auto signed_decrement(vector<bool> v) -> vector<bool> {
+                auto decremented = v;
+
+                for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        decremented.at(i) = false;
+                        break;
+                    } else {
+                        decremented.at(i) = true;
+                    }
+                }
+
+                if (binary_is_negative(v) and not binary_is_negative(decremented)) {
+                    throw new Exception("CheckedArithmeticDecrementSignedOverflow");
+                }
+
+                return decremented;
+            }
+
+
             static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
                 vector<bool> result;
                 auto size_of_result = std::max(lhs.size(), rhs.size());
@@ -592,6 +631,15 @@ auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
         viua::arithmetic::wrapping::binary_division(underlying_array, that.underlying_array), size()));
 }
 
+
+auto viua::types::Bits::checked_signed_increment() -> void {
+    auto result = viua::arithmetic::checked::signed_increment(underlying_array);
+    underlying_array = std::move(result);
+}
+auto viua::types::Bits::checked_signed_decrement() -> void {
+    auto result = viua::arithmetic::checked::signed_decrement(underlying_array);
+    underlying_array = std::move(result);
+}
 auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::checked::signed_add(underlying_array, that.underlying_array), size()));

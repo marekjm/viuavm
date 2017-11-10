@@ -296,7 +296,7 @@ viua::internals::types::byte* viua::process::Process::opcheckedsincrement(viua::
     viua::types::Bits* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    target->increment();
+    target->checked_signed_increment();
 
     return addr;
 }
@@ -304,7 +304,7 @@ viua::internals::types::byte* viua::process::Process::opcheckedsdecrement(viua::
     viua::types::Bits* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    target->decrement();
+    target->checked_signed_decrement();
 
     return addr;
 }
