@@ -444,6 +444,40 @@ namespace viua {
 
                 return decremented;
             }
+            static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
+                return signed_increment(binary_inversion(v));
+            }
+
+            static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
+                lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+                rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+                if (binary_is_negative(lhs) and not binary_is_negative(rhs)) {
+                    return true;
+                }
+                if (not binary_is_negative(lhs) and binary_is_negative(rhs)) {
+                    return false;
+                }
+
+                if (binary_is_negative(lhs)) {
+                    lhs = take_twos_complement(lhs);
+                }
+                if (binary_is_negative(rhs)) {
+                    rhs = take_twos_complement(rhs);
+                }
+
+                for (auto i = (lhs.size() - 1); i; --i) {
+                    if (lhs.at(i - 1) < rhs.at(i - 1)) {
+                        // definitely lhs < rhs
+                        return true;
+                    } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+                        // totally lhs > rhs
+                        return false;
+                    }
+                }
+                // equal to each other
+                return true;
+            }
 
 
             static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
@@ -458,6 +492,12 @@ namespace viua {
                 auto rhs_negative = binary_is_negative(rhs);
 
                 auto result_should_be_negative = (lhs_negative and rhs_negative);
+                if (lhs_negative and (not rhs_negative) and signed_lt(rhs, lhs)) {
+                    result_should_be_negative = true;
+                }
+                if ((not lhs_negative) and rhs_negative and signed_lt(lhs, lhs)) {
+                    result_should_be_negative = true;
+                }
 
                 for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
                     const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
