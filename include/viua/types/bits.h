@@ -61,7 +61,11 @@ namespace viua {
             auto wrapmul(const Bits&) const -> std::unique_ptr<Bits>;
             auto wrapdiv(const Bits&) const -> std::unique_ptr<Bits>;
 
+            auto checked_signed_increment(Bits const&) const -> std::unique_ptr<Bits>;
+            auto checked_signed_decrement(Bits const&) const -> std::unique_ptr<Bits>;
             auto checked_signed_add(Bits const&) const -> std::unique_ptr<Bits>;
+            auto checked_signed_mul(Bits const&) const -> std::unique_ptr<Bits>;
+            auto checked_signed_div(Bits const&) const -> std::unique_ptr<Bits>;
 
             auto operator==(const Bits&) const -> bool;
             auto operator<(const Bits&) const -> bool;
