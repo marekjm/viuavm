@@ -976,6 +976,16 @@ class BitsUnsignedWrappingArithmeticTests(unittest.TestCase):
 class BitsSignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/signed_checked'
 
+    def test_basic_addition(self):
+        runTestSplitlines(self, 'basic_addition.asm', [
+            '00000011',
+            '00000110',
+            '00001001',
+        ])
+
+    def test_overflowing_addition_two_positives_give_negative(self):
+        runTestThrowsException(self, 'overflowing_addition.asm', ('Exception', 'CheckedArithmeticAdditionSignedOverflow'))
+
 class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_checked'
 

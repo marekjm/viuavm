@@ -406,6 +406,89 @@ namespace viua {
                 return quotinent;
             }
         }  // namespace wrapping
+        namespace checked {
+            static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
+                vector<bool> result;
+                auto size_of_result = std::max(lhs.size(), rhs.size());
+                result.reserve(size_of_result + 1);
+                std::fill_n(std::back_inserter(result), size_of_result, false);
+
+                bool carry = false;
+
+                auto lhs_negative = binary_is_negative(lhs);
+                auto rhs_negative = binary_is_negative(rhs);
+
+                auto result_should_be_negative = (lhs_negative and rhs_negative);
+
+                for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
+                    const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+                    const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+
+                    /*
+                     * lhs + rhs -> 0 + 0 -> 0
+                     *
+                     * This is the easy case.
+                     * Everything is zero, so we just carry the carry into the result at
+                     * the current position, and reset the carry flag to zero (it was consumed).
+                     */
+                    if ((not from_rhs) and (not from_lhs)) {
+                        result.at(i) = carry;
+                        carry = false;
+                        continue;
+                    }
+
+                    /*
+                     * lhs + rhs -> 1 + 1 -> 10
+                     *
+                     * This gives us a zero on current position, and
+                     * carry flag in the enabled state.
+                     *
+                     * If carry was enabled before we have 0 + 1 = 1, so we should
+                     * enable bit on current position in the result.
+                     * If carry was not enabled we have 0 + 0, so we should
+                     * obviously leave the bit disabled in the result.
+                     * This means that we can just copy state of the carry flag into
+                     * the result bit string on current position.
+                     */
+                    if (from_rhs and from_lhs) {
+                        result.at(i) = carry;
+                        carry = true;
+                        continue;
+                    }
+
+                    /*
+                     * At this point either the lhs or rhs is enabled, but not both.
+                     * So if the carry bit is enabled this gives us 1 + 1 = 10, so
+                     * zero should be put in result on the current position, and
+                     * carry flag should be enabled.
+                     */
+                    if (carry) {
+                        continue;
+                    }
+
+                    /*
+                     * All other cases.
+                     * Either lhs or rhs is enabled, and carry is not.
+                     * So this is the 0 + 1 = 1 case.
+                     * Easy.
+                     * Just enable the bit in the result.
+                     */
+                    result.at(i) = true;
+                }
+
+                if (carry) {
+                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
+                }
+                if (result_should_be_negative and not binary_is_negative(result)) {
+                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
+                }
+                if (not result_should_be_negative and binary_is_negative(result)) {
+                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
+                }
+
+                return result;
+            }
+        }
     }      // namespace arithmetic
 }  // namespace viua
 
@@ -507,6 +590,11 @@ auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
     }
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::wrapping::binary_division(underlying_array, that.underlying_array), size()));
+}
+
+auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::checked::signed_add(underlying_array, that.underlying_array), size()));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {

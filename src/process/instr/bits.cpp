@@ -318,7 +318,7 @@ viua::internals::types::byte* viua::process::Process::opcheckedsadd(viua::intern
     viua::types::Bits* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    *target = lhs->wrapadd(*rhs);
+    *target = lhs->checked_signed_add(*rhs);
 
     return addr;
 }
