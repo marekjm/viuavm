@@ -986,6 +986,9 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
     def test_overflowing_addition_two_positives_give_negative(self):
         runTestThrowsException(self, 'overflowing_addition.asm', ('Exception', 'CheckedArithmeticAdditionSignedOverflow'))
 
+    def test_overflowing_addition_two_negatives_give_positive(self):
+        runTestThrowsException(self, 'overflowing_addition_two_negatives_give_positive.asm', ('Exception', 'CheckedArithmeticAdditionSignedOverflow'))
+
     def test_maximum_increment(self):
         runTestThrowsException(self, 'maximum_increment.asm', ('Exception', 'CheckedArithmeticIncrementSignedOverflow'))
 
