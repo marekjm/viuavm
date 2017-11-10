@@ -992,6 +992,16 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
     def test_minimum_decrement(self):
         runTestThrowsException(self, 'minimum_decrement.asm', ('Exception', 'CheckedArithmeticDecrementSignedOverflow'))
 
+    def test_decrement_from_positive_to_negative(self):
+        runTestSplitlines(self, 'decrement_from_positive_to_negative.asm', [
+            '11111111',
+        ])
+
+    def test_increment_from_negative_to_positive(self):
+        runTestSplitlines(self, 'increment_from_negative_to_positive.asm', [
+            '00000000',
+        ])
+
 class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_checked'
 
