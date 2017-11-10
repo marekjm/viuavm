@@ -515,9 +515,6 @@ namespace viua {
                     result.at(i) = true;
                 }
 
-                if (carry) {
-                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
-                }
                 if (result_should_be_negative and not binary_is_negative(result)) {
                     throw new Exception("CheckedArithmeticAdditionSignedOverflow");
                 }
