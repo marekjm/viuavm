@@ -51,8 +51,8 @@ matrix:
                         - llvm-toolchain-trusty-5.0
                     packages:
                         - python3
-                        - gcc-6
-                        - g++-6
+                        - gcc-7
+                        - g++-7
                         - valgrind
                         - bc
                         - clang-5.0
