@@ -1,5 +1,6 @@
-# Clang does not yet recognise -std=c++17 option, and
+# Clang 4.0 does not recognise -std=c++17 option, and
 # needs -std=c++1z.
+# Clang 5.0 and later recognises -std=c++17
 # See http://clang.llvm.org/cxx_status.html for details.
 CXX_STANDARD=c++17
 
@@ -40,13 +41,11 @@ COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wco
 SANITISER_FLAGS=-fsanitize=undefined
 else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-4.0)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-5.0)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-CXX_STANDARD=c++1z
 endif
 
 # Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
