@@ -1012,6 +1012,33 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_multiplication_negative_negative_gives_positive(self):
+        runTestSplitlines(self, 'multiplication_negative_negative_gives_positive.asm', [
+            '11111110',
+            '11111110',
+            '00000100',
+        ])
+
+    def test_multiplication_negative_positive_gives_negative(self):
+        runTestSplitlines(self, 'multiplication_negative_positive_gives_negative.asm', [
+            '11111110',
+            '00000010',
+            '11111100',
+        ])
+
+    def test_multiplication_positive_negative_gives_negative(self):
+        runTestSplitlines(self, 'multiplication_positive_negative_gives_negative.asm', [
+            '00000010',
+            '11111110',
+            '11111100',
+        ])
+
+    def test_overflowing_64x2_multiplication(self):
+        runTestThrowsException(self, 'overflowing_64x2_multiplication.asm', ('Exception', 'CheckedArithmeticMultiplicationSignedOverflow'))
+
+    def test_overflowing_64x64_multiplication(self):
+        runTestThrowsException(self, 'overflowing_64x64_multiplication.asm', ('Exception', 'CheckedArithmeticMultiplicationSignedOverflow'))
+
 class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_checked'
 
