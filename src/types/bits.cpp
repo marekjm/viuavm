@@ -681,9 +681,25 @@ namespace viua {
                      * If you ever find something better - feel free to implement it. The test suite should
                      * catch your mistakes.
                      */
-                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative) and
-                        clipped != signed_mul(absolute(lhs), absolute(rhs))) {
-                        throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative)) {
+                        auto lhs_abs = vector<bool>{};
+                        auto rhs_abs = vector<bool>{};
+                        try {
+                            lhs_abs = std::move(absolute(lhs));
+                            rhs_abs = std::move(absolute(rhs));
+                        } catch (Exception* e) {
+                            /*
+                             * This is why we need separate lhs_abs and rhs_abs variables initialised under a
+                             * try: because they can throw exceptions on overflow when taking two's
+                             * complement of the minimal value (a.k.a. negative maximum, e.g. -128 for 8 bit
+                             * integers).
+                             */
+                            delete e;
+                            throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                        }
+                        if (clipped != signed_mul(lhs_abs, rhs_abs)) {
+                            throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                        }
                     }
 
                     /*
