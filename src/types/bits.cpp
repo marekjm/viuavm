@@ -685,8 +685,8 @@ namespace viua {
                         auto lhs_abs = vector<bool>{};
                         auto rhs_abs = vector<bool>{};
                         try {
-                            lhs_abs = std::move(absolute(lhs));
-                            rhs_abs = std::move(absolute(rhs));
+                            lhs_abs = absolute(lhs);
+                            rhs_abs = absolute(rhs);
                         } catch (Exception* e) {
                             /*
                              * This is why we need separate lhs_abs and rhs_abs variables initialised under a
