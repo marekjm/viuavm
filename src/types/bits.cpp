@@ -460,6 +460,13 @@ namespace viua {
             static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
                 return signed_increment(binary_inversion(v));
             }
+            static auto absolute(vector<bool> const& v) -> vector<bool> {
+                if (binary_is_negative(v)) {
+                    return take_twos_complement(v);
+                } else {
+                    return v;
+                }
+            }
 
             static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
                 lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
@@ -618,15 +625,22 @@ namespace viua {
 
                 result = std::accumulate(intermediates.begin(), intermediates.end(), result,
                                        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
-                                           return signed_add(l, r);
+                                           return wrapping::binary_addition(l, r);
                                        });
+
+                auto clipped = binary_clip(result, lhs.size());
 
                 auto last_set = binary_last_bit_set(result);
                 if (last_set and *last_set >= lhs.size()) {
-                    throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative) and clipped != signed_mul(absolute(lhs), absolute(rhs))) {
+                        throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                    }
+                    if (not (lhs_negative or rhs_negative)) {
+                        throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                    }
                 }
 
-                result = binary_clip(result, lhs.size());
+                result = std::move(clipped);
 
                 if (result_should_be_negative != binary_is_negative(result)) {
                     throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
