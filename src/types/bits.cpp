@@ -90,7 +90,8 @@ static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
     return v;
 }
 static auto binary_is_negative(vector<bool> const& v) -> bool { return v.back(); }
-static auto binary_last_bit_set(vector<bool> const& v) -> optional<remove_reference_t<decltype(v)>::size_type> {
+static auto binary_last_bit_set(vector<bool> const& v)
+    -> optional<remove_reference_t<decltype(v)>::size_type> {
     auto index_of_set = optional<remove_reference_t<decltype(v)>::size_type>{};
 
     for (auto i = v.size(); i; --i) {
@@ -584,8 +585,7 @@ namespace viua {
 
                 return result;
             }
-            static auto signed_mul(const vector<bool>& lhs, const vector<bool>& rhs)
-                -> vector<bool> {
+            static auto signed_mul(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
                 vector<vector<bool>> intermediates;
                 intermediates.reserve(rhs.size());
 
@@ -629,17 +629,17 @@ namespace viua {
                 std::fill_n(std::back_inserter(result), lhs.size(), false);
 
                 result = std::accumulate(intermediates.begin(), intermediates.end(), result,
-                                       [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
-                                           /*
-                                            * Use basic (unchecked, expanding) binary addition to accumulate
-                                            * the result. If you used checked addition multiplication would
-                                            * throw "checked signed addition" exceptions as overflow would
-                                            * be detected during accumulation.
-                                            * We don't want that so we use unchecked addition here, and
-                                            * check for errors later.
-                                            */
-                                           return wrapping::binary_addition(l, r);
-                                       });
+                                         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                                             /*
+                                              * Use basic (unchecked, expanding) binary addition to accumulate
+                                              * the result. If you used checked addition multiplication would
+                                              * throw "checked signed addition" exceptions as overflow would
+                                              * be detected during accumulation.
+                                              * We don't want that so we use unchecked addition here, and
+                                              * check for errors later.
+                                              */
+                                             return wrapping::binary_addition(l, r);
+                                         });
 
                 /*
                  * We have to clip the result as it must remain fixed-size.
@@ -681,7 +681,8 @@ namespace viua {
                      * If you ever find something better - feel free to implement it. The test suite should
                      * catch your mistakes.
                      */
-                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative) and clipped != signed_mul(absolute(lhs), absolute(rhs))) {
+                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative) and
+                        clipped != signed_mul(absolute(lhs), absolute(rhs))) {
                         throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
                     }
 
@@ -692,7 +693,7 @@ namespace viua {
                      * errors, as it only fires if at least one operand is negative and this check fires when
                      * neither is.
                      */
-                    if (not (lhs_negative or rhs_negative)) {
+                    if (not(lhs_negative or rhs_negative)) {
                         throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
                     }
                 }
@@ -705,7 +706,7 @@ namespace viua {
 
                 return result;
             }
-        }
+        }  // namespace checked
     }      // namespace arithmetic
 }  // namespace viua
 
@@ -819,12 +820,11 @@ auto viua::types::Bits::checked_signed_decrement() -> void {
     underlying_array = std::move(result);
 }
 auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_clip(
-        viua::arithmetic::checked::signed_add(underlying_array, that.underlying_array), size()));
+    return make_unique<Bits>(
+        binary_clip(viua::arithmetic::checked::signed_add(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::checked_signed_mul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
-        viua::arithmetic::checked::signed_mul(underlying_array, that.underlying_array));
+    return make_unique<Bits>(viua::arithmetic::checked::signed_mul(underlying_array, that.underlying_array));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {

@@ -292,7 +292,8 @@ viua::internals::types::byte* viua::process::Process::opwrapdiv(viua::internals:
 }
 
 
-viua::internals::types::byte* viua::process::Process::opcheckedsincrement(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcheckedsincrement(
+    viua::internals::types::byte* addr) {
     viua::types::Bits* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
@@ -300,7 +301,8 @@ viua::internals::types::byte* viua::process::Process::opcheckedsincrement(viua::
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opcheckedsdecrement(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcheckedsdecrement(
+    viua::internals::types::byte* addr) {
     viua::types::Bits* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 

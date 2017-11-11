@@ -192,27 +192,29 @@ static auto assemble_bit_shift_instruction(Program& program, const vector<Token>
 }
 
 using IncrementOp = Program& (Program::*)(int_op);
-template<IncrementOp const op> static auto assemble_increment_instruction(Program& program,
-        vector<Token> const& tokens, TokenIndex const i) -> void {
-        TokenIndex target = i + 1;
+template<IncrementOp const op>
+static auto assemble_increment_instruction(Program& program, vector<Token> const& tokens, TokenIndex const i)
+    -> void {
+    TokenIndex target = i + 1;
 
-        (program.*op)(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
+    (program.*op)(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                           resolve_rs_type(tokens.at(target + 1))));
 }
 
 using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
-template<ArithmeticOp const op> static auto assemble_arithmetic_instruction(Program& program,
-        vector<Token> const& tokens, TokenIndex const i) -> void {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
+template<ArithmeticOp const op>
+static auto assemble_arithmetic_instruction(Program& program, vector<Token> const& tokens, TokenIndex const i)
+    -> void {
+    TokenIndex target = i + 1;
+    TokenIndex lhs = target + 2;
+    TokenIndex rhs = lhs + 2;
 
-        (program.*op)(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                   resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                   resolve_rs_type(tokens.at(lhs + 1))),
-                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                   resolve_rs_type(tokens.at(rhs + 1))));
+    (program.*op)(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                           resolve_rs_type(tokens.at(target + 1))),
+                  assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                           resolve_rs_type(tokens.at(lhs + 1))),
+                  assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                           resolve_rs_type(tokens.at(rhs + 1))));
 }
 
 static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
