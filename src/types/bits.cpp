@@ -21,6 +21,7 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <viua/types/bits.h>
@@ -89,6 +90,18 @@ static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
     return v;
 }
 static auto binary_is_negative(vector<bool> const& v) -> bool { return v.at(v.size() - 1); }
+static auto binary_last_bit_set(vector<bool> const& v) -> optional<remove_reference_t<decltype(v)>::size_type> {
+    auto index_of_set = optional<remove_reference_t<decltype(v)>::size_type>{};
+
+    for (auto i = v.size(); i; --i) {
+        if (v.at(i - 1)) {
+            index_of_set = (i - 1);
+            break;
+        }
+    }
+
+    return index_of_set;
+}
 
 
 static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
@@ -564,6 +577,63 @@ namespace viua {
 
                 return result;
             }
+            static auto signed_mul(const vector<bool>& lhs, const vector<bool>& rhs)
+                -> vector<bool> {
+                vector<vector<bool>> intermediates;
+                intermediates.reserve(rhs.size());
+
+                /*
+                 * Make sure the result is *always* has at least one entry (in case the rhs is all zero bits),
+                 * and that the results width is *always* the sum of operands' widths.
+                 */
+                intermediates.emplace_back(lhs.size() + rhs.size());
+
+                auto lhs_negative = binary_is_negative(lhs);
+                auto rhs_negative = binary_is_negative(rhs);
+                auto result_should_be_negative = (lhs_negative xor rhs_negative);
+
+                for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0}; i < rhs.size(); ++i) {
+                    if (not rhs.at(i)) {
+                        /*
+                         * Multiplication by 0 just gives a long string of zeroes.
+                         * There is no reason to build all these zero-filled bit strings as
+                         * they will only slow things down the road when all the intermediate
+                         * bit strings are accumulated.
+                         */
+                        continue;
+                    }
+
+                    vector<bool> interm;
+                    interm.reserve(i + lhs.size());
+                    std::fill_n(std::back_inserter(interm), i, false);
+
+                    std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
+
+                    intermediates.emplace_back(std::move(interm));
+                }
+
+                auto result = vector<bool>{};
+                result.reserve(lhs.size());
+                std::fill_n(std::back_inserter(result), lhs.size(), false);
+
+                result = std::accumulate(intermediates.begin(), intermediates.end(), result,
+                                       [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                                           return signed_add(l, r);
+                                       });
+
+                auto last_set = binary_last_bit_set(result);
+                if (last_set and *last_set >= lhs.size()) {
+                    throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                }
+
+                result = binary_clip(result, lhs.size());
+
+                if (result_should_be_negative != binary_is_negative(result)) {
+                    throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                }
+
+                return result;
+            }
         }
     }      // namespace arithmetic
 }  // namespace viua
@@ -680,6 +750,10 @@ auto viua::types::Bits::checked_signed_decrement() -> void {
 auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::checked::signed_add(underlying_array, that.underlying_array), size()));
+}
+auto viua::types::Bits::checked_signed_mul(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(
+        viua::arithmetic::checked::signed_mul(underlying_array, that.underlying_array));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {

@@ -332,7 +332,7 @@ viua::internals::types::byte* viua::process::Process::opcheckedsmul(viua::intern
     viua::types::Bits* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    *target = lhs->wrapmul(*rhs);
+    *target = lhs->checked_signed_mul(*rhs);
 
     return addr;
 }
