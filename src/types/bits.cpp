@@ -89,7 +89,7 @@ static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
     }
     return v;
 }
-static auto binary_is_negative(vector<bool> const& v) -> bool { return v.at(v.size() - 1); }
+static auto binary_is_negative(vector<bool> const& v) -> bool { return v.back(); }
 static auto binary_last_bit_set(vector<bool> const& v) -> optional<remove_reference_t<decltype(v)>::size_type> {
     auto index_of_set = optional<remove_reference_t<decltype(v)>::size_type>{};
 
