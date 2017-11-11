@@ -619,22 +619,79 @@ namespace viua {
                     intermediates.emplace_back(std::move(interm));
                 }
 
+                /*
+                 * Result *MUST NOT* be empty.
+                 * If it would be empty checking if it is negative would result in segmentation fault when
+                 * binary_is_negative() would try to access last element of empty bit string.
+                 */
                 auto result = vector<bool>{};
                 result.reserve(lhs.size());
                 std::fill_n(std::back_inserter(result), lhs.size(), false);
 
                 result = std::accumulate(intermediates.begin(), intermediates.end(), result,
                                        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                                           /*
+                                            * Use basic (unchecked, expanding) binary addition to accumulate
+                                            * the result. If you used checked addition multiplication would
+                                            * throw "checked signed addition" exceptions as overflow would
+                                            * be detected during accumulation.
+                                            * We don't want that so we use unchecked addition here, and
+                                            * check for errors later.
+                                            */
                                            return wrapping::binary_addition(l, r);
                                        });
 
+                /*
+                 * We have to clip the result as it must remain fixed-size.
+                 * However, for overflow checking, we need the full unclipped result so we just stash
+                 * the clipped version here.
+                 * The copy is not useless as it is also used for error checking.
+                 */
                 auto clipped = binary_clip(result, lhs.size());
 
+                /*
+                 * We can't just clip the result and be done with it because the part that would be discarded
+                 * may contain enabled bits.
+                 * So let's check if the last set bit (if there are any) is out of range for the valid result.
+                 * If it is, make some extra checks to remove false positives (it would be too easy if one
+                 * simple check would suffice) and only then throw exception if you must.
+                 */
                 auto last_set = binary_last_bit_set(result);
                 if (last_set and *last_set >= lhs.size()) {
+                    /*
+                     * This check is here to prevent exception being thrown for negative-negative
+                     * multiplication. For example, this calculation would throw without it:
+                     *
+                     *      -2 * -2 = 4
+                     *
+                     * due to the fact that -2 is represented as 0b11111110 in two's complement.
+                     * If you multiplied 0b11111110 by itself the result would be longer than 8 bits, so and
+                     * last set bit would have index greater than 7 so, in theory, it should be an overflow.
+                     *
+                     * In such situations, though, we should check if clipped result (which would be the
+                     * retuned value) is not the same as the product of absolute values of lhs and rhs.
+                     * If they are the same, just discard the extra bits - and this will yield the correct
+                     * value.
+                     *
+                     * This works for small negative values for which abs * abs would be in range.
+                     * For values that would produce out-of-range results the clipped result will be different
+                     * than abs * abs, so we check for that - and throw an exception.
+                     *
+                     * It surely is not the most efficient algorithm, but it is simple and easy to understand.
+                     * If you ever find something better - feel free to implement it. The test suite should
+                     * catch your mistakes.
+                     */
                     if ((not result_should_be_negative) and (lhs_negative or rhs_negative) and clipped != signed_mul(absolute(lhs), absolute(rhs))) {
                         throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
                     }
+
+                    /*
+                     * This is to catch overflows in positive-positive multiplications where both operands
+                     * are quite large, e.g. 64 * 64 for for 8 bit integers.
+                     * It is necessary to put it here because the previous check would suppress these
+                     * errors, as it only fires if at least one operand is negative and this check fires when
+                     * neither is.
+                     */
                     if (not (lhs_negative or rhs_negative)) {
                         throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
                     }
