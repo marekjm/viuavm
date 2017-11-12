@@ -747,17 +747,22 @@ namespace viua {
                 auto negative_dividend = binary_is_negative(dividend);
                 auto negative_quotinent = false;
 
-                divisor = absolute(divisor);
-                remainder = absolute(remainder);
-                negative_quotinent = (negative_divisor xor negative_dividend);
+                try {
+                    divisor = absolute(divisor);
+                    remainder = absolute(remainder);
+                    negative_quotinent = (negative_divisor xor negative_dividend);
 
-                while (wrapping::binary_lte(divisor, remainder)) {
-                    remainder = wrapping::binary_subtraction(remainder, divisor);
-                    quotinent = wrapping::binary_increment(quotinent).second;
-                }
+                    while (wrapping::binary_lte(divisor, remainder)) {
+                        remainder = wrapping::binary_subtraction(remainder, divisor);
+                        quotinent = wrapping::binary_increment(quotinent).second;
+                    }
 
-                if (negative_quotinent) {
-                    quotinent = take_twos_complement(quotinent);
+                    if (negative_quotinent) {
+                        quotinent = take_twos_complement(quotinent);
+                    }
+                } catch (Exception* e) {
+                    delete e;
+                    throw new Exception("CheckedArithmeticDivisionSignedOverflow");
                 }
 
                 return quotinent;
