@@ -722,6 +722,38 @@ namespace viua {
 
                 return result;
             }
+            static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
+                -> vector<bool> {
+                auto quotinent = vector<bool>{};
+                auto remainder = dividend;
+                auto divisor = rhs;
+
+                quotinent.reserve(remainder.size());
+                std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
+
+                if (binary_eq(divisor, dividend)) {
+                    return wrapping::binary_increment(quotinent).second;
+                }
+
+                auto negative_divisor = binary_is_negative(divisor);
+                auto negative_dividend = binary_is_negative(dividend);
+                auto negative_quotinent = false;
+
+                divisor = absolute(divisor);
+                remainder = absolute(remainder);
+                negative_quotinent = (negative_divisor xor negative_dividend);
+
+                while (wrapping::binary_lte(divisor, remainder)) {
+                    remainder = wrapping::binary_subtraction(remainder, divisor);
+                    quotinent = wrapping::binary_increment(quotinent).second;
+                }
+
+                if (negative_quotinent) {
+                    quotinent = take_twos_complement(quotinent);
+                }
+
+                return quotinent;
+            }
         }  // namespace checked
     }      // namespace arithmetic
 }  // namespace viua
@@ -841,6 +873,9 @@ auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr
 }
 auto viua::types::Bits::checked_signed_mul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(viua::arithmetic::checked::signed_mul(underlying_array, that.underlying_array));
+}
+auto viua::types::Bits::checked_signed_div(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(viua::arithmetic::checked::signed_div(underlying_array, that.underlying_array));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {

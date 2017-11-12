@@ -348,7 +348,7 @@ viua::internals::types::byte* viua::process::Process::opcheckedsdiv(viua::intern
     viua::types::Bits* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    *target = lhs->wrapdiv(*rhs);
+    *target = lhs->checked_signed_div(*rhs);
 
     return addr;
 }
