@@ -585,7 +585,7 @@ namespace viua {
 
                 return result;
             }
-            static auto signed_mul(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
+            static auto signed_mul(vector<bool> const & lhs, vector<bool> const& rhs) -> vector<bool> {
                 vector<vector<bool>> intermediates;
                 intermediates.reserve(rhs.size());
 
