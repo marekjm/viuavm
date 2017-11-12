@@ -1056,6 +1056,12 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00000001',
         ])
 
+    def test_minimum_minus_1_division(self):
+        runTestThrowsException(self, 'minimum_minus_1_division.asm', ('Exception', 'CheckedArithmeticDivisionSignedOverflow'))
+
+    def test_x_zero_division(self):
+        runTestThrowsException(self, 'x_zero_division.asm', ('Exception', 'division by zero',))
+
 class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_checked'
 
