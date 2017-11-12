@@ -103,6 +103,19 @@ static auto binary_last_bit_set(vector<bool> const& v)
 
     return index_of_set;
 }
+static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+
+    for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
+        if (lhs.at(i) != rhs.at(i)) {
+            return false;
+        }
+    }
+
+    // yep, they are equal
+    return true;
+}
 
 
 static auto binary_shr(vector<bool> v, decltype(v)::size_type const n, bool const padding = false)
@@ -249,19 +262,6 @@ namespace viua {
                 }
                 // probably equal to each other
                 return false;
-            }
-            static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
-                lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-                rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
-
-                for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
-                    if (lhs.at(i) != rhs.at(i)) {
-                        return false;
-                    }
-                }
-
-                // yep, they are equal
-                return true;
             }
 
 
