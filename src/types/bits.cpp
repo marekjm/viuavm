@@ -384,6 +384,10 @@ namespace viua {
             }
             static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs)
                 -> vector<bool> {
+                if (not binary_to_bool(rhs)) {
+                    throw new Exception("division by zero");
+                }
+
                 auto quotinent = vector<bool>{};
                 auto remainder = dividend;
                 auto divisor = rhs;
@@ -724,6 +728,10 @@ namespace viua {
             }
             static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
                 -> vector<bool> {
+                if (not binary_to_bool(rhs)) {
+                    throw new Exception("division by zero");
+                }
+
                 auto quotinent = vector<bool>{};
                 auto remainder = dividend;
                 auto divisor = rhs;
@@ -851,9 +859,6 @@ auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
         viua::arithmetic::wrapping::binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
-    if (not that.boolean()) {
-        throw new viua::types::Exception("division by zero");
-    }
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::wrapping::binary_division(underlying_array, that.underlying_array), size()));
 }
