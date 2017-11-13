@@ -32,13 +32,13 @@
     ;
     ;   <mnemonic> <target> <sources>...
     ;
-    text %1 "Hello World!"
+    text %1 local "Hello World!"
 
     ; Print contents of a register to standard output.
     ; This is the most primitive form of output the VM supports, and
     ; should be used only in the simplest programs and
     ; for quick-and-dirty debugging.
-    print %1
+    print %1 local
 
     ; The finishing sequence of every program running on Viua.
     ;
