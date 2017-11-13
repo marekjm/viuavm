@@ -57,13 +57,20 @@ Check [Weekly](http://weekly.viuavm.org/) blog for news and developments in Viua
 ### Use cases
 
 Viua is a runtime environment focused on reliability, predictability, and concurrency.
-It is suitable for writing long-running software that runs in the background providing infrastructure services; servers, message queues, and
-system and application daemons.
+It is suitable for writing long-running software that runs in the background providing infrastructure services:
+
+- servers (e.g. IRC)
+- message queues
+- system and application daemons (e.g. cron)
+
+The VM is not ready to be used in places where performance matters the most.
+It is best to employ it for tasks which do not require human interaction or near real-time responses.
+
 The VM is able to fully utilise all cores of the CPU it's running on (tested on a system with 8 hardware threads) so can
 generate high CPU loads, but is relatively light on RAM and should not contain any memory leaks (all runtime tests are
 run under Valgrind to ensure this).
 
-The virtual machine is covered by more than 400 tests to provide safety, and guard against possible regressions.
+The virtual machine is covered by more than 500 tests to provide safety, and guard against possible regressions.
 It ships with an assembler and a static analyser, but does not provide any higher-level language compiler.
 
 
@@ -97,18 +104,17 @@ Some features also supported by the VM:
 
 - separate compilation of Viua code modules
 - static and dynamic linking of Viua-native libraries
-- built-in, simple algorithm supporting multiple inheritance of user-defined types in Viua
-- straightforward ways to use both dynamic and static method dispatch on objects
+- straightforward ways to use both dynamic and static function call dispatch
 - first-class functions
 - closures (with multiple way of capturing objects inside a closure)
-- passing function parameters by value and move (non-copying pass)
+- passing function parameters by value, by move (non-copying pass), and by pointer
 - copy-free function returns
 - inter-function tail calls
-- support for pointers (with no arithmetic, and no reassignment - pointers may be only used for reading and mutating objects)
+- several variants of fixed-size integer arithmetic: wrapping, checked, and saturating
 
 For enhanced reliability, Viua assembler provides a built-in static analyser that is able to detect most common errors related to
-register manipulation at compile time.
-It provides traced errors whenever possible, i.e. when SA detects an error and is able to trace execution path that would trigger it,
+register manipulation at compile time (type mismatches, invalid register access).
+It provides traced errors whenever possible, i.e. when it detects an error and is able to trace execution path that would trigger it,
 a sequence of instructions (with source code locations) leading to the detected error is presented to the user instead of a single offending
 instruction.
 
@@ -116,14 +122,14 @@ instruction.
 Current limitations include:
 
 - severly limited introspection,
-- no way to express atoms (i.e. all names must be known at compile time, and there is no way to tell the machine "Here, take this string,
-  convert it to atom and return corresponding function/class/etc.")
 - calling Viua code from C++ is not tested
 - debugging information encoded in compiled files is limited
 - speed: Viua is not the fastest VM around
 - VM cannot distinguish FFI calls that are CPU or I/O bound (**WIP**), so if the program performs many I/O operations it may saturate all
   FFI schedulers (which will effectively prevent the program from quickly executing more FFI calls; virtual processes are still running, and
   Viua functions are still freely callable, though)
+- lack of libraries
+- no easy way to perform I/O
 
 
 ##### Software state notice
@@ -138,11 +144,8 @@ Suitable announcements will be made when the VM reaches beta, RC and release sta
 #### Influences
 
 The way Viua works has mostly been influenced by
-Python (objects as dictionaries, the way multiple inheritance works),
-C++ (static and dynamic method dispatch), and
+C++ (static and dynamic method dispatch, move semantics), and
 Erlang (message passing, indepenedent VM-based lightweight processes as units of concurrency).
-Maybe also a little bit of Java (more like JVM actually) and Ruby.
-Some parts of Viua assembly syntax may remind some people of Lisp.
 
 
 ----
