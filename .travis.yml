@@ -30,24 +30,6 @@ matrix:
                 apt:
                     sources:
                         - ubuntu-toolchain-r-test
-                        - llvm-toolchain-trusty-4.0
-                    packages:
-                        - python3
-                        - gcc-7
-                        - g++-7
-                        - valgrind
-                        - bc
-                        - clang-4.0
-            env:
-                - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
-                - ASAN_OPTIONS=detect_odr_violation=0
-        -
-            os: linux
-            compiler: clang
-            addons:
-                apt:
-                    sources:
-                        - ubuntu-toolchain-r-test
                         - llvm-toolchain-trusty-5.0
                     packages:
                         - python3
