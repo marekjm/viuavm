@@ -1056,6 +1056,27 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00000110',
         ])
 
+    def test_minus_42_7_division(self):
+        runTestSplitlines(self, 'minus_42_7_division.asm', [
+            '11010110',
+            '00000111',
+            '11111010',
+        ])
+
+    def test_42_minus_7_division(self):
+        runTestSplitlines(self, '42_minus_7_division.asm', [
+            '00101010',
+            '11111001',
+            '11111010',
+        ])
+
+    def test_minus_42_minus_7_division(self):
+        runTestSplitlines(self, 'minus_42_minus_7_division.asm', [
+            '11010110',
+            '11111001',
+            '00000110',
+        ])
+
     def test_x_x_division(self):
         runTestSplitlines(self, 'x_x_division.asm', [
             '00001010',
