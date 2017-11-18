@@ -67,6 +67,12 @@ namespace viua {
             auto checked_signed_mul(Bits const&) const -> std::unique_ptr<Bits>;
             auto checked_signed_div(Bits const&) const -> std::unique_ptr<Bits>;
 
+            auto saturating_signed_increment() -> void;
+            auto saturating_signed_decrement() -> void;
+            auto saturating_signed_add(Bits const&) const -> std::unique_ptr<Bits>;
+            auto saturating_signed_mul(Bits const&) const -> std::unique_ptr<Bits>;
+            auto saturating_signed_div(Bits const&) const -> std::unique_ptr<Bits>;
+
             auto operator==(const Bits&) const -> bool;
             auto operator<(const Bits&) const -> bool;
             auto operator<=(const Bits&) const -> bool;
