@@ -291,11 +291,17 @@ enum OPCODE : viua::internals::types::byte {
      * If 16 is subtracted from 0 (assuming unsigned values) the result is zero
      * because the value is already at the minimum.
      */
-    SATURATINGINCREMENT,
-    SATURATINGDECREMENT,
-    SATURATINGADD,
-    SATURATINGMUL,
-    SATURATINGDIV,
+    SATURATINGSINCREMENT,
+    SATURATINGSDECREMENT,
+    SATURATINGSADD,
+    SATURATINGSMUL,
+    SATURATINGSDIV,
+
+    SATURATINGUINCREMENT,
+    SATURATINGUDECREMENT,
+    SATURATINGUADD,
+    SATURATINGUMUL,
+    SATURATINGUDIV,
 
     // register manipulation
     MOVE,    // move an object from one register to another

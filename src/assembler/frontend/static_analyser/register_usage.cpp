@@ -680,8 +680,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
                                                                               *operand);
             } else if (opcode == WRAPINCREMENT or opcode == WRAPDECREMENT or opcode == CHECKEDSINCREMENT or
-                       opcode == CHECKEDSDECREMENT or opcode == SATURATINGINCREMENT or
-                       opcode == SATURATINGDECREMENT) {
+                       opcode == CHECKEDSDECREMENT or opcode == SATURATINGSINCREMENT or
+                       opcode == SATURATINGSDECREMENT) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
@@ -830,8 +830,8 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 val.value_type = register_usage_profile.at(*lhs).second.value_type;
                 register_usage_profile.define(val, result->tokens.at(0));
             } else if (opcode == WRAPADD or opcode == WRAPMUL or opcode == WRAPDIV or opcode == CHECKEDSADD or
-                       opcode == CHECKEDSMUL or opcode == CHECKEDSDIV or opcode == SATURATINGADD or
-                       opcode == SATURATINGMUL or opcode == SATURATINGDIV) {
+                       opcode == CHECKEDSMUL or opcode == CHECKEDSDIV or opcode == SATURATINGSADD or
+                       opcode == SATURATINGSMUL or opcode == SATURATINGSDIV) {
                 auto result = get_operand<RegisterIndex>(*instruction, 0);
                 if (not result) {
                     throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
