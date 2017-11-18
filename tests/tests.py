@@ -1049,6 +1049,13 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00001001',
         ])
 
+    def test_42_7_division(self):
+        runTestSplitlines(self, '42_7_division.asm', [
+            '00101010',
+            '00000111',
+            '00000110',
+        ])
+
     def test_x_x_division(self):
         runTestSplitlines(self, 'x_x_division.asm', [
             '00001010',
