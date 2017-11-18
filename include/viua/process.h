@@ -341,11 +341,11 @@ namespace viua {
             viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte*);
             viua::internals::types::byte* opcheckedsdiv(viua::internals::types::byte*);
 
-            viua::internals::types::byte* opcheckduincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckdudecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckduadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckdumul(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckdudiv(viua::internals::types::byte*);
+            viua::internals::types::byte* opcheckeduincrement(viua::internals::types::byte*);
+            viua::internals::types::byte* opcheckedudecrement(viua::internals::types::byte*);
+            viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte*);
+            viua::internals::types::byte* opcheckedumul(viua::internals::types::byte*);
+            viua::internals::types::byte* opcheckedudiv(viua::internals::types::byte*);
 
             viua::internals::types::byte* opmove(viua::internals::types::byte*);
             viua::internals::types::byte* opcopy(viua::internals::types::byte*);
