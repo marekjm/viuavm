@@ -390,6 +390,56 @@ Program& Program::opcheckedudiv(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opsaturatingsincrement(int_op target) {
+    addr_ptr = cg::bytecode::opsaturatingsincrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opsaturatingsdecrement(int_op target) {
+    addr_ptr = cg::bytecode::opsaturatingsdecrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opsaturatingsadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingsadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatingsmul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingsmul(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatingsdiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingsdiv(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatinguincrement(int_op target) {
+    addr_ptr = cg::bytecode::opsaturatinguincrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opsaturatingudecrement(int_op target) {
+    addr_ptr = cg::bytecode::opsaturatingudecrement(addr_ptr, target);
+    return (*this);
+}
+
+Program& Program::opsaturatinguadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatinguadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatingumul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingumul(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatingudiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingudiv(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *

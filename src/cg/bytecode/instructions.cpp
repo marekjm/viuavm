@@ -509,6 +509,60 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, CHECKEDUDIV, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opsaturatingsincrement(viua::internals::types::byte* addr_ptr,
+                                                             int_op target) {
+            *(addr_ptr++) = SATURATINGSINCREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opsaturatingsdecrement(viua::internals::types::byte* addr_ptr,
+                                                             int_op target) {
+            *(addr_ptr++) = SATURATINGSDECREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opsaturatingsadd(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGSADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatingsmul(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGSMUL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatingsdiv(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGSDIV, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatinguincrement(viua::internals::types::byte* addr_ptr,
+                                                             int_op target) {
+            *(addr_ptr++) = SATURATINGUINCREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opsaturatingudecrement(viua::internals::types::byte* addr_ptr,
+                                                             int_op target) {
+            *(addr_ptr++) = SATURATINGUDECREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
+        viua::internals::types::byte* opsaturatinguadd(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGUADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatingumul(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGUMUL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatingudiv(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGUDIV, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
             return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
         }

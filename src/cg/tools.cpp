@@ -684,6 +684,48 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+
+            static auto size_of_saturatingsincrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_saturatingsdecrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_saturatingsadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatingsmul(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatingsdiv(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatinguincrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_saturatingudecrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
+            static auto size_of_saturatinguadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatingumul(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatingudiv(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+
             static auto size_of_move(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
@@ -1455,6 +1497,36 @@ namespace viua {
                     } else if (tokens.at(i) == "checkedudiv") {
                         ++i;
                         tie(increase, i) = size_of_checkedudiv(tokens, i);
+                    } else if (tokens.at(i) == "saturatingsincrement") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingsincrement(tokens, i);
+                    } else if (tokens.at(i) == "saturatingsdecrement") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingsdecrement(tokens, i);
+                    } else if (tokens.at(i) == "saturatingsadd") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingsadd(tokens, i);
+                    } else if (tokens.at(i) == "saturatingsmul") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingsmul(tokens, i);
+                    } else if (tokens.at(i) == "saturatingsdiv") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingsdiv(tokens, i);
+                    } else if (tokens.at(i) == "saturatinguincrement") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatinguincrement(tokens, i);
+                    } else if (tokens.at(i) == "saturatingudecrement") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingudecrement(tokens, i);
+                    } else if (tokens.at(i) == "saturatinguadd") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatinguadd(tokens, i);
+                    } else if (tokens.at(i) == "saturatingumul") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingumul(tokens, i);
+                    } else if (tokens.at(i) == "saturatingudiv") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingudiv(tokens, i);
                     } else if (tokens.at(i) == "move") {
                         ++i;
                         tie(increase, i) = size_of_move(tokens, i);
