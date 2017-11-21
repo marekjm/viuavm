@@ -275,6 +275,12 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case CHECKEDSDIV:
             addr = opcheckedsdiv(addr + 1);
             break;
+        case SATURATINGSINCREMENT:
+            addr = opsaturatingsincrement(addr + 1);
+            break;
+        case SATURATINGSDECREMENT:
+            addr = opsaturatingsdecrement(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;
