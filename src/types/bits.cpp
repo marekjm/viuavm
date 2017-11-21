@@ -768,6 +768,74 @@ namespace viua {
                 return quotinent;
             }
         }  // namespace checked
+        namespace saturating {
+            static auto signed_is_min(vector<bool> const v) -> bool {
+                /*
+                 * First bit must be set in two's complement for the number to be negative.
+                 * If it's not then clearly the number encoded is not the minimum *signed* value.
+                 */
+                if (not v.at(0)) {
+                    return false;
+                }
+                for (auto i = decltype(v)::size_type{1}; i < v.size(); ++i) {
+                    /*
+                     * If any bit except the first is set, then the value is not minimum.
+                     * This works for signed integers.
+                     */
+                    if (v.at(i)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            static auto signed_increment(vector<bool> v) -> vector<bool> {
+                auto carry = true;
+                auto incremented = v;
+
+                for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        incremented.at(i) = false;
+                    } else {
+                        incremented.at(i) = true;
+                        carry = false;
+                    }
+                }
+
+                if ((not binary_is_negative(v)) and binary_is_negative(incremented)) {
+                    incremented = signed_make_max(v.size());
+                }
+
+                return incremented;
+            }
+            static auto signed_decrement(vector<bool> v) -> vector<bool> {
+                if (signed_is_min(v)) {
+                    return v;
+                }
+
+                auto decremented = v;
+
+                for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
+                    if (v.at(i)) {
+                        decremented.at(i) = false;
+                        break;
+                    } else {
+                        decremented.at(i) = true;
+                    }
+                }
+
+                return decremented;
+            }
+
+            static auto signed_add(vector<bool> lhs, vector<bool>) -> vector<bool> {
+                return lhs;
+            }
+            static auto signed_mul(vector<bool> lhs, vector<bool>) -> vector<bool> {
+                return lhs;
+            }
+            static auto signed_div(vector<bool> lhs, vector<bool>) -> vector<bool> {
+                return lhs;
+            }
+        }  // namespace saturating
     }      // namespace arithmetic
 }  // namespace viua
 
@@ -886,6 +954,28 @@ auto viua::types::Bits::checked_signed_mul(const Bits& that) const -> unique_ptr
 }
 auto viua::types::Bits::checked_signed_div(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(viua::arithmetic::checked::signed_div(underlying_array, that.underlying_array));
+}
+
+
+auto viua::types::Bits::saturating_signed_increment() -> void {
+    auto result = viua::arithmetic::saturating::signed_increment(underlying_array);
+    underlying_array = std::move(result);
+}
+auto viua::types::Bits::saturating_signed_decrement() -> void {
+    auto result = viua::arithmetic::saturating::signed_decrement(underlying_array);
+    underlying_array = std::move(result);
+}
+auto viua::types::Bits::saturating_signed_add(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::saturating::signed_add(underlying_array, that.underlying_array), size()));
+}
+auto viua::types::Bits::saturating_signed_mul(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(
+        viua::arithmetic::saturating::signed_mul(underlying_array, that.underlying_array));
+}
+auto viua::types::Bits::saturating_signed_div(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(
+        viua::arithmetic::saturating::signed_div(underlying_array, that.underlying_array));
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {

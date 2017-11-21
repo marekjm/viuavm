@@ -352,3 +352,65 @@ viua::internals::types::byte* viua::process::Process::opcheckedsdiv(viua::intern
 
     return addr;
 }
+
+
+viua::internals::types::byte* viua::process::Process::opsaturatingsincrement(
+    viua::internals::types::byte* addr) {
+    viua::types::Bits* target{nullptr};
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    target->saturating_signed_increment();
+
+    return addr;
+}
+viua::internals::types::byte* viua::process::Process::opsaturatingsdecrement(
+    viua::internals::types::byte* addr) {
+    viua::types::Bits* target{nullptr};
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    target->saturating_signed_decrement();
+
+    return addr;
+}
+viua::internals::types::byte* viua::process::Process::opsaturatingsadd(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->saturating_signed_add(*rhs);
+
+    return addr;
+}
+viua::internals::types::byte* viua::process::Process::opsaturatingsmul(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->saturating_signed_mul(*rhs);
+
+    return addr;
+}
+viua::internals::types::byte* viua::process::Process::opsaturatingsdiv(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->saturating_signed_div(*rhs);
+
+    return addr;
+}
