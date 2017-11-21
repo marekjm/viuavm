@@ -144,6 +144,18 @@ class Program {
     Program& opcheckedumul(int_op, int_op, int_op);
     Program& opcheckedudiv(int_op, int_op, int_op);
 
+    Program& opsaturatingsincrement(int_op);
+    Program& opsaturatingsdecrement(int_op);
+    Program& opsaturatingsadd(int_op, int_op, int_op);
+    Program& opsaturatingsmul(int_op, int_op, int_op);
+    Program& opsaturatingsdiv(int_op, int_op, int_op);
+
+    Program& opsaturatinguincrement(int_op);
+    Program& opsaturatingudecrement(int_op);
+    Program& opsaturatinguadd(int_op, int_op, int_op);
+    Program& opsaturatingumul(int_op, int_op, int_op);
+    Program& opsaturatingudiv(int_op, int_op, int_op);
+
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
