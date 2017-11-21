@@ -769,6 +769,21 @@ namespace viua {
             }
         }  // namespace checked
         namespace saturating {
+            static auto signed_make_max(size_t const n) -> vector<bool> {
+                vector<bool> v;
+                v.reserve(n);
+                v.resize(n - 1, true);
+                v.push_back(false);
+                return v;
+            }
+            static auto signed_make_min[[maybe_unused]](size_t const n) -> vector<bool> {
+                vector<bool> v;
+                v.reserve(n);
+                v.push_back(true);
+                v.resize(n - 1, false);
+                v.push_back(true);
+                return v;
+            }
             static auto signed_is_min(vector<bool> const v) -> bool {
                 /*
                  * Last bit must be set in two's complement for the number to be negative.
