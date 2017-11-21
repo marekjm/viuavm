@@ -1096,6 +1096,18 @@ class BitsUnsignedCheckedArithmeticTests(unittest.TestCase):
 class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/signed_saturating'
 
+    def test_maximum_increment(self):
+        runTestSplitlines(self, 'maximum_increment.asm', [
+            '01111111',
+            '01111111',
+        ])
+
+    def test_minimum_decrement(self):
+        runTestSplitlines(self, 'minimum_decrement.asm', [
+            '10000000',
+            '10000000',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 
