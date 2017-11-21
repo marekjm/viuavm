@@ -757,6 +757,10 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_arithmetic_instruction<&Program::opcheckedumul>(program, tokens, i);
     } else if (tokens.at(i) == "checkedudiv") {
         assemble_arithmetic_instruction<&Program::opcheckedudiv>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingsincrement") {
+        assemble_increment_instruction<&Program::opsaturatingsincrement>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingsdecrement") {
+        assemble_increment_instruction<&Program::opsaturatingsdecrement>(program, tokens, i);
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
