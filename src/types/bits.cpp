@@ -771,15 +771,15 @@ namespace viua {
         namespace saturating {
             static auto signed_is_min(vector<bool> const v) -> bool {
                 /*
-                 * First bit must be set in two's complement for the number to be negative.
+                 * Last bit must be set in two's complement for the number to be negative.
                  * If it's not then clearly the number encoded is not the minimum *signed* value.
                  */
-                if (not v.at(0)) {
+                if (not v.back()) {
                     return false;
                 }
-                for (auto i = decltype(v)::size_type{1}; i < v.size(); ++i) {
+                for (auto i = decltype(v)::size_type{0}; i < (v.size() - 1); ++i) {
                     /*
-                     * If any bit except the first is set, then the value is not minimum.
+                     * If any bit except the last is set, then the value is not minimum.
                      * This works for signed integers.
                      */
                     if (v.at(i)) {
