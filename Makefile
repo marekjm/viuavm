@@ -12,7 +12,7 @@ GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize
 
 # These are generic flags that should be used for compiling Viua VM.
 GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef \
-				 -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
+				 -Wstrict-overflow=2 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
 				 -Wuseless-cast -Wconversion -Wshadow -Wswitch-default -Wredundant-decls \
 				 -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual \
 				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors \
