@@ -315,9 +315,9 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
 auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(const ParsedSource& src) -> void {
     verify_wrapper(src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
         unsigned long frame_parameters_count = 0;
-        bool detected_frame_parameters_count = false;
-        bool slot_index_detection_is_reliable = true;
-        viua::assembler::frontend::parser::Instruction* last_frame;
+        auto detected_frame_parameters_count = false;
+        auto slot_index_detection_is_reliable = true;
+        viua::assembler::frontend::parser::Instruction* last_frame = nullptr;
 
         vector<bool> filled_slots;
         vector<Token> pass_lines;

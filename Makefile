@@ -13,12 +13,14 @@ GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize
 
 # These are generic flags that should be used for compiling Viua VM.
 GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef \
-				 -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
-				 -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls \
+				 -Wstrict-overflow=2 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
+				 -Wuseless-cast -Wconversion -Wshadow -Wswitch-default -Wredundant-decls \
 				 -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual \
-				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors -pedantic -g -I./include
-CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default \
-			   -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g \
+				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors \
+				 -pedantic -g -I./include
+CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Wshadow -Wswitch-default \
+			   -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors \
+			   -pedantic -g \
 			   -I./include
 GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
 
@@ -35,7 +37,7 @@ ifeq ($(CXX), g++)
 COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), g++-7)
-COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow \
+COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Wshadow \
 			   -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align \
 			   -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
 SANITISER_FLAGS=-fsanitize=undefined
@@ -78,7 +80,7 @@ LDLIBS=-ldl -lpthread
 ############################################################
 # BASICS
 all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser \
-	build/bin/opcodes.bin platform stdlib
+	build/bin/opcodes.bin platform stdlib standardlibrary compile-test
 
 what:
 	@echo "compiler:  $(CXX)"
@@ -100,7 +102,7 @@ clean: clean-test-compiles
 	find . -name '*.vlib' | xargs -n 1 $(RM)
 
 clean-test-compiles:
-	find ./tests/compiled -name '*.asm' | xargs rm -fv
+	find ./tests/compiled -name '*.asm' | xargs -n 1 $(RM)
 
 
 ############################################################

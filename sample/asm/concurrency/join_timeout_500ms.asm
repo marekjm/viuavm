@@ -34,8 +34,8 @@
 
 .function: main/0
     frame %0
-    process %1 child_process/0
-    print (join %2 %1 500ms)
+    process %1 local child_process/0
+    print (join %2 local %1 local 10ms) local
     izero %0 local
     return
 .end
