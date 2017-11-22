@@ -99,7 +99,7 @@ clean: clean-test-compiles
 	find . -name '*.vlib' | xargs -n 1 rm -fv
 
 clean-test-compiles:
-	find ./tests/compiled -name '*.asm' | xargs rm -fv
+	find ./tests/compiled -name '*.asm' | xargs -n 1 $(RM)
 
 
 ############################################################
