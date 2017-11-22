@@ -317,7 +317,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(cons
         unsigned long frame_parameters_count = 0;
         auto detected_frame_parameters_count = false;
         auto slot_index_detection_is_reliable = true;
-        viua::assembler::frontend::parser::Instruction* last_frame;
+        viua::assembler::frontend::parser::Instruction* last_frame = nullptr;
 
         vector<bool> filled_slots;
         vector<Token> pass_lines;
