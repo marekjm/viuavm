@@ -39,7 +39,7 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
         if (tokens.at(i) == "(") {
             vector<string> subtokens;
             ++i;
-            int balance = 1;
+            unsigned balance = 1;
             while (i < tokens.size()) {
                 if (tokens.at(i) == "(") {
                     ++balance;
@@ -64,8 +64,8 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
         if (tokens.at(i) == "[") {
             vector<string> subtokens;
             ++i;
-            int balance = 1;
-            int toplevel_subexpr_balance = 0;
+            unsigned balance = 1;
+            unsigned toplevel_subexpr_balance = 0;
             unsigned len = 0;
             while (i < tokens.size()) {
                 if (tokens.at(i) == "[") {
