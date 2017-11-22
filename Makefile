@@ -79,7 +79,7 @@ LDLIBS=-ldl -lpthread
 ############################################################
 # BASICS
 all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser \
-	build/bin/opcodes.bin platform stdlib
+	build/bin/opcodes.bin platform stdlib standardlibrary compile-test
 
 what:
 	@echo "compiler:  $(CXX)"
