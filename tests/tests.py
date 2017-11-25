@@ -1115,6 +1115,34 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '00001001',
         ])
 
+    def test_max_max_addition(self):
+        runTestSplitlines(self, 'max_max_addition.asm', [
+            '01111111',
+            '01111111',
+            '01111111',
+        ])
+
+    def test_max_one_addition(self):
+        runTestSplitlines(self, 'max_one_addition.asm', [
+            '01111111',
+            '00000001',
+            '01111111',
+        ])
+
+    def test_one_max_addition(self):
+        runTestSplitlines(self, 'one_max_addition.asm', [
+            '00000001',
+            '01111111',
+            '01111111',
+        ])
+
+    def test_mish_mash_both_positive_addition(self):
+        runTestSplitlines(self, 'mish_mash_both_positive_addition.asm', [
+            '01010101',
+            '00101011',
+            '01111111',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 
