@@ -281,6 +281,15 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case SATURATINGSDECREMENT:
             addr = opsaturatingsdecrement(addr + 1);
             break;
+        case SATURATINGSADD:
+            addr = opsaturatingsadd(addr + 1);
+            break;
+        case SATURATINGSMUL:
+            addr = opsaturatingsmul(addr + 1);
+            break;
+        case SATURATINGSDIV:
+            addr = opsaturatingsdiv(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;
