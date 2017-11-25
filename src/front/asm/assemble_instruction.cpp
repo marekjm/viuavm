@@ -761,6 +761,22 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opsaturatingsincrement>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingsdecrement") {
         assemble_increment_instruction<&Program::opsaturatingsdecrement>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingsadd") {
+        assemble_arithmetic_instruction<&Program::opsaturatingsadd>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingsmul") {
+        assemble_arithmetic_instruction<&Program::opsaturatingsmul>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingsdiv") {
+        assemble_arithmetic_instruction<&Program::opsaturatingsdiv>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatinguincrement") {
+        assemble_increment_instruction<&Program::opsaturatinguincrement>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingudecrement") {
+        assemble_increment_instruction<&Program::opsaturatingudecrement>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatinguadd") {
+        assemble_arithmetic_instruction<&Program::opsaturatinguadd>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingumul") {
+        assemble_arithmetic_instruction<&Program::opsaturatingumul>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingudiv") {
+        assemble_arithmetic_instruction<&Program::opsaturatingudiv>(program, tokens, i);
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
