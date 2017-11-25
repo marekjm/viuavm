@@ -1108,6 +1108,13 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '10000000',
         ])
 
+    def test_basic_addition(self):
+        runTestSplitlines(self, 'basic_addition.asm', [
+            '00000011',
+            '00000110',
+            '00001001',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 
