@@ -18,6 +18,13 @@
 ]$ make -j 4        # (2) build it using 4 jobs
 ```
 
+**Note**: the default build is run with `-O0` (without any optimisations).
+You can compile Viua VM with higher optimisation leves, but keep in mind that the compilation might not
+succeed on machines with 4GB or less RAM (with `-O3`).
+This is tracked by [issue #184](https://github.com/marekjm/viuavm/issues/184) on GitHub, or
+by issue `7c06177872c3a718510a54e6513820f8fe0fb99b` in the embedded issue repository.
+
+
 #### Hello World in Viua VM
 
 ```
