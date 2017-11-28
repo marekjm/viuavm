@@ -1143,6 +1143,13 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '01111111',
         ])
 
+    def test_mish_mash_saturating_multiplication(self):
+        runTestSplitlines(self, 'mish_mash_saturating_multiplication.asm', [
+            '01010101',
+            '01101011',
+            '01111111',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 

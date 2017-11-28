@@ -874,6 +874,13 @@ namespace viua {
                 // equal to each other
                 return true;
             }
+            static auto absolute(vector<bool> const& v) -> vector<bool> {
+                if (binary_is_negative(v)) {
+                    return take_twos_complement(v);
+                } else {
+                    return v;
+                }
+            }
 
             static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
                 vector<bool> result;
@@ -959,8 +966,152 @@ namespace viua {
 
                 return result;
             }
-            static auto signed_mul(vector<bool> lhs, vector<bool>) -> vector<bool> {
-                return lhs;
+            static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
+                vector<vector<bool>> intermediates;
+                intermediates.reserve(rhs.size());
+
+                /*
+                 * Make sure the result is *always* has at least one entry (in case the rhs is all zero bits),
+                 * and that the results width is *always* the sum of operands' widths.
+                 */
+                intermediates.emplace_back(lhs.size() + rhs.size());
+
+                auto lhs_negative = binary_is_negative(lhs);
+                auto rhs_negative = binary_is_negative(rhs);
+                auto result_should_be_negative = (lhs_negative xor rhs_negative);
+
+                for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0}; i < rhs.size(); ++i) {
+                    if (not rhs.at(i)) {
+                        /*
+                         * Multiplication by 0 just gives a long string of zeroes.
+                         * There is no reason to build all these zero-filled bit strings as
+                         * they will only slow things down the road when all the intermediate
+                         * bit strings are accumulated.
+                         */
+                        continue;
+                    }
+
+                    vector<bool> interm;
+                    interm.reserve(i + lhs.size());
+                    std::fill_n(std::back_inserter(interm), i, false);
+
+                    std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
+
+                    intermediates.emplace_back(std::move(interm));
+                }
+
+                /*
+                 * Result *MUST NOT* be empty.
+                 * If it would be empty checking if it is negative would result in segmentation fault when
+                 * binary_is_negative() would try to access last element of empty bit string.
+                 */
+                auto result = vector<bool>{};
+                result.reserve(lhs.size());
+                std::fill_n(std::back_inserter(result), lhs.size(), false);
+
+                result = std::accumulate(intermediates.begin(), intermediates.end(), result,
+                                         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                                             /*
+                                              * Use basic (unchecked, expanding) binary addition to accumulate
+                                              * the result. If you used checked addition multiplication would
+                                              * throw "checked signed addition" exceptions as overflow would
+                                              * be detected during accumulation.
+                                              * We don't want that so we use unchecked addition here, and
+                                              * check for errors later.
+                                              */
+                                             return wrapping::binary_addition(l, r);
+                                         });
+
+                /*
+                 * We have to clip the result as it must remain fixed-size.
+                 * However, for overflow checking, we need the full unclipped result so we just stash
+                 * the clipped version here.
+                 * The copy is not useless as it is also used for error checking.
+                 */
+                auto clipped = binary_clip(result, lhs.size());
+
+                /*
+                 * We can't just clip the result and be done with it because the part that would be discarded
+                 * may contain enabled bits.
+                 * So let's check if the last set bit (if there are any) is out of range for the valid result.
+                 * If it is, make some extra checks to remove false positives (it would be too easy if one
+                 * simple check would suffice) and only then throw exception if you must.
+                 */
+                auto last_set = binary_last_bit_set(result);
+                if (last_set and *last_set >= lhs.size()) {
+                    /*
+                     * This check is here to prevent exception being thrown for negative-negative
+                     * multiplication. For example, this calculation would throw without it:
+                     *
+                     *      -2 * -2 = 4
+                     *
+                     * due to the fact that -2 is represented as 0b11111110 in two's complement.
+                     * If you multiplied 0b11111110 by itself the result would be longer than 8 bits, so and
+                     * last set bit would have index greater than 7 so, in theory, it should be an overflow.
+                     *
+                     * In such situations, though, we should check if clipped result (which would be the
+                     * retuned value) is not the same as the product of absolute values of lhs and rhs.
+                     * If they are the same, just discard the extra bits - and this will yield the correct
+                     * value.
+                     *
+                     * This works for small negative values for which abs * abs would be in range.
+                     * For values that would produce out-of-range results the clipped result will be different
+                     * than abs * abs, so we check for that - and throw an exception.
+                     *
+                     * It surely is not the most efficient algorithm, but it is simple and easy to understand.
+                     * If you ever find something better - feel free to implement it. The test suite should
+                     * catch your mistakes.
+                     */
+                    if ((not result_should_be_negative) and (lhs_negative or rhs_negative)) {
+                        auto lhs_abs = vector<bool>{};
+                        auto rhs_abs = vector<bool>{};
+                        try {
+                            lhs_abs = absolute(lhs);
+                            rhs_abs = absolute(rhs);
+                        } catch (Exception* e) {
+                            /*
+                             * This is why we need separate lhs_abs and rhs_abs variables initialised under a
+                             * try: because they can throw exceptions on overflow when taking two's
+                             * complement of the minimal value (a.k.a. negative maximum, e.g. -128 for 8 bit
+                             * integers).
+                             *
+                             * In this case, the negative-positive multiplication, we need to return the
+                             * minimum representable value (as the result is deep into the negative integers
+                             * teritory).
+                             */
+                            result = signed_make_min(lhs.size());
+                            clipped = signed_make_min(lhs.size());
+                        }
+                        if (clipped != signed_mul(lhs_abs, rhs_abs)) {
+                            result = signed_make_min(lhs.size());
+                            clipped = signed_make_min(lhs.size());
+                        }
+                    }
+
+                    /*
+                     * This is to catch overflows in positive-positive multiplications where both operands
+                     * are quite large, e.g. 64 * 64 for for 8 bit integers.
+                     * It is necessary to put it here because the previous check would suppress these
+                     * errors, as it only fires if at least one operand is negative and this check fires when
+                     * neither is.
+                     */
+                    if (not(lhs_negative or rhs_negative)) {
+                        result = signed_make_max(lhs.size());
+                        clipped = signed_make_max(lhs.size());
+                    }
+                }
+
+                result = std::move(clipped);
+
+                if (result_should_be_negative != binary_is_negative(result)) {
+                    if (result_should_be_negative) {
+                        result = signed_make_min(lhs.size());
+                    } else {
+                        result = signed_make_max(lhs.size());
+                    }
+                }
+
+                return result;
             }
             static auto signed_div(vector<bool> lhs, vector<bool>) -> vector<bool> {
                 return lhs;
