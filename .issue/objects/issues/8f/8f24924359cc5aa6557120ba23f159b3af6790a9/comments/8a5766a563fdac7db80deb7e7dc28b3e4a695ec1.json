@@ -1,0 +1,1 @@
+{"author.name": "Marek Marecki", "author.email": "marejm@ozro.pw", "message": "Type-specifiers can be ditched as well.\nThe new form of arithmetic instruction will be:\n\n    op {result} {lhs} {rhs}\n\nResult inherits type of the left-hand side operand.", "timestamp": 1492886555.281021}

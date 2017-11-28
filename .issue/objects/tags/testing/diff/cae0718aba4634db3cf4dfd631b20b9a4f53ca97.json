@@ -1,0 +1,1 @@
+[{"action": "tag-open", "params": {"name": "testing"}, "author": {"author.email": "marejm@ozro.pw", "author.name": "Marek Marecki"}, "timestamp": 1500413609.424508}, {"action": "tag-set-project-name", "params": {"name": "Viua Virtual Machine"}, "author": {"author.email": "marejm@ozro.pw", "author.name": "Marek Marecki"}, "timestamp": 1500413609.424518}]
