@@ -13,6 +13,11 @@
 
 .*
 
+!.issue
+.issue/*
+!.issue/objects
+!.issue/status
+
 contrib/*
 !contrib/example/
 
