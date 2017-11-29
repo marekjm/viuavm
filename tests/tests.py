@@ -1150,6 +1150,20 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '01111111',
         ])
 
+    def test_64_and_minus_2_multiplication(self):
+        runTestSplitlines(self, '64_and_minus_2_multiplication.asm', [
+            '01000000',
+            '11111110',
+            '10000000',
+        ])
+
+    def test_65_and_minus_2_multiplication(self):
+        runTestSplitlines(self, '65_and_minus_2_multiplication.asm', [
+            '01000001',
+            '11111110',
+            '10000000',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 
