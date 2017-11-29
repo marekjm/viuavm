@@ -779,7 +779,6 @@ namespace viua {
             static auto signed_make_min(size_t const n) -> vector<bool> {
                 vector<bool> v;
                 v.reserve(n);
-                v.push_back(true);
                 v.resize(n - 1, false);
                 v.push_back(true);
                 return v;
