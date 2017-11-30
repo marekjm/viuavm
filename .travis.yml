@@ -7,7 +7,7 @@ group: edge
 
 script:
     - ./configure
-    - ./scripts/test_full.sh
+    - OPTIMISED=no ./scripts/test_full.sh
 
 matrix:
     include:
