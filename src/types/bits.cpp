@@ -1112,8 +1112,40 @@ namespace viua {
 
                 return result;
             }
-            static auto signed_div(vector<bool> lhs, vector<bool>) -> vector<bool> {
-                return lhs;
+            static auto signed_div(vector<bool> dividend, vector<bool> rhs) -> vector<bool> {
+                if (not binary_to_bool(rhs)) {
+                    throw new Exception("division by zero");
+                }
+
+                auto quotinent = vector<bool>{};
+                auto remainder = dividend;
+                auto divisor = rhs;
+
+                quotinent.reserve(remainder.size());
+                std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
+
+                if (binary_eq(divisor, dividend)) {
+                    return wrapping::binary_increment(quotinent).second;
+                }
+
+                auto negative_divisor = binary_is_negative(divisor);
+                auto negative_dividend = binary_is_negative(dividend);
+                auto negative_quotinent = false;
+
+                divisor = absolute(divisor);
+                remainder = absolute(remainder);
+                negative_quotinent = (negative_divisor xor negative_dividend);
+
+                while (wrapping::binary_lte(divisor, remainder)) {
+                    remainder = wrapping::binary_subtraction(remainder, divisor);
+                    quotinent = wrapping::binary_increment(quotinent).second;
+                }
+
+                if (negative_quotinent) {
+                    quotinent = take_twos_complement(quotinent);
+                }
+
+                return quotinent;
             }
         }  // namespace saturating
     }      // namespace arithmetic
