@@ -18,7 +18,14 @@
 ;
 
 .function: main/0
-    -- code goes here
+    bits (.name: %iota lhs) local 0b01111111
+    bits (.name: %iota rhs) local 0b10000000
+
+    saturatingsdiv (.name: %iota result) local %lhs local %rhs local
+
+    print %lhs local
+    print %rhs local
+    print %result local
 
     izero %0 local
     return
