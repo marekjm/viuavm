@@ -1112,14 +1112,13 @@ namespace viua {
 
                 return result;
             }
-            static auto signed_div(vector<bool> dividend, vector<bool> rhs) -> vector<bool> {
-                if (not binary_to_bool(rhs)) {
+            static auto signed_div(vector<bool> dividend, vector<bool> divisor) -> vector<bool> {
+                if (not binary_to_bool(divisor)) {
                     throw new Exception("division by zero");
                 }
 
                 auto quotinent = vector<bool>{};
                 auto remainder = dividend;
-                auto divisor = rhs;
 
                 quotinent.reserve(remainder.size());
                 std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
