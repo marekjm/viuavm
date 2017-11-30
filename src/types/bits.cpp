@@ -1124,6 +1124,16 @@ namespace viua {
                 quotinent.reserve(remainder.size());
                 std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
 
+                if (signed_is_min(divisor)) {
+                    /*
+                     * Remember that we operate on arbitrary but fixed-size integers.
+                     * Viua uses two's complement representation for arithmetic on bits, so the most
+                     * negative value is greater (in absolute terms) than the most positive value.
+                     * Thus, (x / minimum) equals 0 even if 'x' is maximum.
+                     */
+                    return quotinent;
+                }
+
                 if (binary_eq(divisor, dividend)) {
                     return wrapping::binary_increment(quotinent).second;
                 }
