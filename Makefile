@@ -48,6 +48,7 @@ COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-5.0)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
+SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address
 endif
 
 # Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
