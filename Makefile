@@ -43,9 +43,6 @@ COMPILER_FLAGS=-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wco
 SANITISER_FLAGS=-fsanitize=undefined
 else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-else ifeq ($(CXX), clang++-4.0)
-COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-CXX_STANDARD=c++1z
 else ifeq ($(CXX), clang++-5.0)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address
