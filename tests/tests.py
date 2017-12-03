@@ -1178,6 +1178,13 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_minimum_by_minus_1_division(self):
+        runTestSplitlines(self, 'minimum_by_minus_1_division.asm', [
+            '10000000',
+            '11111111',
+            '01111111',
+        ])
+
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
 
