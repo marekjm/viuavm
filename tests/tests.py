@@ -1178,12 +1178,57 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_basic_division(self):
+        runTestSplitlines(self, 'basic_division.asm', [
+            '00010010',
+            '00000010',
+            '00001001',
+        ])
+
+    def test_42_7_division(self):
+        runTestSplitlines(self, '42_7_division.asm', [
+            '00101010',
+            '00000111',
+            '00000110',
+        ])
+
+    def test_minus_42_7_division(self):
+        runTestSplitlines(self, 'minus_42_7_division.asm', [
+            '11010110',
+            '00000111',
+            '11111010',
+        ])
+
+    def test_42_minus_7_division(self):
+        runTestSplitlines(self, '42_minus_7_division.asm', [
+            '00101010',
+            '11111001',
+            '11111010',
+        ])
+
+    def test_minus_42_minus_7_division(self):
+        runTestSplitlines(self, 'minus_42_minus_7_division.asm', [
+            '11010110',
+            '11111001',
+            '00000110',
+        ])
+
+    def test_x_x_division(self):
+        runTestSplitlines(self, 'x_x_division.asm', [
+            '00001010',
+            '00001010',
+            '00000001',
+        ])
+
     def test_minimum_by_minus_1_division(self):
         runTestSplitlines(self, 'minimum_by_minus_1_division.asm', [
             '10000000',
             '11111111',
             '01111111',
         ])
+
+    def test_x_zero_division(self):
+        runTestThrowsException(self, 'x_zero_division.asm', ('Exception', 'division by zero',))
 
 class BitsUnsignedSaturatingArithmeticTests(unittest.TestCase):
     PATH = './sample/asm/bits/arithmetic/unsigned_saturating'
