@@ -44,8 +44,6 @@ There are several categories of change:
 - feature: attributes for functions (`.function: [[attr0, attr1]] fun/0`) providing additional details about
   functions the assembler can use
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
-- feature: `fixedincrement` and`fixeddecrement` instructions for fixed-width integers/bit strings
-- feature: `fixedadd` instructions for arithmetic on fixed-width integers
 - enhancement: C++ standard used for Viua VM development was updated to C++17
 - fix: when displaying errors newlines are no longer underlined
 - fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
@@ -60,6 +58,12 @@ There are several categories of change:
 - bic: rename `strstore` to `string`
 - bic: rename `istore` to `integer`
 - bic: rename `fstore` to `float`
+- feature: `wrapincrement`, `wrapdecrement`, `wrapadd`, `wrapmul`, and `wrapdiv` instructions for modulo
+  arithmetic on fixed-width integers
+- feature: `checkedsincrement`, `checkedsdecrement`, `checkedsadd`, `checkedsmul`, and `checkedsdiv`
+  instructions for checked signed arithmetic on fixed-width integers
+- feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`, `saturatingsmul`, and
+  `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
