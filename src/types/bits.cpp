@@ -1248,6 +1248,10 @@ auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::wrapping::binary_addition(underlying_array, that.underlying_array), size()));
 }
+auto viua::types::Bits::wrapsub(const Bits& that) const -> unique_ptr<Bits> {
+    return make_unique<Bits>(binary_clip(
+        viua::arithmetic::wrapping::binary_subtraction(underlying_array, that.underlying_array), size()));
+}
 auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_clip(
         viua::arithmetic::wrapping::binary_multiplication(underlying_array, that.underlying_array), size()));
