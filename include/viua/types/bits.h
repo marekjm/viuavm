@@ -58,6 +58,7 @@ namespace viua {
             auto decrement() -> bool;
 
             auto wrapadd(const Bits&) const -> std::unique_ptr<Bits>;
+            auto wrapsub(const Bits&) const -> std::unique_ptr<Bits>;
             auto wrapmul(const Bits&) const -> std::unique_ptr<Bits>;
             auto wrapdiv(const Bits&) const -> std::unique_ptr<Bits>;
 

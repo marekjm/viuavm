@@ -254,6 +254,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case WRAPADD:
             addr = opwrapadd(addr + 1);
             break;
+        case WRAPSUB:
+            addr = opwrapsub(addr + 1);
+            break;
         case WRAPMUL:
             addr = opwrapmul(addr + 1);
             break;

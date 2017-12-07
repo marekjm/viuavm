@@ -636,6 +636,10 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_wrapsub(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_wrapmul(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
@@ -1461,6 +1465,9 @@ namespace viua {
                     } else if (tokens.at(i) == "wrapadd") {
                         ++i;
                         tie(increase, i) = size_of_wrapadd(tokens, i);
+                    } else if (tokens.at(i) == "wrapsub") {
+                        ++i;
+                        tie(increase, i) = size_of_wrapsub(tokens, i);
                     } else if (tokens.at(i) == "wrapmul") {
                         ++i;
                         tie(increase, i) = size_of_wrapmul(tokens, i);

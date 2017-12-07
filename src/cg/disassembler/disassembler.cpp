@@ -518,6 +518,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case ASHL:
         case ASHR:
         case WRAPADD:
+        case WRAPSUB:
         case WRAPMUL:
         case WRAPDIV:
         case CHECKEDSADD:

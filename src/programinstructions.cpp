@@ -330,6 +330,11 @@ Program& Program::opwrapadd(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opwrapsub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opwrapsub(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opwrapmul(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opwrapmul(addr_ptr, target, lhs, rhs);
     return (*this);

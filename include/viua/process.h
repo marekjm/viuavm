@@ -332,6 +332,7 @@ namespace viua {
             viua::internals::types::byte* opwrapincrement(viua::internals::types::byte*);
             viua::internals::types::byte* opwrapdecrement(viua::internals::types::byte*);
             viua::internals::types::byte* opwrapadd(viua::internals::types::byte*);
+            viua::internals::types::byte* opwrapsub(viua::internals::types::byte*);
             viua::internals::types::byte* opwrapmul(viua::internals::types::byte*);
             viua::internals::types::byte* opwrapdiv(viua::internals::types::byte*);
 

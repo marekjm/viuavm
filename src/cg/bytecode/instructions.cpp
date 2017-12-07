@@ -445,6 +445,11 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, WRAPADD, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opwrapsub(viua::internals::types::byte* addr_ptr, int_op target,
+                                                int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, WRAPSUB, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opwrapmul(viua::internals::types::byte* addr_ptr, int_op target,
                                                 int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, WRAPMUL, target, lhs, rhs);

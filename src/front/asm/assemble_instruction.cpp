@@ -733,6 +733,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opwrapdecrement>(program, tokens, i);
     } else if (tokens.at(i) == "wrapadd") {
         assemble_arithmetic_instruction<&Program::opwrapadd>(program, tokens, i);
+    } else if (tokens.at(i) == "wrapsub") {
+        assemble_arithmetic_instruction<&Program::opwrapsub>(program, tokens, i);
     } else if (tokens.at(i) == "wrapmul") {
         assemble_arithmetic_instruction<&Program::opwrapmul>(program, tokens, i);
     } else if (tokens.at(i) == "wrapdiv") {
