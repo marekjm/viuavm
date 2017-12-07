@@ -21,11 +21,7 @@
     bits (.name: %iota lhs) local 0b01111111
     bits (.name: %iota rhs) local 0b01111111
 
-    ; take two's complement of rhs
-    bitnot %rhs local %rhs local
-    wrapincrement %rhs local
-
-    wrapadd (.name: %iota result) local %lhs local %rhs local
+    wrapsub (.name: %iota result) local %lhs local %rhs local
 
     print %lhs local
     print %rhs local
