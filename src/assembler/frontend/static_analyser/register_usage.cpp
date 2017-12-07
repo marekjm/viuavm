@@ -829,8 +829,9 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 auto val = Register(*result);
                 val.value_type = register_usage_profile.at(*lhs).second.value_type;
                 register_usage_profile.define(val, result->tokens.at(0));
-            } else if (opcode == WRAPADD or opcode == WRAPMUL or opcode == WRAPDIV or opcode == CHECKEDSADD or
-                       opcode == CHECKEDSMUL or opcode == CHECKEDSDIV or opcode == SATURATINGSADD or
+            } else if (opcode == WRAPADD or opcode == WRAPSUB or opcode == WRAPMUL or opcode == WRAPDIV or
+                       opcode == CHECKEDSADD or opcode == CHECKEDSSUB or opcode == CHECKEDSMUL or
+                       opcode == CHECKEDSDIV or opcode == SATURATINGSADD or opcode == SATURATINGSSUB or
                        opcode == SATURATINGSMUL or opcode == SATURATINGSDIV) {
                 auto result = get_operand<RegisterIndex>(*instruction, 0);
                 if (not result) {
