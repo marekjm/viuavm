@@ -817,14 +817,14 @@ class BitsSignedWrappingArithmeticTests(unittest.TestCase):
     def test_minimum_maximum_subtraction(self):
         runTestSplitlines(self, 'minimum_maximum_subtraction.asm', [
             '10000000',
-            '10000001',
+            '01111111',
             '00000001',
         ])
 
     def test_zero_maximum_subtraction(self):
         runTestSplitlines(self, 'zero_maximum_subtraction.asm', [
             '00000000',
-            '10000001',
+            '01111111',
             '10000001',
         ])
 
