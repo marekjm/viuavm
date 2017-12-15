@@ -141,24 +141,28 @@ namespace cg {
         viua::internals::types::byte* opcheckedsincrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opcheckedsdecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opcheckedsadd(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opcheckedssub(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opcheckedsdiv(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opcheckeduincrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opcheckedudecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opcheckedusub(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opcheckedumul(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opcheckedudiv(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opsaturatingsincrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opsaturatingsdecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opsaturatingsadd(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opsaturatingssub(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opsaturatingsmul(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opsaturatingsdiv(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opsaturatinguincrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opsaturatingudecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opsaturatinguadd(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opsaturatingusub(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opsaturatingumul(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opsaturatingudiv(viua::internals::types::byte*, int_op, int_op, int_op);
 

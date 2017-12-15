@@ -136,24 +136,28 @@ class Program {
     Program& opcheckedsincrement(int_op);
     Program& opcheckedsdecrement(int_op);
     Program& opcheckedsadd(int_op, int_op, int_op);
+    Program& opcheckedssub(int_op, int_op, int_op);
     Program& opcheckedsmul(int_op, int_op, int_op);
     Program& opcheckedsdiv(int_op, int_op, int_op);
 
     Program& opcheckeduincrement(int_op);
     Program& opcheckedudecrement(int_op);
     Program& opcheckeduadd(int_op, int_op, int_op);
+    Program& opcheckedusub(int_op, int_op, int_op);
     Program& opcheckedumul(int_op, int_op, int_op);
     Program& opcheckedudiv(int_op, int_op, int_op);
 
     Program& opsaturatingsincrement(int_op);
     Program& opsaturatingsdecrement(int_op);
     Program& opsaturatingsadd(int_op, int_op, int_op);
+    Program& opsaturatingssub(int_op, int_op, int_op);
     Program& opsaturatingsmul(int_op, int_op, int_op);
     Program& opsaturatingsdiv(int_op, int_op, int_op);
 
     Program& opsaturatinguincrement(int_op);
     Program& opsaturatingudecrement(int_op);
     Program& opsaturatinguadd(int_op, int_op, int_op);
+    Program& opsaturatingusub(int_op, int_op, int_op);
     Program& opsaturatingumul(int_op, int_op, int_op);
     Program& opsaturatingudiv(int_op, int_op, int_op);
 

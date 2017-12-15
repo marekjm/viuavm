@@ -272,6 +272,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case CHECKEDSADD:
             addr = opcheckedsadd(addr + 1);
             break;
+        case CHECKEDSSUB:
+            addr = opcheckedssub(addr + 1);
+            break;
         case CHECKEDSMUL:
             addr = opcheckedsmul(addr + 1);
             break;
@@ -286,6 +289,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             break;
         case SATURATINGSADD:
             addr = opsaturatingsadd(addr + 1);
+            break;
+        case SATURATINGSSUB:
+            addr = opsaturatingssub(addr + 1);
             break;
         case SATURATINGSMUL:
             addr = opsaturatingsmul(addr + 1);

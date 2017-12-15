@@ -522,15 +522,19 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case WRAPMUL:
         case WRAPDIV:
         case CHECKEDSADD:
+        case CHECKEDSSUB:
         case CHECKEDSMUL:
         case CHECKEDSDIV:
         case CHECKEDUADD:
+        case CHECKEDUSUB:
         case CHECKEDUMUL:
         case CHECKEDUDIV:
         case SATURATINGSADD:
+        case SATURATINGSSUB:
         case SATURATINGSMUL:
         case SATURATINGSDIV:
         case SATURATINGUADD:
+        case SATURATINGUSUB:
         case SATURATINGUMUL:
         case SATURATINGUDIV:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

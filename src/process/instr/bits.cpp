@@ -338,6 +338,20 @@ viua::internals::types::byte* viua::process::Process::opcheckedsadd(viua::intern
 
     return addr;
 }
+viua::internals::types::byte* viua::process::Process::opcheckedssub(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->checked_signed_sub(*rhs);
+
+    return addr;
+}
 viua::internals::types::byte* viua::process::Process::opcheckedsmul(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -397,6 +411,20 @@ viua::internals::types::byte* viua::process::Process::opsaturatingsadd(viua::int
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
     *target = lhs->saturating_signed_add(*rhs);
+
+    return addr;
+}
+viua::internals::types::byte* viua::process::Process::opsaturatingssub(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = lhs->saturating_signed_sub(*rhs);
 
     return addr;
 }

@@ -660,6 +660,10 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_checkedssub(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_checkedsmul(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
@@ -677,6 +681,10 @@ namespace viua {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_checkeduadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_checkedusub(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
@@ -701,6 +709,10 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_saturatingssub(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_saturatingsmul(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
@@ -718,6 +730,10 @@ namespace viua {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_saturatinguadd(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_saturatingusub(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
@@ -1483,6 +1499,9 @@ namespace viua {
                     } else if (tokens.at(i) == "checkedsadd") {
                         ++i;
                         tie(increase, i) = size_of_checkedsadd(tokens, i);
+                    } else if (tokens.at(i) == "checkedssub") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedssub(tokens, i);
                     } else if (tokens.at(i) == "checkedsmul") {
                         ++i;
                         tie(increase, i) = size_of_checkedsmul(tokens, i);
@@ -1498,6 +1517,9 @@ namespace viua {
                     } else if (tokens.at(i) == "checkeduadd") {
                         ++i;
                         tie(increase, i) = size_of_checkeduadd(tokens, i);
+                    } else if (tokens.at(i) == "checkedusub") {
+                        ++i;
+                        tie(increase, i) = size_of_checkedusub(tokens, i);
                     } else if (tokens.at(i) == "checkedumul") {
                         ++i;
                         tie(increase, i) = size_of_checkedumul(tokens, i);
@@ -1513,6 +1535,9 @@ namespace viua {
                     } else if (tokens.at(i) == "saturatingsadd") {
                         ++i;
                         tie(increase, i) = size_of_saturatingsadd(tokens, i);
+                    } else if (tokens.at(i) == "saturatingssub") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingssub(tokens, i);
                     } else if (tokens.at(i) == "saturatingsmul") {
                         ++i;
                         tie(increase, i) = size_of_saturatingsmul(tokens, i);
@@ -1528,6 +1553,9 @@ namespace viua {
                     } else if (tokens.at(i) == "saturatinguadd") {
                         ++i;
                         tie(increase, i) = size_of_saturatinguadd(tokens, i);
+                    } else if (tokens.at(i) == "saturatingusub") {
+                        ++i;
+                        tie(increase, i) = size_of_saturatingusub(tokens, i);
                     } else if (tokens.at(i) == "saturatingumul") {
                         ++i;
                         tie(increase, i) = size_of_saturatingumul(tokens, i);

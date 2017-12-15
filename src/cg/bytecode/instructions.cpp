@@ -477,6 +477,11 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, CHECKEDSADD, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opcheckedssub(viua::internals::types::byte* addr_ptr, int_op target,
+                                                    int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDSSUB, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte* addr_ptr, int_op target,
                                                     int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, CHECKEDSMUL, target, lhs, rhs);
@@ -502,6 +507,11 @@ namespace cg {
         viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte* addr_ptr, int_op target,
                                                     int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, CHECKEDUADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opcheckedusub(viua::internals::types::byte* addr_ptr, int_op target,
+                                                    int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, CHECKEDUSUB, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opcheckedumul(viua::internals::types::byte* addr_ptr, int_op target,
@@ -531,6 +541,11 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, SATURATINGSADD, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opsaturatingssub(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGSSUB, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opsaturatingsmul(viua::internals::types::byte* addr_ptr, int_op target,
                                                        int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, SATURATINGSMUL, target, lhs, rhs);
@@ -556,6 +571,11 @@ namespace cg {
         viua::internals::types::byte* opsaturatinguadd(viua::internals::types::byte* addr_ptr, int_op target,
                                                        int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, SATURATINGUADD, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opsaturatingusub(viua::internals::types::byte* addr_ptr, int_op target,
+                                                       int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SATURATINGUSUB, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opsaturatingumul(viua::internals::types::byte* addr_ptr, int_op target,

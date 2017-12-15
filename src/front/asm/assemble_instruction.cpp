@@ -745,6 +745,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opcheckedsdecrement>(program, tokens, i);
     } else if (tokens.at(i) == "checkedsadd") {
         assemble_arithmetic_instruction<&Program::opcheckedsadd>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedssub") {
+        assemble_arithmetic_instruction<&Program::opcheckedssub>(program, tokens, i);
     } else if (tokens.at(i) == "checkedsmul") {
         assemble_arithmetic_instruction<&Program::opcheckedsmul>(program, tokens, i);
     } else if (tokens.at(i) == "checkedsdiv") {
@@ -755,6 +757,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opcheckedudecrement>(program, tokens, i);
     } else if (tokens.at(i) == "checkeduadd") {
         assemble_arithmetic_instruction<&Program::opcheckeduadd>(program, tokens, i);
+    } else if (tokens.at(i) == "checkedusub") {
+        assemble_arithmetic_instruction<&Program::opcheckedusub>(program, tokens, i);
     } else if (tokens.at(i) == "checkedumul") {
         assemble_arithmetic_instruction<&Program::opcheckedumul>(program, tokens, i);
     } else if (tokens.at(i) == "checkedudiv") {
@@ -765,6 +769,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opsaturatingsdecrement>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingsadd") {
         assemble_arithmetic_instruction<&Program::opsaturatingsadd>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingssub") {
+        assemble_arithmetic_instruction<&Program::opsaturatingssub>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingsmul") {
         assemble_arithmetic_instruction<&Program::opsaturatingsmul>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingsdiv") {
@@ -775,6 +781,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opsaturatingudecrement>(program, tokens, i);
     } else if (tokens.at(i) == "saturatinguadd") {
         assemble_arithmetic_instruction<&Program::opsaturatinguadd>(program, tokens, i);
+    } else if (tokens.at(i) == "saturatingusub") {
+        assemble_arithmetic_instruction<&Program::opsaturatingusub>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingumul") {
         assemble_arithmetic_instruction<&Program::opsaturatingumul>(program, tokens, i);
     } else if (tokens.at(i) == "saturatingudiv") {

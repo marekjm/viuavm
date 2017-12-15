@@ -360,6 +360,11 @@ Program& Program::opcheckedsadd(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opcheckedssub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedssub(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opcheckedsmul(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opcheckedsmul(addr_ptr, target, lhs, rhs);
     return (*this);
@@ -382,6 +387,11 @@ Program& Program::opcheckedudecrement(int_op target) {
 
 Program& Program::opcheckeduadd(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opcheckeduadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opcheckedusub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opcheckedusub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
@@ -410,6 +420,11 @@ Program& Program::opsaturatingsadd(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opsaturatingssub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingssub(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opsaturatingsmul(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opsaturatingsmul(addr_ptr, target, lhs, rhs);
     return (*this);
@@ -432,6 +447,11 @@ Program& Program::opsaturatingudecrement(int_op target) {
 
 Program& Program::opsaturatinguadd(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opsaturatinguadd(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsaturatingusub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsaturatingusub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
