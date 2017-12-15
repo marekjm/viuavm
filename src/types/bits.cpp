@@ -1318,16 +1318,14 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_inversion(underlying_array));
 }
 
-auto viua::types::Bits::increment() -> bool {
+auto viua::types::Bits::increment() -> void {
     auto result = viua::arithmetic::wrapping::binary_increment(underlying_array);
     underlying_array = std::move(result.second);
-    return result.first;
 }
 
-auto viua::types::Bits::decrement() -> bool {
+auto viua::types::Bits::decrement() -> void {
     auto result = viua::arithmetic::wrapping::binary_decrement(underlying_array);
     underlying_array = std::move(result.second);
-    return result.first;
 }
 
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
