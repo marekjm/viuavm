@@ -1040,6 +1040,13 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_minimum_one_subtraction(self):
+        runTestSplitlines(self, 'minimum_one_subtraction.asm', [
+            '10000001',
+            '00000001',
+            '10000000',
+        ])
+
     def test_overflowing_minimum_minus_1_multiplication(self):
         runTestThrowsException(self, 'overflowing_minimum_minus_1_multiplication.asm', ('Exception', 'CheckedArithmeticMultiplicationSignedOverflow'))
 
