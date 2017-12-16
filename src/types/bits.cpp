@@ -1319,13 +1319,11 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::increment() -> void {
-    auto result = viua::arithmetic::wrapping::binary_increment(underlying_array);
-    underlying_array = std::move(result.second);
+    underlying_array = std::move(viua::arithmetic::wrapping::binary_increment(underlying_array).second);
 }
 
 auto viua::types::Bits::decrement() -> void {
-    auto result = viua::arithmetic::wrapping::binary_decrement(underlying_array);
-    underlying_array = std::move(result.second);
+    underlying_array = std::move(viua::arithmetic::wrapping::binary_decrement(underlying_array).second);
 }
 
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
@@ -1347,12 +1345,10 @@ auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
 
 
 auto viua::types::Bits::checked_signed_increment() -> void {
-    auto result = viua::arithmetic::checked::signed_increment(underlying_array);
-    underlying_array = std::move(result);
+    underlying_array = std::move(viua::arithmetic::checked::signed_increment(underlying_array));
 }
 auto viua::types::Bits::checked_signed_decrement() -> void {
-    auto result = viua::arithmetic::checked::signed_decrement(underlying_array);
-    underlying_array = std::move(result);
+    underlying_array = std::move(viua::arithmetic::checked::signed_decrement(underlying_array));
 }
 auto viua::types::Bits::checked_signed_add(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
@@ -1371,12 +1367,10 @@ auto viua::types::Bits::checked_signed_div(const Bits& that) const -> unique_ptr
 
 
 auto viua::types::Bits::saturating_signed_increment() -> void {
-    auto result = viua::arithmetic::saturating::signed_increment(underlying_array);
-    underlying_array = std::move(result);
+    underlying_array = std::move(viua::arithmetic::saturating::signed_increment(underlying_array));
 }
 auto viua::types::Bits::saturating_signed_decrement() -> void {
-    auto result = viua::arithmetic::saturating::signed_decrement(underlying_array);
-    underlying_array = std::move(result);
+    underlying_array = std::move(viua::arithmetic::saturating::signed_decrement(underlying_array));
 }
 auto viua::types::Bits::saturating_signed_add(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_clip(
