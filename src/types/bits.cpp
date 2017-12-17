@@ -590,6 +590,13 @@ namespace viua {
                 return result;
             }
             static auto signed_sub(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
+                if (lhs == rhs) {
+                    auto result = std::vector<bool>{};
+                    result.reserve(lhs.size());
+                    std::fill_n(std::back_inserter(result), lhs.size(), false);
+                    return result;
+                }
+
                 auto rhs_used = std::vector<bool>{};
                 try {
                     rhs_used = take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())));
