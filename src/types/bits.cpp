@@ -590,7 +590,22 @@ namespace viua {
                 return result;
             }
             static auto signed_sub(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
-                return wrapping::binary_subtraction(lhs, rhs);
+                auto rhs_used = std::vector<bool>{};
+                try {
+                    rhs_used = take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())));
+                } catch (Exception* e) {
+                    delete e;
+                    throw new Exception("CheckedArithmeticSubtractionSignedOverflow");
+                }
+
+                try {
+                    return binary_clip(
+                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
+                        lhs.size());
+                } catch (Exception* e) {
+                    delete e;
+                    throw new Exception("CheckedArithmeticSubtractionSignedOverflow");
+                }
             }
             static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
                 vector<vector<bool>> intermediates;

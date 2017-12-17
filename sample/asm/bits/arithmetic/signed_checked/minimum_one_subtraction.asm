@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    bits (.name: %iota lhs) local 0b10000001
+    bits (.name: %iota lhs) local 0b10000000
     bits (.name: %iota rhs) local 0b00000001
 
     checkedssub (.name: %iota result) local %lhs local %rhs local
