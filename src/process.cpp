@@ -63,7 +63,7 @@ viua::kernel::Register* viua::process::Process::register_at(viua::internals::typ
     } else if (rs == viua::internals::RegisterSets::GLOBAL) {
         return global_register_set->register_at(i);
     } else {
-        throw new viua::types::Exception("unsupported register set type");
+        throw make_unique<viua::types::Exception>("unsupported register set type");
     }
 }
 
@@ -105,7 +105,7 @@ void viua::process::Process::pushFrame() {
         ostringstream oss;
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '"
             << stack->frame_new->function_name << '\'';
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
 
     currently_used_register_set = stack->frame_new->local_register_set.get();
@@ -132,7 +132,7 @@ viua::internals::types::byte* viua::process::Process::callNative(viua::internals
     viua::internals::types::byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not stack->frame_new) {
-        throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the "
+        throw make_unique<viua::types::Exception>("function call without a frame: use `frame 0' in source code if the "
                                          "function takes no parameters");
     }
 
@@ -148,7 +148,7 @@ viua::internals::types::byte* viua::process::Process::callForeign(
     viua::internals::types::byte* return_address, const string& call_name,
     viua::kernel::Register* return_register, const string&) {
     if (not stack->frame_new) {
-        throw new viua::types::Exception("external function call without a frame: use `frame 0' in source "
+        throw make_unique<viua::types::Exception>("external function call without a frame: use `frame 0' in source "
                                          "code if the function takes no parameters");
     }
 
@@ -165,7 +165,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(
     viua::internals::types::byte* return_address, viua::types::Value* object, const string& call_name,
     viua::kernel::Register* return_register, const string&) {
     if (not stack->frame_new) {
-        throw new viua::types::Exception("foreign method call without a frame");
+        throw make_unique<viua::types::Exception>("foreign method call without a frame");
     }
 
     stack->frame_new->function_name = call_name;
@@ -177,7 +177,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(
     pushFrame();
 
     if (not scheduler->isForeignMethod(call_name)) {
-        throw new viua::types::Exception("call to unregistered foreign method: " + call_name);
+        throw make_unique<viua::types::Exception>("call to unregistered foreign method: " + call_name);
     }
 
     viua::types::Reference* rf = nullptr;
@@ -188,14 +188,14 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(
     try {
         // FIXME: supply static and global registers to foreign functions
         scheduler->requestForeignMethodCall(call_name, object, frame, nullptr, nullptr, this);
-    } catch (const std::out_of_range& e) { throw new viua::types::Exception(e.what()); }
+    } catch (const std::out_of_range& e) { throw make_unique<viua::types::Exception>(e.what()); }
 
     // FIXME: woohoo! segfault!
     unique_ptr<viua::types::Value> returned;
     if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {
-            throw new viua::types::Exception(
+            throw make_unique<viua::types::Exception>(
                 "return value requested by frame but foreign method did not set return register");
         }
         returned = currently_used_register_set->pop(0);
@@ -213,7 +213,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(
 
 auto viua::process::Process::push_deferred(string call_name) -> void {
     if (not stack->frame_new) {
-        throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the "
+        throw make_unique<viua::types::Exception>("function call without a frame: use `frame 0' in source code if the "
                                          "function takes no parameters");
     }
 
@@ -400,7 +400,7 @@ string viua::process::Process::watchdog() const { return watchdog_function; }
 viua::internals::types::byte* viua::process::Process::become(const string& function_name,
                                                              std::unique_ptr<Frame> frame_to_use) {
     if (not scheduler->isNativeFunction(function_name)) {
-        throw new viua::types::Exception("process from undefined function: " + function_name);
+        throw make_unique<viua::types::Exception>("process from undefined function: " + function_name);
     }
 
     stack->clear();
@@ -418,7 +418,7 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
 
 viua::internals::types::byte* viua::process::Process::begin() {
     if (not scheduler->isNativeFunction(stack->at(0)->function_name)) {
-        throw new viua::types::Exception("process from undefined function: " + stack->at(0)->function_name);
+        throw make_unique<viua::types::Exception>("process from undefined function: " + stack->at(0)->function_name);
     }
     return (stack->instruction_pointer = adjustJumpBaseFor(stack->at(0)->function_name));
 }
