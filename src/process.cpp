@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
@@ -248,6 +249,22 @@ viua::internals::types::byte* viua::process::Process::tick() {
             default:
                 break;
         }
+    } catch (unique_ptr<viua::types::Exception>& e) {
+        /*
+         * All machine-thrown exceptions are passed back to user code.
+         * This is much easier than checking for erroneous conditions and
+         * terminating functions conditionally, instead - machine just throws viua::types::Exception objects
+         * which are then caught here.
+         *
+         * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate
+         * execution later.
+         */
+        stack->thrown = std::move(e);
+    } catch (unique_ptr<viua::types::Value>& e) {
+        /*
+         * All values can be thrown as exceptions, so Values must also be caught.
+         */
+        stack->thrown = std::move(e);
     } catch (viua::types::Exception* e) {
         /*
          * All machine-thrown exceptions are passed back to user code.
