@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <viua/kernel/frame.h>
 #include <viua/types/value.h>
@@ -44,7 +45,9 @@ namespace viua {
         template<typename... A> void assert_arity(const Frame* frame, const A&... valid_arities) {
             Arity arity = frame->arguments->size();
             if (not any_equal(arity, valid_arities...)) {
-                throw new ArityException(arity, {valid_arities...});
+                auto ex = std::unique_ptr<viua::types::Exception>{};
+                ex.reset(new ArityException(arity, {valid_arities...}));
+                throw ex;
             }
         }
     }
