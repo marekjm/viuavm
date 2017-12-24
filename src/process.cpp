@@ -265,25 +265,6 @@ viua::internals::types::byte* viua::process::Process::tick() {
          * All values can be thrown as exceptions, so Values must also be caught.
          */
         stack->thrown = std::move(e);
-    } catch (viua::types::Exception* e) {
-        /*
-         * All machine-thrown exceptions are passed back to user code.
-         * This is much easier than checking for erroneous conditions and
-         * terminating functions conditionally, instead - machine just throws viua::types::Exception objects
-         * which are then caught here.
-         *
-         * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate
-         * execution later.
-         */
-        stack->thrown.reset(e);
-    } catch (viua::types::Value* e) {
-        /*
-         * All values can be thrown as exceptions, so Values must also be caught.
-         */
-        stack->thrown.reset(e);
-    } catch (const char* e) {
-        // FIXME places throwing 'const char*' should be refactored to throw either Values or Exceptions
-        stack->thrown = make_unique<viua::types::Exception>(e);
     }
 
     if (stack->state_of() == Stack::STATE::HALTED or stack->size() == 0) {
