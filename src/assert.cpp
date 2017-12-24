@@ -17,7 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/assert.h>
+#include <viua/util/exceptions.h>
 using namespace std;
 
 
@@ -27,6 +29,6 @@ void viua::assertions::assert_typeof(viua::types::Value* object, const string& e
      *  Example: checking if an object is an Integer.
      */
     if (object->type() != expected) {
-        throw new TypeException(expected, object->type());
+        throw viua::util::exceptions::make_unique_exception<TypeException>(expected, object->type());
     }
 }

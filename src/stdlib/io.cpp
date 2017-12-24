@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <viua/include/module.h>
@@ -47,7 +48,7 @@ class Ifstream : public viua::types::Value {
 
     string getline() {
         if (in.eof()) {
-            throw new viua::types::Exception("EOF");
+            throw make_unique<viua::types::Exception>("EOF");
         }
 
         string line;
@@ -56,7 +57,7 @@ class Ifstream : public viua::types::Value {
     }
 
     unique_ptr<viua::types::Value> copy() const override {
-        throw new viua::types::Exception("Ifstream is not copyable");
+        throw make_unique<viua::types::Exception>("Ifstream is not copyable");
     }
 
     Ifstream(const string& path) : filename(path) { in.open(filename); }

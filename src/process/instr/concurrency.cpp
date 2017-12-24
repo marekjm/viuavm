@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,6 +18,7 @@
  */
 
 #include <chrono>
+#include <memory>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -49,7 +50,7 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
         call_name = fn->name();
 
         if (fn->type() == "Closure") {
-            throw new viua::types::Exception("cannot spawn a process from closure");
+            throw make_unique<viua::types::Exception>("cannot spawn a process from closure");
         }
     } else {
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -59,7 +60,7 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
     bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw new viua::types::Exception("call to undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("call to undefined function: " + call_name);
     }
 
     stack->frame_new->function_name = call_name;
@@ -95,7 +96,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (not scheduler->is_joinable(thrd->pid())) {
-        throw new viua::types::Exception("process cannot be joined");
+        throw make_unique<viua::types::Exception>("process cannot be joined");
     }
 
     if (timeout and not timeout_active) {
@@ -136,7 +137,7 @@ viua::internals::types::byte* viua::process::Process::opsend(viua::internals::ty
     if (auto thrd = dynamic_cast<viua::types::Process*>(target->get())) {
         scheduler->send(thrd->pid(), source->give());
     } else {
-        throw new viua::types::Exception("invalid type: expected viua::process::Process");
+        throw make_unique<viua::types::Exception>("invalid type: expected viua::process::Process");
     }
 
     return addr;
@@ -204,15 +205,15 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals
     bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw new viua::types::Exception("watchdog process from undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw new viua::types::Exception("watchdog process must be a native function, used foreign " +
+        throw make_unique<viua::types::Exception>("watchdog process must be a native function, used foreign " +
                                          call_name);
     }
 
     if (not watchdog_function.empty()) {
-        throw new viua::types::Exception("watchdog already set");
+        throw make_unique<viua::types::Exception>("watchdog already set");
     }
 
     watchdog_function = call_name;

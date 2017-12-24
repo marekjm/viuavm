@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <viua/kernel/frame.h>
@@ -67,7 +68,7 @@ unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
     auto o = std::move(attributes.at(key));
     attributes.erase(key);

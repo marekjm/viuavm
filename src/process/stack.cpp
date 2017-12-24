@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
 #include <viua/scheduler/vps.h>
@@ -45,7 +46,7 @@ auto viua::process::Stack::set_return_value() -> void {
     if (back()->return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if ((*currently_used_register_set)->at(0) == nullptr) {
-            throw new viua::types::Exception(
+            throw make_unique<viua::types::Exception>(
                 "return value requested by frame but function did not set return register");
         }
         return_value = (*currently_used_register_set)->pop(0);
@@ -107,7 +108,7 @@ auto viua::process::Stack::pop() -> unique_ptr<Frame> {
 
     for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
         if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
-            throw new viua::types::Exception("unused pass-by-move parameter");
+            throw make_unique<viua::types::Exception>("unused pass-by-move parameter");
         }
     }
 
@@ -178,7 +179,7 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
     }
 
     if (state_of() != STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING) {
-        throw new viua::types::Exception("stack left in an invalid state during unwinding");
+        throw make_unique<viua::types::Exception>("stack left in an invalid state during unwinding");
     }
 
     state_of(STATE::RUNNING);
@@ -284,7 +285,7 @@ auto viua::process::Stack::push_prepared_frame() -> void {
         ostringstream oss;
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name
             << '\'';
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
 
     *currently_used_register_set = frame_new->local_register_set.get();

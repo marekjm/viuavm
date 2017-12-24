@@ -31,7 +31,7 @@ using namespace std;
 static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                       viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
-        throw new viua::types::Exception("expected command to launch (string) as parameter 0");
+        throw make_unique<viua::types::Exception>("expected command to launch (string) as parameter 0");
     }
     string command = frame->arguments->get(0)->str();
     int ret = system(command.c_str());

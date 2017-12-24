@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <utility>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/bytecode/operand_types.h>
@@ -61,7 +62,7 @@ auto viua::bytecode::decoder::operands::fetch_void(viua::internals::types::byte*
     ++ip;
 
     if (ot != OT_VOID) {
-        throw new viua::types::Exception("decoded invalid operand type: expected OT_VOID");
+        throw make_unique<viua::types::Exception>("decoded invalid operand type: expected OT_VOID");
     }
 
     return ip;
@@ -93,7 +94,7 @@ static auto extract_register_index(viua::internals::types::byte* ip, viua::proce
         // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" +
             (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
@@ -101,7 +102,7 @@ static auto extract_register_index(viua::internals::types::byte* ip, viua::proce
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
         if (i->as_integer() < 0) {
-            throw new viua::types::Exception("register indexes cannot be negative");
+            throw make_unique<viua::types::Exception>("register indexes cannot be negative");
         }
         register_index = integer_to_register_index(i->as_integer());
     }
@@ -123,7 +124,7 @@ static auto extract_register_type_and_index(viua::internals::types::byte* ip, vi
         register_type = extract<viua::internals::RegisterSets>(ip);
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" +
             (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
@@ -131,7 +132,7 @@ static auto extract_register_type_and_index(viua::internals::types::byte* ip, vi
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
         if (i->as_integer() < 0) {
-            throw new viua::types::Exception("register indexes cannot be negative");
+            throw make_unique<viua::types::Exception>("register indexes cannot be negative");
         }
         register_index = integer_to_register_index(i->as_integer());
     }
@@ -176,7 +177,7 @@ auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::by
         aligned_read(value) = ip;
         ip += sizeof(decltype(value));
     } else {
-        throw new viua::types::Exception("decoded invalid operand type: expected O_INT");
+        throw make_unique<viua::types::Exception>("decoded invalid operand type: expected O_INT");
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::timeout>(ip, value);
 }
@@ -227,7 +228,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
         aligned_read(value) = ip;
         ip += sizeof(decltype(value));
     } else {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_REFERENCE, OT_INT");
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::plain_int>(ip, value);
@@ -280,7 +281,7 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
     if (object == nullptr) {
         ostringstream oss;
         oss << "read from null register: " << target;
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
 
     if (auto ref = dynamic_cast<viua::types::Reference*>(object)) {
@@ -290,7 +291,7 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
     if (is_pointer_dereference) {
         auto pointer_object = dynamic_cast<viua::types::Pointer*>(object);
         if (pointer_object == nullptr) {
-            throw new viua::types::Exception("dereferenced type is not a pointer: " + object->type());
+            throw make_unique<viua::types::Exception>("dereferenced type is not a pointer: " + object->type());
         }
         object = pointer_object->to(p);
     }

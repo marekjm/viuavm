@@ -48,14 +48,14 @@ viua::internals::types::byte* viua::process::Process::opvector(viua::internals::
         // FIXME vector is inserted into a register after packing, so this exception is not entirely well
         // thought-out
         // allow packing target register
-        throw new viua::types::Exception("vector would pack itself");
+        throw make_unique<viua::types::Exception>("vector would pack itself");
     }
     if ((pack_start_ri + pack_size) >= currently_used_register_set->size()) {
-        throw new viua::types::Exception("vector: packing outside of register set range");
+        throw make_unique<viua::types::Exception>("vector: packing outside of register set range");
     }
     for (decltype(pack_size) i = 0; i < pack_size; ++i) {
         if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
-            throw new viua::types::Exception("vector: cannot pack null register");
+            throw make_unique<viua::types::Exception>("vector: cannot pack null register");
         }
     }
 

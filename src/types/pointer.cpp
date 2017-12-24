@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <viua/types/boolean.h>
@@ -63,10 +64,10 @@ void viua::types::Pointer::reset(viua::types::Value* t) {
 viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     if (process_of_origin != p) {
         // Dereferencing pointers outside of their original process is illegal.
-        throw new viua::types::Exception("InvalidDereference: outside of original process");
+        throw make_unique<viua::types::Exception>("InvalidDereference: outside of original process");
     }
     if (not valid) {
-        throw new viua::types::Exception("expired pointer exception");
+        throw make_unique<viua::types::Exception>("expired pointer exception");
     }
     return points_to;
 }

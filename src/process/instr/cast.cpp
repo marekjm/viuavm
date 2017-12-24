@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
@@ -65,9 +66,9 @@ viua::internals::types::byte* viua::process::Process::opstoi(viua::internals::ty
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
-        throw new viua::types::Exception("out of range: " + supplied_string);
+        throw make_unique<viua::types::Exception>("out of range: " + supplied_string);
     } catch (const std::invalid_argument& e) {
-        throw new viua::types::Exception("invalid argument: " + supplied_string);
+        throw make_unique<viua::types::Exception>("invalid argument: " + supplied_string);
     }
 
     *target = make_unique<viua::types::Integer>(result_integer);

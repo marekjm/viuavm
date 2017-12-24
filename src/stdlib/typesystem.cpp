@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <viua/include/module.h>
@@ -32,7 +33,7 @@ using namespace std;
 static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                    viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw new viua::types::Exception("expected object as parameter 0");
+        throw make_unique<viua::types::Exception>("expected object as parameter 0");
     }
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
 }
@@ -40,7 +41,7 @@ static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regis
 static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw new viua::types::Exception("expected object as parameter 0");
+        throw make_unique<viua::types::Exception>("expected object as parameter 0");
     }
 
     auto ic = frame->arguments->at(0)->inheritancechain();
@@ -56,7 +57,7 @@ static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::ker
 static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                   viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw new viua::types::Exception("expected object as parameter 0");
+        throw make_unique<viua::types::Exception>("expected object as parameter 0");
     }
 
     viua::types::Value* object = frame->arguments->at(0);

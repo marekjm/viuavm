@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
@@ -30,7 +31,7 @@ using namespace std;
 
 static auto throwing_oh_noes(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
-    throw new viua::types::Exception("OH NOES!");
+    throw make_unique<viua::types::Exception>("OH NOES!");
 }
 
 

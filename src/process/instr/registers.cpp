@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -71,7 +72,7 @@ viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target->empty()) {
-        throw new viua::types::Exception("delete of null register");
+        throw make_unique<viua::types::Exception>("delete of null register");
     }
     target->give();
 
@@ -103,7 +104,7 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
             currently_used_register_set = static_registers.at(stack->back()->function_name).get();
             break;
         default:
-            throw new viua::types::Exception("illegal register set ID in ress instruction");
+            throw make_unique<viua::types::Exception>("illegal register set ID in ress instruction");
     }
 
     return addr;

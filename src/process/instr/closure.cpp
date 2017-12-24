@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
@@ -42,7 +43,7 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of closure register set");
     }
 
@@ -76,7 +77,7 @@ viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::intern
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of closure register set");
     }
 
@@ -96,7 +97,7 @@ viua::internals::types::byte* viua::process::Process::opcapturemove(viua::intern
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw new viua::types::Exception(
+        throw make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of closure register set");
     }
 
@@ -109,7 +110,7 @@ viua::internals::types::byte* viua::process::Process::opclosure(viua::internals:
     /** Create a closure from a function.
      */
     if (currently_used_register_set != stack->back()->local_register_set.get()) {
-        throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
+        throw make_unique<viua::types::Exception>("creating closures from nonlocal registers is forbidden");
     }
 
     viua::kernel::Register* target = nullptr;

@@ -51,8 +51,11 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
         if (returned and caller_process->trace().size() > 0) {
             *return_register = std::move(returned);
         }
-    } catch (viua::types::Value* exception) {
-        caller_process->raise(unique_ptr<viua::types::Value>{exception});
+    } catch (std::unique_ptr<viua::types::Value>& exception) {
+        caller_process->raise(std::move(exception));
+        caller_process->handleActiveException();
+    } catch (std::unique_ptr<viua::types::Exception>& exception) {
+        caller_process->raise(std::move(exception));
         caller_process->handleActiveException();
     }
 }

@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
@@ -38,7 +39,7 @@ static auto getrandom() -> long double {
      */
     ifstream in("/dev/urandom");
     if (!in) {
-        throw new viua::types::Exception("failed to open random device: /dev/urandom");
+        throw make_unique<viua::types::Exception>("failed to open random device: /dev/urandom");
     }
     unsigned long long int rullint = 0;
     in.read(reinterpret_cast<char*>(&rullint), sizeof(rullint));
@@ -54,7 +55,7 @@ static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kerne
      */
     ifstream in("/dev/random");
     if (!in) {
-        throw new viua::types::Exception("failed to open random device: /dev/random");
+        throw make_unique<viua::types::Exception>("failed to open random device: /dev/random");
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
@@ -72,7 +73,7 @@ static auto random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kern
      */
     ifstream in("/dev/urandom");
     if (!in) {
-        throw new viua::types::Exception("failed to open random device: /dev/urandom");
+        throw make_unique<viua::types::Exception>("failed to open random device: /dev/urandom");
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));

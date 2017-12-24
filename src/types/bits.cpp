@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -385,7 +386,7 @@ namespace viua {
             static auto binary_division(vector<bool> const& dividend, vector<bool> const& rhs)
                 -> vector<bool> {
                 if (not binary_to_bool(rhs)) {
-                    throw new Exception("division by zero");
+                    throw make_unique<Exception>("division by zero");
                 }
 
                 auto quotinent = vector<bool>{};
@@ -439,7 +440,7 @@ namespace viua {
                 }
 
                 if ((not binary_is_negative(v)) and binary_is_negative(incremented)) {
-                    throw new Exception("CheckedArithmeticIncrementSignedOverflow");
+                    throw make_unique<Exception>("CheckedArithmeticIncrementSignedOverflow");
                 }
 
                 return incremented;
@@ -457,7 +458,7 @@ namespace viua {
                 }
 
                 if (binary_is_negative(v) and not binary_is_negative(decremented)) {
-                    throw new Exception("CheckedArithmeticDecrementSignedOverflow");
+                    throw make_unique<Exception>("CheckedArithmeticDecrementSignedOverflow");
                 }
 
                 return decremented;
@@ -581,10 +582,10 @@ namespace viua {
                 }
 
                 if (result_should_be_negative and not binary_is_negative(result)) {
-                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
+                    throw make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
                 }
                 if (not result_should_be_negative and binary_is_negative(result)) {
-                    throw new Exception("CheckedArithmeticAdditionSignedOverflow");
+                    throw make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
                 }
 
                 return result;
@@ -600,18 +601,16 @@ namespace viua {
                 auto rhs_used = std::vector<bool>{};
                 try {
                     rhs_used = take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())));
-                } catch (Exception* e) {
-                    delete e;
-                    throw new Exception("CheckedArithmeticSubtractionSignedOverflow");
+                } catch (unique_ptr<Exception>&) {
+                    throw make_unique<Exception>("CheckedArithmeticSubtractionSignedOverflow");
                 }
 
                 try {
                     return binary_clip(
                         signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
                         lhs.size());
-                } catch (Exception* e) {
-                    delete e;
-                    throw new Exception("CheckedArithmeticSubtractionSignedOverflow");
+                } catch (unique_ptr<Exception>&) {
+                    throw make_unique<Exception>("CheckedArithmeticSubtractionSignedOverflow");
                 }
             }
             static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
@@ -716,18 +715,17 @@ namespace viua {
                         try {
                             lhs_abs = absolute(lhs);
                             rhs_abs = absolute(rhs);
-                        } catch (Exception* e) {
+                        } catch (unique_ptr<Exception>&) {
                             /*
                              * This is why we need separate lhs_abs and rhs_abs variables initialised under a
                              * try: because they can throw exceptions on overflow when taking two's
                              * complement of the minimal value (a.k.a. negative maximum, e.g. -128 for 8 bit
                              * integers).
                              */
-                            delete e;
-                            throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                            throw make_unique<Exception>("CheckedArithmeticMultiplicationSignedOverflow");
                         }
                         if (clipped != signed_mul(lhs_abs, rhs_abs)) {
-                            throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                            throw make_unique<Exception>("CheckedArithmeticMultiplicationSignedOverflow");
                         }
                     }
 
@@ -739,21 +737,21 @@ namespace viua {
                      * neither is.
                      */
                     if (not(lhs_negative or rhs_negative)) {
-                        throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                        throw make_unique<Exception>("CheckedArithmeticMultiplicationSignedOverflow");
                     }
                 }
 
                 result = std::move(clipped);
 
                 if (result_should_be_negative != binary_is_negative(result)) {
-                    throw new Exception("CheckedArithmeticMultiplicationSignedOverflow");
+                    throw make_unique<Exception>("CheckedArithmeticMultiplicationSignedOverflow");
                 }
 
                 return result;
             }
             static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs) -> vector<bool> {
                 if (not binary_to_bool(rhs)) {
-                    throw new Exception("division by zero");
+                    throw make_unique<Exception>("division by zero");
                 }
 
                 auto quotinent = vector<bool>{};
@@ -784,9 +782,8 @@ namespace viua {
                     if (negative_quotinent) {
                         quotinent = take_twos_complement(quotinent);
                     }
-                } catch (Exception* e) {
-                    delete e;
-                    throw new Exception("CheckedArithmeticDivisionSignedOverflow");
+                } catch (unique_ptr<Exception>&) {
+                    throw make_unique<Exception>("CheckedArithmeticDivisionSignedOverflow");
                 }
 
                 return quotinent;
@@ -1222,7 +1219,7 @@ namespace viua {
             }
             static auto signed_div(vector<bool> dividend, vector<bool> divisor) -> vector<bool> {
                 if (not binary_to_bool(divisor)) {
-                    throw new Exception("division by zero");
+                    throw make_unique<Exception>("division by zero");
                 }
 
                 auto quotinent = vector<bool>{};

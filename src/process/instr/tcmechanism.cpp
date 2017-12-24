@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -43,7 +44,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
     tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(catcher_block_name)) {
-        throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name +
+        throw make_unique<viua::types::Exception>("registering undefined handler block '" + catcher_block_name +
                                          "' to handle " + type_name);
     }
 
@@ -59,7 +60,7 @@ viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (not stack->caught) {
-        throw new viua::types::Exception("no caught object to draw");
+        throw make_unique<viua::types::Exception>("no caught object to draw");
     }
     *target = std::move(stack->caught);
 
@@ -73,7 +74,7 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
     tie(addr, block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(block_name)) {
-        throw new viua::types::Exception("cannot enter undefined block: " + block_name);
+        throw make_unique<viua::types::Exception>("cannot enter undefined block: " + block_name);
     }
 
     viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
@@ -96,7 +97,7 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
     if (source->empty()) {
         ostringstream oss;
         oss << "throw from null register";
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
     stack->thrown = source->give();
 
@@ -107,7 +108,7 @@ viua::internals::types::byte* viua::process::Process::opleave(viua::internals::t
     /*  Run leave instruction.
      */
     if (stack->tryframes.size() == 0) {
-        throw new viua::types::Exception("bad leave: no block has been entered");
+        throw make_unique<viua::types::Exception>("bad leave: no block has been entered");
     }
     addr = stack->tryframes.back()->return_address;
     stack->tryframes.pop_back();

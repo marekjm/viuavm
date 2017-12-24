@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -45,7 +46,7 @@ viua::internals::types::byte* viua::process::Process::opjump(viua::internals::ty
     viua::internals::types::byte* target =
         (stack->jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
-        throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
+        throw make_unique<viua::types::Exception>("aborting: JUMP instruction pointing to itself");
     }
     return target;
 }

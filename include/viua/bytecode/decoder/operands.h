@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
@@ -78,7 +79,7 @@ namespace viua {
 
                     RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
                     if (not converted) {
-                        throw new viua::types::Exception(
+                        throw std::make_unique<viua::types::Exception>(
                             "fetched invalid type: expected '" +
                             RequestedType::type_name +
                             "' but got '" +

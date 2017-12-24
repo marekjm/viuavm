@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
@@ -52,7 +53,7 @@ viua::internals::types::byte* viua::process::Process::opderive(viua::internals::
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
-        throw new viua::types::Exception("cannot derive from unregistered type: " + class_name);
+        throw make_unique<viua::types::Exception>("cannot derive from unregistered type: " + class_name);
     }
 
     static_cast<viua::types::Prototype*>(target->get())->derive(class_name);
@@ -73,7 +74,7 @@ viua::internals::types::byte* viua::process::Process::opattach(viua::internals::
     viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target->get());
 
     if (not(scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
-        throw new viua::types::Exception("cannot attach undefined function '" + function_name +
+        throw make_unique<viua::types::Exception>("cannot attach undefined function '" + function_name +
                                          "' as a method '" + method_name + "' of prototype '" +
                                          proto->getTypeName() + "'");
     }

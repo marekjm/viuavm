@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <sstream>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/bytecode/maps.h>
@@ -467,7 +468,7 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             if (OP_NAMES.count(static_cast<OPCODE>(*addr))) {
                 error << ": " << OP_NAMES.at(static_cast<OPCODE>(*addr));
             }
-            throw new viua::types::Exception(error.str());
+            throw make_unique<viua::types::Exception>(error.str());
     }
     return addr;
 }

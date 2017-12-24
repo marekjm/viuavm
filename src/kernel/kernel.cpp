@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,6 +22,7 @@
 #include <dlfcn.h>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <regex>
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>
@@ -195,7 +196,7 @@ void viua::kernel::Kernel::loadModule(string module) {
     } else if (is_foreign_module(module)) {
         loadForeignLibrary(module);
     } else {
-        throw new viua::types::Exception("LinkException", ("failed to link library: " + module));
+        throw make_unique<viua::types::Exception>("LinkException", ("failed to link library: " + module));
     }
 }
 void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
@@ -237,7 +238,7 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
             pair<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>(
                 loader.getBytecodeSize(), std::move(lnk_btcd));
     } else {
-        throw new viua::types::Exception("failed to link: " + module);
+        throw make_unique<viua::types::Exception>("failed to link: " + module);
     }
 }
 void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
@@ -251,20 +252,20 @@ void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
     }
 
     if (path.size() == 0) {
-        throw new viua::types::Exception("LinkException", ("failed to link library: " + module));
+        throw make_unique<viua::types::Exception>("LinkException", ("failed to link library: " + module));
     }
 
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     if (handle == nullptr) {
-        throw new viua::types::Exception("LinkException",
+        throw make_unique<viua::types::Exception>("LinkException",
                                          ("failed to open handle: " + module + ": " + dlerror()));
     }
 
     using ExporterFunction = const ForeignFunctionSpec* (*)();
     ExporterFunction exports = nullptr;
     if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports"))) == nullptr) {
-        throw new viua::types::Exception("failed to extract interface from module: " + module);
+        throw make_unique<viua::types::Exception>("failed to extract interface from module: " + module);
     }
 
     const ForeignFunctionSpec* exported = (*exports)();
@@ -290,7 +291,7 @@ vector<string> viua::kernel::Kernel::inheritanceChainOf(const string& type_name)
      */
     if (typesystem.count(type_name) == 0) {
         // FIXME: better exception message
-        throw new viua::types::Exception("unregistered type: " + type_name);
+        throw make_unique<viua::types::Exception>("unregistered type: " + type_name);
     }
     vector<string> ichain = typesystem.at(type_name)->getAncestors();
     for (unsigned i = 0; i < ichain.size(); ++i) {
@@ -504,7 +505,7 @@ void viua::kernel::Kernel::receive(const viua::process::PID pid,
                                    queue<unique_ptr<viua::types::Value>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
-        throw new viua::types::Exception("invalid PID");
+        throw make_unique<viua::types::Exception>("invalid PID");
     }
 
 #if VIUA_VM_DEBUG_LOG

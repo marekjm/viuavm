@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -96,7 +97,7 @@ String* String::join(Vector* v) {
 void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                        viua::process::Process* process, viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
-        throw new viua::types::Exception("expected 2 parameters");
+        throw make_unique<viua::types::Exception>("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->str();
 }
@@ -104,7 +105,7 @@ void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::R
 void String::represent(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                        viua::process::Process* process, viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
-        throw new viua::types::Exception("expected 2 parameters");
+        throw make_unique<viua::types::Exception>("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->repr();
 }

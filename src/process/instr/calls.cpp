@@ -52,7 +52,7 @@ viua::internals::types::byte* viua::process::Process::opparam(viua::internals::t
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set "
+        throw make_unique<viua::types::Exception>("parameter register index out of bounds (greater than arguments set "
                                          "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, source->copy());
@@ -70,7 +70,7 @@ viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::ty
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set "
+        throw make_unique<viua::types::Exception>("parameter register index out of bounds (greater than arguments set "
                                          "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, currently_used_register_set->pop(source));
@@ -99,7 +99,7 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
-        throw new viua::types::Exception(oss.str());
+        throw make_unique<viua::types::Exception>(oss.str());
     }
 
     unique_ptr<viua::types::Value> argument;
@@ -156,18 +156,18 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
-        throw new viua::types::Exception("call to undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("call to undefined function: " + call_name);
     }
 
     if (is_foreign_method) {
         if (stack->frame_new == nullptr) {
-            throw new viua::types::Exception("cannot call foreign method without a frame");
+            throw make_unique<viua::types::Exception>("cannot call foreign method without a frame");
         }
         if (stack->frame_new->arguments->size() == 0) {
-            throw new viua::types::Exception("cannot call foreign method using empty frame");
+            throw make_unique<viua::types::Exception>("cannot call foreign method using empty frame");
         }
         if (stack->frame_new->arguments->at(0) == nullptr) {
-            throw new viua::types::Exception(
+            throw make_unique<viua::types::Exception>(
                 "frame must have at least one argument when used to call a foreign method");
         }
         auto obj = stack->frame_new->arguments->at(0);
@@ -192,7 +192,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     }
 
     if (stack->state_of() != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
-        throw new viua::types::Exception("stack left in an invalid state");
+        throw make_unique<viua::types::Exception>("stack left in an invalid state");
     }
 
     stack->state_of(viua::process::Stack::STATE::RUNNING);
@@ -218,11 +218,11 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
-        throw new viua::types::Exception("tail call to undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("tail call to undefined function: " + call_name);
     }
     // FIXME: make to possible to tail call foreign functions and methods
     if (not is_native) {
-        throw new viua::types::Exception("tail call to non-native function: " + call_name);
+        throw make_unique<viua::types::Exception>("tail call to non-native function: " + call_name);
     }
 
     // FIXME tailcalled functions should not inherit local register set of the frame they replace
@@ -257,7 +257,7 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
-        throw new viua::types::Exception("defer of undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("defer of undefined function: " + call_name);
     }
 
     push_deferred(call_name);
@@ -267,7 +267,7 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
 
 viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::types::byte* addr) {
     if (stack->size() == 0) {
-        throw new viua::types::Exception("no frame on stack: no call to return from");
+        throw make_unique<viua::types::Exception>("no frame on stack: no call to return from");
     }
 
     if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
@@ -284,7 +284,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     }
 
     if (stack->state_of() != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
-        throw new viua::types::Exception("stack left in an invalid state");
+        throw make_unique<viua::types::Exception>("stack left in an invalid state");
     }
 
     addr = stack->back()->ret_address();

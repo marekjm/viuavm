@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <viua/types/boolean.h>
@@ -40,7 +41,7 @@ unique_ptr<Value> Integer::copy() const { return make_unique<Integer>(number); }
 
 auto Integer::as_unsigned() const -> uint64_t {
     if (number < 0) {
-        throw new viua::types::Exception("number is negative");
+        throw make_unique<viua::types::Exception>("number is negative");
     }
     return static_cast<uint64_t>(number);
 }
