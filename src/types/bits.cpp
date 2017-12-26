@@ -606,9 +606,8 @@ namespace viua {
                 }
 
                 try {
-                    return binary_clip(
-                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
-                        lhs.size());
+                    return binary_clip(signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
+                                       lhs.size());
                 } catch (unique_ptr<Exception>&) {
                     throw make_unique<Exception>("CheckedArithmeticSubtractionSignedOverflow");
                 }
