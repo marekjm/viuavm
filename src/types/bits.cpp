@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <numeric>
@@ -822,6 +823,26 @@ namespace viua {
                 }
                 return true;
             }
+            //            static auto signed_is_max(vector<bool> const v) -> bool {
+            //                /*
+            //                 * Last bit must be unset in two's complement for the number to be positive.
+            //                 * If it's not then clearly the number encoded is not the maximum *signed*
+            //                 value.
+            //                 */
+            //                if (v.back()) {
+            //                    return false;
+            //                }
+            //                for (auto i = decltype(v)::size_type{0}; i < (v.size() - 1); ++i) {
+            //                    /*
+            //                     * If any bit except the last is unset, then the value is not maximum.
+            //                     * This works for signed integers.
+            //                     */
+            //                    if (not v.at(i)) {
+            //                        return false;
+            //                    }
+            //                }
+            //                return true;
+            //            }
             static auto signed_increment(vector<bool> v) -> vector<bool> {
                 auto carry = true;
                 auto incremented = v;
@@ -1001,9 +1022,12 @@ namespace viua {
                 }
 
                 try {
-                    return binary_clip(
-                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
-                        lhs.size());
+                    auto r = binary_clip(
+                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used), lhs.size());
+                    if (signed_is_min(rhs)) {
+                        r = signed_increment(r);
+                    }
+                    return r;
                 } catch (unique_ptr<Exception>&) {
                     throw make_unique<Exception>("SaturatingArithmeticSubtractionSignedOverflow");
                 }

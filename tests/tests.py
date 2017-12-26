@@ -1228,6 +1228,13 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '10000000',
         ])
 
+    def test_minus_one_minimum_subtraction(self):
+        runTestSplitlines(self, 'minus_one_minimum_subtraction.asm', [
+            '11111111',
+            '10000000',
+            '01111111',
+        ])
+
     def test_maximum_by_minimum_division(self):
         runTestSplitlines(self, 'maximum_by_minimum_division.asm', [
             '01111111',
