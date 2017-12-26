@@ -1040,6 +1040,17 @@ class BitsSignedCheckedArithmeticTests(unittest.TestCase):
             '00000000',
         ])
 
+    def test_maximum_minus_one_subtraction(self):
+        runTestThrowsException(self, 'maximum_minus_one_subtraction.asm', ('Exception',
+            'CheckedArithmeticSubtractionSignedOverflow'))
+
+    def test_minimum_minimum_subtraction(self):
+        runTestSplitlines(self, 'minimum_minimum_subtraction.asm', [
+            '10000000',
+            '10000000',
+            '00000000',
+        ])
+
     def test_minimum_one_subtraction(self):
         runTestThrowsException(self, 'minimum_one_subtraction.asm', ('Exception',
             'CheckedArithmeticSubtractionSignedOverflow'))
@@ -1180,6 +1191,41 @@ class BitsSignedSaturatingArithmeticTests(unittest.TestCase):
             '10000000',
             '01111111',
             '11111111',
+        ])
+
+    def test_maximum_maximum_subtraction(self):
+        runTestSplitlines(self, 'maximum_maximum_subtraction.asm', [
+            '01111111',
+            '01111111',
+            '00000000',
+        ])
+
+    def test_maximum_minus_one_subtraction(self):
+        runTestSplitlines(self, 'maximum_minus_one_subtraction.asm', [
+            '01111111',
+            '11111111',
+            '01111111',
+        ])
+
+    def test_maximum_minimum_subtraction(self):
+        runTestSplitlines(self, 'maximum_minimum_subtraction.asm', [
+            '01111111',
+            '10000000',
+            '01111111',
+        ])
+
+    def test_minimum_minimum_subtraction(self):
+        runTestSplitlines(self, 'minimum_minimum_subtraction.asm', [
+            '10000000',
+            '10000000',
+            '00000000',
+        ])
+
+    def test_minimum_one_subtraction(self):
+        runTestSplitlines(self, 'minimum_one_subtraction.asm', [
+            '10000000',
+            '00000001',
+            '10000000',
         ])
 
     def test_maximum_by_minimum_division(self):
