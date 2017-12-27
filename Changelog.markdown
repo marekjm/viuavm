@@ -58,17 +58,15 @@ There are several categories of change:
 - bic: rename `strstore` to `string`
 - bic: rename `istore` to `integer`
 - bic: rename `fstore` to `float`
-- feature: `wrapincrement`, `wrapdecrement`, `wrapadd`, `wrapmul`, and `wrapdiv` instructions for modulo
-  arithmetic on fixed-width integers
-- feature: `checkedsincrement`, `checkedsdecrement`, `checkedsadd`, `checkedsmul`, and `checkedsdiv`
-  instructions for checked signed arithmetic on fixed-width integers
-- feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`, `saturatingsmul`, and
-  `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
+- feature: `wrapincrement`, `wrapdecrement`, `wrapadd`, `wrapsub`, `wrapmul`, and `wrapdiv` instructions for
+  modulo arithmetic on fixed-width integers
+- feature: `checkedsincrement`, `checkedsdecrement`, `checkedsadd`, `checkedssub` `checkedsmul`, and
+  `checkedsdiv` instructions for checked signed arithmetic on fixed-width integers
+- feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`, `saturatingssub`,
+  `saturatingsmul`, and `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
-Arithmetic *always* wraps when the result is out-of-range.
-Increment and decrement have no concept of signedness and treat all values as unsigned.
 
 
 ----

@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <numeric>
@@ -606,9 +607,8 @@ namespace viua {
                 }
 
                 try {
-                    return binary_clip(
-                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
-                        lhs.size());
+                    return binary_clip(signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used),
+                                       lhs.size());
                 } catch (unique_ptr<Exception>&) {
                     throw make_unique<Exception>("CheckedArithmeticSubtractionSignedOverflow");
                 }
@@ -823,6 +823,26 @@ namespace viua {
                 }
                 return true;
             }
+            //            static auto signed_is_max(vector<bool> const v) -> bool {
+            //                /*
+            //                 * Last bit must be unset in two's complement for the number to be positive.
+            //                 * If it's not then clearly the number encoded is not the maximum *signed*
+            //                 value.
+            //                 */
+            //                if (v.back()) {
+            //                    return false;
+            //                }
+            //                for (auto i = decltype(v)::size_type{0}; i < (v.size() - 1); ++i) {
+            //                    /*
+            //                     * If any bit except the last is unset, then the value is not maximum.
+            //                     * This works for signed integers.
+            //                     */
+            //                    if (not v.at(i)) {
+            //                        return false;
+            //                    }
+            //                }
+            //                return true;
+            //            }
             static auto signed_increment(vector<bool> v) -> vector<bool> {
                 auto carry = true;
                 auto incremented = v;
@@ -987,88 +1007,30 @@ namespace viua {
                 return result;
             }
             static auto signed_sub(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
-                vector<bool> result;
-                auto size_of_result = std::max(lhs.size(), rhs.size());
-                result.reserve(size_of_result + 1);
-                std::fill_n(std::back_inserter(result), size_of_result, false);
-
-                bool carry = false;
-
-                auto lhs_negative = binary_is_negative(lhs);
-                auto rhs_negative = binary_is_negative(rhs);
-
-                auto result_should_be_negative = (lhs_negative and rhs_negative);
-                if (lhs_negative and (not rhs_negative) and signed_lt(rhs, lhs)) {
-                    result_should_be_negative = true;
-                }
-                if ((not lhs_negative) and rhs_negative and signed_lt(lhs, lhs)) {
-                    result_should_be_negative = true;
+                if (lhs == rhs) {
+                    auto result = std::vector<bool>{};
+                    result.reserve(lhs.size());
+                    std::fill_n(std::back_inserter(result), lhs.size(), false);
+                    return result;
                 }
 
-                for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-                    const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
-                    const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+                auto rhs_used = std::vector<bool>{};
+                try {
+                    rhs_used = take_twos_complement(binary_expand(rhs, max(lhs.size(), rhs.size())));
+                } catch (unique_ptr<Exception>&) {
+                    throw make_unique<Exception>("SaturatingArithmeticSubtractionSignedOverflow");
+                }
 
-                    /*
-                     * lhs + rhs -> 0 + 0 -> 0
-                     *
-                     * This is the easy case.
-                     * Everything is zero, so we just carry the carry into the result at
-                     * the current position, and reset the carry flag to zero (it was consumed).
-                     */
-                    if ((not from_rhs) and (not from_lhs)) {
-                        result.at(i) = carry;
-                        carry = false;
-                        continue;
+                try {
+                    auto r = binary_clip(
+                        signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())), rhs_used), lhs.size());
+                    if (signed_is_min(rhs)) {
+                        r = signed_increment(r);
                     }
-
-                    /*
-                     * lhs + rhs -> 1 + 1 -> 10
-                     *
-                     * This gives us a zero on current position, and
-                     * carry flag in the enabled state.
-                     *
-                     * If carry was enabled before we have 0 + 1 = 1, so we should
-                     * enable bit on current position in the result.
-                     * If carry was not enabled we have 0 + 0, so we should
-                     * obviously leave the bit disabled in the result.
-                     * This means that we can just copy state of the carry flag into
-                     * the result bit string on current position.
-                     */
-                    if (from_rhs and from_lhs) {
-                        result.at(i) = carry;
-                        carry = true;
-                        continue;
-                    }
-
-                    /*
-                     * At this point either the lhs or rhs is enabled, but not both.
-                     * So if the carry bit is enabled this gives us 1 + 1 = 10, so
-                     * zero should be put in result on the current position, and
-                     * carry flag should be enabled.
-                     */
-                    if (carry) {
-                        continue;
-                    }
-
-                    /*
-                     * All other cases.
-                     * Either lhs or rhs is enabled, and carry is not.
-                     * So this is the 0 + 1 = 1 case.
-                     * Easy.
-                     * Just enable the bit in the result.
-                     */
-                    result.at(i) = true;
+                    return r;
+                } catch (unique_ptr<Exception>&) {
+                    throw make_unique<Exception>("SaturatingArithmeticSubtractionSignedOverflow");
                 }
-
-                if (result_should_be_negative and not binary_is_negative(result)) {
-                    result = signed_make_min(lhs.size());
-                }
-                if (not result_should_be_negative and binary_is_negative(result)) {
-                    result = signed_make_max(lhs.size());
-                }
-
-                return result;
             }
             static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs) -> vector<bool> {
                 vector<vector<bool>> intermediates;
