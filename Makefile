@@ -104,12 +104,6 @@ clean-test-compiles:
 
 
 ############################################################
-# DOCUMENTATION
-doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
-	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
-
-
-############################################################
 # INSTALLATION AND UNINSTALLATION
 bininstall: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis
 	mkdir -p $(BIN_PATH)
