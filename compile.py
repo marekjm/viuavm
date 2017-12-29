@@ -111,6 +111,11 @@ def main():
         # with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
         #     encoding = ifstream.read().splitlines()
 
+        exceptions = []
+        for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'exceptions')):
+            with open(os.path.join('.', 'opcodes', each, 'exceptions', each_ex)) as ifstream:
+                exceptions.append( (each_ex, ifstream.read().strip(),) )
+
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
             remarks = (ifstream.read().strip() or 'None.')
@@ -145,6 +150,19 @@ def main():
             text = '\n'.join(longen(textwrap.wrap(description, width=66), width=66)).strip(),
             prefix = '    ',
         ))
+        print()
+
+        print('  EXCEPTIONS')
+        if exceptions:
+            print()
+            for each_ex in exceptions:
+                print('    {}'.format(each_ex))
+                print(textwrap.indent(
+                    text = '\n'.join(longen(textwrap.wrap(remarks, width=64), width=64)).strip(),
+                    prefix = '      ',
+                ))
+        else:
+            print('    None.')
         print()
 
         # print('  ENCODING')
