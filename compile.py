@@ -116,6 +116,11 @@ def main():
             with open(os.path.join('.', 'opcodes', each, 'exceptions', each_ex)) as ifstream:
                 exceptions.append( (each_ex, ifstream.read().strip(),) )
 
+        examples = []
+        for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'examples')):
+            with open(os.path.join('.', 'opcodes', each, 'examples', each_ex)) as ifstream:
+                examples.append( (each_ex, ifstream.read().strip(),) )
+
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
             remarks = (ifstream.read().strip() or 'None.')
@@ -160,6 +165,19 @@ def main():
                 print(textwrap.indent(
                     text = '\n'.join(longen(textwrap.wrap(remarks, width=64), width=64)).strip(),
                     prefix = '      ',
+                ))
+                print()
+        else:
+            print('    None.')
+            print()
+
+        print('  EXAMPLES')
+        if examples:
+            print()
+            for each_ex in examples:
+                print(textwrap.indent(
+                    each_ex[1],
+                    prefix = '    ',
                 ))
         else:
             print('    None.')
