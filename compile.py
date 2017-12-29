@@ -107,9 +107,9 @@ def main():
         with open(os.path.join('.', 'opcodes', each, 'description')) as ifstream:
             description = ifstream.read().strip()
 
-        encoding = []
-        with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
-            encoding = ifstream.read().splitlines()
+        # encoding = []
+        # with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
+        #     encoding = ifstream.read().splitlines()
 
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
@@ -147,18 +147,18 @@ def main():
         ))
         print()
 
-        print('  ENCODING')
-        instruction_size, encoding_header, encoding_body = stringify_encoding(encoding)
-        print('    on {} bits'.format(instruction_size))
-        print()
-        print('    MSB{}LSB'.format(' ' * (len(encoding_header) - 6)))
-        print('    {}'.format(encoding_header))
-        print('    {}'.format(encoding_body))
-        print()
-        print('    OP: opcode')
-        print('    AS: access specifier')
-        print('    RS: register set type')
-        print()
+        # print('  ENCODING')
+        # instruction_size, encoding_header, encoding_body = stringify_encoding(encoding)
+        # print('    on {} bits'.format(instruction_size))
+        # print()
+        # print('    MSB{}LSB'.format(' ' * (len(encoding_header) - 6)))
+        # print('    {}'.format(encoding_header))
+        # print('    {}'.format(encoding_body))
+        # print()
+        # print('    OP: opcode')
+        # print('    AS: access specifier')
+        # print('    RS: register set type')
+        # print()
 
         print('  REMARKS')
         print(textwrap.indent(
