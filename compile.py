@@ -13,7 +13,7 @@ def longen_line(line, width):
     length_of_chunks = len(''.join(chunks))
     spaces_to_fill = (width - length_of_chunks)
     no_of_splits = len(chunks) - 1
-    spaces_per_split = (spaces_to_fill // no_of_splits)
+    spaces_per_split = (spaces_to_fill // (no_of_splits or 1))
     spaces_left = (spaces_to_fill - (spaces_per_split * no_of_splits))
     no_of_double_spaces = spaces_left
 
@@ -93,24 +93,31 @@ def main():
     first_opcode_being_documented = True
 
     for each in documented_opcodes:
-        description = ''
-        with open(os.path.join('.', 'opcodes', each, 'description')) as ifstream:
-            description = ifstream.read()
-
-        encoding = []
-        with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
-            encoding = ifstream.read().splitlines()
+        groups = []
+        with open(os.path.join('.', 'opcodes', each, 'groups')) as ifstream:
+            groups = ifstream.read().splitlines()
+        if not groups:
+            groups = [each]
 
         syntax = []
         with open(os.path.join('.', 'opcodes', each, 'syntax')) as ifstream:
             syntax = ifstream.read().splitlines()
 
-        groups = []
-        with open(os.path.join('.', 'opcodes', each, 'groups')) as ifstream:
-            groups = ifstream.read().splitlines()
+        description = ''
+        with open(os.path.join('.', 'opcodes', each, 'description')) as ifstream:
+            description = ifstream.read().strip()
 
-        if not groups:
-            groups = [each]
+        encoding = []
+        with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
+            encoding = ifstream.read().splitlines()
+
+        remarks = ''
+        with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
+            remarks = (ifstream.read().strip() or 'None.')
+
+        see_also = []
+        with open(os.path.join('.', 'opcodes', each, 'see_also')) as ifstream:
+            see_also = ifstream.read().splitlines()
 
 
         if first_opcode_being_documented:
@@ -152,6 +159,16 @@ def main():
         print('    AS: access specifier')
         print('    RS: register set type')
         print()
+
+        print('  REMARKS')
+        print(textwrap.indent(
+            text = '\n'.join(longen(textwrap.wrap(remarks, width=66), width=66)).strip(),
+            prefix = '    ',
+        ))
+        print()
+
+        print('  SEE ALSO')
+        print('    {}'.format(', '.join(see_also)))
 
     return 0
 
