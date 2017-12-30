@@ -6,6 +6,22 @@ import shutil
 import sys
 import textwrap
 
+try:
+    import colored
+except ImportError:
+    colored = None
+
+
+COLOR_OPCODE = 'white'
+COLOR_SECTION = 'red'
+COLOR_SYNTAX_SAMPLE_INDEX = 'cyan'
+COLOR_SYNTAX_SAMPLE = 'green'
+
+def colorise(text, color):
+    if colored is None:
+        return str(text)
+    return (colored.fg(color) + str(text) + colored.attr('reset'))
+
 
 DEBUG_LONGEN = False
 def longen_line(line, width):
@@ -153,26 +169,26 @@ def main(args):
             print()
 
 
-        print('{}'.format(each.upper()))
+        print('{}'.format(colorise(each.upper(), COLOR_OPCODE)))
         print('    in group{}: {}'.format(
             ('' if len(groups) == 1 else 's'),
             ', '.join(groups)
         ))
         print()
 
-        print('  SYNTAX')
+        print('  {}'.format(colorise('SYNTAX', COLOR_SECTION)))
         for i, syn in enumerate(syntax):
-            print('    ({})    {}'.format(i, syn))
+            print('    ({})    {}'.format(colorise(i, COLOR_SYNTAX_SAMPLE_INDEX), colorise(syn, COLOR_SYNTAX_SAMPLE)))
         print()
 
-        print('  DESCRIPTION')
+        print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
         print(textwrap.indent(
             text = '\n'.join(longen(textwrap.wrap(description, width=66), width=66)).strip(),
             prefix = '    ',
         ))
         print()
 
-        print('  EXCEPTIONS')
+        print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION)))
         if exceptions:
             print()
             for each_ex in exceptions:
@@ -186,7 +202,7 @@ def main(args):
             print('    None.')
             print()
 
-        print('  EXAMPLES')
+        print('  {}'.format(colorise('EXAMPLES', COLOR_SECTION)))
         if examples:
             print()
             for each_ex in examples:
@@ -211,7 +227,7 @@ def main(args):
         # print('    RS: register set type')
         # print()
 
-        print('  REMARKS')
+        print('  {}'.format(colorise('REMARKS', COLOR_SECTION)))
         print(textwrap.indent(
             text = '\n'.join(longen(textwrap.wrap(remarks, width=66), width=66)).strip(),
             prefix = '    ',
@@ -219,7 +235,7 @@ def main(args):
         print()
 
         if see_also:
-            print('  SEE ALSO')
+            print('  {}'.format(colorise('SEE ALSO', COLOR_SECTION)))
             print('    {}'.format(', '.join(see_also)))
 
     return 0
