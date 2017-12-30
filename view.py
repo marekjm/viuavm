@@ -276,6 +276,8 @@ def main(args):
         try:
             with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
                 remarks = ifstream.read().strip()
+            if not remarks:
+                raise FileNotFoundError()
             remarks = into_paragraphs(remarks)
         except FileNotFoundError:
             pass
