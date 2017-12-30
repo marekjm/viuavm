@@ -273,15 +273,21 @@ def main(args):
         # other instructions (and its relations with them).
         # Anything that does not fit the "description" field is put here.
         remarks = ''
-        with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
-            remarks = (ifstream.read().strip() or 'None.')
+        try:
+            with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
+                remarks = (ifstream.read().strip() or 'None.')
+        except FileNotFoundError:
+            pass
         remarks = into_paragraphs(remarks)
 
 
         # Any other instructions that are related to the currently rendered instruction.
         see_also = []
-        with open(os.path.join('.', 'opcodes', each, 'see_also')) as ifstream:
-            see_also = ifstream.read().splitlines()
+        try:
+            with open(os.path.join('.', 'opcodes', each, 'see_also')) as ifstream:
+                see_also = ifstream.read().splitlines()
+        except FileNotFoundError:
+            pass
 
 
         # Instructions should be separated by a '------' line.
