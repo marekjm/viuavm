@@ -99,6 +99,36 @@ def stringify_encoding(encoding):
     )
 
 
+def into_paragraphs(text):
+    lines = text.split('\n')
+    paragraphs = []
+    para = []
+
+    for each in lines:
+        if not each:
+            # If the last paragraph is also empty, push only one paragraph-break.
+            if paragraphs and not paragraphs[-1] and not para:
+                continue
+
+            # Append the paragraph, and the paragraph-break after it.
+            # Empty lines on their own introduce paragraph breaks.
+            # Use \break on its own to introduce line-break without an empty line.
+            paragraphs.append(para)
+            paragraphs.append([])
+
+            para = []
+            continue
+        if each == r'\break':
+            paragraphs.append(para)
+            para = []
+            continue
+        para.append(each)
+    if para:
+        paragraphs.append(para)
+
+    return ['\n'.join(each) for each in paragraphs]
+
+
 def main(args):
     documented_opcodes = sorted(os.listdir('./opcodes'))
 
@@ -131,6 +161,7 @@ def main(args):
         description = ''
         with open(os.path.join('.', 'opcodes', each, 'description')) as ifstream:
             description = ifstream.read().strip()
+        description = into_paragraphs(description)
 
         # encoding = []
         # with open(os.path.join('.', 'opcodes', each, 'encoding')) as ifstream:
@@ -155,6 +186,7 @@ def main(args):
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
             remarks = (ifstream.read().strip() or 'None.')
+        remarks = into_paragraphs(remarks)
 
         see_also = []
         with open(os.path.join('.', 'opcodes', each, 'see_also')) as ifstream:
@@ -182,10 +214,11 @@ def main(args):
         print()
 
         print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
-        print(textwrap.indent(
-            text = '\n'.join(longen(textwrap.wrap(description, width=66), width=66)).strip(),
-            prefix = '    ',
-        ))
+        for each_paragraph in description:
+            print(textwrap.indent(
+                text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=66), width=66)).strip(),
+                prefix = '    ',
+            ))
         print()
 
         print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION)))
@@ -228,10 +261,11 @@ def main(args):
         # print()
 
         print('  {}'.format(colorise('REMARKS', COLOR_SECTION)))
-        print(textwrap.indent(
-            text = '\n'.join(longen(textwrap.wrap(remarks, width=66), width=66)).strip(),
-            prefix = '    ',
-        ))
+        for each_paragraph in remarks:
+            print(textwrap.indent(
+                text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=66), width=66)).strip(),
+                prefix = '    ',
+            ))
         print()
 
         if see_also:
