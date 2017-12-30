@@ -18,7 +18,7 @@ COLOR_SYNTAX_SAMPLE_INDEX = 'cyan'
 COLOR_SYNTAX_SAMPLE = 'green'
 
 def colorise(text, color):
-    if colored is None:
+    if colored is None or os.environ.get('COLOR') == 'no':
         return str(text)
     return (colored.fg(color) + str(text) + colored.attr('reset'))
 
