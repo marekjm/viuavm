@@ -112,14 +112,20 @@ def main():
         #     encoding = ifstream.read().splitlines()
 
         exceptions = []
-        for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'exceptions')):
-            with open(os.path.join('.', 'opcodes', each, 'exceptions', each_ex)) as ifstream:
-                exceptions.append( (each_ex, ifstream.read().strip(),) )
+        try:
+            for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'exceptions')):
+                with open(os.path.join('.', 'opcodes', each, 'exceptions', each_ex)) as ifstream:
+                    exceptions.append( (each_ex, ifstream.read().strip(),) )
+        except FileNotFoundError:
+            sys.stderr.write('no exceptions defined for "{}" instruction'.format(each))
 
         examples = []
-        for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'examples')):
-            with open(os.path.join('.', 'opcodes', each, 'examples', each_ex)) as ifstream:
-                examples.append( (each_ex, ifstream.read().strip(),) )
+        try:
+            for each_ex in os.listdir(os.path.join('.', 'opcodes', each, 'examples')):
+                with open(os.path.join('.', 'opcodes', each, 'examples', each_ex)) as ifstream:
+                    examples.append( (each_ex, ifstream.read().strip(),) )
+        except FileNotFoundError:
+            sys.stderr.write('no examples defined for "{}" instruction'.format(each))
 
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
