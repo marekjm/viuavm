@@ -272,13 +272,13 @@ def main(args):
         # These are additional notes, describin peculiarities of an instruction, its differences from
         # other instructions (and its relations with them).
         # Anything that does not fit the "description" field is put here.
-        remarks = ''
+        remarks = []
         try:
             with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
-                remarks = (ifstream.read().strip() or 'None.')
+                remarks = ifstream.read().strip()
+            remarks = into_paragraphs(remarks)
         except FileNotFoundError:
             pass
-        remarks = into_paragraphs(remarks)
 
 
         # Any other instructions that are related to the currently rendered instruction.
@@ -370,14 +370,17 @@ def main(args):
 
 
         print('  {}'.format(colorise('REMARKS', COLOR_SECTION)))
-        for each_paragraph in remarks:
-            print(parse_and_expand(textwrap.indent(
-                text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=(LINE_WIDTH - indent)),
-                    width=(LINE_WIDTH - indent))).strip(),
-                prefix = (' ' * indent),
-            ),
-            syntax = syntax
-            ))
+        if remarks:
+            for each_paragraph in remarks:
+                print(parse_and_expand(textwrap.indent(
+                    text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=(LINE_WIDTH - indent)),
+                        width=(LINE_WIDTH - indent))).strip(),
+                    prefix = (' ' * indent),
+                ),
+                syntax = syntax
+                ))
+        else:
+            print('    None.')
         print()
 
 
