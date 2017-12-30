@@ -88,6 +88,11 @@ def main(args):
 
     first_opcode_being_documented = True
 
+    selected_group = None
+    if len(args) == 1 and args[0][-1] == ':':
+        selected_group = args[0][:-1]
+        args = []
+
     for each in args:
         if each not in documented_opcodes:
             sys.stderr.write('no documentation for {} opcode\n'.format(repr(each)))
@@ -99,6 +104,9 @@ def main(args):
             groups = ifstream.read().splitlines()
         if not groups:
             groups = [each]
+
+        if selected_group is not None and selected_group not in groups:
+            continue
 
         syntax = []
         with open(os.path.join('.', 'opcodes', each, 'syntax')) as ifstream:
@@ -118,7 +126,7 @@ def main(args):
                 with open(os.path.join('.', 'opcodes', each, 'exceptions', each_ex)) as ifstream:
                     exceptions.append( (each_ex, ifstream.read().strip(),) )
         except FileNotFoundError:
-            sys.stderr.write('no exceptions defined for "{}" instruction'.format(each))
+            sys.stderr.write('no exceptions defined for "{}" instruction\n'.format(each))
 
         examples = []
         try:
@@ -126,7 +134,7 @@ def main(args):
                 with open(os.path.join('.', 'opcodes', each, 'examples', each_ex)) as ifstream:
                     examples.append( (each_ex, ifstream.read().strip(),) )
         except FileNotFoundError:
-            sys.stderr.write('no examples defined for "{}" instruction'.format(each))
+            sys.stderr.write('no examples defined for "{}" instruction\n'.format(each))
 
         remarks = ''
         with open(os.path.join('.', 'opcodes', each, 'remarks')) as ifstream:
