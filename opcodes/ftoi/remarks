@@ -1,0 +1,2 @@
+The conversion is done between native types of the CPU the VM is running on.
+Some precission loss may happen.
