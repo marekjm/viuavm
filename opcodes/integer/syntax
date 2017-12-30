@@ -1,0 +1,3 @@
+integer %1 local 0
+integer %1 local 42
+integer %1 local default
