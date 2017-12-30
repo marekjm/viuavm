@@ -1,1 +1,3 @@
 Stores a specified integer in a specified register.
+\break
+The `\syntax{2}` syntax stores a 0.
