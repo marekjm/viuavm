@@ -1,0 +1,4 @@
+float %1 local 0.0
+float %1 local 3.14
+float %1 local -3.14
+float %1 local default

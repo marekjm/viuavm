@@ -1,0 +1,3 @@
+Stores a floating point value in a specified register.
+\break
+The `\syntax{3}` syntax stores a 0.
