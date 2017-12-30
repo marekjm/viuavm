@@ -1,0 +1,14 @@
+Viua VM is programmed in an assembly language, which is only a thin layer of abstraction over
+the underlying bytecode.
+\break
+The assembler that ships with the VM translates the source code one-to-one to bytecode:
+the only "modifications" it does is the linking of different modules, and branch offsets calculation
+- apart from that the bytecode is a direct translation
+of what the programmer wrote.
+
+Below you can find a documentation of the instructions the VM provides;
+with explained syntax, example usage, specification of inputs, outputs, and exceptions.
+
+Note that the documentation is incomplete: not all instructions are documented yet.
+For full listing of instructions, execute the `./build/bin/opcodes.bin' program that you can
+find in a distribution of the VM.
