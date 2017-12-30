@@ -203,8 +203,9 @@ def main():
         ))
         print()
 
-        print('  SEE ALSO')
-        print('    {}'.format(', '.join(see_also)))
+        if see_also:
+            print('  SEE ALSO')
+            print('    {}'.format(', '.join(see_also)))
 
     return 0
 
