@@ -83,16 +83,20 @@ def stringify_encoding(encoding):
     )
 
 
-def main():
+def main(args):
     documented_opcodes = sorted(os.listdir('./opcodes'))
-    sys.stderr.write('documented opcodes ({}): {}\n'.format(
-        len(documented_opcodes),
-        ', '.join(documented_opcodes)
-    ))
 
     first_opcode_being_documented = True
 
+    for each in args:
+        if each not in documented_opcodes:
+            sys.stderr.write('no documentation for {} opcode\n'.format(repr(each)))
+            return 1
+
     for each in documented_opcodes:
+        if args and each not in args:
+            continue
+
         groups = []
         with open(os.path.join('.', 'opcodes', each, 'groups')) as ifstream:
             groups = ifstream.read().splitlines()
@@ -216,4 +220,4 @@ def main():
     return 0
 
 
-exit(main())
+exit(main(sys.argv[1:]))
