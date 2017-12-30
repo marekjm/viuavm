@@ -129,6 +129,20 @@ def into_paragraphs(text):
     return ['\n'.join(each) for each in paragraphs]
 
 
+class InvalidReference(Exception):
+    pass
+
+def parse_and_expand(text, syntax):
+    expanded_text = text
+    reg = re.compile(r'\\syntax{(\d+)}')
+    found_syntax_refs = re.findall(reg, text)
+    for i in found_syntax_refs:
+        if int(i) >= len(syntax):
+            raise InvalidReference('invalid syntax reference: \\syntax{{{}}}\n'.format(i))
+        expanded_text = expanded_text.replace((r'\syntax{' + i + '}'), syntax[int(i)])
+    return expanded_text
+
+
 def main(args):
     documented_opcodes = sorted(os.listdir('./opcodes'))
 
@@ -219,9 +233,11 @@ def main(args):
 
         print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
         for each_paragraph in description:
-            print(textwrap.indent(
+            print(parse_and_expand(textwrap.indent(
                 text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=66), width=66)).strip(),
                 prefix = '    ',
+            ),
+            syntax = syntax,
             ))
         print()
 
@@ -266,9 +282,11 @@ def main(args):
 
         print('  {}'.format(colorise('REMARKS', COLOR_SECTION)))
         for each_paragraph in remarks:
-            print(textwrap.indent(
+            print(parse_and_expand(textwrap.indent(
                 text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=66), width=66)).strip(),
                 prefix = '    ',
+            ),
+            syntax = syntax
             ))
         print()
 
