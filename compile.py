@@ -93,10 +93,7 @@ def main(args):
             sys.stderr.write('no documentation for {} opcode\n'.format(repr(each)))
             return 1
 
-    for each in documented_opcodes:
-        if args and each not in args:
-            continue
-
+    for each in (args or documented_opcodes):
         groups = []
         with open(os.path.join('.', 'opcodes', each, 'groups')) as ifstream:
             groups = ifstream.read().splitlines()
