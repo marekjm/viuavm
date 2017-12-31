@@ -9,6 +9,12 @@ of what the programmer wrote.
 Below you can find a documentation of the instructions the VM provides;
 with explained syntax, example usage, specification of inputs, outputs, and exceptions.
 
-Note that the documentation is incomplete: not all instructions are documented yet.
+NOTE
+\break
+\indent{}
+\indent{}
+The documentation is incomplete: not all instructions are documented yet.
 For full listing of instructions, execute the `./build/bin/opcodes.bin' program that you can
 find in a distribution of the VM.
+\dedent{}
+\dedent{}
