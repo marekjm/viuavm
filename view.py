@@ -117,12 +117,26 @@ def into_paragraphs(text):
             # Empty lines on their own introduce paragraph breaks.
             # Use \break on its own to introduce line-break without an empty line.
             paragraphs.append(para)
-            paragraphs.append([])
+
+            if not (paragraphs[-1] == [r'\reflow{off}'] or paragraphs[-1] == [r'\reflow{on}']):
+                paragraphs.append([])
 
             para = []
             continue
         if each == r'\break':
             paragraphs.append(para)
+            para = []
+            continue
+        if each == r'\reflow{off}' or each == r'\reflow{on}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
+        if each == r'\indent{}' or each == r'\dedent{}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
             para = []
             continue
         para.append(each)
@@ -148,10 +162,30 @@ def parse_and_expand(text, syntax):
 
 def render_free_form_text(source, indent = 4):
     paragraphs = into_paragraphs(source)
+    reflow = True
     for each in paragraphs:
+        if each == r'\reflow{off}':
+            reflow = False
+            continue
+        if each == r'\reflow{on}':
+            reflow = True
+            continue
+        if each == r'\indent{}':
+            indent += 1
+            continue
+        if each == r'\dedent{}':
+            indent -= 1
+            continue
+
+        text = each
+        if reflow:
+            text = '\n'.join(
+                    longen(textwrap.wrap(each,
+                        width=(LINE_WIDTH - indent)),
+                        width=(LINE_WIDTH - indent))
+                )
         print(textwrap.indent(
-            text = '\n'.join(longen(textwrap.wrap(each, width=(LINE_WIDTH - indent)), width=(LINE_WIDTH -
-                indent))).strip(),
+            text = text.strip(),
             prefix = (' ' * indent),
         ))
 
