@@ -102,26 +102,39 @@ def stringify_encoding(encoding):
     )
 
 
+def paragraph_visible(para):
+    para = (para[0] if para else None)
+    if para == r'\reflow{off}' or para == r'\reflow{on}':
+        return False
+    if para == r'\indent{}' or para == r'\dedent{}':
+        return False
+    return True
+
+
 def into_paragraphs(text):
-    lines = text.split('\n')
+    lines = text.splitlines()
     paragraphs = []
     para = []
 
     for each in lines:
         if not each:
+            if para:
+                paragraphs.append(para)
+            para = []
+
+            # No reason to append breaking paragraph after an invisible one.
+            if not paragraph_visible(paragraphs[-1]):
+                continue
+
             # If the last paragraph is also empty, push only one paragraph-break.
-            if paragraphs and not paragraphs[-1] and not para:
+            if not paragraphs[-1]:
                 continue
 
             # Append the paragraph, and the paragraph-break after it.
             # Empty lines on their own introduce paragraph breaks.
             # Use \break on its own to introduce line-break without an empty line.
-            paragraphs.append(para)
+            paragraphs.append([])
 
-            if not (paragraphs[-1] == [r'\reflow{off}'] or paragraphs[-1] == [r'\reflow{on}']):
-                paragraphs.append([])
-
-            para = []
             continue
         if each == r'\break':
             paragraphs.append(para)
