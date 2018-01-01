@@ -102,11 +102,16 @@ def stringify_encoding(encoding):
     )
 
 
+DEFAULT_INDENT_WIDTH = 2
+KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
+KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
+    if para is None:
+        return True
     if para == r'\reflow{off}' or para == r'\reflow{on}':
         return False
-    if para == r'\indent{}' or para == r'\dedent{}':
+    if KEYWORD_INDENT_REGEX.match(para) or KEYWORD_DEDENT_REGEX.match(para):
         return False
     return True
 
@@ -146,7 +151,7 @@ def into_paragraphs(text):
             paragraphs.append([each])
             para = []
             continue
-        if each == r'\indent{}' or each == r'\dedent{}':
+        if KEYWORD_INDENT_REGEX.match(each) or KEYWORD_DEDENT_REGEX.match(each):
             if para:
                 paragraphs.append(para)
             paragraphs.append([each])
@@ -175,6 +180,7 @@ def parse_and_expand(text, syntax):
 
 def render_free_form_text(source, indent = 4):
     paragraphs = into_paragraphs(source)
+    original_indent = indent
     reflow = True
     for each in paragraphs:
         if each == r'\reflow{off}':
@@ -183,11 +189,13 @@ def render_free_form_text(source, indent = 4):
         if each == r'\reflow{on}':
             reflow = True
             continue
-        if each == r'\indent{}':
-            indent += 1
+        if KEYWORD_INDENT_REGEX.match(each):
+            count = int(KEYWORD_INDENT_REGEX.match(each).group(1) or DEFAULT_INDENT_WIDTH)
+            indent += count
             continue
-        if each == r'\dedent{}':
-            indent -= 1
+        if KEYWORD_DEDENT_REGEX.match(each):
+            count = (KEYWORD_DEDENT_REGEX.match(each).group(1) or str(DEFAULT_INDENT_WIDTH))
+            indent = (original_indent if count == 'all' else int(count))
             continue
 
         text = each

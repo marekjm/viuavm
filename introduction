@@ -12,9 +12,7 @@ with explained syntax, example usage, specification of inputs, outputs, and exce
 NOTE
 \break
 \indent{}
-\indent{}
 The documentation is incomplete: not all instructions are documented yet.
 For full listing of instructions, execute the `./build/bin/opcodes.bin' program that you can
 find in a distribution of the VM.
-\dedent{}
 \dedent{}
