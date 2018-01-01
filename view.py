@@ -284,6 +284,10 @@ def main(args):
             print('-' * LINE_WIDTH)
         print()
 
+        render_section('register_access', documented_instructions = documented_opcodes)
+
+        print('-' * LINE_WIDTH)
+        print()
 
     # Render documentation for all requested instructions.
     # If no instructions were explicitly requested then print the full documentation.

@@ -1,0 +1,111 @@
+Viua VM is a register based VM.
+Programs running on it are sequences of instructions that manipulate values placed in registers.
+This section explains how registers are accessed, so that you will be able to understand the
+rest of this documentation.
+
+REGISTER SETS
+
+\indent{}
+
+There are three main register sets:
+\reflow{off}
+
+- local
+- static
+- global
+\reflow{on}
+
+Values that are placed in registers from these register sets can be accessed by any instruction.
+
+There are alse two special register sets:
+\reflow{off}
+
+- process message queue
+- exception register (a.k.a. "caught slot")
+\reflow{on}
+
+Values that are placed in these registers must be moved into a register from one of the main register sets
+before they can be manipulated.
+Use \instruction{receive} instruction to get values out of the process message queue, and use
+\instruction{draw} instruction to get values out of the exception register (after an exception is caught).
+
+All register sets are local to their processes.
+No values are shared between processes - sending a value to another process makes a copy.
+
+LOCAL REGISTER SET
+
+\indent{}
+
+Local register set is bound to a call frame, or a closure, and exists for as long as the entity it is bound to
+exists.
+Local register set that is bound to a call frame is discarded when that frame is dropped from the stack.
+Local register set that is bound to a closure is discarded when that closure is discarded.
+
+\dedent{2}
+
+GLOBAL REGISTER SET
+
+\indent{}
+
+Global register set is bound to a process.
+It is accessible from all call frames of this process.
+It is discarded when the process it is bound to finishes execution.
+
+\dedent{}
+
+STATIC REGISTER SET
+
+\indent{}
+
+Static register set is bound to a function in a process.
+The same function in two different processes has two different static register sets.
+Static register set is discarded when the process it is bound to finishes execution.
+
+\dedent{}
+
+\dedent{all}
+
+FETCH MODES
+
+\indent{}
+
+Values can be fetched from registers in three modes: 1/ plain, 2/ pointer dereference, and
+3/ register indirect.
+
+Plain, or "direct", mode is identified by a '%' sign.
+A value is fetched from a register with the index specified after the '%' sign.
+For example, below code will increment a value located in local register 2:
+
+\reflow{off}
+\indent{4}
+integer %2 local 42
+iinc %2 local
+\dedent{4}
+\break
+
+\reflow{on}
+Pointer dereference mode (identified by '*' sign) will fetch a value that is pointed to by the pointer
+located in the register with the index specified after the '*' sign.
+For example, below code will increment a value pointed to by the pointer in local register 2:
+
+\reflow{off}
+\indent{4}
+integer %3 local 42
+ptr %2 local %3 local
+iinc *2 local
+\dedent{4}
+\break
+
+\reflow{on}
+Register indirect mode (identified by '@' sign) will fetch a value from a register with index specified by the
+integer located in register with the index specified after the '@' sign.
+For example, below code will increment a value in local register 2:
+
+\reflow{off}
+\indent{4}
+integer %2 local 42
+integer %3 local 2
+iinc @3 local
+\dedent{4}
+\break
+\dedent{all}
