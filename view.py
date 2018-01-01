@@ -164,6 +164,15 @@ def into_paragraphs(text):
     return ['\n'.join(each) for each in paragraphs]
 
 
+# Available rendering modes.
+RENDERING_MODE_ASCII_ART = 'RENDERING_MODE_ASCII_ART'
+RENDERING_MODE_HTML_ASCII_ART = 'RENDERING_MODE_HTML_ASCII_ART'
+RENDERING_MODE_HTML = 'RENDERING_MODE_HTML'
+
+# Selected rendering mode.
+RENDERING_MODE = RENDERING_MODE_ASCII_ART
+
+
 class InvalidReference(Exception):
     pass
 
