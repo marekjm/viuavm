@@ -1,0 +1,6 @@
+NO MESSAGE RECEIVED
+
+\indent{}
+This exception is thrown by the \instruction{receive} instruction when either no timeout was given, or it
+has passed, but the message queue of the process executing the instruction is empty.
+\dedent{}
