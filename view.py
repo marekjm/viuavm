@@ -176,18 +176,29 @@ RENDERING_MODE = RENDERING_MODE_ASCII_ART
 class InvalidReference(Exception):
     pass
 
-def parse_and_expand(text, syntax):
+class UnknownInstruction(Exception):
+    pass
+
+def parse_and_expand(text, syntax, documented_instructions):
     expanded_text = text
+
     reg = re.compile(r'\\syntax{(\d+)}')
     found_syntax_refs = re.findall(reg, text)
     for i in found_syntax_refs:
         if int(i) >= len(syntax):
             raise InvalidReference('invalid syntax reference: \\syntax{{{}}}\n'.format(i))
         expanded_text = expanded_text.replace((r'\syntax{' + i + '}'), syntax[int(i)])
+
+    found_instruction_refs = re.compile(r'\\instruction{([a-z]+)}').findall(expanded_text)
+    for each in found_instruction_refs:
+        if each not in documented_instructions:
+            raise UnknownInstruction(each)
+        pat = (r'\instruction{' + each + '}')
+        expanded_text = expanded_text.replace(pat, each)
     return expanded_text
 
 
-def render_free_form_text(source, indent = 4):
+def render_free_form_text(source, documented_instructions, indent = 4):
     paragraphs = into_paragraphs(source)
     original_indent = indent
     reflow = True
@@ -204,13 +215,13 @@ def render_free_form_text(source, indent = 4):
             continue
         if KEYWORD_DEDENT_REGEX.match(each):
             count = (KEYWORD_DEDENT_REGEX.match(each).group(1) or str(DEFAULT_INDENT_WIDTH))
-            indent = (original_indent if count == 'all' else int(count))
+            indent = (original_indent if count == 'all' else (indent - int(count)))
             continue
 
-        text = each
+        text = parse_and_expand(each, syntax = None, documented_instructions = documented_instructions)
         if reflow:
             text = '\n'.join(
-                    longen(textwrap.wrap(each,
+                    longen(textwrap.wrap(text,
                         width=(LINE_WIDTH - indent)),
                         width=(LINE_WIDTH - indent))
                 )
@@ -219,14 +230,22 @@ def render_free_form_text(source, indent = 4):
             prefix = (' ' * indent),
         ))
 
-def render_file(path):
+def render_file(path, documented_instructions, indent = 4):
     source = ''
     with open(path) as ifstream:
         source = ifstream.read().strip()
-    return render_free_form_text(source)
+    return render_free_form_text(source, documented_instructions = documented_instructions, indent = indent)
 
-def render_section(section):
-    return render_file(os.path.join('.', 'sections', section))
+def render_section(section, documented_instructions):
+    with open(os.path.join('.', 'sections', section, 'title')) as ifstream:
+        print('  {}'.format(ifstream.read().strip()))
+    print()
+    res = render_file(
+        os.path.join('.', 'sections', section, 'text'),
+        documented_instructions = documented_instructions
+    )
+    print()
+    return res
 
 
 def main(args):
@@ -260,7 +279,7 @@ def main(args):
         if introduction:
             print('  INTRODUCTION')
             print()
-            render_free_form_text(introduction)
+            render_free_form_text(introduction, documented_instructions = documented_opcodes)
             print()
             print('-' * LINE_WIDTH)
         print()
@@ -389,6 +408,7 @@ def main(args):
                 prefix = (' ' * indent),
             ),
             syntax = syntax,
+            documented_instructions = documented_opcodes,
             ))
         print()
 
@@ -397,11 +417,11 @@ def main(args):
         if exceptions:
             print()
             for each_ex in exceptions:
-                print('    {}'.format(each_ex))
-                print(textwrap.indent(
-                    text = '\n'.join(longen(textwrap.wrap(remarks, width=64), width=64)).strip(),
-                    prefix = '      ',
-                ))
+                render_file(
+                    os.path.join('.', 'exceptions', each_ex[0]),
+                    indent = 4,
+                    documented_instructions = documented_opcodes
+                )
                 print()
         else:
             print('    None.')
@@ -443,7 +463,8 @@ def main(args):
                         width=(LINE_WIDTH - indent))).strip(),
                     prefix = (' ' * indent),
                 ),
-                syntax = syntax
+                syntax = syntax,
+                documented_instructions = documented_opcodes,
                 ))
         else:
             print('    None.')
