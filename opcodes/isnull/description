@@ -8,5 +8,4 @@ RETURN VALUE
 If the register selected as the target is empty, the instruction will store boolean true in register selected
 as the result destination.
 Otherwise, the instruction will store boolean false in register selected as the result destination.
-
 \dedent{}
