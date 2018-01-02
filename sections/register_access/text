@@ -70,6 +70,8 @@ STATIC REGISTER SET
 Static register set is bound to a function in a process.
 The same function in two different processes has two different static register sets.
 Static register set is discarded when the process it is bound to finishes execution.
+The order in which static register sets for different functions are discarded after a process finishes
+execution is random.
 
 CAPACITY
 
