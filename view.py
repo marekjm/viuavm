@@ -197,7 +197,7 @@ def parse_and_expand(text, syntax, documented_instructions):
         expanded_text = expanded_text.replace(pat, each)
     return expanded_text
 
-def render_paragraphs(paragraphs, documented_instructions, indent = 4):
+def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4):
     original_indent = indent
     reflow = True
     for each in paragraphs:
@@ -216,7 +216,7 @@ def render_paragraphs(paragraphs, documented_instructions, indent = 4):
             indent = (original_indent if count == 'all' else (indent - int(count)))
             continue
 
-        text = parse_and_expand(each, syntax = None, documented_instructions = documented_instructions)
+        text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
         if reflow:
             text = '\n'.join(
                     longen(textwrap.wrap(text,
@@ -228,8 +228,13 @@ def render_paragraphs(paragraphs, documented_instructions, indent = 4):
             prefix = (' ' * indent),
         ))
 
-def render_free_form_text(source, documented_instructions, indent = 4):
-    return render_paragraphs(into_paragraphs(source))
+def render_free_form_text(source, documented_instructions, syntax = None, indent = 4):
+    return render_paragraphs(
+        into_paragraphs(source),
+        documented_instructions = documented_instructions,
+        syntax = syntax,
+        indent = indent
+    )
 
 def render_file(path, documented_instructions, indent = 4):
     source = ''
@@ -406,7 +411,8 @@ def main(args):
 
         print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
         indent = 4
-        render_paragraphs(description, documented_instructions = documented_opcodes, indent = indent)
+        render_paragraphs(description, documented_instructions = documented_opcodes, syntax = syntax, indent = indent)
+        print()
 
         print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION)))
         if exceptions:
