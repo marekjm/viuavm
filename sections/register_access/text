@@ -41,17 +41,27 @@ exists.
 Local register set that is bound to a call frame is discarded when that frame is dropped from the stack.
 Local register set that is bound to a closure is discarded when that closure is discarded.
 
-\dedent{2}
-
-GLOBAL REGISTER SET
+CAPACITY
 
 \indent{}
 
-Global register set is bound to a process.
-It is accessible from all call frames of this process.
-It is discarded when the process it is bound to finishes execution.
+Capacity of each local register set may be different (it depends on the number of registers requested when
+either a frame or a closure containing the local register set is created).
+The capacity is limited to 2^32 registers.
 
 \dedent{}
+
+NOTES
+
+\indent{}
+
+Tail calls do not inherit local register set.
+In Viua, tail calls replace instead of reusing the last call frame (meaning that the size of the last frame
+can change) so the register set is created anew.
+
+\dedent{2}
+
+\dedent{2}
 
 STATIC REGISTER SET
 
@@ -60,6 +70,34 @@ STATIC REGISTER SET
 Static register set is bound to a function in a process.
 The same function in two different processes has two different static register sets.
 Static register set is discarded when the process it is bound to finishes execution.
+
+CAPACITY
+
+\indent{}
+
+Currently (2018-01-02) fixed at 16 registers.
+
+\dedent{}
+
+NOTES
+
+\indent{}
+
+Functions are responsible for setting up their static registers.
+Any call to a function may be the first one, so access to static registers should be guarded by
+\instruction{isnull} instruction.
+
+\dedent{}
+
+\dedent{}
+
+GLOBAL REGISTER SET
+
+\indent{}
+
+Global register set is bound to a process.
+It is accessible from all call frames of this process.
+It is discarded when the process it is bound to finishes execution.
 
 \dedent{}
 
