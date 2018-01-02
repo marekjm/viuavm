@@ -197,9 +197,7 @@ def parse_and_expand(text, syntax, documented_instructions):
         expanded_text = expanded_text.replace(pat, each)
     return expanded_text
 
-
-def render_free_form_text(source, documented_instructions, indent = 4):
-    paragraphs = into_paragraphs(source)
+def render_paragraphs(paragraphs, documented_instructions, indent = 4):
     original_indent = indent
     reflow = True
     for each in paragraphs:
@@ -229,6 +227,9 @@ def render_free_form_text(source, documented_instructions, indent = 4):
             text = text.strip(),
             prefix = (' ' * indent),
         ))
+
+def render_free_form_text(source, documented_instructions, indent = 4):
+    return render_paragraphs(into_paragraphs(source))
 
 def render_file(path, documented_instructions, indent = 4):
     source = ''
@@ -405,17 +406,7 @@ def main(args):
 
         print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
         indent = 4
-        for each_paragraph in description:
-            print(parse_and_expand(textwrap.indent(
-                text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=(LINE_WIDTH - indent)),
-                    width=(LINE_WIDTH - indent))).strip(),
-                prefix = (' ' * indent),
-            ),
-            syntax = syntax,
-            documented_instructions = documented_opcodes,
-            ))
-        print()
-
+        render_paragraphs(description, documented_instructions = documented_opcodes, indent = indent)
 
         print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION)))
         if exceptions:

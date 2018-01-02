@@ -1,0 +1,12 @@
+This instruction allows checking if a register is empty.
+It is most useful for setting up registers in static register set.
+
+RETURN VALUE
+
+\indent{}
+
+If the register selected as the target is empty, the instruction will store boolean true in register selected
+as the result destination.
+Otherwise, the instruction will store boolean false in register selected as the result destination.
+
+\dedent{}
