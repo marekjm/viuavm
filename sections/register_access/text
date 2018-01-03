@@ -206,6 +206,6 @@ copy %1 static *1 local
 \reflow{on}
 \break
 
-Will copy a value dereferenced from a pointer located in local register 1 into static register 1.
+will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
 \dedent{all}
