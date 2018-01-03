@@ -163,4 +163,49 @@ integer %3 local 2
 iinc @3 local
 \dedent{4}
 \break
+
+\dedent{}
+\dedent{}
+
+REGISTER ADDRESSING
+
+\indent{}
+
+To fetch or store a value in a register it needs to be addressed.
+A proper register address consists of a fetch mode, a register index, and a register set.
+For example:
+
+\reflow{off}
+\indent{4}
+%1 local
+*1 local
+@1 local
+
+%1 static
+*1 static
+@1 static
+
+%1 global
+*1 global
+@1 global
+\dedent{4}
+\reflow{on}
+\break
+
+are all valid register addresses, conforming to the general syntax:
+\break
+<fetch-mode> <index> <register-set-specifier>
+
+Mixing fetch modes and register sets in single instructions is allowed.
+For exampe, this code:
+
+\reflow{off}
+\indent{4}
+copy %1 static *1 local
+\dedent{4}
+\reflow{on}
+\break
+
+Will copy a value dereferenced from a pointer located in local register 1 into static register 1.
+
 \dedent{all}
