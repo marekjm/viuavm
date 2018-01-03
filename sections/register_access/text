@@ -109,10 +109,14 @@ FETCH MODES
 
 \indent{}
 
-Values can be fetched from registers in three modes: 1/ plain, 2/ pointer dereference, and
+Values can be fetched from registers in three modes: 1/ direct, 2/ pointer dereference, and
 3/ register indirect.
 
-Plain, or "direct", mode is identified by a '%' sign.
+DIRECT
+
+\indent{}
+
+Direct, or plain, mode is identified by a '%' sign.
 A value is fetched from a register with the index specified after the '%' sign.
 For example, below code will increment a value located in local register 2:
 
@@ -123,7 +127,12 @@ iinc %2 local
 \dedent{4}
 \break
 
+\dedent{}
 \reflow{on}
+POINTER DEREFERENCE
+
+\indent{}
+
 Pointer dereference mode (identified by '*' sign) will fetch a value that is pointed to by the pointer
 located in the register with the index specified after the '*' sign.
 For example, below code will increment a value pointed to by the pointer in local register 2:
@@ -136,7 +145,13 @@ iinc *2 local
 \dedent{4}
 \break
 
+\dedent{}
 \reflow{on}
+
+REGISTER INDIRECT
+
+\indent{}
+
 Register indirect mode (identified by '@' sign) will fetch a value from a register with index specified by the
 integer located in register with the index specified after the '@' sign.
 For example, below code will increment a value in local register 2:
