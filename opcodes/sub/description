@@ -1,0 +1,7 @@
+Subtracts two numerical values (either a float, or an integer).
+
+The result has the type of the left-hand side value.
+For example, if the left-hand side is an integer value the result will also be an
+integer value;
+\break
+if the left-hand is a float value the result will also be a float value.
