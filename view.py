@@ -43,15 +43,22 @@ def longen_line(line, width):
 
     new_line = [chunks[0]]
 
+    normal_spacing = ('  ' if spaces_per_split == 2 else ' ')
     for each in chunks[1:]:
         if no_of_double_spaces:
             new_line.append('  ')
             no_of_double_spaces -= 1
         else:
-            new_line.append(' ')
+            new_line.append(normal_spacing)
         new_line.append(each)
 
     new_line = ''.join(new_line)
+
+    # If the desired width was not reached, do not introduce any "double spaces" and
+    # just return the simples representation possible.
+    if len(new_line) != width:
+        new_line = ' '.join(chunks)
+
     if DEBUG_LONGEN:
         new_line = '[{}] {}'.format(len(new_line), new_line)
     return new_line
