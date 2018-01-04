@@ -56,13 +56,21 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::types::byte* addr) {
     /** Run draw instruction.
      */
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    if (viua::bytecode::decoder::operands::is_void(addr)) {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+        /*
+         * Catching thrown objects into a void register will just discard them.
+         */
+        stack->caught.reset(nullptr);
+    } else {
+        viua::kernel::Register* target = nullptr;
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (not stack->caught) {
-        throw make_unique<viua::types::Exception>("no caught object to draw");
+        if (not stack->caught) {
+            throw make_unique<viua::types::Exception>("no caught object to draw");
+        }
+        *target = std::move(stack->caught);
     }
-    *target = std::move(stack->caught);
 
     return addr;
 }
