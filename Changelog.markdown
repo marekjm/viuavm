@@ -64,6 +64,7 @@ There are several categories of change:
   `checkedsdiv` instructions for checked signed arithmetic on fixed-width integers
 - feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`, `saturatingssub`,
   `saturatingsmul`, and `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
+- feature: `draw` instruction now supports `void` as target register
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
