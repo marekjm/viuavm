@@ -17,6 +17,7 @@
 .issue/*
 !.issue/objects
 !.issue/status
+.issue/objects/issues/*/*.json
 
 contrib/*
 !contrib/example/
