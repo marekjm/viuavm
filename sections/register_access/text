@@ -162,6 +162,7 @@ integer %2 local 42
 integer %3 local 2
 iinc @3 local
 \dedent{4}
+\reflow{on}
 \break
 
 \dedent{}
