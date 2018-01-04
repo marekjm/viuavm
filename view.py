@@ -60,7 +60,7 @@ def longen_line(line, width):
         new_line = ' '.join(chunks)
 
     if DEBUG_LONGEN:
-        new_line = '[{}] {}'.format(len(new_line), new_line)
+        new_line = '[{}:{}] {}'.format(len(new_line), width, new_line)
     return new_line
 
 def longen(lines, width):
