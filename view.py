@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import os
 import re
 import shutil
@@ -12,12 +13,30 @@ except ImportError:
     colored = None
 
 
+# Available rendering modes.
+RENDERING_MODE_ASCII_ART = 'RENDERING_MODE_ASCII_ART'
+RENDERING_MODE_HTML_ASCII_ART = 'RENDERING_MODE_HTML_ASCII_ART'
+RENDERING_MODE_HTML = 'RENDERING_MODE_HTML'
+
+# Selected rendering mode.
+RENDERING_MODE = os.environ.get('RENDERING_MODE', RENDERING_MODE_ASCII_ART)
+
+RENDERED_LINES = []
+_preserved_old_print = print
+def print(*args, **kwargs):
+    RENDERED_LINES.append(' '.join(args))
+
+
 COLOR_OPCODE = 'white'
 COLOR_SECTION = 'red'
 COLOR_SYNTAX_SAMPLE_INDEX = 'cyan'
 COLOR_SYNTAX_SAMPLE = 'green'
 
 def colorise(text, color):
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        if os.environ.get('COLOR') != 'no':
+            return '<span style="color: {color};">{text}</span>'.format(color = color, text = str(text).replace('<', '&lt;').replace('>', '&gt;'))
+        return str(text)
     if colored is None or os.environ.get('COLOR') == 'no':
         return str(text)
     return (colored.fg(color) + str(text) + colored.attr('reset'))
@@ -112,11 +131,14 @@ def stringify_encoding(encoding):
 DEFAULT_INDENT_WIDTH = 2
 KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
 KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
+KEYWORD_HEADING_REGEX = re.compile(r'\\heading{([^}]+)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
     if para is None:
         return True
     if para == r'\reflow{off}' or para == r'\reflow{on}':
+        return False
+    if para == r'\section{begin}' or para == r'\section{end}':
         return False
     if KEYWORD_INDENT_REGEX.match(para) or KEYWORD_DEDENT_REGEX.match(para):
         return False
@@ -158,10 +180,24 @@ def into_paragraphs(text):
             paragraphs.append([each])
             para = []
             continue
+        if each == r'\section{begin}' or each == r'\section{end}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
         if KEYWORD_INDENT_REGEX.match(each) or KEYWORD_DEDENT_REGEX.match(each):
             if para:
                 paragraphs.append(para)
             paragraphs.append([each])
+            para = []
+            continue
+        if KEYWORD_HEADING_REGEX.match(each):
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([])
+            paragraphs.append([each])
+            paragraphs.append([])
             para = []
             continue
         para.append(each)
@@ -169,15 +205,6 @@ def into_paragraphs(text):
         paragraphs.append(para)
 
     return ['\n'.join(each) for each in paragraphs]
-
-
-# Available rendering modes.
-RENDERING_MODE_ASCII_ART = 'RENDERING_MODE_ASCII_ART'
-RENDERING_MODE_HTML_ASCII_ART = 'RENDERING_MODE_HTML_ASCII_ART'
-RENDERING_MODE_HTML = 'RENDERING_MODE_HTML'
-
-# Selected rendering mode.
-RENDERING_MODE = RENDERING_MODE_ASCII_ART
 
 
 class InvalidReference(Exception):
@@ -202,9 +229,16 @@ def parse_and_expand(text, syntax, documented_instructions):
             raise UnknownInstruction(each)
         pat = (r'\instruction{' + each + '}')
         expanded_text = expanded_text.replace(pat, each)
+
+    found_colorisations = re.compile(r'\\color{([a-z]+)}{([^}]+)}').findall(expanded_text)
+    for each in found_colorisations:
+        color, text = each
+        pat = (r'\color{' + color + '}{' + text + '}')
+        expanded_text = expanded_text.replace(pat, colorise(text, color))
+
     return expanded_text
 
-def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4):
+def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
     for each in paragraphs:
@@ -221,6 +255,14 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
         if KEYWORD_DEDENT_REGEX.match(each):
             count = (KEYWORD_DEDENT_REGEX.match(each).group(1) or str(DEFAULT_INDENT_WIDTH))
             indent = (original_indent if count == 'all' else (indent - int(count)))
+            continue
+        if each == r'\section{begin}':
+            section_depth += 1
+            indent += DEFAULT_INDENT_WIDTH
+            continue
+        if each == r'\section{end}':
+            section_depth += 1
+            indent -= DEFAULT_INDENT_WIDTH
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
@@ -261,7 +303,7 @@ def render_section(section, documented_instructions):
     return res
 
 
-def main(args):
+def render_view(args):
     # See if the user requested documentation for a specific group of instructions.
     selected_group = None
     if len(args) == 1 and args[0][-1] == ':':
@@ -290,7 +332,7 @@ def main(args):
         with open('./introduction') as ifstream:
             introduction = ifstream.read().strip()
         if introduction:
-            print('  INTRODUCTION')
+            print('  {}'.format(colorise('INTRODUCTION', 'white')))
             print()
             render_free_form_text(introduction, documented_instructions = documented_opcodes)
             print()
@@ -482,6 +524,34 @@ def main(args):
         if see_also:
             print('  {}'.format(colorise('SEE ALSO', COLOR_SECTION)))
             print('    {}'.format(', '.join(see_also)))
+
+
+def main(args):
+    render_view(args)
+
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        sys.stdout.write('<!DOCTYPE html>\n')
+        sys.stdout.write('<html>\n')
+        sys.stdout.write('<head>\n')
+        sys.stdout.write('<meta charset="utf-8">\n')
+        sys.stdout.write('<style>\n')
+        if os.environ.get('COLOR') != 'no':
+            sys.stdout.write('body { color: #d0d0d0; background-color: #000; }\n')
+        sys.stdout.write('</style>\n')
+        sys.stdout.write('<title>Viua VM manual</title>\n')
+        sys.stdout.write('</head>\n')
+        sys.stdout.write('<body>\n')
+        sys.stdout.write('<pre>\n')
+        sys.stdout.write('Generated {}\n'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
+        sys.stdout.write('\n')
+        sys.stdout.write('----------------------------------------------------------------------\n\n')
+
+    sys.stdout.write('\n'.join(RENDERED_LINES))
+
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        sys.stdout.write('</pre>\n')
+        sys.stdout.write('</body>\n')
+        sys.stdout.write('</html>\n')
 
     return 0
 

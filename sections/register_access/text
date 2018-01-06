@@ -1,11 +1,12 @@
+\section{begin}
+
 Viua VM is a register based VM.
 Programs running on it are sequences of instructions that manipulate values placed in registers.
 This section explains how registers are accessed, so that you will be able to understand the
 rest of this documentation.
 
-REGISTER SETS
-
-\indent{}
+\heading{REGISTER SETS}
+\section{begin}
 
 There are three main register sets:
 \reflow{off}
@@ -32,40 +33,35 @@ Use \instruction{receive} instruction to get values out of the process message q
 All register sets are local to their processes.
 No values are shared between processes - sending a value to another process makes a copy.
 
-LOCAL REGISTER SET
-
-\indent{}
+\heading{LOCAL REGISTER SET}
+\section{begin}
 
 Local register set is bound to a call frame, or a closure, and exists for as long as the entity it is bound to
 exists.
 Local register set that is bound to a call frame is discarded when that frame is dropped from the stack.
 Local register set that is bound to a closure is discarded when that closure is discarded.
 
-CAPACITY
-
-\indent{}
+\heading{CAPACITY}
+\section{begin}
 
 Capacity of each local register set may be different (it depends on the number of registers requested when
 either a frame or a closure containing the local register set is created).
 The capacity is limited to 2^32 registers.
+\section{end}
 
-\dedent{}
-
-NOTES
-
-\indent{}
+\heading{NOTES}
+\section{begin}
 
 Tail calls do not inherit local register set.
 In Viua, tail calls replace instead of reusing the last call frame (meaning that the size of the last frame
 can change) so the register set is created anew.
 
-\dedent{2}
+\section{end}
+\section{end}
+\section{end}
 
-\dedent{2}
-
-STATIC REGISTER SET
-
-\indent{}
+\heading{STATIC REGISTER SET}
+\section{begin}
 
 Static register set is bound to a function in a process.
 The same function in two different processes has two different static register sets.
@@ -73,48 +69,42 @@ Static register set is discarded when the process it is bound to finishes execut
 The order in which static register sets for different functions are discarded after a process finishes
 execution is random.
 
-CAPACITY
-
-\indent{}
+\heading{CAPACITY}
+\section{begin}
 
 Currently (2018-01-02) fixed at 16 registers.
 
-\dedent{}
+\section{end}
 
-NOTES
-
-\indent{}
+\heading{NOTES}
+\section{begin}
 
 Functions are responsible for setting up their static registers.
 Any call to a function may be the first one, so access to static registers should be guarded by
 \instruction{isnull} instruction.
 
-\dedent{}
+\section{end}
+\section{end}
 
-\dedent{}
-
-GLOBAL REGISTER SET
-
-\indent{}
+\heading{GLOBAL REGISTER SET}
+\section{begin}
 
 Global register set is bound to a process.
 It is accessible from all call frames of this process.
 It is discarded when the process it is bound to finishes execution.
 
-\dedent{}
+\section{end}
 
 \dedent{all}
 
-FETCH MODES
-
-\indent{}
+\heading{FETCH MODES}
+\section{begin}
 
 Values can be fetched from registers in three modes: 1/ direct, 2/ pointer dereference, and
 3/ register indirect.
 
-DIRECT
-
-\indent{}
+\heading{DIRECT}
+\section{begin}
 
 Direct, or plain, mode is identified by a '%' sign.
 A value is fetched from a register with the index specified after the '%' sign.
@@ -126,12 +116,11 @@ integer %2 local 42
 iinc %2 local
 \dedent{4}
 \break
-
-\dedent{}
 \reflow{on}
-POINTER DEREFERENCE
+\section{end}
 
-\indent{}
+\heading{POINTER DEREFERENCE}
+\section{begin}
 
 Pointer dereference mode (identified by '*' sign) will fetch a value that is pointed to by the pointer
 located in the register with the index specified after the '*' sign.
@@ -144,13 +133,11 @@ ptr %2 local %3 local
 iinc *2 local
 \dedent{4}
 \break
-
-\dedent{}
 \reflow{on}
+\section{end}
 
-REGISTER INDIRECT
-
-\indent{}
+\heading{REGISTER INDIRECT}
+\section{begin}
 
 Register indirect mode (identified by '@' sign) will fetch a value from a register with index specified by the
 integer located in register with the index specified after the '@' sign.
@@ -165,12 +152,11 @@ iinc @3 local
 \reflow{on}
 \break
 
-\dedent{}
-\dedent{}
+\section{end}
+\section{end}
 
-REGISTER ADDRESSING
-
-\indent{}
+\heading{REGISTER ADDRESSING}
+\section{begin}
 
 To fetch or store a value in a register it needs to be addressed.
 A proper register address consists of a fetch mode, a register index, and a register set.
@@ -210,3 +196,4 @@ copy %1 static *1 local
 will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
 \dedent{all}
+\section{end}
