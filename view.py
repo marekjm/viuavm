@@ -667,9 +667,10 @@ def main(args):
         sys.stdout.write('<body>\n')
         sys.stdout.write('<a id="0"></a>\n')
         sys.stdout.write('<pre>\n')
-        sys.stdout.write('Generated {}\n'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
-        sys.stdout.write('\n')
-        sys.stdout.write('----------------------------------------------------------------------\n\n')
+
+    sys.stdout.write('Generated {}\n'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
+    sys.stdout.write('\n')
+    sys.stdout.write('----------------------------------------------------------------------\n\n')
 
     for each in RENDERED_LINES:
         if each == r'\toc{}':
