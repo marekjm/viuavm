@@ -668,7 +668,7 @@ def main(args):
                 else:
                     sys.stdout.write('{}{}\n'.format(
                         (index + ' ').ljust(longest_index, '.'),
-                        (' ' + heading).rjust((LINE_WIDTH - longest_index - 1), '.'),
+                        (' ' + heading).rjust((LINE_WIDTH - longest_index), '.'),
                     ))
             sys.stdout.write('\n')
             sys.stdout.write('{}\n'.format('-' * LINE_WIDTH))
