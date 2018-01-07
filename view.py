@@ -332,8 +332,6 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
     original_indent = indent
     reflow = True
 
-    # sys.stdout.write('rendering paragraph...\n')
-
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
