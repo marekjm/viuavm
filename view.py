@@ -446,7 +446,9 @@ def render_view(args):
 
 
     render_heading('INSTRUCTIONS', DEFAULT_INDENT_WIDTH)
+    print()
     section_counter.begin()
+
     # Render documentation for all requested instructions.
     # If no instructions were explicitly requested then print the full documentation.
     first_opcode_being_documented = True
