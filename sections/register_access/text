@@ -193,5 +193,5 @@ copy %1 static *1 local
 
 will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
-\dedent{all}
+\section{end}
 \section{end}
