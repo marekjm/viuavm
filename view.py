@@ -390,18 +390,7 @@ def render_file(path, documented_instructions, indent = DEFAULT_INDENT_WIDTH):
 
 def render_section(section, documented_instructions):
     with open(os.path.join('.', 'sections', section, 'title')) as ifstream:
-        colorise_with = None
-        if section_counter.depth() < 2:
-            colorise_with = COLOR_SECTION_MAJOR
-        if section_counter.depth() == 2:
-            colorise_with = COLOR_SECTION_MINOR
-        if section_counter.depth() > 2:
-            colorise_with = COLOR_SECTION_SUBSECTION
-        text = ifstream.read().strip()
-        print('  {index} {text}'.format(
-            index = section_counter.heading(text),
-            text = colorise(text, colorise_with),
-        ))
+        render_heading(ifstream.read().strip(), 2)
     print()
     res = render_file(
         os.path.join('.', 'sections', section, 'text'),
