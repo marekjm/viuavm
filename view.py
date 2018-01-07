@@ -226,6 +226,9 @@ class SectionCounter:
     def recorded_headings(self):
         return self._recorded_headings
 
+    def slug(self, index):
+        return index.replace('.', '-')
+
     def current_base_index(self):
         return '.'.join(map(str, self._path))
 
@@ -296,6 +299,27 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
+def render_heading(heading_text, indent):
+    colorise_with = None
+    if section_counter.depth() < 2:
+        colorise_with = COLOR_SECTION_MAJOR
+    if section_counter.depth() == 2:
+        colorise_with = COLOR_SECTION_MINOR
+    if section_counter.depth() > 2:
+        colorise_with = COLOR_SECTION_SUBSECTION
+
+    format_line = '{prefix}{index} {text}'
+    index = section_counter.heading(heading_text)
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        format_line = '{prefix}{index} <a id="{slug}"></a><a href="#{slug}">{text}</a>'
+
+    print(format_line.format(
+        prefix = (' ' * indent),
+        index = index,
+        slug = section_counter.slug(index),
+        text = colorise(heading_text, colorise_with),
+    ))
+
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
@@ -327,18 +351,7 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             continue
         if KEYWORD_HEADING_REGEX.match(each):
             heading_text = KEYWORD_HEADING_REGEX.match(each).group(1)
-            colorise_with = None
-            if section_counter.depth() < 2:
-                colorise_with = COLOR_SECTION_MAJOR
-            if section_counter.depth() == 2:
-                colorise_with = COLOR_SECTION_MINOR
-            if section_counter.depth() > 2:
-                colorise_with = COLOR_SECTION_SUBSECTION
-            print('{prefix}{index} {text}'.format(
-                prefix = (' ' * indent),
-                index = section_counter.heading(heading_text),
-                text = colorise(heading_text, colorise_with),
-            ))
+            render_heading(heading_text, indent)
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
@@ -627,10 +640,12 @@ def main(args):
         sys.stdout.write('<style>\n')
         if os.environ.get('COLOR') != 'no':
             sys.stdout.write('body { color: #d0d0d0; background-color: #000; }\n')
+            sys.stdout.write('a { color: #d0d0d0; }\n')
         sys.stdout.write('</style>\n')
         sys.stdout.write('<title>Viua VM manual</title>\n')
         sys.stdout.write('</head>\n')
         sys.stdout.write('<body>\n')
+        sys.stdout.write('<a id="0"></a>\n')
         sys.stdout.write('<pre>\n')
         sys.stdout.write('Generated {}\n'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
         sys.stdout.write('\n')
@@ -638,12 +653,26 @@ def main(args):
 
     for each in RENDERED_LINES:
         if each == r'\toc{}':
+            sys.stdout.write('{}\n'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
+            sys.stdout.write('\n')
             longest_index = max(map(len, map(lambda e: e[0], section_counter.recorded_headings()))) + 1
             for index, heading in section_counter.recorded_headings():
-                sys.stdout.write('{}{}\n'.format(
-                    (index + ' ').ljust(longest_index, '.'),
-                    (' ' + heading).rjust((LINE_WIDTH - longest_index - 1), '.'),
-                ))
+                if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+                    just = ('.' * (LINE_WIDTH - longest_index - 1 - len(heading)))
+                    heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
+                        just = just,
+                        slug = section_counter.slug(index),
+                        text = heading,
+                    )
+                    sys.stdout.write('{}{}\n'.format(
+                        (index + ' ').ljust(longest_index, '.'),
+                        heading_link,
+                    ))
+                else:
+                    sys.stdout.write('{}{}\n'.format(
+                        (index + ' ').ljust(longest_index, '.'),
+                        (' ' + heading).rjust((LINE_WIDTH - longest_index - 1), '.'),
+                    ))
             sys.stdout.write('\n')
             sys.stdout.write('{}\n'.format('-' * LINE_WIDTH))
             sys.stdout.write('\n')
