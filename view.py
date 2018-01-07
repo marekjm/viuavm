@@ -310,14 +310,22 @@ def render_heading(heading_text, indent):
 
     format_line = '{prefix}{index} {text}'
     index = section_counter.heading(heading_text)
+    top_marker = ''
+    top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-        format_line = '{prefix}{index} <a id="{slug}"></a><a href="#{slug}">{text}</a>'
+        format_line = '{prefix}{index} <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
+        top_marker = '^^^^'
+        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
+            len(top_marker)))
+        top_marker = '<a href="#0">{}</a>'.format(top_marker)
 
     print(format_line.format(
         prefix = (' ' * indent),
         index = index,
         slug = section_counter.slug(index),
         text = colorise(heading_text, colorise_with),
+        top_marker = top_marker,
+        top_marker_spacing = top_marker_spacing,
     ))
 
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
