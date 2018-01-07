@@ -58,7 +58,6 @@ can change) so the register set is created anew.
 
 \section{end}
 \section{end}
-\section{end}
 
 \heading{STATIC REGISTER SET}
 \section{begin}
@@ -94,8 +93,7 @@ It is accessible from all call frames of this process.
 It is discarded when the process it is bound to finishes execution.
 
 \section{end}
-
-\dedent{all}
+\section{end}
 
 \heading{FETCH MODES}
 \section{begin}

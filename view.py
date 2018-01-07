@@ -28,7 +28,9 @@ def print(*args, **kwargs):
 
 
 COLOR_OPCODE = 'white'
-COLOR_SECTION = 'red'
+COLOR_SECTION_MAJOR = 'white'
+COLOR_SECTION_MINOR = 'white'
+COLOR_SECTION_SUBSECTION = 'white'
 COLOR_SYNTAX_SAMPLE_INDEX = 'cyan'
 COLOR_SYNTAX_SAMPLE = 'green'
 
@@ -207,6 +209,62 @@ def into_paragraphs(text):
     return ['\n'.join(each) for each in paragraphs]
 
 
+class SectionCounter:
+    class TooManyEnds(Exception):
+        pass
+
+    def __init__(self, start_counting_at = 0):
+        self._start_counting_at = start_counting_at
+        self._depth = 0
+        self._path = []
+        self._counters = { '': self._start_counting_at, }
+        self._recorded_headings = []
+
+    def depth(self):
+        return self._depth
+
+    def recorded_headings(self):
+        return self._recorded_headings
+
+    def current_base_index(self):
+        return '.'.join(map(str, self._path))
+
+    def heading(self, text):
+        base_index = self.current_base_index()
+        counter_at_base_index = self._counters[base_index]
+
+        index = '{base}{sep}{counter}'.format(
+            base = base_index,
+            sep = ('.' if base_index else ''),
+            counter = counter_at_base_index,
+        )
+        self._recorded_headings.append( (index, text,) )
+
+        self._counters[base_index] += 1
+
+        return index
+
+    def begin(self):
+        # This marker is only useful for tracking how many sections were opened to
+        # prevent calling .end() too many times.
+        self._depth += 1
+
+        current_index = self.current_base_index()
+        counter = self._counters[current_index] - 1
+        self._path.append(counter)
+
+        base_index = self.current_base_index()
+        if base_index not in self._counters:
+            self._counters[base_index] = self._start_counting_at
+
+    def end(self):
+        if self._depth == 0:
+            raise SectionCounter.TooManyEnds()
+        self._depth -= 1
+        self._path.pop()
+section_counter = SectionCounter(1)
+
+
 class InvalidReference(Exception):
     pass
 
@@ -241,6 +299,9 @@ def parse_and_expand(text, syntax, documented_instructions):
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
+
+    # sys.stdout.write('rendering paragraph...\n')
+
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
@@ -257,12 +318,27 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             indent = (original_indent if count == 'all' else (indent - int(count)))
             continue
         if each == r'\section{begin}':
-            section_depth += 1
+            section_counter.begin()
             indent += DEFAULT_INDENT_WIDTH
             continue
         if each == r'\section{end}':
-            section_depth += 1
+            section_counter.end()
             indent -= DEFAULT_INDENT_WIDTH
+            continue
+        if KEYWORD_HEADING_REGEX.match(each):
+            heading_text = KEYWORD_HEADING_REGEX.match(each).group(1)
+            colorise_with = None
+            if section_counter.depth() < 2:
+                colorise_with = COLOR_SECTION_MAJOR
+            if section_counter.depth() == 2:
+                colorise_with = COLOR_SECTION_MINOR
+            if section_counter.depth() > 2:
+                colorise_with = COLOR_SECTION_SUBSECTION
+            print('{prefix}{index} {text}'.format(
+                prefix = (' ' * indent),
+                index = section_counter.heading(heading_text),
+                text = colorise(heading_text, colorise_with),
+            ))
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
@@ -285,7 +361,7 @@ def render_free_form_text(source, documented_instructions, syntax = None, indent
         indent = indent
     )
 
-def render_file(path, documented_instructions, indent = 4):
+def render_file(path, documented_instructions, indent = DEFAULT_INDENT_WIDTH):
     source = ''
     with open(path) as ifstream:
         source = ifstream.read().strip()
@@ -293,7 +369,18 @@ def render_file(path, documented_instructions, indent = 4):
 
 def render_section(section, documented_instructions):
     with open(os.path.join('.', 'sections', section, 'title')) as ifstream:
-        print('  {}'.format(ifstream.read().strip()))
+        colorise_with = None
+        if section_counter.depth() < 2:
+            colorise_with = COLOR_SECTION_MAJOR
+        if section_counter.depth() == 2:
+            colorise_with = COLOR_SECTION_MINOR
+        if section_counter.depth() > 2:
+            colorise_with = COLOR_SECTION_SUBSECTION
+        text = ifstream.read().strip()
+        print('  {index} {text}'.format(
+            index = section_counter.heading(text),
+            text = colorise(text, colorise_with),
+        ))
     print()
     res = render_file(
         os.path.join('.', 'sections', section, 'text'),
@@ -326,6 +413,9 @@ def render_view(args):
     # It looks like the user knows what they want anyway.
     if (not args) and selected_group is None:
         print('VIUA VM OPCODES DOCUMENTATION'.center(LINE_WIDTH))
+        print()
+
+        print(r'\toc{}')
         print()
 
         introduction = ''
@@ -452,18 +542,18 @@ def render_view(args):
         print()
 
 
-        print('  {}'.format(colorise('SYNTAX', COLOR_SECTION)))
+        print('  {}'.format(colorise('SYNTAX', COLOR_SECTION_MINOR)))
         for i, syn in enumerate(syntax):
             print('    ({})    {}'.format(colorise(i, COLOR_SYNTAX_SAMPLE_INDEX), colorise(syn, COLOR_SYNTAX_SAMPLE)))
         print()
 
 
-        print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION)))
+        print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION_MINOR)))
         indent = 4
         render_paragraphs(description, documented_instructions = documented_opcodes, syntax = syntax, indent = indent)
         print()
 
-        print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION)))
+        print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION_MINOR)))
         if exceptions:
             print()
             for each_ex in exceptions:
@@ -478,7 +568,7 @@ def render_view(args):
             print()
 
 
-        print('  {}'.format(colorise('EXAMPLES', COLOR_SECTION)))
+        print('  {}'.format(colorise('EXAMPLES', COLOR_SECTION_MINOR)))
         if examples:
             print()
             for each_ex in examples:
@@ -505,7 +595,7 @@ def render_view(args):
         # print()
 
 
-        print('  {}'.format(colorise('REMARKS', COLOR_SECTION)))
+        print('  {}'.format(colorise('REMARKS', COLOR_SECTION_MINOR)))
         if remarks:
             for each_paragraph in remarks:
                 print(parse_and_expand(textwrap.indent(
@@ -522,7 +612,7 @@ def render_view(args):
 
 
         if see_also:
-            print('  {}'.format(colorise('SEE ALSO', COLOR_SECTION)))
+            print('  {}'.format(colorise('SEE ALSO', COLOR_SECTION_MINOR)))
             print('    {}'.format(', '.join(see_also)))
 
 
@@ -546,7 +636,20 @@ def main(args):
         sys.stdout.write('\n')
         sys.stdout.write('----------------------------------------------------------------------\n\n')
 
-    sys.stdout.write('\n'.join(RENDERED_LINES))
+    for each in RENDERED_LINES:
+        if each == r'\toc{}':
+            longest_index = max(map(len, map(lambda e: e[0], section_counter.recorded_headings()))) + 1
+            for index, heading in section_counter.recorded_headings():
+                sys.stdout.write('{}{}\n'.format(
+                    (index + ' ').ljust(longest_index, '.'),
+                    (' ' + heading).rjust((LINE_WIDTH - longest_index - 1), '.'),
+                ))
+            sys.stdout.write('\n')
+            sys.stdout.write('{}\n'.format('-' * LINE_WIDTH))
+            sys.stdout.write('\n')
+            continue
+        sys.stdout.write('{}\n'.format(each))
+    # sys.stdout.write('\n'.join(RENDERED_LINES))
 
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
         sys.stdout.write('</pre>\n')
