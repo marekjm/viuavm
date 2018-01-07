@@ -232,7 +232,7 @@ class SectionCounter:
     def current_base_index(self):
         return '.'.join(map(str, self._path))
 
-    def heading(self, text):
+    def heading(self, text, noise = False):
         base_index = self.current_base_index()
         counter_at_base_index = self._counters[base_index]
 
@@ -241,7 +241,7 @@ class SectionCounter:
             sep = ('.' if base_index else ''),
             counter = counter_at_base_index,
         )
-        self._recorded_headings.append( (index, text,) )
+        self._recorded_headings.append( (index, text, noise,) )
 
         self._counters[base_index] += 1
 
@@ -299,7 +299,7 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
-def render_heading(heading_text, indent):
+def render_heading(heading_text, indent, noise = False):
     colorise_with = None
     if section_counter.depth() < 2:
         colorise_with = COLOR_SECTION_MAJOR
@@ -309,7 +309,7 @@ def render_heading(heading_text, indent):
         colorise_with = COLOR_SECTION_SUBSECTION
 
     format_line = '{prefix}{index} {text}'
-    index = section_counter.heading(heading_text)
+    index = section_counter.heading(heading_text, noise = noise)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
@@ -560,7 +560,7 @@ def render_view(args):
         print()
 
 
-        render_heading('SYNTAX', 3 * DEFAULT_INDENT_WIDTH)
+        render_heading('SYNTAX', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         print()
         for i, syn in enumerate(syntax):
             print('{}({})    {}'.format(
@@ -571,7 +571,7 @@ def render_view(args):
         print()
 
 
-        render_heading('DESCRIPTION', 3 * DEFAULT_INDENT_WIDTH)
+        render_heading('DESCRIPTION', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         print()
         render_paragraphs(description,
             documented_instructions = documented_opcodes,
@@ -580,7 +580,7 @@ def render_view(args):
         )
         print()
 
-        render_heading('EXCEPTIONS', 3 * DEFAULT_INDENT_WIDTH)
+        render_heading('EXCEPTIONS', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         if exceptions:
             print()
             for each_ex in exceptions:
@@ -595,7 +595,7 @@ def render_view(args):
             print()
 
 
-        render_heading('EXAMPLES', 3 * DEFAULT_INDENT_WIDTH)
+        render_heading('EXAMPLES', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         if examples:
             print()
             for each_ex in examples:
@@ -622,7 +622,7 @@ def render_view(args):
         # print()
 
 
-        render_heading('REMARKS', 3 * DEFAULT_INDENT_WIDTH)
+        render_heading('REMARKS', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         if remarks:
             for each_paragraph in remarks:
                 print(parse_and_expand(textwrap.indent(
@@ -641,7 +641,7 @@ def render_view(args):
 
 
         if see_also:
-            render_heading('SEE ALSO', 3 * DEFAULT_INDENT_WIDTH)
+            render_heading('SEE ALSO', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
             print(textwrap.indent(', '.join(see_also), prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
 
         section_counter.end()
@@ -677,7 +677,9 @@ def main(args):
             sys.stdout.write('{}\n'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
             sys.stdout.write('\n')
             longest_index = max(map(len, map(lambda e: e[0], section_counter.recorded_headings()))) + 1
-            for index, heading in section_counter.recorded_headings():
+            for index, heading, noise in section_counter.recorded_headings():
+                if noise:
+                    continue
                 if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
                     just = ('.' * (LINE_WIDTH - longest_index - 1 - len(heading)))
                     heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
