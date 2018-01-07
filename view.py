@@ -444,6 +444,9 @@ def render_view(args):
         print('-' * LINE_WIDTH)
         print()
 
+
+    render_heading('INSTRUCTIONS', DEFAULT_INDENT_WIDTH)
+    section_counter.begin()
     # Render documentation for all requested instructions.
     # If no instructions were explicitly requested then print the full documentation.
     first_opcode_being_documented = True
@@ -544,50 +547,62 @@ def render_view(args):
             print()
 
 
-        print('{}'.format(colorise(each.upper(), COLOR_OPCODE)))
-        print('    in group{}: {}'.format(
+        render_heading(each.upper(), 2 * DEFAULT_INDENT_WIDTH)
+        section_counter.begin()
+
+        print('{}in group{}: {}'.format(
+            (' ' * (4 * DEFAULT_INDENT_WIDTH)),
             ('' if len(groups) == 1 else 's'),
             ', '.join(groups)
         ))
         print()
 
 
-        print('  {}'.format(colorise('SYNTAX', COLOR_SECTION_MINOR)))
+        render_heading('SYNTAX', 3 * DEFAULT_INDENT_WIDTH)
+        print()
         for i, syn in enumerate(syntax):
-            print('    ({})    {}'.format(colorise(i, COLOR_SYNTAX_SAMPLE_INDEX), colorise(syn, COLOR_SYNTAX_SAMPLE)))
+            print('{}({})    {}'.format(
+                (' ' * (4 * DEFAULT_INDENT_WIDTH)),
+                colorise(i, COLOR_SYNTAX_SAMPLE_INDEX),
+                colorise(syn, COLOR_SYNTAX_SAMPLE)
+            ))
         print()
 
 
-        print('  {}'.format(colorise('DESCRIPTION', COLOR_SECTION_MINOR)))
-        indent = 4
-        render_paragraphs(description, documented_instructions = documented_opcodes, syntax = syntax, indent = indent)
+        render_heading('DESCRIPTION', 3 * DEFAULT_INDENT_WIDTH)
+        print()
+        render_paragraphs(description,
+            documented_instructions = documented_opcodes,
+            syntax = syntax,
+            indent = (4 * DEFAULT_INDENT_WIDTH),
+        )
         print()
 
-        print('  {}'.format(colorise('EXCEPTIONS', COLOR_SECTION_MINOR)))
+        render_heading('EXCEPTIONS', 3 * DEFAULT_INDENT_WIDTH)
         if exceptions:
             print()
             for each_ex in exceptions:
                 render_file(
                     os.path.join('.', 'exceptions', each_ex[0]),
-                    indent = 4,
+                    indent = 4 * DEFAULT_INDENT_WIDTH,
                     documented_instructions = documented_opcodes
                 )
                 print()
         else:
-            print('    None.')
+            print(textwrap.indent('None.', prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
             print()
 
 
-        print('  {}'.format(colorise('EXAMPLES', COLOR_SECTION_MINOR)))
+        render_heading('EXAMPLES', 3 * DEFAULT_INDENT_WIDTH)
         if examples:
             print()
             for each_ex in examples:
                 print(textwrap.indent(
                     each_ex[1],
-                    prefix = '    ',
+                    prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH)),
                 ))
         else:
-            print('    None.')
+            print(textwrap.indent('None.', prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
         print()
 
 
@@ -605,25 +620,31 @@ def render_view(args):
         # print()
 
 
-        print('  {}'.format(colorise('REMARKS', COLOR_SECTION_MINOR)))
+        render_heading('REMARKS', 3 * DEFAULT_INDENT_WIDTH)
         if remarks:
             for each_paragraph in remarks:
                 print(parse_and_expand(textwrap.indent(
-                    text = '\n'.join(longen(textwrap.wrap(each_paragraph, width=(LINE_WIDTH - indent)),
-                        width=(LINE_WIDTH - indent))).strip(),
-                    prefix = (' ' * indent),
-                ),
-                syntax = syntax,
-                documented_instructions = documented_opcodes,
+                        text = '\n'.join(
+                            longen(textwrap.wrap(each_paragraph,
+                                width=(LINE_WIDTH - (4 * DEFAULT_INDENT_WIDTH))),
+                            width=(LINE_WIDTH - (4 * DEFAULT_INDENT_WIDTH)))).strip(),
+                        prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH)),
+                    ),
+                    syntax = syntax,
+                    documented_instructions = documented_opcodes,
                 ))
         else:
-            print('    None.')
+            print(textwrap.indent('None.', prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
         print()
 
 
         if see_also:
-            print('  {}'.format(colorise('SEE ALSO', COLOR_SECTION_MINOR)))
-            print('    {}'.format(', '.join(see_also)))
+            render_heading('SEE ALSO', 3 * DEFAULT_INDENT_WIDTH)
+            print(textwrap.indent(', '.join(see_also), prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
+
+        section_counter.end()
+
+    section_counter.end()
 
 
 def main(args):
