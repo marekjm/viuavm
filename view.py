@@ -432,7 +432,7 @@ def render_view(args):
         with open('./introduction') as ifstream:
             introduction = ifstream.read().strip()
         if introduction:
-            print('  {}'.format(colorise('INTRODUCTION', 'white')))
+            render_heading('INTRODUCTION', 2)
             print()
             render_free_form_text(introduction, documented_instructions = documented_opcodes)
             print()
