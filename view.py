@@ -134,6 +134,7 @@ DEFAULT_INDENT_WIDTH = 2
 KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
 KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
 KEYWORD_HEADING_REGEX = re.compile(r'\\heading{([^}]+)}')
+PARAMETER_REGEX = re.compile(r'{([a-z_]+)(?:(=[^}]*))?}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
     if para is None:
@@ -274,6 +275,12 @@ class InvalidReference(Exception):
 class UnknownInstruction(Exception):
     pass
 
+class UnknownArgument(Exception):
+    pass
+
+class MissingArgument(Exception):
+    pass
+
 def parse_and_expand(text, syntax, documented_instructions):
     expanded_text = text
 
@@ -328,6 +335,55 @@ def render_heading(heading_text, indent, noise = False):
         top_marker_spacing = top_marker_spacing,
     ))
 
+class Types:
+    @staticmethod
+    def boolean(value):
+        if value == 'true':
+            return True
+        elif value == 'false':
+            return False
+        else:
+            raise ArgumentError(value)
+
+    @staticmethod
+    def any(value):
+        return value
+
+    @staticmethod
+    def stringify(something):
+        if something is Types.boolean:
+            return 'boolean'
+        elif something is Types.any:
+            return 'any'
+
+def build_params(raw, description, required = (), default = None):
+    params = {}
+    for key, value in raw:
+        if not value:
+            value = None
+
+        if key not in description:
+            raise UnknownArgument(key, value)
+
+        if value is None:
+            value = 'true'
+        else:
+            # Cut the '='
+            value = value[1:]
+
+        params[key] = description[key](value)
+
+    if default is not None:
+        for key, value in default.items():
+            if key not in params:
+                params[key] = value
+
+    for each in required:
+        if each not in params:
+            raise MissingArgument(each + ' : ' + Types.stringify(description[each]))
+
+    return params
+
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
@@ -357,7 +413,15 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             continue
         if KEYWORD_HEADING_REGEX.match(each):
             heading_text = KEYWORD_HEADING_REGEX.match(each).group(1)
-            render_heading(heading_text, indent)
+
+            # +2 is for { and }
+            # +8 is for \heading
+            params = build_params(PARAMETER_REGEX.findall(each[len(heading_text) + 2 + 8:]), {
+                'noise': Types.boolean,
+            }, default = {
+                'noise': False,
+            })
+            render_heading(heading_text, indent, noise = params['noise'])
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
