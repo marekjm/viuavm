@@ -6,6 +6,6 @@ The result is the value of the following operation:
 
 \reflow{off}
 \indent{4}
-result = lhs < rhs
+result = lhs <= rhs
 \reflow{on}
 \dedent{4}
