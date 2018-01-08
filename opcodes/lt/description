@@ -1,0 +1,3 @@
+Compares two numerical values (either a float, or an integer).
+If the left-hand side operand is an integer compares them as integers;
+if the left-hand side operand is a float compares them as floats.
