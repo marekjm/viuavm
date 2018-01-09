@@ -742,21 +742,24 @@ def main(args):
             for index, heading, noise in section_counter.recorded_headings():
                 if noise:
                     continue
+                character = '.'
+                if index.count('.') == 0:
+                    character = '_'
                 if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-                    just = ('.' * (LINE_WIDTH - longest_index - 1 - len(heading)))
+                    just = (character * (LINE_WIDTH - longest_index - 1 - len(heading)))
                     heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
                         just = just,
                         slug = section_counter.slug(index),
                         text = heading,
                     )
                     sys.stdout.write('{}{}\n'.format(
-                        (index + ' ').ljust(longest_index, '.'),
+                        (index + ' ').ljust(longest_index, character),
                         heading_link,
                     ))
                 else:
                     sys.stdout.write('{}{}\n'.format(
-                        (index + ' ').ljust(longest_index, '.'),
-                        (' ' + heading).rjust((LINE_WIDTH - longest_index), '.'),
+                        (index + ' ').ljust(longest_index, character),
+                        (' ' + heading).rjust((LINE_WIDTH - longest_index), character),
                     ))
             sys.stdout.write('\n')
             sys.stdout.write('{}\n'.format('-' * LINE_WIDTH))
