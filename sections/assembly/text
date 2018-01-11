@@ -1,0 +1,61 @@
+\section{begin}
+
+This section is a reference for Viua VM assembly language.
+It discusses source code organisation, compilation units, syntax, etc.
+Reading this section may allow you to undesrtand the SYNTAX and EXAMPLES sections in
+documentation for each instruction.
+
+\heading{FUNCTIONS}
+\section{begin}
+
+This section talks about functions.
+All code in Viua VM programs is contained in functions, therefore it is incredibly important
+to understand them.
+
+\heading{DEFINITIONS}
+\section{begin}
+
+This section talks about how to define functions.
+
+\heading{DELIMITING FUNCTION BODIES}
+\section{begin}
+
+How function bodies are delimited.
+
+\section{end}
+
+\heading{PARAMETERS}
+\section{begin}
+
+How to get parameters to functions.
+
+\section{end}
+
+\heading{RETURN VALUES}
+\section{begin}
+
+How to return values from functions.
+
+\section{end}
+
+\section{end}
+
+\heading{DECLARATIONS}
+\section{begin}
+
+How to declare that a function will be available during linking, and
+that the assembler should just trust us that it exists.
+
+\section{end}
+
+\section{end}
+
+\heading{REGISTER NAMING}
+\section{begin}
+
+How to name registers with human-readable names, e.g. `index' or `size', instead of bare
+indexes - `1', `4', etc.
+
+\section{end}
+
+\section{end}
