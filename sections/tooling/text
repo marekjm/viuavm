@@ -32,6 +32,14 @@ The third instruction (`add') would cause a type error at runtime as it is not p
 World!".
 The type checker will notice this and reject the program, producing an appropriate error message.
 
+\heading{TYPE INFERENCE}
+
+Viua VM assembly is a language with strong, mostly static typing, and type inference.
+Not all types have to be explicitly declared: assembler will infer types when they are not expressed in source
+code from the way the values defined by them are used.
+In other words - the assembler will enforce consistency of the assumptions about types of values expressed in
+the source code.
+
 \section{end}
 
 \heading{STATIC ANALYSER}
