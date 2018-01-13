@@ -100,7 +100,7 @@ They are listed and discussed below.
 \heading{VIUA_ENABLE_TRACING}
 \section{begin}
 
-\reflow{off}
+\wrap{begin}
 \indent{4}
 $ viua-asm sample/asm/text/hello_world.asm
 $ viua-vm a.out
@@ -118,7 +118,7 @@ Hello World!
 [ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15121, depth = 1 ] move
 [ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d1512e, depth = 1 ] halt
 \dedent{4}
-\reflow{on}
+\wrap{end}
 \break
 
 \section{end}
