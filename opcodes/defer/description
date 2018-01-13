@@ -5,16 +5,22 @@ frame resumes.
 For example, if a deferred call to function `foo' is scheduled then the sequence of events is
 as follows:
 
-\wrap{begin}
-\indent{2}
-- execute a `defer foo/0' instruction
-- schedule a call to `foo/0'
-- encounter `return' instruction
-- set return value in enclosing frame
-- suspend current stack (let's call it S)
-- execute all deferred calls (the process will execute their stacks)
-- resume stack S
-- pop the frame for `bar/0' function
-\dedent{2}
-\wrap{end}
-\break
+\list{begin}
+\item
+execute a `defer foo/0' instruction
+\item
+schedule a call to `foo/0'
+\item
+encounter `return' instruction
+\item
+set return value in enclosing frame
+\item
+suspend current stack (let's call it S)
+\item
+execute all deferred calls (the process will execute all the deferred functions to
+completion, with the last deferred call being executed first)
+\item
+resume stack S
+\item
+pop the frame for `bar/0' function
+\list{end}

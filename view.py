@@ -183,6 +183,24 @@ def into_paragraphs(text):
             paragraphs.append([each])
             para = []
             continue
+        if each == r'\list{begin}' or each == r'\list{end}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
+        if each == r'\item':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
+        if each == r'\wrap{begin}' or each == r'\wrap{end}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
         if each == r'\section{begin}' or each == r'\section{end}':
             if para:
                 paragraphs.append(para)
@@ -426,6 +444,9 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
     reflow = True
     wrapping = False
 
+    in_list = False
+    new_list_item = False
+
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
@@ -440,6 +461,17 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
         if each == r'\wrap{end}':
             wrapping = False
             reflow = True
+            continue
+        if each == r'\list{begin}':
+            in_list = True
+            indent += 2
+            continue
+        if each == r'\list{end}':
+            in_list = False
+            indent -= 2
+            continue
+        if each == r'\item':
+            new_list_item = True
             continue
         if KEYWORD_INDENT_REGEX.match(each):
             count = int(KEYWORD_INDENT_REGEX.match(each).group(1) or DEFAULT_INDENT_WIDTH)
@@ -475,10 +507,14 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             text = text_reflow(text, indent)
         if wrapping:
             text = text_wrap(text, indent)
-        print(textwrap.indent(
+        text = textwrap.indent(
             text = text.strip(),
             prefix = (' ' * indent),
-        ))
+        )
+        if in_list and new_list_item:
+            text = (' ' * (indent - 2) + '-' + text[indent - 1:])
+            new_list_item = False
+        print(text)
 
 def render_free_form_text(source, documented_instructions, syntax = None, indent = 4):
     return render_paragraphs(
