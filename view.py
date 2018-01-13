@@ -758,6 +758,9 @@ def render_view(args):
     section_counter.end()
 
 
+def emit_line(s = ''):
+    sys.stdout.write('{}\n'.format(s))
+
 def main(args):
     render_view(args)
 
@@ -777,14 +780,14 @@ def main(args):
         sys.stdout.write('<a id="0"></a>\n')
         sys.stdout.write('<pre>\n')
 
-    sys.stdout.write('Generated {}\n'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
-    sys.stdout.write('\n')
-    sys.stdout.write('----------------------------------------------------------------------\n\n')
+    emit_line('Generated {}'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
+    emit_line()
+    emit_line('----------------------------------------------------------------------\n')
 
     for each in RENDERED_LINES:
         if each == r'\toc{}':
-            sys.stdout.write('{}\n'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
-            sys.stdout.write('\n')
+            emit_line('{}'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
+            emit_line()
             longest_index = max(map(len, map(lambda e: e[0], section_counter.recorded_headings()))) + 1
             for index, heading, noise in section_counter.recorded_headings():
                 if noise:
@@ -799,21 +802,20 @@ def main(args):
                         slug = section_counter.slug(index),
                         text = heading,
                     )
-                    sys.stdout.write('{}{}\n'.format(
+                    emit_line('{}{}'.format(
                         (index + ' ').ljust(longest_index, character),
                         heading_link,
                     ))
                 else:
-                    sys.stdout.write('{}{}\n'.format(
+                    emit_line('{}{}'.format(
                         (index + ' ').ljust(longest_index, character),
                         (' ' + heading).rjust((LINE_WIDTH - longest_index), character),
                     ))
-            sys.stdout.write('\n')
-            sys.stdout.write('{}\n'.format('-' * LINE_WIDTH))
-            sys.stdout.write('\n')
+            emit_line()
+            emit_line('{}'.format('-' * LINE_WIDTH))
+            emit_line()
             continue
-        sys.stdout.write('{}\n'.format(each))
-    # sys.stdout.write('\n'.join(RENDERED_LINES))
+        emit_line('{}'.format(each))
 
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
         sys.stdout.write('</pre>\n')
