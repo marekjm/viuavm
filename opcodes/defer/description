@@ -24,3 +24,7 @@ resume stack S
 \item
 pop the frame for `bar/0' function
 \list{end}
+
+Note that deferred calls can also contain \instruction{defer} instructions and
+schedule their own deferred calls.
+There is no limit on the nesting of deferred calls.
