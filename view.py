@@ -228,7 +228,7 @@ def into_paragraphs(text):
     return ['\n'.join(each) for each in paragraphs]
 
 
-class SectionCounter:
+class SectionTracker:
     class TooManyEnds(Exception):
         pass
 
@@ -281,10 +281,10 @@ class SectionCounter:
 
     def end(self):
         if self._depth == 0:
-            raise SectionCounter.TooManyEnds()
+            raise SectionTracker.TooManyEnds()
         self._depth -= 1
         self._path.pop()
-section_counter = SectionCounter(1)
+section_tracker = SectionTracker(1)
 
 
 class InvalidReference(Exception):
@@ -326,15 +326,15 @@ def parse_and_expand(text, syntax, documented_instructions):
 
 def render_heading(heading_text, indent, noise = False):
     colorise_with = None
-    if section_counter.depth() < 2:
+    if section_tracker.depth() < 2:
         colorise_with = COLOR_SECTION_MAJOR
-    if section_counter.depth() == 2:
+    if section_tracker.depth() == 2:
         colorise_with = COLOR_SECTION_MINOR
-    if section_counter.depth() > 2:
+    if section_tracker.depth() > 2:
         colorise_with = COLOR_SECTION_SUBSECTION
 
     format_line = '{prefix}{index} {text}'
-    index = section_counter.heading(heading_text, noise = noise)
+    index = section_tracker.heading(heading_text, noise = noise)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
@@ -347,7 +347,7 @@ def render_heading(heading_text, indent, noise = False):
     print(format_line.format(
         prefix = (' ' * indent),
         index = index,
-        slug = section_counter.slug(index),
+        slug = section_tracker.slug(index),
         text = colorise(heading_text, colorise_with),
         top_marker = top_marker,
         top_marker_spacing = top_marker_spacing,
@@ -482,11 +482,11 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             indent = (original_indent if count == 'all' else (indent - int(count)))
             continue
         if each == r'\section{begin}':
-            section_counter.begin()
+            section_tracker.begin()
             indent += DEFAULT_INDENT_WIDTH
             continue
         if each == r'\section{end}':
-            section_counter.end()
+            section_tracker.end()
             indent -= DEFAULT_INDENT_WIDTH
             continue
         if KEYWORD_HEADING_REGEX.match(each):
@@ -591,7 +591,7 @@ def render_view(args):
 
     render_heading('INSTRUCTIONS', DEFAULT_INDENT_WIDTH)
     print()
-    section_counter.begin()
+    section_tracker.begin()
 
     # Render documentation for all requested instructions.
     # If no instructions were explicitly requested then print the full documentation.
@@ -694,7 +694,7 @@ def render_view(args):
 
 
         render_heading(each.upper(), 2 * DEFAULT_INDENT_WIDTH)
-        section_counter.begin()
+        section_tracker.begin()
 
         print('{}in group{}: {}'.format(
             (' ' * (4 * DEFAULT_INDENT_WIDTH)),
@@ -789,9 +789,9 @@ def render_view(args):
             render_heading('SEE ALSO', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
             print(textwrap.indent(', '.join(see_also), prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
 
-        section_counter.end()
+        section_tracker.end()
 
-    section_counter.end()
+    section_tracker.end()
 
 
 def emit_line(s = ''):
@@ -824,8 +824,8 @@ def main(args):
         if each == r'\toc{}':
             emit_line('{}'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
             emit_line()
-            longest_index = max(map(len, map(lambda e: e[0], section_counter.recorded_headings()))) + 1
-            for index, heading, noise in section_counter.recorded_headings():
+            longest_index = max(map(len, map(lambda e: e[0], section_tracker.recorded_headings()))) + 1
+            for index, heading, noise in section_tracker.recorded_headings():
                 if noise:
                     continue
                 character = '.'
@@ -835,7 +835,7 @@ def main(args):
                     just = (character * (LINE_WIDTH - longest_index - 1 - len(heading)))
                     heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
                         just = just,
-                        slug = section_counter.slug(index),
+                        slug = section_tracker.slug(index),
                         text = heading,
                     )
                     emit_line('{}{}'.format(
