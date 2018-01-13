@@ -732,6 +732,7 @@ def render_view(args):
 
         render_heading('REMARKS', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         if remarks:
+            print()
             for each_paragraph in remarks:
                 print(parse_and_expand(textwrap.indent(
                         text = '\n'.join(
