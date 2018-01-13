@@ -384,6 +384,43 @@ def build_params(raw, description, required = (), default = None):
 
     return params
 
+def text_reflow(text, indent):
+    return '\n'.join(longen(textwrap.wrap(text,
+        width=(LINE_WIDTH - indent)),
+        width=(LINE_WIDTH - indent))
+    )
+
+def text_wrap(text, indent):
+    lines = text.split('\n')
+    wrapped_lines = []
+    wrap_to_length = (LINE_WIDTH - indent)
+    for each in lines:
+        if len(each) <= wrap_to_length:
+            wrapped_lines.append(each)
+            continue
+
+        remaining = each
+        # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
+        # 21B5 ↵ Downwards Arrow With Corner Leftwards
+        newline_marker = '↵'
+        part = remaining[:wrap_to_length - len(newline_marker)] + newline_marker
+        remaining = remaining[wrap_to_length - 1:]
+        wrapped_lines.append(part)
+
+        indent_marker = '   '
+
+        while remaining:
+            # sys.stdout.write('{}: {}\n'.format(repr(each), repr(remaining)))
+            # -1 for backslash
+            if len(remaining) <= (wrap_to_length - len(indent_marker)):
+                part = (indent_marker + remaining[:wrap_to_length - len(indent_marker)])
+                remaining = remaining[wrap_to_length - len(indent_marker):]
+            else:
+                part = (indent_marker + remaining[:wrap_to_length - 1 - len(indent_marker)] + newline_marker)
+                remaining = remaining[wrap_to_length - 1 - len(indent_marker):]
+            wrapped_lines.append(part)
+    return '\n'.join(wrapped_lines)
+
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
@@ -435,41 +472,9 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
         if reflow:
-            text = '\n'.join(
-                    longen(textwrap.wrap(text,
-                        width=(LINE_WIDTH - indent)),
-                        width=(LINE_WIDTH - indent))
-                )
+            text = text_reflow(text, indent)
         if wrapping:
-            lines = text.split('\n')
-            wrapped_lines = []
-            wrap_to_length = (LINE_WIDTH - indent)
-            for each in lines:
-                if len(each) <= wrap_to_length:
-                    wrapped_lines.append(each)
-                    continue
-
-                remaining = each
-                # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
-                # 21B5 ↵ Downwards Arrow With Corner Leftwards
-                newline_marker = '↵'
-                part = remaining[:wrap_to_length - len(newline_marker)] + newline_marker
-                remaining = remaining[wrap_to_length - 1:]
-                wrapped_lines.append(part)
-
-                indent_marker = '  '
-
-                while remaining:
-                    # sys.stdout.write('{}: {}\n'.format(repr(each), repr(remaining)))
-                    # -1 for backslash
-                    if len(remaining) <= (wrap_to_length - len(indent_marker)):
-                        part = (indent_marker + remaining[:wrap_to_length - len(indent_marker)])
-                        remaining = remaining[wrap_to_length - len(indent_marker):]
-                    else:
-                        part = (indent_marker + remaining[:wrap_to_length - 1 - len(indent_marker)] + newline_marker)
-                        remaining = remaining[wrap_to_length - 1 - len(indent_marker):]
-                    wrapped_lines.append(part)
-            text = '\n'.join(wrapped_lines)
+            text = text_wrap(text, indent)
         print(textwrap.indent(
             text = text.strip(),
             prefix = (' ' * indent),
