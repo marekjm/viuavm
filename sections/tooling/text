@@ -68,6 +68,9 @@ viua-asm main.asm foo.out bar.out
 \reflow{on}
 \break
 
+Viua supports both static (compile-time) linkage and dynamic (runtime) linkage.
+Dynamic linkage is implemented by the kernel, discussed in a later section.
+
 \section{end}
 
 \section{end}
