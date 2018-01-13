@@ -1,0 +1,20 @@
+The \instruction{defer} instruction schedules a call to be executed just *after* the frame in
+which this instruction is executed is returned from, but before the execution of the enclosing
+frame resumes.
+
+For example, if a deferred call to function `foo' is scheduled then the sequence of events is
+as follows:
+
+\wrap{begin}
+\indent{2}
+- execute a `defer foo/0' instruction
+- schedule a call to `foo/0'
+- encounter `return' instruction
+- set return value in enclosing frame
+- suspend current stack (let's call it S)
+- execute all deferred calls (the process will execute their stacks)
+- resume stack S
+- pop the frame for `bar/0' function
+\dedent{2}
+\wrap{end}
+\break
