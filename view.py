@@ -387,12 +387,21 @@ def build_params(raw, description, required = (), default = None):
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
+    wrapping = False
 
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
             continue
         if each == r'\reflow{on}':
+            reflow = True
+            continue
+        if each == r'\wrap{begin}':
+            wrapping = True
+            reflow = False
+            continue
+        if each == r'\wrap{end}':
+            wrapping = False
             reflow = True
             continue
         if KEYWORD_INDENT_REGEX.match(each):
@@ -431,6 +440,36 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
                         width=(LINE_WIDTH - indent)),
                         width=(LINE_WIDTH - indent))
                 )
+        if wrapping:
+            lines = text.split('\n')
+            wrapped_lines = []
+            wrap_to_length = (LINE_WIDTH - indent)
+            for each in lines:
+                if len(each) <= wrap_to_length:
+                    wrapped_lines.append(each)
+                    continue
+
+                remaining = each
+                # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
+                # 21B5 ↵ Downwards Arrow With Corner Leftwards
+                newline_marker = '↵'
+                part = remaining[:wrap_to_length - len(newline_marker)] + newline_marker
+                remaining = remaining[wrap_to_length - 1:]
+                wrapped_lines.append(part)
+
+                indent_marker = '  '
+
+                while remaining:
+                    # sys.stdout.write('{}: {}\n'.format(repr(each), repr(remaining)))
+                    # -1 for backslash
+                    if len(remaining) <= (wrap_to_length - len(indent_marker)):
+                        part = (indent_marker + remaining[:wrap_to_length - len(indent_marker)])
+                        remaining = remaining[wrap_to_length - len(indent_marker):]
+                    else:
+                        part = (indent_marker + remaining[:wrap_to_length - 1 - len(indent_marker)] + newline_marker)
+                        remaining = remaining[wrap_to_length - 1 - len(indent_marker):]
+                    wrapped_lines.append(part)
+            text = '\n'.join(wrapped_lines)
         print(textwrap.indent(
             text = text.strip(),
             prefix = (' ' * indent),
