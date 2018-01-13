@@ -77,6 +77,22 @@ Dynamic linkage is implemented by the kernel, discussed in a later section.
 
 \heading{KERNEL}
 \section{begin}
+
+Kernel is a program that executes Viua VM bytecode.
+To run a program compiled into Viua VM bytecode you need both the kernel and the executable bytecode.
+Then, you can invoke the program like this:
+
+\reflow{off}
+\indent{4}
+viua-vm program.out --some flags
+\dedent{4}
+\reflow{on}
+\break
+
+The kernel will the begin running the program, starting with the `main' function.
+
+\section{end}
+
 \section{end}
 
 \heading{DISASSEMBLER}
