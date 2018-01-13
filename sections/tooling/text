@@ -128,6 +128,60 @@ Hello World!
 \wrap{end}
 \break
 
+\heading{TRACE LINE EXPLAINED}
+\section{begin}
+
+Trace line contains several different pieces of information.
+
+\wrap{begin}
+\indent{4}
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15104, depth = 1 ] ress
+\dedent{4}
+\wrap{end}
+\break
+
+\heading{SCHEDULER}
+
+The `scheduler = ...' part identifies the scheduler that the process for which this line was emitted is running on.
+Depending on how many schedulers the VM is running there can be many different schedulers.
+
+Also, a process does not need to run on the same scheduler it was spawned on.
+If the VM detects that the spawning scheduler is overloaded (i.e. that it runs more than its fair share of all running processes) the
+process will be migrated to a different scheduler (a one with lighter load).
+
+\heading{PROCESS}
+
+The `process = ...' part identifies a process for which this line was generated.
+
+\heading{STACK}
+
+In Viua VM, a process may contain one active stack, and several suspended stacks.
+Suspended stacks may be added, for example, by \instruction{defer} instructions (then, the
+active stack is suspended when a function exits and stacks added by \instruction{defer} instructions are run).
+
+The `stack = ...' part identifies the stack that was active in the process when the trace line was emitted.
+
+\heading{FRAME}
+
+The `frame = ...' part identifies the top-most frame on the stack that was active when the trace line was emitted.
+It is useful when you want to track a bug that occurs on the frame boundary (just after or before a call or a return).
+
+\heading{JUMP BASE}
+
+The `jump_base = ...' part identifies a base that is used for resolving jumps during runtime.
+Jump bases are different for different modules, so you can use this to track module boundaries (from which module came the function that
+is executed in the current frame).
+
+\heading{ADDRESS}
+
+The `address = ...' part identifies the address at which the currently executed instruction lives.
+
+\heading{DEPTH}
+
+The `depth = ...' part indicates the depth of the stack in the moment the trace line was emitted.
+
+\section{end}
+
 \section{end}
 
 \section{end}
