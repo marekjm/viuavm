@@ -184,6 +184,43 @@ The `depth = ...' part indicates the depth of the stack in the moment the trace 
 
 \section{end}
 
+\heading{VIUA_VP_SCHEDULERS}
+
+Configures the number of virtual process schedulers the VM will launch at startup.
+By default the VM launches 2 virtual process schedulers.
+
+\wrap{begin}
+\indent{2}
+$ ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=2]
+$ VIUA_VP_SCHEDULERS=4 ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=4]
+\dedent{2}
+\wrap{end}
+
+Increase the number of virtual process schedulers if your programs are CPU-intensive, and
+are mostly pure bytecode.
+
+\heading{VIUA_FFI_SCHEDULERS}
+
+Configures the number of FFI schedulers the VM will launch at startup.
+By default the VM launches 2 FFI schedulers.
+
+\wrap{begin}
+\indent{2}
+$ ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=2]
+$ VIUA_FFI_SCHEDULERS=4 ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=4] [sched:vp=2]
+\dedent{2}
+\wrap{end}
+
+Increase the number of FFI schedulers if your programs issue many FFI calls from many virtual
+processes.
+A FFI call blocks only the process that issued it and an FFI scheduler executes only a single
+call at once, so if you increase the number of schedulers you will be able to run more calls
+simultaneously.
+
 \section{end}
 
 \section{end}
