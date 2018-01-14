@@ -89,6 +89,11 @@ def longen(lines, width):
 
 
 LINE_WIDTH = 80
+TOP_MARKER = '^^^^'
+# See https://www.unicode.org/charts/beta/nameslist/n_2190.html
+# 21B5 ↵ Downwards Arrow With Corner Leftwards
+NEWLINE_MARKER = '↵'
+INDENT_MARKER = '   '
 
 
 def stringify_encoding(encoding):
@@ -339,10 +344,9 @@ def render_heading(heading_text, indent, noise = False):
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
         format_line = '{prefix}{index} <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
-        top_marker = '^^^^'
         top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
-            len(top_marker)))
-        top_marker = '<a href="#0">{}</a>'.format(top_marker)
+            len(TOP_MARKER)))
+        top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
 
     print(format_line.format(
         prefix = (' ' * indent),
@@ -418,24 +422,17 @@ def text_wrap(text, indent):
             continue
 
         remaining = each
-        # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
-        # 21B5 ↵ Downwards Arrow With Corner Leftwards
-        newline_marker = '↵'
-        part = remaining[:wrap_to_length - len(newline_marker)] + newline_marker
+        part = remaining[:wrap_to_length - len(NEWLINE_MARKER)] + NEWLINE_MARKER
         remaining = remaining[wrap_to_length - 1:]
         wrapped_lines.append(part)
 
-        indent_marker = '   '
-
         while remaining:
-            # sys.stdout.write('{}: {}\n'.format(repr(each), repr(remaining)))
-            # -1 for backslash
-            if len(remaining) <= (wrap_to_length - len(indent_marker)):
-                part = (indent_marker + remaining[:wrap_to_length - len(indent_marker)])
-                remaining = remaining[wrap_to_length - len(indent_marker):]
+            if len(remaining) <= (wrap_to_length - len(INDENT_MARKER)):
+                part = (INDENT_MARKER + remaining[:wrap_to_length - len(INDENT_MARKER)])
+                remaining = remaining[wrap_to_length - len(INDENT_MARKER):]
             else:
-                part = (indent_marker + remaining[:wrap_to_length - 1 - len(indent_marker)] + newline_marker)
-                remaining = remaining[wrap_to_length - 1 - len(indent_marker):]
+                part = (INDENT_MARKER + remaining[:wrap_to_length - 1 - len(INDENT_MARKER)] + NEWLINE_MARKER)
+                remaining = remaining[wrap_to_length - 1 - len(INDENT_MARKER):]
             wrapped_lines.append(part)
     return '\n'.join(wrapped_lines)
 
