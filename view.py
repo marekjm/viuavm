@@ -88,7 +88,7 @@ def longen(lines, width):
     return [longen_line(each, width) for each in lines]
 
 
-LINE_WIDTH = 80
+LINE_WIDTH = 100
 TOP_MARKER = '^^^^'
 # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
 # 21B5 ↵ Downwards Arrow With Corner Leftwards
