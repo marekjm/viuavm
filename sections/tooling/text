@@ -221,6 +221,18 @@ A FFI call blocks only the process that issued it and an FFI scheduler executes 
 call at once, so if you increase the number of schedulers you will be able to run more calls
 simultaneously.
 
+\heading{VIUAPRELINK [DEPRECATED]}
+
+A colon-separated list of bytecode modules to link before the kernel starts executing the `main' function.
+\break
+This environment variable is DEPRECATED.
+
+\heading{VIUAPREIMPORT [DEPRECATED]}
+
+A colon-separated list of FFI modules to link before the kernel starts executing the `main' function.
+\break
+This environment variable is DEPRECATED.
+
 \section{end}
 
 \section{end}
