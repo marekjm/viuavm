@@ -239,6 +239,43 @@ This environment variable is DEPRECATED.
 
 \heading{DISASSEMBLER}
 \section{begin}
+
+Disassembler may be used to convert compiled bytecode into assembly source code.
+
+It has little chance of producing exactly the source code that was used to compile the bytecode binary.
+The semantics *will* be exactly the same, but the disassembler will not be able to reproduce:
+
+\list{begin}
+\item
+register names
+\item
+attributes
+\item
+closures
+\list{end}
+
+\heading{DISASSEMBLING CLOSURES}
+
+Closures will be disassembled as ordinary functions which will most likely cause them to be rejected
+if you tried to compile the disassembled code, as the static analyser would see that the function tries to
+access undefined registers - these registers will not be undefined at runtime, and with proper annotations
+(that are supplied by the programmer, by using `.closure:' instead of `.function:') the static analyser would
+accept them, but the information what function is a closure is lost during compilation.
+
+The fact that the disassembler is unable to extract this information is a deficiency of the assembler which
+does not encode it in the binaries it produces.
+
+\heading{DISASSEMBLING METADATA}
+
+Metadata such as register names, attributes, etc. that is present in the original source code as needed for
+compilation is lost after the compilation is done and is not included in the resulting binaries.
+The reason for this is that such information is useless at runtime.
+
+However, it may be useful during debugging or disassembling.
+The fact that the assembler does not encode such debugging information in binaries is a deficiency.
+It should be possible to request inclusion of debugging information in the resulting binary by using a flag
+(e.g. `-g') during compilation.
+
 \section{end}
 
 \section{end}
