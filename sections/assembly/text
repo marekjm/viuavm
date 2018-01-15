@@ -5,6 +5,55 @@ It discusses source code organisation, compilation units, syntax, etc.
 Reading this section may allow you to undesrtand the SYNTAX and EXAMPLES sections in
 documentation for each instruction.
 
+\heading{DIRECTIVES}
+\section{begin}
+
+\heading{BLOCK}
+
+`.block:' directive begins a block definition.
+
+\heading{BSIGNATURE}
+
+`.bsignature:' declares that a block will be available at link time, even if it is an unresolved symbol in the
+current compilation unit.
+
+\heading{FUNCTION}
+
+`.function:' directive begins a function definition.
+
+\heading{SIGNATURE}
+
+`.signature:' declares that a function will be available at link time, even if it is an unresolved symbol in the
+current compilation unit.
+
+\heading{CLOSURE}
+
+`.closure:' directive begins a closure definition.
+
+\heading{INFO}
+
+`.info:' directive allows adding metadata to the produced binary.
+
+\heading{IOTA}
+
+`.iota:' directive sets the next value to be used for the `iota' symbol substitution.
+
+\heading{IMPORT}
+
+`.import:' directive requests that a module be statically linked to the currently compiled executable.
+
+\heading{MARK}
+
+`.mark:' directive sets a name for a point in a block, closure, or function body.
+This name then may be used instead of an instruction index in branching instructions.
+
+\heading{NAME}
+
+`.name:' directive sets a name for a register.
+
+
+\section{end}
+
 \heading{FUNCTIONS}
 \section{begin}
 
