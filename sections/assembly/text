@@ -11,6 +11,7 @@ documentation for each instruction.
 \heading{BLOCK}
 
 `.block:' directive begins a block definition.
+Block definitions must end with the `.end' directive.
 
 \heading{BSIGNATURE}
 
@@ -20,6 +21,7 @@ current compilation unit.
 \heading{FUNCTION}
 
 `.function:' directive begins a function definition.
+Function definitions must end with the `.end' directive.
 
 \heading{SIGNATURE}
 
@@ -29,6 +31,7 @@ current compilation unit.
 \heading{CLOSURE}
 
 `.closure:' directive begins a closure definition.
+Closure definitions must end with the `.end' directive.
 
 \heading{INFO}
 
@@ -50,6 +53,11 @@ This name then may be used instead of an instruction index in branching instruct
 \heading{NAME}
 
 `.name:' directive sets a name for a register.
+
+\heading{END}
+
+`.end' directive is used to signal an end of a previously opened directive that requires closing.
+An example of such a directive is `.function:'.
 
 
 \section{end}
