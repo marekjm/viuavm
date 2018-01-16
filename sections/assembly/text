@@ -49,10 +49,28 @@ Closure definitions must end with the `.end' directive.
 
 `.mark:' directive sets a name for a point in a block, closure, or function body.
 This name then may be used instead of an instruction index in branching instructions.
+Marks are a compile-time-only feature and disappear after the source code has been converted to bytecode.
+At runtime the VM uses only bytecode indexes, not marks.
+
+NOTE FIXME
+\break
+\indent{2}
+The assembler is currently unable to encode markers in bytecode, even as a debugging aid.
+This is a deficiency that will be fixed in the future.
+\dedent{2}
 
 \heading{NAME}
 
 `.name:' directive sets a name for a register.
+Names are present only during compilation, and disappear after the source code has been converted to bytecode.
+At runtime the VM uses only indexes, not names.
+
+NOTE FIXME
+\break
+\indent{2}
+The assembler is currently unable to encode register names in bytecode, even as a debugging aid.
+This is a deficiency that will be fixed in the future.
+\dedent{2}
 
 \heading{END}
 
