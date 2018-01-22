@@ -99,7 +99,80 @@ This section talks about how to define functions.
 \heading{DELIMITING FUNCTION BODIES}
 \section{begin}
 
-How function bodies are delimited.
+A function definition is delimited by the `.function:' and `.end' tokens.
+
+\indent{2}
+\reflow{off}
+\wrap{begin}
+.function: main/0
+    text %1 local "Hello World!"
+    print %1 local
+
+    izero %0 local
+    return
+.end
+\wrap{end}
+\reflow{on}
+\dedent{2}
+\break
+
+This example defines a function that prints "Hello World!" to the screen and returns 0.
+The first line
+
+\indent{2}
+\wrap{begin}
+.function: main/0
+\wrap{end}
+\dedent{2}
+\break
+
+contains the `.function:' token and the name of the function.
+In Viua assembly function names must have the following syntax:
+1/ a sequence of alphanumeric ASCII characters, colons, and underscores (this is the root part of the name),
+2/ a slash character,
+3/ the arity of the function (a non-negative integer number).
+
+For example, all following names are valid:
+
+\list{begin}
+\item
+main/0
+\item
+sqrt/1
+\item
+write/2
+\item
+vector::push_back/2
+\list{end}
+
+and all of these are invalid:
+
+\list{begin}
+\item
+main -- no arity
+\item
+foo/-1 -- negative arity
+\item
+in/valid -- invalid character inside the name
+\item
+vector.push_back/2 -- invalid character inside the name
+\list{end}
+
+The arity part may be empty.
+Functions with empty arity can be called with variable number of parameters.
+This is discouraged, however - passing a vector of values is the preferred way to pass multiple parameters.
+
+The last line
+
+\indent{2}
+\wrap{begin}
+.end
+\wrap{end}
+\dedent{2}
+\break
+
+must appear on its own.
+Note the lack of a colon at the end of the token.
 
 \section{end}
 
