@@ -13,6 +13,8 @@ documentation for each instruction.
 `.block:' directive begins a block definition.
 Block definitions must end with the `.end' directive.
 
+A detailed description is provided in a later section.
+
 \heading{BSIGNATURE}
 
 `.bsignature:' declares that a block will be available at link time, even if it is an unresolved symbol in the
@@ -22,6 +24,8 @@ current compilation unit.
 
 `.function:' directive begins a function definition.
 Function definitions must end with the `.end' directive.
+
+A detailed description is provided in a later section.
 
 \heading{SIGNATURE}
 
