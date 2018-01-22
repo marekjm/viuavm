@@ -261,7 +261,7 @@ attributes
 closures
 \list{end}
 
-\heading{DISASSEMBLING CLOSURES}
+\heading{DISASSEMBLING CLOSURES (FIXME)}
 
 Closures will be disassembled as ordinary functions which will most likely cause them to be rejected
 if you tried to compile the disassembled code, as the static analyser would see that the function tries to
@@ -272,7 +272,7 @@ accept them, but the information what function is a closure is lost during compi
 The fact that the disassembler is unable to extract this information is a deficiency of the assembler which
 does not encode it in the binaries it produces.
 
-\heading{DISASSEMBLING METADATA}
+\heading{DISASSEMBLING METADATA (FIXME)}
 
 Metadata such as register names, attributes, etc. that is present in the original source code as needed for
 compilation is lost after the compilation is done and is not included in the resulting binaries.
