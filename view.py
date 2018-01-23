@@ -501,11 +501,11 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
         if reflow:
-            text = text_reflow(text, indent)
+            text = text_reflow(text, indent).strip()
         if wrapping:
             text = text_wrap(text, indent)
         text = textwrap.indent(
-            text = text.strip(),
+            text = text,
             prefix = (' ' * indent),
         )
         if in_list and new_list_item:
