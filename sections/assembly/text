@@ -149,13 +149,21 @@ and all of these are invalid:
 
 \list{begin}
 \item
-main -- no arity
+main
+\break
+no arity
 \item
-foo/-1 -- negative arity
+foo/-1
+\break
+negative arity
 \item
-in/valid -- invalid character inside the name
+in/valid
+\break
+invalid character inside the name
 \item
-vector.push_back/2 -- invalid character inside the name
+vector.push_back/2
+\break
+invalid character inside the name
 \list{end}
 
 The arity part may be empty.
