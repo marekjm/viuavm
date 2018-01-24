@@ -1,0 +1,21 @@
+\heading{ARGUMENT REGISTER OUT OF BOUNDS}
+
+Thrown when the second operand of \instruction{arg} instruction references an index that is out of bounds for
+the current call frame.
+For example, indexes 2 and higher would cause this exception to be thrown on frames with two arguments saved
+(or less); remember that register indexes are counted from 0.
+
+\wrap{begin}
+\indent{2}
+.function: main/0
+    arg %1 local %0  ; This instruction will cause an exception to be thrown.
+
+    izero %0 local
+    return
+.end
+\dedent{2}
+\wrap{end}
+\break
+
+The above code would fail as the `main/0' function receives no arguments, and
+yet it would try to access some in its body.
