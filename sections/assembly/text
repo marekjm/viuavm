@@ -187,7 +187,16 @@ Note the lack of a colon at the end of the token.
 \heading{PARAMETERS}
 \section{begin}
 
-How to get parameters to functions.
+In Viua, functions do not declare the types of parameters they take; they only declare their own arity.
+The assembler will ensure that once extracted inside the function the parameters are used consistently with
+regard to the type (thanks to type inference).
+\break
+This means that types are not preserved across function boundaries.
+This is a deficiency that will be fixed somewhen in the future (FIXME).
+
+\heading{EXTRACTING PARAMETERS}
+
+The parameters are extracted using the \instruction{arg} instruction.
 
 \section{end}
 
