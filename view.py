@@ -723,14 +723,23 @@ def render_view(args):
 
         render_heading('EXCEPTIONS', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         if exceptions:
-            print()
+            section_tracker.begin()
             for each_ex in exceptions:
-                render_file(
-                    os.path.join('.', 'exceptions', each_ex[0]),
-                    indent = 4 * DEFAULT_INDENT_WIDTH,
-                    documented_instructions = documented_opcodes
-                )
+                try:
+                    render_file(
+                        os.path.join('.', 'exceptions', each_ex[0]),
+                        indent = 4 * DEFAULT_INDENT_WIDTH,
+                        documented_instructions = documented_opcodes
+                    )
+                except FileNotFoundError as e:
+                    sys.stderr.write('exception not defined on generic list: {}\n'.format(e))
+                    render_file(
+                        os.path.join('.', 'opcodes', each, 'exceptions', each_ex[0]),
+                        indent = 4 * DEFAULT_INDENT_WIDTH,
+                        documented_instructions = documented_opcodes,
+                    )
                 print()
+            section_tracker.end()
         else:
             print(textwrap.indent('None.', prefix = (' ' * (4 * DEFAULT_INDENT_WIDTH))))
             print()
