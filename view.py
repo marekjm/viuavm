@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+import json
 import os
 import re
 import shutil
@@ -244,6 +245,9 @@ class SectionTracker:
         self._counters = { '': self._start_counting_at, }
         self._recorded_headings = []
 
+    def data(self):
+        return self._recorded_headings
+
     def depth(self):
         return self._depth
 
@@ -256,7 +260,7 @@ class SectionTracker:
     def current_base_index(self):
         return '.'.join(map(str, self._path))
 
-    def heading(self, text, noise = False):
+    def heading(self, text, noise = False, extra = None):
         base_index = self.current_base_index()
         counter_at_base_index = self._counters[base_index]
 
@@ -265,7 +269,7 @@ class SectionTracker:
             sep = ('.' if base_index else ''),
             counter = counter_at_base_index,
         )
-        self._recorded_headings.append( (index, text, noise,) )
+        self._recorded_headings.append( (index, text, noise, extra,) )
 
         self._counters[base_index] += 1
 
@@ -304,6 +308,14 @@ class UnknownArgument(Exception):
 class MissingArgument(Exception):
     pass
 
+
+REFS_FILE = os.path.join('.', 'refs.json')
+REFS = None
+if os.path.isfile(REFS_FILE):
+    with open(REFS_FILE) as ifstream:
+        REFS = json.loads(ifstream.read())
+
+
 def parse_and_expand(text, syntax, documented_instructions):
     expanded_text = text
 
@@ -319,7 +331,18 @@ def parse_and_expand(text, syntax, documented_instructions):
         if each not in documented_instructions:
             raise UnknownInstruction(each)
         pat = (r'\instruction{' + each + '}')
-        expanded_text = expanded_text.replace(pat, each)
+        replacement = each
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART and REFS is not None:
+            for a in REFS:
+                if a[3] is None:
+                    continue
+                if a[3].get('instruction') and a[1] == each.upper():
+                    replacement = '<a href="#{location}">{name}</a>'.format(
+                        location = a[0].replace('.', '-'),
+                        name = each,
+                    )
+                    break
+        expanded_text = expanded_text.replace(pat, replacement)
 
     found_colorisations = re.compile(r'\\color{([a-z]+)}{([^}]+)}').findall(expanded_text)
     for each in found_colorisations:
@@ -329,7 +352,7 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
-def render_heading(heading_text, indent, noise = False):
+def render_heading(heading_text, indent, noise = False, extra = None):
     colorise_with = None
     if section_tracker.depth() < 2:
         colorise_with = COLOR_SECTION_MAJOR
@@ -339,7 +362,7 @@ def render_heading(heading_text, indent, noise = False):
         colorise_with = COLOR_SECTION_SUBSECTION
 
     format_line = '{prefix}{index} {text}'
-    index = section_tracker.heading(heading_text, noise = noise)
+    index = section_tracker.heading(heading_text, noise = noise, extra = extra)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
@@ -690,7 +713,9 @@ def render_view(args):
             print()
 
 
-        render_heading(each.upper(), 2 * DEFAULT_INDENT_WIDTH)
+        render_heading(each.upper(), 2 * DEFAULT_INDENT_WIDTH, extra = {
+            'instruction': True,
+        })
         section_tracker.begin()
 
         print('{}in group{}: {}'.format(
@@ -831,7 +856,7 @@ def main(args):
             emit_line('{}'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
             emit_line()
             longest_index = max(map(len, map(lambda e: e[0], section_tracker.recorded_headings()))) + 1
-            for index, heading, noise in section_tracker.recorded_headings():
+            for index, heading, noise, extra in section_tracker.recorded_headings():
                 if noise:
                     continue
                 character = '.'
@@ -863,6 +888,9 @@ def main(args):
         sys.stdout.write('</pre>\n')
         sys.stdout.write('</body>\n')
         sys.stdout.write('</html>\n')
+
+    with open(REFS_FILE, 'w') as ofstream:
+        ofstream.write(json.dumps(section_tracker.data()))
 
     return 0
 
