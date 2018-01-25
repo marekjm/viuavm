@@ -1,0 +1,18 @@
+Passes a parameter by value.
+A copy of the value from the input register will be put into the output register in the call frame's
+arguments register set, but the original value will be left in the input register after this instruction is
+executed.
+
+The input register is specified by the second operand.
+The output register is specified by the first operand.
+For example, the below code will pass a copy of the value in local register 2 as the first parameter to the
+function to be called:
+
+\wrap{begin}
+\indent{2}
+param %0 %2 local
+\dedent{2}
+\wrap{end}
+\break
+
+Requires a new frame to be active (spawned by \instruction{frame} instruction).
