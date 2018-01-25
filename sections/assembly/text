@@ -194,9 +194,24 @@ regard to the type (thanks to type inference).
 This means that types are not preserved across function boundaries.
 This is a deficiency that will be fixed somewhen in the future (FIXME).
 
-\heading{EXTRACTING PARAMETERS}
+\heading{PASSING PARAMETERS}
 
-The parameters are extracted using the \instruction{arg} instruction.
+Parameters are passed into the function using either \instruction{param} or \instruction{pamv} instruction.
+
+\heading{EXTRACTING ARGUMENTS}
+
+Arguments are extracted using the \instruction{arg} instruction.
+
+\heading{ARGUMENTS REGISTER SET}
+
+Parameters passed to a function become its arguments and are stored in a special register set.
+The size of this register set depends on the function's arity - if the function takes 2 parameters, then the
+size of this register set will be 2, if the function takes 1 parameter it will be 1, and
+if the function takes no parameters it will be 0.
+
+The lifetime of this register set begins just after the \instruction{frame} instruction finishes executing,
+and ends just after the \instruction{return} instruction causes the call frame containing it to be popped off
+the stack.
 
 \section{end}
 
