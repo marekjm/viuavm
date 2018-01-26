@@ -1,12 +1,12 @@
 Calls a function.
 
 \section{begin}
-\heading{STATICALLY DETERMINED CALLS}
+\heading{STATICALLY DISPATCHED CALLS}
 
 The first syntax will call a function f/0 and discard its return value.
 The second syntax will call a function f/0 and store its return value in local register 0.
 
-\heading{DYNAMICALLY DETERMINED CALLS}
+\heading{DYNAMICALLY DISPATCHED CALLS}
 
 The third syntax will call a function that is referenced by the value stored in local register 1 and
 discard the return value of that call.
