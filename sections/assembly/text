@@ -218,7 +218,11 @@ the stack.
 \heading{RETURN VALUES}
 \section{begin}
 
-How to return values from functions.
+When a function executes the \instruction{return} instruction its call frame is popped off the stack, and
+the value contained by the local register 0 is automatically used as the return value.
+
+Viua allows functions to return only one value, but multiple return values can be emulated by returning a
+vector of values.
 
 \section{end}
 
