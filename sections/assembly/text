@@ -220,35 +220,13 @@ the stack.
 
 When a function executes the \instruction{return} instruction its call frame is popped off the stack, and
 the value contained by the local register 0 is automatically used as the return value.
-
 Viua allows functions to return only one value, but multiple return values can be emulated by returning a
 vector of values.
 
-\heading{SAVING THE RETURN VALUE}
-
-To save the return value of a called function use a register instead of void as the target operand of the
-\instruction{call} instruction.
-For example:
-
-\wrap{begin}
-\indent{2}
-call void foo/0
-\dedent{2}
-\wrap{end}
-\break
-
-will not save foo/0's return value, but
-
-\wrap{begin}
-\indent{2}
-call %2 local foo/0
-\dedent{2}
-\wrap{end}
-\break
-
-will save it in local register 2.
 For more information refer to \instruction{call} instruction's documentation in
 section \ref{opcode:call}.
+Section \ref{storing_return_values} provides the detailed explanation of how to
+store return values.
 
 \section{end}
 
