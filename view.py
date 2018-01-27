@@ -145,10 +145,21 @@ def stringify_encoding(encoding):
 
 
 DEFAULT_INDENT_WIDTH = 2
+KEYWORD_REFLOW_OFF_REGEX = re.compile(r'\\reflow{off}')
+KEYWORD_REFLOW_ON_REGEX = re.compile(r'\\reflow{on}')
+KEYWORD_WRAP_BEGIN_REGEX = re.compile(r'\\wrap{begin}')
+KEYWORD_WRAP_END_REGEX = re.compile(r'\\wrap{end}')
+KEYWORD_LIST_BEGIN_REGEX = re.compile(r'\\list{begin}')
+KEYWORD_LIST_END_REGEX = re.compile(r'\\list{end}')
+KEYWORD_ITEM_REGEX = re.compile(r'\\item')
 KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
 KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
+KEYWORD_SECTION_BEGIN_REGEX = re.compile(r'\\section{begin}')
+KEYWORD_SECTION_END_REGEX = re.compile(r'\\section{end}')
 KEYWORD_HEADING_REGEX = re.compile(r'\\heading{([^}]+)}')
 PARAMETER_REGEX = re.compile(r'{([a-z_]+)(?:(=[^}]*))?}')
+KEYWORD_INSTRUCTION_REGEX = re.compile(r'\\instruction{([a-z]+)}')
+KEYWORD_SYNTAX_REGEX = re.compile(r'\\syntax{([0-9]+)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
     if para is None:
@@ -498,6 +509,91 @@ def text_wrap(text, indent):
             wrapped_lines.append(part)
     return '\n'.join(wrapped_lines)
 
+class Token:
+    def __init__(self, text):
+        self._text = text
+
+    def __repr__(self):
+        # return repr(self._text)
+        return '...'
+
+    def render(self, syntax, documented_instructions):
+        m = KEYWORD_SYNTAX_REGEX.match(self._text)
+        if m:
+            i = int(m.group(1))
+            if i >= len(syntax):
+                raise InvalidReference(
+                    'invalid syntax reference: \\syntax{{{}}}'.format(i)
+                )
+            return syntax[i]
+        return self._text
+
+    def length(self, syntax, documented_instructions):
+        return len(self._text)
+
+def log(*args):
+    sys.stderr.write('{}\n'.format(' '.join(map(str, args))))
+
+def render_tokenised(tokens, syntax, documented_instructions, reflow, wrapping, width):
+    stream_of_rendered = []
+
+    for each in tokens:
+        rendered_text = each.render(
+            syntax = syntax,
+            documented_instructions = documented_instructions,
+        )
+        visible_length = each.length(
+            syntax = syntax,
+            documented_instructions = documented_instructions,
+        )
+        stream_of_rendered.append({
+            'source': each,
+            'rendered': rendered_text,
+            'length': visible_length,
+        })
+
+    log(stream_of_rendered)
+
+def tokenise(text):
+    tokens = []
+    tok = ''
+    i = 0
+    while i < len(text):
+        if text[i] == '\n':
+            if tok: tokens.append(tok)
+            tok = ''
+            i += 1
+            continue
+        if text[i].isspace():
+            if tok: tokens.append(tok)
+            tok = ''
+            i += 1
+            continue
+        if text[i] != '\\':
+            tok += text[i]
+            i += 1
+            continue
+        tokens.append(tok)
+        tok = ''
+
+        m = KEYWORD_INSTRUCTION_REGEX.match(text[i:])
+        if m is not None:
+            tokens.append(m.group(0))
+            i += len(tokens[-1])
+            continue
+
+        m = KEYWORD_SYNTAX_REGEX.match(text[i:])
+        if m is not None:
+            tokens.append(m.group(0))
+            i += len(tokens[-1])
+            continue
+
+        i += 1
+    if tok:
+        tokens.append(tok)
+    tokens = list(map(Token, tokens))
+    return tokens
+
 def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent = 4, section_depth = 0):
     original_indent = indent
     reflow = True
@@ -564,6 +660,15 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
+        _ = tokenise(each)
+        render_tokenised(_,
+            syntax = syntax,
+            documented_instructions = documented_instructions,
+            reflow = reflow,
+            wrapping = wrapping,
+            width = (LINE_WIDTH - indent),
+        )
+
         if reflow:
             text = text_reflow(text, indent).strip()
         if wrapping:
