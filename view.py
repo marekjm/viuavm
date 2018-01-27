@@ -260,7 +260,7 @@ class SectionTracker:
     def current_base_index(self):
         return '.'.join(map(str, self._path))
 
-    def heading(self, text, noise = False, extra = None):
+    def heading(self, text, noise = False, extra = None, ref = None):
         base_index = self.current_base_index()
         counter_at_base_index = self._counters[base_index]
 
@@ -269,7 +269,7 @@ class SectionTracker:
             sep = ('.' if base_index else ''),
             counter = counter_at_base_index,
         )
-        self._recorded_headings.append( (index, text, noise, extra,) )
+        self._recorded_headings.append( (index, text, noise, extra, ref,) )
 
         self._counters[base_index] += 1
 
@@ -352,7 +352,7 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
-def render_heading(heading_text, indent, noise = False, extra = None):
+def render_heading(heading_text, indent, noise = False, extra = None, ref = None):
     colorise_with = None
     if section_tracker.depth() < 2:
         colorise_with = COLOR_SECTION_MAJOR
@@ -362,7 +362,7 @@ def render_heading(heading_text, indent, noise = False, extra = None):
         colorise_with = COLOR_SECTION_SUBSECTION
 
     format_line = '{prefix}{index} {text}'
-    index = section_tracker.heading(heading_text, noise = noise, extra = extra)
+    index = section_tracker.heading(heading_text, noise = noise, extra = extra, ref = ref)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
@@ -856,7 +856,7 @@ def main(args):
             emit_line('{}'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
             emit_line()
             longest_index = max(map(len, map(lambda e: e[0], section_tracker.recorded_headings()))) + 1
-            for index, heading, noise, extra in section_tracker.recorded_headings():
+            for index, heading, noise, extra, ref in section_tracker.recorded_headings():
                 if noise:
                     continue
                 character = '.'
