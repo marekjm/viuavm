@@ -97,6 +97,14 @@ NEWLINE_MARKER = '↵'
 INDENT_MARKER = '   '
 
 
+REFS_FILE = os.path.join('.', 'refs.json')
+REFS = None
+REF_NOT_FOUND_MARKER = '????'
+if os.path.isfile(REFS_FILE):
+    with open(REFS_FILE) as ifstream:
+        REFS = json.loads(ifstream.read())
+
+
 def stringify_encoding(encoding):
     stringified = []
 
@@ -325,13 +333,6 @@ class UnknownArgument(Exception):
 
 class MissingArgument(Exception):
     pass
-
-
-REFS_FILE = os.path.join('.', 'refs.json')
-REFS = None
-if os.path.isfile(REFS_FILE):
-    with open(REFS_FILE) as ifstream:
-        REFS = json.loads(ifstream.read())
 
 
 def parse_and_expand(text, syntax, documented_instructions):
