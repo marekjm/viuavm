@@ -420,6 +420,10 @@ class Types:
             raise ArgumentError(value)
 
     @staticmethod
+    def string(value):
+        return value
+
+    @staticmethod
     def any(value):
         return value
 
@@ -545,10 +549,12 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             # +8 is for \heading
             params = build_params(PARAMETER_REGEX.findall(each[len(heading_text) + 2 + 8:]), {
                 'noise': Types.boolean,
+                'ref': Types.string,
             }, default = {
                 'noise': False,
+                'ref': None,
             })
-            render_heading(heading_text, indent, noise = params['noise'])
+            render_heading(heading_text, indent, noise = params['noise'], ref = params['ref'])
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
