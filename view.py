@@ -161,6 +161,7 @@ PARAMETER_REGEX = re.compile(r'{([a-z_]+)(?:(=[^}]*))?}')
 KEYWORD_INSTRUCTION_REGEX = re.compile(r'\\instruction{([a-z]+)}')
 KEYWORD_SYNTAX_REGEX = re.compile(r'\\syntax{([0-9]+)}')
 KEYWORD_REF_REGEX = re.compile(r'\\ref{([a-z_][a-z0-9_]*(?::[a-z_][a-z0-9_]*)*)}')
+KEYWORD_COLOR_REGEX = re.compile(r'\\color{([a-z]+)}{([^}]+)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
     if para is None:
@@ -520,7 +521,7 @@ class RENDERING_MODE_ASCII_RENDERER:
                 raise InvalidReference(
                     'invalid syntax reference: \\syntax{{{}}}'.format(i)
                 )
-            return syntax[i]
+            return "`{}'".format(syntax[i])
 
         m = KEYWORD_INSTRUCTION_REGEX.match(text)
         if m:
@@ -547,7 +548,72 @@ class RENDERING_MODE_ASCII_RENDERER:
                 raise InvalidReference(
                     'invalid syntax reference: \\syntax{{{}}}'.format(i)
                 )
-            return len(syntax[i])
+            return len(syntax[i]) + 2
+
+        m = KEYWORD_INSTRUCTION_REGEX.match(text)
+        if m:
+            instruction = m.group(1)
+            if instruction not in documented_instructions:
+                raise UnknownInstruction(instruction)
+            return len(instruction)
+
+        m = KEYWORD_REF_REGEX.match(text)
+        if m:
+            name = m.group(1)
+            if REFS is not None and name not in REFS['labels']:
+                raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
+            replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
+            return len(replacement or REF_NOT_FOUND_MARKER)
+        return len(text)
+
+class RENDERING_MODE_HTML_ASCII_ART_RENDERER:
+    @staticmethod
+    def render(text, syntax, documented_instructions):
+        m = KEYWORD_SYNTAX_REGEX.match(text)
+        if m:
+            i = int(m.group(1))
+            if i >= len(syntax):
+                raise InvalidReference(
+                    'invalid syntax reference: \\syntax{{{}}}'.format(i)
+                )
+            return "`{}'".format(syntax[i])
+
+        m = KEYWORD_INSTRUCTION_REGEX.match(text)
+        if m:
+            instruction = m.group(1)
+            if instruction not in documented_instructions:
+                raise UnknownInstruction(instruction)
+            replacement = instruction
+            for a in REFS['recorded']:
+                if a[3] is None:
+                    continue
+                if a[3].get('instruction') and a[1] == instruction.upper():
+                    replacement = '<a href="#{location}">{name}</a>'.format(
+                        location = a[0].replace('.', '-'),
+                        name = instruction,
+                    )
+                    break
+            return replacement
+
+        m = KEYWORD_REF_REGEX.match(text)
+        if m:
+            name = m.group(1)
+            if REFS is not None and name not in REFS['labels']:
+                raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
+            replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
+            return (replacement or REF_NOT_FOUND_MARKER)
+        return text
+
+    @staticmethod
+    def length(text, syntax, documented_instructions):
+        m = KEYWORD_SYNTAX_REGEX.match(text)
+        if m:
+            i = int(m.group(1))
+            if i >= len(syntax):
+                raise InvalidReference(
+                    'invalid syntax reference: \\syntax{{{}}}'.format(i)
+                )
+            return len(syntax[i]) + 2
 
         m = KEYWORD_INSTRUCTION_REGEX.match(text)
         if m:
@@ -579,6 +645,12 @@ class Token:
                 syntax = syntax,
                 documented_instructions = documented_instructions,
             )
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+            return RENDERING_MODE_HTML_ASCII_ART_RENDERER.render(
+                text = self._text,
+                syntax = syntax,
+                documented_instructions = documented_instructions,
+            )
 
     def length(self, syntax, documented_instructions):
         if RENDERING_MODE == RENDERING_MODE_ASCII_ART:
@@ -587,9 +659,53 @@ class Token:
                 syntax = syntax,
                 documented_instructions = documented_instructions,
             )
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+            return RENDERING_MODE_HTML_ASCII_ART_RENDERER.length(
+                text = self._text,
+                syntax = syntax,
+                documented_instructions = documented_instructions,
+            )
 
 def log(*args):
     sys.stderr.write('{}\n'.format(' '.join(map(str, args))))
+
+def longen_tokenised_line(chunks, width):
+    # length_of_chunks = len(''.join(chunks))
+    length_of_chunks = sum(map(lambda x: x['length'], chunks))
+    spaces_to_fill = (width - length_of_chunks)
+    no_of_splits = len(chunks) - 1
+    spaces_per_split = (spaces_to_fill // (no_of_splits or 1))
+    spaces_left = (spaces_to_fill - (spaces_per_split * no_of_splits))
+    no_of_double_spaces = spaces_left
+
+    if DEBUG_LONGEN:
+        print('length_of_chunks =', length_of_chunks)
+        print('spaces_to_fill =', spaces_to_fill)
+        print('no_of_splits =', no_of_splits)
+        print('spaces_per_split =', spaces_per_split)
+        print('spaces_left =', spaces_left)
+
+    new_line = [chunks[0]['rendered']]
+
+    normal_spacing = ('  ' if spaces_per_split == 2 else ' ')
+    for each in chunks[1:]:
+        if no_of_double_spaces:
+            new_line.append('  ')
+            no_of_double_spaces -= 1
+        else:
+            new_line.append(normal_spacing)
+        new_line.append(each['rendered'])
+
+    new_line = ''.join(new_line)
+
+    # If the desired width was not reached, do not introduce any "double spaces" and
+    # just return the simples representation possible.
+    if len(new_line) != width:
+        new_line = ' '.join(map(lambda x: x['rendered'], chunks))
+
+    if DEBUG_LONGEN:
+        new_line = '[{}:{}] {}'.format(len(new_line), width, new_line)
+    return new_line
 
 def render_tokenised(tokens, syntax, documented_instructions, reflow, wrapping, width):
     stream_of_rendered = []
@@ -611,6 +727,28 @@ def render_tokenised(tokens, syntax, documented_instructions, reflow, wrapping, 
 
     log(stream_of_rendered)
 
+    lines = []
+
+    line = []
+    length_of_current_line = 0
+    for each in stream_of_rendered:
+        if (length_of_current_line + each['length']) <= width:
+            line.append(each)
+            length_of_current_line += (each['length'] + 1)
+            continue
+        else:
+            lines.append(line)
+            line = []
+            length_of_current_line = 0
+    if line:
+        lines.append(line)
+
+    rendered_lines = []
+    for l in lines:
+        rendered_lines.append(longen_tokenised_line(l, width))
+
+    return rendered_lines
+
 def tokenise(text):
     tokens = []
     tok = ''
@@ -630,7 +768,7 @@ def tokenise(text):
             tok += text[i]
             i += 1
             continue
-        tokens.append(tok)
+        if tok: tokens.append(tok)
         tok = ''
 
         m = KEYWORD_INSTRUCTION_REGEX.match(text[i:])
@@ -723,17 +861,20 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
-        _ = tokenise(each)
-        render_tokenised(_,
-            syntax = syntax,
-            documented_instructions = documented_instructions,
-            reflow = reflow,
-            wrapping = wrapping,
-            width = (LINE_WIDTH - indent),
-        )
-
         if reflow:
-            text = text_reflow(text, indent).strip()
+            _ = tokenise(each)
+            _ = render_tokenised(_,
+                syntax = syntax,
+                documented_instructions = documented_instructions,
+                reflow = reflow,
+                wrapping = wrapping,
+                width = (LINE_WIDTH - indent),
+            )
+            log(_)
+            text = '\n'.join(_)
+
+        # if reflow:
+        #     text = text_reflow(text, indent).strip()
         if wrapping:
             text = text_wrap(text, indent)
         text = textwrap.indent(
