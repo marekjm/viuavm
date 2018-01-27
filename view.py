@@ -246,7 +246,25 @@ class SectionTracker:
         self._recorded_headings = []
 
     def data(self):
-        return self._recorded_headings
+        recorded = self._recorded_headings
+        indexes = {}
+        for each in recorded:
+            indexes[each[0]] = each
+        labels = {}
+        for each in recorded:
+            if each[4] is None:
+                continue
+            labels[each[4]] = {
+                'index': each[0],
+                'extra': each[3],
+                'name': each[1],
+            }
+        refs = {
+            'recorded': recorded,
+            'indexes': indexes,
+            'labels': labels,
+        }
+        return refs
 
     def depth(self):
         return self._depth
@@ -890,7 +908,7 @@ def main(args):
         sys.stdout.write('</html>\n')
 
     with open(REFS_FILE, 'w') as ofstream:
-        ofstream.write(json.dumps(section_tracker.data()))
+        ofstream.write(json.dumps(section_tracker.data(), indent=4))
 
     return 0
 
