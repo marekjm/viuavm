@@ -56,12 +56,12 @@ def longen_line(line, width):
     no_of_double_spaces = spaces_left
 
     if DEBUG_LONGEN:
-        print('---- for line: {}'.format(repr(line)))
-        print('length_of_chunks =', length_of_chunks)
-        print('spaces_to_fill =', spaces_to_fill)
-        print('no_of_splits =', no_of_splits)
-        print('spaces_per_split =', spaces_per_split)
-        print('spaces_left =', spaces_left)
+        sys.stderr.write('---- for line: {}\n'.format(repr(line)))
+        sys.stderr.write('length_of_chunks = {}\n'.format(length_of_chunks))
+        sys.stderr.write('spaces_to_fill = {}\n'.format(spaces_to_fill))
+        sys.stderr.write('no_of_splits = {}\n'.format(no_of_splits))
+        sys.stderr.write('spaces_per_split = {}\n'.format(spaces_per_split))
+        sys.stderr.write('spaces_left = {}\n'.format(spaces_left))
 
     new_line = [chunks[0]]
 
@@ -666,11 +666,7 @@ class Token:
                 documented_instructions = documented_instructions,
             )
 
-def log(*args):
-    sys.stderr.write('{}\n'.format(' '.join(map(str, args))))
-
 def longen_tokenised_line(chunks, width):
-    # length_of_chunks = len(''.join(chunks))
     length_of_chunks = sum(map(lambda x: x['length'], chunks))
     spaces_to_fill = (width - length_of_chunks)
     no_of_splits = len(chunks) - 1
@@ -679,28 +675,32 @@ def longen_tokenised_line(chunks, width):
     no_of_double_spaces = spaces_left
 
     if DEBUG_LONGEN:
-        print('length_of_chunks =', length_of_chunks)
-        print('spaces_to_fill =', spaces_to_fill)
-        print('no_of_splits =', no_of_splits)
-        print('spaces_per_split =', spaces_per_split)
-        print('spaces_left =', spaces_left)
+        sys.stderr.write('length_of_chunks = {}\n'.format(length_of_chunks))
+        sys.stderr.write('spaces_to_fill = {}\n'.format(spaces_to_fill))
+        sys.stderr.write('no_of_splits = {}\n'.format(no_of_splits))
+        sys.stderr.write('spaces_per_split = {}\n'.format(spaces_per_split))
+        sys.stderr.write('spaces_left = {}\n'.format(spaces_left))
 
     new_line = [chunks[0]['rendered']]
+    line_length = chunks[0]['length']
 
     normal_spacing = ('  ' if spaces_per_split == 2 else ' ')
     for each in chunks[1:]:
         if no_of_double_spaces:
             new_line.append('  ')
+            line_length += 2
             no_of_double_spaces -= 1
         else:
             new_line.append(normal_spacing)
+            line_length += 1
         new_line.append(each['rendered'])
+        line_length += each['length']
 
     new_line = ''.join(new_line)
 
     # If the desired width was not reached, do not introduce any "double spaces" and
     # just return the simples representation possible.
-    if len(new_line) != width:
+    if line_length != width:
         new_line = ' '.join(map(lambda x: x['rendered'], chunks))
 
     if DEBUG_LONGEN:
@@ -724,8 +724,6 @@ def render_tokenised(tokens, syntax, documented_instructions, reflow, wrapping, 
             'rendered': rendered_text,
             'length': visible_length,
         })
-
-    log(stream_of_rendered)
 
     lines = []
 
@@ -870,7 +868,6 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
                 wrapping = wrapping,
                 width = (LINE_WIDTH - indent),
             )
-            log(_)
             text = '\n'.join(_)
 
         # if reflow:
