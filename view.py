@@ -160,6 +160,7 @@ KEYWORD_HEADING_REGEX = re.compile(r'\\heading{([^}]+)}')
 PARAMETER_REGEX = re.compile(r'{([a-z_]+)(?:(=[^}]*))?}')
 KEYWORD_INSTRUCTION_REGEX = re.compile(r'\\instruction{([a-z]+)}')
 KEYWORD_SYNTAX_REGEX = re.compile(r'\\syntax{([0-9]+)}')
+KEYWORD_REF_REGEX = re.compile(r'\\ref{([a-z_][a-z0-9_]*(?::[a-z_][a-z0-9_]*)*)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
     if para is None:
@@ -527,6 +528,14 @@ class RENDERING_MODE_ASCII_RENDERER:
             if instruction not in documented_instructions:
                 raise UnknownInstruction(instruction)
             return instruction
+
+        m = KEYWORD_REF_REGEX.match(text)
+        if m:
+            name = m.group(1)
+            if REFS is not None and name not in REFS['labels']:
+                raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
+            replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
+            return (replacement or REF_NOT_FOUND_MARKER)
         return text
 
     @staticmethod
@@ -546,6 +555,14 @@ class RENDERING_MODE_ASCII_RENDERER:
             if instruction not in documented_instructions:
                 raise UnknownInstruction(instruction)
             return len(instruction)
+
+        m = KEYWORD_REF_REGEX.match(text)
+        if m:
+            name = m.group(1)
+            if REFS is not None and name not in REFS['labels']:
+                raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
+            replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
+            return len(replacement or REF_NOT_FOUND_MARKER)
         return len(text)
 
 class Token:
@@ -623,6 +640,12 @@ def tokenise(text):
             continue
 
         m = KEYWORD_SYNTAX_REGEX.match(text[i:])
+        if m is not None:
+            tokens.append(m.group(0))
+            i += len(tokens[-1])
+            continue
+
+        m = KEYWORD_REF_REGEX.match(text[i:])
         if m is not None:
             tokens.append(m.group(0))
             i += len(tokens[-1])
