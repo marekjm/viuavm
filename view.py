@@ -351,8 +351,8 @@ def parse_and_expand(text, syntax, documented_instructions):
             raise UnknownInstruction(each)
         pat = (r'\instruction{' + each + '}')
         replacement = each
-        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART and REFS is not None:
-            for a in REFS:
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+            for a in REFS['recorded']:
                 if a[3] is None:
                     continue
                 if a[3].get('instruction') and a[1] == each.upper():
@@ -373,9 +373,15 @@ def parse_and_expand(text, syntax, documented_instructions):
     for each in found_refs:
         if REFS is not None and each not in REFS['labels']:
             raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(each))
+        replacement = (REFS['labels'][each].get('index') if REFS is not None else None)
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+            replacement = '<a href="#{location}">{name}</a>'.format(
+                location = (replacement or REF_NOT_FOUND_MARKER).replace('.', '-'),
+                name = replacement,
+            )
         expanded_text = expanded_text.replace(
             (r'\ref{' + each + '}'),
-            (REFS['labels'][each]['index'] if REFS is not None else REF_NOT_FOUND_MARKER),
+            (replacement or REF_NOT_FOUND_MARKER),
         )
 
 
