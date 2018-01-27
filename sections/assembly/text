@@ -20,7 +20,7 @@ A detailed description is provided in a later section.
 `.bsignature:' declares that a block will be available at link time, even if it is an unresolved symbol in the
 current compilation unit.
 
-\heading{FUNCTION}
+\heading{FUNCTION}{ref=assembly:directive:function}
 
 `.function:' directive begins a function definition.
 Function definitions must end with the `.end' directive.
@@ -76,7 +76,7 @@ The assembler is currently unable to encode register names in bytecode, even as 
 This is a deficiency that will be fixed in the future.
 \dedent{2}
 
-\heading{END}
+\heading{END}{ref=assembly:directive:end}
 
 `.end' directive is used to signal an end of a previously opened directive that requires closing.
 An example of such a directive is `.function:'.
@@ -100,6 +100,8 @@ This section talks about how to define functions.
 \section{begin}
 
 A function definition is delimited by the `.function:' and `.end' tokens.
+See their documentation in sections \ref{assembly:directive:function} and
+\ref{assembly:directive:end} respectively.
 
 \indent{2}
 \reflow{off}

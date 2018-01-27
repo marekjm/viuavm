@@ -28,7 +28,7 @@ add %3 local %1 local %2 local
 \reflow{on}
 \break
 
-The third instruction (`add') would cause a type error at runtime as it is not possible to add 42 to "Hello
+The third instruction (\instruction{add}) would cause a type error at runtime as it is not possible to add 42 to "Hello
 World!".
 The type checker will notice this and reject the program, producing an appropriate error message.
 
@@ -40,7 +40,7 @@ code from the way the values defined by them are used.
 In other words - the assembler will enforce consistency of the assumptions about types of values expressed in
 the source code.
 
-\heading{TYPES OF FUNCTION PARAMETERS AND RETURNS}
+\heading{TYPES OF FUNCTION PARAMETERS AND RETURNS (FIXME)}
 
 Functions in Viua VM assembly (as of 2018-01-17) do not declare types of their parameters (only the number of
 them), and do not declare the return type either.
