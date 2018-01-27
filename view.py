@@ -715,7 +715,7 @@ def render_view(args):
 
         render_heading(each.upper(), 2 * DEFAULT_INDENT_WIDTH, extra = {
             'instruction': True,
-        })
+        }, ref = 'opcode:{}'.format(each.lower()))
         section_tracker.begin()
 
         print('{}in group{}: {}'.format(
