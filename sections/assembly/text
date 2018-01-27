@@ -247,6 +247,8 @@ call %2 local foo/0
 \break
 
 will save it in local register 2.
+For more information refer to \instruction{call} instruction's documentation in
+section \ref{opcode:call}.
 
 \section{end}
 

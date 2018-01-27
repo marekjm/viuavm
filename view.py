@@ -369,6 +369,16 @@ def parse_and_expand(text, syntax, documented_instructions):
         pat = (r'\color{' + color + '}{' + text + '}')
         expanded_text = expanded_text.replace(pat, colorise(text, color))
 
+    found_refs = re.compile(r'\\ref{([a-z_][a-z0-9_]*(?::[a-z_][a-z0-9_]*)*)}').findall(expanded_text)
+    for each in found_refs:
+        if REFS is not None and each not in REFS['labels']:
+            raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(each))
+        expanded_text = expanded_text.replace(
+            (r'\ref{' + each + '}'),
+            (REFS['labels'][each]['index'] if REFS is not None else REF_NOT_FOUND_MARKER),
+        )
+
+
     return expanded_text
 
 def render_heading(heading_text, indent, noise = False, extra = None, ref = None):
