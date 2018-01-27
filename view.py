@@ -509,16 +509,10 @@ def text_wrap(text, indent):
             wrapped_lines.append(part)
     return '\n'.join(wrapped_lines)
 
-class Token:
-    def __init__(self, text):
-        self._text = text
-
-    def __repr__(self):
-        # return repr(self._text)
-        return '...'
-
-    def render(self, syntax, documented_instructions):
-        m = KEYWORD_SYNTAX_REGEX.match(self._text)
+class RENDERING_MODE_ASCII_RENDERER:
+    @staticmethod
+    def render(text, syntax, documented_instructions):
+        m = KEYWORD_SYNTAX_REGEX.match(text)
         if m:
             i = int(m.group(1))
             if i >= len(syntax):
@@ -526,10 +520,56 @@ class Token:
                     'invalid syntax reference: \\syntax{{{}}}'.format(i)
                 )
             return syntax[i]
-        return self._text
+
+        m = KEYWORD_INSTRUCTION_REGEX.match(text)
+        if m:
+            instruction = m.group(1)
+            if instruction not in documented_instructions:
+                raise UnknownInstruction(instruction)
+            return instruction
+        return text
+
+    @staticmethod
+    def length(text, syntax, documented_instructions):
+        m = KEYWORD_SYNTAX_REGEX.match(text)
+        if m:
+            i = int(m.group(1))
+            if i >= len(syntax):
+                raise InvalidReference(
+                    'invalid syntax reference: \\syntax{{{}}}'.format(i)
+                )
+            return len(syntax[i])
+
+        m = KEYWORD_INSTRUCTION_REGEX.match(text)
+        if m:
+            instruction = m.group(1)
+            if instruction not in documented_instructions:
+                raise UnknownInstruction(instruction)
+            return len(instruction)
+        return len(text)
+
+class Token:
+    def __init__(self, text):
+        self._text = text
+
+    def __repr__(self):
+        return repr(self._text)
+
+    def render(self, syntax, documented_instructions):
+        if RENDERING_MODE == RENDERING_MODE_ASCII_ART:
+            return RENDERING_MODE_ASCII_RENDERER.render(
+                text = self._text,
+                syntax = syntax,
+                documented_instructions = documented_instructions,
+            )
 
     def length(self, syntax, documented_instructions):
-        return len(self._text)
+        if RENDERING_MODE == RENDERING_MODE_ASCII_ART:
+            return RENDERING_MODE_ASCII_RENDERER.length(
+                text = self._text,
+                syntax = syntax,
+                documented_instructions = documented_instructions,
+            )
 
 def log(*args):
     sys.stderr.write('{}\n'.format(' '.join(map(str, args))))
