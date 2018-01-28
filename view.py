@@ -670,6 +670,11 @@ class Token:
                 documented_instructions = documented_instructions,
             )
 
+TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE = (
+    '.',
+    ',',
+)
+
 def longen_tokenised_line(chunks, width):
     length_of_chunks = sum(map(lambda x: x['length'], chunks))
     spaces_to_fill = (width - length_of_chunks)
@@ -690,14 +695,16 @@ def longen_tokenised_line(chunks, width):
 
     normal_spacing = ('  ' if spaces_per_split == 2 else ' ')
     for each in chunks[1:]:
-        if no_of_double_spaces:
-            new_line.append('  ')
-            line_length += 2
-            no_of_double_spaces -= 1
-        else:
-            new_line.append(normal_spacing)
-            line_length += 1
-        new_line.append(each['rendered'])
+        text = each['rendered']
+        if text not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
+            if no_of_double_spaces:
+                new_line.append('  ')
+                line_length += 2
+                no_of_double_spaces -= 1
+            else:
+                new_line.append(normal_spacing)
+                line_length += 1
+        new_line.append(text)
         line_length += each['length']
 
     new_line = ''.join(new_line)
