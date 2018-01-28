@@ -145,6 +145,7 @@ def stringify_encoding(encoding):
 
 
 DEFAULT_INDENT_WIDTH = 2
+COMMENT_MARKER = '%%'
 KEYWORD_REFLOW_OFF_REGEX = re.compile(r'\\reflow{off}')
 KEYWORD_REFLOW_ON_REGEX = re.compile(r'\\reflow{on}')
 KEYWORD_WRAP_BEGIN_REGEX = re.compile(r'\\wrap{begin}')
@@ -247,6 +248,8 @@ def into_paragraphs(text):
             paragraphs.append([each])
             paragraphs.append([])
             para = []
+            continue
+        if each.startswith(COMMENT_MARKER):
             continue
         para.append(each)
     if para:
@@ -876,6 +879,8 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
                 'ref': None,
             })
             render_heading(heading_text, indent, noise = params['noise'], ref = params['ref'])
+            continue
+        if each.startswith(COMMENT_MARKER):
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
