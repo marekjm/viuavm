@@ -956,7 +956,7 @@ def render_view(args):
     # a list of instructions do not print the introduction.
     # It looks like the user knows what they want anyway.
     if (not args) and selected_group is None:
-        print('VIUA VM OPCODES DOCUMENTATION'.center(LINE_WIDTH))
+        print('VIUA VM MANUAL'.center(LINE_WIDTH))
         print()
 
         print(r'\toc{}')
@@ -1222,7 +1222,7 @@ def main(args):
 
     emit_line('Generated {}'.format(datetime.datetime.now().astimezone().strftime('%FT%T %z')))
     emit_line()
-    emit_line('----------------------------------------------------------------------\n')
+    emit_line('{}\n'.format('-' * LINE_WIDTH))
 
     for each in RENDERED_LINES:
         if each == r'\toc{}':
