@@ -27,15 +27,14 @@ Function definitions must end with the `.end' directive.
 
 A detailed description is provided in section \ref{assembly:blocks:functions:delimiting}.
 
-\heading{SIGNATURE}
+\heading{SIGNATURE}{ref=assembly:directive:signature}
 
-`.signature:' declares that a function will be available at link time.
-This directive is used to inform the assembler that a symbol used as a function name that
-cannot be resolved in the current compilation unit will be available at link time.
+`.signature:' declares that a function should be treated "as if" the assembler is
+able to resolve it.
 It can be thought about as a forward declaration of a function.
 
 The following code declares that symbol `foo/2' refers to a function name, and
-that the symbol will be available at link time so the assembler should not reject the
+that the symbol will be available at a later time so the assembler should not reject the
 code:
 
 \wrap{begin}
@@ -45,10 +44,11 @@ code:
 \wrap{end}
 \break
 
-If a symbol declared in a signature is not available at link time the linker will not
-report an error, and will instead assume that the symbol will be linked dynamically.
-Static linking is described in section \ref{tooling:linker:static_linking}, and
-dynamic linking is described in section \ref{tooling:kernel:dynamic_linking}.
+The symbol declared using this directive must be made available either during link time
+(if it is to be linked statically; static linking is described in
+section \ref{tooling:linker:static_linking}), or
+at runtime (if it is to be linked in dynamically; dynamic linking is described in
+section \ref{tooling:kernel:dynamic_linking}).
 
 \heading{CLOSURE}
 
@@ -102,7 +102,7 @@ An example of such a directive is `.function:'.
 
 \section{end}
 
-\heading{FUNCTIONS}
+\heading{FUNCTIONS}{ref=assembly:functions}
 \section{begin}
 
 This section talks about functions.

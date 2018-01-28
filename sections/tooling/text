@@ -97,6 +97,7 @@ main.viua:1:1: error: expected a function or a block definition (or signature), 
        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \dedent{2}
 \wrap{end}
+\break
 
 \heading{STATIC LINKING}{ref=tooling:linker:static_linking}
 \section{begin}
@@ -125,6 +126,7 @@ There is currently no mechanism available to restrict the visibility of the symb
 contained by the module.
 
 \heading{SYMBOL AVAILABILITY}
+\section{begin}
 
 When compiling a file the assembler must be able to resolve all symbols, or
 it will reject the code.
@@ -141,6 +143,49 @@ it will attempt to resolve the symbol `fn/0' and throw an error if it fails to d
 There are several ways to make a symbol available to the assembler, or
 make it treat the symbol "as if" it was resolvable and to defer the resolving until
 link-time or runtime (described in section \ref{tooling:kernel:dynamic_linking}).
+
+\heading{IMPLEMENTING A SYMBOL}{noise=true}
+
+The first way to make the symbol resolvable is to implement the function it refers to in
+the same source code file.
+Section \ref{assembly:functions} describes how to write a function.
+
+\heading{DECLARING A SYMBOL}{noise=true}
+
+To tell the assembler that a symbol will be resolvable at either run- or linking-time
+use the `.signature:' directive (described in
+section \ref{assembly:directive:signature}).
+This is most useful when:
+
+\list{begin}
+\item
+the symbol is in a module that will be linked statically to the current module but
+the current module is not the main file of the program
+\item
+the symbol is in the module that will be linked dynamically and thus will not be
+available until runtime
+\list{end}
+
+The linker will not complain if the declared symbol is not available during link time.
+If it cannot resolve the symbol, the resolving will be deferred until runtime (described
+in section \ref{tooling:kernel:dynamic_linking}).
+
+\heading{ADDING A MODULE CONTAINING THE SYMBOL TO ASSEMBLER'S INPUT FILE LIST}{noise=true}
+
+To make the symbol available without declaring it, add the module containing it to the
+list of modules the assembler should link to the current module.
+
+\wrap{begin}
+\indent{2}
+viua-asm main.asm module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+The above command will automatically make all symbols in `module.viua' available to the
+code in `main.asm'.
+
+\section{end}
 
 \section{end}
 
@@ -167,7 +212,14 @@ The kernel will the begin running the program, starting with the `main' function
 \heading{DYNAMIC LINKING}{ref=tooling:kernel:dynamic_linking}
 \section{begin}
 
-Viua VM kernel supports dynamic linking.
+Symbols that were not resolved during compilation, but were declared, are resolved at
+runtime.
+
+\heading{WHEN THE SYMBOLS ARE RESOLVED}
+
+A symbol is resolved the first time it is accessed (which is a questionable design
+choice, and can lead to the program running for quite some time before the error is
+detected).
 
 \section{end}
 
