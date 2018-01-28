@@ -600,8 +600,12 @@ class RENDERING_MODE_HTML_ASCII_ART_RENDERER:
             name = m.group(1)
             if REFS is not None and name not in REFS['labels']:
                 raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
-            replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
-            return (replacement or REF_NOT_FOUND_MARKER)
+            replacement = (REFS['labels'][name].get('index') if REFS is not None else REF_NOT_FOUND_MARKER)
+            replacement = '<a href="#{location}">{name}</a>'.format(
+                location = replacement.replace('.', '-'),
+                name = replacement,
+            )
+            return replacement
         return text
 
     @staticmethod
