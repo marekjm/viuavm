@@ -222,6 +222,12 @@ A symbol is resolved the first time it is accessed (which is a questionable desi
 choice, and can lead to the program running for quite some time before the error is
 detected).
 
+\heading{WHEN MODULES ARE LINKED}
+
+Modules provide function implementations.
+To link a module at runtime use the \instruction{import} instruction described in
+section \ref{opcode:import}.
+
 \section{end}
 
 \heading{ENVIRONMENT VARIABLES}
