@@ -1,0 +1,6 @@
+join %0 local %1 local infinity
+join %0 local %1 local 1ms
+join %0 local %1 local 1s
+join void %1 local infinity
+join void %1 local 1ms
+join void %1 local 1s

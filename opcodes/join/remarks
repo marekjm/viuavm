@@ -1,0 +1,2 @@
+It is impossible to specify all exception types that this instruction may throw due
+to the fact that it will rethrow any exception that killed its target.
