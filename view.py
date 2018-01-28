@@ -736,8 +736,8 @@ def render_tokenised(tokens, syntax, documented_instructions, reflow, wrapping, 
             continue
         else:
             lines.append(line)
-            line = []
-            length_of_current_line = 0
+            line = [each]
+            length_of_current_line = (line[0]['length'] + 1)
     if line:
         lines.append(line)
 
