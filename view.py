@@ -1112,11 +1112,13 @@ def render_view(args):
 
         render_heading('DESCRIPTION', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         print()
+        section_tracker.begin()
         render_paragraphs(description,
             documented_instructions = documented_opcodes,
             syntax = syntax,
             indent = (4 * DEFAULT_INDENT_WIDTH),
         )
+        section_tracker.end()
         print()
 
         render_heading('EXCEPTIONS', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
