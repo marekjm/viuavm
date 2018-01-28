@@ -21,7 +21,7 @@ the result of its execution (either a return value, or an exception).
 
 \section{begin}
 
-\heading{FUTURES AND PROMISES}
+\heading{RELATION TO FUTURES AND PROMISES}{noise=true}
 
 A PID of a joinable process may be treated as a "future", and
 the process identified by it may treat its final \instruction{return} instruction as
