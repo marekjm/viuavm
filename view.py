@@ -673,12 +673,13 @@ class Token:
 TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE = (
     '.',
     ',',
+    ')',
 )
 def simple_join_with_spaces(chunks):
     new_line = [chunks[0]['rendered']]
     for each in chunks[1:]:
         text = each['rendered']
-        if text not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
+        if text[0] not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
             new_line.append(' ')
         new_line.append(text)
     return ''.join(new_line)
@@ -704,7 +705,7 @@ def longen_tokenised_line(chunks, width):
     normal_spacing = ('  ' if spaces_per_split == 2 else ' ')
     for each in chunks[1:]:
         text = each['rendered']
-        if text not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
+        if text[0] not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
             if no_of_double_spaces:
                 new_line.append('  ')
                 line_length += 2
