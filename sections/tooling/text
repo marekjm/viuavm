@@ -197,7 +197,8 @@ code in `main.asm'.
 \section{begin}
 
 Kernel is a program that executes Viua VM bytecode.
-To run a program compiled into Viua VM bytecode you need both the kernel and the executable bytecode.
+To run a program compiled into Viua VM bytecode you need both the kernel and
+the executable bytecode.
 Then, you can invoke the program like this:
 
 \reflow{off}
@@ -215,7 +216,7 @@ The kernel will the begin running the program, starting with the `main' function
 Symbols that were not resolved during compilation, but were declared, are resolved at
 runtime.
 
-\heading{WHEN THE SYMBOLS ARE RESOLVED}
+\heading{WHEN SYMBOLS ARE RESOLVED}
 
 A symbol is resolved the first time it is accessed (which is a questionable design
 choice, and can lead to the program running for quite some time before the error is
