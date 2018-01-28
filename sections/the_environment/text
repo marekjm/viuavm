@@ -1,0 +1,73 @@
+\section{begin}
+
+This section describes the processes and procedures followed by the Viua VM assembly
+when it executes programs.
+It also describes program organisation from the VM's point of view, and
+talks about mechanisms that it makes available to programmers.
+
+Hey
+%% a comment
+man!
+
+\heading{RUNTIME}
+\section{begin}
+%% RUNTIME
+\section{end}
+
+\heading{PROGRAM ORGANISATION}
+\section{begin}
+%% PROGRAM ORGANISATION
+\section{end}
+
+\heading{PROCESSES}
+\section{begin}
+%% PROCESSES
+\section{end}
+
+\heading{COMMUNICATION WITH THE OUTSIDE WORLD}
+\section{begin}
+
+\heading{I/O}
+\section{begin}
+
+\heading{STANDARD STREAMS}
+\section{begin}
+
+\heading{STANDARD INPUT}
+\section{begin}
+%% STANDARD INPUT
+\section{end}
+
+\heading{STANDARD OUTPUT}
+\section{begin}
+%% STANDARD INPUT
+\section{end}
+
+\heading{STANDARD ERROR}
+\section{begin}
+%% STANDARD ERROR
+\section{end}
+
+%% STANDARD STREAMS
+\section{end}
+
+\heading{FILE I/O}
+\section{begin}
+%% FILE I/O
+\section{end}
+
+\heading{NETWORK I/O}
+\section{begin}
+%% NETWORK I/O
+\section{end}
+
+\heading{GENERIC I/O}
+\section{begin}
+%% GENERIC I/O
+\section{end}
+
+%% I/O
+\section{end}
+
+%% COMMUNICATION WITH THE OUTSIDE WORLD
+\section{end}
