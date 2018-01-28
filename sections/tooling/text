@@ -60,23 +60,89 @@ This mostly means following branches, and verifying that register accesses are c
 
 \section{end}
 
-\heading{LINKER}
+\heading{LINKER}{ref=tooling:linker}
 \section{begin}
 
-Static linking is performed by the assembler, which also has the role of the linker in Viua VM tooling.
+Linker cannot be invoked explicitly, and is only usable via the assembler.
+Due to this, the first file passed as input must always contain source code and
+not bytecode.
+For example, this will compile and link correctly:
+
+\wrap{begin}
+\indent{2}
+viua-asm main.asm module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+because the first file contains valid Viua assembly source code.
+\break
+The following will most likely fail (unless you use non-standard file extensions and
+store Viua assembly source code in files that do not have the `.asm' extension):
+
+\wrap{begin}
+\indent{2}
+viua-asm main.viua module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+In this case the assembler will most probably print the following error:
+
+\wrap{begin}
+\indent{2}
+main.viua:1:1: error: expected a function or a block definition (or signature), or a newline
+
+>>>> 1 VIUAL����f/0����Hello, World!d������
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\dedent{2}
+\wrap{end}
+
+\heading{STATIC LINKING}{ref=tooling:linker:static_linking}
+\section{begin}
+
+Static linking is performed by the assembler as the last part of the compilation
+process.
 To link a module statically add it to the list of files the assembler takes as input.
-For example, the following command will compile `main.asm' module and statically link `foo.out' and
-`bar.out' to it:
+For example, the following command will compile `main.asm' module and statically link
+`modulea.viua' and `moduleb.viua' to it:
 
 \reflow{off}
 \indent{4}
-viua-asm main.asm foo.out bar.out
+viua-asm main.asm modulea.viua moduleb.viua
 \dedent{4}
 \reflow{on}
 \break
 
 Viua supports both static (compile-time) linkage and dynamic (runtime) linkage.
-Dynamic linkage is implemented by the kernel, discussed in a later section.
+Dynamic linkage is implemented by the kernel, and is discussed in a section
+\ref{tooling:kernel:dynamic_linking}.
+
+\heading{SYMBOL VISIBILITY}
+
+All symbols available in a module are visible to all modules that will link it.
+There is currently no mechanism available to restrict the visibility of the symbols
+contained by the module.
+
+\heading{SYMBOL AVAILABILITY}
+
+When compiling a file the assembler must be able to resolve all symbols, or
+it will reject the code.
+For example, when the assembler encounters the following code:
+
+\wrap{begin}
+\indent{2}
+call void fn/0
+\dedent{2}
+\wrap{end}
+\break
+
+it will attempt to resolve the symbol `fn/0' and throw an error if it fails to do so.
+There are several ways to make a symbol available to the assembler, or
+make it treat the symbol "as if" it was resolvable and to defer the resolving until
+link-time or runtime (described in section \ref{tooling:kernel:dynamic_linking}).
+
+\section{end}
 
 \section{end}
 
@@ -97,6 +163,13 @@ viua-vm program.out --some flags
 \break
 
 The kernel will the begin running the program, starting with the `main' function.
+
+\heading{DYNAMIC LINKING}{ref=tooling:kernel:dynamic_linking}
+\section{begin}
+
+Viua VM kernel supports dynamic linking.
+
+\section{end}
 
 \heading{ENVIRONMENT VARIABLES}
 \section{begin}

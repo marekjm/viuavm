@@ -25,12 +25,30 @@ current compilation unit.
 `.function:' directive begins a function definition.
 Function definitions must end with the `.end' directive.
 
-A detailed description is provided in a later section.
+A detailed description is provided in section \ref{assembly:blocks:functions:delimiting}.
 
 \heading{SIGNATURE}
 
-`.signature:' declares that a function will be available at link time, even if it is an unresolved symbol in the
-current compilation unit.
+`.signature:' declares that a function will be available at link time.
+This directive is used to inform the assembler that a symbol used as a function name that
+cannot be resolved in the current compilation unit will be available at link time.
+It can be thought about as a forward declaration of a function.
+
+The following code declares that symbol `foo/2' refers to a function name, and
+that the symbol will be available at link time so the assembler should not reject the
+code:
+
+\wrap{begin}
+\indent{2}
+.signature: foo/2
+\dedent{2}
+\wrap{end}
+\break
+
+If a symbol declared in a signature is not available at link time the linker will not
+report an error, and will instead assume that the symbol will be linked dynamically.
+Static linking is described in section \ref{tooling:linker:static_linking}, and
+dynamic linking is described in section \ref{tooling:kernel:dynamic_linking}.
 
 \heading{CLOSURE}
 
@@ -96,7 +114,7 @@ to understand them.
 
 This section talks about how to define functions.
 
-\heading{DELIMITING FUNCTION BODIES}
+\heading{DELIMITING FUNCTION BODIES}{ref=assembly:blocks:functions:delimiting}
 \section{begin}
 
 A function definition is delimited by the `.function:' and `.end' tokens.
