@@ -1,0 +1,2 @@
+process %0 local fn/0
+process void fn/0
