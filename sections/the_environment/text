@@ -5,10 +5,6 @@ when it executes programs.
 It also describes program organisation from the VM's point of view, and
 talks about mechanisms that it makes available to programmers.
 
-Hey
-%% a comment
-man!
-
 \heading{RUNTIME}
 \section{begin}
 %% RUNTIME
