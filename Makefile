@@ -1,15 +1,17 @@
 all: text html pdf
 
+RENDER_COLUMNS=100
+
 .PHONY: watch
 
 text:
-	COLOR=no ./view.py > manual.txt
+	RENDER_COLUMNS=$(RENDER_COLUMNS) COLOR=no ./view.py > manual.txt
 
 html:
-	RENDERING_MODE=RENDERING_MODE_HTML_ASCII_ART ./view.py > manual.html
-	COLOR=no RENDERING_MODE=RENDERING_MODE_HTML_ASCII_ART ./view.py > manual.nocolor.html
+	RENDER_COLUMNS=$(RENDER_COLUMNS) RENDERING_MODE=RENDERING_MODE_HTML_ASCII_ART ./view.py > manual.html
+	RENDER_COLUMNS=$(RENDER_COLUMNS) COLOR=no RENDERING_MODE=RENDERING_MODE_HTML_ASCII_ART ./view.py > manual.nocolor.html
 
-ps:
+ps: text
 	paps --font 'Mononoki 9' manual.txt > manual.ps
 
 pdf: ps
