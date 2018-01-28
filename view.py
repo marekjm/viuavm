@@ -703,7 +703,7 @@ def longen_tokenised_line(chunks, width):
     new_line = ''.join(new_line)
 
     # If the desired width was not reached, do not introduce any "double spaces" and
-    # just return the simples representation possible.
+    # just return the simplest representation possible.
     if line_length != width:
         new_line = ' '.join(map(lambda x: x['rendered'], chunks))
 
