@@ -89,7 +89,10 @@ def longen(lines, width):
     return [longen_line(each, width) for each in lines]
 
 
-LINE_WIDTH = 100
+LINE_WIDTH = int(os.environ.get('RENDER_COLUMNS', -1))
+MARGIN_COLUMNS = 2
+if LINE_WIDTH is -1:
+    LINE_WIDTH = int(os.popen('stty size', 'r').read().split()[1]) - MARGIN_COLUMNS
 TOP_MARKER = '^^^^'
 # See https://www.unicode.org/charts/beta/nameslist/n_2190.html
 # 21B5 ↵ Downwards Arrow With Corner Leftwards
