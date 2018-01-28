@@ -1,0 +1,17 @@
+\heading{IMPORT EXCEPTION}
+
+When the import fails an `ImportException' is thrown by the VM.
+The process that triggered the import can then service the exception
+appropriately, choosing from several different available solutions:
+
+\list{begin}
+\item
+crash
+\break
+This is the simplest thing to do, and requires no code to be written by the programmer.
+If the `ImportException' is not caught by the process it will cause the call stack to be
+unwound (stack unwinding is described in section
+\ref{environment:processes:error_handling:exceptions:stack_unwinding}), and
+the process will be shut down using the normal procedure (described in section
+\ref{environment:processes:shut_down}).
+\list{end}
