@@ -674,6 +674,14 @@ TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE = (
     '.',
     ',',
 )
+def simple_join_with_spaces(chunks):
+    new_line = [chunks[0]['rendered']]
+    for each in chunks[1:]:
+        text = each['rendered']
+        if text not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
+            new_line.append(' ')
+        new_line.append(text)
+    return ''.join(new_line)
 
 def longen_tokenised_line(chunks, width):
     length_of_chunks = sum(map(lambda x: x['length'], chunks))
@@ -712,7 +720,7 @@ def longen_tokenised_line(chunks, width):
     # If the desired width was not reached, do not introduce any "double spaces" and
     # just return the simplest representation possible.
     if line_length != width:
-        new_line = ' '.join(map(lambda x: x['rendered'], chunks))
+        new_line = simple_join_with_spaces(chunks)
 
     if DEBUG_LONGEN:
         new_line = '[{}:{}] {}'.format(len(new_line), width, new_line)
