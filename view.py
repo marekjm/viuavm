@@ -543,6 +543,12 @@ class RENDERING_MODE_ASCII_RENDERER:
                 raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
             replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
             return (replacement or REF_NOT_FOUND_MARKER)
+
+        m = KEYWORD_COLOR_REGEX.match(text)
+        if m:
+            color = m.group(1)
+            content = m.group(2)
+            return colorise(text, color)
         return text
 
     @staticmethod
@@ -570,6 +576,11 @@ class RENDERING_MODE_ASCII_RENDERER:
                 raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
             replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
             return len(replacement or REF_NOT_FOUND_MARKER)
+
+        m = KEYWORD_COLOR_REGEX.match(text)
+        if m:
+            content = m.group(2)
+            return len(content)
         return len(text)
 
 class RENDERING_MODE_HTML_ASCII_ART_RENDERER:
@@ -612,6 +623,12 @@ class RENDERING_MODE_HTML_ASCII_ART_RENDERER:
                 name = replacement,
             )
             return replacement
+
+        m = KEYWORD_COLOR_REGEX.match(text)
+        if m:
+            color = m.group(1)
+            content = m.group(2)
+            return colorise(content, color)
         return text
 
     @staticmethod
@@ -639,6 +656,11 @@ class RENDERING_MODE_HTML_ASCII_ART_RENDERER:
                 raise InvalidReference('invalid reference: \\ref{{{}}}\n'.format(name))
             replacement = (REFS['labels'][name].get('index') if REFS is not None else None)
             return len(replacement or REF_NOT_FOUND_MARKER)
+
+        m = KEYWORD_COLOR_REGEX.match(text)
+        if m:
+            content = m.group(2)
+            return len(content)
         return len(text)
 
 class Token:
@@ -808,6 +830,12 @@ def tokenise(text):
             continue
 
         m = KEYWORD_REF_REGEX.match(text[i:])
+        if m is not None:
+            tokens.append(m.group(0))
+            i += len(tokens[-1])
+            continue
+
+        m = KEYWORD_COLOR_REGEX.match(text[i:])
         if m is not None:
             tokens.append(m.group(0))
             i += len(tokens[-1])
