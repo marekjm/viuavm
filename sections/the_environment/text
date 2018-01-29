@@ -179,5 +179,15 @@ Interrupts are not yet implemented.
 %% COMMUNICATION WITH THE OUTSIDE WORLD
 \section{end}
 
+\heading{STANDARD LIBRARY}
+\section{begin}
+
+Viua VM provides a standard library.
+The library provides basic functionality that may be useful to a wide array of different programs and
+systems.
+
+%% STANDARD LIBRARY
+\section{end}
+
 %% THE ENVIRONMENT
 \section{end}
