@@ -420,7 +420,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-        format_line = '{prefix}{index} <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
+        format_line = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
         top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
             len(TOP_MARKER)))
         top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
