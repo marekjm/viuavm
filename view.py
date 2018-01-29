@@ -415,7 +415,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
     if section_tracker.depth() > 2:
         colorise_with = COLOR_SECTION_SUBSECTION
 
-    format_line = '{prefix}{index} {text}'
+    format_line = '{prefix}[{index}] {text}'
     index = section_tracker.heading(heading_text, noise = noise, extra = extra, ref = ref)
     top_marker = ''
     top_marker_spacing = ''
