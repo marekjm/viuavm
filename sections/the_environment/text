@@ -12,6 +12,12 @@ talks about mechanisms that it makes available to programmers.
 
 \heading{PROGRAM ORGANISATION}
 \section{begin}
+
+Programs in Viua VM are organised into concurrently running processes.
+Each process runs a function.
+
+Programs being execution from the main function, and with a single process.
+
 %% PROGRAM ORGANISATION
 \section{end}
 
