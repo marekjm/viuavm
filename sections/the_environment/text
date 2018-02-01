@@ -18,6 +18,42 @@ Each process runs a function.
 
 Programs being execution from the main function, and with a single process.
 
+\heading{MAIN FUNCTION}
+
+There are several flavours of the main function.
+Just as C++ defines
+
+\wrap{begin}
+\indent{2}
+int main();
+int main(int args, char* argv[]);
+\dedent{2}
+\wrap{end}
+\break
+
+as possible entry points, Viua VM defines
+
+\wrap{begin}
+\indent{2}
+.function: main/0
+.function: main/1
+.function: main/2
+\dedent{2}
+\wrap{end}
+\break
+
+Main function is required to return an integer exit code.
+
+The `main/1' main function receives one argument: a vector of strings representing the parameters the
+program received on the command line with name with which the program was invoked inserted as the first
+entry.
+The `main/2' main function receives two arguments: 1/ a string containing the name of the program as it
+was called (which would be `argv[0]' in C++), and 2/ a vector of strings representing the parameters the
+program received on the command line.
+
+Vectors are described in section \ref{environment:data_types:vector}, and
+strings in section \ref{environment:data_types:string}.
+
 %% PROGRAM ORGANISATION
 \section{end}
 
