@@ -185,6 +185,73 @@ Interrupts are not yet implemented.
 %% COMMUNICATION WITH THE OUTSIDE WORLD
 \section{end}
 
+\heading{DATA TYPES}{ref=environment:data_types}
+\section{begin}
+
+Viua provides several built-in data types.
+User-defined ones can be built on top of them.
+
+\heading{PRIMITIVE TYPES}
+\section{begin}
+
+\heading{NUMERIC TYPES}{ref=environment:data_types:numeric}
+\section{begin}
+
+\heading{INTEGER}{ref=environment:data_types:numeric:integer}
+\section{begin}
+%% INTEGER
+\section{end}
+
+\heading{FLOATING POINT}{ref=environment:data_types:numeric:floating_points}
+\section{begin}
+%% FLOATING POINT
+\section{end}
+
+%% NUMERIC TYPES
+\section{end}
+
+\heading{BITS}{ref=environment:data_types:bits}
+\section{begin}
+%% BITS
+\section{end}
+
+\heading{STRING}{ref=environment:data_types:string}
+\section{begin}
+%% STRING
+\section{end}
+
+\heading{TEXT}{ref=environment:data_types:text}
+\section{begin}
+%% TEXT
+\section{end}
+
+%% PRIMITIVE TYPES
+\section{end}
+
+\heading{AGGREGATE TYPES}
+\section{begin}
+
+\heading{VECTOR}{ref=environment:data_types:vector}
+\section{begin}
+%% VECTOR
+\section{end}
+
+\heading{STRUCT}{ref=environment:data_types:struct}
+\section{begin}
+%% STRUCT
+\section{end}
+
+%% AGGREGATE TYPES
+\section{end}
+
+\heading{POINTERS}{ref=environment:data_types:pointers}
+\section{begin}
+%% POINTERS
+\section{end}
+
+%% DATA TYPES
+\section{end}
+
 \heading{STANDARD LIBRARY}
 \section{begin}
 
