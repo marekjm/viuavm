@@ -236,6 +236,10 @@ representing text, described in section \ref{environment:data_types:text}).
 
 \heading{TEXT}{ref=environment:data_types:text}
 \section{begin}
+
+Text is a data type designed to hold text values.
+It is a sequence of UTF-8 encoded Unicode codepoints.
+
 %% TEXT
 \section{end}
 
