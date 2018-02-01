@@ -210,6 +210,10 @@ For integers with well-defined semantics see section \ref{environment:data_types
 
 \heading{FLOATING POINT}{ref=environment:data_types:numeric:floating_points}
 \section{begin}
+
+Floating point values are 64 bit floating pointer numbers.
+They are implemented using platform-provided primitive type.
+
 %% FLOATING POINT
 \section{end}
 
