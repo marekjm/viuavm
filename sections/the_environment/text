@@ -199,6 +199,12 @@ User-defined ones can be built on top of them.
 
 \heading{INTEGER}{ref=environment:data_types:numeric:integer}
 \section{begin}
+
+Integer values are 64 bit wide, signed integers.
+They are implemented using platform-provided primitive type so their semantics are not
+well-defined in the VM but they are fast.
+For integers with well-defined semantics see section \ref{environment:data_types:bits}.
+
 %% INTEGER
 \section{end}
 
