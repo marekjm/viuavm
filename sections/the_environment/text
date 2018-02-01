@@ -226,6 +226,11 @@ Signed integers are encoded using two's complement representation.
 
 \heading{STRING}{ref=environment:data_types:string}
 \section{begin}
+
+A string is just a string of bytes, without any particular structure.
+It can be used to represent ASCII text, but this usage is not recommended (there is a text type for
+representing text, described in section \ref{environment:data_types:text}).
+
 %% STRING
 \section{end}
 
