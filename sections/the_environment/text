@@ -251,6 +251,12 @@ It is a sequence of UTF-8 encoded Unicode codepoints.
 
 \heading{VECTOR}{ref=environment:data_types:vector}
 \section{begin}
+
+A vector is a collection of values, indexed by a non-negative integer.
+Vectors can be nested.
+
+Currently (as of 2018-02-01) vectors in Viua VM can have at most 2^64 items.
+
 %% VECTOR
 \section{end}
 
