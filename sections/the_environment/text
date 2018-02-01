@@ -212,6 +212,15 @@ User-defined ones can be built on top of them.
 
 \heading{BITS}{ref=environment:data_types:bits}
 \section{begin}
+
+Bits provide the expected bit operators (shifts, rotates, and logic operations), and
+implement arbitrary precision signed- and unsigned integers.
+
+On its own, the bits type is just that - a string of bits.
+However, there are instructions that treat bits values as integers and which implement saturating, checked,
+and wrapping arithmetic operations (for both signed and unsigned integers).
+Signed integers are encoded using two's complement representation.
+
 %% BITS
 \section{end}
 
