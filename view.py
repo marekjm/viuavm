@@ -703,11 +703,15 @@ TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE = (
     ',',
     ')',
 )
+TOKENS_THAT_SHOULD_NOT_BE_SUCCEEDED_BY_WHITESPACE = (
+    '(',
+)
 def simple_join_with_spaces(chunks):
     new_line = [chunks[0]['rendered']]
     for each in chunks[1:]:
         text = each['rendered']
-        if text[0] not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE:
+        if (text[0] not in TOKENS_THAT_SHOULD_NOT_BE_PRECEDED_BY_WHITESPACE) and (new_line[-1] not in
+                TOKENS_THAT_SHOULD_NOT_BE_SUCCEEDED_BY_WHITESPACE):
             new_line.append(' ')
         new_line.append(text)
     return ''.join(new_line)
