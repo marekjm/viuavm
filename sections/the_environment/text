@@ -245,6 +245,37 @@ for integers there is - Viua provides a bits type (described in section
 with well-defined semantics, implementing wrapping, saturating, and checked integer arithmetic for
 signed and unsigned integers.
 
+To manipulate values of numeric types use instructions from the "arithmetic" group:
+
+\list{begin}
+\item
+    \instruction{add} (\ref{opcode:add})
+\item
+    \instruction{sub} (\ref{opcode:sub})
+\item
+    \instruction{mul} (\ref{opcode:mul})
+\item
+    \instruction{div} (\ref{opcode:div})
+\list{end}
+
+Values of numeric types can be compared using the following instructions:
+
+\list{begin}
+\item
+    \instruction{lt} (\ref{opcode:lt})
+\item
+    \instruction{lte} (\ref{opcode:lte})
+\item
+    \instruction{gt} (\ref{opcode:gt})
+\item
+    \instruction{gte} (\ref{opcode:gte})
+\item
+    \instruction{eq} (\ref{opcode:mul})
+\list{end}
+
+All of these instructions work on any combination of numeric types: the right-hand side operand's value
+is converted to the type of the left-hand side's operand before comparison.
+
 \heading{INTEGER}{ref=environment:data_types:numeric:integer}
 \section{begin}
 
@@ -255,6 +286,18 @@ For integers with well-defined semantics see section \ref{environment:data_types
 
 To construct an integer value use \instruction{izero} (described in section \ref{opcode:izero}), or
 \instruction{integer} (described in \ref{opcode:integer}).
+To manipulate integer values use:
+
+\list{begin}
+\item
+    \instruction{iinc} (\ref{opcode:iinc})
+\item
+    \instruction{idec} (\ref{opcode:idec})
+\item
+    \instruction{idec} (\ref{opcode:idec})
+\list{end}
+
+and instructions from the "arithmetic" group.
 
 %% INTEGER
 \section{end}
@@ -267,6 +310,7 @@ They are implemented using platform-provided primitive type.
 
 To construct a floating point value use \instruction{float} (described in section
 \ref{opcode:float}).
+To manipulate floating point values use instructions from the "arithmetic" group.
 
 %% FLOATING POINT
 \section{end}
