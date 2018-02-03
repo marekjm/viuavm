@@ -233,6 +233,18 @@ User-defined ones can be built on top of them.
 \heading{NUMERIC TYPES}{ref=environment:data_types:numeric}
 \section{begin}
 
+Viua provides two basic numeric types: integers, and floating point numbers.
+Both these types are just thin wrappers around the platform-provided types.
+This means that they are quite efficient ("quite" because we still have to factor in the
+overhead of the VM), but not reliable - their semantics are not enforced by the VM so
+the behaviour of the program using them may vary depending on which platform it runs.
+
+For floating point numbers there is no escape from platform-provided types (as of 03-01-2018), but
+for integers there is - Viua provides a bits type (described in section
+\ref{environment:data_types:bits}) and several instructions that operate on its bit patterns
+with well-defined semantics, implementing wrapping, saturating, and checked integer arithmetic for
+signed and unsigned integers.
+
 \heading{INTEGER}{ref=environment:data_types:numeric:integer}
 \section{begin}
 
