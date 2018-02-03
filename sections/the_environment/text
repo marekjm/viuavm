@@ -253,6 +253,9 @@ They are implemented using primitive type provided by the platform so their sema
 well-defined in the VM but they are fast.
 For integers with well-defined semantics see section \ref{environment:data_types:bits}.
 
+To construct an integer value use \instruction{izero} (described in section \ref{opcode:izero}), or
+\instruction{integer} (described in \ref{opcode:integer}).
+
 %% INTEGER
 \section{end}
 
@@ -261,6 +264,9 @@ For integers with well-defined semantics see section \ref{environment:data_types
 
 Floating point values are 64 bit floating pointer numbers.
 They are implemented using platform-provided primitive type.
+
+To construct a floating point value use \instruction{float} (described in section
+\ref{opcode:float}).
 
 %% FLOATING POINT
 \section{end}
