@@ -45,7 +45,7 @@ namespace viua {
                 viua::kernel::Kernel *kernel;
 
                 public:
-                    std::string functionName() const;
+                    std::string function_name() const;
                     void call(ForeignFunction*);
                     void raise(std::unique_ptr<viua::types::Value>);
                     void wakeup();

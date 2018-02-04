@@ -25,6 +25,6 @@
 #include <string>
 #include <viua/kernel/frame.h>
 
-std::string stringifyFunctionInvocation(const Frame*);
+std::string stringify_function_invocation(const Frame*);
 
 #endif

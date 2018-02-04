@@ -299,7 +299,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(co
                     .add(operand->tokens.at(0));
             }
 
-            auto arity = ::assembler::utils::getFunctionArity(function_name);
+            auto arity = ::assembler::utils::get_function_arity(function_name);
 
             if (arity >= 0 and arity != frame_parameters_count) {
                 ostringstream report;

@@ -238,7 +238,7 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateJumps(
+    Program& calculate_jumps(
         std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>,
         std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();

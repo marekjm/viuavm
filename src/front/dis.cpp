@@ -173,15 +173,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint64_t bytes = loader.getBytecodeSize();
-    unique_ptr<viua::internals::types::byte[]> bytecode = loader.getBytecode();
+    uint64_t bytes = loader.get_bytecode_size();
+    unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
 
-    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
-    vector<string> functions = loader.getFunctions();
-    map<string, uint64_t> function_sizes = loader.getFunctionSizes();
+    map<string, uint64_t> function_address_mapping = loader.get_function_addresses();
+    vector<string> functions = loader.get_functions();
+    map<string, uint64_t> function_sizes = loader.get_function_sizes();
 
-    map<string, uint64_t> block_address_mapping = loader.getBlockAddresses();
-    vector<string> blocks = loader.getBlocks();
+    map<string, uint64_t> block_address_mapping = loader.get_block_addresses();
+    vector<string> blocks = loader.get_blocks();
     map<string, uint64_t> block_sizes;
 
     map<string, uint64_t> element_address_mapping;
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    auto meta_information = loader.getMetaInformation();
+    auto meta_information = loader.get_meta_information();
     if (meta_information.size()) {
         disassembled_lines.emplace_back("; meta information\n");
     }
@@ -250,7 +250,7 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("\n");
     }
 
-    auto signatures = loader.getExternalSignatures();
+    auto signatures = loader.get_external_signatures();
     if (signatures.size()) {
         disassembled_lines.emplace_back("; external function signatures\n");
     }
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("\n");
     }
 
-    auto block_signatures = loader.getExternalBlockSignatures();
+    auto block_signatures = loader.get_external_block_signatures();
     if (block_signatures.size()) {
         disassembled_lines.emplace_back("; external block signatures\n");
     }

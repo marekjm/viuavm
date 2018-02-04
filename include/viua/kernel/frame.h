@@ -43,7 +43,7 @@ class Frame {
 
         inline viua::internals::types::byte* ret_address() { return return_address; }
 
-        void setLocalRegisterSet(viua::kernel::RegisterSet*, bool receives_ownership = true);
+        void set_local_register_set(viua::kernel::RegisterSet*, bool receives_ownership = true);
 
         Frame(viua::internals::types::byte*, viua::internals::types::register_index, viua::internals::types::register_index = 16);
         Frame(const Frame&);

@@ -285,7 +285,7 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
     }
 
     if (auto ref = dynamic_cast<viua::types::Reference*>(object)) {
-        object = ref->pointsTo();
+        object = ref->points_to();
     }
 
     if (is_pointer_dereference) {

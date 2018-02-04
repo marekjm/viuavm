@@ -43,7 +43,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
     tie(addr, type_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->isBlock(catcher_block_name)) {
+    if (not scheduler->is_block(catcher_block_name)) {
         throw make_unique<viua::types::Exception>("registering undefined handler block '" + catcher_block_name +
                                          "' to handle " + type_name);
     }
@@ -81,11 +81,11 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
     string block_name;
     tie(addr, block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->isBlock(block_name)) {
+    if (not scheduler->is_block(block_name)) {
         throw make_unique<viua::types::Exception>("cannot enter undefined block: " + block_name);
     }
 
-    viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
+    viua::internals::types::byte* block_address = adjust_jump_base_for_block(block_name);
 
     stack->try_frame_new->return_address = addr;
     stack->try_frame_new->associated_frame = stack->back().get();
@@ -122,7 +122,7 @@ viua::internals::types::byte* viua::process::Process::opleave(viua::internals::t
     stack->tryframes.pop_back();
 
     if (stack->size() > 0) {
-        adjustJumpBaseFor(stack->back()->function_name);
+        adjust_jump_base_for(stack->back()->function_name);
     }
     return addr;
 }

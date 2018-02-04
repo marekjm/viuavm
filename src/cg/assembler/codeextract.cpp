@@ -131,7 +131,7 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
 
     return names;
 }
-vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
+vector<string> assembler::ce::get_function_names(const vector<Token>& tokens) {
     auto names = get_instruction_block_names(
         tokens, "function", [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
     for (const auto& each : get_instruction_block_names(tokens, "closure")) {
@@ -139,15 +139,15 @@ vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
     }
     return names;
 }
-vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
+vector<string> assembler::ce::get_signatures(const vector<Token>& tokens) {
     return get_instruction_block_names(tokens, "signature",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
 }
-vector<string> assembler::ce::getBlockNames(const vector<Token>& tokens) {
+vector<string> assembler::ce::get_block_names(const vector<Token>& tokens) {
     return get_instruction_block_names(tokens, "block",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
 }
-vector<string> assembler::ce::getBlockSignatures(const vector<Token>& tokens) {
+vector<string> assembler::ce::get_block_signatures(const vector<Token>& tokens) {
     return get_instruction_block_names(tokens, "bsignature",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
 }
@@ -193,7 +193,7 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
 
     return invokables;
 }
-map<string, vector<Token>> assembler::ce::getInvokablesTokenBodies(const string& type,
+map<string, vector<Token>> assembler::ce::get_invokables_token_bodies(const string& type,
                                                                    const vector<Token>& tokens) {
     return get_raw_block_bodies(type, tokens);
 }

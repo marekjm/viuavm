@@ -49,7 +49,7 @@ void viua::scheduler::ffi::ff_call_processor(
             break;
         }
 
-        string call_name = request->functionName();
+        string call_name = request->function_name();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
             request->raise(

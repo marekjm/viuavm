@@ -24,30 +24,30 @@
 using namespace std;
 
 
-invocables_t gatherFunctions(const vector<viua::cg::lex::Token>& tokens) {
+invocables_t gather_functions(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
 
-    invocables.names = assembler::ce::getFunctionNames(tokens);
-    invocables.signatures = assembler::ce::getSignatures(tokens);
-    invocables.tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
-    for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
+    invocables.names = assembler::ce::get_function_names(tokens);
+    invocables.signatures = assembler::ce::get_signatures(tokens);
+    invocables.tokens = assembler::ce::get_invokables_token_bodies("function", tokens);
+    for (const auto& each : assembler::ce::get_invokables_token_bodies("closure", tokens)) {
         invocables.tokens[each.first] = each.second;
     }
 
     return invocables;
 }
 
-invocables_t gatherBlocks(const vector<viua::cg::lex::Token>& tokens) {
+invocables_t gather_blocks(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
 
-    invocables.names = assembler::ce::getBlockNames(tokens);
-    invocables.signatures = assembler::ce::getBlockSignatures(tokens);
-    invocables.tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
+    invocables.names = assembler::ce::get_block_names(tokens);
+    invocables.signatures = assembler::ce::get_block_signatures(tokens);
+    invocables.tokens = assembler::ce::get_invokables_token_bodies("block", tokens);
 
     return invocables;
 }
 
-map<string, string> gatherMetaInformation(const vector<viua::cg::lex::Token>& tokens) {
+map<string, string> gather_meta_information(const vector<viua::cg::lex::Token>& tokens) {
     map<string, string> meta_information;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {

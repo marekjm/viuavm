@@ -148,7 +148,7 @@ static void assemble(Program& program, const vector<Token>& tokens) {
 }
 
 
-static map<string, viua::internals::types::bytecode_size> mapInvocableAddresses(
+static map<string, viua::internals::types::bytecode_size> map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction, const invocables_t& blocks) {
     map<string, viua::internals::types::bytecode_size> addresses;
     for (string name : blocks.names) {
@@ -160,7 +160,7 @@ static map<string, viua::internals::types::bytecode_size> mapInvocableAddresses(
     return addresses;
 }
 
-static viua::internals::types::bytecode_size writeCodeBlocksSection(
+static viua::internals::types::bytecode_size write_code_blocks_section(
     ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
@@ -498,8 +498,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
     map<string, viua::internals::types::bytecode_size> function_addresses;
     map<string, viua::internals::types::bytecode_size> block_addresses;
     try {
-        block_addresses = mapInvocableAddresses(starting_instruction, blocks);
-        function_addresses = mapInvocableAddresses(starting_instruction, functions);
+        block_addresses = map_invocable_addresses(starting_instruction, blocks);
+        function_addresses = map_invocable_addresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
     } catch (const string& e) { throw("bytecode size calculation failed: " + e); }
 
@@ -533,7 +533,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
         Loader loader(lnk);
         loader.load();
 
-        vector<string> fn_names = loader.getFunctions();
+        vector<string> fn_names = loader.get_functions();
         for (string fn : fn_names) {
             if (function_addresses.count(fn)) {
                 throw("duplicate symbol '" + fn + "' found when linking '" + lnk +
@@ -541,7 +541,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
             }
         }
 
-        map<string, viua::internals::types::bytecode_size> fn_addresses = loader.getFunctionAddresses();
+        map<string, viua::internals::types::bytecode_size> fn_addresses = loader.get_function_addresses();
         for (string fn : fn_names) {
             function_addresses[fn] = 0;  // for now we just build a list of all available functions
             symbol_sources[fn] = lnk;
@@ -621,9 +621,9 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
         Loader loader(lnk);
         loader.load();
 
-        vector<string> fn_names = loader.getFunctions();
+        vector<string> fn_names = loader.get_functions();
 
-        vector<viua::internals::types::bytecode_size> lib_jumps = loader.getJumps();
+        vector<viua::internals::types::bytecode_size> lib_jumps = loader.get_jumps();
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
             cout << ": ";
@@ -637,7 +637,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
 
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        map<string, viua::internals::types::bytecode_size> fn_addresses = loader.getFunctionAddresses();
+        map<string, viua::internals::types::bytecode_size> fn_addresses = loader.get_function_addresses();
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             if (DEBUG) {
@@ -652,16 +652,16 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
             }
         }
 
-        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), loader.getBytecode());
-        bytes += loader.getBytecodeSize();
+        linked_libs_bytecode.emplace_back(lnk, loader.get_bytecode_size(), loader.get_bytecode());
+        bytes += loader.get_bytecode_size();
     }
 
 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    assembler::verify::functionCallsAreDefined(tokens, functions.names, functions.signatures);
-    assembler::verify::callableCreations(tokens, functions.names, functions.signatures);
+    assembler::verify::function_calls_are_defined(tokens, functions.names, functions.signatures);
+    assembler::verify::callable_creations(tokens, functions.names, functions.signatures);
 
 
     /////////////////////////////
@@ -764,7 +764,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
-        func.calculateJumps(local_jumps, blocks.tokens.at(name));
+        func.calculate_jumps(local_jumps, blocks.tokens.at(name));
 
         auto btcode = func.bytecode();
 
@@ -854,7 +854,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
             viua::internals::types::bytecode_size jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
         }
-        func.calculateJumps(local_jumps, functions.tokens.at(name));
+        func.calculate_jumps(local_jumps, functions.tokens.at(name));
 
         auto btcode = func.bytecode();
 
@@ -895,7 +895,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
 
     /////////////////////////////////////////////////////////////
     // WRITE META-INFORMATION MAP
-    auto meta_information_map = gatherMetaInformation(tokens);
+    auto meta_information_map = gather_meta_information(tokens);
     viua::internals::types::bytecode_size meta_information_map_size = 0;
     for (auto each : meta_information_map) {
         meta_information_map_size += (each.first.size() + each.second.size() + 2);
@@ -967,8 +967,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
     /////////////////////////////////////////////////////////////
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     viua::internals::types::bytecode_size functions_size_so_far =
-        writeCodeBlocksSection(out, blocks, linked_block_names);
-    writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
+        write_code_blocks_section(out, blocks, linked_block_names);
+    write_code_blocks_section(out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name

@@ -36,7 +36,7 @@ viua::internals::types::byte* viua::process::Process::opframe(viua::internals::t
     tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    requestNewFrame(arguments, local_registers);
+    request_new_frame(arguments, local_registers);
 
     return addr;
 }
@@ -145,15 +145,15 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
         call_name = fn->name();
 
         if (fn->type() == "Closure") {
-            stack->frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+            stack->frame_new->set_local_register_set(static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
     } else {
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->isNativeFunction(call_name);
-    bool is_foreign = scheduler->isForeignFunction(call_name);
-    bool is_foreign_method = scheduler->isForeignMethod(call_name);
+    bool is_native = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
         throw make_unique<viua::types::Exception>("call to undefined function: " + call_name);
@@ -171,10 +171,10 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
                 "frame must have at least one argument when used to call a foreign method");
         }
         auto obj = stack->frame_new->arguments->at(0);
-        return callForeignMethod(addr, obj, call_name, return_register, call_name);
+        return call_foreign_method(addr, obj, call_name, return_register, call_name);
     }
 
-    auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
+    auto caller = (is_native ? &viua::process::Process::call_native : &viua::process::Process::call_foreign);
     return (this->*caller)(addr, call_name, return_register, "");
 }
 
@@ -213,9 +213,9 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->isNativeFunction(call_name);
-    bool is_foreign = scheduler->isForeignFunction(call_name);
-    bool is_foreign_method = scheduler->isForeignMethod(call_name);
+    bool is_native = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
         throw make_unique<viua::types::Exception>("tail call to undefined function: " + call_name);
@@ -232,7 +232,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     // it's a simulated "push-and-pop" from the stack
     stack->frame_new.reset(nullptr);
 
-    return adjustJumpBaseFor(call_name);
+    return adjust_jump_base_for(call_name);
 }
 
 viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::types::byte* addr) {
@@ -252,9 +252,9 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->isNativeFunction(call_name);
-    bool is_foreign = scheduler->isForeignFunction(call_name);
-    bool is_foreign_method = scheduler->isForeignMethod(call_name);
+    bool is_native = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
         throw make_unique<viua::types::Exception>("defer of undefined function: " + call_name);
@@ -305,7 +305,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     }
 
     if (stack->size() > 0) {
-        adjustJumpBaseFor(stack->back()->function_name);
+        adjust_jump_base_for(stack->back()->function_name);
     }
 
     return addr;

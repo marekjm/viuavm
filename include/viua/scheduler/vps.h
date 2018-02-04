@@ -76,29 +76,29 @@ namespace viua {
 
             viua::kernel::Kernel* kernel() const;
 
-            bool isClass(const std::string&) const;
-            bool classAccepts(const std::string&, const std::string&) const;
-            auto inheritanceChainOf(const std::string& name) const -> decltype(attached_kernel->inheritanceChainOf(name));
-            bool isLocalFunction(const std::string&) const;
-            bool isLinkedFunction(const std::string&) const;
-            bool isNativeFunction(const std::string&) const;
-            bool isForeignMethod(const std::string&) const;
-            bool isForeignFunction(const std::string&) const;
+            bool is_class(const std::string&) const;
+            bool class_accepts(const std::string&, const std::string&) const;
+            auto inheritance_chain_of(const std::string& name) const -> decltype(attached_kernel->inheritance_chain_of(name));
+            bool is_local_function(const std::string&) const;
+            bool is_linked_function(const std::string&) const;
+            bool is_native_function(const std::string&) const;
+            bool is_foreign_method(const std::string&) const;
+            bool is_foreign_function(const std::string&) const;
 
-            bool isBlock(const std::string&) const;
-            bool isLocalBlock(const std::string&) const;
-            bool isLinkedBlock(const std::string&) const;
-            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOfBlock(const std::string&) const;
+            bool is_block(const std::string&) const;
+            bool is_local_block(const std::string&) const;
+            bool is_linked_block(const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(const std::string&) const;
 
-            std::string resolveMethodName(const std::string&, const std::string&) const;
-            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOf(const std::string&) const;
+            std::string resolve_method_name(const std::string&, const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(const std::string&) const;
 
-            void registerPrototype(std::unique_ptr<viua::types::Prototype>);
+            void register_prototype(std::unique_ptr<viua::types::Prototype>);
 
-            void requestForeignFunctionCall(Frame*, viua::process::Process*) const;
-            void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+            void request_foreign_function_call(Frame*, viua::process::Process*) const;
+            void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
-            void loadModule(std::string);
+            void load_module(std::string);
 
             auto cpi() const -> decltype(processes)::size_type;
             auto size() const -> decltype(processes)::size_type;
@@ -116,7 +116,7 @@ namespace viua {
             auto transfer_exception_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Value>;
             auto transfer_result_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Value>;
 
-            bool executeQuant(viua::process::Process*, viua::internals::types::process_time_slice_type);
+            bool execute_quant(viua::process::Process*, viua::internals::types::process_time_slice_type);
             bool burst();
 
             void operator()();

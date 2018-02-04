@@ -24,25 +24,25 @@
 using namespace std;
 
 
-regex assembler::utils::getFunctionNameRegex() {
+regex assembler::utils::get_function_name_regex() {
     // FIXME function names *MUST* end with '/' to avoid ambiguity when determining whether a token
     // is a function name, or a label
     return regex{"(?:::)?[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z_][a-zA-Z0-9_]*)*/([0-9]+)?"};
 }
 
-bool assembler::utils::isValidFunctionName(const string& function_name) {
-    return regex_match(function_name, getFunctionNameRegex());
+bool assembler::utils::is_valid_function_name(const string& function_name) {
+    return regex_match(function_name, get_function_name_regex());
 }
 
-smatch assembler::utils::matchFunctionName(const string& function_name) {
+smatch assembler::utils::match_function_name(const string& function_name) {
     smatch parts;
-    regex_match(function_name, parts, getFunctionNameRegex());
+    regex_match(function_name, parts, get_function_name_regex());
     return parts;
 }
 
-int assembler::utils::getFunctionArity(const string& function_name) {
+int assembler::utils::get_function_arity(const string& function_name) {
     int arity = -1;
-    auto parts = matchFunctionName(function_name);
+    auto parts = match_function_name(function_name);
     if (auto a = parts[1].str(); a.size()) {
         arity = stoi(a);
     }

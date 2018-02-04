@@ -276,7 +276,7 @@ int main(int argc, char* argv[]) {
 
     invocables_t functions;
     try {
-        functions = gatherFunctions(cooked_tokens);
+        functions = gather_functions(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -287,7 +287,7 @@ int main(int argc, char* argv[]) {
 
     invocables_t blocks;
     try {
-        blocks = gatherBlocks(cooked_tokens);
+        blocks = gather_blocks(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
             if (USE_NEW_SA) {
                 viua::assembler::frontend::static_analyser::check_register_usage(parsed_source);
             } else {
-                assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced,
+                assembler::verify::manipulation_of_defined_registers(cooked_tokens_without_names_replaced,
                                                                   blocks.tokens, DEBUG);
             }
         }
@@ -334,7 +334,7 @@ int main(int argc, char* argv[]) {
     flags.scream = SCREAM;
 
     if (SHOW_META) {
-        auto meta = gatherMetaInformation(cooked_tokens);
+        auto meta = gather_meta_information(cooked_tokens);
         for (auto each : meta) {
             cout << each.first << " = " << str::enquote(str::strencode(each.second)) << endl;
         }

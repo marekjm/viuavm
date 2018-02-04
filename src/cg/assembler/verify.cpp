@@ -49,7 +49,7 @@ static bool is_defined(string function_name, const vector<string>& function_name
     }
     return (not is_undefined);
 }
-void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens,
+void assembler::verify::function_calls_are_defined(const vector<Token>& tokens,
                                                 const vector<string>& function_names,
                                                 const vector<string>& function_signatures) {
     ostringstream report("");
@@ -92,7 +92,7 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens,
     }
 }
 
-void assembler::verify::callableCreations(const vector<Token>& tokens, const vector<string>& function_names,
+void assembler::verify::callable_creations(const vector<Token>& tokens, const vector<string>& function_names,
                                           const vector<string>& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (not(tokens.at(i) == "closure" or tokens.at(i) == "function")) {
@@ -105,7 +105,7 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
 
         string function = tokens.at(i + 3);
 
-        if (not assembler::utils::isValidFunctionName(function)) {
+        if (not assembler::utils::is_valid_function_name(function)) {
             // we don't have a valid function name here, let's defer to SA to catch the error (?)
             continue;
         }

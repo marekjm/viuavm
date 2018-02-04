@@ -135,14 +135,14 @@ auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame) -> decltype(fra
 
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for_block(const string& call_name) {
     viua::internals::types::byte* entry_point = nullptr;
-    auto ep = scheduler->getEntryPointOfBlock(call_name);
+    auto ep = scheduler->get_entry_point_of_block(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const string& call_name) {
     viua::internals::types::byte* entry_point = nullptr;
-    auto ep = scheduler->getEntryPointOf(call_name);
+    auto ep = scheduler->get_entry_point_of(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
@@ -210,8 +210,8 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
-        if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
-            vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
+        if ((not handler_found) and scheduler->is_class(handler_found_for_type)) {
+            vector<string> types_to_check = scheduler->inheritance_chain_of(handler_found_for_type);
             for (decltype(types_to_check)::size_type j = 0; j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found = true;

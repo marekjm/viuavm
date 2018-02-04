@@ -52,7 +52,7 @@ viua::internals::types::byte* viua::process::Process::opderive(viua::internals::
     string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->isClass(class_name)) {
+    if (not scheduler->is_class(class_name)) {
         throw make_unique<viua::types::Exception>("cannot derive from unregistered type: " + class_name);
     }
 
@@ -73,10 +73,10 @@ viua::internals::types::byte* viua::process::Process::opattach(viua::internals::
 
     viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target->get());
 
-    if (not(scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
+    if (not(scheduler->is_native_function(function_name) or scheduler->is_foreign_function(function_name))) {
         throw make_unique<viua::types::Exception>("cannot attach undefined function '" + function_name +
                                          "' as a method '" + method_name + "' of prototype '" +
-                                         proto->getTypeName() + "'");
+                                         proto->get_type_name() + "'");
     }
 
     proto->attach(function_name, method_name);
@@ -91,7 +91,7 @@ viua::internals::types::byte* viua::process::Process::opregister(viua::internals
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     unique_ptr<viua::types::Prototype> prototype{static_cast<viua::types::Prototype*>(source->release())};
-    scheduler->registerPrototype(std::move(prototype));
+    scheduler->register_prototype(std::move(prototype));
 
     return addr;
 }

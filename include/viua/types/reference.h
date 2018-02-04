@@ -48,7 +48,7 @@ namespace viua {
 
             std::unique_ptr<Value> copy() const override;
 
-            virtual Value* pointsTo() const;
+            virtual Value* points_to() const;
             virtual void rebind(Value*);
             virtual void rebind(std::unique_ptr<Value>);
 

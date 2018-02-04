@@ -209,7 +209,7 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ++i;
 
         operand = std::move(label);
-    } else if (::assembler::utils::isValidFunctionName(tok)) {
+    } else if (::assembler::utils::is_valid_function_name(tok)) {
         auto fn_name_literal = make_unique<FunctionNameLiteral>();
         fn_name_literal->content = tokens.at(i);
         fn_name_literal->add(tokens.at(i));
@@ -426,7 +426,7 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
 
     ib.name = tokens.at(i);
 
-    if (not::assembler::utils::isValidFunctionName(ib.name)) {
+    if (not::assembler::utils::is_valid_function_name(ib.name)) {
         throw InvalidSyntax(ib.name, ("invalid function name: " + ib.name.str()));
     }
 
@@ -458,10 +458,10 @@ auto viua::assembler::frontend::parser::parse_closure(const vector_view<Token> t
     ib.closure = true;
     ib.name = tokens.at(i);
 
-    if (not::assembler::utils::isValidFunctionName(ib.name)) {
+    if (not::assembler::utils::is_valid_function_name(ib.name)) {
         throw InvalidSyntax(ib.name, ("invalid function name: " + ib.name.str()));
     }
-    if (::assembler::utils::getFunctionArity(ib.name) == -1) {
+    if (::assembler::utils::get_function_arity(ib.name) == -1) {
         throw InvalidSyntax(ib.name, ("function with undefined arity: " + ib.name.str()));
     }
 
@@ -536,7 +536,7 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
             if (tokens.at(i) == "\n") {
                 throw InvalidSyntax(tokens.at(i - 1), "missing function name");
             }
-            if (not::assembler::utils::isValidFunctionName(tokens.at(i))) {
+            if (not::assembler::utils::is_valid_function_name(tokens.at(i))) {
                 throw InvalidSyntax(tokens.at(i), "not a valid function name");
             }
             parsed.function_signatures.push_back(tokens.at(i++));

@@ -59,40 +59,40 @@ class Loader {
     std::vector<std::string> blocks;
 
     IdToAddressMapping loadmap(char*, const viua::internals::types::bytecode_size&);
-    void calculateFunctionSizes();
+    void calculate_function_sizes();
 
-    void loadMagicNumber(std::ifstream&);
-    void assumeBinaryType(std::ifstream&, ViuaBinaryType);
+    void load_magic_number(std::ifstream&);
+    void assume_binary_type(std::ifstream&, ViuaBinaryType);
 
-    void loadMetaInformation(std::ifstream&);
+    void load_meta_information(std::ifstream&);
 
-    void loadExternalSignatures(std::ifstream&);
-    void loadExternalBlockSignatures(std::ifstream&);
-    void loadJumpTable(std::ifstream&);
-    void loadFunctionsMap(std::ifstream&);
-    void loadBlocksMap(std::ifstream&);
-    void loadBytecode(std::ifstream&);
+    void load_external_signatures(std::ifstream&);
+    void load_external_block_signatures(std::ifstream&);
+    void load_jump_table(std::ifstream&);
+    void load_functions_map(std::ifstream&);
+    void load_blocks_map(std::ifstream&);
+    void load_bytecode(std::ifstream&);
 
     public:
     Loader& load();
     Loader& executable();
 
-    viua::internals::types::bytecode_size getBytecodeSize();
-    std::unique_ptr<viua::internals::types::byte[]> getBytecode();
+    viua::internals::types::bytecode_size get_bytecode_size();
+    std::unique_ptr<viua::internals::types::byte[]> get_bytecode();
 
-    std::vector<viua::internals::types::bytecode_size> getJumps();
+    std::vector<viua::internals::types::bytecode_size> get_jumps();
 
-    std::map<std::string, std::string> getMetaInformation();
+    std::map<std::string, std::string> get_meta_information();
 
-    std::vector<std::string> getExternalSignatures();
-    std::vector<std::string> getExternalBlockSignatures();
+    std::vector<std::string> get_external_signatures();
+    std::vector<std::string> get_external_block_signatures();
 
-    std::map<std::string, viua::internals::types::bytecode_size> getFunctionAddresses();
-    std::map<std::string, viua::internals::types::bytecode_size> getFunctionSizes();
-    std::vector<std::string> getFunctions();
+    std::map<std::string, viua::internals::types::bytecode_size> get_function_addresses();
+    std::map<std::string, viua::internals::types::bytecode_size> get_function_sizes();
+    std::vector<std::string> get_functions();
 
-    std::map<std::string, viua::internals::types::bytecode_size> getBlockAddresses();
-    std::vector<std::string> getBlocks();
+    std::map<std::string, viua::internals::types::bytecode_size> get_block_addresses();
+    std::vector<std::string> get_blocks();
 
     Loader(std::string pth): path(pth), size(0), bytecode(nullptr) {}
     ~Loader() {

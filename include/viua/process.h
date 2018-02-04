@@ -226,25 +226,25 @@ namespace viua {
             viua::types::Value* fetch(viua::internals::types::register_index) const;
             std::unique_ptr<viua::types::Value> pop(viua::internals::types::register_index);
             void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
-            void ensureStaticRegisters(std::string);
+            void ensure_static_registers(std::string);
 
             /*  Methods dealing with stack and frame manipulation, and
              *  function calls.
              */
-            Frame* requestNewFrame(viua::internals::types::register_index arguments_size = 0,
+            Frame* request_new_frame(viua::internals::types::register_index arguments_size = 0,
                                    viua::internals::types::register_index registers_size = 0);
-            TryFrame* requestNewTryFrame();
-            void pushFrame();
-            viua::internals::types::byte* adjustJumpBaseForBlock(const std::string&);
-            viua::internals::types::byte* adjustJumpBaseFor(const std::string&);
+            TryFrame* request_new_try_frame();
+            void push_frame();
+            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
+            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             // call native (i.e. written in Viua) function
-            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&,
+            viua::internals::types::byte* call_native(viua::internals::types::byte*, const std::string&,
                                                      viua::kernel::Register*, const std::string&);
             // call foreign (i.e. from a C++ extension) function
-            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&,
+            viua::internals::types::byte* call_foreign(viua::internals::types::byte*, const std::string&,
                                                       viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*,
+            viua::internals::types::byte* call_foreign_method(viua::internals::types::byte*,
                                                             viua::types::Value*, const std::string&,
                                                             viua::kernel::Register*, const std::string&);
 
@@ -460,21 +460,21 @@ namespace viua {
             bool stopped() const;
 
             bool terminated() const;
-            viua::types::Value* getActiveException();
-            std::unique_ptr<viua::types::Value> transferActiveException();
+            viua::types::Value* get_active_exception();
+            std::unique_ptr<viua::types::Value> transfer_active_exception();
             void raise(std::unique_ptr<viua::types::Value>);
-            void handleActiveException();
+            void handle_active_exception();
 
             void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
-            std::unique_ptr<viua::types::Value> getReturnValue();
+            std::unique_ptr<viua::types::Value> get_return_value();
 
             bool watchdogged() const;
             std::string watchdog() const;
             viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
             viua::internals::types::byte* begin();
-            auto executionAt() const -> decltype(Stack::instruction_pointer);
+            auto execution_at() const -> decltype(Stack::instruction_pointer);
 
             std::vector<Frame*> trace() const;
 

@@ -47,13 +47,13 @@ namespace viua {
 
                 std::string str() const override;
 
-                std::string getTypeName() const;
-                std::vector<std::string> getAncestors() const;
+                std::string get_type_name() const;
+                std::vector<std::string> get_ancestors() const;
 
                 // attach a function as a method to the prototype
                 Prototype* attach(const std::string&, const std::string&);
                 bool accepts(const std::string&) const;
-                std::string resolvesTo(const std::string&) const;
+                std::string resolves_to(const std::string&) const;
 
                 // add an attribute to the prototype
                 Prototype* add(const std::string&);

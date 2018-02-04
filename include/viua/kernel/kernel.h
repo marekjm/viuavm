@@ -209,9 +209,9 @@ namespace viua {
             public:
                 /*  Methods dealing with dynamic library loading.
                  */
-                void loadModule(std::string);
-                void loadNativeLibrary(const std::string&);
-                void loadForeignLibrary(const std::string&);
+                void load_module(std::string);
+                void load_native_library(const std::string&);
+                void load_foreign_library(const std::string&);
 
                 // debug and error reporting flags
                 bool debug, errors;
@@ -231,42 +231,42 @@ namespace viua {
                 Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
                 Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
 
-                Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
-                Kernel& removeExternalFunction(std::string);
+                Kernel& register_external_function(const std::string&, ForeignFunction*);
+                Kernel& remove_external_function(std::string);
 
                 /*  Methods dealing with typesystem related tasks.
                  */
-                bool isClass(const std::string&) const;
-                bool classAccepts(const std::string&, const std::string&) const;
-                std::vector<std::string> inheritanceChainOf(const std::string&) const;
-                bool isLocalFunction(const std::string&) const;
-                bool isLinkedFunction(const std::string&) const;
-                bool isNativeFunction(const std::string&) const;
-                bool isForeignMethod(const std::string&) const;
-                bool isForeignFunction(const std::string&) const;
+                bool is_class(const std::string&) const;
+                bool class_accepts(const std::string&, const std::string&) const;
+                std::vector<std::string> inheritance_chain_of(const std::string&) const;
+                bool is_local_function(const std::string&) const;
+                bool is_linked_function(const std::string&) const;
+                bool is_native_function(const std::string&) const;
+                bool is_foreign_method(const std::string&) const;
+                bool is_foreign_function(const std::string&) const;
 
-                bool isBlock(const std::string&) const;
-                bool isLocalBlock(const std::string&) const;
-                bool isLinkedBlock(const std::string&) const;
-                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOfBlock(const std::string&) const;
+                bool is_block(const std::string&) const;
+                bool is_local_block(const std::string&) const;
+                bool is_linked_block(const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(const std::string&) const;
 
-                std::string resolveMethodName(const std::string&, const std::string&) const;
-                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOf(const std::string&) const;
+                std::string resolve_method_name(const std::string&, const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(const std::string&) const;
 
-                void registerPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
-                void registerPrototype(std::unique_ptr<viua::types::Prototype>);
+                void register_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
+                void register_prototype(std::unique_ptr<viua::types::Prototype>);
 
                 /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-                Kernel& registerForeignPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
-                Kernel& registerForeignMethod(const std::string&, ForeignMethod);
+                Kernel& register_foreign_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
+                Kernel& register_foreign_method(const std::string&, ForeignMethod);
 
-                void requestForeignFunctionCall(Frame*, viua::process::Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+                void request_foreign_function_call(Frame*, viua::process::Process*);
+                void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
-                void postFreeProcess(std::unique_ptr<viua::process::Process>);
+                void post_free_process(std::unique_ptr<viua::process::Process>);
 
-                auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
-                auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+                auto create_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+                auto delete_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
 
                 auto create_result_slot_for(viua::process::PID) -> void;
                 auto detach_process(const viua::process::PID) -> void;

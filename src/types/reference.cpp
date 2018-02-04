@@ -23,7 +23,7 @@ using namespace std;
 
 const string viua::types::Reference::type_name = "Reference";
 
-viua::types::Value* viua::types::Reference::pointsTo() const { return *pointer; }
+viua::types::Value* viua::types::Reference::points_to() const { return *pointer; }
 
 void viua::types::Reference::rebind(viua::types::Value* ptr) {
     if (*pointer) {

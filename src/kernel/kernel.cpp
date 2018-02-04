@@ -140,7 +140,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name,
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::registerExternalFunction(const string& name,
+viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(const string& name,
                                                                      ForeignFunction* function_ptr) {
     /** Registers external function in viua::kernel::Kernel.
      */
@@ -149,15 +149,15 @@ viua::kernel::Kernel& viua::kernel::Kernel::registerExternalFunction(const strin
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::registerForeignPrototype(
+viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_prototype(
     const string& name, unique_ptr<viua::types::Prototype> proto) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
-    registerPrototype(name, std::move(proto));
+    register_prototype(name, std::move(proto));
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::registerForeignMethod(const string& name, ForeignMethod method) {
+viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(const string& name, ForeignMethod method) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
     foreign_methods[name] = method;
@@ -190,16 +190,16 @@ static auto is_foreign_module(string module) -> bool {
     }
     return (path.size() > 0);
 }
-void viua::kernel::Kernel::loadModule(string module) {
+void viua::kernel::Kernel::load_module(string module) {
     if (is_native_module(module)) {
-        loadNativeLibrary(module);
+        load_native_library(module);
     } else if (is_foreign_module(module)) {
-        loadForeignLibrary(module);
+        load_foreign_library(module);
     } else {
         throw make_unique<viua::types::Exception>("LinkException", ("failed to link library: " + module));
     }
 }
-void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
+void viua::kernel::Kernel::load_native_library(const string& module) {
     regex double_colon("::");
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
@@ -216,18 +216,18 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
         Loader loader(path);
         loader.load();
 
-        unique_ptr<viua::internals::types::byte[]> lnk_btcd{loader.getBytecode()};
+        unique_ptr<viua::internals::types::byte[]> lnk_btcd{loader.get_bytecode()};
 
-        vector<string> fn_names = loader.getFunctions();
-        map<string, viua::internals::types::bytecode_size> fn_addrs = loader.getFunctionAddresses();
+        vector<string> fn_names = loader.get_functions();
+        map<string, viua::internals::types::bytecode_size> fn_addrs = loader.get_function_addresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] =
                 pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + fn_addrs[fn_names[i]]));
         }
 
-        vector<string> bl_names = loader.getBlocks();
-        map<string, viua::internals::types::bytecode_size> bl_addrs = loader.getBlockAddresses();
+        vector<string> bl_names = loader.get_blocks();
+        map<string, viua::internals::types::bytecode_size> bl_addrs = loader.get_block_addresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
             linked_blocks[bl_linkname] =
@@ -236,12 +236,12 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
 
         linked_modules[module] =
             pair<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>(
-                loader.getBytecodeSize(), std::move(lnk_btcd));
+                loader.get_bytecode_size(), std::move(lnk_btcd));
     } else {
         throw make_unique<viua::types::Exception>("failed to link: " + module);
     }
 }
-void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
+void viua::kernel::Kernel::load_foreign_library(const string& module) {
     string path = "";
     path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
     if (path.size() == 0) {
@@ -272,7 +272,7 @@ void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
 
     unsigned i = 0;
     while (exported[i].name != nullptr) {
-        registerExternalFunction(exported[i].name, exported[i].fpointer);
+        register_external_function(exported[i].name, exported[i].fpointer);
         ++i;
     }
 
@@ -280,22 +280,22 @@ void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
 }
 
 
-bool viua::kernel::Kernel::isClass(const string& name) const { return typesystem.count(name); }
+bool viua::kernel::Kernel::is_class(const string& name) const { return typesystem.count(name); }
 
-bool viua::kernel::Kernel::classAccepts(const string& klass, const string& method_name) const {
+bool viua::kernel::Kernel::class_accepts(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->accepts(method_name);
 }
 
-vector<string> viua::kernel::Kernel::inheritanceChainOf(const string& type_name) const {
+vector<string> viua::kernel::Kernel::inheritance_chain_of(const string& type_name) const {
     /** This methods returns full inheritance chain of a type.
      */
     if (typesystem.count(type_name) == 0) {
         // FIXME: better exception message
         throw make_unique<viua::types::Exception>("unregistered type: " + type_name);
     }
-    vector<string> ichain = typesystem.at(type_name)->getAncestors();
+    vector<string> ichain = typesystem.at(type_name)->get_ancestors();
     for (unsigned i = 0; i < ichain.size(); ++i) {
-        vector<string> sub_ichain = inheritanceChainOf(ichain[i]);
+        vector<string> sub_ichain = inheritance_chain_of(ichain[i]);
         for (unsigned j = 0; j < sub_ichain.size(); ++j) {
             ichain.push_back(sub_ichain[j]);
         }
@@ -320,31 +320,31 @@ vector<string> viua::kernel::Kernel::inheritanceChainOf(const string& type_name)
     return ichain;
 }
 
-bool viua::kernel::Kernel::isLocalFunction(const string& name) const {
+bool viua::kernel::Kernel::is_local_function(const string& name) const {
     return function_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::isLinkedFunction(const string& name) const { return linked_functions.count(name); }
+bool viua::kernel::Kernel::is_linked_function(const string& name) const { return linked_functions.count(name); }
 
-bool viua::kernel::Kernel::isNativeFunction(const string& name) const {
+bool viua::kernel::Kernel::is_native_function(const string& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
 }
 
-bool viua::kernel::Kernel::isForeignMethod(const string& name) const { return foreign_methods.count(name); }
+bool viua::kernel::Kernel::is_foreign_method(const string& name) const { return foreign_methods.count(name); }
 
-bool viua::kernel::Kernel::isForeignFunction(const string& name) const {
+bool viua::kernel::Kernel::is_foreign_function(const string& name) const {
     return foreign_functions.count(name);
 }
 
-bool viua::kernel::Kernel::isBlock(const string& name) const {
+bool viua::kernel::Kernel::is_block(const string& name) const {
     return (block_addresses.count(name) or linked_blocks.count(name));
 }
 
-bool viua::kernel::Kernel::isLocalBlock(const string& name) const { return block_addresses.count(name); }
+bool viua::kernel::Kernel::is_local_block(const string& name) const { return block_addresses.count(name); }
 
-bool viua::kernel::Kernel::isLinkedBlock(const string& name) const { return linked_blocks.count(name); }
+bool viua::kernel::Kernel::is_linked_block(const string& name) const { return linked_blocks.count(name); }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOfBlock(
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::get_entry_point_of_block(
     const std::string& name) const {
     viua::internals::types::byte* entry_point = nullptr;
     viua::internals::types::byte* module_base = nullptr;
@@ -359,11 +359,11 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel:
     return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
-string viua::kernel::Kernel::resolveMethodName(const string& klass, const string& method_name) const {
-    return typesystem.at(klass)->resolvesTo(method_name);
+string viua::kernel::Kernel::resolve_method_name(const string& klass, const string& method_name) const {
+    return typesystem.at(klass)->resolves_to(method_name);
 }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOf(
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::get_entry_point_of(
     const std::string& name) const {
     viua::internals::types::byte* entry_point = nullptr;
     viua::internals::types::byte* module_base = nullptr;
@@ -378,17 +378,17 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel:
     return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
-void viua::kernel::Kernel::registerPrototype(const string& type_name,
+void viua::kernel::Kernel::register_prototype(const string& type_name,
                                              unique_ptr<viua::types::Prototype> proto) {
     typesystem.emplace(type_name, nullptr);
     typesystem.at(type_name) = std::move(proto);
 }
-void viua::kernel::Kernel::registerPrototype(unique_ptr<viua::types::Prototype> proto) {
-    auto type_name = proto->getTypeName();
-    registerPrototype(type_name, std::move(proto));
+void viua::kernel::Kernel::register_prototype(unique_ptr<viua::types::Prototype> proto) {
+    auto type_name = proto->get_type_name();
+    register_prototype(type_name, std::move(proto));
 }
 
-void viua::kernel::Kernel::requestForeignFunctionCall(Frame* frame,
+void viua::kernel::Kernel::request_foreign_function_call(Frame* frame,
                                                       viua::process::Process* requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(
@@ -401,20 +401,20 @@ void viua::kernel::Kernel::requestForeignFunctionCall(Frame* frame,
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Value* object,
+void viua::kernel::Kernel::request_foreign_method_call(const string& name, viua::types::Value* object,
                                                     Frame* frame, viua::kernel::RegisterSet*,
                                                     viua::kernel::RegisterSet*, viua::process::Process* p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
-void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p) {
+void viua::kernel::Kernel::post_free_process(unique_ptr<viua::process::Process> p) {
     unique_lock<mutex> lock(free_virtual_processes_mutex);
     free_virtual_processes.emplace_back(std::move(p));
     lock.unlock();
     free_virtual_processes_cv.notify_one();
 }
 
-auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid)
+auto viua::kernel::Kernel::create_mailbox(const viua::process::PID pid)
     -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
@@ -423,7 +423,7 @@ auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid)
     mailboxes.emplace(pid, Mailbox{});
     return ++running_processes;
 }
-auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid)
+auto viua::kernel::Kernel::delete_mailbox(const viua::process::PID pid)
     -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
@@ -456,9 +456,9 @@ auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_pr
     }
 
     if (done_process->terminated()) {
-        process_results.at(done_process->pid()).raise(done_process->transferActiveException());
+        process_results.at(done_process->pid()).raise(done_process->transfer_active_exception());
     } else {
-        process_results.at(done_process->pid()).resolve(done_process->getReturnValue());
+        process_results.at(done_process->pid()).resolve(done_process->get_return_value());
     }
 }
 auto viua::kernel::Kernel::is_process_joinable(const viua::process::PID pid) const -> bool {

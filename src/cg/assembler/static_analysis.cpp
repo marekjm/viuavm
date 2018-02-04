@@ -963,7 +963,7 @@ static void check_block_body(const TokenVector& body_tokens, Registers& register
     check_block_body(body_tokens, 0, registers, block_bodies, debug);
 }
 
-void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens,
+void assembler::verify::manipulation_of_defined_registers(const TokenVector& tokens,
                                                        const map<string, TokenVector>& block_bodies,
                                                        const bool debug) {
     string opened_function;

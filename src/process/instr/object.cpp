@@ -43,7 +43,7 @@ viua::internals::types::byte* viua::process::Process::opnew(viua::internals::typ
     string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->isClass(class_name)) {
+    if (not scheduler->is_class(class_name)) {
         throw make_unique<viua::types::Exception>("cannot create new instance of unregistered type: " + class_name);
     }
 
@@ -77,7 +77,7 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
         method_name = fn->name();
 
         if (fn->type() == "Closure") {
-            stack->frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+            stack->frame_new->set_local_register_set(static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
     } else {
         tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -87,21 +87,21 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {
         obj = ptr->to(this);
     }
-    if (not scheduler->isClass(obj->type())) {
+    if (not scheduler->is_class(obj->type())) {
         throw make_unique<viua::types::Exception>("unregistered type cannot be used for dynamic dispatch: " +
                                          obj->type());
     }
-    vector<string> mro = scheduler->inheritanceChainOf(obj->type());
+    vector<string> mro = scheduler->inheritance_chain_of(obj->type());
     mro.insert(mro.begin(), obj->type());
 
     string function_name = "";
     for (decltype(mro.size()) i = 0; i < mro.size(); ++i) {
-        if (not scheduler->isClass(mro[i])) {
+        if (not scheduler->is_class(mro[i])) {
             throw make_unique<viua::types::Exception>("unavailable base type in inheritance hierarchy of " + mro[0] +
                                              ": " + mro[i]);
         }
-        if (scheduler->classAccepts(mro[i], method_name)) {
-            function_name = scheduler->resolveMethodName(mro[i], method_name);
+        if (scheduler->class_accepts(mro[i], method_name)) {
+            function_name = scheduler->resolve_method_name(mro[i], method_name);
             break;
         }
     }
@@ -110,9 +110,9 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
                                          method_name + "'");
     }
 
-    bool is_native = scheduler->isNativeFunction(function_name);
-    bool is_foreign = scheduler->isForeignFunction(function_name);
-    bool is_foreign_method = scheduler->isForeignMethod(function_name);
+    bool is_native = scheduler->is_native_function(function_name);
+    bool is_foreign = scheduler->is_foreign_function(function_name);
+    bool is_foreign_method = scheduler->is_foreign_method(function_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
         throw make_unique<viua::types::Exception>("method '" + method_name + "' resolves to undefined function '" +
@@ -120,10 +120,10 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     }
 
     if (is_foreign_method) {
-        return callForeignMethod(addr, obj, function_name, return_register, method_name);
+        return call_foreign_method(addr, obj, function_name, return_register, method_name);
     }
 
-    auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
+    auto caller = (is_native ? &viua::process::Process::call_native : &viua::process::Process::call_foreign);
     return (this->*caller)(addr, function_name, return_register, method_name);
 }
 

@@ -26,14 +26,14 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel, const string& pro
     Loader loader(program);
     loader.executable();
 
-    uint64_t bytes = loader.getBytecodeSize();
-    unique_ptr<viua::internals::types::byte[]> bytecode = loader.getBytecode();
+    uint64_t bytes = loader.get_bytecode_size();
+    unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
 
-    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
+    map<string, uint64_t> function_address_mapping = loader.get_function_addresses();
     for (auto p : function_address_mapping) {
         kernel->mapfunction(p.first, p.second);
     }
-    for (auto p : loader.getBlockAddresses()) {
+    for (auto p : loader.get_block_addresses()) {
         kernel->mapblock(p.first, p.second);
     }
 
@@ -44,7 +44,7 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel, const string& pro
 
 void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     auto proto_object = make_unique<viua::types::Prototype>("Object");
-    kernel->registerForeignPrototype("Object", std::move(proto_object));
+    kernel->register_foreign_prototype("Object", std::move(proto_object));
 
     auto proto_string = make_unique<viua::types::Prototype>("String");
     proto_string->attach("String::stringify/2", "stringify/2");
@@ -58,33 +58,33 @@ void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     proto_string->attach("String::concatenate/2", "concatenate/2");
     proto_string->attach("String::join/1", "join/1");
     proto_string->attach("String::size/1", "size/1");
-    kernel->registerForeignPrototype("String", std::move(proto_string));
-    kernel->registerForeignMethod("String::stringify/2",
+    kernel->register_foreign_prototype("String", std::move(proto_string));
+    kernel->register_foreign_method("String::stringify/2",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::stringify));
-    kernel->registerForeignMethod("String::represent/2",
+    kernel->register_foreign_method("String::represent/2",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::represent));
-    kernel->registerForeignMethod("String::startswith/2",
+    kernel->register_foreign_method("String::startswith/2",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::startswith));
-    kernel->registerForeignMethod("String::endswith/2",
+    kernel->register_foreign_method("String::endswith/2",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::endswith));
-    kernel->registerForeignMethod("String::format/",
+    kernel->register_foreign_method("String::format/",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::format));
-    kernel->registerForeignMethod("String::substr/",
+    kernel->register_foreign_method("String::substr/",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::substr));
-    kernel->registerForeignMethod("String::concatenate/2",
+    kernel->register_foreign_method("String::concatenate/2",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::concatenate));
-    kernel->registerForeignMethod("String::join/",
+    kernel->register_foreign_method("String::join/",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::join));
-    kernel->registerForeignMethod("String::size/1",
+    kernel->register_foreign_method("String::size/1",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::size));
 
     auto proto_process = make_unique<viua::types::Prototype>("Process");
-    kernel->registerForeignPrototype("Process", std::move(proto_process));
+    kernel->register_foreign_prototype("Process", std::move(proto_process));
 
     auto proto_pointer = make_unique<viua::types::Prototype>("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");
-    kernel->registerForeignPrototype("Pointer", std::move(proto_pointer));
-    kernel->registerForeignMethod("Pointer::expired/1",
+    kernel->register_foreign_prototype("Pointer", std::move(proto_pointer));
+    kernel->register_foreign_method("Pointer::expired/1",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::Pointer::expired));
 }
 
@@ -93,11 +93,11 @@ void viua::front::vm::preload_libraries(viua::kernel::Kernel* kernel) {
      */
     vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
     for (unsigned i = 0; i < preload_native.size(); ++i) {
-        kernel->loadNativeLibrary(preload_native[i]);
+        kernel->load_native_library(preload_native[i]);
     }
 
     vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
     for (unsigned i = 0; i < preload_foreign.size(); ++i) {
-        kernel->loadForeignLibrary(preload_foreign[i]);
+        kernel->load_foreign_library(preload_foreign[i]);
     }
 }

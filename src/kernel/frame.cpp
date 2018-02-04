@@ -22,7 +22,7 @@
 using std::make_unique;
 
 
-void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_ownership) {
+void Frame::set_local_register_set(viua::kernel::RegisterSet* rs, bool receives_ownership) {
     local_register_set.reset(rs, receives_ownership);
 }
 

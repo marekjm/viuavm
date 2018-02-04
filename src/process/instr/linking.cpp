@@ -33,6 +33,6 @@ viua::internals::types::byte* viua::process::Process::opimport(viua::internals::
      */
     string module;
     tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    scheduler->loadModule(module);
+    scheduler->load_module(module);
     return addr;
 }

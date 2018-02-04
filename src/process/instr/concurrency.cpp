@@ -56,8 +56,8 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->isNativeFunction(call_name);
-    bool is_foreign = scheduler->isForeignFunction(call_name);
+    bool is_native = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: " + call_name);
@@ -201,8 +201,8 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals
     string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    bool is_native = scheduler->isNativeFunction(call_name);
-    bool is_foreign = scheduler->isForeignFunction(call_name);
+    bool is_native = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("watchdog process from undefined function: " + call_name);

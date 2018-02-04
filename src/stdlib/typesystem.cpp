@@ -38,7 +38,7 @@ static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regis
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
 }
 
-static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+static auto inheritance_chain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
         throw make_unique<viua::types::Exception>("expected object as parameter 0");
@@ -74,7 +74,7 @@ static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
 
 const ForeignFunctionSpec functions[] = {
     {"typesystem::typeof/1", &typeof},
-    {"typesystem::inheritanceChain/1", &inheritanceChain},
+    {"typesystem::inheritance_chain/1", &inheritance_chain},
     {"typesystem::bases/1", &bases},
     {nullptr, nullptr},
 };
