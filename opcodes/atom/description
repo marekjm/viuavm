@@ -1,0 +1,8 @@
+Atoms are values that stand for themselves.
+They are unique in the way that no two atoms are the same; however, there may be several instances of the same
+atom.
+As an example, there may be two atoms with the value 'foo' and they will be indistinguishable from each other,
+but they will be radically different from a third atom with the value 'fooo'.
+
+The only operation that atoms support is comparison for equality, using the \instruction{atomeq} instruction
+described in section \ref{opcode:atomeq}.
