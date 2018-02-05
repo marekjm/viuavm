@@ -1017,7 +1017,7 @@ def render_view(args):
         print()
 
 
-    render_heading('INSTRUCTIONS', DEFAULT_INDENT_WIDTH)
+    render_heading('INSTRUCTIONS', DEFAULT_INDENT_WIDTH, ref = 'isa:instructions')
     print()
     section_tracker.begin()
 
