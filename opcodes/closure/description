@@ -1,0 +1,60 @@
+A closure is a function which bound some pieces of its environment.
+
+In higher-level languages closures are usually created implicitly, when a function is defined inside another
+function and references some of the enclosing function's variables.
+In Viua VM assembly the process is explicit, as it requires the programmer to write a standalone function
+(which involves giving it a name), construct a closure from the function, capture required values in the
+closure.
+Every listed step requires an instruction, adding to the verbosity.
+
+What is more, the functions that will be used to construct closures are specially marked - they begin with the
+`.closure:' directive (described in section \ref{assembly:directive:closure}).
+
+Closure bodies are not statically analysed until the closure is actually constructed.
+This is because closures are defined with obvious "holes" (empty registers to be filled with captured values,
+but which are used in the closure body) whose values are not known until the closure constructor instruction
+is not executed.
+The static analyser will verify type correctness of each closure instantiation at points where
+\instruction{closure} instructions are executed.
+
+\heading{CAPTURING VALUES}
+\section{begin}
+
+Closure construction process, while explict, is very flexible.
+It allows capturing values by:
+
+\list{begin}
+\item
+copy - copying them into the closure
+\item
+reference - making the closure and its environment share the value
+\item
+move - moving values from the enclosing environment inside the closure
+\list{end}
+
+Due to the presence of by-copy and by-move captures and the fact that closures must be explicitly constructed
+the closure mechanism in Viua can be used to create specialised functions (for example, there can be a `min'
+function that is constructed with different values to create different "minimisers").
+
+\heading{BY REFERENCE}
+
+By reference captures are made using \instruction{capture} instruction (section \ref{opcode:capture}).
+Captured value is shared between the closure and the enclosing function.
+Changes made be any of them are visible to the other.
+
+This capture mode is provided to allow creating closures in the usual sense, but its use is not encouraged.
+It is better to use by copy or by move captures as they avoid sharing values between two different functions.
+
+\heading{BY COPY}
+
+By copy captures are made using \instruction{capturecopy} instruction (section \ref{opcode:capturecopy}).
+The closure gets a fresh copy of the captured value.
+Enclosing function retains captured value.
+
+\heading{BY MOVE}
+
+By move captures are made using \instruction{capturemove} instruction (section \ref{opcode:capturemove}).
+The closure becomes the owner of the value, and the enclosing function loses access to it.
+
+%% CAPTURING VALUES
+\section{end}
