@@ -351,6 +351,15 @@ It is a sequence of UTF-8 encoded Unicode codepoints.
 %% TEXT
 \section{end}
 
+\heading{ATOM}{ref=environment:data_types:atom}
+\section{begin}
+
+An Atom is a value that represents itself.
+See description of \instruction{atom} instruction in section \ref{opcode:atom}.
+
+%% ATOM
+\section{end}
+
 %% PRIMITIVE TYPES
 \section{end}
 
