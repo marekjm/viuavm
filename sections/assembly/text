@@ -1,9 +1,13 @@
 \section{begin}
 
 This section is a reference for Viua VM assembly language.
-It discusses source code organisation, compilation units, syntax, etc.
-Reading this section may allow you to undesrtand the SYNTAX and EXAMPLES sections in
+It discusses source code organisation and syntax.
+Reading this section may allow you to understand the SYNTAX and EXAMPLES sections in
 documentation for each instruction.
+
+A listing of all instructions can be found in section \ref{isa:instructions}.
+Instruction set architecture is described in section \ref{isa}.
+
 
 \heading{DIRECTIVES}
 \section{begin}
