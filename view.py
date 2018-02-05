@@ -959,7 +959,8 @@ def render_file(path, documented_instructions, indent = DEFAULT_INDENT_WIDTH):
 
 def render_section(section, documented_instructions):
     with open(os.path.join('.', 'sections', section, 'title')) as ifstream:
-        render_heading(ifstream.read().strip(), 2)
+        title = ifstream.read().strip().splitlines()
+        render_heading(title[0], indent = 2, ref = (None if len(title) < 2 else title[1]))
     print()
     res = render_file(
         os.path.join('.', 'sections', section, 'text'),
