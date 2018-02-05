@@ -146,7 +146,7 @@ Using the \instruction{process} instruction described in section \ref{opcode:pro
 \heading{COMMUNICATION}
 \section{begin}
 
-\heading{MESSAGE PASSING}
+\heading{MESSAGE PASSING}{ref=environment:processes:communication:message_passing}
 \section{begin}
 %% MESSAGE PASSING
 \section{end}
