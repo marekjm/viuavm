@@ -1,0 +1,1 @@
+capturemove %TargetClosure local %InClosureRegister %CapturedValue local
