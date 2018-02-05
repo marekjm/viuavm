@@ -54,7 +54,7 @@ section \ref{tooling:linker:static_linking}), or
 at runtime (if it is to be linked in dynamically; dynamic linking is described in
 section \ref{tooling:kernel:dynamic_linking}).
 
-\heading{CLOSURE}
+\heading{CLOSURE}{ref=assembly:directive:closure}
 
 `.closure:' directive begins a closure definition.
 Closure definitions must end with the `.end' directive.
