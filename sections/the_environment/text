@@ -387,6 +387,37 @@ Currently (as of 2018-02-01) vectors in Viua VM can have at most 2^64 items.
 
 \heading{POINTERS}{ref=environment:data_types:pointers}
 \section{begin}
+
+Pointers can be created using the \instruction{ptr} instruction (see section \ref{opcode:ptr}).
+
+Pointers in Viua point to values, not to locations.
+This is in stark contrast to pointers in C or C++, where they point to memory locations.
+In other words, pointers in Viua track the values they point to: when a value is moved to a different
+register (even if it is in a different register set), or moved to a closure or a deferred function the
+pointer still points to that value.
+
+Another feature provided by pointers is that they expire.
+When the value a pointer points to is deleted the pointer is marked as "expired" (no longer valid), and
+any access through that pointer results in an exception being thrown by the VM.
+You can still write programs that will have dangling pointers, but you can recover if you accidentally try to
+use such a pointer to access a value.
+Moving (or otherwise manipulating) expired pointers does not throw an exception, only using the pointer to
+access a value does.
+
+Pointers cannot be created uninitialised.
+A pointer is constructed from a value, and trying to construct it from an empty register will throw an
+exception.
+
+Pointers cannot be "reseated".
+Once a pointer is constructed and starts pointing to some value it cannot be made to point to a different one,
+the binding established at construction time is immutable.
+This also means that pointers cannot be used to create cycles - since a value must exist before a pointer is
+taken to it, a pointer can only point to things that were constructed before the pointer itself; and since a
+pointer cannot be reseated it cannot be made to point to a value that was created after it.
+
+It is possible to create pointers to pointers.
+In fact, pointers can be nested to an arbitrary depth.
+
 %% POINTERS
 \section{end}
 
