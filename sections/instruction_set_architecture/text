@@ -68,7 +68,7 @@ and
 \heading{VARIABLE-WIDTH DATA}
 
 The decision to include variable-width immediates as part of the instruction may seem a dubious design choice,
-but it works (as of 2018-02-05) and there are no plans currently.
+but it works (as of 2018-02-05) and there are no plans to change it.
 
 %% IMMEDIATES
 \section{end}
