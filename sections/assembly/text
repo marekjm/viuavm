@@ -103,7 +103,7 @@ This is a deficiency that will be fixed in the future.
 `.end' directive is used to signal an end of a previously opened directive that requires closing.
 An example of such a directive is `.function:'.
 
-
+%% DIRECTIVES
 \section{end}
 
 \heading{FUNCTIONS}{ref=assembly:functions}
@@ -206,6 +206,7 @@ The last line
 must appear on its own.
 Note the lack of a colon at the end of the token.
 
+%% DELIMITING FUNCTION BODIES
 \section{end}
 
 \heading{PARAMETERS}
@@ -237,6 +238,7 @@ The lifetime of this register set begins just after the \instruction{frame} inst
 and ends just after the \instruction{return} instruction causes the call frame containing it to be popped off
 the stack.
 
+%% PARAMETERS
 \section{end}
 
 \heading{RETURN VALUES}
@@ -252,8 +254,10 @@ section \ref{opcode:call}.
 Section \ref{storing_return_values} provides the detailed explanation of how to
 store return values.
 
+%% RETURN VALUES
 \section{end}
 
+%% DEFINITIONS
 \section{end}
 
 \heading{DECLARATIONS}
@@ -262,8 +266,10 @@ store return values.
 How to declare that a function will be available during linking, and
 that the assembler should just trust us that it exists.
 
+%% DECLARATIONS
 \section{end}
 
+%% FUNCTIONS
 \section{end}
 
 \heading{REGISTER NAMING}
@@ -272,6 +278,8 @@ that the assembler should just trust us that it exists.
 How to name registers with human-readable names, e.g. `index' or `size', instead of bare
 indexes - `1', `4', etc.
 
+%% REGISTER NAMING
 \section{end}
 
+%% VIUA VM ASSEMBLY LANGUAGE
 \section{end}
