@@ -1013,7 +1013,6 @@ def render_view(args):
         render_section('tooling', documented_instructions = documented_opcodes)
         render_section('the_environment', documented_instructions = documented_opcodes)
         render_section('instruction_set_architecture', documented_instructions = documented_opcodes)
-        # render_section('register_access', documented_instructions = documented_opcodes)
 
         print('-' * LINE_WIDTH)
         print()
