@@ -1022,6 +1022,13 @@ def render_view(args):
     print()
     section_tracker.begin()
 
+    render_file(
+        'instructions',
+        indent = 2 * DEFAULT_INDENT_WIDTH,
+        documented_instructions = documented_opcodes,
+    )
+    print()
+
     # Render documentation for all requested instructions.
     # If no instructions were explicitly requested then print the full documentation.
     first_opcode_being_documented = True
