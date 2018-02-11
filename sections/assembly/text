@@ -8,6 +8,52 @@ documentation for each instruction.
 A listing of all instructions can be found in section \ref{isa:instructions}.
 Instruction set architecture is described in section \ref{isa}.
 
+\heading{PROGRAMMING}
+\section{begin}
+
+\heading{CONTROL FLOW}
+\section{begin}
+
+\heading{SEQUENCING}
+\section{begin}
+%% SEQUENCING
+\section{end}
+
+\heading{SELECTION}
+\section{begin}
+%% SELECTION
+\section{end}
+
+\heading{ITERATION}
+\section{begin}
+%% ITERATION
+\section{end}
+
+\heading{PROCEDURAL ABSTRACTION}
+\section{begin}
+%% PROCEDURAL ABSTRACTION
+\section{end}
+
+\heading{RECURSION}
+\section{begin}
+%% RECURSION
+\section{end}
+
+\heading{CONCURRENCY}
+\section{begin}
+%% CONCURRENCY
+\section{end}
+
+\heading{NONDETERMINACY}
+\section{begin}
+%% NONDETERMINACY
+\section{end}
+
+%% CONTROL FLOW
+\section{end}
+
+%% PROGRAMMING
+\section{end}
 
 \heading{DIRECTIVES}
 \section{begin}
