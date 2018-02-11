@@ -14,6 +14,10 @@ Instruction set architecture is described in section \ref{isa}.
 \heading{CONTROL FLOW}
 \section{begin}
 
+Contents of this section are modelled after Chapter 6 "Control Flow"
+(Section 6.2 "Structured and Unstructred Flow") of Michael L. Scott's book
+Programming Language Pragmatics (ISBN 1-55860-442-1).
+
 \heading{SEQUENCING}
 \section{begin}
 %% SEQUENCING
