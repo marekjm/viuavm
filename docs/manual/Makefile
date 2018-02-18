@@ -2,7 +2,7 @@ all: text html pdf
 
 RENDER_COLUMNS=100
 
-.PHONY: watch
+.PHONY: watch clean
 
 text:
 	RENDER_COLUMNS=$(RENDER_COLUMNS) COLOR=no ./view.py > manual.txt
@@ -19,3 +19,10 @@ pdf: ps
 
 watch:
 	find ./sections ./opcodes ./introduction ./view.py -type f | entr make
+
+clean:
+	$(RM) *.ps
+	$(RM) *.pdf
+	$(RM) *.json
+	$(RM) *.html
+	$(RM) *.txt
