@@ -1,0 +1,335 @@
+\section{begin}
+
+This section is a reference for Viua VM assembly language.
+It discusses source code organisation and syntax.
+Reading this section may allow you to understand the SYNTAX and EXAMPLES sections in
+documentation for each instruction.
+
+A listing of all instructions can be found in section \ref{isa:instructions}.
+Instruction set architecture is described in section \ref{isa}.
+
+\heading{PROGRAMMING}
+\section{begin}
+
+\heading{CONTROL FLOW}
+\section{begin}
+
+Contents of this section are modelled after Chapter 6 "Control Flow"
+(Section 6.2 "Structured and Unstructred Flow") of Michael L. Scott's book
+Programming Language Pragmatics (ISBN 1-55860-442-1).
+
+\heading{SEQUENCING}
+\section{begin}
+%% SEQUENCING
+\section{end}
+
+\heading{SELECTION}
+\section{begin}
+%% SELECTION
+\section{end}
+
+\heading{ITERATION}
+\section{begin}
+%% ITERATION
+\section{end}
+
+\heading{PROCEDURAL ABSTRACTION}
+\section{begin}
+%% PROCEDURAL ABSTRACTION
+\section{end}
+
+\heading{RECURSION}
+\section{begin}
+%% RECURSION
+\section{end}
+
+\heading{CONCURRENCY}
+\section{begin}
+%% CONCURRENCY
+\section{end}
+
+\heading{NONDETERMINACY}
+\section{begin}
+%% NONDETERMINACY
+\section{end}
+
+%% CONTROL FLOW
+\section{end}
+
+%% PROGRAMMING
+\section{end}
+
+\heading{DIRECTIVES}
+\section{begin}
+
+\heading{BLOCK}
+
+`.block:' directive begins a block definition.
+Block definitions must end with the `.end' directive.
+
+A detailed description is provided in a later section.
+
+\heading{BSIGNATURE}
+
+`.bsignature:' declares that a block will be available at link time, even if it is an unresolved symbol in the
+current compilation unit.
+
+\heading{FUNCTION}{ref=assembly:directive:function}
+
+`.function:' directive begins a function definition.
+Function definitions must end with the `.end' directive.
+
+A detailed description is provided in section \ref{assembly:blocks:functions:delimiting}.
+
+\heading{SIGNATURE}{ref=assembly:directive:signature}
+
+`.signature:' declares that a function should be treated "as if" the assembler is
+able to resolve it.
+It can be thought about as a forward declaration of a function.
+
+The following code declares that symbol `foo/2' refers to a function name, and
+that the symbol will be available at a later time so the assembler should not reject the
+code:
+
+\wrap{begin}
+\indent{2}
+.signature: foo/2
+\dedent{2}
+\wrap{end}
+\break
+
+The symbol declared using this directive must be made available either during link time
+(if it is to be linked statically; static linking is described in
+section \ref{tooling:linker:static_linking}), or
+at runtime (if it is to be linked in dynamically; dynamic linking is described in
+section \ref{tooling:kernel:dynamic_linking}).
+
+\heading{CLOSURE}{ref=assembly:directive:closure}
+
+`.closure:' directive begins a closure definition.
+Closure definitions must end with the `.end' directive.
+
+\heading{INFO}
+
+`.info:' directive allows adding metadata to the produced binary.
+
+\heading{IOTA}
+
+`.iota:' directive sets the next value to be used for the `iota' symbol substitution.
+
+\heading{IMPORT}
+
+`.import:' directive requests that a module be statically linked to the currently compiled executable.
+
+\heading{MARK}
+
+`.mark:' directive sets a name for a point in a block, closure, or function body.
+This name then may be used instead of an instruction index in branching instructions.
+Marks are a compile-time-only feature and disappear after the source code has been converted to bytecode.
+At runtime the VM uses only bytecode indexes, not marks.
+
+NOTE FIXME
+\break
+\indent{2}
+The assembler is currently unable to encode markers in bytecode, even as a debugging aid.
+This is a deficiency that will be fixed in the future.
+\dedent{2}
+
+\heading{NAME}
+
+`.name:' directive sets a name for a register.
+Names are present only during compilation, and disappear after the source code has been converted to bytecode.
+At runtime the VM uses only indexes, not names.
+
+NOTE FIXME
+\break
+\indent{2}
+The assembler is currently unable to encode register names in bytecode, even as a debugging aid.
+This is a deficiency that will be fixed in the future.
+\dedent{2}
+
+\heading{END}{ref=assembly:directive:end}
+
+`.end' directive is used to signal an end of a previously opened directive that requires closing.
+An example of such a directive is `.function:'.
+
+%% DIRECTIVES
+\section{end}
+
+\heading{FUNCTIONS}{ref=assembly:functions}
+\section{begin}
+
+This section talks about functions.
+All code in Viua VM programs is contained in functions, therefore it is incredibly important
+to understand them.
+
+\heading{DEFINITIONS}
+\section{begin}
+
+This section talks about how to define functions.
+
+\heading{DELIMITING FUNCTION BODIES}{ref=assembly:blocks:functions:delimiting}
+\section{begin}
+
+A function definition is delimited by the `.function:' and `.end' tokens.
+See their documentation in sections \ref{assembly:directive:function} and
+\ref{assembly:directive:end} respectively.
+
+\indent{2}
+\reflow{off}
+\wrap{begin}
+.function: main/0
+    text %1 local "Hello World!"
+    print %1 local
+
+    izero %0 local
+    return
+.end
+\wrap{end}
+\reflow{on}
+\dedent{2}
+\break
+
+This example defines a function that prints "Hello World!" to the screen and returns 0.
+The first line
+
+\indent{2}
+\wrap{begin}
+.function: main/0
+\wrap{end}
+\dedent{2}
+\break
+
+contains the `.function:' token and the name of the function.
+In Viua assembly function names must have the following syntax:
+1/ a sequence of alphanumeric ASCII characters, colons, and underscores (this is the root part of the name),
+2/ a slash character,
+3/ the arity of the function (a non-negative integer number).
+
+For example, all following names are valid:
+
+\list{begin}
+\item
+main/0
+\item
+sqrt/1
+\item
+write/2
+\item
+vector::push_back/2
+\list{end}
+
+and all of these are invalid:
+
+\list{begin}
+\item
+main
+\break
+no arity
+\item
+foo/-1
+\break
+negative arity
+\item
+in/valid
+\break
+invalid character inside the name
+\item
+vector.push_back/2
+\break
+invalid character inside the name
+\list{end}
+
+The arity part may be empty.
+Functions with empty arity can be called with variable number of parameters.
+This is discouraged, however - passing a vector of values is the preferred way to pass variable number of parameters.
+
+The last line
+
+\indent{2}
+\wrap{begin}
+.end
+\wrap{end}
+\dedent{2}
+\break
+
+must appear on its own.
+Note the lack of a colon at the end of the token.
+
+%% DELIMITING FUNCTION BODIES
+\section{end}
+
+\heading{PARAMETERS}
+\section{begin}
+
+In Viua, functions do not declare the types of parameters they take; they only declare their own arity.
+The assembler will ensure that once extracted inside the function the parameters are used consistently with
+regard to the type (thanks to type inference).
+\break
+This means that types are not preserved across function boundaries.
+This is a deficiency that will be fixed somewhen in the future (FIXME).
+
+\heading{PASSING PARAMETERS}
+
+Parameters are passed into the function using either \instruction{param} or \instruction{pamv} instruction.
+
+\heading{EXTRACTING ARGUMENTS}
+
+Arguments are extracted using the \instruction{arg} instruction.
+
+\heading{ARGUMENTS REGISTER SET}
+
+Parameters passed to a function become its arguments and are stored in a special register set.
+The size of this register set depends on the function's arity - if the function takes 2 parameters, then the
+size of this register set will be 2, if the function takes 1 parameter it will be 1, and
+if the function takes no parameters it will be 0.
+
+The lifetime of this register set begins just after the \instruction{frame} instruction finishes executing,
+and ends just after the \instruction{return} instruction causes the call frame containing it to be popped off
+the stack.
+
+%% PARAMETERS
+\section{end}
+
+\heading{RETURN VALUES}
+\section{begin}
+
+When a function executes the \instruction{return} instruction its call frame is popped off the stack, and
+the value contained by the local register 0 is automatically used as the return value.
+Viua allows functions to return only one value, but multiple return values can be emulated by returning a
+vector of values.
+
+For more information refer to \instruction{call} instruction's documentation in
+section \ref{opcode:call}.
+Section \ref{storing_return_values} provides the detailed explanation of how to
+store return values.
+
+%% RETURN VALUES
+\section{end}
+
+%% DEFINITIONS
+\section{end}
+
+\heading{DECLARATIONS}
+\section{begin}
+
+How to declare that a function will be available during linking, and
+that the assembler should just trust us that it exists.
+
+%% DECLARATIONS
+\section{end}
+
+%% FUNCTIONS
+\section{end}
+
+\heading{REGISTER NAMING}
+\section{begin}
+
+How to name registers with human-readable names, e.g. `index' or `size', instead of bare
+indexes - `1', `4', etc.
+
+%% REGISTER NAMING
+\section{end}
+
+%% VIUA VM ASSEMBLY LANGUAGE
+\section{end}

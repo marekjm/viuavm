@@ -1,0 +1,8 @@
+This instruction operates on 64 bit signed integers.
+It is unreliable, in the sense that it uses the native int64_t type
+which incurs all the negative properties of no overflow checking, wraparounds, etc.
+However, it (the native type) is fast.
+
+
+If you need safe, overflow-checked, version of this instruction look into checked
+arithmetic on fixed-width bit strings.

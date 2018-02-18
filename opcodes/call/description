@@ -1,0 +1,47 @@
+Calls a function.
+
+\section{begin}
+\heading{STATICALLY DISPATCHED CALLS}
+
+The first syntax will call a function f/0 and discard its return value.
+The second syntax will call a function f/0 and store its return value in local register 0.
+
+\heading{DYNAMICALLY DISPATCHED CALLS}
+
+The third syntax will call a function that is referenced by the value stored in local register 1 and
+discard the return value of that call.
+\break
+The fourth syntax will call a function that is referenced by the value stored in local register 1 and
+store the return value of that call in local register 0.
+
+A function can be "stored" in a register using the \instruction{function} instruction described in
+section \ref{opcode:function}.
+
+\heading{STORING RETURN VALUES}{ref=storing_return_values}
+
+To save the return value of a call use a register instead of void as the target operand
+of the \instruction{call} instruction.
+For example:
+
+\wrap{begin}
+\indent{2}
+call void foo/0
+\dedent{2}
+\wrap{end}
+\break
+
+will not save foo/0's return value, but
+
+\wrap{begin}
+\indent{2}
+call %2 local foo/0
+\dedent{2}
+\wrap{end}
+\break
+
+will save it in local register 2.
+
+Syntaxes \syntax{0} (0) and \syntax{2} (2) discard the return value, and
+\syntax{1} (1) and \syntax{3} (3) save it.
+
+\section{end}

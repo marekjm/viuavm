@@ -1,0 +1,1 @@
+mul %output local %lhs local %rhs local

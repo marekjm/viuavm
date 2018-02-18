@@ -1,0 +1,11 @@
+Compares two numerical values (either a float, or an integer).
+If the left-hand side operand is an integer compares them as integers;
+if the left-hand side operand is a float compares them as floats.
+
+The result is the value of the following operation:
+
+\reflow{off}
+\indent{4}
+result = lhs <= rhs
+\reflow{on}
+\dedent{4}

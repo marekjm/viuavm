@@ -1,0 +1,13 @@
+This instruction is used to extract arguments passed to the function and saved in the call frame.
+The second operand is the index of the argument saved in the call frame, and
+the first operand is the register index to save.
+\break
+For example, the following code will extract the first argument and
+put it in local register 1:
+
+\wrap{begin}
+\indent{2}
+arg %1 local %0
+\dedent{2}
+\wrap{end}
+\break

@@ -1,0 +1,5 @@
+This section contains a reference for Viua VM instruction set, and
+has a description of every available instruction; with documented inputs, outputs, and exceptions.
+
+It is loosely modelled after Appendix A to William Hohl's 2009 book "ARM Assembly Language: Fundamentals and
+Techniques" (ISBN 9781439806104).

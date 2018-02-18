@@ -1,0 +1,4 @@
+call void f/0
+call %0 local f/0
+call void %1 local
+call %0 local %1 local

@@ -1,0 +1,5 @@
+Stores a function reference in a register.
+
+Use this instruction to "store" a function in a register.
+The value stored can then be used in \instruction{call} instructions to decide which function
+to invoke at runtime, rather than during compilation.

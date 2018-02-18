@@ -1,0 +1,12 @@
+This instruction may be used to implement a RAII approximation.
+You can create a value that needs to be finalised somehow (e.g. a socket needs to be
+closed) you can
+spawn the value,
+obtain a pointer to it,
+defer a call to a closing function and pass the value as a parameter by move.
+
+The value is still available because the deferred call is scheduled after the
+current function ends so the pointer you leave for yourself is still valid.
+
+Also, this ensures exception safety - deferred functions are called even if the
+frame is popped during stack unwinding after an exception is thrown.

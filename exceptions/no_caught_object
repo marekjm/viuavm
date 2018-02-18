@@ -1,0 +1,7 @@
+NO CAUGHT OBJECT
+
+\indent{}
+No exception was caught.
+This exception is thrown when the \instruction{draw} instruction is executed but there is no value it could
+fetch.
+\dedent{}

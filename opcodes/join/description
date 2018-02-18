@@ -1,0 +1,9 @@
+Used to join a different process.
+
+This instruction causes the executing process to become suspended until the process that
+is the target of the instruction (whose PID is given in the second operand) finishes
+running.
+
+After the target finishes running, this instruction will either transfer a return value
+of the joined process into the current process, or transfer the exception that killed
+the joined process into the current one (by rethrowing it).

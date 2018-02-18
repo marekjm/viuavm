@@ -1,0 +1,31 @@
+Spawns a new process.
+
+When a new process is spawned it begins executing the function that was passed as the
+second operand to the \instruction{process} instruction (full initialisation procedure
+of new processes is described in section \ref{environment:processes:initialisation}).
+
+Spawned process can be either "detached" or "joinable".
+Each of these two states is described in more details below.
+
+\heading{DETACHED PROCESSES}
+
+A detached process (spawned using the \syntax{1} syntax) cannot be joined
+using the \instruction{join} instruction (described in section \ref{opcode:join}).
+Detached processes are independent of their parent processes and
+can run even after main function finishes.
+
+\heading{JOINABLE PROCESSES}
+
+A joinable process (spawned using the \syntax{0} syntax) can be joined to obtain
+the result of its execution (either a return value, or an exception).
+
+\section{begin}
+
+\heading{RELATION TO FUTURES AND PROMISES}{noise=true}
+
+A PID of a joinable process may be treated as a "future", and
+the process identified by it may treat its final \instruction{return} instruction as
+fulfilling a "promise".
+
+%% JOINABLE PROCESSES
+\section{end}

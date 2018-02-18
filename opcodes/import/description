@@ -1,0 +1,4 @@
+Import a module into the running program (perform dynamic linkage).
+
+After a module is imported all symbols that it contains become immediately
+available to the running program.

@@ -1,0 +1,6 @@
+receive %target local 1ms
+receive %target local 1s
+receive %target local infinity
+receive void 1ms
+receive void 1s
+receive void infinity

@@ -1,0 +1,80 @@
+\section{begin}
+
+Viua is a CISC machine, and its instructions vary in complexity from very simple (e.g. adding two
+integers) to complex and expensive ones (e.g. performing signed saturating multiplication).
+
+\heading{INSTRUCTION CATEGORIES}
+\section{begin}
+
+Instructions provided by Viua VM can be split into the general categories described below.
+This description is purely theoretical and does not manifest in the encoding of bytecode or
+execution of instructions.
+
+\heading{DATA MOVEMENT}
+
+This category includes instructions that move data between registers in the same process as well as
+instructions that move values across process boundaries (using message passing described in section
+\ref{environment:processes:communication:message_passing}).
+
+\heading{COMPUTATION}
+
+This category includes instructions that perform computations - those that "do stuff" to put it in less fancy
+terms, and because "computation" here is meant as a more general concept than simply arithmetic.
+For example, modifying text values or pushing new items onto a vector is also thrown under the "computation"
+umbrella.
+
+\heading{CONTROL TRANSFER}
+
+This category includes instructions that alter the control flow of the program.
+Alteration of the control flow includes performing jumps, calling functions, spawning processes, and
+throwing exceptions.
+
+%% INSTRUCTION CATEGORIES
+\section{end}
+
+\heading{OPERANDS}
+\section{begin}
+
+Operands can be supplied to Viua VM instructions either in registers or as immediates.
+
+\heading{REGISTER OPERANDS}
+\section{begin}
+
+%% REGISTER OPERANDS
+\section{end}
+
+\heading{IMMEDIATES}
+\section{begin}
+
+Immediate operands come in several flavours.
+Some are symbols (e.g. function names to call), some are fixed-width data (e.g. integers and addresses), and
+some are variable-width data (e.g. text).
+
+\heading{SYMBOLS}
+
+Symbol operands are used with control-flow instructions, and encode function names.
+They are variable-width immediates, but are assigned given their own category for conceptual reasons - a piece
+of text is something entirely different (on the conceptual level, even if the encoding is largely similar)
+than a function name.
+
+Symbol operands are also used in constructions of
+\instruction{function} (in section \ref{opcode:function}),
+\instruction{closure} (in section \ref{opcode:closure}),
+and
+\instruction{atom} (in section \ref{opcode:atom}) instructions.
+
+\heading{FIXED-WIDTH DATA}
+
+\heading{VARIABLE-WIDTH DATA}
+
+The decision to include variable-width immediates as part of the instruction may seem a dubious design choice,
+but it works (as of 2018-02-05) and there are no plans to change it.
+
+%% IMMEDIATES
+\section{end}
+
+%% OPERANDS
+\section{end}
+
+%% INSTRUCTION SET ARCHITECTURE
+\section{end}

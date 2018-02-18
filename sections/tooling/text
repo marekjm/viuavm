@@ -1,0 +1,420 @@
+\section{begin}
+
+This section discusses tools provided in the standard distribution.
+
+\heading{ASSEMBLER}
+\section{begin}
+
+Source code must be compiled to bytecode before execution on Viua VM kernel.
+Assembler does the job of converting source files into the executable bytecode files (or libraries).
+
+\heading{COMPILE TIME VERIFICATION}
+\section{begin}
+
+Assembler includes a simple static analyser and type checker.
+
+\heading{TYPE CHECKER}
+\section{begin}
+
+The type checker will reject programs in which it can find errors at compile time.
+For example, the following code will clearly produce an error:
+
+\reflow{off}
+\indent{4}
+text %1 local "Hello World!"
+integer %2 local 42
+add %3 local %1 local %2 local
+\dedent{4}
+\reflow{on}
+\break
+
+The third instruction (\instruction{add}) would cause a type error at runtime as it is not possible to add 42 to "Hello
+World!".
+The type checker will notice this and reject the program, producing an appropriate error message.
+
+\heading{TYPE INFERENCE}
+
+Viua VM assembly is a language with strong, mostly static typing, and type inference.
+Not all types have to be explicitly declared: assembler will infer types when they are not expressed in source
+code from the way the values defined by them are used.
+In other words - the assembler will enforce consistency of the assumptions about types of values expressed in
+the source code.
+
+\heading{TYPES OF FUNCTION PARAMETERS AND RETURNS (FIXME)}
+
+Functions in Viua VM assembly (as of 2018-01-17) do not declare types of their parameters (only the number of
+them), and do not declare the return type either.
+Type checker is thus unable to ensure type consistency across function boundaries.
+This deficiency will be fixed in the future. FIXME
+
+\section{end}
+
+\heading{STATIC ANALYSER}
+\section{begin}
+
+Static analyser will simulate how a piece of source code would be executed and check if any errors would be
+thrown.
+This mostly means following branches, and verifying that register accesses are correct.
+
+\section{end}
+
+\section{end}
+
+\heading{LINKER}{ref=tooling:linker}
+\section{begin}
+
+Linker cannot be invoked explicitly, and is only usable via the assembler.
+Due to this, the first file passed as input must always contain source code and
+not bytecode.
+For example, this will compile and link correctly:
+
+\wrap{begin}
+\indent{2}
+viua-asm main.asm module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+because the first file contains valid Viua assembly source code.
+\break
+The following will most likely fail (unless you use non-standard file extensions and
+store Viua assembly source code in files that do not have the `.asm' extension):
+
+\wrap{begin}
+\indent{2}
+viua-asm main.viua module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+In this case the assembler will most probably print the following error:
+
+\wrap{begin}
+\indent{2}
+main.viua:1:1: error: expected a function or a block definition (or signature), or a newline
+
+>>>> 1 VIUAL����f/0����Hello, World!d������
+       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\dedent{2}
+\wrap{end}
+\break
+
+\heading{STATIC LINKING}{ref=tooling:linker:static_linking}
+\section{begin}
+
+Static linking is performed by the assembler as the last part of the compilation
+process.
+To link a module statically add it to the list of files the assembler takes as input.
+For example, the following command will compile `main.asm' module and statically link
+`modulea.viua' and `moduleb.viua' to it:
+
+\reflow{off}
+\indent{4}
+viua-asm main.asm modulea.viua moduleb.viua
+\dedent{4}
+\reflow{on}
+\break
+
+Viua supports both static (compile-time) linkage and dynamic (runtime) linkage.
+Dynamic linkage is implemented by the kernel, and is discussed in a section
+\ref{tooling:kernel:dynamic_linking}.
+
+\heading{SYMBOL VISIBILITY}
+
+All symbols available in a module are visible to all modules that will link it.
+There is currently no mechanism available to restrict the visibility of the symbols
+contained by the module.
+
+\heading{SYMBOL AVAILABILITY}
+\section{begin}
+
+When compiling a file the assembler must be able to resolve all symbols, or
+it will reject the code.
+For example, when the assembler encounters the following code:
+
+\wrap{begin}
+\indent{2}
+call void fn/0
+\dedent{2}
+\wrap{end}
+\break
+
+it will attempt to resolve the symbol `fn/0' and throw an error if it fails to do so.
+There are several ways to make a symbol available to the assembler, or
+make it treat the symbol "as if" it was resolvable and to defer the resolving until
+link-time or runtime (described in section \ref{tooling:kernel:dynamic_linking}).
+
+\heading{IMPLEMENTING A SYMBOL}{noise=true}
+
+The first way to make the symbol resolvable is to implement the function it refers to in
+the same source code file.
+Section \ref{assembly:functions} describes how to write a function.
+
+\heading{DECLARING A SYMBOL}{noise=true}
+
+To tell the assembler that a symbol will be resolvable at either run- or linking-time
+use the `.signature:' directive (described in
+section \ref{assembly:directive:signature}).
+This is most useful when:
+
+\list{begin}
+\item
+the symbol is in a module that will be linked statically to the current module but
+the current module is not the main file of the program
+\item
+the symbol is in the module that will be linked dynamically and thus will not be
+available until runtime
+\list{end}
+
+The linker will not complain if the declared symbol is not available during link time.
+If it cannot resolve the symbol, the resolving will be deferred until runtime (described
+in section \ref{tooling:kernel:dynamic_linking}).
+
+\heading{ADDING A MODULE CONTAINING THE SYMBOL TO ASSEMBLER'S INPUT FILE LIST}{noise=true}
+
+To make the symbol available without declaring it, add the module containing it to the
+list of modules the assembler should link to the current module.
+
+\wrap{begin}
+\indent{2}
+viua-asm main.asm module.viua
+\dedent{2}
+\wrap{end}
+\break
+
+The above command will automatically make all symbols in `module.viua' available to the
+code in `main.asm'.
+
+\section{end}
+
+\section{end}
+
+\section{end}
+
+\section{end}
+
+\heading{KERNEL}
+\section{begin}
+
+Kernel is a program that executes Viua VM bytecode.
+To run a program compiled into Viua VM bytecode you need both the kernel and
+the executable bytecode.
+Then, you can invoke the program like this:
+
+\reflow{off}
+\indent{4}
+viua-vm program.out --some flags
+\dedent{4}
+\reflow{on}
+\break
+
+The kernel will the begin running the program, starting with the `main' function.
+
+\heading{DYNAMIC LINKING}{ref=tooling:kernel:dynamic_linking}
+\section{begin}
+
+Symbols that were not resolved during compilation, but were declared, are resolved at
+runtime.
+
+\heading{WHEN SYMBOLS ARE RESOLVED}
+
+A symbol is resolved the first time it is accessed (which is a questionable design
+choice, and can lead to the program running for quite some time before the error is
+detected).
+
+\heading{WHEN MODULES ARE LINKED}
+
+Modules provide function implementations.
+To link a module at runtime use the \instruction{import} instruction described in
+section \ref{opcode:import}.
+
+\section{end}
+
+\heading{ENVIRONMENT VARIABLES}
+\section{begin}
+
+There are environment variables that may be used to enable, disable, or otherwise affect certain kernel features.
+They are listed and discussed below.
+
+\heading{VIUA_ENABLE_TRACING}
+\section{begin}
+
+Setting this variable to `yes' (`VIUA_ENABLE_TRACING=yes') will make the kernel dump execution trace of the running program.
+Note that the trace is verbose, and a line is dumped to stderr for *every* executed instruction.
+This means that traces can quickly get long.
+\break
+However, due to the verbosity and per-executed-instruction granularity they can be a great aid in debugging (of both programs
+running on the VM, and the VM itself).
+
+\wrap{begin}
+\indent{4}
+$ viua-asm sample/asm/text/hello_world.asm
+$ viua-vm a.out
+Hello World!
+$ VIUA_ENABLE_TRACING=yes viua-vm a.out
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15104, depth = 1 ] ress
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15106, depth = 1 ] frame
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15113, depth = 1 ] call main/0
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000003000, jump_base = 0x605000c150e0, address = 0x605000d150e0, depth = 2 ] text
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000003000, jump_base = 0x605000c150e0, address = 0x605000d150f5, depth = 2 ] print
+Hello World!
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000003000, jump_base = 0x605000c150e0, address = 0x605000d150fc, depth = 2 ] izero
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000003000, jump_base = 0x605000c150e0, address = 0x605000d15103, depth = 2 ] return from main/0 with no deferred
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000003000, jump_base = 0x605000c150e0, address = 0x605000d15103, depth = 2 ] return from main/0 after deferred
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15121, depth = 1 ] move
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d1512e, depth = 1 ] halt
+\dedent{4}
+\wrap{end}
+\break
+
+\heading{TRACE LINE EXPLAINED}
+\section{begin}
+
+Trace line contains several different pieces of information.
+
+\wrap{begin}
+\indent{4}
+[ scheduler = 0x80e000000000, process = 0x913000000000, stack = 0x40b000000000, frame = 0x306000000780, jump_base = 0x605000c150e0, address = 0x605000d15104, depth = 1 ] ress
+\dedent{4}
+\wrap{end}
+\break
+
+\heading{SCHEDULER}
+
+The `scheduler = ...' part identifies the scheduler that the process for which this line was emitted is running on.
+Depending on how many schedulers the VM is running there can be many different schedulers.
+
+Also, a process does not need to run on the same scheduler it was spawned on.
+If the VM detects that the spawning scheduler is overloaded (i.e. that it runs more than its fair share of all running processes) the
+process will be migrated to a different scheduler (a one with lighter load).
+
+\heading{PROCESS}
+
+The `process = ...' part identifies a process for which this line was generated.
+
+\heading{STACK}
+
+In Viua VM, a process may contain one active stack, and several suspended stacks.
+Suspended stacks may be added, for example, by \instruction{defer} instructions (then, the
+active stack is suspended when a function exits and stacks added by \instruction{defer} instructions are run).
+
+The `stack = ...' part identifies the stack that was active in the process when the trace line was emitted.
+
+\heading{FRAME}
+
+The `frame = ...' part identifies the top-most frame on the stack that was active when the trace line was emitted.
+It is useful when you want to track a bug that occurs on the frame boundary (just after or before a call or a return).
+
+\heading{JUMP BASE}
+
+The `jump_base = ...' part identifies a base that is used for resolving jumps during runtime.
+Jump bases are different for different modules, so you can use this to track module boundaries (from which module came the function that
+is executed in the current frame).
+
+\heading{ADDRESS}
+
+The `address = ...' part identifies the address at which the currently executed instruction lives.
+
+\heading{DEPTH}
+
+The `depth = ...' part indicates the depth of the stack in the moment the trace line was emitted.
+
+\section{end}
+
+\section{end}
+
+\heading{VIUA_VP_SCHEDULERS}
+
+Configures the number of virtual process schedulers the VM will launch at startup.
+By default the VM launches 2 virtual process schedulers.
+
+\wrap{begin}
+\indent{2}
+$ ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=2]
+$ VIUA_VP_SCHEDULERS=4 ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=4]
+\dedent{2}
+\wrap{end}
+
+Increase the number of virtual process schedulers if your programs are CPU-intensive, and
+are mostly pure bytecode.
+
+\heading{VIUA_FFI_SCHEDULERS}
+
+Configures the number of FFI schedulers the VM will launch at startup.
+By default the VM launches 2 FFI schedulers.
+
+\wrap{begin}
+\indent{2}
+$ ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=2] [sched:vp=2]
+$ VIUA_FFI_SCHEDULERS=4 ./build/bin/vm/kernel --info
+0.9.0.969 [sched:ffi=4] [sched:vp=2]
+\dedent{2}
+\wrap{end}
+
+Increase the number of FFI schedulers if your programs issue many FFI calls from many virtual
+processes.
+A FFI call blocks only the process that issued it and an FFI scheduler executes only a single
+call at once, so if you increase the number of schedulers you will be able to run more calls
+simultaneously.
+
+\heading{VIUAPRELINK [DEPRECATED]}
+
+A colon-separated list of bytecode modules to link before the kernel starts executing the `main' function.
+\break
+This environment variable is DEPRECATED.
+
+\heading{VIUAPREIMPORT [DEPRECATED]}
+
+A colon-separated list of FFI modules to link before the kernel starts executing the `main' function.
+\break
+This environment variable is DEPRECATED.
+
+\section{end}
+
+\section{end}
+
+\heading{DISASSEMBLER}
+\section{begin}
+
+Disassembler may be used to convert compiled bytecode into assembly source code.
+
+It has little chance of producing exactly the source code that was used to compile the bytecode binary.
+The semantics *will* be exactly the same, but the disassembler will not be able to reproduce:
+
+\list{begin}
+\item
+register names
+\item
+attributes
+\item
+closures
+\list{end}
+
+\heading{DISASSEMBLING CLOSURES (FIXME)}
+
+Closures will be disassembled as ordinary functions which will most likely cause them to be rejected
+if you tried to compile the disassembled code, as the static analyser would see that the function tries to
+access undefined registers - these registers will not be undefined at runtime, and with proper annotations
+(that are supplied by the programmer, by using `.closure:' instead of `.function:') the static analyser would
+accept them, but the information what function is a closure is lost during compilation.
+
+The fact that the disassembler is unable to extract this information is a deficiency of the assembler which
+does not encode it in the binaries it produces.
+
+\heading{DISASSEMBLING METADATA (FIXME)}
+
+Metadata such as register names, attributes, etc. that is present in the original source code as needed for
+compilation is lost after the compilation is done and is not included in the resulting binaries.
+The reason for this is that such information is useless at runtime.
+
+However, it may be useful during debugging or disassembling.
+The fact that the assembler does not encode such debugging information in binaries is a deficiency.
+It should be possible to request inclusion of debugging information in the resulting binary by using a flag
+(e.g. `-g') during compilation.
+
+\section{end}
+
+\section{end}

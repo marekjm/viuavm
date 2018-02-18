@@ -1,0 +1,438 @@
+\section{begin}
+
+This section describes the processes and procedures followed by the Viua VM assembly
+when it executes programs.
+It also describes program organisation from the VM's point of view, and
+talks about mechanisms that it makes available to programmers.
+
+\heading{RUNTIME}
+\section{begin}
+%% RUNTIME
+\section{end}
+
+\heading{PROGRAM ORGANISATION}
+\section{begin}
+
+Programs in Viua VM are organised into concurrently running processes.
+Each process runs a function.
+
+Programs being execution from the main function, and with a single process.
+
+\heading{MAIN FUNCTION}
+
+There are several flavours of the main function.
+Just as C++ defines
+
+\wrap{begin}
+\indent{2}
+int main();
+int main(int args, char* argv[]);
+\dedent{2}
+\wrap{end}
+\break
+
+as possible entry points, Viua VM defines
+
+\wrap{begin}
+\indent{2}
+.function: main/0
+.function: main/1
+.function: main/2
+\dedent{2}
+\wrap{end}
+\break
+
+Main function is required to return an integer exit code.
+
+The `main/1' main function receives one argument: a vector of strings representing the parameters the
+program received on the command line with name with which the program was invoked inserted as the first
+entry.
+The `main/2' main function receives two arguments: 1/ a string containing the name of the program as it
+was called (which would be `argv[0]' in C++), and 2/ a vector of strings representing the parameters the
+program received on the command line.
+
+Vectors are described in section \ref{environment:data_types:vector}, and
+strings in section \ref{environment:data_types:string}.
+
+%% PROGRAM ORGANISATION
+\section{end}
+
+\heading{PROCESSES}
+\section{begin}
+
+\heading{INITIALISATION}{ref=environment:processes:initialisation}
+\section{begin}
+%% INITIALISATION
+\section{end}
+
+\heading{EXECUTION}
+\section{begin}
+
+\heading{NORMAL CALLS}
+\section{begin}
+
+Using the \instruction{call} instruction described in section \ref{opcode:call}.
+
+%% NORMAL CALLS
+\section{end}
+
+\heading{DEFERRED CALLS}
+\section{begin}
+
+Using the \instruction{defer} instruction described in section \ref{opcode:defer}.
+
+%% DEFERRED CALLS
+\section{end}
+
+\heading{SPAWNING NEW PROCESSES}
+\section{begin}
+
+Using the \instruction{process} instruction described in section \ref{opcode:process}.
+
+%% SPAWNING NEW PROCESSES
+\section{end}
+
+\heading{THE CALL STACK}
+\section{begin}
+
+\heading{MULTIPLE STACKS}
+\section{begin}
+%% MULTIPLE STACKS
+\section{end}
+
+%% THE CALL STACK
+\section{end}
+
+%% EXECUTION
+\section{end}
+
+\heading{SHUT DOWN}{ref=environment:processes:shut_down}
+\section{begin}
+%% SHUT DOWN
+\section{end}
+
+\heading{ERROR HANDLING}
+\section{begin}
+
+\heading{EXCEPTIONS}
+\section{begin}
+
+\heading{THROWING}
+\section{begin}
+%% THROWING
+\section{end}
+
+\heading{CATCHING}
+\section{begin}
+%% CATCHING
+\section{end}
+
+\heading{STACK UNWINDING}{ref=environment:processes:error_handling:exceptions:stack_unwinding}
+\section{begin}
+%% STACK UNWINDING
+\section{end}
+
+%% EXCEPTIONS
+\section{end}
+
+\heading{WATCHDOG}
+\section{begin}
+%% WATCHDOG
+\section{end}
+
+%% ERROR HANDLING
+\section{end}
+
+\heading{COMMUNICATION}
+\section{begin}
+
+\heading{MESSAGE PASSING}{ref=environment:processes:communication:message_passing}
+\section{begin}
+%% MESSAGE PASSING
+\section{end}
+
+\heading{SIGNALS}
+\section{begin}
+
+Signals are not yet implemented.
+
+%% SIGNALS
+\section{end}
+
+\heading{INTERRUPTS}
+\section{begin}
+
+Interrupts are not yet implemented.
+
+%% INTERRUPTS
+\section{end}
+
+%% COMMUNICATION
+\section{end}
+
+%% PROCESSES
+\section{end}
+
+\heading{COMMUNICATION WITH THE OUTSIDE WORLD}
+\section{begin}
+
+\heading{I/O}
+\section{begin}
+
+\heading{STANDARD STREAMS}
+\section{begin}
+
+\heading{STANDARD INPUT}
+\section{begin}
+%% STANDARD INPUT
+\section{end}
+
+\heading{STANDARD OUTPUT}
+\section{begin}
+%% STANDARD INPUT
+\section{end}
+
+\heading{STANDARD ERROR}
+\section{begin}
+%% STANDARD ERROR
+\section{end}
+
+%% STANDARD STREAMS
+\section{end}
+
+\heading{FILE I/O}
+\section{begin}
+%% FILE I/O
+\section{end}
+
+\heading{NETWORK I/O}
+\section{begin}
+%% NETWORK I/O
+\section{end}
+
+\heading{GENERIC I/O}
+\section{begin}
+%% GENERIC I/O
+\section{end}
+
+%% I/O
+\section{end}
+
+%% COMMUNICATION WITH THE OUTSIDE WORLD
+\section{end}
+
+\heading{DATA TYPES}{ref=environment:data_types}
+\section{begin}
+
+Viua provides several built-in data types.
+User-defined ones can be built on top of them.
+
+\heading{PRIMITIVE TYPES}
+\section{begin}
+
+\heading{NUMERIC TYPES}{ref=environment:data_types:numeric}
+\section{begin}
+
+Viua provides two basic numeric types: integers, and floating point numbers.
+Both these types are just thin wrappers around the platform-provided types.
+This means that they are quite efficient ("quite" because we still have to factor in the
+overhead of the VM), but not reliable - their semantics are not enforced by the VM so
+the behaviour of the program using them may vary depending on which platform it runs.
+
+For floating point numbers there is no escape from platform-provided types (as of 03-01-2018), but
+for integers there is - Viua provides a bits type (described in section
+\ref{environment:data_types:bits}) and several instructions that operate on its bit patterns
+with well-defined semantics, implementing wrapping, saturating, and checked integer arithmetic for
+signed and unsigned integers.
+
+To manipulate values of numeric types use instructions from the "arithmetic" group:
+
+\list{begin}
+\item
+    \instruction{add} (\ref{opcode:add})
+\item
+    \instruction{sub} (\ref{opcode:sub})
+\item
+    \instruction{mul} (\ref{opcode:mul})
+\item
+    \instruction{div} (\ref{opcode:div})
+\list{end}
+
+Values of numeric types can be compared using the following instructions:
+
+\list{begin}
+\item
+    \instruction{lt} (\ref{opcode:lt})
+\item
+    \instruction{lte} (\ref{opcode:lte})
+\item
+    \instruction{gt} (\ref{opcode:gt})
+\item
+    \instruction{gte} (\ref{opcode:gte})
+\item
+    \instruction{eq} (\ref{opcode:mul})
+\list{end}
+
+All of these instructions work on any combination of numeric types: the right-hand side operand's value
+is converted to the type of the left-hand side's operand before comparison.
+
+\heading{INTEGER}{ref=environment:data_types:numeric:integer}
+\section{begin}
+
+Integer values are 64 bit wide, signed integers.
+They are implemented using primitive type provided by the platform so their semantics are not
+well-defined in the VM but they are fast.
+For integers with well-defined semantics see section \ref{environment:data_types:bits}.
+
+To construct an integer value use \instruction{izero} (described in section \ref{opcode:izero}), or
+\instruction{integer} (described in \ref{opcode:integer}).
+To manipulate integer values use:
+
+\list{begin}
+\item
+    \instruction{iinc} (\ref{opcode:iinc})
+\item
+    \instruction{idec} (\ref{opcode:idec})
+\item
+    \instruction{idec} (\ref{opcode:idec})
+\list{end}
+
+and instructions from the "arithmetic" group.
+
+%% INTEGER
+\section{end}
+
+\heading{FLOATING POINT}{ref=environment:data_types:numeric:floating_points}
+\section{begin}
+
+Floating point values are 64 bit floating pointer numbers.
+They are implemented using platform-provided primitive type.
+
+To construct a floating point value use \instruction{float} (described in section
+\ref{opcode:float}).
+To manipulate floating point values use instructions from the "arithmetic" group.
+
+%% FLOATING POINT
+\section{end}
+
+%% NUMERIC TYPES
+\section{end}
+
+\heading{BITS}{ref=environment:data_types:bits}
+\section{begin}
+
+Bits provide the expected bit operators (shifts, rotates, and logic operations), and
+implement arbitrary precision signed- and unsigned integers.
+
+On its own, the bits type is just that - a string of bits.
+However, there are instructions that treat bits values as integers and which implement saturating, checked,
+and wrapping arithmetic operations (for both signed and unsigned integers).
+Signed integers are encoded using two's complement representation.
+
+%% BITS
+\section{end}
+
+\heading{STRING}{ref=environment:data_types:string}
+\section{begin}
+
+A string is just a string of bytes, without any particular structure.
+It can be used to represent ASCII text, but this usage is not recommended (there is a text type for
+representing text, described in section \ref{environment:data_types:text}).
+
+%% STRING
+\section{end}
+
+\heading{TEXT}{ref=environment:data_types:text}
+\section{begin}
+
+Text is a data type designed to hold text values.
+It is a sequence of UTF-8 encoded Unicode codepoints.
+
+%% TEXT
+\section{end}
+
+\heading{ATOM}{ref=environment:data_types:atom}
+\section{begin}
+
+An Atom is a value that represents itself.
+See description of \instruction{atom} instruction in section \ref{opcode:atom}.
+
+%% ATOM
+\section{end}
+
+%% PRIMITIVE TYPES
+\section{end}
+
+\heading{AGGREGATE TYPES}
+\section{begin}
+
+\heading{VECTOR}{ref=environment:data_types:vector}
+\section{begin}
+
+A vector is a collection of values, indexed by a non-negative integer.
+Vectors can be nested.
+
+Currently (as of 2018-02-01) vectors in Viua VM can have at most 2^64 items.
+
+%% VECTOR
+\section{end}
+
+\heading{STRUCT}{ref=environment:data_types:struct}
+\section{begin}
+%% STRUCT
+\section{end}
+
+%% AGGREGATE TYPES
+\section{end}
+
+\heading{POINTERS}{ref=environment:data_types:pointers}
+\section{begin}
+
+Pointers can be created using the \instruction{ptr} instruction (see section \ref{opcode:ptr}).
+
+Pointers in Viua point to values, not to locations.
+This is in stark contrast to pointers in C or C++, where they point to memory locations.
+In other words, pointers in Viua track the values they point to: when a value is moved to a different
+register (even if it is in a different register set), or moved to a closure or a deferred function the
+pointer still points to that value.
+
+Another feature provided by pointers is that they expire.
+When the value a pointer points to is deleted the pointer is marked as "expired" (no longer valid), and
+any access through that pointer results in an exception being thrown by the VM.
+You can still write programs that will have dangling pointers, but you can recover if you accidentally try to
+use such a pointer to access a value.
+Moving (or otherwise manipulating) expired pointers does not throw an exception, only using the pointer to
+access a value does.
+
+Pointers cannot be created uninitialised.
+A pointer is constructed from a value, and trying to construct it from an empty register will throw an
+exception.
+
+Pointers cannot be "reseated".
+Once a pointer is constructed and starts pointing to some value it cannot be made to point to a different one,
+the binding established at construction time is immutable.
+This also means that pointers cannot be used to create cycles - since a value must exist before a pointer is
+taken to it, a pointer can only point to things that were constructed before the pointer itself; and since a
+pointer cannot be reseated it cannot be made to point to a value that was created after it.
+
+It is possible to create pointers to pointers.
+In fact, pointers can be nested to an arbitrary depth.
+
+%% POINTERS
+\section{end}
+
+%% DATA TYPES
+\section{end}
+
+\heading{STANDARD LIBRARY}
+\section{begin}
+
+Viua VM provides a standard library.
+The library provides basic functionality that may be useful to a wide array of different programs and
+systems.
+
+%% STANDARD LIBRARY
+\section{end}
+
+%% THE ENVIRONMENT
+\section{end}

@@ -1,0 +1,4 @@
+Pops the current call frame off the stack.
+
+Before the frame is popped, all deferred calls scheduled by the \instruction{defer} instruction are executed
+till completion.

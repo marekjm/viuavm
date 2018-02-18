@@ -1,0 +1,9 @@
+Receive a message.
+Pops the first message in the message queue.
+
+`\syntax{3}`, `\syntax{4}`, and `\syntax{5}` will pop the first message in the queue but immediately discard
+it.
+
+The timeouts (1s, 1ms, and infinity) specify for how long the VM should suspend the process if no message is
+available in the queue.
+These values are supplied by the programmer at compile time and are impossible to set dynamically (yet).
