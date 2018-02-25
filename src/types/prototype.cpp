@@ -53,7 +53,9 @@ viua::types::Prototype* viua::types::Prototype::attach(const string& function_na
 
 bool viua::types::Prototype::accepts(const string& method_name) const { return methods.count(method_name); }
 
-string viua::types::Prototype::resolves_to(const string& method_name) const { return methods.at(method_name); }
+string viua::types::Prototype::resolves_to(const string& method_name) const {
+    return methods.at(method_name);
+}
 
 viua::types::Prototype::Prototype(const string& tn) : prototype_name(tn) {}
 

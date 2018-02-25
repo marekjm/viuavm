@@ -141,7 +141,9 @@ static vector<string> load_string_list(ifstream& in) {
     return strings_list;
 }
 void Loader::load_external_signatures(ifstream& in) { external_signatures = load_string_list(in); }
-void Loader::load_external_block_signatures(ifstream& in) { external_signatures_block = load_string_list(in); }
+void Loader::load_external_block_signatures(ifstream& in) {
+    external_signatures_block = load_string_list(in);
+}
 
 void Loader::load_jump_table(ifstream& in) {
     // load jump table

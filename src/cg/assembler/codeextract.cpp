@@ -194,6 +194,6 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
     return invokables;
 }
 map<string, vector<Token>> assembler::ce::get_invokables_token_bodies(const string& type,
-                                                                   const vector<Token>& tokens) {
+                                                                      const vector<Token>& tokens) {
     return get_raw_block_bodies(type, tokens);
 }

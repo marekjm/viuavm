@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
                 viua::assembler::frontend::static_analyser::check_register_usage(parsed_source);
             } else {
                 assembler::verify::manipulation_of_defined_registers(cooked_tokens_without_names_replaced,
-                                                                  blocks.tokens, DEBUG);
+                                                                     blocks.tokens, DEBUG);
             }
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {

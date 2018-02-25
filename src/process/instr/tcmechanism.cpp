@@ -44,8 +44,8 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
     tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->is_block(catcher_block_name)) {
-        throw make_unique<viua::types::Exception>("registering undefined handler block '" + catcher_block_name +
-                                         "' to handle " + type_name);
+        throw make_unique<viua::types::Exception>("registering undefined handler block '" +
+                                                  catcher_block_name + "' to handle " + type_name);
     }
 
     stack->try_frame_new->catchers[type_name] = make_unique<Catcher>(type_name, catcher_block_name);

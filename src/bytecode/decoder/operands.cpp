@@ -291,7 +291,8 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
     if (is_pointer_dereference) {
         auto pointer_object = dynamic_cast<viua::types::Pointer*>(object);
         if (pointer_object == nullptr) {
-            throw make_unique<viua::types::Exception>("dereferenced type is not a pointer: " + object->type());
+            throw make_unique<viua::types::Exception>("dereferenced type is not a pointer: " +
+                                                      object->type());
         }
         object = pointer_object->to(p);
     }

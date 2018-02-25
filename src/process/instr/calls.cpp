@@ -52,8 +52,9 @@ viua::internals::types::byte* viua::process::Process::opparam(viua::internals::t
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw make_unique<viua::types::Exception>("parameter register index out of bounds (greater than arguments set "
-                                         "size) while adding parameter");
+        throw make_unique<viua::types::Exception>(
+            "parameter register index out of bounds (greater than arguments set "
+            "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, source->copy());
     stack->frame_new->arguments->clear(parameter_no_operand_index);
@@ -70,8 +71,9 @@ viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::ty
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw make_unique<viua::types::Exception>("parameter register index out of bounds (greater than arguments set "
-                                         "size) while adding parameter");
+        throw make_unique<viua::types::Exception>(
+            "parameter register index out of bounds (greater than arguments set "
+            "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, currently_used_register_set->pop(source));
     stack->frame_new->arguments->clear(parameter_no_operand_index);

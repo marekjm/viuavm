@@ -141,7 +141,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name,
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(const string& name,
-                                                                     ForeignFunction* function_ptr) {
+                                                                       ForeignFunction* function_ptr) {
     /** Registers external function in viua::kernel::Kernel.
      */
     unique_lock<mutex> lock(foreign_functions_mutex);
@@ -157,7 +157,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_prototype(
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(const string& name, ForeignMethod method) {
+viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(const string& name,
+                                                                    ForeignMethod method) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
     foreign_methods[name] = method;
@@ -259,7 +260,7 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
 
     if (handle == nullptr) {
         throw make_unique<viua::types::Exception>("LinkException",
-                                         ("failed to open handle: " + module + ": " + dlerror()));
+                                                  ("failed to open handle: " + module + ": " + dlerror()));
     }
 
     using ExporterFunction = const ForeignFunctionSpec* (*)();
@@ -324,7 +325,9 @@ bool viua::kernel::Kernel::is_local_function(const string& name) const {
     return function_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::is_linked_function(const string& name) const { return linked_functions.count(name); }
+bool viua::kernel::Kernel::is_linked_function(const string& name) const {
+    return linked_functions.count(name);
+}
 
 bool viua::kernel::Kernel::is_native_function(const string& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
@@ -344,8 +347,8 @@ bool viua::kernel::Kernel::is_local_block(const string& name) const { return blo
 
 bool viua::kernel::Kernel::is_linked_block(const string& name) const { return linked_blocks.count(name); }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::get_entry_point_of_block(
-    const std::string& name) const {
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::
+    get_entry_point_of_block(const std::string& name) const {
     viua::internals::types::byte* entry_point = nullptr;
     viua::internals::types::byte* module_base = nullptr;
     if (block_addresses.count(name)) {
@@ -379,7 +382,7 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel:
 }
 
 void viua::kernel::Kernel::register_prototype(const string& type_name,
-                                             unique_ptr<viua::types::Prototype> proto) {
+                                              unique_ptr<viua::types::Prototype> proto) {
     typesystem.emplace(type_name, nullptr);
     typesystem.at(type_name) = std::move(proto);
 }
@@ -389,7 +392,7 @@ void viua::kernel::Kernel::register_prototype(unique_ptr<viua::types::Prototype>
 }
 
 void viua::kernel::Kernel::request_foreign_function_call(Frame* frame,
-                                                      viua::process::Process* requesting_process) {
+                                                         viua::process::Process* requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(
         make_unique<viua::scheduler::ffi::ForeignFunctionCallRequest>(frame, requesting_process, this));
@@ -402,8 +405,9 @@ void viua::kernel::Kernel::request_foreign_function_call(Frame* frame,
 }
 
 void viua::kernel::Kernel::request_foreign_method_call(const string& name, viua::types::Value* object,
-                                                    Frame* frame, viua::kernel::RegisterSet*,
-                                                    viua::kernel::RegisterSet*, viua::process::Process* p) {
+                                                       Frame* frame, viua::kernel::RegisterSet*,
+                                                       viua::kernel::RegisterSet*,
+                                                       viua::process::Process* p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 

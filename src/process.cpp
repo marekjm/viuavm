@@ -97,7 +97,7 @@ void viua::process::Process::ensure_static_registers(string function_name) {
 }
 
 Frame* viua::process::Process::request_new_frame(viua::internals::types::register_index arguments_size,
-                                               viua::internals::types::register_index registers_size) {
+                                                 viua::internals::types::register_index registers_size) {
     return stack->prepare_frame(arguments_size, registers_size);
 }
 void viua::process::Process::push_frame() {
@@ -125,15 +125,15 @@ viua::internals::types::byte* viua::process::Process::adjust_jump_base_for_block
 viua::internals::types::byte* viua::process::Process::adjust_jump_base_for(const string& call_name) {
     return stack->adjust_jump_base_for(call_name);
 }
-viua::internals::types::byte* viua::process::Process::call_native(viua::internals::types::byte* return_address,
-                                                                 const string& call_name,
-                                                                 viua::kernel::Register* return_register,
-                                                                 const string&) {
+viua::internals::types::byte* viua::process::Process::call_native(
+    viua::internals::types::byte* return_address, const string& call_name,
+    viua::kernel::Register* return_register, const string&) {
     viua::internals::types::byte* call_address = adjust_jump_base_for(call_name);
 
     if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>("function call without a frame: use `frame 0' in source code if the "
-                                         "function takes no parameters");
+        throw make_unique<viua::types::Exception>(
+            "function call without a frame: use `frame 0' in source code if the "
+            "function takes no parameters");
     }
 
     stack->frame_new->function_name = call_name;
@@ -148,8 +148,9 @@ viua::internals::types::byte* viua::process::Process::call_foreign(
     viua::internals::types::byte* return_address, const string& call_name,
     viua::kernel::Register* return_register, const string&) {
     if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>("external function call without a frame: use `frame 0' in source "
-                                         "code if the function takes no parameters");
+        throw make_unique<viua::types::Exception>(
+            "external function call without a frame: use `frame 0' in source "
+            "code if the function takes no parameters");
     }
 
     stack->frame_new->function_name = call_name;
@@ -213,8 +214,9 @@ viua::internals::types::byte* viua::process::Process::call_foreign_method(
 
 auto viua::process::Process::push_deferred(string call_name) -> void {
     if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>("function call without a frame: use `frame 0' in source code if the "
-                                         "function takes no parameters");
+        throw make_unique<viua::types::Exception>(
+            "function call without a frame: use `frame 0' in source code if the "
+            "function takes no parameters");
     }
 
     stack->frame_new->function_name = call_name;
@@ -399,7 +401,8 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
 
 viua::internals::types::byte* viua::process::Process::begin() {
     if (not scheduler->is_native_function(stack->at(0)->function_name)) {
-        throw make_unique<viua::types::Exception>("process from undefined function: " + stack->at(0)->function_name);
+        throw make_unique<viua::types::Exception>("process from undefined function: " +
+                                                  stack->at(0)->function_name);
     }
     return (stack->instruction_pointer = adjust_jump_base_for(stack->at(0)->function_name));
 }

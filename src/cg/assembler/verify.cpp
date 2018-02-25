@@ -50,8 +50,8 @@ static bool is_defined(string function_name, const vector<string>& function_name
     return (not is_undefined);
 }
 void assembler::verify::function_calls_are_defined(const vector<Token>& tokens,
-                                                const vector<string>& function_names,
-                                                const vector<string>& function_signatures) {
+                                                   const vector<string>& function_names,
+                                                   const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
@@ -93,7 +93,7 @@ void assembler::verify::function_calls_are_defined(const vector<Token>& tokens,
 }
 
 void assembler::verify::callable_creations(const vector<Token>& tokens, const vector<string>& function_names,
-                                          const vector<string>& function_signatures) {
+                                           const vector<string>& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (not(tokens.at(i) == "closure" or tokens.at(i) == "function")) {
             // skip while lines to avoid triggering the check by registers named 'function' or 'closure'

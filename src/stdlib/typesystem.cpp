@@ -39,7 +39,7 @@ static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regis
 }
 
 static auto inheritance_chain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                             viua::process::Process*, viua::kernel::Kernel*) -> void {
+                              viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
         throw make_unique<viua::types::Exception>("expected object as parameter 0");
     }

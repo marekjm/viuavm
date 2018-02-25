@@ -22,9 +22,9 @@
 #include <string>
 #include <vector>
 #include <viua/exceptions.h>
-#include <viua/util/exceptions.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
+#include <viua/util/exceptions.h>
 using namespace std;
 
 using viua::util::exceptions::make_unique_exception;

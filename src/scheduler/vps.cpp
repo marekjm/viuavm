@@ -222,7 +222,8 @@ bool viua::scheduler::VirtualProcessScheduler::is_class(const string& name) cons
     return attached_kernel->is_class(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::class_accepts(const string& klass, const string& method) const {
+bool viua::scheduler::VirtualProcessScheduler::class_accepts(const string& klass,
+                                                             const string& method) const {
     return attached_kernel->class_accepts(klass, method);
 }
 
@@ -269,7 +270,7 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::schedul
 }
 
 string viua::scheduler::VirtualProcessScheduler::resolve_method_name(const string& klass,
-                                                                   const string& method) const {
+                                                                     const string& method) const {
     return attached_kernel->resolve_method_name(klass, method);
 }
 
@@ -282,8 +283,8 @@ void viua::scheduler::VirtualProcessScheduler::register_prototype(unique_ptr<viu
     attached_kernel->register_prototype(std::move(proto));
 }
 
-void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(Frame* frame,
-                                                                          viua::process::Process* p) const {
+void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(
+    Frame* frame, viua::process::Process* p) const {
     attached_kernel->request_foreign_function_call(frame, p);
 }
 

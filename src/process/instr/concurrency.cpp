@@ -208,8 +208,8 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals
         throw make_unique<viua::types::Exception>("watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw make_unique<viua::types::Exception>("watchdog process must be a native function, used foreign " +
-                                         call_name);
+        throw make_unique<viua::types::Exception>(
+            "watchdog process must be a native function, used foreign " + call_name);
     }
 
     if (not watchdog_function.empty()) {
