@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
 #include <iostream>
 #include <unistd.h>
 #include <viua/assembler/util/pretty_printer.h>
@@ -148,7 +149,8 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 }
 auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua::cg::lex::Token>& tokens,
                                                                const viua::cg::lex::InvalidSyntax& error,
-                                                               decltype(tokens.size()) i) -> decltype(i) {
+                                                               decltype(tokens.size()) i,
+                                                               const size_t line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << send_control_seq(COLOR_FG_RED);
@@ -156,6 +158,7 @@ auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua
     cout << ' ';
 
     cout << send_control_seq(COLOR_FG_YELLOW);
+    cout << std::setw(static_cast<int>(line_no_width));
     cout << token_line + 1;
     cout << ' ';
 
@@ -182,11 +185,13 @@ auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua
 }
 auto viua::assembler::util::pretty_printer::display_context_line(const vector<viua::cg::lex::Token>& tokens,
                                                                  const viua::cg::lex::InvalidSyntax&,
-                                                                 decltype(tokens.size()) i) -> decltype(i) {
+                                                                 decltype(tokens.size()) i,
+                                                                 const size_t line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << "    ";  // message indent, ">>>>" on error line
     cout << ' ';
+    cout << std::setw(static_cast<int>(line_no_width));
     cout << token_line + 1;
     cout << ' ';
 
@@ -222,15 +227,17 @@ auto viua::assembler::util::pretty_printer::display_error_location(const vector<
         context_before = (error.line() - context_lines);
     }
 
+    const auto line_no_width = std::to_string(context_after).size();
+
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size();) {
         if (tokens.at(i).line() > context_after) {
             break;
         }
         if (tokens.at(i).line() >= context_before) {
             if (tokens.at(i).line() == error.line()) {
-                i = display_error_line(tokens, error, i);
+                i = display_error_line(tokens, error, i, line_no_width);
             } else {
-                i = display_context_line(tokens, error, i);
+                i = display_context_line(tokens, error, i, line_no_width);
             }
             continue;
         }

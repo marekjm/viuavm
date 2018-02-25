@@ -45,11 +45,11 @@ namespace viua {
                                            decltype(tokens.size()) i,
                                            const viua::cg::lex::InvalidSyntax& error) -> void;
                 auto display_error_line(const std::vector<viua::cg::lex::Token>& tokens,
-                                        const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i)
-                    -> decltype(i);
+                                        const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i,
+                                        const size_t) -> decltype(i);
                 auto display_context_line(const std::vector<viua::cg::lex::Token>& tokens,
-                                          const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i)
-                    -> decltype(i);
+                                          const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i,
+                                          const size_t) -> decltype(i);
                 auto display_error_header(const viua::cg::lex::InvalidSyntax& error,
                                           const std::string& filename) -> void;
                 auto display_error_location(const std::vector<viua::cg::lex::Token>& tokens,
@@ -60,9 +60,9 @@ namespace viua {
                 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
                                               const viua::cg::lex::TracedSyntaxError error,
                                               const std::string& filename) -> void;
-            }
-        }
-    }
-}
+            }  // namespace pretty_printer
+        }      // namespace util
+    }          // namespace assembler
+}  // namespace viua
 
 #endif
