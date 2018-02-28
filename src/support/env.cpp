@@ -73,9 +73,9 @@ namespace support {
                 auto found = false;
 
                 auto oss = ostringstream{};
-                for (auto i = std::remove_reference_t<decltype(paths)>::size_type{0}; i < paths.size(); ++i) {
+                for (auto const& each : paths) {
                     oss.str("");
-                    oss << paths[i] << '/' << module << '.' << extension;
+                    oss << each << '/' << module << '.' << extension;
                     path = oss.str();
                     if (path[0] == '~') {
                         oss.str("");

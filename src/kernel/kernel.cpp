@@ -220,16 +220,14 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
 
         auto const fn_names = loader.get_functions();
         auto const fn_addrs = loader.get_function_addresses();
-        for (unsigned i = 0; i < fn_names.size(); ++i) {
-            string fn_linkname = fn_names[i];
+        for (const auto& fn_linkname : fn_names) {
             linked_functions[fn_linkname] =
                 pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
         }
 
         auto const bl_names = loader.get_blocks();
         auto const bl_addrs = loader.get_block_addresses();
-        for (unsigned i = 0; i < bl_names.size(); ++i) {
-            string bl_linkname = bl_names[i];
+        for (auto const& bl_linkname : bl_names) {
             linked_blocks[bl_linkname] =
                 pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
         }
@@ -641,7 +639,7 @@ viua::kernel::Kernel::~Kernel() {
         w->join();
     }
 
-    for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
-        dlclose(cxx_dynamic_lib_handles[i]);
+    for (auto const each : cxx_dynamic_lib_handles) {
+        dlclose(each);
     }
 }
