@@ -92,12 +92,12 @@ void viua::front::vm::preload_libraries(viua::kernel::Kernel* kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
     vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
-    for (unsigned i = 0; i < preload_native.size(); ++i) {
-        kernel->load_native_library(preload_native[i]);
+    for (auto const& each : preload_native) {
+        kernel->load_native_library(each);
     }
 
     vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
-    for (unsigned i = 0; i < preload_foreign.size(); ++i) {
-        kernel->load_foreign_library(preload_foreign[i]);
+    for (auto const& each : preload_foreign) {
+        kernel->load_foreign_library(each);
     }
 }
