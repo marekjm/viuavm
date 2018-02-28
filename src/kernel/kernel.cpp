@@ -218,20 +218,20 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
 
         unique_ptr<viua::internals::types::byte[]> lnk_btcd{loader.get_bytecode()};
 
-        vector<string> fn_names = loader.get_functions();
-        map<string, viua::internals::types::bytecode_size> fn_addrs = loader.get_function_addresses();
+        auto const fn_names = loader.get_functions();
+        auto const fn_addrs = loader.get_function_addresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] =
-                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + fn_addrs[fn_names[i]]));
+                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
         }
 
-        vector<string> bl_names = loader.get_blocks();
-        map<string, viua::internals::types::bytecode_size> bl_addrs = loader.get_block_addresses();
+        auto const bl_names = loader.get_blocks();
+        auto const bl_addrs = loader.get_block_addresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
             linked_blocks[bl_linkname] =
-                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + bl_addrs[bl_linkname]));
+                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
         }
 
         linked_modules[module] =

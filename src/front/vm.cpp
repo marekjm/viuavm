@@ -23,17 +23,17 @@ using namespace std;
 
 
 void viua::front::vm::initialise(viua::kernel::Kernel* kernel, const string& program, vector<string> args) {
-    Loader loader(program);
+    auto loader = Loader{ program };
     loader.executable();
 
-    uint64_t bytes = loader.get_bytecode_size();
-    unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
+    auto const bytes = loader.get_bytecode_size();
+    auto bytecode = loader.get_bytecode();
 
-    map<string, uint64_t> function_address_mapping = loader.get_function_addresses();
-    for (auto p : function_address_mapping) {
+    auto const function_address_mapping = loader.get_function_addresses();
+    for (auto const p : function_address_mapping) {
         kernel->mapfunction(p.first, p.second);
     }
-    for (auto p : loader.get_block_addresses()) {
+    for (auto const p : loader.get_block_addresses()) {
         kernel->mapblock(p.first, p.second);
     }
 
