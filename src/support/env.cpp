@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,35 +23,35 @@ using namespace std;
 
 namespace support {
     namespace env {
-        string getvar(const string& var) {
-            const char* VAR = getenv(var.c_str());
+        auto get_var(string const & var) -> string {
+            auto const VAR = getenv(var.c_str());
             return (VAR == nullptr ? string("") : string(VAR));
         }
-        vector<string> getpaths(const string& var) {
-            string PATH = getvar(var);
-            vector<string> paths;
+        auto get_paths(string const & var) -> vector<string> {
+            auto path = get_var(var);
+            auto paths = vector<string>{};
 
-            string path;
-            unsigned i = 0;
-            while (i < PATH.size()) {
-                if (PATH[i] == ':') {
-                    if (path.size()) {
-                        paths.emplace_back(path);
-                        path = "";
+            auto a_path = string{};
+            auto i = decltype(path)::size_type{0};
+            while (i < path.size()) {
+                if (path[i] == ':') {
+                    if (a_path.size()) {
+                        paths.emplace_back(a_path);
+                        a_path = "";
                         ++i;
                     }
                 }
-                path += PATH[i];
+                a_path += path[i];
                 ++i;
             }
-            if (path.size()) {
-                paths.emplace_back(path);
+            if (a_path.size()) {
+                paths.emplace_back(a_path);
             }
 
             return paths;
         }
 
-        bool isfile(const string& path) {
+        auto is_file(string const & path) -> bool {
             struct stat sf;
 
             // not a file if stat returned error
@@ -68,12 +68,12 @@ namespace support {
         }
 
         namespace viua {
-            string getmodpath(const string& module, const string& extension, const vector<string>& paths) {
-                string path = "";
-                bool found = false;
+            auto get_mod_path(string const & module, string const& extension, vector<string> const& paths) -> string {
+                auto path = string{""};
+                auto found = false;
 
-                ostringstream oss;
-                for (unsigned i = 0; i < paths.size(); ++i) {
+                auto oss = ostringstream{};
+                for (auto i = std::remove_reference_t<decltype(paths)>::size_type{0}; i < paths.size(); ++i) {
                     oss.str("");
                     oss << paths[i] << '/' << module << '.' << extension;
                     path = oss.str();

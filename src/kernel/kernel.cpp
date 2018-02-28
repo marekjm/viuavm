@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -171,23 +171,22 @@ static auto is_native_module(string module) -> bool {
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
     string try_path = oss.str();
-    string path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAPATH"));
+    auto path = support::env::viua::get_mod_path(try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(try_path, "vlib", VIUAPATH);
+        path = support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
     }
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAAFTERPATH"));
+        path = support::env::viua::get_mod_path(try_path, "vlib", support::env::get_paths("VIUAAFTERPATH"));
     }
     return (path.size() > 0);
 }
 static auto is_foreign_module(string module) -> bool {
-    string path = "";
-    path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
+    auto path = support::env::viua::get_mod_path(module, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(module, "so", VIUAPATH);
+        path = support::env::viua::get_mod_path(module, "so", VIUAPATH);
     }
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH"));
+        path = support::env::viua::get_mod_path(module, "so", support::env::get_paths("VIUAAFTERPATH"));
     }
     return (path.size() > 0);
 }
@@ -205,12 +204,12 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
     string try_path = oss.str();
-    string path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAPATH"));
+    auto path = support::env::viua::get_mod_path(try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(try_path, "vlib", VIUAPATH);
+        path = support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
     }
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAAFTERPATH"));
+        path = support::env::viua::get_mod_path(try_path, "vlib", support::env::get_paths("VIUAAFTERPATH"));
     }
 
     if (path.size()) {
@@ -243,13 +242,12 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
     }
 }
 void viua::kernel::Kernel::load_foreign_library(const string& module) {
-    string path = "";
-    path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
+    auto path = support::env::viua::get_mod_path(module, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(module, "so", VIUAPATH);
+        path = support::env::viua::get_mod_path(module, "so", VIUAPATH);
     }
     if (path.size() == 0) {
-        path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH"));
+        path = support::env::viua::get_mod_path(module, "so", support::env::get_paths("VIUAAFTERPATH"));
     }
 
     if (path.size() == 0) {

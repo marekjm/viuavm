@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
         cout << "fatal: no file to tokenize" << endl;
         return 1;
     }
-    if (!support::env::isfile(filename)) {
+    if (!support::env::is_file(filename)) {
         cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }

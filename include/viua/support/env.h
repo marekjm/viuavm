@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,13 +28,13 @@
 
 namespace support {
     namespace env {
-        std::vector<std::string> getpaths(const std::string&);
-        std::string getvar(const std::string&);
+        auto get_paths(std::string const &) -> std::vector<std::string>;
+        auto get_var(std::string const&) -> std::string;
 
-        bool isfile(const std::string&);
+        auto is_file(std::string const&) -> bool;
 
         namespace viua {
-            std::string getmodpath(const std::string&, const std::string&, const std::vector<std::string>&);
+            auto get_mod_path(std::string const&, std::string const&, std::vector<std::string> const&) -> std::string;
         }
     }
 }

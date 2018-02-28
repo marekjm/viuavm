@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -91,12 +91,12 @@ void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
 void viua::front::vm::preload_libraries(viua::kernel::Kernel* kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
-    vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
+    auto const preload_native = support::env::get_paths("VIUAPRELINK");
     for (auto const& each : preload_native) {
         kernel->load_native_library(each);
     }
 
-    vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
+    auto const preload_foreign = support::env::get_paths("VIUAPREIMPORT");
     for (auto const& each : preload_foreign) {
         kernel->load_foreign_library(each);
     }

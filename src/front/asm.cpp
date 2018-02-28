@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
         cout << ": no file to assemble" << endl;
         return 1;
     }
-    if (!support::env::isfile(filename)) {
+    if (!support::env::is_file(filename)) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
         cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
         cout << ": could not open file" << endl;

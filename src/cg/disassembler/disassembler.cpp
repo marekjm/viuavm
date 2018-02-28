@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -96,8 +96,8 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
                     oss << "static";
                     break;
                 default:
-                    if (support::env::getvar("VIUA_DISASM_INVALID_RS_TYPES") == "yes") {
-                        oss << "<invalid=" << int(*ptr) << '>';
+                    if (support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES") == "yes") {
+                        oss << "<invalid=" << static_cast<int>(*ptr) << '>';
                     } else {
                         throw "invalid register set detected";
                     }
