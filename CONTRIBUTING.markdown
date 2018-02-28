@@ -110,16 +110,7 @@ a possible fix preventing the exploit.
 ### Coding standard
 
 When submitting a patch make sure that it is formatted according to the coding standard:
-
-- long, descriptive variable names are an accepted tradeoff for shorter lines (it's better to give variables hilariously descriptive names than
-  to wonder "WTF does this code do" some time later)
-- opening braces on the same line as their ifs, whiles, class and function signatures, etc.
-- indent by four spaces
-
-An appropriate `.clang-format` file is included in the repository.
-Use it to format your code before commiting.
-Documentation for `clang-format`: https://clang.llvm.org/docs/ClangFormat.html
-
+It is described [here](CODING_STYLE.markdown).
 
 ----
 
@@ -129,7 +120,7 @@ Documentation for `clang-format`: https://clang.llvm.org/docs/ClangFormat.html
 **Documentation**
 
 As always, the documentation is lacking.
-If you're interested in writing documentation have a go at [docs repository](https://github.com/marekjm/docs.viuavm.org).
+If you're interested in writing documentation have a go at it.
 
 
 **Code samples**
