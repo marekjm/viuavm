@@ -267,7 +267,7 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
 
     const ForeignFunctionSpec* exported = (*exports)();
 
-    unsigned i = 0;
+    size_t i = 0;
     while (exported[i].name != nullptr) {
         register_external_function(exported[i].name, exported[i].fpointer);
         ++i;
