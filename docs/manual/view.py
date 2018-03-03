@@ -998,17 +998,7 @@ def render_view(args):
         print(r'\toc{}')
         print()
 
-        introduction = ''
-        with open('./introduction') as ifstream:
-            introduction = ifstream.read().strip()
-        if introduction:
-            render_heading('INTRODUCTION', 2)
-            print()
-            render_free_form_text(introduction, documented_instructions = documented_opcodes)
-            print()
-            print('-' * LINE_WIDTH)
-        print()
-
+        render_section('introduction', documented_instructions = documented_opcodes)
         render_section('assembly', documented_instructions = documented_opcodes)
         render_section('tooling', documented_instructions = documented_opcodes)
         render_section('the_environment', documented_instructions = documented_opcodes)

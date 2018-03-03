@@ -1,5 +1,25 @@
 \section{begin}
 
+Viua VM is programmed in an assembly language, which is only a thin layer of abstraction over
+the underlying bytecode.
+\break
+The assembler that ships with the VM translates the source code one-to-one to bytecode:
+the only "modifications" it does is the linking of different modules, and branch offsets calculation
+- apart from that the bytecode is a direct translation
+of what the programmer wrote.
+
+Below you can find a documentation of the instructions the VM provides;
+with explained syntax, example usage, specification of inputs, outputs, and exceptions.
+
+\color{white}{NOTE}
+\break
+\indent{}
+The documentation is incomplete: not all instructions are documented yet.
+For full listing of instructions, execute the `./build/bin/opcodes.bin' program that you can
+find in a distribution of the VM.
+\dedent{}
+\break
+
 Viua VM is a register based VM.
 Programs running on it are sequences of instructions that manipulate values placed in registers.
 This section explains how registers are accessed, so that you will be able to understand the
@@ -194,4 +214,6 @@ copy %1 static *1 local
 will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
 \section{end}
+
+%% INTRODUCTION
 \section{end}
