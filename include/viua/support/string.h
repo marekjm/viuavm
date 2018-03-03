@@ -28,34 +28,34 @@
 
 
 namespace str {
-    bool startswith(const std::string& s, const std::string& w);
-    bool startswithchunk(const std::string& s, const std::string& w);
-    bool endswith(const std::string& s, const std::string& w);
+    auto startswith(std::string const& s, std::string const& w) -> bool;
+    auto startswithchunk(std::string const& s, std::string const& w) -> bool;
+    auto endswith(std::string const& s, std::string const& w) -> bool;
 
-    bool isnum(const std::string& s, bool negatives = true);
-    bool ishex(const std::string& s, bool negatives = true);
-    bool isfloat(const std::string& s, bool negatives = true);
-    bool isid(const std::string& s);
+    auto isnum(std::string const& s, bool const negatives = true) -> bool;
+    auto ishex(std::string const& s, bool const negatives = true) -> bool;
+    auto isfloat(std::string const& s, bool const negatives = true) -> bool;
+    auto isid(std::string const& s) -> bool;
 
-    auto is_binary_literal(const std::string) -> bool;
-    auto is_boolean_literal(const std::string) -> bool;
-    auto is_void(const std::string) -> bool;
-    auto is_atom_literal(const std::string) -> bool;
-    auto is_text_literal(const std::string) -> bool;
-    auto is_timeout_literal(const std::string s) -> bool;
-    auto is_register_set_name(const std::string) -> bool;
+    auto is_binary_literal(std::string const) -> bool;
+    auto is_boolean_literal(std::string const) -> bool;
+    auto is_void(std::string const) -> bool;
+    auto is_atom_literal(std::string const) -> bool;
+    auto is_text_literal(std::string const) -> bool;
+    auto is_timeout_literal(std::string const s) -> bool;
+    auto is_register_set_name(std::string const) -> bool;
 
-    std::string sub(const std::string& s, std::string::size_type b = 0, long int e = -1);
+    auto sub(std::string const& s, std::string::size_type b = 0, ssize_t const e = -1) -> std::string;
 
-    std::string extract(const std::string& s);
-    std::string chunk(const std::string& s, bool ignore_leading_ws = true);
-    std::vector<std::string> chunks(const std::string& s);
+    auto extract(std::string const& s) -> std::string;
+    auto chunk(std::string const& s, bool const ignore_leading_ws = true) -> std::string;
+    auto chunks(std::string const& s) -> std::vector<std::string>;
 
-    std::string join(const std::string& s, const std::vector<std::string>& v);
-    template<typename T> std::string join(const std::vector<std::string>& seq, const T& delim) {
-        auto sz = seq.size();
+    auto join(std::string const& s, std::vector<std::string> const& v) -> std::string;
+    template<typename T> auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
+        auto const sz = seq.size();
         std::ostringstream oss;
-        for (decltype(sz) i = 0; i < sz; ++i) {
+        for (std::remove_const_t<decltype(sz)> i = 0; i < sz; ++i) {
             oss << seq[i];
             if (i < (sz - 1)) {
                 oss << delim;
@@ -64,33 +64,33 @@ namespace str {
         return oss.str();
     }
 
-    template<typename T> std::string strmul(const T& s, long unsigned times) {
+    template<typename T> auto strmul(T const& s, size_t const times) -> std::string {
         std::ostringstream oss;
-        for (decltype(times) i = 0; i < times; ++i) {
+        for (std::remove_const_t<decltype(times)> i = 0; i < times; ++i) {
             oss << s;
         }
         return oss.str();
     }
 
-    std::string lstrip(const std::string& s);
+    auto lstrip(std::string const& s) -> std::string;
 
-    std::string::size_type lshare(const std::string& s, const std::string& w);
-    bool contains(const std::string& s, const char c);
+    std::string::size_type lshare(std::string const& s, std::string const& w);
+    auto contains(std::string const& s, char const c) -> bool;
 
     using LevenshteinDistance = std::string::size_type;
     using DistancePair = std::pair<LevenshteinDistance, std::string>;
-    auto levenshtein(const std::string, const std::string) -> LevenshteinDistance;
-    auto levenshtein_filter(const std::string, const std::vector<std::string>&, const LevenshteinDistance)
+    auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
+    auto levenshtein_filter(std::string const, std::vector<std::string> const&, LevenshteinDistance const)
         -> std::vector<DistancePair>;
-    auto levenshtein_best(const std::string, const std::vector<std::string>&, const LevenshteinDistance)
+    auto levenshtein_best(std::string const, std::vector<std::string> const&, LevenshteinDistance const)
         -> DistancePair;
 
-    std::string enquote(const std::string&, const char = '"');
-    std::string strdecode(const std::string&);
-    std::string strencode(const std::string&);
+    auto enquote(std::string const&, char const = '"') -> std::string;
+    auto strdecode(std::string const&) -> std::string;
+    auto strencode(std::string const&) -> std::string;
 
-    std::string stringify(const std::vector<std::string>&);
-    template<class T> std::string stringify(const T o, const bool nl = true) {
+    auto stringify(std::vector<std::string> const&) -> std::string;
+    template<class T> auto stringify(T const o, bool const nl = true) -> std::string {
         std::ostringstream oss;
         oss << o;
         if (nl) {

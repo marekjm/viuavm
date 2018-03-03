@@ -27,26 +27,26 @@ using namespace std;
 
 
 namespace str {
-    bool startswith(const std::string& s, const std::string& w) {
+    auto startswith(std::string const& s, std::string const& w) -> bool {
         /*  Returns true if s stars with w.
          */
         return (s.compare(0, w.length(), w) == 0);
     }
 
-    bool startswithchunk(const std::string& s, const std::string& w) {
+    auto startswithchunk(std::string const& s, std::string const& w) -> bool {
         /*  Returns true if s stars with chunk w.
          */
         return (chunk(s) == w);
     }
 
-    bool endswith(const std::string& s, const std::string& w) {
+    auto endswith(std::string const& s, std::string const& w) -> bool {
         /*  Returns true if s ends with w.
          */
         return (s.compare(s.length() - w.length(), s.length(), w) == 0);
     }
 
 
-    bool isnum(const std::string& s, bool negatives) {
+    auto isnum(std::string const& s, bool negatives) -> bool {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+$`
          */
@@ -79,23 +79,23 @@ namespace str {
         return num;
     }
 
-    bool ishex(const std::string& s, bool) {
+    auto ishex(std::string const& s, bool) -> bool {
         /*  Returns true if s is a valid hexadecimal number.
          */
         static regex hexadecimal_number("^0x[0-9a-fA-F]+$");
         return regex_match(s, hexadecimal_number);
     }
 
-    auto is_binary_literal(const string s) -> bool {
+    auto is_binary_literal(string const s) -> bool {
         static regex binary_literal{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
         return regex_match(s, binary_literal);
     }
 
-    auto is_boolean_literal(const string s) -> bool { return (s == "true" or s == "false"); }
+    auto is_boolean_literal(string const s) -> bool { return (s == "true" or s == "false"); }
 
-    auto is_void(const string s) -> bool { return (s == "void"); }
+    auto is_void(string const s) -> bool { return (s == "void"); }
 
-    auto is_atom_literal(const string s) -> bool {
+    auto is_atom_literal(string const s) -> bool {
         /*
          * This seemingly naive check is sufficient, as this function should only
          * be called after the source code already lexed (and the lexer ensures that
@@ -105,14 +105,14 @@ namespace str {
         return (s.at(0) == '\'' and s.at(s.size() - 1) == '\'');
     }
 
-    auto is_text_literal(const string s) -> bool {
+    auto is_text_literal(string const s) -> bool {
         /*
          * Same as with with is_atom_literal().
          */
         return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
     }
 
-    auto is_timeout_literal(const string s) -> bool {
+    auto is_timeout_literal(string const s) -> bool {
         if (s == "infinity") {
             return true;
         }
@@ -130,11 +130,11 @@ namespace str {
         return false;
     }
 
-    auto is_register_set_name(const string s) -> bool {
+    auto is_register_set_name(string const s) -> bool {
         return (s == "local" or s == "static" or s == "global" or s == "current");
     }
 
-    bool isfloat(const std::string& s, bool negatives) {
+    auto isfloat(std::string const& s, bool negatives) -> bool {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
          */
@@ -158,7 +158,7 @@ namespace str {
         return is;
     }
 
-    bool isid(const std::string& s) {
+    auto isid(std::string const& s) -> bool {
         /*  Returns true if s is a valid identifier.
          */
         static regex identifier("^[a-zA-Z_][:/a-zA-Z0-9_]*$");
@@ -166,7 +166,7 @@ namespace str {
     }
 
 
-    string sub(const string& s, std::string::size_type b, long int e) {
+    auto sub(string const& s, std::string::size_type b, long int e) -> string {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
@@ -191,7 +191,7 @@ namespace str {
     }
 
 
-    string chunk(const string& s, bool ignore_leading_ws) {
+    auto chunk(string const& s, bool ignore_leading_ws) -> string {
         /*  Returns part of the string until first whitespace from left side.
          */
         ostringstream chnk;
@@ -206,7 +206,7 @@ namespace str {
         return chnk.str();
     }
 
-    vector<string> chunks(const string& s) {
+    auto chunks(string const& s) -> vector<string> {
         /*  Returns chunks of string.
          */
         vector<string> chnks;
@@ -221,7 +221,7 @@ namespace str {
     }
 
 
-    string join(const string& s, const vector<string>& parts) {
+    auto join(string const& s, vector<string> const& parts) -> string {
         /** Join elements of vector with given string.
          */
         ostringstream oss;
@@ -236,7 +236,7 @@ namespace str {
     }
 
 
-    string extract(const string& s) {
+    auto extract(string const& s) -> string {
         /** Extracts *enquoted chunk*.
          *
          *  It is particularly useful if you have a string encoded in another string.
@@ -284,7 +284,7 @@ namespace str {
     }
 
 
-    string lstrip(const string& s) {
+    auto lstrip(string const& s) -> string {
         /*  Removes whitespace from left side of the string.
          */
         std::string::size_type i = 0;
@@ -298,7 +298,7 @@ namespace str {
     }
 
 
-    std::string::size_type lshare(const string& s, const string& w) {
+    auto lshare(string const& s, string const& w) -> std::string::size_type {
         std::string::size_type share = 0;
         for (std::string::size_type i = 0; i < s.size() and i < w.size(); ++i) {
             if (s[i] == w[i]) {
@@ -309,7 +309,7 @@ namespace str {
         }
         return share;
     }
-    bool contains(const string& s, const char c) {
+    auto contains(string const& s, char const c) -> bool {
         bool it_does = false;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
             if (s[i] == c) {
@@ -321,7 +321,7 @@ namespace str {
     }
 
 
-    auto levenshtein(const string source, const string target) -> LevenshteinDistance {
+    auto levenshtein(string const source, string const target) -> LevenshteinDistance {
         if (not source.size()) {
             return target.size();
         }
@@ -363,8 +363,8 @@ namespace str {
 
         return distance_matrix.at(source.size() - 1).at(target.size() - 1);
     }
-    auto levenshtein_filter(const string source, const vector<string>& candidates,
-                            const LevenshteinDistance limit) -> vector<DistancePair> {
+    auto levenshtein_filter(string const source, vector<string> const& candidates,
+                            LevenshteinDistance const limit) -> vector<DistancePair> {
         vector<DistancePair> matched;
 
         for (const auto each : candidates) {
@@ -375,8 +375,8 @@ namespace str {
 
         return matched;
     }
-    auto levenshtein_best(const string source, const vector<string>& candidates,
-                          const LevenshteinDistance limit) -> DistancePair {
+    auto levenshtein_best(string const source, vector<string> const& candidates,
+                          LevenshteinDistance const limit) -> DistancePair {
         auto best = DistancePair{0, source};
 
         for (const auto each : levenshtein_filter(source, candidates, limit)) {
@@ -390,7 +390,7 @@ namespace str {
     }
 
 
-    string enquote(const string& s, const char closing) {
+    auto enquote(string const& s, char const closing) -> string {
         /** Enquote the string.
          */
         ostringstream encoded;
@@ -407,7 +407,7 @@ namespace str {
         return encoded.str();
     }
 
-    string strdecode(const string& s) {
+    auto strdecode(string const& s) -> string {
         /** Decode escape sequences in strings.
          *
          *  This function recognizes escape sequences as listed on:
@@ -471,7 +471,7 @@ namespace str {
         }
         return decoded.str();
     }
-    string strencode(const string& s) {
+    auto strencode(string const& s) -> string {
         /** Encode escape sequences in strings.
          *
          *  This function recognizes escape sequences as listed on:
@@ -533,7 +533,7 @@ namespace str {
     }
 
 
-    string stringify(const vector<string>& sv) {
+    auto stringify(vector<string> const& sv) -> string {
         ostringstream oss;
         oss << '[';
         auto sz = sv.size();
