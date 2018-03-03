@@ -9,6 +9,11 @@ script:
     - ./configure
     - OPTIMISED=no ./scripts/test_full.sh
 
+branches:
+    only:
+        - devel
+        - master
+
 matrix:
     include:
         -
