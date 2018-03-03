@@ -1,29 +1,26 @@
 \section{begin}
 
-Viua VM is programmed in an assembly language, which is only a thin layer of abstraction over
-the underlying bytecode.
-\break
-The assembler that ships with the VM translates the source code one-to-one to bytecode:
-the only "modifications" it does is the linking of different modules, and branch offsets calculation
-- apart from that the bytecode is a direct translation
-of what the programmer wrote.
+Viua VM is a register based VM (what is a register is explained in section \ref{registers}).
 
-Below you can find a documentation of the instructions the VM provides;
-with explained syntax, example usage, specification of inputs, outputs, and exceptions.
+\heading{PROGRAMMING MODEL}{ref=programming_model}
+\section{begin}
 
-\color{white}{NOTE}
-\break
-\indent{}
-The documentation is incomplete: not all instructions are documented yet.
-For full listing of instructions, execute the `./build/bin/opcodes.bin' program that you can
-find in a distribution of the VM.
-\dedent{}
-\break
+A program running on Viua is modelled as a set of communicating processes running in parallel.
+Each process runs a function, and a function is a sequence of instructions.
+Every instruction advances the execution of the program by manipulating values placed in registers.
 
-Viua VM is a register based VM.
-Programs running on it are sequences of instructions that manipulate values placed in registers.
-This section explains how registers are accessed, so that you will be able to understand the
-rest of this documentation.
+\heading{REGISTERS}{ref=registers}
+\section{begin}
+
+\heading{WHAT IS A REGISTER}
+
+A register is a container for a value.
+
+%% REGISTERS
+\section{end}
+
+%% PROGRAMMING MODEL
+\section{end}
 
 \heading{REGISTER SETS}
 \section{begin}
