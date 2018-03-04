@@ -15,8 +15,21 @@ Every instruction advances the execution of the program by manipulating values p
 \heading{A REGISTER}
 \section{begin}
 
+A register is a container for a single value of any type representable by a Viua VM program, either
+simple (e.g. an integer, a boolean) or compound (e.g. a vector, a struct).
 
-A register is a container for a value.
+An instruction can access registers to get its inputs and set its outputs.
+For example, the \instruction{add} instruction gets two inputs (`rhs` and `lhs`) and
+sets a single output (`output`):
+
+\indent{}
+\reflow{off}
+add %output local %lhs local %rhs local
+\reflow{on}
+\dedent{}
+\break
+
+A register belongs to one of available register sets.
 
 %% A REGISTER
 \section{end}
