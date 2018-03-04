@@ -102,6 +102,11 @@ a closure is created (using the \instruction{closure} instruction, described in 
 \list{end}
 
 A local register set is accessible only inside a single call frame.
+This usually means that it is accessible only for the duration of a single function call, with the exception
+of local register sets allocated for closures.
+
+Since closures can be called many times their local register sets must persist between calls.
+This makes them similar to static registers, but only when closures are concerned.
 
 %% DIRECT ACCESS REGISTER SETS
 \section{end}
