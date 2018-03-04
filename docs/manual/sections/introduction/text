@@ -37,14 +37,71 @@ A register belongs to one of available register sets.
 \heading{REGISTER SETS}
 \section{begin}
 
+Registers are grouped in register sets.
+Register sets are allocated per-process.
+Processes do not share any registers, and can only exchange values using message passing.
+
+Register sets are divided into two main groups: direct access, and control-oriented access.
+
 \heading{DIRECT ACCESS REGISTER SETS}
 \section{begin}
 
+A register in a direct access register set can be used directly by any instruction.
+An instruction can freely mix the register sets it uses for its operands.
+As an example, the following instruction will add
+an integer from local register 1
+to an integer from static register 2
+and store the result in global register 3.
+
+\indent{}
+\reflow{off}
+add %3 global %2 static %1 local
+\reflow{on}
+\dedent{}
+\break
+
+This manual assumes a certain style of referring to registers.
+Whenever "local register N" is written it means "N-th register of the local register set".
+
+A register in a direct access register set is accessed using its index.
+A register index is an unsigned integer.
+Valid register indexes start with zero (0) and end with K, where K is the size of the register
+set to be accessed minus 1.
+For example, for a local register set with size 16 valid indexes span from 0 to 15.
+
 \heading{GLOBAL REGISTER SET}
+
+Global register set is allocated per-process.
+It is accessible from any call frame inside a process.
+Global register set is shared between all call stacks inside a process.
 
 \heading{STATIC REGISTER SET}
 
+Static register set is allocated per-function per-process.
+It is accessible only for the function that requested it (i.e. function f cannot access
+static register set of function g).
+Static register sets are shared between all call stacks inside a process.
+
 \heading{LOCAL REGISTER SET}
+
+A local register set is allocated whenever:
+
+\list{begin}
+\item
+a function call is made (using the \instruction{call} instruction, described in section
+\ref{opcode:call})
+\item
+a process is spawned (using the \instruction{process} instruction, described in section
+\ref{opcode:process})
+\item
+a deferred call is scheduled (using the \instruction{defer} instruction, described in section
+\ref{opcode:defer})
+\item
+a closure is created (using the \instruction{closure} instruction, described in section
+\ref{opcode:closure})
+\list{end}
+
+A local register set is accessible only inside a single call frame.
 
 %% DIRECT ACCESS REGISTER SETS
 \section{end}
