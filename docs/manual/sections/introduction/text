@@ -12,9 +12,42 @@ Every instruction advances the execution of the program by manipulating values p
 \heading{REGISTERS}{ref=registers}
 \section{begin}
 
-\heading{WHAT IS A REGISTER}
+\heading{A REGISTER}
+\section{begin}
+
 
 A register is a container for a value.
+
+%% A REGISTER
+\section{end}
+
+\heading{REGISTER SETS}
+\section{begin}
+
+\heading{DIRECT ACCESS REGISTER SETS}
+\section{begin}
+
+\heading{GLOBAL REGISTER SET}
+
+\heading{STATIC REGISTER SET}
+
+\heading{LOCAL REGISTER SET}
+
+%% DIRECT ACCESS REGISTER SETS
+\section{end}
+
+\heading{CONTROL-ORIENTED REGISTER SETS}
+\section{begin}
+
+\heading{PROCESS' MESSAGE QUEUE}
+
+\heading{EXCEPTION REGISTER}
+
+%% CONTROL-ORIENTED REGISTER SETS
+\section{end}
+
+%% REGISTER SETS
+\section{end}
 
 %% REGISTERS
 \section{end}
