@@ -136,6 +136,9 @@ receive %1 local 1s
 \break
 
 The size of the message queue is theoretically unbounded.
+When a message is delievered to a process it is put into its message queue (or: mailbox), increasing the size
+of the queue.
+When a message is received by the process it is popped from its mailbox, decreasing mailbox's size.
 
 \heading{EXCEPTION REGISTER}
 
