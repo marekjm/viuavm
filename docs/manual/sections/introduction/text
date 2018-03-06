@@ -343,3 +343,5 @@ will copy a value dereferenced from a pointer located in local register 1 into s
 
 %% INTRODUCTION
 \section{end}
+
+%% vim:set ft=tex:
