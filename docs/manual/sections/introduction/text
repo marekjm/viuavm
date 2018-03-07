@@ -117,7 +117,7 @@ This makes them similar to static registers, but only when closures are concerne
 A value placed in a control oriented register set is not directly accessible.
 It must be moved to a direct access register set before it can be used.
 
-\heading{PROCESS' MESSAGE QUEUE}
+\heading{MESSAGE QUEUE}
 
 Message queue is allocated per-process.
 It is accessible from all call frames, and all stacks of a process (similarly to a global register set).
