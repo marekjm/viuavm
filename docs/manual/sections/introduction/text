@@ -88,13 +88,18 @@ registers (i.e. the value in global register 1 is destructed before the value in
 \section{end}
 
 \heading{STATIC REGISTER SET}
+\section{begin}
 
 Static register set is allocated per-function per-process.
 It is accessible only for the function that requested it (i.e. function f cannot access
 static register set of function g).
 Static register sets are shared between all call stacks inside a process.
 
+%% STATIC REGISTER SET
+\section{end}
+
 \heading{LOCAL REGISTER SET}
+\section{begin}
 
 A local register set is allocated whenever:
 
@@ -119,6 +124,9 @@ of local register sets allocated for closures.
 
 Since closures can be called many times their local register sets must persist between calls.
 This makes them similar to static registers, but only when closures are concerned.
+
+%% LOCAL REGISTER SET
+\section{begin}
 
 %% DIRECT ACCESS REGISTER SETS
 \section{end}
