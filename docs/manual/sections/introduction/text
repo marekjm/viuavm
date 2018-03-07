@@ -78,7 +78,8 @@ Global register set is shared between all call stacks inside a process.
 
 \heading{LIFETIME}
 
-Global register is allocated when a process is spawned, before the process begins execution.
+Global register set is allocated when a process is spawned, before the process begins execution.
+
 It is deallocated after the process finishes execution (either normally, or due to being killed by a runaway
 exception).
 Contents of the global register set are destructed in order, beginning with values in the lowest-indexed
