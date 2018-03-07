@@ -126,7 +126,7 @@ Since closures can be called many times their local register sets must persist b
 This makes them similar to static registers, but only when closures are concerned.
 
 %% LOCAL REGISTER SET
-\section{begin}
+\section{end}
 
 %% DIRECT ACCESS REGISTER SETS
 \section{end}
