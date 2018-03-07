@@ -114,7 +114,7 @@ Using the \instruction{process} instruction described in section \ref{opcode:pro
 \heading{ERROR HANDLING}
 \section{begin}
 
-\heading{EXCEPTIONS}
+\heading{EXCEPTIONS}{ref=environment.processes.error_handling.exceptions}
 \section{begin}
 
 \heading{THROWING}
