@@ -164,7 +164,7 @@ KEYWORD_HEADING_REGEX = re.compile(r'\\heading{([^}]+)}')
 PARAMETER_REGEX = re.compile(r'{([a-z_]+)(?:(=[^}]*))?}')
 KEYWORD_INSTRUCTION_REGEX = re.compile(r'\\instruction{([a-z]+)}')
 KEYWORD_SYNTAX_REGEX = re.compile(r'\\syntax{([0-9]+)}')
-KEYWORD_REF_REGEX = re.compile(r'\\ref{([a-z_][a-z0-9_]*(?::[a-z_][a-z0-9_]*)*)}')
+KEYWORD_REF_REGEX = re.compile(r'\\ref{([a-z_][a-z0-9_]*(?:[:.][a-z_][a-z0-9_]*)*)}')
 KEYWORD_COLOR_REGEX = re.compile(r'\\color{([a-z]+)}{([^}]+)}')
 def paragraph_visible(para):
     para = (para[0] if para else None)
