@@ -96,6 +96,18 @@ It is accessible only for the function that requested it (i.e. function f cannot
 static register set of function g).
 Static register sets are shared between all call stacks inside a process.
 
+\heading{LIFETIME}
+
+Static register set is allocated when a function first requests it.
+Currently (2018-03-07), this means that it is allocated on first access to a register from the static register
+set.
+
+It is deallocated after the process in which it was allocated finishes execution.
+Contents of a static register set are destructed in order, beginning with values in the lowest-indexed
+registers (i.e. the value in static register 1 is destructed before the value in static register 2, etc.).
+It is unspecified (as of 2018-03-07) whether static register sets are deallocated before or after the global
+register set.
+
 %% STATIC REGISTER SET
 \section{end}
 
