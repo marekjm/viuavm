@@ -1,0 +1,7 @@
+Throw a value.
+Thrown value is moved to the exception register (described in section \ref{register_sets.exception_register}).
+
+Throwing a value triggers the exception handling mechanism, and
+may result in a stack being unwound.
+Exception handling is described in section \ref{environment.processes.error_handling.exceptions}.
+Stack unwinding is described in section \ref{environment:processes:error_handling:exceptions:stack_unwinding}.
