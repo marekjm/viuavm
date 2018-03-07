@@ -126,7 +126,7 @@ The message queue of a process contains an ordered sequence of the messages that
 The first message in the queue can be popped using the \instruction{receive} instruction described in section
 \ref{opcode:receive}.
 The following example puts the first value in the queue in local register 1, or throws an exception if no
-values is available after 1 second.
+value is available after 1 second.
 
 \indent{}
 \wrap{begin}
