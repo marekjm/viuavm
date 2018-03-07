@@ -1051,7 +1051,6 @@ def render_view(args):
         description = ''
         with open(os.path.join('.', 'opcodes', each, 'description')) as ifstream:
             description = ifstream.read().strip()
-        description = into_paragraphs(description)
 
 
         # encoding = []
@@ -1146,7 +1145,8 @@ def render_view(args):
         render_heading('DESCRIPTION', indent = 3 * DEFAULT_INDENT_WIDTH, noise = True)
         print()
         section_tracker.begin()
-        render_paragraphs(description,
+        render_free_form_text(
+            source = description,
             documented_instructions = documented_opcodes,
             syntax = syntax,
             indent = (4 * DEFAULT_INDENT_WIDTH),
