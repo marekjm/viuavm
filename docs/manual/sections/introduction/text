@@ -198,21 +198,26 @@ A value can be fetched from the exception register using the \instruction{draw} 
 \section{begin}
 
 There are three main register sets:
-\reflow{off}
 
-- local
-- static
-- global
-\reflow{on}
+\list{begin}
+\item
+local
+\item
+static
+\item
+global
+\list{end}
 
 Values that are placed in registers from these register sets can be accessed by any instruction.
 
 There are alse two special register sets:
-\reflow{off}
 
-- process message queue
-- exception register (a.k.a. "caught slot")
-\reflow{on}
+\list{begin}
+\item
+process message queue
+\item
+exception register (a.k.a. "caught slot")
+\list{end}
 
 Values that are placed in these registers must be moved into a register from one of the main register sets
 before they can be manipulated.
