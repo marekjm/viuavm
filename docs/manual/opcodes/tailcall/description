@@ -1,0 +1,4 @@
+Makes a tail call to a function.
+
+A tail call does not increase stack depth, it pops the caller's call frame before
+pushing its own.
