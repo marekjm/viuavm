@@ -390,6 +390,8 @@ Currently (as of 2018-02-01) vectors in Viua VM can have at most 2^64 items.
 
 Pointers can be created using the \instruction{ptr} instruction (see section \ref{opcode:ptr}).
 
+\heading{VALUE TRACKING}{noise=true}
+
 Pointers in Viua point to values, not to locations.
 This is in stark contrast to pointers in C or C++, where they point to memory locations.
 In other words, pointers in Viua "track" the values they point to: when a value is moved
@@ -418,6 +420,8 @@ iinc *2 local           ; Increment the value pointed to by the pointer in
 \wrap{end}
 \break
 
+\heading{EXPIRATION}{noise=true}
+
 Another feature provided by pointers is that they expire.
 When the value a pointer points to is deleted the pointer is marked as "expired" (no
 longer valid), and
@@ -427,9 +431,42 @@ you accidentally try to use such a pointer to access a value.
 Moving (or otherwise manipulating) expired pointers does not throw an exception, only
 using the pointer to access a value does.
 
+\wrap{begin}
+\indent{}
+integer %1 local 42     ; Create a value of type integer (valued 42) in
+                        ; local register 1.
+
+ptr %2 local %1 local   ; Create a pointer to a value in local register 1 in
+                        ; local register 2.
+
+iinc *2 local           ; Increment the value pointed to by the pointer in
+                        ; local register 2. After this instruction local register 1
+                        ; contains 43.
+
+delete %1 local         ; Delete a value in local register 1.
+                        ; Local register 1 becomes empty.
+
+iinc *2 local           ; This instruction throws an exception because the pointer it
+                        ; uses to access the value has expired.
+\dedent{}
+\wrap{end}
+\break
+
+\heading{INITIALISATION AND RESEATING}{noise=true}
+
 Pointers cannot be created uninitialised.
 A pointer is constructed from a value, and trying to construct it from an empty
 register will throw an exception.
+
+\wrap{begin}
+\indent{}
+ptr %2 local %1 local   ; Try to create a pointer to a value in local register 1 in
+                        ; local register 2. This instruction throws an exception
+                        ; because it is not legal to create a pointer that does not
+                        ; point to a value.
+\dedent{}
+\wrap{end}
+\break
 
 Pointers cannot be "reseated".
 Once a pointer is constructed and starts pointing to some value it cannot be made to
@@ -439,8 +476,40 @@ before a pointer is taken to it, a pointer can only point to things that were co
 before the pointer itself; and since a pointer cannot be reseated it cannot be made to
 point to a value that was created after it.
 
-It is possible to create pointers to pointers.
-In fact, pointers can be nested to an arbitrary depth.
+No example is provided for a reseating attempt since Viua VM assembly languages lacks
+the way to express such a construction.
+
+\heading{NESTING}{noise=true}
+
+Pointers to pointers can be arbitrarily nested.
+Creating a pointer nested to n-th level requires using n \instruction{ptr} instructions.
+Dereferencing a pointer nested to n-th level also requires using n instructions.
+Only one level of nesting can be added or subtracted in one step.
+
+\wrap{begin}
+\indent{}
+integer %1 local 42     ; Create a value of type integer (valued 42) in
+                        ; local register 1.
+
+ptr %2 local %1 local   ; Try to create a pointer to a value in local register 1 in
+                        ; local register 2. This instruction throws an exception
+                        ; because it is not legal to create a pointer that does not
+                        ; point to a value.
+
+ptr %3 local %2 local   ; Create a pointer to a value in local register 2 in
+                        ; local register 3. The pointer created in the local register 3
+                        ; is a "pointer to a pointer to an integer".
+
+move %4 local *3 local  ; Move a value dereferenced from the pointer in local register 3
+                        ; to local register 4. Moving a dereferenced value copies the
+                        ; value since there is no way to actually perform the move.
+
+iinc *4 local           ; Increment the value pointed to by the pointer in
+                        ; local register 3. After this instruction local register 1
+                        ; contains 43.
+\dedent{}
+\wrap{end}
+\break
 
 %% POINTERS
 \section{end}
