@@ -212,8 +212,24 @@ pointer dereference
 register indirect
 \list{end}
 
+The "fetch" name may be misleading in case of the direct mode.
+Direct fetch mode is also (always) used for specifying output
+register of an instruction.
+
 \heading{DIRECT}
 \section{begin}
+
+Direct, or plain, mode is identified by a '%' sign.
+A value is fetched from a register with the index specified after the '%' sign.
+
+\wrap{begin}
+\indent{4}
+integer %2 local 42     ; create a value of type integer (valued 42) in
+                        ; local register 2
+iinc %2 local           ; increment a value in local register 2 by one
+\dedent{4}
+\wrap{end}
+\break
 
 %% DIRECT
 \section{end}
@@ -221,11 +237,42 @@ register indirect
 \heading{POINTER DEREFERENCE}
 \section{begin}
 
+Pointer dereference mode is identified by a '*' sign.
+A value is fetched using a pointer located in register with the index specified after
+the '*' sign.
+
+\wrap{begin}
+\indent{4}
+integer %2 local 42     ; create a value of type integer (valued 42) in
+                        ; local register 2
+ptr %3 local %2 local   ; create a pointer to an integer in local register 3
+                        ; the pointer points to a value in local register 2
+iinc *3 local           ; increment a value pointed to by the pointer in
+                        ; local register 3
+\dedent{4}
+\wrap{end}
+\break
+
+Pointers are described in detail in section \ref{environment:data_types:pointers}.
+
 %% POINTER DEREFERENCE
 \section{end}
 
 \heading{REGISTER INDIRECT}
 \section{begin}
+
+Register indirect mode (identified by '@' sign) will fetch a value from a register with index specified by the
+integer located in register with the index specified after the '@' sign.
+For example, below code will increment a value in local register 2:
+
+\wrap{begin}
+\indent{4}
+integer %2 local 42
+integer %3 local 2
+iinc @3 local
+\dedent{4}
+\wrap{end}
+\break
 
 %% REGISTER INDIRECT
 \section{end}
@@ -237,64 +284,6 @@ register indirect
 \section{end}
 
 %% PROGRAMMING MODEL
-\section{end}
-
-\heading{FETCH MODES (OLD)}
-\section{begin}
-
-Values can be fetched from registers in three modes: 1/ direct, 2/ pointer dereference, and
-3/ register indirect.
-
-\heading{DIRECT}
-\section{begin}
-
-Direct, or plain, mode is identified by a '%' sign.
-A value is fetched from a register with the index specified after the '%' sign.
-For example, below code will increment a value located in local register 2:
-
-\reflow{off}
-\indent{4}
-integer %2 local 42
-iinc %2 local
-\dedent{4}
-\break
-\reflow{on}
-\section{end}
-
-\heading{POINTER DEREFERENCE}
-\section{begin}
-
-Pointer dereference mode (identified by '*' sign) will fetch a value that is pointed to by the pointer
-located in the register with the index specified after the '*' sign.
-For example, below code will increment a value pointed to by the pointer in local register 2:
-
-\reflow{off}
-\indent{4}
-integer %3 local 42
-ptr %2 local %3 local
-iinc *2 local
-\dedent{4}
-\break
-\reflow{on}
-\section{end}
-
-\heading{REGISTER INDIRECT}
-\section{begin}
-
-Register indirect mode (identified by '@' sign) will fetch a value from a register with index specified by the
-integer located in register with the index specified after the '@' sign.
-For example, below code will increment a value in local register 2:
-
-\reflow{off}
-\indent{4}
-integer %2 local 42
-integer %3 local 2
-iinc @3 local
-\dedent{4}
-\reflow{on}
-\break
-
-\section{end}
 \section{end}
 
 \heading{REGISTER ADDRESSING}
