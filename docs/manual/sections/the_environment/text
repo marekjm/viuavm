@@ -392,9 +392,31 @@ Pointers can be created using the \instruction{ptr} instruction (see section \re
 
 Pointers in Viua point to values, not to locations.
 This is in stark contrast to pointers in C or C++, where they point to memory locations.
-In other words, pointers in Viua track the values they point to: when a value is moved
+In other words, pointers in Viua "track" the values they point to: when a value is moved
 to a different register (even if it is in a different register set), or moved to a
 closure or a deferred function the pointer still points to that value.
+
+\wrap{begin}
+\indent{}
+integer %1 local 42     ; Create a value of type integer (valued 42) in
+                        ; local register 1.
+
+ptr %2 local %1 local   ; Create a pointer to a value in local register 1 in
+                        ; local register 2.
+
+iinc *2 local           ; Increment the value pointed to by the pointer in
+                        ; local register 2. After this instruction local register 1
+                        ; contains 43.
+
+move %3 local %1 local  ; Move the value from local register 1 to local register 3.
+                        ; Local register 1 becomes empty.
+
+iinc *2 local           ; Increment the value pointed to by the pointer in
+                        ; local register 2. After this instruction local register 3
+                        ; contains 43.
+\dedent{}
+\wrap{end}
+\break
 
 Another feature provided by pointers is that they expire.
 When the value a pointer points to is deleted the pointer is marked as "expired" (no
