@@ -108,6 +108,13 @@ registers (i.e. the value in static register 1 is destructed before the value in
 It is unspecified (as of 2018-03-07) whether static register sets are deallocated before or after the global
 register set.
 
+\heading{NOTES}
+
+Functions are responsible for setting up their static register sets.
+Since any call to a function may be the first one, access to static registers should
+be guarded by the \instruction{isnull} instruction (described in section
+\ref{opcode:isnull}).
+
 %% STATIC REGISTER SET
 \section{end}
 
