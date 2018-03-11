@@ -415,13 +415,16 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
     if section_tracker.depth() > 2:
         colorise_with = COLOR_SECTION_SUBSECTION
 
-    format_line = '{prefix}[{index}] {text}'
+    format_line = '{prefix}[{index}] {text}{ref}'
     index = section_tracker.heading(heading_text, noise = noise, extra = extra, ref = ref)
+    ref_name = ''
+    if ref is not None:
+        ref_name = ' {{{}}}'.format(ref)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-        format_line = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
-        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
+        format_line = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{ref}{top_marker_spacing}{top_marker}'
+        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - len(ref_name) - 1 -
             len(TOP_MARKER)))
         top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
 
@@ -430,6 +433,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
         index = index,
         slug = section_tracker.slug(index),
         text = colorise(heading_text, colorise_with),
+        ref = ref_name,
         top_marker = top_marker,
         top_marker_spacing = top_marker_spacing,
     ))
