@@ -138,6 +138,9 @@ of local register sets allocated for closures.
 Since closures can be called many times their local register sets must persist between calls.
 This makes them similar to static registers, but scoped only to a single closure instance.
 
+Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
+\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
+
 %% LOCAL REGISTER SET
 \section{end}
 
