@@ -198,13 +198,48 @@ A value can be fetched from the exception register using the \instruction{draw} 
 %% REGISTER SETS
 \section{end}
 
+\heading{FETCH MODES}{ref=programming_model.registers.fetch_modes}
+\section{begin}
+
+A value is fetched from a register using of three available modes:
+
+\list{begin}
+\item
+direct
+\item
+pointer dereference
+\item
+register indirect
+\list{end}
+
+\heading{DIRECT}
+\section{begin}
+
+%% DIRECT
+\section{end}
+
+\heading{POINTER DEREFERENCE}
+\section{begin}
+
+%% POINTER DEREFERENCE
+\section{end}
+
+\heading{REGISTER INDIRECT}
+\section{begin}
+
+%% REGISTER INDIRECT
+\section{end}
+
+%% FETCH MODES
+\section{end}
+
 %% REGISTERS
 \section{end}
 
 %% PROGRAMMING MODEL
 \section{end}
 
-\heading{FETCH MODES}
+\heading{FETCH MODES (OLD)}
 \section{begin}
 
 Values can be fetched from registers in three modes: 1/ direct, 2/ pointer dereference, and
