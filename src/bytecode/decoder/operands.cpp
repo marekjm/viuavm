@@ -39,19 +39,19 @@ template<class T> static auto extract(viua::internals::types::byte* ip) -> T {
     std::memcpy(&data, ip, sizeof(T));
     return data;
 }
-template<class T> static auto extract(const viua::internals::types::byte* ip) -> T {
+template<class T> static auto extract(viua::internals::types::byte const* const ip) -> T {
     return *reinterpret_cast<T*>(ip);
 }
 template<class T> static auto extract_ptr(viua::internals::types::byte* ip) -> T* {
     return reinterpret_cast<T*>(ip);
 }
 
-auto viua::bytecode::decoder::operands::get_operand_type(const viua::internals::types::byte* ip)
+auto viua::bytecode::decoder::operands::get_operand_type(viua::internals::types::byte const* const ip)
     -> OperandType {
-    return extract<const OperandType>(ip);
+    return extract<OperandType const>(ip);
 }
 
-auto viua::bytecode::decoder::operands::is_void(const viua::internals::types::byte* ip) -> bool {
+auto viua::bytecode::decoder::operands::is_void(viua::internals::types::byte const* const ip) -> bool {
     OperandType ot = get_operand_type(ip);
     return (ot == OT_VOID);
 }
@@ -75,7 +75,7 @@ auto viua::bytecode::decoder::operands::fetch_operand_type(viua::internals::type
     return tuple<viua::internals::types::byte*, OperandType>{ip, ot};
 }
 
-static auto integer_to_register_index(const viua::types::Integer::underlying_type n)
+static auto integer_to_register_index(viua::types::Integer::underlying_type const n)
     -> viua::internals::types::register_index {
     // FIXME maximum integer is greater than maximum register index, add bouns checking
     return static_cast<viua::internals::types::register_index>(n);
@@ -256,14 +256,14 @@ auto viua::bytecode::decoder::operands::extract_primitive_uint64(viua::internals
 auto viua::bytecode::decoder::operands::fetch_primitive_string(viua::internals::types::byte* ip,
                                                                viua::process::Process*)
     -> tuple<viua::internals::types::byte*, string> {
-    string s(extract_ptr<const char>(ip));
+    string s(extract_ptr<char const>(ip));
     ip += (s.size() + 1);
     return tuple<viua::internals::types::byte*, string>(ip, s);
 }
 
 auto viua::bytecode::decoder::operands::fetch_atom(viua::internals::types::byte* ip, viua::process::Process*)
     -> tuple<viua::internals::types::byte*, string> {
-    string s(extract_ptr<const char>(ip));
+    string s(extract_ptr<char const>(ip));
     ip += (s.size() + 1);
     return tuple<viua::internals::types::byte*, string>(ip, s);
 }

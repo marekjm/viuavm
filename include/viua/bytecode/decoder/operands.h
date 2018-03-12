@@ -43,7 +43,7 @@ namespace viua {
     namespace bytecode {
         namespace decoder {
             namespace operands {
-                auto get_operand_type(const viua::internals::types::byte*) -> OperandType;
+                auto get_operand_type(viua::internals::types::byte const* const) -> OperandType;
 
                 /*
                  *  Fetch fully specified operands, possibly stored in registers.
@@ -56,7 +56,7 @@ namespace viua {
                  *  These functions are used most often by majority of the instructions.
                  *
                  */
-                auto is_void(const viua::internals::types::byte*) -> bool;
+                auto is_void(viua::internals::types::byte const* const) -> bool;
                 auto fetch_void(viua::internals::types::byte*) -> viua::internals::types::byte*;
                 auto fetch_operand_type(viua::internals::types::byte*) -> std::tuple<viua::internals::types::byte*, OperandType>;
                 auto fetch_register_index(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
