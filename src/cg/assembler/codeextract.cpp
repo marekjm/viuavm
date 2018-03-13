@@ -33,18 +33,18 @@ using namespace std;
 using Token = viua::cg::lex::Token;
 
 
-auto assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens)
+auto assembler::ce::getmarks(vector<viua::cg::lex::Token> const& tokens)
     -> map<string, std::remove_reference<decltype(tokens)>::type::size_type> {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
      */
-    std::remove_reference<decltype(tokens)>::type::size_type instruction =
-        0;  // we need separate instruction counter because number of lines is not exactly number of
+    auto instruction =
+        std::remove_reference<decltype(tokens)>::type::size_type{0};  // we need separate instruction counter because number of lines is not exactly number of
             // instructions
-    map<string, decltype(instruction)> marks;
+    auto marks = map<string, decltype(instruction)>{};
 
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+    for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".name:" or tokens.at(i) == ".import:") {
             do {
                 ++i;
@@ -66,12 +66,12 @@ auto assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens)
     return marks;
 }
 
-vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& tokens) {
+auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens) -> vector<string> {
     /** This function will pass over all instructions and
      * gather .import: assembler instructions.
      */
-    vector<string> links;
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+    auto links = vector<string>{};
+    for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".import:") {
             ++i;  // skip '.import:' token
             if (tokens.at(i) == "\n") {
@@ -84,21 +84,20 @@ vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& token
     return links;
 }
 
-static bool looks_like_name_definition(Token t) {
+static auto looks_like_name_definition(Token const t) -> bool {
     return (t == ".function:" or t == ".closure:" or t == ".block:" or t == ".signature:" or
             t == ".bsignature:");
 }
-static vector<string> get_instruction_block_names(const vector<Token>& tokens, string directive,
-                                                  void predicate(Token) = [](Token) {}) {
-    vector<string> names;
-    vector<string> all_names;
-    map<string, Token> defined_where;
+static auto get_instruction_block_names(vector<Token> const& tokens, string const directive, void predicate(Token) = [](Token) {}) -> vector<string> {
+    auto names = vector<string>{};
+    auto all_names = vector<string>{};
+    auto defined_where = map<string, Token>{};
 
-    const auto limit = tokens.size();
-    string looking_for = ("." + directive + ":");
-    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+    auto const limit = tokens.size();
+    auto const looking_for = string{"." + directive + ":"};
+    for (auto i = decltype(tokens.size()){0}; i < limit; ++i) {
         if (looks_like_name_definition(tokens.at(i))) {
-            const auto first_token_of_block_header_at = i;
+            auto const first_token_of_block_header_at = i;
             ++i;
             if (i >= limit) {
                 throw tokens[i - 1];
@@ -131,7 +130,7 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
 
     return names;
 }
-vector<string> assembler::ce::get_function_names(const vector<Token>& tokens) {
+auto assembler::ce::get_function_names(vector<Token> const& tokens) -> vector<string> {
     auto names = get_instruction_block_names(
         tokens, "function", [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
     for (const auto& each : get_instruction_block_names(tokens, "closure")) {
@@ -139,28 +138,26 @@ vector<string> assembler::ce::get_function_names(const vector<Token>& tokens) {
     }
     return names;
 }
-vector<string> assembler::ce::get_signatures(const vector<Token>& tokens) {
+auto assembler::ce::get_signatures(vector<Token> const& tokens) -> vector<string> {
     return get_instruction_block_names(tokens, "signature",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
 }
-vector<string> assembler::ce::get_block_names(const vector<Token>& tokens) {
+auto assembler::ce::get_block_names(vector<Token> const& tokens) -> vector<string> {
     return get_instruction_block_names(tokens, "block",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
 }
-vector<string> assembler::ce::get_block_signatures(const vector<Token>& tokens) {
+auto assembler::ce::get_block_signatures(vector<Token> const& tokens) -> vector<string> {
     return get_instruction_block_names(tokens, "bsignature",
                                        [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
 }
 
 
-static map<string, vector<Token>> get_raw_block_bodies(const string& type, const vector<Token>& tokens) {
-    map<string, vector<Token>> invokables;
+static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens) -> map<string, vector<Token>> {
+    auto invokables = map<string, vector<Token>>{};
 
-    string looking_for = ("." + type + ":");
-    string name;
-    vector<Token> body;
+    auto const looking_for = string{ "." + type + ":" };
 
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+    for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
         if (tokens[i] == looking_for) {
             ++i;  // skip directive
 
@@ -170,9 +167,10 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
                 ++i;  // skip closing ]]
             }
 
-            name = tokens[i];
+            auto const name = tokens[i].str();
             ++i;  // skip name
 
+            auto body = vector<Token>{};
             ++i;  // skip '\n' token
             while (i < tokens.size() and tokens[i].str() != ".end") {
                 if (tokens[i] == looking_for) {
@@ -186,14 +184,12 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
             ++i;  // skip .end token
 
             invokables[name] = body;
-            name = "";
             body.clear();
         }
     }
 
     return invokables;
 }
-map<string, vector<Token>> assembler::ce::get_invokables_token_bodies(const string& type,
-                                                                      const vector<Token>& tokens) {
+auto assembler::ce::get_invokables_token_bodies(const string& type, const vector<Token>& tokens) -> map<string, vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }

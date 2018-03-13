@@ -28,15 +28,15 @@
 using namespace std;
 
 
-static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_integers = false) {
+static auto resolveregister(viua::cg::lex::Token const token, bool const allow_bare_integers = false) -> string {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `integer` instruction or in `branch` in condition operand.
      *
      *  This function MUST return string as teh result is further passed to assembler::operands::getint()
      * function which *expects* string.
      */
-    ostringstream out;
-    string reg = token.str();
+    auto out = ostringstream{};
+    auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register, everything is still nice and
          * simple.
@@ -78,7 +78,7 @@ static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_
 }
 
 
-int_op assembler::operands::getint(const string& s, const bool allow_bare_integers) {
+auto assembler::operands::getint(string const& s, bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -98,8 +98,7 @@ int_op assembler::operands::getint(const string& s, const bool allow_bare_intege
     }
 }
 
-int_op assembler::operands::getint_with_rs_type(const string& s, const viua::internals::RegisterSets rs_type,
-                                                const bool allow_bare_integers) {
+auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::RegisterSets const rs_type, bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -119,8 +118,8 @@ int_op assembler::operands::getint_with_rs_type(const string& s, const viua::int
     }
 }
 
-int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) {
-    string s = resolveregister(tokens.at(i));
+auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, decltype(tokens.size()) const i) -> int_op {
+    auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
@@ -130,7 +129,7 @@ int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, d
         return int_op(IntegerOperandType::VOID);
     }
 
-    int_op iop;
+    auto iop = int_op{};
     if (s.at(0) == '@') {
         iop = int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
@@ -146,49 +145,45 @@ int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, d
     return iop;
 }
 
-byte_op assembler::operands::getbyte(const string& s) {
-    bool ref = s[0] == '@';
+auto assembler::operands::getbyte(string const& s) -> byte_op {
+    auto const ref = (s[0] == '@');
     return tuple<bool, char>(ref, static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
-float_op assembler::operands::getfloat(const string& s) {
-    bool ref = s[0] == '@';
+auto assembler::operands::getfloat(string const& s) -> float_op {
+    auto const ref = (s[0] == '@');
     return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
 }
 
-tuple<string, string> assembler::operands::get2(string s) {
+auto assembler::operands::get2(string const s) -> tuple<string, string> {
     /** Returns tuple of two strings - two operands chunked from the `s` string.
      */
-    string op_a, op_b;
-    op_a = str::chunk(s);
-    s = str::sub(s, op_a.size());
-    op_b = str::chunk(s);
+    auto const op_a = str::chunk(s);
+    auto const op_b = str::chunk(str::sub(s, op_a.size()));
     return tuple<string, string>(op_a, op_b);
 }
 
-tuple<string, string, string> assembler::operands::get3(string s, bool fill_third) {
-    string op_a, op_b, op_c;
+auto assembler::operands::get3(string const s, bool const fill_third) -> tuple<string, string, string> {
+    auto const op_a = str::chunk(s);
+    auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
-    op_a = str::chunk(s);
-    s = str::lstrip(str::sub(s, op_a.size()));
-
-    op_b = str::chunk(s);
-    s = str::lstrip(str::sub(s, op_b.size()));
+    auto const op_b = str::chunk(s_after_a);
+    auto const s_after_b = str::lstrip(str::sub(s_after_a, op_b.size()));
 
     /* If s is empty and fill_third is true, use first operand as a filler.
      * In any other case, use the chunk of s.
      * The chunk of empty string will give us empty string and
      * it is a valid (and sometimes wanted) value to return.
      */
-    op_c = (s.size() == 0 and fill_third ? op_a : str::chunk(s));
+    auto const op_c = (s.size() == 0 and fill_third ? op_a : str::chunk(s_after_b));
 
     return tuple<string, string, string>(op_a, op_b, op_c);
 }
 
-auto assembler::operands::convert_token_to_bitstring_operand(const viua::cg::lex::Token token)
+auto assembler::operands::convert_token_to_bitstring_operand(viua::cg::lex::Token const token)
     -> vector<uint8_t> {
-    auto s = token.str();
-    string normalised_version;
+    auto const s = token.str();
+    auto normalised_version = string{};
     if (s.at(1) == 'b') {
         normalised_version = normalise_binary_literal(s.substr(2));
     } else if (s.at(1) == 'o') {
@@ -199,13 +194,13 @@ auto assembler::operands::convert_token_to_bitstring_operand(const viua::cg::lex
         throw viua::cg::lex::InvalidSyntax(token);
     }
 
-    string workable_version = normalised_version;
-    reverse(workable_version.begin(), workable_version.end());
+    reverse(normalised_version.begin(), normalised_version.end());
+    auto const workable_version = normalised_version;
 
-    vector<uint8_t> converted;
-    uint8_t part = 0;
-    for (decltype(workable_version)::size_type i = 0; i < workable_version.size(); ++i) {
-        uint8_t one = 1;
+    auto converted = vector<uint8_t>{};
+    auto part = uint8_t{0};
+    for (auto i = decltype(workable_version)::size_type{0}; i < workable_version.size(); ++i) {
+        auto one = uint8_t{1};
         if (workable_version.at(i) == '1') {
             one = static_cast<uint8_t>(one << (i % 8));
             part = (part | one);

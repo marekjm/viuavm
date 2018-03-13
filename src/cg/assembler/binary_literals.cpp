@@ -21,8 +21,8 @@
 using namespace std;
 
 
-auto assembler::operands::normalise_binary_literal(const string s) -> string {
-    ostringstream oss;
+auto assembler::operands::normalise_binary_literal(string const s) -> string {
+    auto oss = ostringstream{};
 
     if (s.size() == 0) {
         // FIXME create InternalError class
@@ -43,16 +43,16 @@ auto assembler::operands::normalise_binary_literal(const string s) -> string {
 
     return oss.str();
 }
-static auto strip_leading_zeroes(const string s) -> string {
+static auto strip_leading_zeroes(string const s) -> string {
     auto leading_zeroes = decltype(s)::size_type{0};
     while (leading_zeroes < s.size() and s.at(leading_zeroes) == '0') {
         ++leading_zeroes;
     }
     return (leading_zeroes < s.size() ? s.substr(leading_zeroes) : "0");
 }
-auto assembler::operands::octal_to_binary_literal(const string s) -> string {
+auto assembler::operands::octal_to_binary_literal(string const s) -> string {
     ostringstream oss;
-    const static map<const char, const string> lookup = {
+    static map<const char, const string> const lookup = {
         {
             '0',
             "000",
@@ -86,14 +86,14 @@ auto assembler::operands::octal_to_binary_literal(const string s) -> string {
             "111",
         },
     };
-    for (const auto c : s.substr(2)) {
+    for (auto const c : s.substr(2)) {
         oss << lookup.at(c);
     }
     return strip_leading_zeroes(oss.str());
 }
-auto assembler::operands::hexadecimal_to_binary_literal(const string s) -> string {
+auto assembler::operands::hexadecimal_to_binary_literal(string const s) -> string {
     ostringstream oss;
-    const static map<const char, const string> lookup = {
+    static map<const char, const string> const lookup = {
         {
             '0',
             "0000",
@@ -159,7 +159,7 @@ auto assembler::operands::hexadecimal_to_binary_literal(const string s) -> strin
             "1111",
         },
     };
-    for (const auto c : s.substr(2)) {
+    for (auto const c : s.substr(2)) {
         oss << lookup.at(c);
     }
     return strip_leading_zeroes(oss.str());

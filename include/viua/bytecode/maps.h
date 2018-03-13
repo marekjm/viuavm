@@ -31,7 +31,7 @@
 #include <viua/bytecode/operand_types.h>
 
 
-const std::map<enum OPCODE, std::string> OP_NAMES = {
+std::map<enum OPCODE, std::string> const OP_NAMES = {
     {NOP, "nop"},
 
     {IZERO, "izero"},
