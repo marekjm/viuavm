@@ -571,16 +571,14 @@ namespace cg {
             return insert_ri_operand(addr_ptr, source_register);
         }
 
-        viua::internals::types::byte* opcapturecopy(viua::internals::types::byte* addr_ptr, int_op target_closure, int_op target_register,
-                                                    int_op source_register) {
+        auto opcapturecopy(viua::internals::types::byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) -> viua::internals::types::byte* {
             *(addr_ptr++) = CAPTURECOPY;
             addr_ptr = insert_ri_operand(addr_ptr, target_closure);
             addr_ptr = insert_ri_operand(addr_ptr, target_register);
             return insert_ri_operand(addr_ptr, source_register);
         }
 
-        viua::internals::types::byte* opcapturemove(viua::internals::types::byte* addr_ptr, int_op target_closure, int_op target_register,
-                                                    int_op source_register) {
+        auto opcapturemove(viua::internals::types::byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) -> viua::internals::types::byte* {
             *(addr_ptr++) = CAPTUREMOVE;
             addr_ptr = insert_ri_operand(addr_ptr, target_closure);
             addr_ptr = insert_ri_operand(addr_ptr, target_register);
@@ -716,8 +714,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        viua::internals::types::byte* opif(viua::internals::types::byte* addr_ptr, int_op regc, viua::internals::types::bytecode_size addr_truth,
-                                           viua::internals::types::bytecode_size addr_false) {
+        auto opif(viua::internals::types::byte* addr_ptr, int_op regc, viua::internals::types::bytecode_size addr_truth, viua::internals::types::bytecode_size addr_false) -> viua::internals::types::byte* {
             *(addr_ptr++) = IF;
             addr_ptr = insert_ri_operand(addr_ptr, regc);
 
