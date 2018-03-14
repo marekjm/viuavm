@@ -112,8 +112,8 @@ static auto insert_four_ri_instruction(viua::internals::types::byte* addr_ptr, e
 static auto insert_type_prefixed_string(viua::internals::types::byte* ptr, const string& s, const OperandType op_type) -> viua::internals::types::byte* {
     *(reinterpret_cast<OperandType*>(ptr)) = op_type;
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
-        *(ptr++) = static_cast<viua::internals::types::byte>(s[i]);
+    for (auto const each : s) {
+        *(ptr++) = static_cast<viua::internals::types::byte>(each);
     }
     *(ptr++) = '\0';
     return ptr;
@@ -138,8 +138,8 @@ static auto insert_size_and_type_prefixed_bitstring(viua::internals::types::byte
 }
 
 static auto insert_string(viua::internals::types::byte* ptr, const string& s) -> viua::internals::types::byte* {
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
-        *(ptr++) = static_cast<viua::internals::types::byte>(s[i]);
+    for (auto const each : s) {
+        *(ptr++) = static_cast<viua::internals::types::byte>(each);
     }
     *(ptr++) = '\0';
     return ptr;
