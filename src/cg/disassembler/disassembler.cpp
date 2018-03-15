@@ -33,7 +33,7 @@ using namespace std;
 using viua::util::memory::load_aligned;
 
 
-string disassembler::intop(viua::internals::types::byte* ptr) {
+auto disassembler::intop(viua::internals::types::byte* ptr) -> string {
     ostringstream oss;
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
@@ -68,7 +68,7 @@ string disassembler::intop(viua::internals::types::byte* ptr) {
 
     return oss.str();
 }
-string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
+auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> string {
     ostringstream oss;
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
@@ -158,8 +158,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
 
     return oss.str();
 }
-static auto disassemble_bit_string(viua::internals::types::byte* ptr,
-                                   const viua::internals::types::bits_size size) -> string {
+static auto disassemble_bit_string(viua::internals::types::byte* ptr, const viua::internals::types::bits_size size) -> string {
     const static map<uint8_t, char> decodings = {
         {
             0b0000,
@@ -246,10 +245,10 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr,
     return oss.str();
 }
 
-static viua::internals::types::timeout decode_timeout(viua::internals::types::byte* ptr) {
+static auto decode_timeout(viua::internals::types::byte* ptr) -> viua::internals::types::timeout {
     return load_aligned<viua::internals::types::timeout>(ptr);
 }
-static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr) {
+static auto disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop(ptr);
 
     switch (*ptr) {
@@ -272,8 +271,7 @@ static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::
     }
     return ptr;
 }
-static viua::internals::types::byte* disassemble_ri_operand_with_rs_type(ostream& oss,
-                                                                         viua::internals::types::byte* ptr) {
+static auto disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
     switch (*ptr) {
@@ -296,8 +294,7 @@ static viua::internals::types::byte* disassemble_ri_operand_with_rs_type(ostream
     }
     return ptr;
 }
-tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
-    viua::internals::types::byte* ptr) {
+auto disassembler::instruction( viua::internals::types::byte* ptr) -> tuple<string, viua::internals::types::bytecode_size> {
     viua::internals::types::byte* saved_ptr = ptr;
 
     OPCODE op = OPCODE(*saved_ptr);

@@ -28,17 +28,17 @@
 
 
 // Helper functions for checking if a container contains an item.
-template<typename T> bool in(std::vector<T> v, T item) {
+template<typename T> auto in(std::vector<T> v, T item) -> bool {
     return (std::find(v.begin(), v.end(), item) != v.end());
 }
-template<typename K, typename V> bool in(std::map<K, V> m, K key) {
+template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool {
     return (m.count(key) == 1);
 }
 
 namespace disassembler {
-    std::string intop(viua::internals::types::byte*);
-    std::string intop_with_rs_type(viua::internals::types::byte*);
-    std::tuple<std::string, viua::internals::types::bytecode_size> instruction(viua::internals::types::byte*);
+    auto intop(viua::internals::types::byte*) -> std::string;
+    auto intop_with_rs_type(viua::internals::types::byte*) -> std::string;
+    auto instruction(viua::internals::types::byte*) -> std::tuple<std::string, viua::internals::types::bytecode_size>;
 }
 
 
