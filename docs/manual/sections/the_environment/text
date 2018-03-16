@@ -392,28 +392,52 @@ Pointers can be created using the \instruction{ptr} instruction (see section \re
 
 Pointers in Viua point to values, not to locations.
 This is in stark contrast to pointers in C or C++, where they point to memory locations.
-In other words, pointers in Viua track the values they point to: when a value is moved to a different
-register (even if it is in a different register set), or moved to a closure or a deferred function the
-pointer still points to that value.
+In other words, pointers in Viua "track" the values they point to: when a value is moved
+to a different register (even if it is in a different register set), or moved to a
+closure or a deferred function the pointer still points to that value.
+
+\wrap{begin}
+\indent{}
+integer %1 local 42     ; Create a value of type integer (valued 42) in
+                        ; local register 1.
+
+ptr %2 local %1 local   ; Create a pointer to a value in local register 1 in
+                        ; local register 2.
+
+iinc *2 local           ; Increment the value pointed to by the pointer in
+                        ; local register 2. After this instruction local register 1
+                        ; contains 43.
+
+move %3 local %1 local  ; Move the value from local register 1 to local register 3.
+                        ; Local register 1 becomes empty.
+
+iinc *2 local           ; Increment the value pointed to by the pointer in
+                        ; local register 2. After this instruction local register 3
+                        ; contains 43.
+\dedent{}
+\wrap{end}
+\break
 
 Another feature provided by pointers is that they expire.
-When the value a pointer points to is deleted the pointer is marked as "expired" (no longer valid), and
+When the value a pointer points to is deleted the pointer is marked as "expired" (no
+longer valid), and
 any access through that pointer results in an exception being thrown by the VM.
-You can still write programs that will have dangling pointers, but you can recover if you accidentally try to
-use such a pointer to access a value.
-Moving (or otherwise manipulating) expired pointers does not throw an exception, only using the pointer to
-access a value does.
+You can still write programs that will have dangling pointers, but you can recover if
+you accidentally try to use such a pointer to access a value.
+Moving (or otherwise manipulating) expired pointers does not throw an exception, only
+using the pointer to access a value does.
 
 Pointers cannot be created uninitialised.
-A pointer is constructed from a value, and trying to construct it from an empty register will throw an
-exception.
+A pointer is constructed from a value, and trying to construct it from an empty
+register will throw an exception.
 
 Pointers cannot be "reseated".
-Once a pointer is constructed and starts pointing to some value it cannot be made to point to a different one,
-the binding established at construction time is immutable.
-This also means that pointers cannot be used to create cycles - since a value must exist before a pointer is
-taken to it, a pointer can only point to things that were constructed before the pointer itself; and since a
-pointer cannot be reseated it cannot be made to point to a value that was created after it.
+Once a pointer is constructed and starts pointing to some value it cannot be made to
+point to a different one, the binding established at construction time is immutable.
+This also means that pointers cannot be used to create cycles - since a value must exist
+before a pointer is taken to it, a pointer can only point to things that were constructed
+before the pointer itself; and since a pointer cannot be reseated it cannot be made to
+point to a value that was created after it.
 
 It is possible to create pointers to pointers.
 In fact, pointers can be nested to an arbitrary depth.
@@ -436,3 +460,5 @@ systems.
 
 %% THE ENVIRONMENT
 \section{end}
+
+%% vim:set ft=tex:

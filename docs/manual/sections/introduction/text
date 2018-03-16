@@ -108,6 +108,13 @@ registers (i.e. the value in static register 1 is destructed before the value in
 It is unspecified (as of 2018-03-07) whether static register sets are deallocated before or after the global
 register set.
 
+\heading{NOTES}
+
+Functions are responsible for setting up their static register sets.
+Since any call to a function may be the first one, access to static registers should
+be guarded by the \instruction{isnull} instruction (described in section
+\ref{opcode:isnull}).
+
 %% STATIC REGISTER SET
 \section{end}
 
@@ -136,7 +143,10 @@ This usually means that it is accessible only for the duration of a single funct
 of local register sets allocated for closures.
 
 Since closures can be called many times their local register sets must persist between calls.
-This makes them similar to static registers, but only when closures are concerned.
+This makes them similar to static registers, but scoped only to a single closure instance.
+
+Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
+\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
 
 %% LOCAL REGISTER SET
 \section{end}
@@ -188,144 +198,64 @@ A value can be fetched from the exception register using the \instruction{draw} 
 %% REGISTER SETS
 \section{end}
 
-%% REGISTERS
-\section{end}
-
-%% PROGRAMMING MODEL
-\section{end}
-
-\heading{REGISTER SETS}
+\heading{FETCH MODES}{ref=programming_model.registers.fetch_modes}
 \section{begin}
 
-There are three main register sets:
+A value is fetched from a register using of three available modes:
 
 \list{begin}
 \item
-local
+direct
 \item
-static
+pointer dereference
 \item
-global
+register indirect
 \list{end}
 
-Values that are placed in registers from these register sets can be accessed by any instruction.
-
-There are alse two special register sets:
-
-\list{begin}
-\item
-process message queue
-\item
-exception register (a.k.a. "caught slot")
-\list{end}
-
-Values that are placed in these registers must be moved into a register from one of the main register sets
-before they can be manipulated.
-Use \instruction{receive} instruction to get values out of the process message queue, and use
-\instruction{draw} instruction to get values out of the exception register (after an exception is caught).
-
-All register sets are local to their processes.
-No values are shared between processes - sending a value to another process makes a copy.
-
-\heading{LOCAL REGISTER SET}
-\section{begin}
-
-Local register set is bound to a call frame, or a closure, and exists for as long as the entity it is bound to
-exists.
-Local register set that is bound to a call frame is discarded when that frame is dropped from the stack.
-Local register set that is bound to a closure is discarded when that closure is discarded.
-
-\heading{CAPACITY}
-\section{begin}
-
-Capacity of each local register set may be different (it depends on the number of registers requested when
-either a frame or a closure containing the local register set is created).
-The capacity is limited to 2^32 registers.
-\section{end}
-
-\heading{NOTES}
-\section{begin}
-
-Tail calls do not inherit local register set.
-In Viua, tail calls replace instead of reusing the last call frame (meaning that the size of the last frame
-can change) so the register set is created anew.
-
-\section{end}
-\section{end}
-
-\heading{STATIC REGISTER SET}
-\section{begin}
-
-Static register set is bound to a function in a process.
-The same function in two different processes has two different static register sets.
-Static register set is discarded when the process it is bound to finishes execution.
-The order in which static register sets for different functions are discarded after a process finishes
-execution is random.
-
-\heading{CAPACITY}
-\section{begin}
-
-Currently (2018-01-02) fixed at 16 registers.
-
-\section{end}
-
-\heading{NOTES}
-\section{begin}
-
-Functions are responsible for setting up their static registers.
-Any call to a function may be the first one, so access to static registers should be guarded by
-\instruction{isnull} instruction.
-
-\section{end}
-\section{end}
-
-\heading{GLOBAL REGISTER SET}
-\section{begin}
-
-Global register set is bound to a process.
-It is accessible from all call frames of this process.
-It is discarded when the process it is bound to finishes execution.
-
-\section{end}
-\section{end}
-
-\heading{FETCH MODES}
-\section{begin}
-
-Values can be fetched from registers in three modes: 1/ direct, 2/ pointer dereference, and
-3/ register indirect.
+The "fetch" name may be misleading in case of the direct mode.
+Direct fetch mode is also (always) used for specifying output
+register of an instruction.
 
 \heading{DIRECT}
 \section{begin}
 
 Direct, or plain, mode is identified by a '%' sign.
 A value is fetched from a register with the index specified after the '%' sign.
-For example, below code will increment a value located in local register 2:
 
-\reflow{off}
+\wrap{begin}
 \indent{4}
-integer %2 local 42
-iinc %2 local
+integer %2 local 42     ; create a value of type integer (valued 42) in
+                        ; local register 2
+iinc %2 local           ; increment a value in local register 2 by one
 \dedent{4}
+\wrap{end}
 \break
-\reflow{on}
+
+%% DIRECT
 \section{end}
 
 \heading{POINTER DEREFERENCE}
 \section{begin}
 
-Pointer dereference mode (identified by '*' sign) will fetch a value that is pointed to by the pointer
-located in the register with the index specified after the '*' sign.
-For example, below code will increment a value pointed to by the pointer in local register 2:
+Pointer dereference mode is identified by a '*' sign.
+A value is fetched using a pointer located in register with the index specified after
+the '*' sign.
 
-\reflow{off}
+\wrap{begin}
 \indent{4}
-integer %3 local 42
-ptr %2 local %3 local
-iinc *2 local
+integer %2 local 42     ; create a value of type integer (valued 42) in
+                        ; local register 2
+ptr %3 local %2 local   ; create a pointer to an integer in local register 3
+                        ; the pointer points to a value in local register 2
+iinc *3 local           ; increment a value pointed to by the pointer in
+                        ; local register 3
 \dedent{4}
+\wrap{end}
 \break
-\reflow{on}
+
+Pointers are described in detail in section \ref{environment:data_types:pointers}.
+
+%% POINTER DEREFERENCE
 \section{end}
 
 \heading{REGISTER INDIRECT}
@@ -335,16 +265,25 @@ Register indirect mode (identified by '@' sign) will fetch a value from a regist
 integer located in register with the index specified after the '@' sign.
 For example, below code will increment a value in local register 2:
 
-\reflow{off}
+\wrap{begin}
 \indent{4}
 integer %2 local 42
 integer %3 local 2
 iinc @3 local
 \dedent{4}
-\reflow{on}
+\wrap{end}
 \break
 
+%% REGISTER INDIRECT
 \section{end}
+
+%% FETCH MODES
+\section{end}
+
+%% REGISTERS
+\section{end}
+
+%% PROGRAMMING MODEL
 \section{end}
 
 \heading{REGISTER ADDRESSING}

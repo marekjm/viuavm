@@ -415,13 +415,16 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
     if section_tracker.depth() > 2:
         colorise_with = COLOR_SECTION_SUBSECTION
 
-    format_line = '{prefix}[{index}] {text}'
+    format_line = '{prefix}[{index}] {text}{ref}'
     index = section_tracker.heading(heading_text, noise = noise, extra = extra, ref = ref)
+    ref_name = ''
+    if ref is not None:
+        ref_name = ' {{{}}}'.format(ref)
     top_marker = ''
     top_marker_spacing = ''
     if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-        format_line = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
-        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
+        format_line = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{ref}{top_marker_spacing}{top_marker}'
+        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - len(ref_name) - 1 -
             len(TOP_MARKER)))
         top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
 
@@ -430,6 +433,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
         index = index,
         slug = section_tracker.slug(index),
         text = colorise(heading_text, colorise_with),
+        ref = ref_name,
         top_marker = top_marker,
         top_marker_spacing = top_marker_spacing,
     ))
@@ -995,7 +999,10 @@ def render_view(args):
         print('VIUA VM MANUAL'.center(LINE_WIDTH))
         print()
 
-        print(r'\toc{}')
+        print(r'\toc{overview}')
+        print()
+
+        print(r'\toc{full}')
         print()
 
         render_section('introduction', documented_instructions = documented_opcodes)
@@ -1236,6 +1243,47 @@ def render_view(args):
 def emit_line(s = ''):
     sys.stdout.write('{}\n'.format(s))
 
+def render_toc(max_depth = None, title = 'TABLE OF CONTENTS'):
+    emit_line('{}'.format(title.center(LINE_WIDTH)))
+    emit_line()
+    longest_index = max(map(len, map(lambda e: e[0], section_tracker.recorded_headings()))) + 1
+    for index, heading, noise, extra, ref in section_tracker.recorded_headings():
+        if noise:
+            continue
+        character = '.'
+        if max_depth is not None and index.count('.') > max_depth:
+            continue
+        if max_depth is not None and index.count('.') == 0:
+            character = '_'
+        if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+            just = (character * (LINE_WIDTH - longest_index - 1 - len(heading)))
+            heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
+                just = just,
+                slug = section_tracker.slug(index),
+                text = heading,
+            )
+            emit_line('{}{}'.format(
+                (index + ' ').ljust(longest_index, character),
+                heading_link,
+            ))
+        else:
+            emit_line('{}{}'.format(
+                (index + ' ').ljust(longest_index, character),
+                (' ' + heading).rjust((LINE_WIDTH - longest_index), character),
+            ))
+    emit_line()
+    emit_line('{}'.format('-' * LINE_WIDTH))
+    emit_line()
+
+def render_toc_overview():
+    render_toc(
+        max_depth = 0,
+        title = 'OVERVIEW OF CONTENTS',
+    )
+
+def render_toc_full():
+    render_toc()
+
 def main(args):
     render_view(args)
 
@@ -1260,35 +1308,11 @@ def main(args):
     emit_line('{}\n'.format('-' * LINE_WIDTH))
 
     for each in RENDERED_LINES:
-        if each == r'\toc{}':
-            emit_line('{}'.format('TABLE OF CONTENTS'.center(LINE_WIDTH)))
-            emit_line()
-            longest_index = max(map(len, map(lambda e: e[0], section_tracker.recorded_headings()))) + 1
-            for index, heading, noise, extra, ref in section_tracker.recorded_headings():
-                if noise:
-                    continue
-                character = '.'
-                if index.count('.') == 0:
-                    character = '_'
-                if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
-                    just = (character * (LINE_WIDTH - longest_index - 1 - len(heading)))
-                    heading_link = '{just} <a href="#{slug}">{text}</a>'.format(
-                        just = just,
-                        slug = section_tracker.slug(index),
-                        text = heading,
-                    )
-                    emit_line('{}{}'.format(
-                        (index + ' ').ljust(longest_index, character),
-                        heading_link,
-                    ))
-                else:
-                    emit_line('{}{}'.format(
-                        (index + ' ').ljust(longest_index, character),
-                        (' ' + heading).rjust((LINE_WIDTH - longest_index), character),
-                    ))
-            emit_line()
-            emit_line('{}'.format('-' * LINE_WIDTH))
-            emit_line()
+        if each == r'\toc{overview}':
+            render_toc_overview()
+            continue
+        if each == r'\toc{full}':
+            render_toc_full()
             continue
         emit_line('{}'.format(each))
 
