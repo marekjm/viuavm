@@ -34,8 +34,8 @@
 namespace assembler {
     namespace operands {
         auto getint(const std::string& s, const bool = false) -> int_op;
-        auto getint_with_rs_type(const std::string&, const viua::internals::RegisterSets,
-                                   const bool = false) -> int_op;
+        auto getint_with_rs_type(const std::string&, const viua::internals::RegisterSets, const bool = false)
+            -> int_op;
         auto getint(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size())) -> int_op;
         auto getbyte(const std::string& s) -> byte_op;
         auto getfloat(const std::string& s) -> float_op;
@@ -47,7 +47,7 @@ namespace assembler {
 
         auto get2(std::string s) -> std::tuple<std::string, std::string>;
         auto get3(std::string s, bool fill_third = true) -> std::tuple<std::string, std::string, std::string>;
-    }
+    }  // namespace operands
 
     namespace ce {
         auto getmarks(const std::vector<viua::cg::lex::Token>& tokens)
@@ -58,15 +58,22 @@ namespace assembler {
         auto get_signatures(const std::vector<viua::cg::lex::Token>&) -> std::vector<std::string>;
         auto get_block_names(const std::vector<viua::cg::lex::Token>&) -> std::vector<std::string>;
         auto get_block_signatures(const std::vector<viua::cg::lex::Token>&) -> std::vector<std::string>;
-        auto get_invokables(const std::string& type, const std::vector<viua::cg::lex::Token>&) -> std::map<std::string, std::vector<std::string>>;
-        auto get_invokables_token_bodies(const std::string&, const std::vector<viua::cg::lex::Token>&) -> std::map<std::string, std::vector<viua::cg::lex::Token>>;
-    }
+        auto get_invokables(const std::string& type, const std::vector<viua::cg::lex::Token>&)
+            -> std::map<std::string, std::vector<std::string>>;
+        auto get_invokables_token_bodies(const std::string&, const std::vector<viua::cg::lex::Token>&)
+            -> std::map<std::string, std::vector<viua::cg::lex::Token>>;
+    }  // namespace ce
 
     namespace verify {
-        auto function_calls_are_defined(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&) -> void;
-        auto callable_creations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&) -> void;
-        auto manipulation_of_defined_registers(const std::vector<viua::cg::lex::Token>&, const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool) -> void;
-    }
+        auto function_calls_are_defined(const std::vector<viua::cg::lex::Token>&,
+                                        const std::vector<std::string>&, const std::vector<std::string>&)
+            -> void;
+        auto callable_creations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&,
+                                const std::vector<std::string>&) -> void;
+        auto manipulation_of_defined_registers(
+            const std::vector<viua::cg::lex::Token>&,
+            const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool) -> void;
+    }  // namespace verify
 
     namespace utils {
         auto get_function_name_regex() -> std::regex;
@@ -91,9 +98,9 @@ namespace assembler {
             auto make_function_signature(const std::string&) -> std::string;
             auto make_block_signature(const std::string&) -> std::string;
             auto make_info(const std::string&, const std::string&) -> std::string;
-        }
-    }
-}
+        }  // namespace lines
+    }      // namespace utils
+}  // namespace assembler
 
 
 #endif

@@ -31,15 +31,14 @@
 template<typename T> auto in(std::vector<T> v, T item) -> bool {
     return (std::find(v.begin(), v.end(), item) != v.end());
 }
-template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool {
-    return (m.count(key) == 1);
-}
+template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool { return (m.count(key) == 1); }
 
 namespace disassembler {
     auto intop(viua::internals::types::byte*) -> std::string;
     auto intop_with_rs_type(viua::internals::types::byte*) -> std::string;
-    auto instruction(viua::internals::types::byte*) -> std::tuple<std::string, viua::internals::types::bytecode_size>;
-}
+    auto instruction(viua::internals::types::byte*)
+        -> std::tuple<std::string, viua::internals::types::bytecode_size>;
+}  // namespace disassembler
 
 
 #endif

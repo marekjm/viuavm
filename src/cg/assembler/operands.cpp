@@ -28,7 +28,8 @@
 using namespace std;
 
 
-static auto resolveregister(viua::cg::lex::Token const token, bool const allow_bare_integers = false) -> string {
+static auto resolveregister(viua::cg::lex::Token const token, bool const allow_bare_integers = false)
+    -> string {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `integer` instruction or in `branch` in condition operand.
      *
@@ -98,7 +99,8 @@ auto assembler::operands::getint(string const& s, bool const allow_bare_integers
     }
 }
 
-auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::RegisterSets const rs_type, bool const allow_bare_integers) -> int_op {
+auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::RegisterSets const rs_type,
+                                              bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -118,7 +120,8 @@ auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::
     }
 }
 
-auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, decltype(tokens.size()) const i) -> int_op {
+auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, decltype(tokens.size()) const i)
+    -> int_op {
     auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {

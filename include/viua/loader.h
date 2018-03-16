@@ -25,15 +25,16 @@
 
 #include <cstdint>
 #include <fstream>
-#include <tuple>
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
-#include <viua/machine.h>
+#include <string>
+#include <tuple>
+#include <vector>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/machine.h>
 
-typedef std::tuple<std::vector<std::string>, std::map<std::string, viua::internals::types::bytecode_size> > IdToAddressMapping;
+typedef std::tuple<std::vector<std::string>, std::map<std::string, viua::internals::types::bytecode_size>>
+    IdToAddressMapping;
 
 template<class T> void readinto(std::ifstream& in, T* object) {
     in.read(reinterpret_cast<char*>(object), sizeof(T));
@@ -73,7 +74,7 @@ class Loader {
     void load_blocks_map(std::ifstream&);
     void load_bytecode(std::ifstream&);
 
-    public:
+  public:
     Loader& load();
     Loader& executable();
 
@@ -94,9 +95,8 @@ class Loader {
     std::map<std::string, viua::internals::types::bytecode_size> get_block_addresses();
     std::vector<std::string> get_blocks();
 
-    Loader(std::string pth): path(pth), size(0), bytecode(nullptr) {}
-    ~Loader() {
-    }
+    Loader(std::string pth) : path(pth), size(0), bytecode(nullptr) {}
+    ~Loader() {}
 };
 
 

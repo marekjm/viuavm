@@ -26,11 +26,12 @@
 #include <viua/bytecode/bytetypedef.h>
 
 class Catcher {
-    public:
-        std::string caught_type;
-        std::string catcher_name;
+  public:
+    std::string caught_type;
+    std::string catcher_name;
 
-        Catcher(const std::string& type_name, const std::string& catching_block): caught_type(type_name), catcher_name(catching_block) {}
+    Catcher(const std::string& type_name, const std::string& catching_block)
+        : caught_type(type_name), catcher_name(catching_block) {}
 };
 
 

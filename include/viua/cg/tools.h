@@ -30,9 +30,7 @@
 namespace viua {
     namespace cg {
         namespace tools {
-            template<class T> static bool any(T item, T other) {
-                return (item == other);
-            }
+            template<class T> static bool any(T item, T other) { return (item == other); }
             template<class T, class... R> static bool any(T item, T first, R... rest) {
                 if (item == first) {
                     return true;
@@ -40,11 +38,14 @@ namespace viua {
                 return any(item, rest...);
             }
 
-            viua::internals::types::bytecode_size calculate_bytecode_size_of_first_n_instructions2(const std::vector<viua::cg::lex::Token>& tokens, const std::remove_reference<decltype(tokens)>::type::size_type limit);
-            viua::internals::types::bytecode_size calculate_bytecode_size2(const std::vector<viua::cg::lex::Token>&);
-        }
-    }
-}
+            viua::internals::types::bytecode_size calculate_bytecode_size_of_first_n_instructions2(
+                const std::vector<viua::cg::lex::Token>& tokens,
+                const std::remove_reference<decltype(tokens)>::type::size_type limit);
+            viua::internals::types::bytecode_size calculate_bytecode_size2(
+                const std::vector<viua::cg::lex::Token>&);
+        }  // namespace tools
+    }      // namespace cg
+}  // namespace viua
 
 
 #endif

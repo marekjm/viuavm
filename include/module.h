@@ -36,13 +36,12 @@ const std::vector<const char*> VIUAPATH = {
 };
 
 
-
 /** External modules must export the "exports()" function.
  *  Should a module fail to provide this function, it is deemed invalid and is rejected by the VM.
  */
 
 // External functions must have this signature
-typedef Type* (ForeignFunction)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*);
+typedef Type*(ForeignFunction)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*);
 
 // Specification of single external function
 // The "exports()" function returns an array of such structures.

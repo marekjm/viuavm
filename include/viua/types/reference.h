@@ -59,8 +59,8 @@ namespace viua {
             Reference(Value* ptr);
             virtual ~Reference();
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

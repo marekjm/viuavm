@@ -161,9 +161,9 @@ namespace viua {
             std::vector<Token> unwrap_lines(std::vector<Token>, bool full = true);
 
             std::vector<Token> cook(std::vector<Token>, const bool = true);
-        }
-    }
-}
+        }  // namespace lex
+    }      // namespace cg
+}  // namespace viua
 
 
 #endif

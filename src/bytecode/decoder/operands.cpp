@@ -255,14 +255,14 @@ auto viua::bytecode::decoder::operands::extract_primitive_uint64(viua::internals
 auto viua::bytecode::decoder::operands::fetch_primitive_string(viua::internals::types::byte* ip,
                                                                viua::process::Process*)
     -> tuple<viua::internals::types::byte*, string> {
-    auto const s = string{ extract_ptr<char const>(ip) };
+    auto const s = string{extract_ptr<char const>(ip)};
     ip += (s.size() + 1);
     return tuple<viua::internals::types::byte*, string>(ip, s);
 }
 
 auto viua::bytecode::decoder::operands::fetch_atom(viua::internals::types::byte* ip, viua::process::Process*)
     -> tuple<viua::internals::types::byte*, string> {
-    auto const s = string{ extract_ptr<char const>(ip) };
+    auto const s = string{extract_ptr<char const>(ip)};
     ip += (s.size() + 1);
     return tuple<viua::internals::types::byte*, string>(ip, s);
 }

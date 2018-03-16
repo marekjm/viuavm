@@ -98,7 +98,7 @@ namespace str {
         }
         return oss.str();
     }
-}
+}  // namespace str
 
 
 #endif

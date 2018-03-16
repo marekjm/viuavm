@@ -149,7 +149,8 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {DELETE, "delete"},
     {ISNULL, "isnull"},
     {
-        RESS, "ress",
+        RESS,
+        "ress",
     },
 
     {PRINT, "print"},

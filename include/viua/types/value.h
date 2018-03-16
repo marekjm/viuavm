@@ -23,8 +23,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 
@@ -40,29 +40,29 @@ namespace viua {
             friend class Pointer;
             std::vector<Pointer*> pointers;
 
-            public:
-                /** Basic interface of a Value.
-                 *
-                 *  Derived objects are expected to override this methods, but in case they do not
-                 *  Value provides safe defaults.
-                 */
-                virtual std::string type() const;
-                virtual std::string str() const;
-                virtual std::string repr() const;
-                virtual bool boolean() const;
+          public:
+            /** Basic interface of a Value.
+             *
+             *  Derived objects are expected to override this methods, but in case they do not
+             *  Value provides safe defaults.
+             */
+            virtual std::string type() const;
+            virtual std::string str() const;
+            virtual std::string repr() const;
+            virtual bool boolean() const;
 
-                virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
+            virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
 
-                virtual std::vector<std::string> bases() const;
-                virtual std::vector<std::string> inheritancechain() const;
+            virtual std::vector<std::string> bases() const;
+            virtual std::vector<std::string> inheritancechain() const;
 
-                virtual std::unique_ptr<Value> copy() const = 0;
+            virtual std::unique_ptr<Value> copy() const = 0;
 
-                Value() = default;
-                virtual ~Value();
+            Value() = default;
+            virtual ~Value();
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

@@ -26,6 +26,6 @@ namespace pointer {
         ptr++;
         p = reinterpret_cast<S*>(ptr);
     }
-}
+}  // namespace pointer
 
 #endif

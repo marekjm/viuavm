@@ -159,7 +159,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
     return oss.str();
 }
 
-static auto disassemble_bit_string(viua::internals::types::byte* ptr, viua::internals::types::bits_size const size) -> string {
+static auto disassemble_bit_string(viua::internals::types::byte* ptr,
+                                   viua::internals::types::bits_size const size) -> string {
     static map<uint8_t, char> const decodings = {
         {
             0b0000,
@@ -249,7 +250,8 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr, viua::inte
 static auto decode_timeout(viua::internals::types::byte* ptr) -> viua::internals::types::timeout {
     return load_aligned<viua::internals::types::timeout>(ptr);
 }
-static auto disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
+static auto disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr)
+    -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop(ptr);
 
     switch (*ptr) {
@@ -272,7 +274,8 @@ static auto disassemble_ri_operand(ostream& oss, viua::internals::types::byte* p
     }
     return ptr;
 }
-static auto disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
+static auto disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::types::byte* ptr)
+    -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
     switch (*ptr) {
@@ -295,7 +298,8 @@ static auto disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::t
     }
     return ptr;
 }
-auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<string, viua::internals::types::bytecode_size> {
+auto disassembler::instruction(viua::internals::types::byte* ptr)
+    -> tuple<string, viua::internals::types::bytecode_size> {
     viua::internals::types::byte* saved_ptr = ptr;
 
     auto const op = OPCODE(*saved_ptr);
@@ -327,7 +331,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
             ++ptr;  // for operand type
-            auto const s = string{ reinterpret_cast<char*>(ptr) };
+            auto const s = string{reinterpret_cast<char*>(ptr)};
             oss << ' ' << str::enquote(s);
             ptr += s.size();
             ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -335,7 +339,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
     } else if (op == ATOM) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
-        auto const s = string{ reinterpret_cast<char*>(ptr) };
+        auto const s = string{reinterpret_cast<char*>(ptr)};
         oss << ' ' << str::enquote(s, '\'');
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -343,7 +347,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
-        auto const fn_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const fn_name = string{reinterpret_cast<char*>(ptr)};
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -355,7 +359,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
         if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
-            auto const fn_name = string{ reinterpret_cast<char*>(ptr) };
+            auto const fn_name = string{reinterpret_cast<char*>(ptr)};
             oss << fn_name;
             ptr += fn_name.size();
             ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -364,7 +368,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
-        auto const fn_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const fn_name = string{reinterpret_cast<char*>(ptr)};
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -374,26 +378,26 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
         if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
-            auto const fn_name = string{ reinterpret_cast<char*>(ptr) };
+            auto const fn_name = string{reinterpret_cast<char*>(ptr)};
             oss << fn_name;
             ptr += fn_name.size();
             ++ptr;  // for null character terminating the C-style string not included in std::string
         }
     } else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
         oss << ' ';
-        auto const s = string{ reinterpret_cast<char*>(ptr) };
+        auto const s = string{reinterpret_cast<char*>(ptr)};
         oss << (op == IMPORT ? str::enquote(s) : s);
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
     } else if (op == CATCH) {
         oss << ' ';
-        auto const type_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const type_name = string{reinterpret_cast<char*>(ptr)};
         oss << str::enquote(type_name);
         ptr += type_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
 
         oss << ' ';
-        auto const block_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const block_name = string{reinterpret_cast<char*>(ptr)};
         oss << block_name;
         ptr += block_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
@@ -401,13 +405,13 @@ auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<strin
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
-        auto const fn_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const fn_name = string{reinterpret_cast<char*>(ptr)};
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string
 
         oss << ' ';
-        auto const md_name = string{ reinterpret_cast<char*>(ptr) };
+        auto const md_name = string{reinterpret_cast<char*>(ptr)};
         oss << md_name;
         ptr += md_name.size();
         ++ptr;  // for null character terminating the C-style string not included in std::string

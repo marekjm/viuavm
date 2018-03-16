@@ -40,8 +40,9 @@ auto assembler::ce::getmarks(vector<viua::cg::lex::Token> const& tokens)
      * `jump` and `branch` instructions.
      */
     auto instruction =
-        std::remove_reference<decltype(tokens)>::type::size_type{0};  // we need separate instruction counter because number of lines is not exactly number of
-            // instructions
+        std::remove_reference<decltype(tokens)>::type::size_type{0};  // we need separate instruction counter
+                                                                      // because number of lines is not
+                                                                      // exactly number of instructions
     auto marks = map<string, decltype(instruction)>{};
 
     for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
@@ -88,7 +89,8 @@ static auto looks_like_name_definition(Token const t) -> bool {
     return (t == ".function:" or t == ".closure:" or t == ".block:" or t == ".signature:" or
             t == ".bsignature:");
 }
-static auto get_instruction_block_names(vector<Token> const& tokens, string const directive, void predicate(Token) = [](Token) {}) -> vector<string> {
+static auto get_instruction_block_names(vector<Token> const& tokens, string const directive,
+                                        void predicate(Token) = [](Token) {}) -> vector<string> {
     auto names = vector<string>{};
     auto all_names = vector<string>{};
     auto defined_where = map<string, Token>{};
@@ -152,10 +154,11 @@ auto assembler::ce::get_block_signatures(vector<Token> const& tokens) -> vector<
 }
 
 
-static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens) -> map<string, vector<Token>> {
+static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens)
+    -> map<string, vector<Token>> {
     auto invokables = map<string, vector<Token>>{};
 
-    auto const looking_for = string{ "." + type + ":" };
+    auto const looking_for = string{"." + type + ":"};
 
     for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
         if (tokens[i] == looking_for) {
@@ -190,6 +193,7 @@ static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens
 
     return invokables;
 }
-auto assembler::ce::get_invokables_token_bodies(const string& type, const vector<Token>& tokens) -> map<string, vector<Token>> {
+auto assembler::ce::get_invokables_token_bodies(const string& type, const vector<Token>& tokens)
+    -> map<string, vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }
