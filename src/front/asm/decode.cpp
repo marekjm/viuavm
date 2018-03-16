@@ -88,10 +88,10 @@ auto decode_line_tokens(vector<string> const& tokens) -> vector<vector<string>> 
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
-            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            auto sublines = decode_line_tokens(subtokens);
             sublines.pop_back();
-            for (unsigned j = 0; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines.at(j));
+            for (auto const& each : sublines) {
+                decoded_lines.emplace_back(each);
             }
             main_line.emplace_back(str::stringify(len));
             ++i;
