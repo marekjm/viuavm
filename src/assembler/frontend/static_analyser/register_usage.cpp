@@ -42,30 +42,7 @@ static auto invalid_syntax[[gnu::unused]](const vector<Token>& tokens, const str
     return invalid_syntax_error;
 }
 
-
-struct Register {
-    viua::internals::types::register_index index{0};
-    viua::internals::RegisterSets register_set = viua::internals::RegisterSets::LOCAL;
-    viua::internals::ValueTypes value_type = viua::internals::ValueTypes::UNDEFINED;
-    pair<bool, Token> inferred = {false, {}};
-
-    auto operator<(const Register& that) const -> bool {
-        if (register_set < that.register_set) {
-            return true;
-        }
-        if (register_set == that.register_set and index < that.index) {
-            return true;
-        }
-        return false;
-    }
-    auto operator==(const Register& that) const -> bool {
-        return (register_set == that.register_set) and (index == that.index);
-    }
-
-    Register() = default;
-    Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
-        : index(ri.index), register_set(ri.rss) {}
-};
+using viua::assembler::frontend::static_analyser::Register;
 
 struct Closure {
     string name;

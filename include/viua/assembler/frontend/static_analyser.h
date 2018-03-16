@@ -40,6 +40,19 @@ namespace viua {
 
                 auto verify(const parser::ParsedSource&) -> void;
 
+struct Register {
+    viua::internals::types::register_index index{0};
+    viua::internals::RegisterSets register_set = viua::internals::RegisterSets::LOCAL;
+    viua::internals::ValueTypes value_type = viua::internals::ValueTypes::UNDEFINED;
+    std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
+
+    auto operator<(const Register& that) const -> bool;
+    auto operator==(const Register& that) const -> bool;
+
+    Register() = default;
+    Register(viua::assembler::frontend::parser::RegisterIndex const&);
+};
+
                 auto check_register_usage(const parser::ParsedSource&) -> void;
             }  // namespace static_analyser
         }      // namespace frontend

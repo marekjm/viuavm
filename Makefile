@@ -277,6 +277,7 @@ build/bin/vm/asm: build/front/asm.o build/front/asm/generate.o build/front/asm/a
 	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
+	build/assembler/frontend/static_analyser/Register.o \
 	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
