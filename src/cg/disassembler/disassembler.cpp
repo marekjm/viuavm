@@ -34,7 +34,7 @@ using viua::util::memory::load_aligned;
 
 
 auto disassembler::intop(viua::internals::types::byte* ptr) -> string {
-    ostringstream oss;
+    auto oss = ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
@@ -69,7 +69,7 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> string {
     return oss.str();
 }
 auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> string {
-    ostringstream oss;
+    auto oss = ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
@@ -158,8 +158,9 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
 
     return oss.str();
 }
-static auto disassemble_bit_string(viua::internals::types::byte* ptr, const viua::internals::types::bits_size size) -> string {
-    const static map<uint8_t, char> decodings = {
+
+static auto disassemble_bit_string(viua::internals::types::byte* ptr, viua::internals::types::bits_size const size) -> string {
+    static map<uint8_t, char> const decodings = {
         {
             0b0000,
             '0',
@@ -226,13 +227,13 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr, const viua
         },
     };
 
-    ostringstream oss;
+    auto oss = ostringstream{};
     oss << "0x";
 
-    static uint8_t const mask_high = 0b00001111;
-    static uint8_t const mask_low = 0b11110000;
+    static auto const mask_high = uint8_t{0b00001111};
+    static auto const mask_low = uint8_t{0b11110000};
 
-    for (std::remove_const_t<decltype(size)> i = 0; i < size; ++i) {
+    for (auto i = std::remove_const_t<decltype(size)>(0); i < size; ++i) {
         auto two_digits = *(ptr + i);
 
         auto high_digit = ((two_digits & mask_low) >> 4);
