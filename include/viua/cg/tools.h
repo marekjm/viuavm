@@ -40,9 +40,10 @@ namespace viua {
 
             auto calculate_bytecode_size_of_first_n_instructions2(
                 std::vector<viua::cg::lex::Token> const& tokens,
-                std::remove_reference<decltype(tokens)>::type::size_type const limit) -> viua::internals::types::bytecode_size;
-            auto calculate_bytecode_size2(
-                std::vector<viua::cg::lex::Token> const&) -> viua::internals::types::bytecode_size;
+                std::remove_reference<decltype(tokens)>::type::size_type const limit)
+                -> viua::internals::types::bytecode_size;
+            auto calculate_bytecode_size2(std::vector<viua::cg::lex::Token> const&)
+                -> viua::internals::types::bytecode_size;
         }  // namespace tools
     }      // namespace cg
 }  // namespace viua

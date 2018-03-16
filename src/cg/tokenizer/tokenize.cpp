@@ -25,7 +25,7 @@ using namespace std;
 namespace viua {
     namespace cg {
         namespace tokenizer {
-            auto tokenize(string const & s) -> vector<string> {
+            auto tokenize(string const& s) -> vector<string> {
                 auto tokens = vector<string>{};
                 auto token = ostringstream{};
                 token.str("");
