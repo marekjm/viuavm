@@ -269,10 +269,21 @@ build/bin/vm/vdb: build/front/wdb.o build/lib/linenoise.o build/kernel/kernel.o 
 	build/types/process.o build/types/value.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/asm: build/front/asm.o build/front/asm/generate.o build/front/asm/assemble_instruction.o \
-	build/front/asm/gather.o build/front/asm/decode.o build/program.o build/programinstructions.o \
-	build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
-	build/cg/lex.o build/cg/lex/reduce_fns.o build/cg/lex/cook.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o \
+build/bin/vm/asm: build/front/asm.o \
+	build/front/asm/generate.o \
+	build/front/asm/assemble_instruction.o \
+	build/front/asm/gather.o \
+	build/front/asm/decode.o \
+	build/program.o \
+	build/programinstructions.o \
+	build/cg/tokenizer/tokenize.o \
+	build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
+	build/cg/lex.o \
+	build/cg/lex/reduce_fns.o \
+	build/cg/lex/cook.o \
+	build/cg/tools.o \
+	build/cg/assembler/verify.o \
+	build/cg/assembler/static_analysis.o \
 	build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o \
 	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
