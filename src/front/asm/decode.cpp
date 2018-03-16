@@ -53,7 +53,7 @@ auto decode_line_tokens(vector<string> const& tokens) -> vector<vector<string>> 
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
-            auto sublines = decode_line_tokens(subtokens);
+            auto const sublines = decode_line_tokens(subtokens);
             for (auto const& each : sublines) {
                 decoded_lines.emplace_back(each);
             }
