@@ -128,8 +128,12 @@ namespace viua {
                 return adjacent(second, rest...);
             }
 
-            auto join_tokens(std::vector<Token> const tokens, decltype(tokens)::size_type const from, decltype(from) const to) -> std::string;
+            auto join_tokens(std::vector<Token> const tokens, decltype(tokens)::size_type const from,
+                             decltype(from) const to) -> std::string;
 
+            auto reduce_token_sequence(std::vector<Token>, std::vector<std::string> const)
+                -> std::vector<Token>;
+            auto reduce_directive(std::vector<Token>, std::string const) -> std::vector<Token>;
             auto remove_spaces(std::vector<Token>) -> std::vector<Token>;
             auto remove_comments(std::vector<Token>) -> std::vector<Token>;
             auto reduce_newlines(std::vector<Token>) -> std::vector<Token>;
