@@ -54,8 +54,8 @@ auto decode_line_tokens(vector<string> const& tokens) -> vector<vector<string>> 
                 ++i;
             }
             auto sublines = decode_line_tokens(subtokens);
-            for (auto j = decltype(sublines)::size_type{0}; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines.at(j));
+            for (auto const& each : sublines) {
+                decoded_lines.emplace_back(each);
             }
             main_line.emplace_back(sublines.at(sublines.size() - 1).at(1));
             ++i;
