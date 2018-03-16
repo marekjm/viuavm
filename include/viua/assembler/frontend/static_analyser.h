@@ -53,6 +53,16 @@ struct Register {
     Register(viua::assembler::frontend::parser::RegisterIndex const&);
 };
 
+struct Closure {
+    std::string name;
+    std::map<Register, std::pair<viua::cg::lex::Token, Register>> defined_registers;
+
+    auto define(Register const, viua::cg::lex::Token const) -> void;
+
+    Closure();
+    Closure(std::string);
+};
+
                 auto check_register_usage(const parser::ParsedSource&) -> void;
             }  // namespace static_analyser
         }      // namespace frontend

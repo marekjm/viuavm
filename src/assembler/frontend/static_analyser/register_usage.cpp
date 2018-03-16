@@ -43,18 +43,7 @@ static auto invalid_syntax[[gnu::unused]](const vector<Token>& tokens, const str
 }
 
 using viua::assembler::frontend::static_analyser::Register;
-
-struct Closure {
-    string name;
-    map<Register, pair<Token, Register>> defined_registers;
-
-    auto define(const Register r, const Token t) -> void {
-        defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
-    }
-
-    Closure() : name("") {}
-    Closure(string n) : name(n) {}
-};
+using viua::assembler::frontend::static_analyser::Closure;
 
 class Register_usage_profile {
     /*

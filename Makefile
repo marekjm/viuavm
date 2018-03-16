@@ -289,6 +289,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
 	build/assembler/frontend/static_analyser/Register.o \
+	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
