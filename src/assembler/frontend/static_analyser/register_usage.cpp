@@ -56,7 +56,7 @@ struct Closure {
     Closure(string n) : name(n) {}
 };
 
-class RegisterUsageProfile {
+class Register_usage_profile {
     /*
      * Maps a register to the token that "defined" the register.
      * Consider:
@@ -131,11 +131,11 @@ class RegisterUsageProfile {
     auto end() const -> decltype(defined_registers.end());
 };
 
-auto RegisterUsageProfile::fresh(Register const r) const -> bool { return fresh_registers.count(r); }
+auto Register_usage_profile::fresh(Register const r) const -> bool { return fresh_registers.count(r); }
 
-auto RegisterUsageProfile::defresh() -> void { fresh_registers.clear(); }
+auto Register_usage_profile::defresh() -> void { fresh_registers.clear(); }
 
-auto RegisterUsageProfile::define(const Register r, const Token t, bool const allow_overwrites) -> void {
+auto Register_usage_profile::define(const Register r, const Token t, bool const allow_overwrites) -> void {
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw TracedSyntaxError{}
             .append(viua::cg::lex::UnusedValue{t, "overwrite of unused value:"})
@@ -144,12 +144,12 @@ auto RegisterUsageProfile::define(const Register r, const Token t, bool const al
     defined_registers.insert_or_assign(r, pair<Token, Register>(t, r));
     fresh_registers.insert(r);
 }
-auto RegisterUsageProfile::defined(const Register r) const -> bool { return defined_registers.count(r); }
-auto RegisterUsageProfile::defined_where(const Register r) const -> Token {
+auto Register_usage_profile::defined(const Register r) const -> bool { return defined_registers.count(r); }
+auto Register_usage_profile::defined_where(const Register r) const -> Token {
     return defined_registers.at(r).first;
 }
 
-auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueTypes value_type_id,
+auto Register_usage_profile::infer(const Register r, const viua::internals::ValueTypes value_type_id,
                                  const Token& t) -> void {
     auto reg = at(r);
     reg.second.value_type = value_type_id;
@@ -162,27 +162,27 @@ auto RegisterUsageProfile::infer(const Register r, const viua::internals::ValueT
     }
 }
 
-auto RegisterUsageProfile::at(const Register r) const -> const decltype(defined_registers)::mapped_type {
+auto Register_usage_profile::at(const Register r) const -> const decltype(defined_registers)::mapped_type {
     return defined_registers.at(r);
 }
 
-auto RegisterUsageProfile::used(const Register r) const -> bool { return used_registers.count(r); }
-auto RegisterUsageProfile::use(const Register r, const Token t) -> void {
+auto Register_usage_profile::used(const Register r) const -> bool { return used_registers.count(r); }
+auto Register_usage_profile::use(const Register r, const Token t) -> void {
     used_registers[r] = t;
     fresh_registers.erase(r);
 }
 
-auto RegisterUsageProfile::erase(const Register r, const Token& token) -> void {
+auto Register_usage_profile::erase(const Register r, const Token& token) -> void {
     erased_registers.emplace(r, token);
     defined_registers.erase(defined_registers.find(r));
 }
-auto RegisterUsageProfile::erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
-auto RegisterUsageProfile::erased_where(const Register r) const -> Token { return erased_registers.at(r); }
+auto Register_usage_profile::erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
+auto Register_usage_profile::erased_where(const Register r) const -> Token { return erased_registers.at(r); }
 
-auto RegisterUsageProfile::begin() const -> decltype(defined_registers.begin()) {
+auto Register_usage_profile::begin() const -> decltype(defined_registers.begin()) {
     return defined_registers.begin();
 }
-auto RegisterUsageProfile::end() const -> decltype(defined_registers.end()) {
+auto Register_usage_profile::end() const -> decltype(defined_registers.end()) {
     return defined_registers.end();
 }
 
@@ -236,7 +236,7 @@ template<typename K, typename V> static auto keys_of(const map<K, V>& m) -> vect
 
     return keys;
 }
-static auto check_if_name_resolved(const RegisterUsageProfile& rup, const RegisterIndex r) -> void {
+static auto check_if_name_resolved(const Register_usage_profile& rup, const RegisterIndex r) -> void {
     if (not r.resolved) {
         auto error = InvalidSyntax(r.tokens.at(0), "unresolved name");
         if (auto suggestion =
@@ -248,7 +248,7 @@ static auto check_if_name_resolved(const RegisterUsageProfile& rup, const Regist
         throw error;
     }
 }
-static auto maybe_mistyped_register_set_helper(RegisterUsageProfile& rup,
+static auto maybe_mistyped_register_set_helper(Register_usage_profile& rup,
                                                viua::assembler::frontend::parser::RegisterIndex r,
                                                TracedSyntaxError& error, RegisterSets rs_id) -> bool {
     if (r.rss != rs_id) {
@@ -266,7 +266,7 @@ static auto maybe_mistyped_register_set_helper(RegisterUsageProfile& rup,
     }
     return false;
 }
-static auto maybe_mistyped_register_set(RegisterUsageProfile& rup,
+static auto maybe_mistyped_register_set(Register_usage_profile& rup,
                                         viua::assembler::frontend::parser::RegisterIndex r,
                                         TracedSyntaxError& error) -> void {
     if (maybe_mistyped_register_set_helper(rup, r, error, RegisterSets::LOCAL)) {
@@ -276,7 +276,7 @@ static auto maybe_mistyped_register_set(RegisterUsageProfile& rup,
         return;
     }
 }
-static auto check_use_of_register(RegisterUsageProfile& rup,
+static auto check_use_of_register(Register_usage_profile& rup,
                                   viua::assembler::frontend::parser::RegisterIndex r,
                                   const string error_core_msg = "use of") {
     check_if_name_resolved(rup, r);
@@ -408,7 +408,7 @@ static auto depointerise_type_if_needed(ValueTypes const t, bool const access_vi
     return (access_via_pointer_dereference ? (t ^ ValueTypes::POINTER) : t);
 }
 template<viua::internals::ValueTypes expected_type>
-static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile,
+static auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                                     const RegisterIndex& register_index) -> ValueTypes {
     auto actual_type = register_usage_profile.at(Register(register_index)).second.value_type;
 
@@ -469,14 +469,14 @@ static auto assert_type_of_register(RegisterUsageProfile& register_usage_profile
     return depointerise_type_if_needed(actual_type, access_via_pointer_dereference);
 }
 
-static auto erase_if_direct_access(RegisterUsageProfile& register_usage_profile, RegisterIndex* r,
+static auto erase_if_direct_access(Register_usage_profile& register_usage_profile, RegisterIndex* r,
                                    viua::assembler::frontend::parser::Instruction const* const instruction) {
     if (r->as == viua::internals::AccessSpecifier::DIRECT) {
         register_usage_profile.erase(Register(*r), instruction->tokens.at(0));
     }
 }
 
-static auto map_names_to_register_indexes(RegisterUsageProfile& register_usage_profile,
+static auto map_names_to_register_indexes(Register_usage_profile& register_usage_profile,
                                           const InstructionsBlock& ib) -> void {
     for (const auto& line : ib.body) {
         auto directive = dynamic_cast<viua::assembler::frontend::parser::Directive*>(line.get());
@@ -505,7 +505,7 @@ static auto map_names_to_register_indexes(RegisterUsageProfile& register_usage_p
         register_usage_profile.index_to_name[index] = name;
     }
 }
-static auto check_for_unused_registers(const RegisterUsageProfile& register_usage_profile) -> void {
+static auto check_for_unused_registers(const Register_usage_profile& register_usage_profile) -> void {
     for (const auto& each : register_usage_profile) {
         if (not each.first.index) {
             /*
@@ -530,14 +530,14 @@ static auto check_for_unused_registers(const RegisterUsageProfile& register_usag
     }
 }
 using InstructionIndex = InstructionsBlock::size_type;
-static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile&, const ParsedSource&,
+static auto check_register_usage_for_instruction_block_impl(Register_usage_profile&, const ParsedSource&,
                                                             const InstructionsBlock&, InstructionIndex,
                                                             InstructionIndex) -> void;
-static auto check_closure_instantiations(const RegisterUsageProfile& register_usage_profile,
+static auto check_closure_instantiations(const Register_usage_profile& register_usage_profile,
                                          const ParsedSource& ps,
                                          const map<Register, Closure>& created_closures) -> void {
     for (const auto& each : created_closures) {
-        RegisterUsageProfile closure_register_usage_profile;
+        Register_usage_profile closure_register_usage_profile;
         const auto& fn = *find_if(ps.functions.begin(), ps.functions.end(),
                                   [&each](const InstructionsBlock& b) { return b.name == each.second.name; });
         for (auto& captured_value : each.second.defined_registers) {
@@ -594,7 +594,7 @@ static auto get_input_operand(viua::assembler::frontend::parser::Instruction con
     }
     return operand;
 }
-static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile& register_usage_profile,
+static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
                                                             const InstructionsBlock& ib, InstructionIndex i,
                                                             InstructionIndex mnemonic_counter) -> void {
@@ -2229,7 +2229,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 string register_with_unused_value;
 
                 try {
-                    RegisterUsageProfile register_usage_profile_if_true = register_usage_profile;
+                    Register_usage_profile register_usage_profile_if_true = register_usage_profile;
                     register_usage_profile_if_true.defresh();
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
                                                                     jump_target_if_true, mnemonic_counter);
@@ -2248,7 +2248,7 @@ static auto check_register_usage_for_instruction_block_impl(RegisterUsageProfile
                 }
 
                 try {
-                    RegisterUsageProfile register_usage_profile_if_false = register_usage_profile;
+                    Register_usage_profile register_usage_profile_if_false = register_usage_profile;
                     register_usage_profile_if_false.defresh();
                     check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
                                                                     jump_target_if_false, mnemonic_counter);
@@ -2642,7 +2642,7 @@ static auto check_register_usage_for_instruction_block(const ParsedSource& ps, c
         return;
     }
 
-    RegisterUsageProfile register_usage_profile;
+    Register_usage_profile register_usage_profile;
     map_names_to_register_indexes(register_usage_profile, ib);
     check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, 0,
                                                     static_cast<InstructionIndex>(-1));
