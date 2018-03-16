@@ -25,11 +25,11 @@ using namespace std;
 namespace viua {
     namespace cg {
         namespace tokenizer {
-            vector<string> tokenize(const string& s) {
-                vector<string> tokens;
-                ostringstream token;
+            auto tokenize(string const & s) -> vector<string> {
+                auto tokens = vector<string>{};
+                auto token = ostringstream{};
                 token.str("");
-                for (long unsigned i = 0; i < s.size(); ++i) {
+                for (auto i = decltype(s.size()){0}; i < s.size(); ++i) {
                     if (s[i] == ' ' and token.str().size()) {
                         tokens.emplace_back(token.str());
                         token.str("");
@@ -70,7 +70,7 @@ namespace viua {
                         continue;
                     }
                     if (s[i] == '"' or s[i] == '\'') {
-                        string ss = str::extract(s.substr(i));
+                        auto const ss = str::extract(s.substr(i));
                         i += (ss.size() - 1);
                         tokens.emplace_back(ss);
                         continue;
