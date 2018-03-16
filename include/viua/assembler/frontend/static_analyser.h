@@ -40,28 +40,28 @@ namespace viua {
 
                 auto verify(const parser::ParsedSource&) -> void;
 
-struct Register {
-    viua::internals::types::register_index index{0};
-    viua::internals::RegisterSets register_set = viua::internals::RegisterSets::LOCAL;
-    viua::internals::ValueTypes value_type = viua::internals::ValueTypes::UNDEFINED;
-    std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
+                struct Register {
+                    viua::internals::types::register_index index{0};
+                    viua::internals::RegisterSets register_set = viua::internals::RegisterSets::LOCAL;
+                    viua::internals::ValueTypes value_type = viua::internals::ValueTypes::UNDEFINED;
+                    std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
 
-    auto operator<(const Register& that) const -> bool;
-    auto operator==(const Register& that) const -> bool;
+                    auto operator<(const Register& that) const -> bool;
+                    auto operator==(const Register& that) const -> bool;
 
-    Register() = default;
-    Register(viua::assembler::frontend::parser::RegisterIndex const&);
-};
+                    Register() = default;
+                    Register(viua::assembler::frontend::parser::RegisterIndex const&);
+                };
 
-struct Closure {
-    std::string name;
-    std::map<Register, std::pair<viua::cg::lex::Token, Register>> defined_registers;
+                struct Closure {
+                    std::string name;
+                    std::map<Register, std::pair<viua::cg::lex::Token, Register>> defined_registers;
 
-    auto define(Register const, viua::cg::lex::Token const) -> void;
+                    auto define(Register const, viua::cg::lex::Token const) -> void;
 
-    Closure();
-    Closure(std::string);
-};
+                    Closure();
+                    Closure(std::string);
+                };
 
                 auto check_register_usage(const parser::ParsedSource&) -> void;
             }  // namespace static_analyser

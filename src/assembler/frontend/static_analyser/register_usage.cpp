@@ -42,8 +42,8 @@ static auto invalid_syntax[[gnu::unused]](const vector<Token>& tokens, const str
     return invalid_syntax_error;
 }
 
-using viua::assembler::frontend::static_analyser::Register;
 using viua::assembler::frontend::static_analyser::Closure;
+using viua::assembler::frontend::static_analyser::Register;
 
 class Register_usage_profile {
     /*
@@ -139,7 +139,7 @@ auto Register_usage_profile::defined_where(const Register r) const -> Token {
 }
 
 auto Register_usage_profile::infer(const Register r, const viua::internals::ValueTypes value_type_id,
-                                 const Token& t) -> void {
+                                   const Token& t) -> void {
     auto reg = at(r);
     reg.second.value_type = value_type_id;
     reg.second.inferred = {true, t};
@@ -165,7 +165,9 @@ auto Register_usage_profile::erase(const Register r, const Token& token) -> void
     erased_registers.emplace(r, token);
     defined_registers.erase(defined_registers.find(r));
 }
-auto Register_usage_profile::erased(const Register r) const -> bool { return (erased_registers.count(r) == 1); }
+auto Register_usage_profile::erased(const Register r) const -> bool {
+    return (erased_registers.count(r) == 1);
+}
 auto Register_usage_profile::erased_where(const Register r) const -> Token { return erased_registers.at(r); }
 
 auto Register_usage_profile::begin() const -> decltype(defined_registers.begin()) {

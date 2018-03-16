@@ -23,12 +23,12 @@ namespace viua {
     namespace assembler {
         namespace frontend {
             namespace static_analyser {
-    auto Closure::define(Register const r, viua::cg::lex::Token const t) -> void {
-        defined_registers.insert_or_assign(r, std::pair<viua::cg::lex::Token, Register>(t, r));
-    }
+                auto Closure::define(Register const r, viua::cg::lex::Token const t) -> void {
+                    defined_registers.insert_or_assign(r, std::pair<viua::cg::lex::Token, Register>(t, r));
+                }
 
-    Closure::Closure() : name("") {}
-    Closure::Closure(std::string n) : name(n) {}
+                Closure::Closure() : name("") {}
+                Closure::Closure(std::string n) : name(n) {}
             }  // namespace static_analyser
         }      // namespace frontend
     }          // namespace assembler
