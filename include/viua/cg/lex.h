@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -43,10 +43,10 @@ namespace viua {
                 auto original() const -> decltype(original_content);
                 auto original(std::string) -> void;
 
-                auto ends(const bool = false) const -> decltype(character_in_line);
+                auto ends(bool const = false) const -> decltype(character_in_line);
 
-                bool operator==(const std::string& s) const;
-                bool operator!=(const std::string& s) const;
+                auto operator==(std::string const& s) const -> bool;
+                auto operator!=(std::string const& s) const -> bool;
 
                 operator std::string() const;
 
@@ -69,7 +69,7 @@ namespace viua {
 
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
-                auto match(Token) const -> bool;
+                auto match(Token const) const -> bool;
 
                 auto add(Token) -> InvalidSyntax&;
 
@@ -93,20 +93,20 @@ namespace viua {
             struct TracedSyntaxError {
                 std::vector<InvalidSyntax> errors;
 
-                const char* what() const;
+                auto what() const -> const char*;
 
                 auto line() const -> decltype(errors.front().line());
                 auto character() const -> decltype(errors.front().character());
 
-                auto append(const InvalidSyntax&) -> TracedSyntaxError&;
+                auto append(InvalidSyntax const&) -> TracedSyntaxError&;
             };
 
-            bool is_reserved_keyword(const std::string&);
+            auto is_reserved_keyword(std::string const&) -> bool;
             auto is_mnemonic(std::string const&) -> bool;
-            void assert_is_not_reserved_keyword(Token, const std::string&);
+            auto assert_is_not_reserved_keyword(Token, std::string const&) -> void;
 
-            std::vector<Token> tokenise(const std::string&);
-            std::vector<Token> standardise(std::vector<Token>);
+            auto tokenise(std::string const&) -> std::vector<Token>;
+            auto standardise(std::vector<Token>) -> std::vector<Token>;
             auto normalise(std::vector<Token>) -> std::vector<Token>;
 
             template<class T, typename... R> bool adjacent(T first, T second) {
@@ -128,39 +128,38 @@ namespace viua {
                 return adjacent(second, rest...);
             }
 
-            std::string join_tokens(const std::vector<Token> tokens, const decltype(tokens)::size_type from,
-                                    const decltype(from) to);
+            auto join_tokens(std::vector<Token> const tokens, decltype(tokens)::size_type const from, decltype(from) const to) -> std::string;
 
-            std::vector<Token> remove_spaces(std::vector<Token>);
-            std::vector<Token> remove_comments(std::vector<Token>);
-            std::vector<Token> reduce_newlines(std::vector<Token>);
-            std::vector<Token> reduce_mark_directive(std::vector<Token>);
-            std::vector<Token> reduce_name_directive(std::vector<Token>);
-            std::vector<Token> reduce_info_directive(std::vector<Token>);
-            std::vector<Token> reduce_import_directive(std::vector<Token>);
-            std::vector<Token> reduce_function_directive(std::vector<Token>);
-            std::vector<Token> reduce_closure_directive(std::vector<Token>);
-            std::vector<Token> reduce_end_directive(std::vector<Token>);
-            std::vector<Token> reduce_signature_directive(std::vector<Token>);
-            std::vector<Token> reduce_bsignature_directive(std::vector<Token>);
-            std::vector<Token> reduce_block_directive(std::vector<Token>);
-            std::vector<Token> reduce_iota_directive(std::vector<Token>);
-            std::vector<Token> reduce_double_colon(std::vector<Token>);
-            std::vector<Token> reduce_left_attribute_bracket(std::vector<Token>);
-            std::vector<Token> reduce_right_attribute_bracket(std::vector<Token>);
-            std::vector<Token> reduce_function_signatures(std::vector<Token>);
-            std::vector<Token> reduce_names(std::vector<Token>);
-            std::vector<Token> reduce_offset_jumps(std::vector<Token>);
-            std::vector<Token> reduce_at_prefixed_registers(std::vector<Token>);
-            std::vector<Token> reduce_floats(std::vector<Token>);
+            auto remove_spaces(std::vector<Token>) -> std::vector<Token>;
+            auto remove_comments(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_newlines(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_mark_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_name_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_info_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_import_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_function_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_closure_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_end_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_signature_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_bsignature_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_block_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_iota_directive(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_double_colon(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_left_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_right_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_function_signatures(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_names(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_offset_jumps(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_at_prefixed_registers(std::vector<Token>) -> std::vector<Token>;
+            auto reduce_floats(std::vector<Token>) -> std::vector<Token>;
 
-            std::vector<Token> replace_iotas(std::vector<Token>);
-            std::vector<Token> replace_defaults(std::vector<Token>);
-            std::vector<Token> replace_named_registers(std::vector<Token>);
-            std::vector<Token> move_inline_blocks_out(std::vector<Token>);
-            std::vector<Token> unwrap_lines(std::vector<Token>, bool full = true);
+            auto replace_iotas(std::vector<Token>) -> std::vector<Token>;
+            auto replace_defaults(std::vector<Token>) -> std::vector<Token>;
+            auto replace_named_registers(std::vector<Token>) -> std::vector<Token>;
+            auto move_inline_blocks_out(std::vector<Token>) -> std::vector<Token>;
+            auto unwrap_lines(std::vector<Token>, bool full = true) -> std::vector<Token>;
 
-            std::vector<Token> cook(std::vector<Token>, const bool = true);
+            auto cook(std::vector<Token>, bool const = true) -> std::vector<Token>;
         }  // namespace lex
     }      // namespace cg
 }  // namespace viua

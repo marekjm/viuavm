@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -37,12 +37,12 @@ namespace viua {
             auto Token::original() const -> decltype(original_content) { return original_content; }
             auto Token::original(string s) -> void { original_content = s; }
 
-            auto Token::ends(const bool as_original) const -> decltype(character_in_line) {
+            auto Token::ends(bool const as_original) const -> decltype(character_in_line) {
                 return (character_in_line + (as_original ? original_content : content).size());
             }
 
-            bool Token::operator==(const string& s) const { return (content == s); }
-            bool Token::operator!=(const string& s) const { return (content != s); }
+            auto Token::operator==(string const& s) const -> bool { return (content == s); }
+            auto Token::operator!=(string const& s) const -> bool { return (content != s); }
 
             Token::operator string() const { return str(); }
 
@@ -59,7 +59,7 @@ namespace viua {
             auto InvalidSyntax::line() const -> decltype(line_number) { return line_number; }
             auto InvalidSyntax::character() const -> decltype(character_in_line) { return character_in_line; }
 
-            auto InvalidSyntax::match(Token token) const -> bool {
+            auto InvalidSyntax::match(Token const token) const -> bool {
                 for (const auto& each : tokens) {
                     if (token.line() == each.line() and token.character() == each.character()) {
                         return true;
@@ -122,7 +122,7 @@ namespace viua {
 
             UnusedValue::UnusedValue(Token token, string s) : InvalidSyntax(token, s) {}
 
-            const char* TracedSyntaxError::what() const { return errors.front().what(); }
+            auto TracedSyntaxError::what() const -> const char* { return errors.front().what(); }
 
             auto TracedSyntaxError::line() const -> decltype(errors.front().line()) {
                 return errors.front().line();
@@ -131,13 +131,13 @@ namespace viua {
                 return errors.front().character();
             }
 
-            auto TracedSyntaxError::append(const InvalidSyntax& e) -> TracedSyntaxError& {
+            auto TracedSyntaxError::append(InvalidSyntax const& e) -> TracedSyntaxError& {
                 errors.push_back(e);
                 return (*this);
             }
 
 
-            bool is_mnemonic(string const& s) {
+            auto is_mnemonic(string const& s) -> bool {
                 auto is_it = false;
                 for (const auto& each : OP_NAMES) {
                     if (each.second == s) {
@@ -147,8 +147,8 @@ namespace viua {
                 }
                 return is_it;
             }
-            bool is_reserved_keyword(const string& s) {
-                static const set<string> reserved_keywords{
+            auto is_reserved_keyword(string const& s) -> bool {
+                static set<string> const reserved_keywords{
                     /*
                      * Used for timeouts in 'join' and 'receive' instructions
                      */
@@ -203,15 +203,15 @@ namespace viua {
                 };
                 return (reserved_keywords.count(s) or is_mnemonic(s));
             }
-            void assert_is_not_reserved_keyword(Token token, const string& message) {
-                string s = token.original();
+            auto assert_is_not_reserved_keyword(Token token, string const& message) -> void {
+                auto const s = token.original();
                 if (is_reserved_keyword(s)) {
                     throw viua::cg::lex::InvalidSyntax(
                         token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
                 }
             }
 
-            vector<Token> tokenise(const string& source) {
+            auto tokenise(string const& source) -> vector<Token> {
                 vector<Token> tokens;
 
                 ostringstream candidate_token;
@@ -308,14 +308,14 @@ namespace viua {
                 return tokens;
             }
 
-            static auto is_register_set_name(string s) -> bool {
+            static auto is_register_set_name(string const s) -> bool {
                 return (s == "current" or s == "local" or s == "static" or s == "global");
             }
-            static auto is_register_index(string s) -> bool {
-                const auto p = s.at(0);
+            static auto is_register_index(string const s) -> bool {
+                auto const p = s.at(0);
                 return (p == '%' or p == '*' or p == '@');
             }
-            vector<Token> standardise(vector<Token> input_tokens) {
+            auto standardise(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
 
                 const auto limit = input_tokens.size();
@@ -1696,8 +1696,7 @@ namespace viua {
                 return tokens;
             }
 
-            string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from,
-                               const decltype(from) to) {
+            auto join_tokens(vector<Token> const tokens, decltype(tokens)::size_type const from, decltype(from) const to) -> string {
                 ostringstream joined;
 
                 for (auto i = from; i < tokens.size() and i < to; ++i) {
@@ -1707,7 +1706,7 @@ namespace viua {
                 return joined.str();
             }
 
-            vector<Token> remove_spaces(vector<Token> input_tokens) {
+            auto remove_spaces(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
 
                 string space(" ");
@@ -1720,7 +1719,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> remove_comments(vector<Token> input_tokens) {
+            auto remove_comments(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
 
                 const auto limit = input_tokens.size();
@@ -1751,7 +1750,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_newlines(vector<Token> input_tokens) {
+            auto reduce_newlines(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
 
                 const auto limit = input_tokens.size();
@@ -1776,9 +1775,7 @@ namespace viua {
             }
 
             static auto is_valid_register_id(string s) -> bool { return (str::isnum(s) or str::isid(s)); }
-            static bool match(const vector<Token>& tokens,
-                              std::remove_reference<decltype(tokens)>::type::size_type i,
-                              const vector<string>& sequence) {
+            static auto match(vector<Token> const& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, vector<string> const& sequence) -> bool {
                 if (i + sequence.size() >= tokens.size()) {
                     return false;
                 }
@@ -1795,9 +1792,7 @@ namespace viua {
                 return true;
             }
 
-            static bool match_adjacent(const vector<Token>& tokens,
-                                       std::remove_reference<decltype(tokens)>::type::size_type i,
-                                       const vector<string>& sequence) {
+            static auto match_adjacent(vector<Token> const& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, vector<string> const& sequence) -> bool {
                 if (i + sequence.size() >= tokens.size()) {
                     return false;
                 }
@@ -1817,7 +1812,7 @@ namespace viua {
                 return true;
             }
 
-            static vector<Token> reduce_token_sequence(vector<Token> input_tokens, vector<string> sequence) {
+            static auto reduce_token_sequence(vector<Token> input_tokens, vector<string> const sequence) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -1835,67 +1830,67 @@ namespace viua {
                 return tokens;
             }
 
-            static vector<Token> reduce_directive(vector<Token> input_tokens, string directive) {
+            static auto reduce_directive(vector<Token> input_tokens, string const directive) -> vector<Token> {
                 return reduce_token_sequence(input_tokens, {".", directive, ":"});
             }
 
-            vector<Token> reduce_mark_directive(vector<Token> input_tokens) {
+            auto reduce_mark_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "mark");
             }
 
-            vector<Token> reduce_name_directive(vector<Token> input_tokens) {
+            auto reduce_name_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "name");
             }
 
-            vector<Token> reduce_info_directive(vector<Token> input_tokens) {
+            auto reduce_info_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "info");
             }
 
-            vector<Token> reduce_import_directive(vector<Token> input_tokens) {
+            auto reduce_import_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "import");
             }
 
-            vector<Token> reduce_function_directive(vector<Token> input_tokens) {
+            auto reduce_function_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "function");
             }
 
-            vector<Token> reduce_closure_directive(vector<Token> input_tokens) {
+            auto reduce_closure_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "closure");
             }
 
-            vector<Token> reduce_end_directive(vector<Token> input_tokens) {
+            auto reduce_end_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_token_sequence(input_tokens, {".", "end"});
             }
 
-            vector<Token> reduce_signature_directive(vector<Token> input_tokens) {
+            auto reduce_signature_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "signature");
             }
 
-            vector<Token> reduce_bsignature_directive(vector<Token> input_tokens) {
+            auto reduce_bsignature_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "bsignature");
             }
 
-            vector<Token> reduce_iota_directive(vector<Token> input_tokens) {
+            auto reduce_iota_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "iota");
             }
 
-            vector<Token> reduce_block_directive(vector<Token> input_tokens) {
+            auto reduce_block_directive(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_directive(input_tokens, "block");
             }
 
-            vector<Token> reduce_double_colon(vector<Token> input_tokens) {
+            auto reduce_double_colon(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_token_sequence(input_tokens, {":", ":"});
             }
 
-            vector<Token> reduce_left_attribute_bracket(vector<Token> input_tokens) {
+            auto reduce_left_attribute_bracket(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_token_sequence(input_tokens, {"[", "["});
             }
 
-            vector<Token> reduce_right_attribute_bracket(vector<Token> input_tokens) {
+            auto reduce_right_attribute_bracket(vector<Token> input_tokens) -> vector<Token> {
                 return reduce_token_sequence(input_tokens, {"]", "]"});
             }
 
-            vector<Token> reduce_function_signatures(vector<Token> input_tokens) {
+            auto reduce_function_signatures(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -1936,7 +1931,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_names(vector<Token> input_tokens) {
+            auto reduce_names(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -1974,7 +1969,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_offset_jumps(vector<Token> input_tokens) {
+            auto reduce_offset_jumps(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -1996,7 +1991,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_at_prefixed_registers(vector<Token> input_tokens) {
+            auto reduce_at_prefixed_registers(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -2028,7 +2023,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_floats(vector<Token> input_tokens) {
+            auto reduce_floats(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
@@ -2049,7 +2044,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> move_inline_blocks_out(vector<Token> input_tokens) {
+            auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
                 decltype(input_tokens) tokens;
                 decltype(tokens) block_tokens, nested_block_tokens;
                 string opened_inside;
@@ -2241,7 +2236,7 @@ namespace viua {
                 return Token{subtokens.at(0).line(), subtokens.at(0).character(),
                              ('%' + str::stringify(toplevel_subexpressions, false))};
             }
-            vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
+            auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
                 decltype(input_tokens) final_tokens;
@@ -2316,7 +2311,7 @@ namespace viua {
                 return final_tokens;
             }
 
-            vector<Token> replace_iotas(vector<Token> input_tokens) {
+            auto replace_iotas(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
                 vector<unsigned long> iotas;
 
@@ -2368,7 +2363,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> replace_defaults(vector<Token> input_tokens) {
+            auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
                 vector<Token> tokens;
 
                 for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
@@ -2443,7 +2438,7 @@ namespace viua {
                 return tokens;
             }
 
-            std::vector<Token> replace_named_registers(std::vector<Token> input_tokens) {
+            auto replace_named_registers(std::vector<Token> input_tokens) -> std::vector<Token> {
                 vector<Token> tokens;
                 map<string, string> names;
                 unsigned open_blocks = 0;
@@ -2516,7 +2511,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> cook(vector<Token> tokens, const bool with_replaced_names) {
+            auto cook(vector<Token> tokens, const bool with_replaced_names) -> vector<Token> {
                 /*
                  * Remove whitespace as first step to reduce noise in token stream.
                  * Remember not to remove newlines ('\n') because they act as separators
