@@ -35,10 +35,10 @@ using bytecode_size_type = viua::internals::types::bytecode_size;
 namespace viua {
     namespace cg {
         namespace tools {
-            static auto size_of_register_index_operand_with_rs_type(const TokenVector& tokens,
+            static auto size_of_register_index_operand_with_rs_type(TokenVector const & tokens,
                                                                     TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = 0;
+                auto calculated_size = bytecode_size_type{0};
 
                 if (tokens.at(i) == "void" or tokens.at(i) == "true" or tokens.at(i) == "false") {
                     calculated_size += sizeof(viua::internals::types::byte);
@@ -80,9 +80,9 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_register_index_operand(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_register_index_operand(TokenVector const & tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = 0;
+                auto calculated_size = bytecode_size_type{0};
 
                 if (tokens.at(i) == "static" or tokens.at(i) == "local" or tokens.at(i) == "global") {
                     ++i;
@@ -114,18 +114,18 @@ namespace viua {
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
 
-            static auto size_of_instruction_with_no_operands(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_instruction_with_no_operands(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto const calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_one_ri_operand(const TokenVector& tokens,
+            static auto size_of_instruction_with_one_ri_operand(TokenVector const& tokens,
                                                                 TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size =
+                    bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -133,13 +133,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_one_ri_operand_with_rs_type(const TokenVector& tokens,
+            static auto size_of_instruction_with_one_ri_operand_with_rs_type(TokenVector const& tokens,
                                                                              TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -147,13 +146,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_two_ri_operands_with_rs_types(const TokenVector& tokens,
+            static auto size_of_instruction_with_two_ri_operands_with_rs_types(TokenVector const& tokens,
                                                                                TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -165,13 +163,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_two_ri_operands(const TokenVector& tokens,
+            static auto size_of_instruction_with_two_ri_operands(TokenVector const& tokens,
                                                                  TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -183,13 +180,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_three_ri_operands_with_rs_types(const TokenVector& tokens,
+            static auto size_of_instruction_with_three_ri_operands_with_rs_types(TokenVector const& tokens,
                                                                                  TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -205,13 +201,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_four_ri_operands_with_rs_types(const TokenVector& tokens,
+            static auto size_of_instruction_with_four_ri_operands_with_rs_types(TokenVector const& tokens,
                                                                                 TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -231,13 +226,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_with_three_ri_operands(const TokenVector& tokens,
+            static auto size_of_instruction_with_three_ri_operands(TokenVector const& tokens,
                                                                    TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -253,17 +247,17 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_instruction_alu(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_instruction_alu(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_binary_literal_operand(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_binary_literal_operand(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 calculated_size += sizeof(viua::internals::types::bits_size);
 
-                auto literal = tokens.at(i).str().substr(2);
+                auto const literal = tokens.at(i).str().substr(2);
                 ++i;
 
                 /*
@@ -272,15 +266,15 @@ namespace viua {
                  * Then the result is divided by 8.0 because a byte has 8 bits, and
                  * the bytecode is encoded using bytes.
                  */
-                auto size = (assembler::operands::normalise_binary_literal(literal).size() / 8);
+                auto const size = (assembler::operands::normalise_binary_literal(literal).size() / 8);
                 calculated_size += size;
 
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
 
-            static auto size_of_octal_literal_operand(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_octal_literal_operand(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 calculated_size += sizeof(viua::internals::types::bits_size);
 
                 auto literal = tokens.at(i).str();
@@ -294,10 +288,10 @@ namespace viua {
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
 
-            static auto size_of_hexadecimal_literal_operand(const TokenVector& tokens,
+            static auto size_of_hexadecimal_literal_operand(TokenVector const& tokens,
                                                             TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 calculated_size += sizeof(viua::internals::types::bits_size);
 
                 auto literal = tokens.at(i).str();
@@ -311,15 +305,15 @@ namespace viua {
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
 
-            static auto size_of_nop(const TokenVector& v, TokenVector::size_type i)
+            static auto size_of_nop(TokenVector const& v, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_no_operands(v, i);
             }
-            static auto size_of_izero(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_izero(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_istore(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_istore(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_one_ri_operand(tokens, i);
@@ -330,19 +324,19 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_iinc(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_iinc(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_idec(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_idec(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_fstore(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_fstore(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -353,63 +347,63 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_itof(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_itof(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ftoi(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_ftoi(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_stoi(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_stoi(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_stof(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_stof(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_add(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_add(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_sub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_sub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_mul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_mul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_div(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_div(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_lt(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_lt(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_lte(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_lte(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_gt(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_gt(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_gte(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_gte(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_eq(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_eq(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
             }
-            static auto size_of_string(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_string(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -421,16 +415,16 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_streq(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_streq(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
 
-            static auto size_of_text(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_text(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -447,41 +441,40 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_texteq(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_texteq(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textat(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textat(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textsub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textsub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_four_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textlength(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textlength(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textcommonprefix(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textcommonprefix(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textcommonsuffix(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textcommonsuffix(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textconcat(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_textconcat(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_vec(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vec(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -497,12 +490,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_vinsert(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vinsert(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -518,43 +510,43 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_vpush(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vpush(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_vpop(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vpop(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_vat(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vat(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_vlen(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_vlen(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bool(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bool(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_not(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_not(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_and(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_and(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_or(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_or(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bits(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bits(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -576,220 +568,219 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_bitand(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitand(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bitor(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitor(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bitnot(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitnot(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bitxor(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitxor(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bitat(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitat(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_bitset(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_bitset(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_shl(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_shl(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_shr(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_shr(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ashl(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_ashl(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ashr(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_ashr(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_rol(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_rol(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ror(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_ror(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_wrapincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapincrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_wrapdecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapdecrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_wrapadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapadd(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_wrapsub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapsub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_wrapmul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapmul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_wrapdiv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_wrapdiv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedsincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedsincrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_checkedsdecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedsdecrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_checkedsadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedsadd(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedssub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedssub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedsmul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedsmul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedsdiv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedsdiv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkeduincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkeduincrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_checkedudecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedudecrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_checkeduadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkeduadd(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedusub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedusub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedumul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedumul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_checkedudiv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_checkedudiv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_saturatingsincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingsincrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_saturatingsdecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingsdecrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_saturatingsadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingsadd(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingssub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingssub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingsmul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingsmul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingsdiv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingsdiv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatinguincrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatinguincrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_saturatingudecrement(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingudecrement(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_saturatinguadd(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatinguadd(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingusub(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingusub(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingumul(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingumul(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_saturatingudiv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_saturatingudiv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_move(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_move(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_copy(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_copy(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ptr(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_ptr(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_swap(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_swap(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_delete(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_delete(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_isnull(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_isnull(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_ress(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_ress(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 calculated_size += sizeof(viua::internals::types::registerset_type_marker);
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_print(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_print(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_echo(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_echo(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_capture(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_capture(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -805,12 +796,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_capturecopy(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_capturecopy(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -826,12 +816,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_capturemove(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_capturemove(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -847,12 +836,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_closure(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_closure(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -863,12 +851,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_function(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_function(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -879,16 +866,15 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_frame(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_frame(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
             }
-            static auto size_of_param(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_param(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -900,12 +886,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_pamv(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_pamv(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -917,12 +902,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_call(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_call(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -938,13 +922,12 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_tailcall(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_tailcall(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
                 if (tokens.at(i).str().at(0) == '*' or tokens.at(i).str().at(0) == '%') {
-                    decltype(calculated_size) size_increment = 0;
+                    auto size_increment = decltype(calculated_size){0};
                     tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
                     calculated_size += size_increment;
                 } else {
@@ -954,16 +937,15 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_defer(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_defer(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_tailcall(tokens, i);
             }
-            static auto size_of_arg(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_arg(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -975,16 +957,15 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_argc(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_argc(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
-            static auto size_of_process(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_process(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -995,11 +976,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_self(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_self(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
-            static auto size_of_join(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
@@ -1014,11 +995,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_send(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_send(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_receive(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_receive(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 bytecode_size_type calculated_size = 0;
                 tie(calculated_size, i) = size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
@@ -1033,28 +1014,27 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_watchdog(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_watchdog(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
                 calculated_size += tokens.at(i).str().size() + 1;
                 ++i;
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_jump(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_jump(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 calculated_size += sizeof(bytecode_size_type);
                 ++i;
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_if(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_if(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
                 // for source register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
                 calculated_size += size_increment;
@@ -1064,13 +1044,13 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_throw(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_throw(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
-            static auto size_of_catch(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_catch(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
                 calculated_size +=
                     tokens.at(i++).str().size() + 1 - 2;             // +1 for null terminator, -2 for quotes
@@ -1078,42 +1058,42 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_pull(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_pull(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
-            static auto size_of_try(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_try(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_enter(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_enter(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
                 calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null terminator
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_leave(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_leave(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_import(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_import(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
                 calculated_size +=
                     tokens.at(i++).str().size() + 1 - 2;  // +1 for null terminator, -2 for quotes
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_class(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_class(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1123,11 +1103,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_prototype(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_prototype(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
@@ -1137,12 +1117,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_derive(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_derive(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1154,12 +1133,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_attach(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_attach(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1175,16 +1153,16 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_register(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_register(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
 
-            static auto size_of_atom(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_atom(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1195,34 +1173,33 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_atomeq(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_atomeq(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_struct(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_struct(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_structinsert(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_structinsert(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_structremove(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_structremove(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_structkeys(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_structkeys(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_new(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_new(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1234,12 +1211,11 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_msg(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_msg(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
 
-                decltype(calculated_size) size_increment = 0;
+                auto size_increment = decltype(calculated_size){0};
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
@@ -1255,29 +1231,26 @@ namespace viua {
 
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_insert(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_insert(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_remove(const TokenVector& tokens, TokenVector::size_type i)
+            static auto size_of_remove(TokenVector const& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_return(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_return(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size =
-                    sizeof(viua::internals::types::byte);  // start with the size of a single opcode
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};  // start with the size of a single opcode
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_halt(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_halt(TokenVector const&, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
 
-            bytecode_size_type calculate_bytecode_size_of_first_n_instructions2(
-                const TokenVector& tokens,
-                const std::remove_reference<decltype(tokens)>::type::size_type instructions_counter) {
+            auto calculate_bytecode_size_of_first_n_instructions2( TokenVector const& tokens, const std::remove_reference<decltype(tokens)>::type::size_type instructions_counter) -> bytecode_size_type {
                 bytecode_size_type bytes = 0;
 
                 const auto limit = tokens.size();
@@ -1740,7 +1713,7 @@ namespace viua {
 
                 return bytes;
             }
-            bytecode_size_type calculate_bytecode_size2(const TokenVector& tokens) {
+            auto calculate_bytecode_size2(TokenVector const& tokens) -> bytecode_size_type {
                 return calculate_bytecode_size_of_first_n_instructions2(tokens, tokens.size());
             }
         }  // namespace tools
