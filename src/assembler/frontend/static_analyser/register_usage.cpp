@@ -454,6 +454,24 @@ static auto get_input_operand(viua::assembler::frontend::parser::Instruction con
     }
     return operand;
 }
+
+using viua::assembler::frontend::parser::Instruction;
+static auto check_izero(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
+
+    check_if_name_resolved(register_usage_profile, *operand);
+
+    auto val = Register{};
+    val.index = operand->index;
+    val.register_set = operand->rss;
+    val.value_type = viua::internals::ValueTypes::INTEGER;
+    register_usage_profile.define(val, operand->tokens.at(0));
+}
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
                                                             const InstructionsBlock& ib, InstructionIndex i,
@@ -473,19 +491,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
 
         try {
             if (opcode == IZERO) {
-                auto operand = get_operand<RegisterIndex>(*instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *operand);
-
-                auto val = Register{};
-                val.index = operand->index;
-                val.register_set = operand->rss;
-                val.value_type = viua::internals::ValueTypes::INTEGER;
-                register_usage_profile.define(val, operand->tokens.at(0));
+                check_izero(register_usage_profile, *instruction);
             } else if (opcode == INTEGER) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
