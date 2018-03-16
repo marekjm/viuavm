@@ -295,21 +295,21 @@ static auto disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::t
     }
     return ptr;
 }
-auto disassembler::instruction( viua::internals::types::byte* ptr) -> tuple<string, viua::internals::types::bytecode_size> {
+auto disassembler::instruction(viua::internals::types::byte* ptr) -> tuple<string, viua::internals::types::bytecode_size> {
     viua::internals::types::byte* saved_ptr = ptr;
 
-    OPCODE op = OPCODE(*saved_ptr);
-    string opname;
+    auto const op = OPCODE(*saved_ptr);
+    auto opname = string{};
     try {
         opname = OP_NAMES.at(op);
         ++ptr;
-    } catch (const std::out_of_range& e) {
-        ostringstream emsg;
+    } catch (std::out_of_range const& e) {
+        auto emsg = ostringstream{};
         emsg << "could not find name for opcode: " << op;
         throw emsg.str();
     }
 
-    ostringstream oss;
+    auto oss = ostringstream{};
     oss << opname;
 
     if (op == STRING) {
@@ -686,7 +686,7 @@ auto disassembler::instruction( viua::internals::types::byte* ptr) -> tuple<stri
         throw("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
     }
     // we already *know* that the result will not be negative
-    auto increase = static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
+    auto const increase = static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
 
     return tuple<string, viua::internals::types::bytecode_size>(oss.str(), increase);
 }
