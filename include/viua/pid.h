@@ -30,9 +30,9 @@ namespace viua {
         class Process;
 
         class PID {
-            const viua::process::Process *associated_process;
+            const viua::process::Process* associated_process;
 
-            public:
+          public:
             bool operator==(const viua::process::PID&) const;
             bool operator==(const viua::process::Process*) const;
             bool operator<(const viua::process::PID&) const;
@@ -43,8 +43,8 @@ namespace viua {
 
             PID(const viua::process::Process*);
         };
-    }
-}
+    }  // namespace process
+}  // namespace viua
 
 
 #endif

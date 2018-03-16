@@ -23,11 +23,11 @@ using namespace std;
 
 namespace support {
     namespace env {
-        auto get_var(string const & var) -> string {
+        auto get_var(string const& var) -> string {
             auto const VAR = getenv(var.c_str());
             return (VAR == nullptr ? string("") : string(VAR));
         }
-        auto get_paths(string const & var) -> vector<string> {
+        auto get_paths(string const& var) -> vector<string> {
             auto path = get_var(var);
             auto paths = vector<string>{};
 
@@ -51,7 +51,7 @@ namespace support {
             return paths;
         }
 
-        auto is_file(string const & path) -> bool {
+        auto is_file(string const& path) -> bool {
             struct stat sf;
 
             // not a file if stat returned error
@@ -68,7 +68,8 @@ namespace support {
         }
 
         namespace viua {
-            auto get_mod_path(string const & module, string const& extension, vector<string> const& paths) -> string {
+            auto get_mod_path(string const& module, string const& extension, vector<string> const& paths)
+                -> string {
                 auto path = string{""};
                 auto found = false;
 

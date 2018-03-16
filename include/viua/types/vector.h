@@ -34,28 +34,28 @@ namespace viua {
              */
             std::vector<std::unique_ptr<Value>> internal_object;
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                std::string type() const override;
-                std::string str() const override;
-                bool boolean() const override;
-                std::unique_ptr<Value> copy() const override;
+            std::string type() const override;
+            std::string str() const override;
+            bool boolean() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                std::vector<std::unique_ptr<Value>>& value();
+            std::vector<std::unique_ptr<Value>>& value();
 
-                void insert(long int, std::unique_ptr<Value>);
-                void push(std::unique_ptr<Value>);
-                std::unique_ptr<Value> pop(long int);
-                Value* at(long int);
-                int len();
+            void insert(long int, std::unique_ptr<Value>);
+            void push(std::unique_ptr<Value>);
+            std::unique_ptr<Value> pop(long int);
+            Value* at(long int);
+            int len();
 
-                Vector();
-                Vector(const std::vector<Value*>& v);
-                ~Vector();
+            Vector();
+            Vector(const std::vector<Value*>& v);
+            ~Vector();
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

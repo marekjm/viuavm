@@ -22,27 +22,27 @@
 
 #pragma once
 
-#include <dlfcn.h>
+#include <algorithm>
+#include <atomic>
+#include <condition_variable>
 #include <cstdint>
+#include <dlfcn.h>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <queue>
 #include <map>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <stdexcept>
+#include <string>
+#include <thread>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
-#include <memory>
-#include <algorithm>
-#include <stdexcept>
-#include <atomic>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
+#include <vector>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/prototype.h>
 #include <viua/include/module.h>
 #include <viua/process.h>
+#include <viua/types/prototype.h>
 
 
 namespace viua {
@@ -55,8 +55,8 @@ namespace viua {
         namespace ffi {
             class ForeignFunctionCallRequest;
         }
-    }
-}
+    }  // namespace scheduler
+}  // namespace viua
 
 
 namespace viua {
@@ -65,8 +65,7 @@ namespace viua {
             mutable std::mutex mailbox_mutex;
             std::vector<std::unique_ptr<viua::types::Value>> messages;
 
-            public:
-
+          public:
             auto send(std::unique_ptr<viua::types::Value>) -> void;
             auto receive(std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
             auto size() const -> decltype(messages)::size_type;
@@ -76,56 +75,57 @@ namespace viua {
         };
 
         class ProcessResult {
-                mutable std::mutex result_mutex;
+            mutable std::mutex result_mutex;
 
-                /*
-                 * A process that has finished may either return a value, or
-                 * throw an exception.
-                 * Slots for both of these cases must be provided.
-                 */
-                std::unique_ptr<viua::types::Value> value_returned;
-                std::unique_ptr<viua::types::Value> exception_thrown;
+            /*
+             * A process that has finished may either return a value, or
+             * throw an exception.
+             * Slots for both of these cases must be provided.
+             */
+            std::unique_ptr<viua::types::Value> value_returned;
+            std::unique_ptr<viua::types::Value> exception_thrown;
 
-                /*
-                 * A flag set to 'true' once the process has finished execution.
-                 */
-                std::atomic_bool done;
-            public:
-                /*
-                 * Check if the process has stopped (for any reason).
-                 */
-                auto stopped() const -> bool;
+            /*
+             * A flag set to 'true' once the process has finished execution.
+             */
+            std::atomic_bool done;
 
-                /*
-                 * Check if the process has been terminated.
-                 */
-                auto terminated() const -> bool;
+          public:
+            /*
+             * Check if the process has stopped (for any reason).
+             */
+            auto stopped() const -> bool;
 
-                /*
-                 * Resolve a process to some return value.
-                 * This means that the execution succeeded.
-                 */
-                auto resolve(std::unique_ptr<viua::types::Value>) -> void;
+            /*
+             * Check if the process has been terminated.
+             */
+            auto terminated() const -> bool;
 
-                /*
-                 * Raise an exception that killed the process.
-                 * This means that the execution failed.
-                 */
-                auto raise(std::unique_ptr<viua::types::Value>) -> void;
+            /*
+             * Resolve a process to some return value.
+             * This means that the execution succeeded.
+             */
+            auto resolve(std::unique_ptr<viua::types::Value>) -> void;
 
-                /*
-                 * Transfer return value and exception from process result.
-                 */
-                auto transfer_exception() -> std::unique_ptr<viua::types::Value>;
-                auto transfer_result() -> std::unique_ptr<viua::types::Value>;
+            /*
+             * Raise an exception that killed the process.
+             * This means that the execution failed.
+             */
+            auto raise(std::unique_ptr<viua::types::Value>) -> void;
 
-                ProcessResult() = default;
-                ProcessResult(ProcessResult&&);
+            /*
+             * Transfer return value and exception from process result.
+             */
+            auto transfer_exception() -> std::unique_ptr<viua::types::Value>;
+            auto transfer_result() -> std::unique_ptr<viua::types::Value>;
+
+            ProcessResult() = default;
+            ProcessResult(ProcessResult&&);
         };
 
         class Kernel {
 #ifdef AS_DEBUG_HEADER
-            public:
+          public:
 #endif
             /*  Bytecode pointer is a pointer to program's code.
              *  Size and executable offset are metadata exported from bytecode dump.
@@ -144,7 +144,9 @@ namespace viua {
 
             std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_functions;
             std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_blocks;
-            std::map<std::string, std::pair<viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>> linked_modules;
+            std::map<std::string, std::pair<viua::internals::types::bytecode_size,
+                                            std::unique_ptr<viua::internals::types::byte[]>>>
+                linked_modules;
 
             int return_code;
 
@@ -165,11 +167,12 @@ namespace viua {
             std::mutex free_virtual_processes_mutex;
             std::condition_variable free_virtual_processes_cv;
             // list of running VP schedulers, pairs of {scheduler-pointer, thread}
-            std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>> virtual_process_schedulers;
+            std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>>
+                virtual_process_schedulers;
             // list of idle VP schedulers
             std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
-            std::atomic<viua::internals::types::processes_count> running_processes { 0 };
+            std::atomic<viua::internals::types::processes_count> running_processes{0};
 
             static const viua::internals::types::schedulers_count default_vp_schedulers_limit = 2;
             viua::internals::types::schedulers_count vp_schedulers_limit;
@@ -206,93 +209,97 @@ namespace viua {
             std::map<viua::process::PID, ProcessResult> process_results;
             mutable std::mutex process_results_mutex;
 
-            public:
-                /*  Methods dealing with dynamic library loading.
-                 */
-                void load_module(std::string);
-                void load_native_library(const std::string&);
-                void load_foreign_library(const std::string&);
+          public:
+            /*  Methods dealing with dynamic library loading.
+             */
+            void load_module(std::string);
+            void load_native_library(const std::string&);
+            void load_foreign_library(const std::string&);
 
-                // debug and error reporting flags
-                bool debug, errors;
+            // debug and error reporting flags
+            bool debug, errors;
 
-                std::vector<std::string> commandline_arguments;
+            std::vector<std::string> commandline_arguments;
 
-                /*  Public API of the Kernel provides basic actions:
-                 *
-                 *      * load bytecode,
-                 *      * set its size,
-                 *      * tell the Kernel where to start execution,
-                 *      * kick the Kernel so it starts running,
-                 */
-                Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
-                Kernel& bytes(viua::internals::types::bytecode_size);
+            /*  Public API of the Kernel provides basic actions:
+             *
+             *      * load bytecode,
+             *      * set its size,
+             *      * tell the Kernel where to start execution,
+             *      * kick the Kernel so it starts running,
+             */
+            Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
+            Kernel& bytes(viua::internals::types::bytecode_size);
 
-                Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
-                Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
+            Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
+            Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
 
-                Kernel& register_external_function(const std::string&, ForeignFunction*);
-                Kernel& remove_external_function(std::string);
+            Kernel& register_external_function(const std::string&, ForeignFunction*);
+            Kernel& remove_external_function(std::string);
 
-                /*  Methods dealing with typesystem related tasks.
-                 */
-                bool is_class(const std::string&) const;
-                bool class_accepts(const std::string&, const std::string&) const;
-                std::vector<std::string> inheritance_chain_of(const std::string&) const;
-                bool is_local_function(const std::string&) const;
-                bool is_linked_function(const std::string&) const;
-                bool is_native_function(const std::string&) const;
-                bool is_foreign_method(const std::string&) const;
-                bool is_foreign_function(const std::string&) const;
+            /*  Methods dealing with typesystem related tasks.
+             */
+            bool is_class(const std::string&) const;
+            bool class_accepts(const std::string&, const std::string&) const;
+            std::vector<std::string> inheritance_chain_of(const std::string&) const;
+            bool is_local_function(const std::string&) const;
+            bool is_linked_function(const std::string&) const;
+            bool is_native_function(const std::string&) const;
+            bool is_foreign_method(const std::string&) const;
+            bool is_foreign_function(const std::string&) const;
 
-                bool is_block(const std::string&) const;
-                bool is_local_block(const std::string&) const;
-                bool is_linked_block(const std::string&) const;
-                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(const std::string&) const;
+            bool is_block(const std::string&) const;
+            bool is_local_block(const std::string&) const;
+            bool is_linked_block(const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(
+                const std::string&) const;
 
-                std::string resolve_method_name(const std::string&, const std::string&) const;
-                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(const std::string&) const;
+            std::string resolve_method_name(const std::string&, const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(
+                const std::string&) const;
 
-                void register_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
-                void register_prototype(std::unique_ptr<viua::types::Prototype>);
+            void register_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
+            void register_prototype(std::unique_ptr<viua::types::Prototype>);
 
-                /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-                Kernel& register_foreign_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
-                Kernel& register_foreign_method(const std::string&, ForeignMethod);
+            /// These two methods are used to inject pure-C++ classes into machine's typesystem.
+            Kernel& register_foreign_prototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
+            Kernel& register_foreign_method(const std::string&, ForeignMethod);
 
-                void request_foreign_function_call(Frame*, viua::process::Process*);
-                void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+            void request_foreign_function_call(Frame*, viua::process::Process*);
+            void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*,
+                                             viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                             viua::process::Process*);
 
-                void post_free_process(std::unique_ptr<viua::process::Process>);
+            void post_free_process(std::unique_ptr<viua::process::Process>);
 
-                auto create_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
-                auto delete_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+            auto create_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+            auto delete_mailbox(const viua::process::PID) -> viua::internals::types::processes_count;
 
-                auto create_result_slot_for(viua::process::PID) -> void;
-                auto detach_process(const viua::process::PID) -> void;
-                auto record_process_result(viua::process::Process*) -> void;
-                auto is_process_joinable(const viua::process::PID) const -> bool;
-                auto is_process_stopped(const viua::process::PID) const -> bool;
-                auto is_process_terminated(const viua::process::PID) const -> bool;
-                auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
-                auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
+            auto create_result_slot_for(viua::process::PID) -> void;
+            auto detach_process(const viua::process::PID) -> void;
+            auto record_process_result(viua::process::Process*) -> void;
+            auto is_process_joinable(const viua::process::PID) const -> bool;
+            auto is_process_stopped(const viua::process::PID) const -> bool;
+            auto is_process_terminated(const viua::process::PID) const -> bool;
+            auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
+            auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
 
-                void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
-                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
-                uint64_t pids() const;
+            void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
+            void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
+            uint64_t pids() const;
 
-                auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;
-                auto static no_of_ffi_schedulers() -> viua::internals::types::schedulers_count;
-                auto static is_tracing_enabled() -> bool;
+            auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;
+            auto static no_of_ffi_schedulers() -> viua::internals::types::schedulers_count;
+            auto static is_tracing_enabled() -> bool;
 
-                int run();
+            int run();
 
-                int exit() const;
+            int exit() const;
 
-                Kernel();
-                ~Kernel();
+            Kernel();
+            ~Kernel();
         };
-    }
-}
+    }  // namespace kernel
+}  // namespace viua
 
 #endif

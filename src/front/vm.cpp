@@ -23,7 +23,7 @@ using namespace std;
 
 
 void viua::front::vm::initialise(viua::kernel::Kernel* kernel, const string& program, vector<string> args) {
-    auto loader = Loader{ program };
+    auto loader = Loader{program};
     loader.executable();
 
     auto const bytes = loader.get_bytecode_size();

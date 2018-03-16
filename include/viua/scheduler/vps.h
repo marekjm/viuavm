@@ -20,14 +20,14 @@
 #ifndef VIUA_SCHEDULER_VPS_H
 #define VIUA_SCHEDULER_VPS_H
 
-#include <vector>
+#include <atomic>
+#include <memory>
+#include <mutex>
 #include <queue>
 #include <string>
-#include <utility>
-#include <memory>
 #include <thread>
-#include <mutex>
-#include <atomic>
+#include <utility>
+#include <vector>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/frame.h>
 
@@ -39,7 +39,7 @@ namespace viua {
     namespace kernel {
         class Kernel;
     }
-}
+}  // namespace viua
 
 
 namespace viua {
@@ -47,7 +47,7 @@ namespace viua {
         class VirtualProcessScheduler {
             /** Scheduler of Viua VM virtual processes.
              */
-            viua::kernel::Kernel *attached_kernel;
+            viua::kernel::Kernel* attached_kernel;
 
             /*
              * Variables set below control whether the VM should gather and
@@ -56,11 +56,11 @@ namespace viua {
              */
             const bool tracing_enabled;
 
-            std::vector<std::unique_ptr<viua::process::Process>> *free_processes;
-            std::mutex *free_processes_mutex;
-            std::condition_variable *free_processes_cv;
+            std::vector<std::unique_ptr<viua::process::Process>>* free_processes;
+            std::mutex* free_processes_mutex;
+            std::condition_variable* free_processes_cv;
 
-            viua::process::Process *main_process;
+            viua::process::Process* main_process;
             std::vector<std::unique_ptr<viua::process::Process>> processes;
             decltype(processes)::size_type current_process_index;
 
@@ -72,13 +72,13 @@ namespace viua {
             std::atomic_bool shut_down;
             std::thread scheduler_thread;
 
-            public:
-
+          public:
             viua::kernel::Kernel* kernel() const;
 
             bool is_class(const std::string&) const;
             bool class_accepts(const std::string&, const std::string&) const;
-            auto inheritance_chain_of(const std::string& name) const -> decltype(attached_kernel->inheritance_chain_of(name));
+            auto inheritance_chain_of(const std::string& name) const
+                -> decltype(attached_kernel->inheritance_chain_of(name));
             bool is_local_function(const std::string&) const;
             bool is_linked_function(const std::string&) const;
             bool is_native_function(const std::string&) const;
@@ -88,15 +88,19 @@ namespace viua {
             bool is_block(const std::string&) const;
             bool is_local_block(const std::string&) const;
             bool is_linked_block(const std::string&) const;
-            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of_block(
+                const std::string&) const;
 
             std::string resolve_method_name(const std::string&, const std::string&) const;
-            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(const std::string&) const;
+            std::pair<viua::internals::types::byte*, viua::internals::types::byte*> get_entry_point_of(
+                const std::string&) const;
 
             void register_prototype(std::unique_ptr<viua::types::Prototype>);
 
             void request_foreign_function_call(Frame*, viua::process::Process*) const;
-            void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+            void request_foreign_method_call(const std::string&, viua::types::Value*, Frame*,
+                                             viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                             viua::process::Process*);
 
             void load_module(std::string);
 
@@ -127,12 +131,14 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*, const bool = false);
+            VirtualProcessScheduler(viua::kernel::Kernel*,
+                                    std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*,
+                                    std::condition_variable*, const bool = false);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };
-    }
-}
+    }  // namespace scheduler
+}  // namespace viua
 
 
 #endif

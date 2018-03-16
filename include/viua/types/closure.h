@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/function.h>
@@ -32,32 +32,32 @@
 namespace viua {
     namespace types {
         class Closure : public Function {
-                std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
-                std::string function_name;
+            std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
+            std::string function_name;
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                std::string type() const override;
-                std::string str() const override;
-                std::string repr() const override;
+            std::string type() const override;
+            std::string str() const override;
+            std::string repr() const override;
 
-                bool boolean() const override;
+            bool boolean() const override;
 
-                std::unique_ptr<Value> copy() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                std::string name() const override;
-                viua::kernel::RegisterSet* rs() const;
-                auto release() -> viua::kernel::RegisterSet*;
-                auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
-                auto empty() const -> bool;
-                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+            std::string name() const override;
+            viua::kernel::RegisterSet* rs() const;
+            auto release() -> viua::kernel::RegisterSet*;
+            auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
+            auto empty() const -> bool;
+            void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
 
-                Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
-                virtual ~Closure();
+            Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
+            virtual ~Closure();
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

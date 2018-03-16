@@ -23,12 +23,12 @@
 #pragma once
 
 #include <string>
-#include <viua/types/value.h>
-#include <viua/types/vector.h>
-#include <viua/types/integer.h>
-#include <viua/support/string.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
+#include <viua/support/string.h>
+#include <viua/types/integer.h>
+#include <viua/types/value.h>
+#include <viua/types/vector.h>
 
 
 namespace viua {
@@ -38,7 +38,7 @@ namespace viua {
     namespace kernel {
         class Kernel;
     }
-}
+}  // namespace viua
 
 
 namespace viua {
@@ -52,40 +52,49 @@ namespace viua {
              */
             std::string svalue;
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                std::string type() const override;
-                std::string str() const override;
-                std::string repr() const override;
-                bool boolean() const override;
+            std::string type() const override;
+            std::string str() const override;
+            std::string repr() const override;
+            bool boolean() const override;
 
-                std::unique_ptr<Value> copy() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                std::string& value();
+            std::string& value();
 
-                Integer* size();
-                String* sub(int64_t b = 0, int64_t e = -1);
-                String* add(String*);
-                String* join(Vector*);
+            Integer* size();
+            String* sub(int64_t b = 0, int64_t e = -1);
+            String* add(String*);
+            String* join(Vector*);
 
-                virtual void stringify(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void represent(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+            virtual void stringify(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                   viua::process::Process*, viua::kernel::Kernel*);
+            virtual void represent(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                   viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void startswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void endswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+            virtual void startswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                    viua::process::Process*, viua::kernel::Kernel*);
+            virtual void endswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                  viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void format(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void substr(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void concatenate(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+            virtual void format(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                viua::process::Process*, viua::kernel::Kernel*);
+            virtual void substr(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                viua::process::Process*, viua::kernel::Kernel*);
+            virtual void concatenate(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                     viua::process::Process*, viua::kernel::Kernel*);
+            virtual void join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                              viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void size(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+            virtual void size(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                              viua::process::Process*, viua::kernel::Kernel*);
 
-                String(std::string s = "");
+            String(std::string s = "");
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

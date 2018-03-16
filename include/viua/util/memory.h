@@ -118,9 +118,9 @@ namespace viua {
             template<class To> auto aligned_read(To& target) -> aligned_read_impl<To> {
                 return aligned_read_impl<To>(target);
             }
-        }
-    }
-}
+        }  // namespace memory
+    }      // namespace util
+}  // namespace viua
 
 
 #endif

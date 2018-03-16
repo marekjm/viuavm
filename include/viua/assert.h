@@ -24,9 +24,9 @@
 
 #include <memory>
 #include <string>
+#include <viua/exceptions.h>
 #include <viua/kernel/frame.h>
 #include <viua/types/value.h>
-#include <viua/exceptions.h>
 
 
 namespace viua {
@@ -36,7 +36,8 @@ namespace viua {
         template<typename T, typename U> inline bool any_equal(const T& to_compare, const U& first) {
             return (to_compare == first);
         }
-        template<typename T, typename U, typename... R> bool any_equal(const T& to_compare, const U& first, const R&... rest) {
+        template<typename T, typename U, typename... R>
+        bool any_equal(const T& to_compare, const U& first, const R&... rest) {
             return ((to_compare == first) or any_equal(to_compare, rest...));
         }
 
@@ -50,9 +51,8 @@ namespace viua {
                 throw ex;
             }
         }
-    }
-}
-
+    }  // namespace assertions
+}  // namespace viua
 
 
 #endif

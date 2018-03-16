@@ -20,9 +20,9 @@
 #ifndef VIUA_SCHEDULER_FFI_H
 #define VIUA_SCHEDULER_FFI_H
 
+#include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
 #include <viua/include/module.h>
 
 
@@ -33,7 +33,7 @@ namespace viua {
     namespace kernel {
         class Kernel;
     }
-}
+}  // namespace viua
 
 
 namespace viua {
@@ -41,23 +41,26 @@ namespace viua {
         namespace ffi {
             class ForeignFunctionCallRequest {
                 std::unique_ptr<Frame> frame;
-                viua::process::Process *caller_process;
-                viua::kernel::Kernel *kernel;
+                viua::process::Process* caller_process;
+                viua::kernel::Kernel* kernel;
 
-                public:
-                    std::string function_name() const;
-                    void call(ForeignFunction*);
-                    void raise(std::unique_ptr<viua::types::Value>);
-                    void wakeup();
+              public:
+                std::string function_name() const;
+                void call(ForeignFunction*);
+                void raise(std::unique_ptr<viua::types::Value>);
+                void wakeup();
 
-                    ForeignFunctionCallRequest(Frame *fr, viua::process::Process *cp, viua::kernel::Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
-                    ~ForeignFunctionCallRequest() {}
+                ForeignFunctionCallRequest(Frame* fr, viua::process::Process* cp, viua::kernel::Kernel* c)
+                    : frame(fr), caller_process(cp), kernel(c) {}
+                ~ForeignFunctionCallRequest() {}
             };
 
-            void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>> *requests, std::map<std::string, ForeignFunction*> *foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
-        }
-    }
-}
+            void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>>* requests,
+                                   std::map<std::string, ForeignFunction*>* foreign_functions,
+                                   std::mutex* ff_map_mtx, std::mutex* mtx, std::condition_variable* cv);
+        }  // namespace ffi
+    }      // namespace scheduler
+}  // namespace viua
 
 
 #endif

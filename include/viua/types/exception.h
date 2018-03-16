@@ -24,8 +24,8 @@
 
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/value.h>
 #include <viua/support/string.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
@@ -36,27 +36,28 @@ namespace viua {
              *  Thrown when irrecoverable conditions are encountered
              *  during program execution.
              */
-            protected:
-                std::string cause;
-                std::string detailed_type;
-            public:
-                static const std::string type_name;
+          protected:
+            std::string cause;
+            std::string detailed_type;
 
-                std::string type() const override;
-                std::string str() const override;
-                std::string repr() const override;
-                bool boolean() const override;
+          public:
+            static const std::string type_name;
 
-                std::unique_ptr<Value> copy() const override;
+            std::string type() const override;
+            std::string str() const override;
+            std::string repr() const override;
+            bool boolean() const override;
 
-                virtual std::string what() const;
-                virtual std::string etype() const;
+            std::unique_ptr<Value> copy() const override;
 
-                Exception(std::string s = "");
-                Exception(std::string ts, std::string cs);
+            virtual std::string what() const;
+            virtual std::string etype() const;
+
+            Exception(std::string s = "");
+            Exception(std::string ts, std::string cs);
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

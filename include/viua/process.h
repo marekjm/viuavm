@@ -53,7 +53,7 @@ namespace viua {
     namespace scheduler {
         class VirtualProcessScheduler;
     }
-}
+}  // namespace viua
 
 namespace viua {
     namespace process {
@@ -232,21 +232,21 @@ namespace viua {
              *  function calls.
              */
             Frame* request_new_frame(viua::internals::types::register_index arguments_size = 0,
-                                   viua::internals::types::register_index registers_size = 0);
+                                     viua::internals::types::register_index registers_size = 0);
             TryFrame* request_new_try_frame();
             void push_frame();
             viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
             viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             // call native (i.e. written in Viua) function
             viua::internals::types::byte* call_native(viua::internals::types::byte*, const std::string&,
-                                                     viua::kernel::Register*, const std::string&);
+                                                      viua::kernel::Register*, const std::string&);
             // call foreign (i.e. from a C++ extension) function
             viua::internals::types::byte* call_foreign(viua::internals::types::byte*, const std::string&,
-                                                      viua::kernel::Register*, const std::string&);
+                                                       viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
             viua::internals::types::byte* call_foreign_method(viua::internals::types::byte*,
-                                                            viua::types::Value*, const std::string&,
-                                                            viua::kernel::Register*, const std::string&);
+                                                              viua::types::Value*, const std::string&,
+                                                              viua::kernel::Register*, const std::string&);
 
             auto push_deferred(std::string) -> void;
 
@@ -488,8 +488,8 @@ namespace viua {
                     viua::process::Process*, const bool = false);
             ~Process();
         };
-    }
-}
+    }  // namespace process
+}  // namespace viua
 
 
 #endif

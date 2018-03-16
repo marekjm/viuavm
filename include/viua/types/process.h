@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
-#include <viua/types/value.h>
-#include <viua/types/vector.h>
-#include <viua/types/integer.h>
-#include <viua/support/string.h>
+#include <string>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/process.h>
+#include <viua/support/string.h>
+#include <viua/types/integer.h>
+#include <viua/types/value.h>
+#include <viua/types/vector.h>
 
 
 // we only need a pointer so class declaration will be sufficient
@@ -38,7 +38,7 @@ namespace viua {
     namespace kernel {
         class Kernel;
     }
-}
+}  // namespace viua
 
 
 namespace viua {
@@ -47,29 +47,29 @@ namespace viua {
             viua::process::Process* thrd;
             viua::process::PID saved_pid;
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                /*
-                 * For use by the VM and user code.
-                 * Provides interface common to all values in Viua.
-                 */
-                std::string type() const override;
-                std::string str() const override;
-                std::string repr() const override;
-                bool boolean() const override;
-                std::unique_ptr<Value> copy() const override;
+            /*
+             * For use by the VM and user code.
+             * Provides interface common to all values in Viua.
+             */
+            std::string type() const override;
+            std::string str() const override;
+            std::string repr() const override;
+            bool boolean() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                /*
-                 * For use by the VM.
-                 * User code has no way of discovering PIDs - it must receive them.
-                 */
-                viua::process::PID pid() const;
+            /*
+             * For use by the VM.
+             * User code has no way of discovering PIDs - it must receive them.
+             */
+            viua::process::PID pid() const;
 
-                Process(viua::process::Process*);
+            Process(viua::process::Process*);
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif
