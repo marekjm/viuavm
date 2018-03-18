@@ -2018,6 +2018,22 @@ static auto check_op_send(Register_usage_profile& register_usage_profile, Instru
                                                                                 *target);
                 erase_if_direct_access(register_usage_profile, source, instruction);
 }
+static auto check_op_receive(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    if (not get_operand<VoidLiteral>(instruction, 0)) {
+                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                            .note("expected register index or void");
+                    }
+                }
+
+                if (target) {
+                    check_if_name_resolved(register_usage_profile, *target);
+
+                    auto val = Register{*target};
+                    register_usage_profile.define(val, target->tokens.at(0));
+                }
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2167,20 +2183,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == SEND) {
                 check_op_send(register_usage_profile, *instruction);
             } else if (opcode == RECEIVE) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(*instruction, 0)) {
-                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
-
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-
-                    auto val = Register{*target};
-                    register_usage_profile.define(val, target->tokens.at(0));
-                }
+                check_op_receive(register_usage_profile, *instruction);
             } else if (opcode == WATCHDOG) {
                 auto fn = instruction->operands.at(0).get();
                 if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
