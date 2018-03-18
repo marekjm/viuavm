@@ -41,6 +41,10 @@ add %output local %lhs local %rhs local
 
 A register belongs to one of available register sets.
 
+A register may be empty, or full - it never exists in an "uninitialised" state where it contains some
+unspecified value but is not empty.
+In Viua a register either contains a valid value, or nothing.
+
 %% A REGISTER
 \section{end}
 
