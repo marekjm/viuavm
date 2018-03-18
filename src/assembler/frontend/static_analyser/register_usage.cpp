@@ -2034,6 +2034,13 @@ static auto check_op_receive(Register_usage_profile& register_usage_profile, Ins
                     register_usage_profile.define(val, target->tokens.at(0));
                 }
 }
+static auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction) -> void {
+                auto fn = instruction.operands.at(0).get();
+                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected function name or atom literal");
+                }
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2185,11 +2192,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == RECEIVE) {
                 check_op_receive(register_usage_profile, *instruction);
             } else if (opcode == WATCHDOG) {
-                auto fn = instruction->operands.at(0).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name or atom literal");
-                }
+                check_op_watchdog(register_usage_profile, *instruction);
             } else if (opcode == JUMP) {
                 auto target = instruction->operands.at(0).get();
 
