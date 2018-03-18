@@ -2097,6 +2097,38 @@ static auto check_op_enter(Register_usage_profile& register_usage_profile, Parse
                     throw e.append(InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
                 }
 }
+static auto check_op_jump(
+        Register_usage_profile& register_usage_profile
+        , ParsedSource const& ps
+        , Instruction const& instruction
+        , InstructionsBlock const& ib
+        , InstructionIndex i
+        , InstructionIndex const mnemonic_counter
+        ) -> void {
+                auto target = instruction.operands.at(0).get();
+
+                if (auto offset = dynamic_cast<Offset*>(target); offset) {
+                    auto jump_target = stol(offset->tokens.at(0));
+                    if (jump_target > 0) {
+                        i = get_line_index_of_instruction(
+                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, i,
+                                                                        mnemonic_counter);
+                    }
+                } else if (auto label = dynamic_cast<Label*>(target); label) {
+                    auto jump_target = ib.marker_map.at(label->tokens.at(0));
+                    jump_target = get_line_index_of_instruction(jump_target, ib);
+                    if (jump_target > i) {
+                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib,
+                                                                        jump_target, mnemonic_counter);
+                    }
+                } else if (str::ishex(target->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                } else {
+                    throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
+                }
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2250,32 +2282,14 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == WATCHDOG) {
                 check_op_watchdog(register_usage_profile, *instruction);
             } else if (opcode == JUMP) {
-                auto target = instruction->operands.at(0).get();
+                check_op_jump(register_usage_profile, ps,  *instruction, ib, i, mnemonic_counter);
 
-                if (auto offset = dynamic_cast<Offset*>(target); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        i = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, i,
-                                                                        mnemonic_counter);
-                    }
-                    return;
-                } else if (auto label = dynamic_cast<Label*>(target); label) {
-                    auto jump_target = ib.marker_map.at(label->tokens.at(0));
-                    jump_target = get_line_index_of_instruction(jump_target, ib);
-                    if (jump_target > i) {
-                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib,
-                                                                        jump_target, mnemonic_counter);
-                    }
-                    return;
-                } else if (str::ishex(target->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                    return;
-                } else {
-                    throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
-                }
+                /*
+                 * Do not perform further checks after a "jump" instruction.
+                 * All state has been "moved" into the nested checking call above, and
+                 * it would be useless to perform the checks twice here.
+                 */
+                return;
             } else if (opcode == IF) {
                 auto source = get_operand<RegisterIndex>(*instruction, 0);
                 if (not source) {
