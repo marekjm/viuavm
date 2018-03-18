@@ -2418,6 +2418,29 @@ static auto check_op_structremove(Register_usage_profile& register_usage_profile
                     register_usage_profile.define(Register{*target}, target->tokens.at(0));
                 }
 }
+static auto check_op_structkeys(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *target);
+
+                auto source = get_operand<RegisterIndex>(instruction, 1);
+                if (not source) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
+
+                auto val = Register{*target};
+                val.value_type = ValueTypes::VECTOR;
+                register_usage_profile.define(val, target->tokens.at(0));
+}
 /*
 static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
 {
@@ -2618,26 +2641,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == STRUCTREMOVE) {
                 check_op_structremove(register_usage_profile, *instruction);
             } else if (opcode == STRUCTKEYS) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *target);
-
-                auto source = get_operand<RegisterIndex>(*instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
-
-                auto val = Register{*target};
-                val.value_type = ValueTypes::VECTOR;
-                register_usage_profile.define(val, target->tokens.at(0));
+                check_op_structkeys(register_usage_profile, *instruction);
             } else if (opcode == NEW) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
