@@ -407,6 +407,46 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     }
 
     switch (op) {
+        case NOP:
+        case TRY:
+        case LEAVE:
+        case RETURN:
+        case HALT:
+            // These ops have no operands.
+            break;
+        case STRING:
+        case TEXT:
+        case ATOM:
+        case CLOSURE:
+        case FUNCTION:
+        case CALL:
+        case PROCESS:
+        case MSG:
+        case CLASS:
+        case NEW:
+        case DERIVE:
+        case TAILCALL:
+        case DEFER:
+        case IMPORT:
+        case ENTER:
+        case WATCHDOG:
+        case CATCH:
+        case ATTACH:
+            // Already handled in the `if` above.
+            break;
+        case BITSWIDTH:
+        case BITSEQ:
+        case BITSLT:
+        case BITSLTE:
+        case BITSGT:
+        case BITSGTE:
+        case BITAEQ:
+        case BITALT:
+        case BITALTE:
+        case BITAGT:
+        case BITAGTE:
+            // Not implemented.
+            break;
         case IZERO:
         case PRINT:
         case ECHO:
@@ -636,10 +676,15 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
                 case viua::internals::RegisterSets::STATIC:
                     oss << "static";
                     break;
+                case viua::internals::RegisterSets::CURRENT:
+                    // FIXME: should this only be a warning?
+                    oss << "current ";
+                    oss << "; WARNING: invalid register set type\n";
+                    break;
                 default:
                     // FIXME: should this only be a warning?
-                    oss << "; WARNING: invalid register set type\n";
                     oss << int(*ptr);
+                    oss << " ; WARNING: invalid register set type\n";
             }
             pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
             break;

@@ -251,6 +251,13 @@ viua::internals::types::byte* viua::process::Process::tick() {
             case Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP:
                 saved_stack->instruction_pointer = dispatch(stack->instruction_pointer);
                 break;
+            case Stack::STATE::UNINITIALISED:
+                // Stack should never be uninitialised at runtime.
+                break;
+            case Stack::STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING:
+            case Stack::STATE::HALTED:
+                // Not interesting in this case.
+                break;
             default:
                 break;
         }

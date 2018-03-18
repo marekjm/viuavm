@@ -103,6 +103,9 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
             ensure_static_registers(stack->back()->function_name);
             currently_used_register_set = static_registers.at(stack->back()->function_name).get();
             break;
+        case viua::internals::RegisterSets::CURRENT:
+            // No point in switching to current register set.
+            break;
         default:
             throw make_unique<viua::types::Exception>("illegal register set ID in ress instruction");
     }
