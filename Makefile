@@ -20,15 +20,47 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 
 
 # These are generic flags that should be used for compiling Viua VM.
-GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef \
-				 -Wstrict-overflow=2 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
-				 -Wuseless-cast -Wconversion -Wshadow -Wswitch-default -Wredundant-decls \
-				 -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual \
-				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors \
-				 -pedantic -g -I./include
-CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Wshadow -Wswitch-default \
-			   -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors \
-			   -pedantic -g \
+GENERIC_CXXFLAGS=-Wall \
+				 -Wextra \
+				 -Wctor-dtor-privacy \
+				 -Wnon-virtual-dtor \
+				 -Wreorder \
+				 -Woverloaded-virtual \
+				 -Wundef \
+				 -Wstrict-overflow=2 \
+				 -Wdisabled-optimization \
+				 -Winit-self \
+				 -Wzero-as-null-pointer-constant \
+				 -Wuseless-cast \
+				 -Wconversion \
+				 -Wshadow \
+				 -Wswitch-default \
+				 -Wredundant-decls \
+				 -Wlogical-op \
+				 -Wmissing-include-dirs \
+				 -Wmissing-declarations \
+				 -Wcast-align \
+				 -Wcast-qual \
+				 -Wold-style-cast \
+				 -Walloc-zero \
+				 -Werror \
+				 -Wfatal-errors \
+				 -pedantic \
+				 -g \
+				 -I./include
+CLANG_CXXFLAGS=-Wall \
+			   -Wextra \
+			   -Wint-to-void-pointer-cast \
+			   -Wconversion \
+			   -Wshadow \
+			   -Wswitch-default \
+			   -Wmissing-include-dirs \
+			   -Wcast-align \
+			   -Wold-style-cast \
+			   -Werror \
+			   -Wfatal-errors \
+			   -pedantic \
+			   -g \
 			   -I./include
 GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
 
