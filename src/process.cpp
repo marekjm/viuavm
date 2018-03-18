@@ -31,6 +31,9 @@
 #include <viua/types/reference.h>
 using namespace std;
 
+// Provide storage for static member.
+viua::internals::types::register_index const viua::process::Process::DEFAULT_REGISTER_SIZE;
+
 
 viua::types::Value* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
@@ -101,9 +104,9 @@ Frame* viua::process::Process::request_new_frame(viua::internals::types::registe
     return stack->prepare_frame(arguments_size, registers_size);
 }
 void viua::process::Process::push_frame() {
-    if (stack->size() > MAX_STACK_SIZE) {
+    if (stack->size() > Stack::MAX_STACK_SIZE) {
         ostringstream oss;
-        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '"
+        oss << "stack size (" << Stack::MAX_STACK_SIZE << ") exceeded with call to '"
             << stack->frame_new->function_name << '\'';
         throw make_unique<viua::types::Exception>(oss.str());
     }

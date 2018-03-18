@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -39,8 +39,6 @@
 #include <viua/types/value.h>
 
 
-const viua::internals::types::register_index DEFAULT_REGISTER_SIZE = 255;
-const uint16_t MAX_STACK_SIZE = 8192;
 
 
 class HaltException : public std::runtime_error {
@@ -171,6 +169,8 @@ namespace viua {
 
             Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*,
                   viua::scheduler::VirtualProcessScheduler*);
+
+            static uint16_t const MAX_STACK_SIZE = 8192;
         };
 
         class Process {
@@ -487,6 +487,8 @@ namespace viua {
             Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*,
                     viua::process::Process*, const bool = false);
             ~Process();
+
+            static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE = 255;
         };
     }  // namespace process
 }  // namespace viua
