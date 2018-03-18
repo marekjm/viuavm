@@ -2339,6 +2339,20 @@ static auto check_op_atomeq(Register_usage_profile& register_usage_profile, Inst
                 val.value_type = viua::internals::ValueTypes::BOOLEAN;
                 register_usage_profile.define(val, result->tokens.at(0));
 }
+static auto check_op_struct(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto operand = get_operand<RegisterIndex>(instruction, 0);
+                if (not operand) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *operand);
+
+                auto val = Register{*operand};
+                val.value_type = ValueTypes::STRUCT;
+                register_usage_profile.define(val, operand->tokens.at(0));
+}
 /*
 static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
 {
@@ -2533,17 +2547,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == ATOMEQ) {
                 check_op_atomeq(register_usage_profile, *instruction);
             } else if (opcode == STRUCT) {
-                auto operand = get_operand<RegisterIndex>(*instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *operand);
-
-                auto val = Register{*operand};
-                val.value_type = ValueTypes::STRUCT;
-                register_usage_profile.define(val, operand->tokens.at(0));
+                check_op_struct(register_usage_profile, *instruction);
             } else if (opcode == STRUCTINSERT) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
