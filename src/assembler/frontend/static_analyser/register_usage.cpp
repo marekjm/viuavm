@@ -1997,6 +1997,27 @@ static auto check_op_join(Register_usage_profile& register_usage_profile, Instru
                     register_usage_profile.define(val, target->tokens.at(0));
                 }
 }
+static auto check_op_send(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target, "send target from");
+                assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
+
+                auto source = get_operand<RegisterIndex>(instruction, 1);
+                if (not source) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source, "send from");
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *target);
+                erase_if_direct_access(register_usage_profile, source, instruction);
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2144,25 +2165,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == JOIN) {
                 check_op_join(register_usage_profile, *instruction);
             } else if (opcode == SEND) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *target, "send target from");
-                assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
-
-                auto source = get_operand<RegisterIndex>(*instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *source, "send from");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *target);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+                check_op_send(register_usage_profile, *instruction);
             } else if (opcode == RECEIVE) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
