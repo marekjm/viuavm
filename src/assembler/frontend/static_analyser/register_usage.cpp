@@ -2129,6 +2129,151 @@ static auto check_op_jump(
                     throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
                 }
 }
+static auto check_op_if(
+        Register_usage_profile& register_usage_profile
+        , ParsedSource const& ps
+        , Instruction const& instruction
+        , InstructionsBlock const& ib
+        , InstructionIndex i
+        , InstructionIndex const mnemonic_counter
+        ) -> void {
+                auto source = get_operand<RegisterIndex>(instruction, 0);
+                if (not source) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+                check_use_of_register(register_usage_profile, *source, "branch depends on");
+                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
+                                                                                *source);
+
+                auto jump_target_if_true = InstructionIndex{0};
+                if (auto offset = get_operand<Offset>(instruction, 1); offset) {
+                    auto jump_target = stol(offset->tokens.at(0));
+                    if (jump_target > 0) {
+                        jump_target_if_true = get_line_index_of_instruction(
+                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+                    } else {
+                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                        return;
+                    }
+                } else if (auto label = get_operand<Label>(instruction, 1); label) {
+                    auto jump_target =
+                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+                    if (jump_target > i) {
+                        jump_target_if_true = jump_target;
+                    } else {
+                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                        return;
+                    }
+                } else if (str::ishex(instruction.operands.at(1)->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                    // FIXME Return now and abort further checking of this block or risk throwing *many*
+                    // false positives.
+                    return;
+                } else {
+                    throw InvalidSyntax(instruction.operands.at(1)->tokens.at(0),
+                                        "invalid operand for if instruction");
+                }
+
+                auto jump_target_if_false = InstructionIndex{0};
+                if (auto offset = get_operand<Offset>(instruction, 2); offset) {
+                    auto jump_target = stol(offset->tokens.at(0));
+                    if (jump_target > 0) {
+                        jump_target_if_false = get_line_index_of_instruction(
+                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+                    } else {
+                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                        return;
+                    }
+                } else if (auto label = get_operand<Label>(instruction, 2); label) {
+                    auto jump_target =
+                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+                    if (jump_target > i) {
+                        jump_target_if_false = jump_target;
+                    } else {
+                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
+                        return;
+                    }
+                } else if (str::ishex(instruction.operands.at(2)->tokens.at(0))) {
+                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+                    // Do not check them now, but this should be fixed in the future.
+                    // FIXME Return now and abort further checking of this block or risk throwing *many*
+                    // false positives.
+                    return;
+                } else {
+                    throw InvalidSyntax(instruction.operands.at(2)->tokens.at(0),
+                                        "invalid operand for if instruction");
+                }
+
+                auto register_with_unused_value = string{};
+
+                try {
+                    Register_usage_profile register_usage_profile_if_true = register_usage_profile;
+                    register_usage_profile_if_true.defresh();
+                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
+                                                                    jump_target_if_true, mnemonic_counter);
+                } catch (viua::cg::lex::UnusedValue& e) {
+                    // Do not fail yet, because the value may be used by false branch.
+                    // Save the error for later rethrowing.
+                    register_with_unused_value = e.what();
+                } catch (InvalidSyntax& e) {
+                    throw TracedSyntaxError{}.append(e).append(
+                        InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
+                            instruction.operands.at(1)->tokens.at(0)));
+                } catch (TracedSyntaxError& e) {
+                    throw e.append(
+                        InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
+                            instruction.operands.at(1)->tokens.at(0)));
+                }
+
+                try {
+                    Register_usage_profile register_usage_profile_if_false = register_usage_profile;
+                    register_usage_profile_if_false.defresh();
+                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
+                                                                    jump_target_if_false, mnemonic_counter);
+                } catch (viua::cg::lex::UnusedValue& e) {
+                    if (register_with_unused_value == e.what()) {
+                        throw TracedSyntaxError{}.append(e).append(
+                            InvalidSyntax{instruction.tokens.at(0), "after taking either branch:"});
+                    } else {
+                        /*
+                         * If an error was thrown for a different register it means that the register that
+                         * was unused in true branch was used in the false one (so no errror), and
+                         * the register for which the false branch threw was used in the true one (so no
+                         * error either).
+                         */
+                    }
+                } catch (InvalidSyntax& e) {
+                    if (register_with_unused_value != e.what() and
+                        string{e.what()}.substr(0, 6) == "unused") {
+                        /*
+                         * If an error was thrown for a different register it means that the register that
+                         * was unused in true branch was used in the false one (so no errror), and
+                         * the register for which the false branch threw was used in the true one (so no
+                         * error either).
+                         */
+                    } else {
+                        throw TracedSyntaxError{}.append(e).append(
+                            InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
+                                instruction.operands.at(2)->tokens.at(0)));
+                    }
+                } catch (TracedSyntaxError& e) {
+                    if (register_with_unused_value != e.errors.front().what() and
+                        string{e.errors.front().what()}.substr(0, 6) == "unused") {
+                        /*
+                         * If an error was thrown for a different register it means that the register that
+                         * was unused in true branch was used in the false one (so no errror), and
+                         * the register for which the false branch threw was used in the true one (so no
+                         * error either).
+                         */
+                    } else {
+                        throw e.append(
+                            InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
+                                instruction.operands.at(2)->tokens.at(0)));
+                    }
+                }
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2291,143 +2436,13 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
                  */
                 return;
             } else if (opcode == IF) {
-                auto source = get_operand<RegisterIndex>(*instruction, 0);
-                if (not source) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-                check_use_of_register(register_usage_profile, *source, "branch depends on");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+                check_op_if(register_usage_profile, ps,  *instruction, ib, i, mnemonic_counter);
 
-                auto jump_target_if_true = InstructionIndex{0};
-                if (auto offset = get_operand<Offset>(*instruction, 1); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        jump_target_if_true = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (auto label = get_operand<Label>(*instruction, 1); label) {
-                    auto jump_target =
-                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
-                    if (jump_target > i) {
-                        jump_target_if_true = jump_target;
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        continue;
-                    }
-                } else if (str::ishex(instruction->operands.at(1)->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                    // FIXME Return now and abort further checking of this block or risk throwing *many*
-                    // false positives.
-                    return;
-                } else {
-                    throw InvalidSyntax(instruction->operands.at(1)->tokens.at(0),
-                                        "invalid operand for if instruction");
-                }
-
-                auto jump_target_if_false = InstructionIndex{0};
-                if (auto offset = get_operand<Offset>(*instruction, 2); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        jump_target_if_false = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (auto label = get_operand<Label>(*instruction, 2); label) {
-                    auto jump_target =
-                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
-                    if (jump_target > i) {
-                        jump_target_if_false = jump_target;
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        continue;
-                    }
-                } else if (str::ishex(instruction->operands.at(2)->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                    // FIXME Return now and abort further checking of this block or risk throwing *many*
-                    // false positives.
-                    return;
-                } else {
-                    throw InvalidSyntax(instruction->operands.at(2)->tokens.at(0),
-                                        "invalid operand for if instruction");
-                }
-
-                string register_with_unused_value;
-
-                try {
-                    Register_usage_profile register_usage_profile_if_true = register_usage_profile;
-                    register_usage_profile_if_true.defresh();
-                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
-                                                                    jump_target_if_true, mnemonic_counter);
-                } catch (viua::cg::lex::UnusedValue& e) {
-                    // Do not fail yet, because the value may be used by false branch.
-                    // Save the error for later rethrowing.
-                    register_with_unused_value = e.what();
-                } catch (InvalidSyntax& e) {
-                    throw TracedSyntaxError{}.append(e).append(
-                        InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
-                            instruction->operands.at(1)->tokens.at(0)));
-                } catch (TracedSyntaxError& e) {
-                    throw e.append(
-                        InvalidSyntax{instruction->tokens.at(0), "after taking true branch here:"}.add(
-                            instruction->operands.at(1)->tokens.at(0)));
-                }
-
-                try {
-                    Register_usage_profile register_usage_profile_if_false = register_usage_profile;
-                    register_usage_profile_if_false.defresh();
-                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
-                                                                    jump_target_if_false, mnemonic_counter);
-                } catch (viua::cg::lex::UnusedValue& e) {
-                    if (register_with_unused_value == e.what()) {
-                        throw TracedSyntaxError{}.append(e).append(
-                            InvalidSyntax{instruction->tokens.at(0), "after taking either branch:"});
-                    } else {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    }
-                } catch (InvalidSyntax& e) {
-                    if (register_with_unused_value != e.what() and
-                        string{e.what()}.substr(0, 6) == "unused") {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    } else {
-                        throw TracedSyntaxError{}.append(e).append(
-                            InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
-                                instruction->operands.at(2)->tokens.at(0)));
-                    }
-                } catch (TracedSyntaxError& e) {
-                    if (register_with_unused_value != e.errors.front().what() and
-                        string{e.errors.front().what()}.substr(0, 6) == "unused") {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    } else {
-                        throw e.append(
-                            InvalidSyntax{instruction->tokens.at(0), "after taking false branch here:"}.add(
-                                instruction->operands.at(2)->tokens.at(0)));
-                    }
-                }
-
+                /*
+                 * Do not perform further checks after an "if" instruction.
+                 * All state has been "moved" into the nested checking call above, and
+                 * it would be useless to perform the checks twice here.
+                 */
                 return;
             } else if (opcode == THROW) {
                 check_op_throw(register_usage_profile, ps, created_closures, *instruction);
