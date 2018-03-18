@@ -12,6 +12,16 @@ Every instruction advances the execution of the program by manipulating values p
 \heading{REGISTERS}{ref=registers}
 \section{begin}
 
+All data in a Viua VM program is held in registers.
+Viua has no concept of "memory" in the traditional sense (as a byte-addressable array of bytes).
+This means that a value cannot be stored to, or loaded from, memory.
+
+To cover a wide range of use cases Viua provides several different register sets.
+These sets vary in lifetime and visibility, and are described in section \ref{registers.register_sets}.
+With this architecture the need for explicit memory should be reduced.
+If a "store-and-load" functionality is needed it may be emulated using a combination of processes, global and
+static registers.
+
 \heading{A REGISTER}
 \section{begin}
 
@@ -34,7 +44,7 @@ A register belongs to one of available register sets.
 %% A REGISTER
 \section{end}
 
-\heading{REGISTER SETS}
+\heading{REGISTER SETS}{ref=registers.register_sets}
 \section{begin}
 
 Registers are grouped in register sets.
