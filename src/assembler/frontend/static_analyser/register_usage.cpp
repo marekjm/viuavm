@@ -2458,6 +2458,36 @@ static auto check_op_new(Register_usage_profile& register_usage_profile, Instruc
 
                 register_usage_profile.define(val, operand->tokens.at(0));
 }
+static auto check_op_msg(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    if (not get_operand<VoidLiteral>(instruction, 0)) {
+                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                            .note("expected register index or void");
+                    }
+                }
+
+                if (target) {
+                    check_if_name_resolved(register_usage_profile, *target);
+                }
+
+                auto fn = instruction.operands.at(1).get();
+                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+                    (not dynamic_cast<RegisterIndex*>(fn))) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected function name, atom literal, or register index");
+                }
+                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+                    check_use_of_register(register_usage_profile, *r, "call from");
+                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
+                                                                                    *r);
+                }
+
+                if (target) {
+                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
+                }
+}
 /*
 static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
 {
@@ -2662,33 +2692,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == NEW) {
                 check_op_new(register_usage_profile, *instruction);
             } else if (opcode == MSG) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(*instruction, 0)) {
-                        throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
-
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-                }
-
-                auto fn = instruction->operands.at(1).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r, "call from");
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
-
-                if (target) {
-                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
-                }
+                check_op_msg(register_usage_profile, *instruction);
             } else if (opcode == INSERT) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
