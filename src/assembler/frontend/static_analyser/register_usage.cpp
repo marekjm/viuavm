@@ -329,12 +329,6 @@ static auto assert_type_of_register(Register_usage_profile& register_usage_profi
     return depointerise_type_if_needed(actual_type, access_via_pointer_dereference);
 }
 
-static auto erase_if_direct_access(Register_usage_profile& register_usage_profile, RegisterIndex* r,
-                                   viua::assembler::frontend::parser::Instruction const* const instruction) {
-    if (r->as == viua::internals::AccessSpecifier::DIRECT) {
-        register_usage_profile.erase(Register(*r), instruction->tokens.at(0));
-    }
-}
 static auto erase_if_direct_access(Register_usage_profile& register_usage_profile, RegisterIndex* const r,
                                    viua::assembler::frontend::parser::Instruction const& instruction) {
     if (r->as == viua::internals::AccessSpecifier::DIRECT) {
@@ -2549,11 +2543,6 @@ static auto check_op_remove(Register_usage_profile& register_usage_profile, Inst
                     register_usage_profile.define(Register{*target}, target->tokens.at(0));
                 }
 }
-/*
-static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-}
-*/
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
