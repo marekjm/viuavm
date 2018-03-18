@@ -2530,15 +2530,15 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
     map<Register, Closure> created_closures;
 
     for (; i < ib.body.size(); ++i) {
-        const auto& line = ib.body.at(i);
-        auto instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
+        auto const& line = ib.body.at(i);
+        auto const instruction = dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
         if (not instruction) {
             continue;
         }
         ++mnemonic_counter;
 
         using viua::assembler::frontend::parser::RegisterIndex;
-        auto opcode = instruction->opcode;
+        auto const opcode = instruction->opcode;
 
         try {
             if (opcode == IZERO) {
