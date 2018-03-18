@@ -2488,6 +2488,35 @@ static auto check_op_msg(Register_usage_profile& register_usage_profile, Instruc
                     register_usage_profile.define(Register{*target}, target->tokens.at(0));
                 }
 }
+static auto check_op_insert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *target);
+                assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *target);
+
+                auto key = get_operand<RegisterIndex>(instruction, 1);
+                if (not key) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *key);
+                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
+
+                auto source = get_operand<RegisterIndex>(instruction, 2);
+                if (not source) {
+                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *source);
+                erase_if_direct_access(register_usage_profile, source, instruction);
+}
 /*
 static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
 {
@@ -2694,32 +2723,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == MSG) {
                 check_op_msg(register_usage_profile, *instruction);
             } else if (opcode == INSERT) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *target);
-                assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *target);
-
-                auto key = get_operand<RegisterIndex>(*instruction, 1);
-                if (not key) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *key);
-                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
-
-                auto source = get_operand<RegisterIndex>(*instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction->operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *source);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+                check_op_insert(register_usage_profile, *instruction);
             } else if (opcode == REMOVE) {
                 auto target = get_operand<RegisterIndex>(*instruction, 0);
                 if (not target) {
