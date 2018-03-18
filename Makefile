@@ -20,6 +20,10 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 
 
 # These are generic flags that should be used for compiling Viua VM.
+# Additional flags:
+# 	-Wpadded            -- maybe, but throws errors on current code
+#	-Wsuggest-override  -- definitely, but it is a matter of style so not now
+#	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
 GENERIC_CXXFLAGS=-Wall \
 				 -Wextra \
 				 -Wctor-dtor-privacy \
@@ -35,6 +39,7 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wconversion \
 				 -Wshadow \
 				 -Wswitch-default \
+				 -Wswitch-enum \
 				 -Wredundant-decls \
 				 -Wlogical-op \
 				 -Wmissing-include-dirs \
@@ -43,9 +48,20 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wcast-qual \
 				 -Wold-style-cast \
 				 -Walloc-zero \
+				 -Wdouble-promotion \
+				 -Wunused-const-variable=2 \
+				 -Wduplicated-branches \
+				 -Wduplicated-cond \
+				 -Wsuggest-final-types \
+				 -Wsuggest-final-methods \
+				 -Wconversion \
+				 -Wsign-conversion \
+				 -Wrestrict \
+				 -Winline \
+				 -Wstack-protector \
 				 -Werror \
 				 -Wfatal-errors \
-				 -pedantic \
+				 -Wpedantic \
 				 -g \
 				 -I./include
 CLANG_CXXFLAGS=-Wall \
