@@ -5,10 +5,18 @@
 CXX_STANDARD=c++17
 
 
-GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
-CLANG_SANITISER_FLAGS=  -fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
+GENERIC_SANITISER_FLAGS=-fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak \
+						-fsanitize=address
+CLANG_SANITISER_FLAGS=  -fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak \
+						-fsanitize=address
 # No -fsanitize=address for GCC because of too many false positives.
-GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize=leak
+GCC_SANITISER_FLAGS=    -fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak
 
 
 # These are generic flags that should be used for compiling Viua VM.
