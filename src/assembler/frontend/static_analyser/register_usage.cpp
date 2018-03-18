@@ -1455,1085 +1455,1072 @@ static auto check_op_bit_rotates(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile, *target);
     assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, *offset);
 }
-// here
-static auto check_op_copy(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_copy(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source, "copy from");
-                auto type_of_source = assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
-                    register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source, "copy from");
+    auto type_of_source =
+        assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto val = Register(*target);
-                val.value_type = type_of_source;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register(*target);
+    val.value_type = type_of_source;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_move(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_move(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source, "move from");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source, "move from");
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto val = Register(*target);
-                val.value_type = register_usage_profile.at(*source).second.value_type;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register(*target);
+    val.value_type = register_usage_profile.at(*source).second.value_type;
+    register_usage_profile.define(val, target->tokens.at(0));
 
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_ptr(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto result = get_operand<RegisterIndex>(instruction, 0);
-                if (not result) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_ptr(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto result = get_operand<RegisterIndex>(instruction, 0);
+    if (not result) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *result);
+    check_if_name_resolved(register_usage_profile, *result);
 
-                auto operand = get_operand<RegisterIndex>(instruction, 1);
-                if (not operand) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto operand = get_operand<RegisterIndex>(instruction, 1);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *operand, "pointer from");
+    check_use_of_register(register_usage_profile, *operand, "pointer from");
 
-                auto val = Register(*result);
-                val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
-                                  viua::internals::ValueTypes::POINTER);
-                register_usage_profile.define(val, result->tokens.at(0));
+    auto val = Register(*result);
+    val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
+                      viua::internals::ValueTypes::POINTER);
+    register_usage_profile.define(val, result->tokens.at(0));
 }
-static auto check_op_swap(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_swap(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *target, "swap with");
-                if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                    throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                        .note("can only swap using direct access mode")
-                        .aside(target->tokens.at(0),
-                               "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
-                }
+    check_use_of_register(register_usage_profile, *target, "swap with");
+    if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+        throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+            .note("can only swap using direct access mode")
+            .aside(target->tokens.at(0), "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source, "swap with");
-                if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                    throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
-                        .note("can only swap using direct access mode")
-                        .aside(source->tokens.at(0),
-                               "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
-                }
+    check_use_of_register(register_usage_profile, *source, "swap with");
+    if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+        throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
+            .note("can only swap using direct access mode")
+            .aside(source->tokens.at(0), "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+    }
 
-                auto val_target = Register(*target);
-                val_target.value_type = register_usage_profile.at(*source).second.value_type;
+    auto val_target = Register(*target);
+    val_target.value_type = register_usage_profile.at(*source).second.value_type;
 
-                auto val_source = Register(*source);
-                val_source.value_type = register_usage_profile.at(*target).second.value_type;
+    auto val_source = Register(*source);
+    val_source.value_type = register_usage_profile.at(*target).second.value_type;
 
-                register_usage_profile.define(val_target, target->tokens.at(0));
-                register_usage_profile.define(val_source, source->tokens.at(0));
+    register_usage_profile.define(val_target, target->tokens.at(0));
+    register_usage_profile.define(val_source, source->tokens.at(0));
 }
-static auto check_op_delete(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_delete(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *target, "delete of");
-                if (target->as != viua::internals::AccessSpecifier::DIRECT) {
-                    throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                        .note("can only delete using direct access mode")
-                        .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
-                }
-                register_usage_profile.erase(Register(*target), instruction.tokens.at(0));
+    check_use_of_register(register_usage_profile, *target, "delete of");
+    if (target->as != viua::internals::AccessSpecifier::DIRECT) {
+        throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+            .note("can only delete using direct access mode")
+            .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+    }
+    register_usage_profile.erase(Register(*target), instruction.tokens.at(0));
 }
-static auto check_op_isnull(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_isnull(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                    throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
-                        .note("can only check using direct access mode")
-                        .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
-                }
+    if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
+        throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
+            .note("can only check using direct access mode")
+            .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
+    }
 
-                if (register_usage_profile.defined(Register{*source})) {
-                    throw TracedSyntaxError{}
-                        .append(InvalidSyntax{source->tokens.at(0),
-                                              "useless check, register will always be defined"})
-                        .append(InvalidSyntax{register_usage_profile.defined_where(Register{*source})}.note(
-                            "register is defined here"));
-                }
+    if (register_usage_profile.defined(Register{*source})) {
+        throw TracedSyntaxError{}
+            .append(InvalidSyntax{source->tokens.at(0), "useless check, register will always be defined"})
+            .append(InvalidSyntax{register_usage_profile.defined_where(Register{*source})}.note(
+                "register is defined here"));
+    }
 
-                auto val = Register(*target);
-                val.value_type = ValueTypes::BOOLEAN;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register(*target);
+    val.value_type = ValueTypes::BOOLEAN;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_print(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto operand = get_input_operand<RegisterIndex>(instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_print(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto operand = get_input_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *operand);
+    check_use_of_register(register_usage_profile, *operand);
 
-                // This type assertion is here because we can infer the register to contain a pointer, and
-                // even if we can't be sure if it's a pointer to text or integer, the fact that a register
-                // holds a *pointer* is valuable on its own.
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *operand);
+    // This type assertion is here because we can infer the register to contain a pointer, and
+    // even if we can't be sure if it's a pointer to text or integer, the fact that a register
+    // holds a *pointer* is valuable on its own.
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *operand);
 
-                register_usage_profile.use(Register(*operand), operand->tokens.at(0));
+    register_usage_profile.use(Register(*operand), operand->tokens.at(0));
 }
-static auto check_op_capture(Register_usage_profile& register_usage_profile, Instruction const& instruction, map<Register, Closure>& created_closures) -> void {
-                auto closure = get_operand<RegisterIndex>(instruction, 0);
-                if (not closure) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_capture(Register_usage_profile& register_usage_profile, Instruction const& instruction,
+                             map<Register, Closure>& created_closures) -> void {
+    auto closure = get_operand<RegisterIndex>(instruction, 0);
+    if (not closure) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *closure);
-                assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile,
-                                                                              *closure);
+    check_use_of_register(register_usage_profile, *closure);
+    assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile, *closure);
 
-                // this index is not verified because it is used as *the* index to use when
-                // putting a value inside the closure
-                auto index = get_operand<RegisterIndex>(instruction, 1);
-                if (not index) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    // this index is not verified because it is used as *the* index to use when
+    // putting a value inside the closure
+    auto index = get_operand<RegisterIndex>(instruction, 1);
+    if (not index) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 2);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto val = Register{};
-                val.index = index->index;
-                val.register_set = RegisterSets::LOCAL;
-                val.value_type = register_usage_profile.at(*source).second.value_type;
-                created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
+    auto val = Register{};
+    val.index = index->index;
+    val.register_set = RegisterSets::LOCAL;
+    val.value_type = register_usage_profile.at(*source).second.value_type;
+    created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }
-static auto check_op_capturecopy(Register_usage_profile& register_usage_profile, Instruction const& instruction, map<Register, Closure>& created_closures) -> void {
-                auto closure = get_operand<RegisterIndex>(instruction, 0);
-                if (not closure) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
+                                 Instruction const& instruction, map<Register, Closure>& created_closures)
+    -> void {
+    auto closure = get_operand<RegisterIndex>(instruction, 0);
+    if (not closure) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *closure);
-                assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile,
-                                                                              *closure);
+    check_use_of_register(register_usage_profile, *closure);
+    assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile, *closure);
 
-                // this index is not verified because it is used as *the* index to use when
-                // putting a value inside the closure
-                auto index = get_operand<RegisterIndex>(instruction, 1);
-                if (not index) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    // this index is not verified because it is used as *the* index to use when
+    // putting a value inside the closure
+    auto index = get_operand<RegisterIndex>(instruction, 1);
+    if (not index) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 2);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto val = Register{};
-                val.index = index->index;
-                val.register_set = RegisterSets::LOCAL;
-                val.value_type = register_usage_profile.at(*source).second.value_type;
-                created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
+    auto val = Register{};
+    val.index = index->index;
+    val.register_set = RegisterSets::LOCAL;
+    val.value_type = register_usage_profile.at(*source).second.value_type;
+    created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }
-static auto check_op_capturemove(Register_usage_profile& register_usage_profile, Instruction const& instruction, map<Register, Closure>& created_closures) -> void {
-                auto closure = get_operand<RegisterIndex>(instruction, 0);
-                if (not closure) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_capturemove(Register_usage_profile& register_usage_profile,
+                                 Instruction const& instruction, map<Register, Closure>& created_closures)
+    -> void {
+    auto closure = get_operand<RegisterIndex>(instruction, 0);
+    if (not closure) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *closure);
-                assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile,
-                                                                              *closure);
+    check_use_of_register(register_usage_profile, *closure);
+    assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(register_usage_profile, *closure);
 
-                // this index is not verified because it is used as *the* index to use when
-                // putting a value inside the closure
-                auto index = get_operand<RegisterIndex>(instruction, 1);
-                if (not index) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    // this index is not verified because it is used as *the* index to use when
+    // putting a value inside the closure
+    auto index = get_operand<RegisterIndex>(instruction, 1);
+    if (not index) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 2);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto val = Register{};
-                val.index = index->index;
-                val.register_set = RegisterSets::LOCAL;
-                val.value_type = register_usage_profile.at(*source).second.value_type;
-                created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
+    auto val = Register{};
+    val.index = index->index;
+    val.register_set = RegisterSets::LOCAL;
+    val.value_type = register_usage_profile.at(*source).second.value_type;
+    created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_closure(Register_usage_profile& register_usage_profile, Instruction const& instruction, map<Register, Closure>& created_closures) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_closure(Register_usage_profile& register_usage_profile, Instruction const& instruction,
+                             map<Register, Closure>& created_closures) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                auto fn = get_operand<FunctionNameLiteral>(instruction, 1);
-                if (not fn) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name literal");
-                }
+    auto fn = get_operand<FunctionNameLiteral>(instruction, 1);
+    if (not fn) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name literal");
+    }
 
-                /*
-                 * FIXME The SA should switch to verification of the closure after it has been
-                 * created and all required values captured.
-                 * The SA will need some guidance to discover the precise moment at which it can
-                 * start checking the closure for correctness.
-                 */
+    /*
+     * FIXME The SA should switch to verification of the closure after it has been
+     * created and all required values captured.
+     * The SA will need some guidance to discover the precise moment at which it can
+     * start checking the closure for correctness.
+     */
 
-                auto val = Register{*target};
-                val.value_type = ValueTypes::CLOSURE;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register{*target};
+    val.value_type = ValueTypes::CLOSURE;
+    register_usage_profile.define(val, target->tokens.at(0));
 
-                created_closures[val] = Closure{fn->content};
+    created_closures[val] = Closure{fn->content};
 }
-static auto check_op_function(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_function(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name literal");
-                }
+    if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name literal");
+    }
 
-                auto val = Register{*target};
-                val.value_type = ValueTypes::FUNCTION;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register{*target};
+    val.value_type = ValueTypes::FUNCTION;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
 static auto check_op_frame(Register_usage_profile&, Instruction const&) -> void {
-                // do nothing, FRAMEs do not modify registers;
-                // also, frame balance and arity is handled by verifier which runs before SA
+    // do nothing, FRAMEs do not modify registers;
+    // also, frame balance and arity is handled by verifier which runs before SA
 }
-static auto check_op_param(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_param(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
-                    auto r = *target;
-                    r.rss = viua::internals::RegisterSets::LOCAL;
-                    check_use_of_register(register_usage_profile, r);
-                    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
-                }
+    if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+        auto r = *target;
+        r.rss = viua::internals::RegisterSets::LOCAL;
+        check_use_of_register(register_usage_profile, r);
+        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 }
-static auto check_op_pamv(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-                if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
-                    auto r = *target;
-                    r.rss = viua::internals::RegisterSets::LOCAL;
-                    check_use_of_register(register_usage_profile, r);
-                    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
-                }
+static auto check_op_pamv(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
+    if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+        auto r = *target;
+        r.rss = viua::internals::RegisterSets::LOCAL;
+        check_use_of_register(register_usage_profile, r);
+        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile, r);
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_call(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_call(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-                }
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
+    }
 
-                auto fn = instruction.operands.at(1).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r, "call from");
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
+    auto fn = instruction.operands.at(1).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+        (not dynamic_cast<RegisterIndex*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name, atom literal, or register index");
+    }
+    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+        check_use_of_register(register_usage_profile, *r, "call from");
+        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+    }
 
-                if (target) {
-                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
-                }
+    if (target) {
+        register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    }
 }
-static auto check_op_tailcall(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto fn = instruction.operands.at(0).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r);
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
+static auto check_op_tailcall(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto fn = instruction.operands.at(0).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+        (not dynamic_cast<RegisterIndex*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name, atom literal, or register index");
+    }
+    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+        check_use_of_register(register_usage_profile, *r);
+        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+    }
 }
-static auto check_op_defer(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto fn = instruction.operands.at(0).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r);
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
+static auto check_op_defer(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto fn = instruction.operands.at(0).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+        (not dynamic_cast<RegisterIndex*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name, atom literal, or register index");
+    }
+    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+        check_use_of_register(register_usage_profile, *r);
+        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+    }
 }
-static auto check_op_arg(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                if (get_operand<VoidLiteral>(instruction, 0)) {
-                    return;
-                }
+static auto check_op_arg(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    if (get_operand<VoidLiteral>(instruction, 0)) {
+        return;
+    }
 
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index or void");
-                }
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index or void");
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                auto val = Register(*target);
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register(*target);
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_argc(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index or void");
-                }
+static auto check_op_argc(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index or void");
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                auto val = Register(*target);
-                val.value_type = ValueTypes::INTEGER;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register(*target);
+    val.value_type = ValueTypes::INTEGER;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_process(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_process(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-                }
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
+    }
 
-                auto fn = instruction.operands.at(1).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r);
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
+    auto fn = instruction.operands.at(1).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+        (not dynamic_cast<RegisterIndex*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name, atom literal, or register index");
+    }
+    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+        check_use_of_register(register_usage_profile, *r);
+        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+    }
 
-                if (target) {
-                    auto val = Register{*target};
-                    val.value_type = ValueTypes::PID;
-                    register_usage_profile.define(val, target->tokens.at(0));
-                }
+    if (target) {
+        auto val = Register{*target};
+        val.value_type = ValueTypes::PID;
+        register_usage_profile.define(val, target->tokens.at(0));
+    }
 }
-static auto check_op_self(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_self(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                auto val = Register{*target};
-                val.value_type = ValueTypes::PID;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register{*target};
+    val.value_type = ValueTypes::PID;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_join(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_join(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-                    if (target->as != viua::internals::AccessSpecifier::DIRECT) {
-                        throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                            .note("can only join using direct access mode")
-                            .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
-                    }
-                }
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
+        if (target->as != viua::internals::AccessSpecifier::DIRECT) {
+            throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+                .note("can only join using direct access mode")
+                .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
+        }
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *source);
 
-                if (target) {
-                    auto val = Register{*target};
-                    register_usage_profile.define(val, target->tokens.at(0));
-                }
+    if (target) {
+        auto val = Register{*target};
+        register_usage_profile.define(val, target->tokens.at(0));
+    }
 }
-static auto check_op_send(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_send(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *target, "send target from");
-                assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
+    check_use_of_register(register_usage_profile, *target, "send target from");
+    assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile, *target);
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source, "send from");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *target);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    check_use_of_register(register_usage_profile, *source, "send from");
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *target);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_receive(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_receive(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
 
-                    auto val = Register{*target};
-                    register_usage_profile.define(val, target->tokens.at(0));
-                }
+        auto val = Register{*target};
+        register_usage_profile.define(val, target->tokens.at(0));
+    }
 }
 static auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction) -> void {
-                auto fn = instruction.operands.at(0).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name or atom literal");
-                }
+    auto fn = instruction.operands.at(0).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name or atom literal");
+    }
 }
-static auto check_op_throw(Register_usage_profile& register_usage_profile, ParsedSource const& ps, map<Register, Closure>& created_closures, Instruction const& instruction) -> void {
-                auto source = get_operand<RegisterIndex>(instruction, 0);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_throw(Register_usage_profile& register_usage_profile, ParsedSource const& ps,
+                           map<Register, Closure>& created_closures, Instruction const& instruction) -> void {
+    auto source = get_operand<RegisterIndex>(instruction, 0);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source, "throw from");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    check_use_of_register(register_usage_profile, *source, "throw from");
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 
-                /*
-                 * If we reached a throw instruction there is no reason to continue analysing instructions, as
-                 * at runtime the execution of the function would stop.
-                 */
-                try {
-                    check_for_unused_registers(register_usage_profile);
-                    check_closure_instantiations(register_usage_profile, ps, created_closures);
-                } catch (InvalidSyntax& e) {
-                    throw TracedSyntaxError{}.append(e).append(
-                        InvalidSyntax{instruction.tokens.at(0), "after a throw here:"});
-                } catch (TracedSyntaxError& e) {
-                    throw e.append(InvalidSyntax{instruction.tokens.at(0), "after a throw here:"});
-                }
+    /*
+     * If we reached a throw instruction there is no reason to continue analysing instructions, as
+     * at runtime the execution of the function would stop.
+     */
+    try {
+        check_for_unused_registers(register_usage_profile);
+        check_closure_instantiations(register_usage_profile, ps, created_closures);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError{}.append(e).append(
+            InvalidSyntax{instruction.tokens.at(0), "after a throw here:"});
+    } catch (TracedSyntaxError& e) {
+        throw e.append(InvalidSyntax{instruction.tokens.at(0), "after a throw here:"});
+    }
 
-                return;
+    return;
 }
-static auto check_op_draw(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_draw(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    register_usage_profile.define(Register{*target}, target->tokens.at(0));
 }
-static auto check_op_enter(Register_usage_profile& register_usage_profile, ParsedSource const& ps, Instruction const& instruction) -> void {
-                auto const label = get_operand<Label>(instruction, 0);
-                if (not label) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected a block name");
-                }
+static auto check_op_enter(Register_usage_profile& register_usage_profile, ParsedSource const& ps,
+                           Instruction const& instruction) -> void {
+    auto const label = get_operand<Label>(instruction, 0);
+    if (not label) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected a block name");
+    }
 
-                auto const block_name = label->tokens.at(0).str();
+    auto const block_name = label->tokens.at(0).str();
 
-                try {
-                    check_register_usage_for_instruction_block_impl(register_usage_profile, ps,
-                                                                    ps.block(block_name), 0, 0);
-                } catch (InvalidSyntax& e) {
-                    throw TracedSyntaxError{}.append(e).append(
-                        InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                } catch (TracedSyntaxError& e) {
-                    throw e.append(InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                }
+    try {
+        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ps.block(block_name), 0,
+                                                        0);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError{}.append(e).append(
+            InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
+    } catch (TracedSyntaxError& e) {
+        throw e.append(InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
+    }
 }
-static auto check_op_jump(
-        Register_usage_profile& register_usage_profile
-        , ParsedSource const& ps
-        , Instruction const& instruction
-        , InstructionsBlock const& ib
-        , InstructionIndex i
-        , InstructionIndex const mnemonic_counter
-        ) -> void {
-                auto target = instruction.operands.at(0).get();
+static auto check_op_jump(Register_usage_profile& register_usage_profile, ParsedSource const& ps,
+                          Instruction const& instruction, InstructionsBlock const& ib, InstructionIndex i,
+                          InstructionIndex const mnemonic_counter) -> void {
+    auto target = instruction.operands.at(0).get();
 
-                if (auto offset = dynamic_cast<Offset*>(target); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        i = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, i,
-                                                                        mnemonic_counter);
-                    }
-                } else if (auto label = dynamic_cast<Label*>(target); label) {
-                    auto jump_target = ib.marker_map.at(label->tokens.at(0));
-                    jump_target = get_line_index_of_instruction(jump_target, ib);
-                    if (jump_target > i) {
-                        check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib,
-                                                                        jump_target, mnemonic_counter);
-                    }
-                } else if (str::ishex(target->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                } else {
-                    throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
-                }
+    if (auto offset = dynamic_cast<Offset*>(target); offset) {
+        auto jump_target = stol(offset->tokens.at(0));
+        if (jump_target > 0) {
+            i = get_line_index_of_instruction(mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+            check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, i,
+                                                            mnemonic_counter);
+        }
+    } else if (auto label = dynamic_cast<Label*>(target); label) {
+        auto jump_target = ib.marker_map.at(label->tokens.at(0));
+        jump_target = get_line_index_of_instruction(jump_target, ib);
+        if (jump_target > i) {
+            check_register_usage_for_instruction_block_impl(register_usage_profile, ps, ib, jump_target,
+                                                            mnemonic_counter);
+        }
+    } else if (str::ishex(target->tokens.at(0))) {
+        // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+        // Do not check them now, but this should be fixed in the future.
+    } else {
+        throw InvalidSyntax(target->tokens.at(0), "invalid operand for jump instruction");
+    }
 }
-static auto check_op_if(
-        Register_usage_profile& register_usage_profile
-        , ParsedSource const& ps
-        , Instruction const& instruction
-        , InstructionsBlock const& ib
-        , InstructionIndex i
-        , InstructionIndex const mnemonic_counter
-        ) -> void {
-                auto source = get_operand<RegisterIndex>(instruction, 0);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-                check_use_of_register(register_usage_profile, *source, "branch depends on");
-                assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile,
-                                                                                *source);
+static auto check_op_if(Register_usage_profile& register_usage_profile, ParsedSource const& ps,
+                        Instruction const& instruction, InstructionsBlock const& ib, InstructionIndex i,
+                        InstructionIndex const mnemonic_counter) -> void {
+    auto source = get_operand<RegisterIndex>(instruction, 0);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
+    check_use_of_register(register_usage_profile, *source, "branch depends on");
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(register_usage_profile, *source);
 
-                auto jump_target_if_true = InstructionIndex{0};
-                if (auto offset = get_operand<Offset>(instruction, 1); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        jump_target_if_true = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (auto label = get_operand<Label>(instruction, 1); label) {
-                    auto jump_target =
-                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
-                    if (jump_target > i) {
-                        jump_target_if_true = jump_target;
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (str::ishex(instruction.operands.at(1)->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                    // FIXME Return now and abort further checking of this block or risk throwing *many*
-                    // false positives.
-                    return;
-                } else {
-                    throw InvalidSyntax(instruction.operands.at(1)->tokens.at(0),
-                                        "invalid operand for if instruction");
-                }
+    auto jump_target_if_true = InstructionIndex{0};
+    if (auto offset = get_operand<Offset>(instruction, 1); offset) {
+        auto jump_target = stol(offset->tokens.at(0));
+        if (jump_target > 0) {
+            jump_target_if_true =
+                get_line_index_of_instruction(mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+        } else {
+            // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            return;
+        }
+    } else if (auto label = get_operand<Label>(instruction, 1); label) {
+        auto jump_target = get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+        if (jump_target > i) {
+            jump_target_if_true = jump_target;
+        } else {
+            // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            return;
+        }
+    } else if (str::ishex(instruction.operands.at(1)->tokens.at(0))) {
+        // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+        // Do not check them now, but this should be fixed in the future.
+        // FIXME Return now and abort further checking of this block or risk throwing *many*
+        // false positives.
+        return;
+    } else {
+        throw InvalidSyntax(instruction.operands.at(1)->tokens.at(0), "invalid operand for if instruction");
+    }
 
-                auto jump_target_if_false = InstructionIndex{0};
-                if (auto offset = get_operand<Offset>(instruction, 2); offset) {
-                    auto jump_target = stol(offset->tokens.at(0));
-                    if (jump_target > 0) {
-                        jump_target_if_false = get_line_index_of_instruction(
-                            mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (auto label = get_operand<Label>(instruction, 2); label) {
-                    auto jump_target =
-                        get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
-                    if (jump_target > i) {
-                        jump_target_if_false = jump_target;
-                    } else {
-                        // XXX FIXME Checking backward jumps is tricky, beware of loops.
-                        return;
-                    }
-                } else if (str::ishex(instruction.operands.at(2)->tokens.at(0))) {
-                    // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
-                    // Do not check them now, but this should be fixed in the future.
-                    // FIXME Return now and abort further checking of this block or risk throwing *many*
-                    // false positives.
-                    return;
-                } else {
-                    throw InvalidSyntax(instruction.operands.at(2)->tokens.at(0),
-                                        "invalid operand for if instruction");
-                }
+    auto jump_target_if_false = InstructionIndex{0};
+    if (auto offset = get_operand<Offset>(instruction, 2); offset) {
+        auto jump_target = stol(offset->tokens.at(0));
+        if (jump_target > 0) {
+            jump_target_if_false =
+                get_line_index_of_instruction(mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
+        } else {
+            // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            return;
+        }
+    } else if (auto label = get_operand<Label>(instruction, 2); label) {
+        auto jump_target = get_line_index_of_instruction(ib.marker_map.at(label->tokens.at(0)), ib);
+        if (jump_target > i) {
+            jump_target_if_false = jump_target;
+        } else {
+            // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            return;
+        }
+    } else if (str::ishex(instruction.operands.at(2)->tokens.at(0))) {
+        // FIXME Disassembler outputs '0x...' hexadecimal targets for if and jump instructions.
+        // Do not check them now, but this should be fixed in the future.
+        // FIXME Return now and abort further checking of this block or risk throwing *many*
+        // false positives.
+        return;
+    } else {
+        throw InvalidSyntax(instruction.operands.at(2)->tokens.at(0), "invalid operand for if instruction");
+    }
 
-                auto register_with_unused_value = string{};
+    auto register_with_unused_value = string{};
 
-                try {
-                    Register_usage_profile register_usage_profile_if_true = register_usage_profile;
-                    register_usage_profile_if_true.defresh();
-                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
-                                                                    jump_target_if_true, mnemonic_counter);
-                } catch (viua::cg::lex::UnusedValue& e) {
-                    // Do not fail yet, because the value may be used by false branch.
-                    // Save the error for later rethrowing.
-                    register_with_unused_value = e.what();
-                } catch (InvalidSyntax& e) {
-                    throw TracedSyntaxError{}.append(e).append(
-                        InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
-                            instruction.operands.at(1)->tokens.at(0)));
-                } catch (TracedSyntaxError& e) {
-                    throw e.append(
-                        InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
-                            instruction.operands.at(1)->tokens.at(0)));
-                }
+    try {
+        Register_usage_profile register_usage_profile_if_true = register_usage_profile;
+        register_usage_profile_if_true.defresh();
+        check_register_usage_for_instruction_block_impl(register_usage_profile_if_true, ps, ib,
+                                                        jump_target_if_true, mnemonic_counter);
+    } catch (viua::cg::lex::UnusedValue& e) {
+        // Do not fail yet, because the value may be used by false branch.
+        // Save the error for later rethrowing.
+        register_with_unused_value = e.what();
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError{}.append(e).append(
+            InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
+                instruction.operands.at(1)->tokens.at(0)));
+    } catch (TracedSyntaxError& e) {
+        throw e.append(InvalidSyntax{instruction.tokens.at(0), "after taking true branch here:"}.add(
+            instruction.operands.at(1)->tokens.at(0)));
+    }
 
-                try {
-                    Register_usage_profile register_usage_profile_if_false = register_usage_profile;
-                    register_usage_profile_if_false.defresh();
-                    check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
-                                                                    jump_target_if_false, mnemonic_counter);
-                } catch (viua::cg::lex::UnusedValue& e) {
-                    if (register_with_unused_value == e.what()) {
-                        throw TracedSyntaxError{}.append(e).append(
-                            InvalidSyntax{instruction.tokens.at(0), "after taking either branch:"});
-                    } else {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    }
-                } catch (InvalidSyntax& e) {
-                    if (register_with_unused_value != e.what() and
-                        string{e.what()}.substr(0, 6) == "unused") {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    } else {
-                        throw TracedSyntaxError{}.append(e).append(
-                            InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
-                                instruction.operands.at(2)->tokens.at(0)));
-                    }
-                } catch (TracedSyntaxError& e) {
-                    if (register_with_unused_value != e.errors.front().what() and
-                        string{e.errors.front().what()}.substr(0, 6) == "unused") {
-                        /*
-                         * If an error was thrown for a different register it means that the register that
-                         * was unused in true branch was used in the false one (so no errror), and
-                         * the register for which the false branch threw was used in the true one (so no
-                         * error either).
-                         */
-                    } else {
-                        throw e.append(
-                            InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
-                                instruction.operands.at(2)->tokens.at(0)));
-                    }
-                }
+    try {
+        Register_usage_profile register_usage_profile_if_false = register_usage_profile;
+        register_usage_profile_if_false.defresh();
+        check_register_usage_for_instruction_block_impl(register_usage_profile_if_false, ps, ib,
+                                                        jump_target_if_false, mnemonic_counter);
+    } catch (viua::cg::lex::UnusedValue& e) {
+        if (register_with_unused_value == e.what()) {
+            throw TracedSyntaxError{}.append(e).append(
+                InvalidSyntax{instruction.tokens.at(0), "after taking either branch:"});
+        } else {
+            /*
+             * If an error was thrown for a different register it means that the register that
+             * was unused in true branch was used in the false one (so no errror), and
+             * the register for which the false branch threw was used in the true one (so no
+             * error either).
+             */
+        }
+    } catch (InvalidSyntax& e) {
+        if (register_with_unused_value != e.what() and string{e.what()}.substr(0, 6) == "unused") {
+            /*
+             * If an error was thrown for a different register it means that the register that
+             * was unused in true branch was used in the false one (so no errror), and
+             * the register for which the false branch threw was used in the true one (so no
+             * error either).
+             */
+        } else {
+            throw TracedSyntaxError{}.append(e).append(
+                InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
+                    instruction.operands.at(2)->tokens.at(0)));
+        }
+    } catch (TracedSyntaxError& e) {
+        if (register_with_unused_value != e.errors.front().what() and
+            string{e.errors.front().what()}.substr(0, 6) == "unused") {
+            /*
+             * If an error was thrown for a different register it means that the register that
+             * was unused in true branch was used in the false one (so no errror), and
+             * the register for which the false branch threw was used in the true one (so no
+             * error either).
+             */
+        } else {
+            throw e.append(InvalidSyntax{instruction.tokens.at(0), "after taking false branch here:"}.add(
+                instruction.operands.at(2)->tokens.at(0)));
+        }
+    }
 }
-static auto check_op_atom(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto operand = get_operand<RegisterIndex>(instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_atom(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *operand);
+    check_if_name_resolved(register_usage_profile, *operand);
 
-                auto source = get_operand<AtomLiteral>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected atom literal");
-                }
+    auto source = get_operand<AtomLiteral>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected atom literal");
+    }
 
-                auto val = Register{};
-                val.index = operand->index;
-                val.register_set = operand->rss;
-                val.value_type = ValueTypes::ATOM;
+    auto val = Register{};
+    val.index = operand->index;
+    val.register_set = operand->rss;
+    val.value_type = ValueTypes::ATOM;
 
-                register_usage_profile.define(val, operand->tokens.at(0));
+    register_usage_profile.define(val, operand->tokens.at(0));
 }
-static auto check_op_atomeq(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto result = get_operand<RegisterIndex>(instruction, 0);
-                if (not result) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_atomeq(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto result = get_operand<RegisterIndex>(instruction, 0);
+    if (not result) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *result);
+    check_if_name_resolved(register_usage_profile, *result);
 
-                auto lhs = get_operand<RegisterIndex>(instruction, 1);
-                if (not lhs) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens,
-                                         "invalid left-hand side operand")
-                        .note("expected register index");
-                }
+    auto lhs = get_operand<RegisterIndex>(instruction, 1);
+    if (not lhs) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid left-hand side operand")
+            .note("expected register index");
+    }
 
-                auto rhs = get_operand<RegisterIndex>(instruction, 2);
-                if (not rhs) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens,
-                                         "invalid right-hand side operand")
-                        .note("expected register index");
-                }
+    auto rhs = get_operand<RegisterIndex>(instruction, 2);
+    if (not rhs) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid right-hand side operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *lhs);
-                check_use_of_register(register_usage_profile, *rhs);
+    check_use_of_register(register_usage_profile, *lhs);
+    check_use_of_register(register_usage_profile, *rhs);
 
-                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *lhs);
-                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *rhs);
+    assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *lhs);
+    assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *rhs);
 
-                auto val = Register(*result);
-                val.value_type = viua::internals::ValueTypes::BOOLEAN;
-                register_usage_profile.define(val, result->tokens.at(0));
+    auto val = Register(*result);
+    val.value_type = viua::internals::ValueTypes::BOOLEAN;
+    register_usage_profile.define(val, result->tokens.at(0));
 }
-static auto check_op_struct(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto operand = get_operand<RegisterIndex>(instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_struct(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *operand);
+    check_if_name_resolved(register_usage_profile, *operand);
 
-                auto val = Register{*operand};
-                val.value_type = ValueTypes::STRUCT;
-                register_usage_profile.define(val, operand->tokens.at(0));
+    auto val = Register{*operand};
+    val.value_type = ValueTypes::STRUCT;
+    register_usage_profile.define(val, operand->tokens.at(0));
 }
-static auto check_op_structinsert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_structinsert(Register_usage_profile& register_usage_profile,
+                                  Instruction const& instruction) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *target);
-                assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *target);
+    check_use_of_register(register_usage_profile, *target);
+    assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *target);
 
-                auto key = get_operand<RegisterIndex>(instruction, 1);
-                if (not key) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto key = get_operand<RegisterIndex>(instruction, 1);
+    if (not key) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *key);
-                assert_type_of_register<viua::internals::ValueTypes::ATOM>(register_usage_profile, *key);
+    check_use_of_register(register_usage_profile, *key);
+    assert_type_of_register<viua::internals::ValueTypes::ATOM>(register_usage_profile, *key);
 
-                auto source = get_operand<RegisterIndex>(instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 2);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    check_use_of_register(register_usage_profile, *source);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_structremove(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void literal");
-                    }
-                }
+static auto check_op_structremove(Register_usage_profile& register_usage_profile,
+                                  Instruction const& instruction) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void literal");
+        }
+    }
 
-                if (target) {
-                    check_use_of_register(register_usage_profile, *target);
-                }
+    if (target) {
+        check_use_of_register(register_usage_profile, *target);
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
 
-                auto key = get_operand<RegisterIndex>(instruction, 2);
-                if (not key) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto key = get_operand<RegisterIndex>(instruction, 2);
+    if (not key) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *key);
-                assert_type_of_register<viua::internals::ValueTypes::ATOM>(register_usage_profile, *key);
+    check_use_of_register(register_usage_profile, *key);
+    assert_type_of_register<viua::internals::ValueTypes::ATOM>(register_usage_profile, *key);
 
-                if (target) {
-                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
-                }
+    if (target) {
+        register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    }
 }
-static auto check_op_structkeys(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_structkeys(Register_usage_profile& register_usage_profile,
+                                Instruction const& instruction) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::STRUCT>(register_usage_profile, *source);
 
-                auto val = Register{*target};
-                val.value_type = ValueTypes::VECTOR;
-                register_usage_profile.define(val, target->tokens.at(0));
+    auto val = Register{*target};
+    val.value_type = ValueTypes::VECTOR;
+    register_usage_profile.define(val, target->tokens.at(0));
 }
-static auto check_op_new(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto operand = get_operand<RegisterIndex>(instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_new(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_if_name_resolved(register_usage_profile, *operand);
+    check_if_name_resolved(register_usage_profile, *operand);
 
-                auto val = Register{};
-                val.index = operand->index;
-                val.register_set = operand->rss;
-                val.value_type = viua::internals::ValueTypes::OBJECT;
+    auto val = Register{};
+    val.index = operand->index;
+    val.register_set = operand->rss;
+    val.value_type = viua::internals::ValueTypes::OBJECT;
 
-                register_usage_profile.define(val, operand->tokens.at(0));
+    register_usage_profile.define(val, operand->tokens.at(0));
 }
-static auto check_op_msg(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void");
-                    }
-                }
+static auto check_op_msg(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                if (target) {
-                    check_if_name_resolved(register_usage_profile, *target);
-                }
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
+    }
 
-                auto fn = instruction.operands.at(1).get();
-                if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                    (not dynamic_cast<RegisterIndex*>(fn))) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected function name, atom literal, or register index");
-                }
-                if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                    check_use_of_register(register_usage_profile, *r, "call from");
-                    assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile,
-                                                                                    *r);
-                }
+    auto fn = instruction.operands.at(1).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and (not dynamic_cast<FunctionNameLiteral*>(fn)) and
+        (not dynamic_cast<RegisterIndex*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected function name, atom literal, or register index");
+    }
+    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+        check_use_of_register(register_usage_profile, *r, "call from");
+        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(register_usage_profile, *r);
+    }
 
-                if (target) {
-                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
-                }
+    if (target) {
+        register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    }
 }
-static auto check_op_insert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+static auto check_op_insert(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *target);
-                assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *target);
+    check_use_of_register(register_usage_profile, *target);
+    assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *target);
 
-                auto key = get_operand<RegisterIndex>(instruction, 1);
-                if (not key) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto key = get_operand<RegisterIndex>(instruction, 1);
+    if (not key) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *key);
-                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
+    check_use_of_register(register_usage_profile, *key);
+    assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
 
-                auto source = get_operand<RegisterIndex>(instruction, 2);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 2);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                erase_if_direct_access(register_usage_profile, source, instruction);
+    check_use_of_register(register_usage_profile, *source);
+    erase_if_direct_access(register_usage_profile, source, instruction);
 }
-static auto check_op_remove(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
-{
-                auto target = get_operand<RegisterIndex>(instruction, 0);
-                if (not target) {
-                    if (not get_operand<VoidLiteral>(instruction, 0)) {
-                        throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                            .note("expected register index or void literal");
-                    }
-                }
+static auto check_op_remove(Register_usage_profile& register_usage_profile, Instruction const& instruction)
+    -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                .note("expected register index or void literal");
+        }
+    }
 
-                auto source = get_operand<RegisterIndex>(instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *source);
-                assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::OBJECT>(register_usage_profile, *source);
 
-                auto key = get_operand<RegisterIndex>(instruction, 2);
-                if (not key) {
-                    throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
+    auto key = get_operand<RegisterIndex>(instruction, 2);
+    if (not key) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
+            .note("expected register index");
+    }
 
-                check_use_of_register(register_usage_profile, *key);
-                assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
+    check_use_of_register(register_usage_profile, *key);
+    assert_type_of_register<viua::internals::ValueTypes::STRING>(register_usage_profile, *key);
 
-                if (target) {
-                    register_usage_profile.define(Register{*target}, target->tokens.at(0));
-                }
+    if (target) {
+        register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    }
 }
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
@@ -2688,7 +2675,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == WATCHDOG) {
                 check_op_watchdog(register_usage_profile, *instruction);
             } else if (opcode == JUMP) {
-                check_op_jump(register_usage_profile, ps,  *instruction, ib, i, mnemonic_counter);
+                check_op_jump(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
 
                 /*
                  * Do not perform further checks after a "jump" instruction.
@@ -2697,7 +2684,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
                  */
                 return;
             } else if (opcode == IF) {
-                check_op_if(register_usage_profile, ps,  *instruction, ib, i, mnemonic_counter);
+                check_op_if(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
 
                 /*
                  * Do not perform further checks after an "if" instruction.
