@@ -194,19 +194,10 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(const Pars
                 continue;
             }
 
-            switch (opcode) {
-                case CALL:
-                case TAILCALL:
-                case DEFER:
-                case PROCESS:
-                case MSG:
-                    --balance;
-                    break;
-                case FRAME:
-                    ++balance;
-                    break;
-                default:
-                    break;
+            if (opcode == CALL or opcode == TAILCALL or opcode == DEFER or opcode == PROCESS or opcode == MSG) {
+                --balance;
+            } else if (opcode == FRAME) {
+                ++balance;
             }
 
             if (balance < 0) {

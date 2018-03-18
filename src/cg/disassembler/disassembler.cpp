@@ -39,31 +39,26 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> string {
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
 
-    switch (type) {
-        case OT_VOID:
+    if (type == OT_VOID) {
             oss << "void";
-            break;
-        case OT_REGISTER_INDEX:
+    } else if (type == OT_REGISTER_INDEX) {
             oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_REGISTER_REFERENCE:
+    } else if (type == OT_REGISTER_REFERENCE) {
             oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_POINTER:
+    } else if (type == OT_POINTER) {
             oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_INT:
+    } else if (type == OT_INT) {
             oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
-            break;
-        default:
-            throw "invalid operand type detected";
+    } else {
+        // FIXME Throw a real exception.
+        throw "invalid operand type detected";
     }
 
     return oss.str();
@@ -74,11 +69,9 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
 
-    switch (type) {
-        case OT_VOID:
+    if (type == OT_VOID) {
             oss << "void";
-            break;
-        case OT_REGISTER_INDEX:
+    } else if (type == OT_REGISTER_INDEX) {
             oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
@@ -103,8 +96,7 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
                     }
             }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_REGISTER_REFERENCE:
+    } else if (type == OT_REGISTER_REFERENCE) {
             oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
@@ -125,8 +117,7 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
                     throw "invalid register set detected";
             }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_POINTER:
+    } else if (type == OT_POINTER) {
             oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
@@ -147,13 +138,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
                     throw "invalid register set detected";
             }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_INT:
+    } else if (type == OT_INT) {
             oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
-            break;
-        default:
-            throw "invalid operand type detected";
+    } else {
+        throw "invalid operand type detected";
     }
 
     return oss.str();
