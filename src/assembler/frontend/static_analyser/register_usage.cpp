@@ -2541,211 +2541,358 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
         auto const opcode = instruction->opcode;
 
         try {
-            if (opcode == IZERO) {
-                check_op_izero(register_usage_profile, *instruction);
-            } else if (opcode == INTEGER) {
-                check_op_integer(register_usage_profile, *instruction);
-            } else if (opcode == IINC or opcode == IDEC) {
-                check_op_iinc(register_usage_profile, *instruction);
-            } else if (opcode == WRAPINCREMENT or opcode == WRAPDECREMENT or opcode == CHECKEDSINCREMENT or
-                       opcode == CHECKEDSDECREMENT or opcode == SATURATINGSINCREMENT or
-                       opcode == SATURATINGSDECREMENT) {
-                check_op_bit_increment(register_usage_profile, *instruction);
-            } else if (opcode == FLOAT) {
-                check_op_float(register_usage_profile, *instruction);
-            } else if (opcode == ITOF) {
-                check_op_itof(register_usage_profile, *instruction);
-            } else if (opcode == FTOI) {
-                check_op_ftoi(register_usage_profile, *instruction);
-            } else if (opcode == STOI) {
-                check_op_stoi(register_usage_profile, *instruction);
-            } else if (opcode == STOF) {
-                check_op_stof(register_usage_profile, *instruction);
-            } else if (opcode == ADD or opcode == SUB or opcode == MUL or opcode == DIV) {
-                check_op_arithmetic(register_usage_profile, *instruction);
-            } else if (opcode == WRAPADD or opcode == WRAPSUB or opcode == WRAPMUL or opcode == WRAPDIV or
-                       opcode == CHECKEDSADD or opcode == CHECKEDSSUB or opcode == CHECKEDSMUL or
-                       opcode == CHECKEDSDIV or opcode == SATURATINGSADD or opcode == SATURATINGSSUB or
-                       opcode == SATURATINGSMUL or opcode == SATURATINGSDIV) {
-                check_op_bit_arithmetic(register_usage_profile, *instruction);
-            } else if (opcode == LT or opcode == LTE or opcode == GT or opcode == GTE or opcode == EQ) {
-                check_op_compare(register_usage_profile, *instruction);
-            } else if (opcode == STRING) {
-                check_op_string(register_usage_profile, *instruction);
-            } else if (opcode == STREQ) {
-                check_op_streq(register_usage_profile, *instruction);
-            } else if (opcode == TEXT) {
-                check_op_text(register_usage_profile, *instruction);
-            } else if (opcode == TEXTEQ) {
-                check_op_texteq(register_usage_profile, *instruction);
-            } else if (opcode == TEXTAT) {
-                check_op_textat(register_usage_profile, *instruction);
-            } else if (opcode == TEXTSUB) {
-                check_op_textsub(register_usage_profile, *instruction);
-            } else if (opcode == TEXTLENGTH) {
-                check_op_textlength(register_usage_profile, *instruction);
-            } else if (opcode == TEXTCOMMONPREFIX) {
-                check_op_textcommonprefix(register_usage_profile, *instruction);
-            } else if (opcode == TEXTCOMMONSUFFIX) {
-                check_op_textcommonsuffix(register_usage_profile, *instruction);
-            } else if (opcode == TEXTCONCAT) {
-                check_op_textconcat(register_usage_profile, *instruction);
-            } else if (opcode == VECTOR) {
-                check_op_vector(register_usage_profile, *instruction);
-            } else if (opcode == VINSERT) {
-                check_op_vinsert(register_usage_profile, *instruction);
-            } else if (opcode == VPUSH) {
-                check_op_vpush(register_usage_profile, *instruction);
-            } else if (opcode == VPOP) {
-                check_op_vpop(register_usage_profile, *instruction);
-            } else if (opcode == VAT) {
-                check_op_vat(register_usage_profile, *instruction);
-            } else if (opcode == VLEN) {
-                check_op_vlen(register_usage_profile, *instruction);
-            } else if (opcode == NOT) {
-                check_op_not(register_usage_profile, *instruction);
-            } else if (opcode == AND or opcode == OR) {
-                check_op_boolean_and_or(register_usage_profile, *instruction);
-            } else if (opcode == BITS) {
-                check_op_bits(register_usage_profile, *instruction);
-            } else if (opcode == BITAND or opcode == BITOR or opcode == BITXOR) {
-                check_op_binary_logic(register_usage_profile, *instruction);
-            } else if (opcode == BITNOT) {
-                check_op_bitnot(register_usage_profile, *instruction);
-            } else if (opcode == BITAT) {
-                check_op_bitat(register_usage_profile, *instruction);
-            } else if (opcode == BITSET) {
-                check_op_bitset(register_usage_profile, *instruction);
-            } else if (opcode == SHL or opcode == SHR or opcode == ASHL or opcode == ASHR) {
-                check_op_bit_shifts(register_usage_profile, *instruction);
-            } else if (opcode == ROL or opcode == ROR) {
-                check_op_bit_rotates(register_usage_profile, *instruction);
-            } else if (opcode == COPY) {
-                check_op_copy(register_usage_profile, *instruction);
-            } else if (opcode == MOVE) {
-                check_op_move(register_usage_profile, *instruction);
-            } else if (opcode == PTR) {
-                check_op_ptr(register_usage_profile, *instruction);
-            } else if (opcode == SWAP) {
-                check_op_swap(register_usage_profile, *instruction);
-            } else if (opcode == DELETE) {
-                check_op_delete(register_usage_profile, *instruction);
-            } else if (opcode == ISNULL) {
-                check_op_isnull(register_usage_profile, *instruction);
-            } else if (opcode == RESS) {
-                // do nothing
-            } else if (opcode == PRINT or opcode == ECHO) {
-                check_op_print(register_usage_profile, *instruction);
-            } else if (opcode == CAPTURE) {
-                check_op_capture(register_usage_profile, *instruction, created_closures);
-            } else if (opcode == CAPTURECOPY) {
-                check_op_capturecopy(register_usage_profile, *instruction, created_closures);
-            } else if (opcode == CAPTUREMOVE) {
-                check_op_capturemove(register_usage_profile, *instruction, created_closures);
-            } else if (opcode == CLOSURE) {
-                check_op_closure(register_usage_profile, *instruction, created_closures);
-            } else if (opcode == FUNCTION) {
-                check_op_function(register_usage_profile, *instruction);
-            } else if (opcode == FRAME) {
-                check_op_frame(register_usage_profile, *instruction);
-            } else if (opcode == PARAM) {
-                check_op_param(register_usage_profile, *instruction);
-            } else if (opcode == PAMV) {
-                check_op_pamv(register_usage_profile, *instruction);
-            } else if (opcode == CALL) {
-                check_op_call(register_usage_profile, *instruction);
-            } else if (opcode == TAILCALL) {
-                check_op_tailcall(register_usage_profile, *instruction);
-            } else if (opcode == DEFER) {
-                check_op_defer(register_usage_profile, *instruction);
-            } else if (opcode == ARG) {
-                check_op_arg(register_usage_profile, *instruction);
-            } else if (opcode == ARGC) {
-                check_op_argc(register_usage_profile, *instruction);
-            } else if (opcode == PROCESS) {
-                check_op_process(register_usage_profile, *instruction);
-            } else if (opcode == SELF) {
-                check_op_self(register_usage_profile, *instruction);
-            } else if (opcode == JOIN) {
-                check_op_join(register_usage_profile, *instruction);
-            } else if (opcode == SEND) {
-                check_op_send(register_usage_profile, *instruction);
-            } else if (opcode == RECEIVE) {
-                check_op_receive(register_usage_profile, *instruction);
-            } else if (opcode == WATCHDOG) {
-                check_op_watchdog(register_usage_profile, *instruction);
-            } else if (opcode == JUMP) {
-                check_op_jump(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
-
-                /*
-                 * Do not perform further checks after a "jump" instruction.
-                 * All state has been "moved" into the nested checking call above, and
-                 * it would be useless to perform the checks twice here.
-                 */
-                return;
-            } else if (opcode == IF) {
-                check_op_if(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
-
-                /*
-                 * Do not perform further checks after an "if" instruction.
-                 * All state has been "moved" into the nested checking call above, and
-                 * it would be useless to perform the checks twice here.
-                 */
-                return;
-            } else if (opcode == THROW) {
-                check_op_throw(register_usage_profile, ps, created_closures, *instruction);
-            } else if (opcode == CATCH) {
-                // FIXME TODO SA for entered blocks
-            } else if (opcode == DRAW) {
-                check_op_draw(register_usage_profile, *instruction);
-            } else if (opcode == TRY) {
-                // do nothing
-            } else if (opcode == ENTER) {
-                check_op_enter(register_usage_profile, ps, *instruction);
-            } else if (opcode == LEAVE) {
-                /*
-                 * Just return.
-                 * Since blocks are never entered independently (and only in context of some other frame, we
-                 * will use that "outer" frame to check for unused values, etc.
-                 *
-                 * This may lead to less-than-stellar readability for some errors; e.g. when a value is
-                 * defined inside a block, but is used neither inside it nor in the surrounding frame.
-                 */
-                return;
-            } else if (opcode == IMPORT) {
-                // do nothing
-            } else if (opcode == CLASS) {
-                // TODO
-            } else if (opcode == DERIVE) {
-                // TODO
-            } else if (opcode == ATTACH) {
-                // TODO
-            } else if (opcode == REGISTER) {
-                // TODO
-            } else if (opcode == ATOM) {
-                check_op_atom(register_usage_profile, *instruction);
-            } else if (opcode == ATOMEQ) {
-                check_op_atomeq(register_usage_profile, *instruction);
-            } else if (opcode == STRUCT) {
-                check_op_struct(register_usage_profile, *instruction);
-            } else if (opcode == STRUCTINSERT) {
-                check_op_structinsert(register_usage_profile, *instruction);
-            } else if (opcode == STRUCTREMOVE) {
-                check_op_structremove(register_usage_profile, *instruction);
-            } else if (opcode == STRUCTKEYS) {
-                check_op_structkeys(register_usage_profile, *instruction);
-            } else if (opcode == NEW) {
-                check_op_new(register_usage_profile, *instruction);
-            } else if (opcode == MSG) {
-                check_op_msg(register_usage_profile, *instruction);
-            } else if (opcode == INSERT) {
-                check_op_insert(register_usage_profile, *instruction);
-            } else if (opcode == REMOVE) {
-                check_op_remove(register_usage_profile, *instruction);
-            } else if (opcode == RETURN) {
-                // do nothing
-            } else if (opcode == HALT) {
-                // do nothing
+            switch (opcode) {
+                case IZERO:
+                    check_op_izero(register_usage_profile, *instruction);
+                    break;
+                case INTEGER:
+                    check_op_integer(register_usage_profile, *instruction);
+                    break;
+                case IINC:
+                case IDEC:
+                    check_op_iinc(register_usage_profile, *instruction);
+                    break;
+                case WRAPINCREMENT:
+                case WRAPDECREMENT:
+                case CHECKEDSINCREMENT:
+                case CHECKEDSDECREMENT:
+                case SATURATINGSINCREMENT:
+                case SATURATINGSDECREMENT:
+                    check_op_bit_increment(register_usage_profile, *instruction);
+                    break;
+                case FLOAT:
+                    check_op_float(register_usage_profile, *instruction);
+                    break;
+                case ITOF:
+                    check_op_itof(register_usage_profile, *instruction);
+                    break;
+                case FTOI:
+                    check_op_ftoi(register_usage_profile, *instruction);
+                    break;
+                case STOI:
+                    check_op_stoi(register_usage_profile, *instruction);
+                    break;
+                case STOF:
+                    check_op_stof(register_usage_profile, *instruction);
+                    break;
+                case ADD:
+                case SUB:
+                case MUL:
+                case DIV:
+                    check_op_arithmetic(register_usage_profile, *instruction);
+                    break;
+                case WRAPADD:
+                case WRAPSUB:
+                case WRAPMUL:
+                case WRAPDIV:
+                case CHECKEDSADD:
+                case CHECKEDSSUB:
+                case CHECKEDSMUL:
+                case CHECKEDSDIV:
+                case SATURATINGSADD:
+                case SATURATINGSSUB:
+                case SATURATINGSMUL:
+                case SATURATINGSDIV:
+                    check_op_bit_arithmetic(register_usage_profile, *instruction);
+                    break;
+                case CHECKEDUINCREMENT:
+                case CHECKEDUDECREMENT:
+                case CHECKEDUADD:
+                case CHECKEDUSUB:
+                case CHECKEDUMUL:
+                case CHECKEDUDIV:
+                case SATURATINGUINCREMENT:
+                case SATURATINGUDECREMENT:
+                case SATURATINGUADD:
+                case SATURATINGUSUB:
+                case SATURATINGUMUL:
+                case SATURATINGUDIV:
+                    // FIXME implement
+                    break;
+                case LT:
+                case LTE:
+                case GT:
+                case GTE:
+                case EQ:
+                    check_op_compare(register_usage_profile, *instruction);
+                    break;
+                case STRING:
+                    check_op_string(register_usage_profile, *instruction);
+                    break;
+                case STREQ:
+                    check_op_streq(register_usage_profile, *instruction);
+                    break;
+                case TEXT:
+                    check_op_text(register_usage_profile, *instruction);
+                    break;
+                case TEXTEQ:
+                    check_op_texteq(register_usage_profile, *instruction);
+                    break;
+                case TEXTAT:
+                    check_op_textat(register_usage_profile, *instruction);
+                    break;
+                case TEXTSUB:
+                    check_op_textsub(register_usage_profile, *instruction);
+                    break;
+                case TEXTLENGTH:
+                    check_op_textlength(register_usage_profile, *instruction);
+                    break;
+                case TEXTCOMMONPREFIX:
+                    check_op_textcommonprefix(register_usage_profile, *instruction);
+                    break;
+                case TEXTCOMMONSUFFIX:
+                    check_op_textcommonsuffix(register_usage_profile, *instruction);
+                    break;
+                case TEXTCONCAT:
+                    check_op_textconcat(register_usage_profile, *instruction);
+                    break;
+                case VECTOR:
+                    check_op_vector(register_usage_profile, *instruction);
+                    break;
+                case VINSERT:
+                    check_op_vinsert(register_usage_profile, *instruction);
+                    break;
+                case VPUSH:
+                    check_op_vpush(register_usage_profile, *instruction);
+                    break;
+                case VPOP:
+                    check_op_vpop(register_usage_profile, *instruction);
+                    break;
+                case VAT:
+                    check_op_vat(register_usage_profile, *instruction);
+                    break;
+                case VLEN:
+                    check_op_vlen(register_usage_profile, *instruction);
+                    break;
+                case NOT:
+                    check_op_not(register_usage_profile, *instruction);
+                    break;
+                case AND:
+                case OR:
+                    check_op_boolean_and_or(register_usage_profile, *instruction);
+                    break;
+                case BITS:
+                    check_op_bits(register_usage_profile, *instruction);
+                    break;
+                case BITAND:
+                case BITOR:
+                case BITXOR:
+                    check_op_binary_logic(register_usage_profile, *instruction);
+                    break;
+                case BITNOT:
+                    check_op_bitnot(register_usage_profile, *instruction);
+                    break;
+                case BITAT:
+                    check_op_bitat(register_usage_profile, *instruction);
+                    break;
+                case BITSET:
+                    check_op_bitset(register_usage_profile, *instruction);
+                    break;
+                case BITSWIDTH:
+                case BITSEQ:
+                case BITSLT:
+                case BITSLTE:
+                case BITSGT:
+                case BITSGTE:
+                case BITAEQ:
+                case BITALT:
+                case BITALTE:
+                case BITAGT:
+                case BITAGTE:
+                    // do nothing
+                    break;
+                case SHL:
+                case SHR:
+                case ASHL:
+                case ASHR:
+                    check_op_bit_shifts(register_usage_profile, *instruction);
+                    break;
+                case ROL:
+                case ROR:
+                    check_op_bit_rotates(register_usage_profile, *instruction);
+                    break;
+                case COPY:
+                    check_op_copy(register_usage_profile, *instruction);
+                    break;
+                case MOVE:
+                    check_op_move(register_usage_profile, *instruction);
+                    break;
+                case PTR:
+                    check_op_ptr(register_usage_profile, *instruction);
+                    break;
+                case SWAP:
+                    check_op_swap(register_usage_profile, *instruction);
+                    break;
+                case DELETE:
+                    check_op_delete(register_usage_profile, *instruction);
+                    break;
+                case ISNULL:
+                    check_op_isnull(register_usage_profile, *instruction);
+                    break;
+                case RESS:
+                    // do nothing
+                    break;
+                case PRINT:
+                case ECHO:
+                    check_op_print(register_usage_profile, *instruction);
+                    break;
+                case CAPTURE:
+                    check_op_capture(register_usage_profile, *instruction, created_closures);
+                    break;
+                case CAPTURECOPY:
+                    check_op_capturecopy(register_usage_profile, *instruction, created_closures);
+                    break;
+                case CAPTUREMOVE:
+                    check_op_capturemove(register_usage_profile, *instruction, created_closures);
+                    break;
+                case CLOSURE:
+                    check_op_closure(register_usage_profile, *instruction, created_closures);
+                    break;
+                case FUNCTION:
+                    check_op_function(register_usage_profile, *instruction);
+                    break;
+                case FRAME:
+                    check_op_frame(register_usage_profile, *instruction);
+                    break;
+                case PARAM:
+                    check_op_param(register_usage_profile, *instruction);
+                    break;
+                case PAMV:
+                    check_op_pamv(register_usage_profile, *instruction);
+                    break;
+                case CALL:
+                    check_op_call(register_usage_profile, *instruction);
+                    break;
+                case TAILCALL:
+                    check_op_tailcall(register_usage_profile, *instruction);
+                    break;
+                case DEFER:
+                    check_op_defer(register_usage_profile, *instruction);
+                    break;
+                case ARG:
+                    check_op_arg(register_usage_profile, *instruction);
+                    break;
+                case ARGC:
+                    check_op_argc(register_usage_profile, *instruction);
+                    break;
+                case PROCESS:
+                    check_op_process(register_usage_profile, *instruction);
+                    break;
+                case SELF:
+                    check_op_self(register_usage_profile, *instruction);
+                    break;
+                case JOIN:
+                    check_op_join(register_usage_profile, *instruction);
+                    break;
+                case SEND:
+                    check_op_send(register_usage_profile, *instruction);
+                    break;
+                case RECEIVE:
+                    check_op_receive(register_usage_profile, *instruction);
+                    break;
+                case WATCHDOG:
+                    check_op_watchdog(register_usage_profile, *instruction);
+                    break;
+                case JUMP:
+                    check_op_jump(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
+                    /*
+                     * Do not perform further checks after a "jump" instruction.
+                     * All state has been "moved" into the nested checking call above, and
+                     * it would be useless to perform the checks twice here.
+                     */
+                    return;
+                case IF:
+                    check_op_if(register_usage_profile, ps, *instruction, ib, i, mnemonic_counter);
+                    /*
+                     * Do not perform further checks after an "if" instruction.
+                     * All state has been "moved" into the nested checking call above, and
+                     * it would be useless to perform the checks twice here.
+                     */
+                    return;
+                case THROW:
+                    check_op_throw(register_usage_profile, ps, created_closures, *instruction);
+                    break;
+                case CATCH:
+                    // FIXME TODO SA for entered blocks
+                    break;
+                case DRAW:
+                    check_op_draw(register_usage_profile, *instruction);
+                    break;
+                case TRY:
+                    // do nothing
+                    break;
+                case ENTER:
+                    check_op_enter(register_usage_profile, ps, *instruction);
+                    break;
+                case LEAVE:
+                    /*
+                     * Just return.
+                     * Since blocks are never entered independently (and only in context of some other frame, we
+                     * will use that "outer" frame to check for unused values, etc.
+                     *
+                     * This may lead to less-than-stellar readability for some errors; e.g. when a value is
+                     * defined inside a block, but is used neither inside it nor in the surrounding frame.
+                     */
+                    return;
+                case IMPORT:
+                    // do nothing
+                    break;
+                case CLASS:
+                    // TODO
+                    break;
+                case DERIVE:
+                    // TODO
+                    break;
+                case ATTACH:
+                    // TODO
+                    break;
+                case REGISTER:
+                    // TODO
+                    break;
+                case ATOM:
+                    check_op_atom(register_usage_profile, *instruction);
+                    break;
+                case ATOMEQ:
+                    check_op_atomeq(register_usage_profile, *instruction);
+                    break;
+                case STRUCT:
+                    check_op_struct(register_usage_profile, *instruction);
+                    break;
+                case STRUCTINSERT:
+                    check_op_structinsert(register_usage_profile, *instruction);
+                    break;
+                case STRUCTREMOVE:
+                    check_op_structremove(register_usage_profile, *instruction);
+                    break;
+                case STRUCTKEYS:
+                    check_op_structkeys(register_usage_profile, *instruction);
+                    break;
+                case NEW:
+                    check_op_new(register_usage_profile, *instruction);
+                    break;
+                case MSG:
+                    check_op_msg(register_usage_profile, *instruction);
+                    break;
+                case INSERT:
+                    check_op_insert(register_usage_profile, *instruction);
+                    break;
+                case REMOVE:
+                    check_op_remove(register_usage_profile, *instruction);
+                    break;
+                case RETURN:
+                    // do nothing
+                    break;
+                case HALT:
+                    // do nothing
+                    break;
+                case NOP:
+                    // do nothing
+                    break;
+                case BOOL:
+                    // FIXME "bool" opcode is not even implemented
+                    break;
+                default:
+                    throw invalid_syntax(instruction->tokens, "instruction does not have static analysis implemented");
             }
         } catch (InvalidSyntax& e) { throw e.add(instruction->tokens.at(0)); } catch (TracedSyntaxError& e) {
             e.errors.at(0).add(instruction->tokens.at(0));
