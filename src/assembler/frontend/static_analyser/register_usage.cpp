@@ -2432,7 +2432,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
                  * will use that "outer" frame to check for unused values, etc.
                  *
                  * This may lead to less-than-stellar readability for some errors; e.g. when a value is
-                 * defined inside a block, but is used neither inside it not in the surrounding frame.
+                 * defined inside a block, but is used neither inside it nor in the surrounding frame.
                  */
                 return;
             } else if (opcode == IMPORT) {
