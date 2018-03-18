@@ -2069,6 +2069,15 @@ static auto check_op_throw(Register_usage_profile& register_usage_profile, Parse
 
                 return;
 }
+static auto check_op_draw(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void {
+                auto target = get_operand<RegisterIndex>(instruction, 0);
+                if (not target) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                register_usage_profile.define(Register{*target}, target->tokens.at(0));
+}
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2392,13 +2401,7 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == CATCH) {
                 // FIXME TODO SA for entered blocks
             } else if (opcode == DRAW) {
-                auto target = get_operand<RegisterIndex>(*instruction, 0);
-                if (not target) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                register_usage_profile.define(Register{*target}, target->tokens.at(0));
+                check_op_draw(register_usage_profile, *instruction);
             } else if (opcode == TRY) {
                 // do nothing
             } else if (opcode == ENTER) {
