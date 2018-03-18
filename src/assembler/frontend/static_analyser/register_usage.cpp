@@ -2282,6 +2282,68 @@ static auto check_op_leave(Register_usage_profile&, Instruction const&) -> void 
      */
     return;
 }
+static auto check_op_atom(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto operand = get_operand<RegisterIndex>(instruction, 0);
+                if (not operand) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *operand);
+
+                auto source = get_operand<AtomLiteral>(instruction, 1);
+                if (not source) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
+                        .note("expected atom literal");
+                }
+
+                auto val = Register{};
+                val.index = operand->index;
+                val.register_set = operand->rss;
+                val.value_type = ValueTypes::ATOM;
+
+                register_usage_profile.define(val, operand->tokens.at(0));
+}
+static auto check_op_atomeq(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+                auto result = get_operand<RegisterIndex>(instruction, 0);
+                if (not result) {
+                    throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
+                        .note("expected register index");
+                }
+
+                check_if_name_resolved(register_usage_profile, *result);
+
+                auto lhs = get_operand<RegisterIndex>(instruction, 1);
+                if (not lhs) {
+                    throw invalid_syntax(instruction.operands.at(1)->tokens,
+                                         "invalid left-hand side operand")
+                        .note("expected register index");
+                }
+
+                auto rhs = get_operand<RegisterIndex>(instruction, 2);
+                if (not rhs) {
+                    throw invalid_syntax(instruction.operands.at(2)->tokens,
+                                         "invalid right-hand side operand")
+                        .note("expected register index");
+                }
+
+                check_use_of_register(register_usage_profile, *lhs);
+                check_use_of_register(register_usage_profile, *rhs);
+
+                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *lhs);
+                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *rhs);
+
+                auto val = Register(*result);
+                val.value_type = viua::internals::ValueTypes::BOOLEAN;
+                register_usage_profile.define(val, result->tokens.at(0));
+}
+/*
+static auto check_op_(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void
+{
+}
+*/
 
 static auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile,
                                                             const ParsedSource& ps,
@@ -2467,58 +2529,9 @@ static auto check_register_usage_for_instruction_block_impl(Register_usage_profi
             } else if (opcode == REGISTER) {
                 // TODO
             } else if (opcode == ATOM) {
-                auto operand = get_operand<RegisterIndex>(*instruction, 0);
-                if (not operand) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *operand);
-
-                auto source = get_operand<AtomLiteral>(*instruction, 1);
-                if (not source) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens, "invalid operand")
-                        .note("expected atom literal");
-                }
-
-                auto val = Register{};
-                val.index = operand->index;
-                val.register_set = operand->rss;
-                val.value_type = ValueTypes::ATOM;
-
-                register_usage_profile.define(val, operand->tokens.at(0));
+                check_op_atom(register_usage_profile, *instruction);
             } else if (opcode == ATOMEQ) {
-                auto result = get_operand<RegisterIndex>(*instruction, 0);
-                if (not result) {
-                    throw invalid_syntax(instruction->operands.at(0)->tokens, "invalid operand")
-                        .note("expected register index");
-                }
-
-                check_if_name_resolved(register_usage_profile, *result);
-
-                auto lhs = get_operand<RegisterIndex>(*instruction, 1);
-                if (not lhs) {
-                    throw invalid_syntax(instruction->operands.at(1)->tokens,
-                                         "invalid left-hand side operand")
-                        .note("expected register index");
-                }
-
-                auto rhs = get_operand<RegisterIndex>(*instruction, 2);
-                if (not rhs) {
-                    throw invalid_syntax(instruction->operands.at(2)->tokens,
-                                         "invalid right-hand side operand")
-                        .note("expected register index");
-                }
-
-                check_use_of_register(register_usage_profile, *lhs);
-                check_use_of_register(register_usage_profile, *rhs);
-
-                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *lhs);
-                assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *rhs);
-
-                auto val = Register(*result);
-                val.value_type = viua::internals::ValueTypes::BOOLEAN;
-                register_usage_profile.define(val, result->tokens.at(0));
+                check_op_atomeq(register_usage_profile, *instruction);
             } else if (opcode == STRUCT) {
                 auto operand = get_operand<RegisterIndex>(*instruction, 0);
                 if (not operand) {
