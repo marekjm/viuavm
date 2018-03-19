@@ -344,6 +344,9 @@ build/bin/vm/asm: build/front/asm.o \
 	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
+	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
+	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
 	build/assembler/frontend/static_analyser/Register.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \

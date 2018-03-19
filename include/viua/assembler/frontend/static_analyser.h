@@ -139,7 +139,105 @@ namespace viua {
                     auto end() const -> decltype(defined_registers.end());
                 };
 
-                auto check_register_usage(const parser::ParsedSource&) -> void;
+                namespace checkers {
+                    using viua::assembler::frontend::parser::Instruction;
+                    using viua::assembler::frontend::parser::ParsedSource;
+                    using viua::assembler::frontend::parser::InstructionsBlock;
+                    using InstructionIndex = InstructionsBlock::size_type;
+
+auto check_op_izero(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_integer(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_iinc(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bit_increment(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bit_arithmetic(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_float(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_itof(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_ftoi(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_stoi(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_stof(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_arithmetic(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_compare(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_string(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_streq(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_text(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_texteq(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textat(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textsub(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textlength(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textcommonprefix(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textcommonsuffix(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_textconcat(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vector(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vinsert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vpush(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vpop(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vat(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_vlen(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_not(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_boolean_and_or(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bits(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_binary_logic(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bitnot(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bitat(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bitset(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bit_shifts(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_bit_rotates(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_copy(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_move(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_ptr(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_swap(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_delete(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_isnull(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_print(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_capture(Register_usage_profile& register_usage_profile, Instruction const& instruction, std::map<Register, Closure>& created_closures) -> void;
+auto check_op_capturecopy(Register_usage_profile& register_usage_profile, Instruction const& instruction, std::map<Register, Closure>& created_closures) -> void;
+auto check_op_capturemove(Register_usage_profile& register_usage_profile, Instruction const& instruction, std::map<Register, Closure>& created_closures) -> void;
+auto check_op_closure(Register_usage_profile& register_usage_profile, Instruction const& instruction, std::map<Register, Closure>& created_closures) -> void;
+auto check_op_function(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_frame(Register_usage_profile&, Instruction const&) -> void;
+auto check_op_param(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_pamv(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_call(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_tailcall(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_defer(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_arg(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_argc(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_process(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_self(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_join(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_send(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_receive(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction) -> void;
+auto check_op_throw(Register_usage_profile& register_usage_profile, ParsedSource const& ps, std::map<Register, Closure>&, Instruction const&) -> void;
+auto check_op_draw(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_enter(Register_usage_profile& register_usage_profile, ParsedSource const& ps, Instruction const& instruction) -> void;
+auto check_op_jump(Register_usage_profile& register_usage_profile, ParsedSource const& ps, Instruction const& instruction, InstructionsBlock const& ib, InstructionIndex i, InstructionIndex const mnemonic_counter) -> void;
+auto check_op_if(Register_usage_profile& register_usage_profile, ParsedSource const& ps, Instruction const& instruction, InstructionsBlock const& ib, InstructionIndex i, InstructionIndex const mnemonic_counter) -> void;
+auto check_op_atom(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_atomeq(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_struct(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_structinsert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_structremove(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_structkeys(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_new(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_msg(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_insert(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+auto check_op_remove(Register_usage_profile& register_usage_profile, Instruction const& instruction) -> void;
+
+auto check_for_unused_registers(Register_usage_profile const& register_usage_profile) -> void;
+auto check_closure_instantiations(Register_usage_profile const& register_usage_profile,
+                                         ParsedSource const& ps,
+                                         std::map<Register, Closure> const& created_closures) -> void;
+
+auto check_register_usage_for_instruction_block_impl(Register_usage_profile& register_usage_profile, ParsedSource const& ps, InstructionsBlock const& ib, InstructionIndex i, InstructionIndex mnemonic_counter) -> void;
+
+auto map_names_to_register_indexes(Register_usage_profile& register_usage_profile, InstructionsBlock const& ib) -> void;
+
+auto to_string(viua::internals::RegisterSets const) -> std::string;
+auto to_string(viua::internals::ValueTypes const) -> std::string;
+                }
+
+                auto check_register_usage(parser::ParsedSource const&) -> void;
             }  // namespace static_analyser
         }      // namespace frontend
     }          // namespace assembler
