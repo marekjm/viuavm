@@ -39,8 +39,6 @@
 #include <viua/types/value.h>
 
 
-
-
 class HaltException : public std::runtime_error {
   public:
     HaltException() : std::runtime_error("execution halted") {}

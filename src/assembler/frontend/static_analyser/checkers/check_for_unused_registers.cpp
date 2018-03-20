@@ -18,8 +18,8 @@
  */
 
 #include <sstream>
-#include <viua/support/string.h>
 #include <viua/assembler/frontend/static_analyser.h>
+#include <viua/support/string.h>
 
 using viua::assembler::frontend::parser::Instruction;
 
@@ -28,32 +28,35 @@ namespace viua {
         namespace frontend {
             namespace static_analyser {
                 namespace checkers {
-auto check_for_unused_registers(const Register_usage_profile& register_usage_profile) -> void {
-    for (const auto& each : register_usage_profile) {
-        if (not each.first.index) {
-            /*
-             * Registers with index 0 do not take part in the "unused" analysis, because
-             * they are used to store return values of functions.
-             * This means that they *MUST* be defined, but *MAY* stay unused.
-             */
-            continue;
-        }
-        // FIXME Implement the .unused: directive, and [[maybe_unused]] attribute (later).
-        if (not register_usage_profile.used(each.first)) {
-            auto msg = std::ostringstream{};
-            msg << "unused " + to_string(each.second.second.value_type) + " in register "
-                << str::enquote(std::to_string(each.first.index));
-            if (register_usage_profile.index_to_name.count(each.first.index)) {
-                msg << " (named " << str::enquote(register_usage_profile.index_to_name.at(each.first.index))
-                    << ')';
-            }
+                    auto check_for_unused_registers(const Register_usage_profile& register_usage_profile)
+                        -> void {
+                        for (const auto& each : register_usage_profile) {
+                            if (not each.first.index) {
+                                /*
+                                 * Registers with index 0 do not take part in the "unused" analysis, because
+                                 * they are used to store return values of functions.
+                                 * This means that they *MUST* be defined, but *MAY* stay unused.
+                                 */
+                                continue;
+                            }
+                            // FIXME Implement the .unused: directive, and [[maybe_unused]] attribute (later).
+                            if (not register_usage_profile.used(each.first)) {
+                                auto msg = std::ostringstream{};
+                                msg << "unused " + to_string(each.second.second.value_type) + " in register "
+                                    << str::enquote(std::to_string(each.first.index));
+                                if (register_usage_profile.index_to_name.count(each.first.index)) {
+                                    msg << " (named "
+                                        << str::enquote(
+                                               register_usage_profile.index_to_name.at(each.first.index))
+                                        << ')';
+                                }
 
-            throw viua::cg::lex::UnusedValue{each.second.first, msg.str()};
-        }
-    }
-}
-                }
-            }
-        }
-    }
-}
+                                throw viua::cg::lex::UnusedValue{each.second.first, msg.str()};
+                            }
+                        }
+                    }
+                }  // namespace checkers
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
+}  // namespace viua

@@ -194,7 +194,8 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(const Pars
                 continue;
             }
 
-            if (opcode == CALL or opcode == TAILCALL or opcode == DEFER or opcode == PROCESS or opcode == MSG) {
+            if (opcode == CALL or opcode == TAILCALL or opcode == DEFER or opcode == PROCESS or
+                opcode == MSG) {
                 --balance;
             } else if (opcode == FRAME) {
                 ++balance;

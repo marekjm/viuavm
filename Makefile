@@ -347,6 +347,8 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
 	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
 	build/assembler/frontend/static_analyser/Register.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \
