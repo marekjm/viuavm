@@ -298,46 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_vector(Register_usage_profile& register_usage_profile,
-                                         Instruction const& instruction) -> void {
-                        auto operand = get_operand<RegisterIndex>(instruction, 0);
-                        if (not operand) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        auto const pack_range_start = get_operand<RegisterIndex>(instruction, 1);
-                        if (not pack_range_start) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        auto const pack_range_count = get_operand<RegisterIndex>(instruction, 2);
-                        if (not pack_range_count) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *operand);
-
-                        auto const limit = (pack_range_start->index + pack_range_count->index);
-                        for (auto j = pack_range_start->index; j < limit; ++j) {
-                            auto checker = Register{};
-                            checker.index = j;
-                            checker.register_set = pack_range_start->rss;
-                            if (not register_usage_profile.defined(checker)) {
-                                throw InvalidSyntax{pack_range_start->tokens.at(0),
-                                                    "pack of empty register: " + std::to_string(j)};
-                            }
-                            register_usage_profile.erase(checker, instruction.tokens.at(0));
-                        }
-
-                        auto val = Register{};
-                        val.index = operand->index;
-                        val.register_set = operand->rss;
-                        val.value_type = viua::internals::ValueTypes::VECTOR;
-                        register_usage_profile.define(val, operand->tokens.at(0));
-                    }
                     auto check_op_vinsert(Register_usage_profile& register_usage_profile,
                                           Instruction const& instruction) -> void {
                         auto result = get_operand<RegisterIndex>(instruction, 0);

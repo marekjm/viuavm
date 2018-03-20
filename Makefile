@@ -369,6 +369,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_texteq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textlength.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textsub.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vector.o \
 	build/assembler/frontend/static_analyser/Register.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \
