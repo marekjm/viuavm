@@ -294,12 +294,6 @@ iinc @3 local
 %% FETCH MODES
 \section{end}
 
-%% REGISTERS
-\section{end}
-
-%% PROGRAMMING MODEL
-\section{end}
-
 \heading{REGISTER ADDRESSING}
 \section{begin}
 
@@ -340,6 +334,12 @@ copy %1 static *1 local
 
 will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
+\section{end}
+
+%% REGISTERS
+\section{end}
+
+%% PROGRAMMING MODEL
 \section{end}
 
 %% INTRODUCTION
