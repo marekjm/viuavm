@@ -298,42 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_vinsert(Register_usage_profile& register_usage_profile,
-                                          Instruction const& instruction) -> void {
-                        auto result = get_operand<RegisterIndex>(instruction, 0);
-                        if (not result) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *result);
-                        assert_type_of_register<viua::internals::ValueTypes::VECTOR>(register_usage_profile,
-                                                                                     *result);
-
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        auto key = get_operand<RegisterIndex>(instruction, 2);
-                        if (not key) {
-                            if (not get_operand<VoidLiteral>(instruction, 2)) {
-                                throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                                    .note("expected register index or void");
-                            }
-                        }
-
-                        check_use_of_register(register_usage_profile, *source);
-
-                        if (key) {
-                            check_use_of_register(register_usage_profile, *key);
-                            assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
-                                register_usage_profile, *key);
-                        }
-
-                        erase_if_direct_access(register_usage_profile, source, instruction);
-                    }
                     auto check_op_vpush(Register_usage_profile& register_usage_profile,
                                         Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
