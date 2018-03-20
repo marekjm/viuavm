@@ -363,6 +363,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textcommonprefix.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textcommonsuffix.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textconcat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_text.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_texteq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textlength.o \
