@@ -761,22 +761,6 @@ namespace viua {
                         register_usage_profile.define(val_target, target->tokens.at(0));
                         register_usage_profile.define(val_source, source->tokens.at(0));
                     }
-                    auto check_op_delete(Register_usage_profile& register_usage_profile,
-                                         Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *target, "delete of");
-                        if (target->as != viua::internals::AccessSpecifier::DIRECT) {
-                            throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                                .note("can only delete using direct access mode")
-                                .aside("did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
-                        }
-                        register_usage_profile.erase(Register(*target), instruction.tokens.at(0));
-                    }
                     auto check_op_isnull(Register_usage_profile& register_usage_profile,
                                          Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);

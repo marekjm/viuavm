@@ -352,6 +352,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_increment.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_delete.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_float.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ftoi.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
