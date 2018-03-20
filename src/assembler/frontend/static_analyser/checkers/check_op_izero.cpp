@@ -315,23 +315,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_string(Register_usage_profile& register_usage_profile,
-                                         Instruction const& instruction) -> void {
-                        auto operand = get_operand<RegisterIndex>(instruction, 0);
-                        if (not operand) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *operand);
-
-                        auto val = Register{};
-                        val.index = operand->index;
-                        val.register_set = operand->rss;
-                        val.value_type = viua::internals::ValueTypes::STRING;
-
-                        register_usage_profile.define(val, operand->tokens.at(0));
-                    }
                     auto check_op_streq(Register_usage_profile& register_usage_profile,
                                         Instruction const& instruction) -> void {
                         auto result = get_operand<RegisterIndex>(instruction, 0);
