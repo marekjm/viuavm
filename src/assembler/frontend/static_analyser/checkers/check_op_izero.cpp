@@ -1232,20 +1232,6 @@ namespace viua {
                         auto val = Register(*target);
                         register_usage_profile.define(val, target->tokens.at(0));
                     }
-                    auto check_op_argc(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index or void");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *target);
-
-                        auto val = Register(*target);
-                        val.value_type = ValueTypes::INTEGER;
-                        register_usage_profile.define(val, target->tokens.at(0));
-                    }
                     auto check_op_process(Register_usage_profile& register_usage_profile,
                                           Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
