@@ -75,22 +75,7 @@ namespace viua {
                         return invalid_syntax_error;
                     }
 
-                    template<typename T>
-                    static auto get_input_operand(
-                        viua::assembler::frontend::parser::Instruction const& instruction,
-                        size_t operand_index) -> T* {
-                        auto operand = get_operand<T>(instruction, operand_index);
-                        if ((not operand) and
-                            dynamic_cast<VoidLiteral*>(instruction.operands.at(operand_index).get())) {
-                            throw InvalidSyntax{instruction.operands.at(operand_index)->tokens.at(0),
-                                                "use of void as input register:"};
-                        }
-                        return operand;
-                    }
-
-                    static auto get_line_index_of_instruction(InstructionIndex const n,
-                                                              InstructionsBlock const& ib)
-                        -> InstructionIndex {
+                    auto get_line_index_of_instruction(InstructionIndex const n, InstructionsBlock const& ib) -> InstructionIndex {
                         auto left = n;
                         auto i = InstructionIndex{0};
                         for (; left and i < ib.body.size(); ++i) {
@@ -103,9 +88,7 @@ namespace viua {
                         return i;
                     }
 
-                    static auto erase_if_direct_access(
-                        Register_usage_profile& register_usage_profile, RegisterIndex* const r,
-                        viua::assembler::frontend::parser::Instruction const& instruction) {
+                    auto erase_if_direct_access( Register_usage_profile& register_usage_profile, RegisterIndex* const r, viua::assembler::frontend::parser::Instruction const& instruction) -> void {
                         if (r->as == viua::internals::AccessSpecifier::DIRECT) {
                             register_usage_profile.erase(Register(*r), instruction.tokens.at(0));
                         }
