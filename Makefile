@@ -376,6 +376,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vector.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vinsert.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vpush.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_watchdog.o \
 	build/assembler/frontend/static_analyser/Register.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \

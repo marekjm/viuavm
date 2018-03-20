@@ -1161,14 +1161,6 @@ namespace viua {
                             register_usage_profile.define(val, target->tokens.at(0));
                         }
                     }
-                    auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction) -> void {
-                        auto fn = instruction.operands.at(0).get();
-                        if ((not dynamic_cast<AtomLiteral*>(fn)) and
-                            (not dynamic_cast<FunctionNameLiteral*>(fn))) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name or atom literal");
-                        }
-                    }
                     auto check_op_throw(Register_usage_profile& register_usage_profile,
                                         ParsedSource const& ps, std::map<Register, Closure>& created_closures,
                                         Instruction const& instruction) -> void {
