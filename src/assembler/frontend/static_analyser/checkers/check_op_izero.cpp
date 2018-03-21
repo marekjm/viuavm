@@ -463,38 +463,6 @@ namespace viua {
                                           viua::internals::ValueTypes::POINTER);
                         register_usage_profile.define(val, result->tokens.at(0));
                     }
-                    auto check_op_isnull(Register_usage_profile& register_usage_profile,
-                                         Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                            throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
-                                .note("can only check using direct access mode")
-                                .aside("did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
-                        }
-
-                        if (register_usage_profile.defined(Register{*source})) {
-                            throw TracedSyntaxError{}
-                                .append(InvalidSyntax{source->tokens.at(0),
-                                                      "useless check, register will always be defined"})
-                                .append(InvalidSyntax{register_usage_profile.defined_where(Register{*source})}
-                                            .note("register is defined here"));
-                        }
-
-                        auto val = Register(*target);
-                        val.value_type = ValueTypes::BOOLEAN;
-                        register_usage_profile.define(val, target->tokens.at(0));
-                    }
                     auto check_op_capture(Register_usage_profile& register_usage_profile,
                                           Instruction const& instruction,
                                           std::map<Register, Closure>& created_closures) -> void {
