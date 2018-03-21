@@ -358,6 +358,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitnot.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bits.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitset.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bit_shifts.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_boolean_and_or.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
