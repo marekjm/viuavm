@@ -298,25 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_function(Register_usage_profile& register_usage_profile,
-                                           Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *target);
-
-                        if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name literal");
-                        }
-
-                        auto val = Register{*target};
-                        val.value_type = ValueTypes::FUNCTION;
-                        register_usage_profile.define(val, target->tokens.at(0));
-                    }
                     auto check_op_frame(Register_usage_profile&, Instruction const&) -> void {
                         // do nothing, FRAMEs do not modify registers;
                         // also, frame balance and arity is handled by verifier which runs before SA
