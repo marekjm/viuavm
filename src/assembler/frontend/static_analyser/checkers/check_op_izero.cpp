@@ -640,45 +640,6 @@ namespace viua {
                                           viua::internals::ValueTypes::POINTER);
                         register_usage_profile.define(val, result->tokens.at(0));
                     }
-                    auto check_op_swap(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *target, "swap with");
-                        if (target->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                            throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
-                                .note("can only swap using direct access mode")
-                                .aside(target->tokens.at(0),
-                                       "did you mean '%" + target->tokens.at(0).str().substr(1) + "'?");
-                        }
-
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *source, "swap with");
-                        if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-                            throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
-                                .note("can only swap using direct access mode")
-                                .aside(source->tokens.at(0),
-                                       "did you mean '%" + source->tokens.at(0).str().substr(1) + "'?");
-                        }
-
-                        auto val_target = Register(*target);
-                        val_target.value_type = register_usage_profile.at(*source).second.value_type;
-
-                        auto val_source = Register(*source);
-                        val_source.value_type = register_usage_profile.at(*target).second.value_type;
-
-                        register_usage_profile.define(val_target, target->tokens.at(0));
-                        register_usage_profile.define(val_source, source->tokens.at(0));
-                    }
                     auto check_op_isnull(Register_usage_profile& register_usage_profile,
                                          Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
