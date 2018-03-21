@@ -1067,29 +1067,6 @@ namespace viua {
                             }
                         }
                     }
-                    auto check_op_atom(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto operand = get_operand<RegisterIndex>(instruction, 0);
-                        if (not operand) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *operand);
-
-                        auto source = get_operand<AtomLiteral>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected atom literal");
-                        }
-
-                        auto val = Register{};
-                        val.index = operand->index;
-                        val.register_set = operand->rss;
-                        val.value_type = ValueTypes::ATOM;
-
-                        register_usage_profile.define(val, operand->tokens.at(0));
-                    }
                     auto check_op_atomeq(Register_usage_profile& register_usage_profile,
                                          Instruction const& instruction) -> void {
                         auto result = get_operand<RegisterIndex>(instruction, 0);
