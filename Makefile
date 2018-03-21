@@ -350,6 +350,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arg.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arithmetic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_arithmetic.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bitat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_increment.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
