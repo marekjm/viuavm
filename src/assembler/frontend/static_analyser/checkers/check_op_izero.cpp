@@ -298,36 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_closure(Register_usage_profile& register_usage_profile,
-                                          Instruction const& instruction,
-                                          std::map<Register, Closure>& created_closures) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *target);
-
-                        auto fn = get_operand<FunctionNameLiteral>(instruction, 1);
-                        if (not fn) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name literal");
-                        }
-
-                        /*
-                         * FIXME The SA should switch to verification of the closure after it has been
-                         * created and all required values captured.
-                         * The SA will need some guidance to discover the precise moment at which it can
-                         * start checking the closure for correctness.
-                         */
-
-                        auto val = Register{*target};
-                        val.value_type = ValueTypes::CLOSURE;
-                        register_usage_profile.define(val, target->tokens.at(0));
-
-                        created_closures[val] = Closure{fn->content};
-                    }
                     auto check_op_function(Register_usage_profile& register_usage_profile,
                                            Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
