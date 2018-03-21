@@ -441,12 +441,12 @@ namespace viua {
                         -> void;
 
                     auto check_register_usage_for_instruction_block_impl(
-                        Register_usage_profile& register_usage_profile, ParsedSource const& ps,
-                        InstructionsBlock const& ib, InstructionIndex i, InstructionIndex mnemonic_counter)
+                        Register_usage_profile&, ParsedSource const&,
+                        InstructionsBlock const&, InstructionIndex, InstructionIndex)
                         -> void;
 
-                    auto map_names_to_register_indexes(Register_usage_profile& register_usage_profile,
-                                                       InstructionsBlock const& ib) -> void;
+                    auto map_names_to_register_indexes(Register_usage_profile&,
+                                                       InstructionsBlock const&) -> void;
                     auto erase_if_direct_access( Register_usage_profile&, RegisterIndex* const, viua::assembler::frontend::parser::Instruction const&) -> void;
                     auto get_line_index_of_instruction(InstructionIndex const, InstructionsBlock const&) -> InstructionIndex;
                 }  // namespace checkers
