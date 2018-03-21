@@ -298,39 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_process(Register_usage_profile& register_usage_profile,
-                                          Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            if (not get_operand<VoidLiteral>(instruction, 0)) {
-                                throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                    .note("expected register index or void");
-                            }
-                        }
-
-                        if (target) {
-                            check_if_name_resolved(register_usage_profile, *target);
-                        }
-
-                        auto fn = instruction.operands.at(1).get();
-                        if ((not dynamic_cast<AtomLiteral*>(fn)) and
-                            (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-                            (not dynamic_cast<RegisterIndex*>(fn))) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name, atom literal, or register index");
-                        }
-                        if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
-                            check_use_of_register(register_usage_profile, *r);
-                            assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(
-                                register_usage_profile, *r);
-                        }
-
-                        if (target) {
-                            auto val = Register{*target};
-                            val.value_type = ValueTypes::PID;
-                            register_usage_profile.define(val, target->tokens.at(0));
-                        }
-                    }
                     auto check_op_self(Register_usage_profile& register_usage_profile,
                                        Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
