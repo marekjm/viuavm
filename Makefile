@@ -347,6 +347,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
 	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_argc.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_arg.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arithmetic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_arithmetic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_increment.o \
