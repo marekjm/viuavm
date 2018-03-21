@@ -19,6 +19,7 @@
 
 #include <string>
 #include <viua/assembler/frontend/static_analyser.h>
+#include <viua/support/string.h>
 
 using viua::assembler::frontend::parser::Instruction;
 
