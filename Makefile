@@ -395,6 +395,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_process.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_receive.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_remove.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_self.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_send.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \
