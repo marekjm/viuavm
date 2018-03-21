@@ -362,6 +362,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_itof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_new.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_not.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_print.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stoi.o \
