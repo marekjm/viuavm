@@ -376,6 +376,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_frame.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ftoi.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_function.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_if.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_isnull.o \
