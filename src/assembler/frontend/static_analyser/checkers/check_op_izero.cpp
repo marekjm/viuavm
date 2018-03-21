@@ -298,29 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_send(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *target, "send target from");
-                        assert_type_of_register<viua::internals::ValueTypes::PID>(register_usage_profile,
-                                                                                  *target);
-
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *source, "send from");
-                        assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
-                            register_usage_profile, *target);
-                        erase_if_direct_access(register_usage_profile, source, instruction);
-                    }
                     auto check_op_receive(Register_usage_profile& register_usage_profile,
                                           Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
