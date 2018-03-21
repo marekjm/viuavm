@@ -373,6 +373,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_texteq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textlength.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textsub.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_throw.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vector.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vinsert.o \
