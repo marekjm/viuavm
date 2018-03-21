@@ -363,6 +363,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_boolean_and_or.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_copy.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_delete.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_float.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ftoi.o \
