@@ -298,29 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_ptr(Register_usage_profile& register_usage_profile,
-                                      Instruction const& instruction) -> void {
-                        auto result = get_operand<RegisterIndex>(instruction, 0);
-                        if (not result) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_if_name_resolved(register_usage_profile, *result);
-
-                        auto operand = get_operand<RegisterIndex>(instruction, 1);
-                        if (not operand) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *operand, "pointer from");
-
-                        auto val = Register(*result);
-                        val.value_type = (register_usage_profile.at(Register(*operand)).second.value_type |
-                                          viua::internals::ValueTypes::POINTER);
-                        register_usage_profile.define(val, result->tokens.at(0));
-                    }
                     auto check_op_capture(Register_usage_profile& register_usage_profile,
                                           Instruction const& instruction,
                                           std::map<Register, Closure>& created_closures) -> void {
