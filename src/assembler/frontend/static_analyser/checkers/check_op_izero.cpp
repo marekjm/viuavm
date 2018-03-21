@@ -298,10 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_frame(Register_usage_profile&, Instruction const&) -> void {
-                        // do nothing, FRAMEs do not modify registers;
-                        // also, frame balance and arity is handled by verifier which runs before SA
-                    }
                     auto check_op_param(Register_usage_profile& register_usage_profile,
                                         Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
