@@ -364,6 +364,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_capturecopy.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_capture.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_capturemove.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_copy.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_delete.o \
