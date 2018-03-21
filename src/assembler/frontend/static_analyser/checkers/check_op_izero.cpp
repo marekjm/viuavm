@@ -298,28 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_bit_rotates(Register_usage_profile& register_usage_profile,
-                                              Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        auto offset = get_operand<RegisterIndex>(instruction, 1);
-                        if (not offset) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
-
-                        check_use_of_register(register_usage_profile, *target);
-                        check_use_of_register(register_usage_profile, *offset);
-
-                        assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile,
-                                                                                   *target);
-                        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
-                                                                                      *offset);
-                    }
                     auto check_op_copy(Register_usage_profile& register_usage_profile,
                                        Instruction const& instruction) -> void {
                         auto target = get_operand<RegisterIndex>(instruction, 0);
