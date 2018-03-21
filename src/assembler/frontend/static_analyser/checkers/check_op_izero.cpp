@@ -298,27 +298,6 @@ namespace viua {
                         val.value_type = viua::internals::ValueTypes::INTEGER;
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
-                    auto check_op_enter(Register_usage_profile& register_usage_profile,
-                                        ParsedSource const& ps, Instruction const& instruction) -> void {
-                        auto const label = get_operand<Label>(instruction, 0);
-                        if (not label) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected a block name");
-                        }
-
-                        auto const block_name = label->tokens.at(0).str();
-
-                        try {
-                            check_register_usage_for_instruction_block_impl(register_usage_profile, ps,
-                                                                            ps.block(block_name), 0, 0);
-                        } catch (InvalidSyntax& e) {
-                            throw TracedSyntaxError{}.append(e).append(
-                                InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                        } catch (TracedSyntaxError& e) {
-                            throw e.append(
-                                InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                        }
-                    }
                     auto check_op_jump(Register_usage_profile& register_usage_profile, ParsedSource const& ps,
                                        Instruction const& instruction, InstructionsBlock const& ib,
                                        InstructionIndex i, InstructionIndex const mnemonic_counter) -> void {

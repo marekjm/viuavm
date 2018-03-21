@@ -371,6 +371,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_defer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_delete.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_draw.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_enter.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_float.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_frame.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ftoi.o \
