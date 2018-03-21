@@ -400,6 +400,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_streq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_string.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structinsert.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_swap.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_tailcall.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textat.o \
