@@ -315,7 +315,6 @@ enum OPCODE : viua::internals::types::byte {
     SWAP,    // swap two objects between registers
     DELETE,  // delete an object from a register, freeing the memory
     ISNULL,  // checks if register is null (empty)
-    RESS,    // REgister Set Switch - switches register set
 
     PRINT,
     ECHO,
