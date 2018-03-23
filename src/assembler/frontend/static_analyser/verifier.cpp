@@ -70,48 +70,6 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier) -> voi
 }
 
 
-auto viua::assembler::frontend::static_analyser::verify_ress_instructions(const ParsedSource& src) -> void {
-    verify_wrapper(src, [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
-        for (const auto& line : ib.body) {
-            const auto instruction =
-                dynamic_cast<viua::assembler::frontend::parser::Instruction*>(line.get());
-            if (not instruction) {
-                continue;
-            }
-            if (instruction->opcode != RESS) {
-                continue;
-            }
-            const auto label =
-                dynamic_cast<viua::assembler::frontend::parser::Label*>(instruction->operands.at(0).get());
-            if (not label) {
-                throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                     "illegal operand for 'ress' instruction")
-                    .note("expected register set name");
-            }
-
-            auto name = label->content;
-            if (not(name == "global" or name == "static" or name == "local")) {
-                auto error = invalid_syntax(instruction->operands.at(0)->tokens, "not a register set name");
-                if (auto suggestion = str::levenshtein_best(name,
-                                                            {
-                                                                "global",
-                                                                "static",
-                                                                "local",
-                                                            },
-                                                            4);
-                    suggestion.first) {
-                    error.aside(label->tokens.at(0), "did you mean '" + suggestion.second + "'?");
-                }
-                throw error;
-            }
-            if (name == "global" and source.as_library) {
-                throw invalid_syntax(instruction->operands.at(0)->tokens,
-                                     "global register set used by a library function")
-                    .note("library functions may only use 'local' and 'static' register sets");
-            }
-        }
-    });
-}
 static auto is_defined_block_name(const ParsedSource& source, const string name) -> bool {
     auto is_undefined = (source.blocks.end() ==
                          find_if(source.blocks.begin(), source.blocks.end(),
@@ -511,7 +469,6 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(const
 
 
 auto viua::assembler::frontend::static_analyser::verify(const ParsedSource& source) -> void {
-    verify_ress_instructions(source);
     verify_block_tries(source);
     verify_block_catches(source);
     verify_block_endings(source);

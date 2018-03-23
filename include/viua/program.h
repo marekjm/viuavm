@@ -165,7 +165,6 @@ class Program {
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
     Program& opswap(int_op, int_op);
-    Program& opress(std::string);
     Program& opdelete(int_op);
     Program& opisnull(int_op, int_op);
 

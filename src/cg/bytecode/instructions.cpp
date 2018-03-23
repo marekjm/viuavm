@@ -630,27 +630,6 @@ namespace cg {
             return insert_two_ri_instruction(addr_ptr, ISNULL, a, b);
         }
 
-        auto opress(viua::internals::types::byte* addr_ptr, const string& a)
-            -> viua::internals::types::byte* {
-            *(addr_ptr++) = RESS;
-            viua::internals::RegisterSets register_set_marker = viua::internals::RegisterSets::LOCAL;
-            if (a == "global") {
-                register_set_marker = viua::internals::RegisterSets::GLOBAL;
-            } else if (a == "local") {
-                register_set_marker = viua::internals::RegisterSets::LOCAL;
-            } else if (a == "static") {
-                register_set_marker = viua::internals::RegisterSets::STATIC;
-            } else {
-                // FIXME: detect invalid register set names
-                // after switching to token-based code generation
-                // it will not be necessary
-            }
-            *(addr_ptr) = static_cast<viua::internals::types::registerset_type_marker>(register_set_marker);
-            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(
-                addr_ptr);
-            return addr_ptr;
-        }
-
         auto opprint(viua::internals::types::byte* addr_ptr, int_op reg) -> viua::internals::types::byte* {
             *(addr_ptr++) = PRINT;
             return insert_ri_operand(addr_ptr, reg);

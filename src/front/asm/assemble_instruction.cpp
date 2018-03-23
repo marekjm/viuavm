@@ -832,10 +832,6 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                                   resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)),
                                                                   resolve_rs_type(tokens.at(source + 1))));
-    } else if (tokens.at(i) == "ress") {
-        TokenIndex target = i + 1;
-
-        program.opress(tokens.at(target));
     } else if (tokens.at(i) == "print") {
         TokenIndex source = i + 1;
 

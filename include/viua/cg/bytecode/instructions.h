@@ -195,7 +195,6 @@ namespace cg {
         auto opswap(viua::internals::types::byte*, int_op, int_op) -> viua::internals::types::byte*;
         auto opdelete(viua::internals::types::byte*, int_op) -> viua::internals::types::byte*;
         auto opisnull(viua::internals::types::byte*, int_op, int_op) -> viua::internals::types::byte*;
-        auto opress(viua::internals::types::byte*, const std::string&) -> viua::internals::types::byte*;
 
         auto opprint(viua::internals::types::byte*, int_op) -> viua::internals::types::byte*;
         auto opecho(viua::internals::types::byte*, int_op) -> viua::internals::types::byte*;

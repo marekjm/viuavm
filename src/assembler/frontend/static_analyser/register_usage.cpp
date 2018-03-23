@@ -312,9 +312,6 @@ namespace viua {
                                     case ISNULL:
                                         check_op_isnull(register_usage_profile, *instruction);
                                         break;
-                                    case RESS:
-                                        // do nothing
-                                        break;
                                     case PRINT:
                                     case ECHO:
                                         check_op_print(register_usage_profile, *instruction);
