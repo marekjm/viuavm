@@ -369,8 +369,6 @@ namespace viua {
             viua::internals::types::byte* opdelete(viua::internals::types::byte*);
             viua::internals::types::byte* opisnull(viua::internals::types::byte*);
 
-            viua::internals::types::byte* opress(viua::internals::types::byte*);
-
             viua::internals::types::byte* opprint(viua::internals::types::byte*);
             viua::internals::types::byte* opecho(viua::internals::types::byte*);
 

@@ -87,28 +87,3 @@ viua::internals::types::byte* viua::process::Process::opisnull(viua::internals::
 
     return addr;
 }
-
-viua::internals::types::byte* viua::process::Process::opress(viua::internals::types::byte* addr) {
-    viua::internals::types::registerset_type_marker to_register_set = 0;
-    tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_registerset_type(addr, this);
-
-    switch (static_cast<viua::internals::RegisterSets>(to_register_set)) {
-        case viua::internals::RegisterSets::GLOBAL:
-            currently_used_register_set = global_register_set.get();
-            break;
-        case viua::internals::RegisterSets::LOCAL:
-            currently_used_register_set = stack->back()->local_register_set.get();
-            break;
-        case viua::internals::RegisterSets::STATIC:
-            ensure_static_registers(stack->back()->function_name);
-            currently_used_register_set = static_registers.at(stack->back()->function_name).get();
-            break;
-        case viua::internals::RegisterSets::CURRENT:
-            // No point in switching to current register set.
-            break;
-        default:
-            throw make_unique<viua::types::Exception>("illegal register set ID in ress instruction");
-    }
-
-    return addr;
-}

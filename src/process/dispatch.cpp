@@ -318,9 +318,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case ISNULL:
             addr = opisnull(addr + 1);
             break;
-        case RESS:
-            addr = opress(addr + 1);
-            break;
         case PRINT:
             addr = opprint(addr + 1);
             break;
