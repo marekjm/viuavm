@@ -207,6 +207,8 @@ namespace viua {
              * This pointer points different register sets during the process's lifetime.
              * It can be explicitly adjusted by the user code (using "ress" instruction), or
              * implicitly by the VM (e.g. when calling a closure).
+             * FIXME Remove this. It is not needed after "ress" was removed. The "current"
+             * pseudo-register set must also be removed for this to be viable.
              */
             viua::kernel::RegisterSet* currently_used_register_set;
 
