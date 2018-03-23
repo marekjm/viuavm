@@ -152,6 +152,15 @@ namespace viua {
                                                viua::assembler::frontend::parser::RegisterIndex r,
                                                std::string const error_core_msg) -> void {
                         check_if_name_resolved(rup, r);
+                        if (r.rss == RegisterSets::GLOBAL) {
+                            /*
+                             * Do not check global register set access.
+                             * There is currently no simple (or complicated) way to check if such accesses are
+                             * correct or not.
+                             * FIXME Maybe check global register set accesses?
+                             */
+                            return;
+                        }
                         if (not rup.defined(Register(r))) {
                             auto empty_or_erased = (rup.erased(Register(r)) ? "erased" : "empty");
 

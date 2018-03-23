@@ -187,6 +187,10 @@ namespace viua {
                         using viua::cg::lex::TracedSyntaxError;
                         using viua::internals::ValueTypes;
 
+                        if (register_index.rss == viua::internals::RegisterSets::GLOBAL) {
+                            return expected_type;
+                        }
+
                         auto actual_type =
                             register_usage_profile.at(Register(register_index)).second.value_type;
 
