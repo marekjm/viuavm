@@ -181,7 +181,7 @@ namespace viua {
 
                     template<viua::internals::ValueTypes expected_type>
                     auto assert_type_of_register(Register_usage_profile& register_usage_profile,
-                                                 const RegisterIndex& register_index)
+                                                 RegisterIndex const& register_index)
                         -> viua::internals::ValueTypes {
                         using viua::cg::lex::InvalidSyntax;
                         using viua::cg::lex::TracedSyntaxError;
