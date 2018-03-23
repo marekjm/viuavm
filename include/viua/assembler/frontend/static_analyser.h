@@ -30,7 +30,6 @@ namespace viua {
     namespace assembler {
         namespace frontend {
             namespace static_analyser {
-                auto verify_ress_instructions(const parser::ParsedSource&) -> void;
                 auto verify_block_tries(const parser::ParsedSource&) -> void;
                 auto verify_block_catches(const parser::ParsedSource&) -> void;
                 auto verify_block_endings(const parser::ParsedSource& src) -> void;
