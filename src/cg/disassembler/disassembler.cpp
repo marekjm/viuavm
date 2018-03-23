@@ -664,30 +664,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             oss << load_aligned<viua::internals::types::plain_float>(ptr);
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
             break;
-        case RESS:
-            oss << ' ';
-            switch (static_cast<viua::internals::RegisterSets>(*ptr)) {
-                case viua::internals::RegisterSets::GLOBAL:
-                    oss << "global";
-                    break;
-                case viua::internals::RegisterSets::LOCAL:
-                    oss << "local";
-                    break;
-                case viua::internals::RegisterSets::STATIC:
-                    oss << "static";
-                    break;
-                case viua::internals::RegisterSets::CURRENT:
-                    // FIXME: should this only be a warning?
-                    oss << "current ";
-                    oss << "; WARNING: invalid register set type\n";
-                    break;
-                default:
-                    // FIXME: should this only be a warning?
-                    oss << int(*ptr);
-                    oss << " ; WARNING: invalid register set type\n";
-            }
-            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
-            break;
         case JOIN:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
