@@ -25,7 +25,13 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> tokenize(const std::string&);
+namespace viua {
+    namespace cg {
+        namespace tokenizer {
+            auto tokenize(std::string const&) -> std::vector<std::string>;
+        }
+    }  // namespace cg
+}  // namespace viua
 
 
 #endif

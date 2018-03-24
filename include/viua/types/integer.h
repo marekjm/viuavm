@@ -70,8 +70,8 @@ namespace viua {
 
             Integer(decltype(number) n = 0) : number(n) {}
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

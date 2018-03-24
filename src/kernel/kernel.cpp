@@ -221,15 +221,15 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
         auto const fn_names = loader.get_functions();
         auto const fn_addrs = loader.get_function_addresses();
         for (const auto& fn_linkname : fn_names) {
-            linked_functions[fn_linkname] =
-                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
+            linked_functions[fn_linkname] = pair<string, viua::internals::types::byte*>(
+                module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
         }
 
         auto const bl_names = loader.get_blocks();
         auto const bl_addrs = loader.get_block_addresses();
         for (auto const& bl_linkname : bl_names) {
-            linked_blocks[bl_linkname] =
-                pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
+            linked_blocks[bl_linkname] = pair<string, viua::internals::types::byte*>(
+                module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
         }
 
         linked_modules[module] =

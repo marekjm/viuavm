@@ -134,7 +134,7 @@ namespace viua {
 
             POINTER = 1 << 15,
         };
-    }
-}
+    }  // namespace internals
+}  // namespace viua
 
 #endif

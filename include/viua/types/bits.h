@@ -99,8 +99,8 @@ namespace viua {
             Bits(const size_type);
             Bits(const size_type, const uint8_t*);
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

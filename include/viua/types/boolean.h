@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <viua/types/value.h>
 
 
@@ -36,24 +36,24 @@ namespace viua {
              */
             bool b;
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                std::string type() const override;
-                std::string str() const override;
-                bool boolean() const override;
+            std::string type() const override;
+            std::string str() const override;
+            bool boolean() const override;
 
-                bool& value();
+            bool& value();
 
-                virtual std::vector<std::string> bases() const override;
-                virtual std::vector<std::string> inheritancechain() const override;
+            virtual std::vector<std::string> bases() const override;
+            virtual std::vector<std::string> inheritancechain() const override;
 
-                std::unique_ptr<Value> copy() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                Boolean(bool v = false);
+            Boolean(bool v = false);
         };
-    }
-}
+    }  // namespace types
+}  // namespace viua
 
 
 #endif

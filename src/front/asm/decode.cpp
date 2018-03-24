@@ -24,12 +24,12 @@
 using namespace std;
 
 
-vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
-    vector<vector<string>> decoded_lines;
-    vector<string> main_line;
+auto decode_line_tokens(vector<string> const& tokens) -> vector<vector<string>> {
+    auto decoded_lines = vector<vector<string>>{};
+    auto main_line = vector<string>{};
 
-    unsigned i = 0;
-    bool invert = false;
+    auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
+    auto invert = false;
     while (i < tokens.size()) {
         if (tokens.at(i) == "^") {
             invert = true;
@@ -39,7 +39,7 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
         if (tokens.at(i) == "(") {
             vector<string> subtokens;
             ++i;
-            unsigned balance = 1;
+            auto balance = unsigned{1};
             while (i < tokens.size()) {
                 if (tokens.at(i) == "(") {
                     ++balance;
@@ -53,20 +53,20 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
-            vector<vector<string>> sublines = decode_line_tokens(subtokens);
-            for (unsigned j = 0; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines.at(j));
+            auto const sublines = decode_line_tokens(subtokens);
+            for (auto const& each : sublines) {
+                decoded_lines.emplace_back(each);
             }
             main_line.emplace_back(sublines.at(sublines.size() - 1).at(1));
             ++i;
             continue;
         }
         if (tokens.at(i) == "[") {
-            vector<string> subtokens;
+            auto subtokens = vector<string>{};
             ++i;
-            unsigned balance = 1;
-            unsigned toplevel_subexpr_balance = 0;
-            unsigned len = 0;
+            auto balance = unsigned{1};
+            auto toplevel_subexpr_balance = unsigned{0};
+            auto len = decltype(i){0};
             while (i < tokens.size()) {
                 if (tokens.at(i) == "[") {
                     ++balance;
@@ -88,10 +88,10 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
-            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            auto sublines = decode_line_tokens(subtokens);
             sublines.pop_back();
-            for (unsigned j = 0; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines.at(j));
+            for (auto const& each : sublines) {
+                decoded_lines.emplace_back(each);
             }
             main_line.emplace_back(str::stringify(len));
             ++i;
@@ -109,4 +109,6 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
 
     return decoded_lines;
 }
-vector<vector<string>> decode_line(const string& s) { return decode_line_tokens(tokenize(s)); }
+auto decode_line(string const& s) -> vector<vector<string>> {
+    return decode_line_tokens(viua::cg::tokenizer::tokenize(s));
+}

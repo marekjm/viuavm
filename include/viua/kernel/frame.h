@@ -22,31 +22,32 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/util/memory.h>
 #include <viua/kernel/registerset.h>
+#include <viua/util/memory.h>
 
 class Frame {
-    public:
-        viua::internals::types::byte* return_address;
-        std::unique_ptr<viua::kernel::RegisterSet> arguments;
-        viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
+  public:
+    viua::internals::types::byte* return_address;
+    std::unique_ptr<viua::kernel::RegisterSet> arguments;
+    viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
 
-        viua::kernel::Register* return_register;
+    viua::kernel::Register* return_register;
 
-        std::vector<std::unique_ptr<Frame>> deferred_calls;
+    std::vector<std::unique_ptr<Frame>> deferred_calls;
 
-        std::string function_name;
+    std::string function_name;
 
-        inline viua::internals::types::byte* ret_address() { return return_address; }
+    inline viua::internals::types::byte* ret_address() { return return_address; }
 
-        void set_local_register_set(viua::kernel::RegisterSet*, bool receives_ownership = true);
+    void set_local_register_set(viua::kernel::RegisterSet*, bool receives_ownership = true);
 
-        Frame(viua::internals::types::byte*, viua::internals::types::register_index, viua::internals::types::register_index = 16);
-        Frame(const Frame&);
+    Frame(viua::internals::types::byte*, viua::internals::types::register_index,
+          viua::internals::types::register_index = 16);
+    Frame(const Frame&);
 };
 
 
