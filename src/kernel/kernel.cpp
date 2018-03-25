@@ -167,10 +167,11 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(const string
 
 
 static auto is_native_module(string module) -> bool {
-    regex double_colon("::");
-    ostringstream oss;
+    auto double_colon = regex{"::"};
+    auto oss = ostringstream{};
     oss << regex_replace(module, double_colon, "/");
-    string try_path = oss.str();
+
+    auto const try_path = oss.str();
     auto path = support::env::viua::get_mod_path(try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
         path = support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
