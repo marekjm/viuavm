@@ -253,7 +253,7 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
         throw make_unique<viua::types::Exception>("LinkException", ("failed to link library: " + module));
     }
 
-    void* handle = dlopen(path.c_str(), RTLD_LAZY);
+    void* handle = dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 
     if (handle == nullptr) {
         throw make_unique<viua::types::Exception>("LinkException",

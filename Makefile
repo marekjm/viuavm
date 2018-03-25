@@ -109,7 +109,7 @@ CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS) $(CXX_EXTRA_F
 
 CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
-DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
+DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo -rdynamic
 
 VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o \
 				   build/process/instr/concurrency.o build/process/instr/linking.o \
@@ -252,6 +252,9 @@ tools: build/bin/tools/log-shortener
 build/platform/types/%.o: src/types/%.cpp include/viua/types/%.h
 	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
+build/platform/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
+
 build/test/%.o: sample/asm/external/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
 
@@ -281,6 +284,7 @@ build/stdlib/%.o: src/stdlib/%.cpp
 
 build/stdlib/%.so: build/stdlib/%.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
+	# $(CXX) $(CXXFLAGS) -Wl,--no-undefined -fPIC -shared -o $@ $^
 
 build/types/%.o: src/types/%.cpp include/viua/types/%.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
@@ -488,9 +492,7 @@ build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/types/excep
 	build/platform/types/pointer.o build/platform/types/integer.o build/platform/types/bits.o \
 	build/platform/types/number.o build/platform/kernel/registerset.o build/platform/support/string.o
 
-build/stdlib/io.so: build/stdlib/io.o build/platform/types/exception.o build/platform/types/vector.o \
-	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
-	build/platform/types/integer.o build/platform/kernel/registerset.o build/platform/support/string.o
+build/stdlib/io.so: build/stdlib/io.o
 
 build/stdlib/random.so: build/stdlib/random.o build/platform/types/exception.o build/platform/types/vector.o \
 	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
