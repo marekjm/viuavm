@@ -20,8 +20,6 @@
 .function: iterfib/1
     .name: %iota vec
 
-    ress static
-
     .name: %iota minus_one
     .name: %iota minus_two
     integer %minus_one -1

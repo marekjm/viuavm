@@ -535,12 +535,6 @@ namespace viua {
             static auto const size_of_swap = size_of_instruction_with_two_ri_operands_with_rs_types;
             static auto const size_of_delete = size_of_instruction_with_one_ri_operand;
             static auto const size_of_isnull = size_of_instruction_with_two_ri_operands_with_rs_types;
-            static auto size_of_ress(TokenVector const&, TokenVector::size_type i)
-                -> tuple<bytecode_size_type, decltype(i)> {
-                auto calculated_size = bytecode_size_type{sizeof(viua::internals::types::byte)};
-                calculated_size += sizeof(viua::internals::types::registerset_type_marker);
-                return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-            }
             static auto size_of_print = size_of_instruction_with_one_ri_operand;
             static auto size_of_echo = size_of_instruction_with_one_ri_operand;
             static auto size_of_capture(TokenVector const& tokens, TokenVector::size_type i)
@@ -1293,9 +1287,6 @@ namespace viua {
                     } else if (tokens.at(i) == "isnull") {
                         ++i;
                         tie(increase, i) = size_of_isnull(tokens, i);
-                    } else if (tokens.at(i) == "ress") {
-                        ++i;
-                        tie(increase, i) = size_of_ress(tokens, i);
                     } else if (tokens.at(i) == "print") {
                         ++i;
                         tie(increase, i) = size_of_print(tokens, i);

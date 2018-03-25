@@ -55,23 +55,16 @@
     ; check if process_counter is initialised
     ; initialise it if necessary
     ; static register set is used to preserve the value across calls
-    ress static
-    if (isnull %2 %process_counter) +1 already_initialised
+    if (isnull %2 local %process_counter static) local +1 already_initialised
     ; initialisation to -1 makes later code simpler as there is no need
     ; to special-case the first call to preserve the zero
-    integer %process_counter -1
+    integer %process_counter static -1
 
     .mark: already_initialised
-    iinc %process_counter
+    iinc %process_counter static
 
     frame %2
-    param %0 %process_counter
-
-    ; switch to local register set to avoid accidentally stepping on
-    ; static registers
-    ; it is generally a good idea to switch back to local register set as soon as
-    ; the special features of the other sets are not needed
-    ress local
+    param %0 %process_counter static
 
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2

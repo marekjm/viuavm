@@ -1696,7 +1696,8 @@ namespace viua {
                 return tokens;
             }
 
-            auto join_tokens(vector<Token> const tokens, decltype(tokens)::size_type const from, decltype(from) const to) -> string {
+            auto join_tokens(vector<Token> const tokens, decltype(tokens)::size_type const from,
+                             decltype(from) const to) -> string {
                 ostringstream joined;
 
                 for (auto i = from; i < tokens.size() and i < to; ++i) {

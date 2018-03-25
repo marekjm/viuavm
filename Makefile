@@ -5,22 +5,78 @@
 CXX_STANDARD=c++17
 
 
-GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
-CLANG_SANITISER_FLAGS=  -fsanitize=undefined -fstack-protector-strong -fsanitize=leak -fsanitize=address
+GENERIC_SANITISER_FLAGS=-fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak \
+						-fsanitize=address
+CLANG_SANITISER_FLAGS=  -fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak \
+						-fsanitize=address
 # No -fsanitize=address for GCC because of too many false positives.
-GCC_SANITISER_FLAGS=    -fsanitize=undefined -fstack-protector-strong -fsanitize=leak
+GCC_SANITISER_FLAGS=    -fstack-protector-strong \
+						-fsanitize=undefined \
+						-fsanitize=leak
 
 
 # These are generic flags that should be used for compiling Viua VM.
-GENERIC_CXXFLAGS=-Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef \
-				 -Wstrict-overflow=2 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant \
-				 -Wuseless-cast -Wconversion -Wshadow -Wswitch-default -Wredundant-decls \
-				 -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual \
-				 -Wold-style-cast -Walloc-zero -Werror -Wfatal-errors \
-				 -pedantic -g -I./include
-CLANG_CXXFLAGS=-Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Wshadow -Wswitch-default \
-			   -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors \
-			   -pedantic -g \
+# Additional flags:
+# 	-Wpadded            -- maybe, but throws errors on current code
+#	-Wsuggest-override  -- definitely, but it is a matter of style so not now
+#	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
+GENERIC_CXXFLAGS=-Wall \
+				 -Wextra \
+				 -Wctor-dtor-privacy \
+				 -Wnon-virtual-dtor \
+				 -Wreorder \
+				 -Woverloaded-virtual \
+				 -Wundef \
+				 -Wstrict-overflow=2 \
+				 -Wdisabled-optimization \
+				 -Winit-self \
+				 -Wzero-as-null-pointer-constant \
+				 -Wuseless-cast \
+				 -Wconversion \
+				 -Wshadow \
+				 -Wswitch-default \
+				 -Wswitch-enum \
+				 -Wredundant-decls \
+				 -Wlogical-op \
+				 -Wmissing-include-dirs \
+				 -Wmissing-declarations \
+				 -Wcast-align \
+				 -Wcast-qual \
+				 -Wold-style-cast \
+				 -Walloc-zero \
+				 -Wdouble-promotion \
+				 -Wunused-const-variable=2 \
+				 -Wduplicated-branches \
+				 -Wduplicated-cond \
+				 -Wsuggest-final-types \
+				 -Wsuggest-final-methods \
+				 -Wconversion \
+				 -Wsign-conversion \
+				 -Wrestrict \
+				 -Winline \
+				 -Wstack-protector \
+				 -Werror \
+				 -Wfatal-errors \
+				 -Wpedantic \
+				 -g \
+				 -I./include
+CLANG_CXXFLAGS=-Wall \
+			   -Wextra \
+			   -Wint-to-void-pointer-cast \
+			   -Wconversion \
+			   -Wshadow \
+			   -Wswitch-default \
+			   -Wmissing-include-dirs \
+			   -Wcast-align \
+			   -Wold-style-cast \
+			   -Werror \
+			   -Wfatal-errors \
+			   -pedantic \
+			   -g \
 			   -I./include
 GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
 
@@ -269,14 +325,109 @@ build/bin/vm/vdb: build/front/wdb.o build/lib/linenoise.o build/kernel/kernel.o 
 	build/types/process.o build/types/value.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/asm: build/front/asm.o build/front/asm/generate.o build/front/asm/assemble_instruction.o \
-	build/front/asm/gather.o build/front/asm/decode.o build/program.o build/programinstructions.o \
-	build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
-	build/cg/lex.o build/cg/lex/reduce_fns.o build/cg/lex/cook.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o \
+build/bin/vm/asm: build/front/asm.o \
+	build/front/asm/generate.o \
+	build/front/asm/assemble_instruction.o \
+	build/front/asm/gather.o \
+	build/front/asm/decode.o \
+	build/program.o \
+	build/programinstructions.o \
+	build/cg/tokenizer/tokenize.o \
+	build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
+	build/cg/lex.o \
+	build/cg/lex/reduce_fns.o \
+	build/cg/lex/cook.o \
+	build/cg/tools.o \
+	build/cg/assembler/verify.o \
+	build/cg/assembler/static_analysis.o \
 	build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o \
 	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
 	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
+	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
+	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_argc.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_arg.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_arithmetic.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_atom.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_atomeq.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_binary_logic.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bit_arithmetic.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bitat.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bit_increment.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bitnot.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bit_rotates.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bits.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bitset.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bit_shifts.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_boolean_and_or.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_capturecopy.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_capture.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_capturemove.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_closure.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_copy.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_defer.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_delete.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_draw.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_enter.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_float.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_frame.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_ftoi.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_function.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_if.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_insert.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_isnull.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_itof.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_join.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_jump.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_move.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_msg.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_new.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_not.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_pamv.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_param.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_print.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_process.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_receive.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_remove.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_self.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_send.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_stoi.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_streq.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_string.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structinsert.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structkeys.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structremove.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_swap.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_tailcall.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textat.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textcommonprefix.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textcommonsuffix.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textconcat.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_text.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_texteq.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textlength.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_textsub.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_throw.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vat.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vector.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vinsert.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vlen.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vpop.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_vpush.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_watchdog.o \
+	build/assembler/frontend/static_analyser/checkers/utils.o \
+	build/assembler/frontend/static_analyser/Register.o \
+	build/assembler/frontend/static_analyser/Closure.o \
+	build/assembler/frontend/static_analyser/Register_usage_profile.o \
 	build/assembler/util/pretty_printer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 

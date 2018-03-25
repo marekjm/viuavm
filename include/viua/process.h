@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -37,10 +37,6 @@
 #include <viua/pid.h>
 #include <viua/types/prototype.h>
 #include <viua/types/value.h>
-
-
-const viua::internals::types::register_index DEFAULT_REGISTER_SIZE = 255;
-const uint16_t MAX_STACK_SIZE = 8192;
 
 
 class HaltException : public std::runtime_error {
@@ -171,6 +167,8 @@ namespace viua {
 
             Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*,
                   viua::scheduler::VirtualProcessScheduler*);
+
+            static uint16_t const MAX_STACK_SIZE = 8192;
         };
 
         class Process {
@@ -209,6 +207,8 @@ namespace viua {
              * This pointer points different register sets during the process's lifetime.
              * It can be explicitly adjusted by the user code (using "ress" instruction), or
              * implicitly by the VM (e.g. when calling a closure).
+             * FIXME Remove this. It is not needed after "ress" was removed. The "current"
+             * pseudo-register set must also be removed for this to be viable.
              */
             viua::kernel::RegisterSet* currently_used_register_set;
 
@@ -371,8 +371,6 @@ namespace viua {
             viua::internals::types::byte* opdelete(viua::internals::types::byte*);
             viua::internals::types::byte* opisnull(viua::internals::types::byte*);
 
-            viua::internals::types::byte* opress(viua::internals::types::byte*);
-
             viua::internals::types::byte* opprint(viua::internals::types::byte*);
             viua::internals::types::byte* opecho(viua::internals::types::byte*);
 
@@ -487,6 +485,8 @@ namespace viua {
             Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*,
                     viua::process::Process*, const bool = false);
             ~Process();
+
+            static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE = 255;
         };
     }  // namespace process
 }  // namespace viua

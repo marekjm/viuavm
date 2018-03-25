@@ -318,9 +318,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case ISNULL:
             addr = opisnull(addr + 1);
             break;
-        case RESS:
-            addr = opress(addr + 1);
-            break;
         case PRINT:
             addr = opprint(addr + 1);
             break;
@@ -462,6 +459,31 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case NOP:
             ++addr;
             break;
+        case STREQ:
+        case BOOL:
+        case BITSWIDTH:
+        case BITSEQ:
+        case BITSLT:
+        case BITSLTE:
+        case BITSGT:
+        case BITSGTE:
+        case BITAEQ:
+        case BITALT:
+        case BITALTE:
+        case BITAGT:
+        case BITAGTE:
+        case CHECKEDUINCREMENT:
+        case CHECKEDUDECREMENT:
+        case CHECKEDUADD:
+        case CHECKEDUSUB:
+        case CHECKEDUMUL:
+        case CHECKEDUDIV:
+        case SATURATINGUINCREMENT:
+        case SATURATINGUDECREMENT:
+        case SATURATINGUADD:
+        case SATURATINGUSUB:
+        case SATURATINGUMUL:
+        case SATURATINGUDIV:
         default:
             ostringstream error;
             error << "unrecognised instruction (byte value " << int(*addr) << ")";

@@ -331,12 +331,6 @@ static viua::internals::types::bytecode_size generate_entry_function(
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
 
-    // entry function sets global stuff (FIXME: not really)
-    entry_function_tokens.emplace_back(0, 0, "ress");
-    entry_function_tokens.emplace_back(0, 0, "local");
-    entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::registerset_type_marker);
-
     // generate different instructions based on which main function variant
     // has been selected
     if (main_function == "main/0") {

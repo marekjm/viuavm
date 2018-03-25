@@ -39,31 +39,26 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> string {
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
 
-    switch (type) {
-        case OT_VOID:
-            oss << "void";
-            break;
-        case OT_REGISTER_INDEX:
-            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_REGISTER_REFERENCE:
-            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_POINTER:
-            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_INT:
-            oss << load_aligned<viua::internals::types::plain_int>(ptr);
-            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
-            break;
-        default:
-            throw "invalid operand type detected";
+    if (type == OT_VOID) {
+        oss << "void";
+    } else if (type == OT_REGISTER_INDEX) {
+        oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_REGISTER_REFERENCE) {
+        oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_POINTER) {
+        oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_INT) {
+        oss << load_aligned<viua::internals::types::plain_int>(ptr);
+        pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
+    } else {
+        // FIXME Throw a real exception.
+        throw "invalid operand type detected";
     }
 
     return oss.str();
@@ -74,86 +69,80 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) -> stri
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
 
-    switch (type) {
-        case OT_VOID:
-            oss << "void";
-            break;
-        case OT_REGISTER_INDEX:
-            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            oss << ' ';
-            switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
-                case viua::internals::RegisterSets::CURRENT:
-                    oss << "current";
-                    break;
-                case viua::internals::RegisterSets::GLOBAL:
-                    oss << "global";
-                    break;
-                case viua::internals::RegisterSets::LOCAL:
-                    oss << "local";
-                    break;
-                case viua::internals::RegisterSets::STATIC:
-                    oss << "static";
-                    break;
-                default:
-                    if (support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES") == "yes") {
-                        oss << "<invalid=" << static_cast<int>(*ptr) << '>';
-                    } else {
-                        throw "invalid register set detected";
-                    }
-            }
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_REGISTER_REFERENCE:
-            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            oss << ' ';
-            switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
-                case viua::internals::RegisterSets::CURRENT:
-                    oss << "current";
-                    break;
-                case viua::internals::RegisterSets::GLOBAL:
-                    oss << "global";
-                    break;
-                case viua::internals::RegisterSets::LOCAL:
-                    oss << "local";
-                    break;
-                case viua::internals::RegisterSets::STATIC:
-                    oss << "static";
-                    break;
-                default:
+    if (type == OT_VOID) {
+        oss << "void";
+    } else if (type == OT_REGISTER_INDEX) {
+        oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        oss << ' ';
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+            case viua::internals::RegisterSets::CURRENT:
+                oss << "current";
+                break;
+            case viua::internals::RegisterSets::GLOBAL:
+                oss << "global";
+                break;
+            case viua::internals::RegisterSets::LOCAL:
+                oss << "local";
+                break;
+            case viua::internals::RegisterSets::STATIC:
+                oss << "static";
+                break;
+            default:
+                if (support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES") == "yes") {
+                    oss << "<invalid=" << static_cast<int>(*ptr) << '>';
+                } else {
                     throw "invalid register set detected";
-            }
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_POINTER:
-            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
-            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
-            oss << ' ';
-            switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
-                case viua::internals::RegisterSets::CURRENT:
-                    oss << "current";
-                    break;
-                case viua::internals::RegisterSets::GLOBAL:
-                    oss << "global";
-                    break;
-                case viua::internals::RegisterSets::LOCAL:
-                    oss << "local";
-                    break;
-                case viua::internals::RegisterSets::STATIC:
-                    oss << "static";
-                    break;
-                default:
-                    throw "invalid register set detected";
-            }
-            pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
-            break;
-        case OT_INT:
-            oss << load_aligned<viua::internals::types::plain_int>(ptr);
-            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
-            break;
-        default:
-            throw "invalid operand type detected";
+                }
+        }
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_REGISTER_REFERENCE) {
+        oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        oss << ' ';
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+            case viua::internals::RegisterSets::CURRENT:
+                oss << "current";
+                break;
+            case viua::internals::RegisterSets::GLOBAL:
+                oss << "global";
+                break;
+            case viua::internals::RegisterSets::LOCAL:
+                oss << "local";
+                break;
+            case viua::internals::RegisterSets::STATIC:
+                oss << "static";
+                break;
+            default:
+                throw "invalid register set detected";
+        }
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_POINTER) {
+        oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
+        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        oss << ' ';
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+            case viua::internals::RegisterSets::CURRENT:
+                oss << "current";
+                break;
+            case viua::internals::RegisterSets::GLOBAL:
+                oss << "global";
+                break;
+            case viua::internals::RegisterSets::LOCAL:
+                oss << "local";
+                break;
+            case viua::internals::RegisterSets::STATIC:
+                oss << "static";
+                break;
+            default:
+                throw "invalid register set detected";
+        }
+        pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
+    } else if (type == OT_INT) {
+        oss << load_aligned<viua::internals::types::plain_int>(ptr);
+        pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
+    } else {
+        throw "invalid operand type detected";
     }
 
     return oss.str();
@@ -418,6 +407,46 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     }
 
     switch (op) {
+        case NOP:
+        case TRY:
+        case LEAVE:
+        case RETURN:
+        case HALT:
+            // These ops have no operands.
+            break;
+        case STRING:
+        case TEXT:
+        case ATOM:
+        case CLOSURE:
+        case FUNCTION:
+        case CALL:
+        case PROCESS:
+        case MSG:
+        case CLASS:
+        case NEW:
+        case DERIVE:
+        case TAILCALL:
+        case DEFER:
+        case IMPORT:
+        case ENTER:
+        case WATCHDOG:
+        case CATCH:
+        case ATTACH:
+            // Already handled in the `if` above.
+            break;
+        case BITSWIDTH:
+        case BITSEQ:
+        case BITSLT:
+        case BITSLTE:
+        case BITSGT:
+        case BITSGTE:
+        case BITAEQ:
+        case BITALT:
+        case BITALTE:
+        case BITAGT:
+        case BITAGTE:
+            // Not implemented.
+            break;
         case IZERO:
         case PRINT:
         case ECHO:
@@ -634,25 +663,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             oss << ' ';
             oss << load_aligned<viua::internals::types::plain_float>(ptr);
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
-            break;
-        case RESS:
-            oss << ' ';
-            switch (static_cast<viua::internals::RegisterSets>(*ptr)) {
-                case viua::internals::RegisterSets::GLOBAL:
-                    oss << "global";
-                    break;
-                case viua::internals::RegisterSets::LOCAL:
-                    oss << "local";
-                    break;
-                case viua::internals::RegisterSets::STATIC:
-                    oss << "static";
-                    break;
-                default:
-                    // FIXME: should this only be a warning?
-                    oss << "; WARNING: invalid register set type\n";
-                    oss << int(*ptr);
-            }
-            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
             break;
         case JOIN:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

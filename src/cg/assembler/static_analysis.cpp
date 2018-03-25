@@ -363,14 +363,6 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             check_defined_but_unused(registers);
             return;
         }
-        if (token == "ress") {
-            if (body_tokens.at(i + 1) == "global" or body_tokens.at(i + 1) == "static") {
-                // FIXME SA cannot reliably verify functions that use global or static registers
-                return;
-            }
-            i = skip_till_next_line(body_tokens, i);
-            continue;
-        }
         if (token == ".mark:" or token == ".import:" or token == "nop" or token == "tryframe" or
             token == "try" or token == "catch" or token == "frame" or token == "halt" or
             token == "watchdog" or token == "import") {

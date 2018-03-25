@@ -30,7 +30,7 @@
 #include <viua/types/object.h>
 
 
-const std::vector<std::string> VIUAPATH = {
+const auto VIUAPATH = std::vector<std::string>{
     ".",
     "~/.local/lib/viua",
     "~/.local/lib/viua/site",

@@ -18,38 +18,29 @@
 ;
 
 .function: global_printer/1
-    send (arg %1 %0) (self %2)
-
-    ; switch to global register set
-    ress global
+    send (arg %1 local %0) local (self %2 local) local
 
     ; wait until a message arrives
-    receive %2 10s
+    receive %2 global 10s
 
     ; print contents of first register
     ; this should throw an exception because this process
     ; did not set any global registers
-    print %1
+    print %1 global
 
     return
 .end
 
 .function: global_writer/2
-    ; switch to global register set
-    ress global
-
     ; put second parameter (whatever it is) in
     ; global register 1
-    arg %1 %1
-
-    ; switch to local register set
-    ress local
+    arg %1 global %1
 
     ; send message to printer process to trigger it to
     ; print contents of global register 1
     ; it should cause an exception
     .name: 1 printer_process_handle
-    send (arg %printer_process_handle %0) (izero %3)
+    send (arg %printer_process_handle local %0) local (izero %3 local) local
 
     return
 .end

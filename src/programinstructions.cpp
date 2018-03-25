@@ -525,17 +525,6 @@ Program& Program::opisnull(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::opress(string a) {
-    /*  Inserts ress instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register set ID
-     */
-    addr_ptr = cg::bytecode::opress(addr_ptr, a);
-    return (*this);
-}
-
 Program& Program::opprint(int_op reg) {
     /*  Inserts print instuction.
      */

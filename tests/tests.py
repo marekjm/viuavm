@@ -1508,7 +1508,7 @@ class FunctionTests(unittest.TestCase):
         runTestReturnsIntegers(self, 'recursive.asm', [i for i in range(9, -1, -1)])
 
     def testLocalRegistersInFunctions(self):
-        runTestReturnsIntegers(self, 'local_registers.asm', [42, 69])
+        runTestReturnsIntegers(self, 'local_registers.asm', [42, 666], assembly_opts=('--no-sa',))
 
     def testObtainingNumberOfParameters(self):
         runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
@@ -2621,20 +2621,6 @@ class AssemblerErrorTests(unittest.TestCase):
     def testFunctionFromUndefinedFunction(self):
         runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:5: error: function from undefined function: foo/0")
 
-    def testInvalidRegisterSetName(self):
-        runTestFailsToAssembleDetailed(self, 'invalid_ress_instruction.asm', [
-            "21:10: error: not a register set name",
-            "                 ^ did you mean 'local'?",
-            "20:12: error: in function main/1",
-        ])
-
-    def testGlobalRegisterSetUsedInLibraryFunction(self):
-        runTestFailsToAssembleDetailed(self, 'global_rs_used_in_lib.asm', [
-            "21:10: error: global register set used by a library function",
-            "21:10: note: library functions may only use 'local' and 'static' register sets",
-            "20:12: error: in function foo/0",
-        ], asm_opts=('-c',))
-
     def testFunctionWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:20:12: error: function with empty body: foo/0")
 
@@ -2897,10 +2883,6 @@ class MiscExceptionTests(unittest.TestCase):
         ]
         # FIXME: SA needs basic support for static register set
         runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())), assembly_opts=('--no-sa',))
-
-    def testClosureFromGlobalResgisterSet(self):
-        # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',), assembly_opts=('--no-sa',))
 
     def testCatchingMachineThrownException(self):
         # pass --no-sa flag; we want to check runtime exception
