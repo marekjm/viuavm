@@ -262,14 +262,14 @@ namespace viua {
                     }
 
                     template<typename T>
-                    auto get_input_operand(
-                        viua::assembler::frontend::parser::Instruction const& instruction,
-                        size_t operand_index) -> T* {
+                    auto get_input_operand(viua::assembler::frontend::parser::Instruction const& instruction,
+                                           size_t operand_index) -> T* {
                         auto operand = get_operand<T>(instruction, operand_index);
-                        if ((not operand) and
-                            dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(instruction.operands.at(operand_index).get())) {
-                            throw viua::cg::lex::InvalidSyntax{instruction.operands.at(operand_index)->tokens.at(0),
-                                                "use of void as input register:"};
+                        if ((not operand) and dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(
+                                                  instruction.operands.at(operand_index).get())) {
+                            throw viua::cg::lex::InvalidSyntax{
+                                instruction.operands.at(operand_index)->tokens.at(0),
+                                "use of void as input register:"};
                         }
                         return operand;
                     }
@@ -443,15 +443,19 @@ namespace viua {
                                                       std::map<Register, Closure> const& created_closures)
                         -> void;
 
-                    auto check_register_usage_for_instruction_block_impl(
-                        Register_usage_profile&, ParsedSource const&,
-                        InstructionsBlock const&, InstructionIndex, InstructionIndex)
+                    auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
+                                                                         ParsedSource const&,
+                                                                         InstructionsBlock const&,
+                                                                         InstructionIndex, InstructionIndex)
                         -> void;
 
-                    auto map_names_to_register_indexes(Register_usage_profile&,
-                                                       InstructionsBlock const&) -> void;
-                    auto erase_if_direct_access( Register_usage_profile&, RegisterIndex* const, viua::assembler::frontend::parser::Instruction const&) -> void;
-                    auto get_line_index_of_instruction(InstructionIndex const, InstructionsBlock const&) -> InstructionIndex;
+                    auto map_names_to_register_indexes(Register_usage_profile&, InstructionsBlock const&)
+                        -> void;
+                    auto erase_if_direct_access(Register_usage_profile&, RegisterIndex* const,
+                                                viua::assembler::frontend::parser::Instruction const&)
+                        -> void;
+                    auto get_line_index_of_instruction(InstructionIndex const, InstructionsBlock const&)
+                        -> InstructionIndex;
                 }  // namespace checkers
 
                 auto check_register_usage(parser::ParsedSource const&) -> void;

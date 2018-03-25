@@ -46,7 +46,7 @@ namespace viua {
                         register_usage_profile.use(Register(*operand), operand->tokens.at(0));
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

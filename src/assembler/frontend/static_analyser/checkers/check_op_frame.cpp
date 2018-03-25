@@ -32,7 +32,7 @@ namespace viua {
                         // also, frame balance and arity is handled by verifier which runs before SA
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

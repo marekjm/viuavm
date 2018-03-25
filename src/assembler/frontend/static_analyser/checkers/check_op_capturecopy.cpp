@@ -67,7 +67,7 @@ namespace viua {
                         created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

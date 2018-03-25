@@ -75,7 +75,8 @@ namespace viua {
                         return invalid_syntax_error;
                     }
 
-                    auto get_line_index_of_instruction(InstructionIndex const n, InstructionsBlock const& ib) -> InstructionIndex {
+                    auto get_line_index_of_instruction(InstructionIndex const n, InstructionsBlock const& ib)
+                        -> InstructionIndex {
                         auto left = n;
                         auto i = InstructionIndex{0};
                         for (; left and i < ib.body.size(); ++i) {
@@ -88,7 +89,9 @@ namespace viua {
                         return i;
                     }
 
-                    auto erase_if_direct_access( Register_usage_profile& register_usage_profile, RegisterIndex* const r, viua::assembler::frontend::parser::Instruction const& instruction) -> void {
+                    auto erase_if_direct_access(
+                        Register_usage_profile& register_usage_profile, RegisterIndex* const r,
+                        viua::assembler::frontend::parser::Instruction const& instruction) -> void {
                         if (r->as == viua::internals::AccessSpecifier::DIRECT) {
                             register_usage_profile.erase(Register(*r), instruction.tokens.at(0));
                         }

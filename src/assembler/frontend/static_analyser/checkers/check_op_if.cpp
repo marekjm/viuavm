@@ -176,7 +176,7 @@ namespace viua {
                         }
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

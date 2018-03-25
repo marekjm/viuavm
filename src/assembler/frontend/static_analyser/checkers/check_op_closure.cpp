@@ -60,7 +60,7 @@ namespace viua {
                         created_closures[val] = Closure{fn->content};
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

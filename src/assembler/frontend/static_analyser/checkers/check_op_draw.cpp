@@ -38,7 +38,7 @@ namespace viua {
                         register_usage_profile.define(Register{*target}, target->tokens.at(0));
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua

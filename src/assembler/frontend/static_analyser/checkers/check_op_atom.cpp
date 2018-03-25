@@ -29,7 +29,7 @@ namespace viua {
                 namespace checkers {
                     auto check_op_atom(Register_usage_profile& register_usage_profile,
                                        Instruction const& instruction) -> void {
-                    using viua::assembler::frontend::parser::AtomLiteral;
+                        using viua::assembler::frontend::parser::AtomLiteral;
 
                         auto operand = get_operand<RegisterIndex>(instruction, 0);
                         if (not operand) {
@@ -53,7 +53,7 @@ namespace viua {
                         register_usage_profile.define(val, operand->tokens.at(0));
                     }
                 }  // namespace checkers
-            }                          // namespace static_analyser
-        }                              // namespace frontend
-    }                                  // namespace assembler
+            }      // namespace static_analyser
+        }          // namespace frontend
+    }              // namespace assembler
 }  // namespace viua
