@@ -400,9 +400,9 @@ static auto get_token_index_of_operand(const TokenVector& tokens,
                   or token.str().at(0) == '*')
                  and (str::isnum(token.str().substr(1))
                       or str::isid(token.str().substr(1)))));
-        bool is_valid_operand_area_token =
-            (token == "," or token == "static" or token == "local"
-             or token == "global");
+        bool is_valid_operand_area_token = (token == "," or token == "static"
+                                            or token == "local"
+                                            or token == "global");
         if (is_valid_operand_area_token) {
             ++i;
         } else if (is_valid_operand) {

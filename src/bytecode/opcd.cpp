@@ -30,9 +30,9 @@ using namespace std;
 int main() {
     std::string::size_type max_mnemonic_length = 0;
     for (pair<const OPCODE, string> i : OP_NAMES) {
-        max_mnemonic_length =
-            ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length
-                                                      : i.second.size());
+        max_mnemonic_length = ((max_mnemonic_length >= i.second.size())
+                                   ? max_mnemonic_length
+                                   : i.second.size());
     }
 
     max_mnemonic_length += 1;
@@ -40,9 +40,9 @@ int main() {
     const string initial_column = "MNEMONIC            ";
     cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
 
-    max_mnemonic_length =
-        (max_mnemonic_length < initial_column.size() ? initial_column.size()
-                                                     : max_mnemonic_length);
+    max_mnemonic_length = (max_mnemonic_length < initial_column.size()
+                               ? initial_column.size()
+                               : max_mnemonic_length);
 
     for (auto i = viua::internals::types::byte{0};
          i < static_cast<viua::internals::types::byte>(0xff);
