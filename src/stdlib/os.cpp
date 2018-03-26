@@ -36,7 +36,7 @@ static void os_system(Frame* frame, viua::kernel::RegisterSet*,
             "expected command to launch (string) as parameter 0");
     }
     auto const command = frame->arguments->get(0)->str();
-    auto const ret = system(command.c_str());
+    auto const ret     = system(command.c_str());
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(ret));
 }
 

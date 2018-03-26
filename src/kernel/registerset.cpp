@@ -54,26 +54,26 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register::give() {
 void viua::kernel::Register::swap(Register& that) {
     value.swap(that.value);
     // FIXME are masks still used?
-    auto tmp = mask;
-    mask = that.mask;
+    auto tmp  = mask;
+    mask      = that.mask;
     that.mask = tmp;
 }
 
 mask_type viua::kernel::Register::set_mask(mask_type new_mask) {
     auto tmp = mask;
-    mask = new_mask;
+    mask     = new_mask;
     return tmp;
 }
 
 mask_type viua::kernel::Register::flag(mask_type new_mask) {
     auto tmp = mask;
-    mask = (mask | new_mask);
+    mask     = (mask | new_mask);
     return tmp;
 }
 
 mask_type viua::kernel::Register::unflag(mask_type new_mask) {
     auto tmp = mask;
-    mask = (mask ^ new_mask);
+    mask     = (mask ^ new_mask);
     return tmp;
 }
 
@@ -97,7 +97,7 @@ viua::kernel::Register::operator bool() const { return not empty(); }
 
 auto viua::kernel::Register::operator=(Register&& that) -> Register& {
     reset(std::move(that.value));
-    mask = that.mask;
+    mask      = that.mask;
     that.mask = 0;
     return *this;
 }

@@ -330,8 +330,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
     const ParsedSource& src) -> void {
     verify_wrapper(
         src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
-            unsigned long frame_parameters_count = 0;
-            auto detected_frame_parameters_count = false;
+            unsigned long frame_parameters_count  = 0;
+            auto detected_frame_parameters_count  = false;
             auto slot_index_detection_is_reliable = true;
             viua::assembler::frontend::parser::Instruction* last_frame =
                 nullptr;
@@ -420,7 +420,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                                         .note("in frame spawned at"));
                         }
                         filled_slots[slot_index] = true;
-                        pass_lines[slot_index] = instruction->tokens.at(0);
+                        pass_lines[slot_index]   = instruction->tokens.at(0);
                     }
 
                     continue;
@@ -564,7 +564,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
                                   current_instruction_counter, jump_targets);
                 } else if (auto op = dynamic_cast<Instruction*>(line.get());
                            op and op->opcode == IF) {
-                    Token when_true = op->operands.at(1)->tokens.at(0);
+                    Token when_true  = op->operands.at(1)->tokens.at(0);
                     Token when_false = op->operands.at(2)->tokens.at(0);
 
                     validate_jump_pair(line->tokens.at(0), when_true,

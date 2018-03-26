@@ -147,7 +147,7 @@ auto reduce_directive(vector<Token> input_tokens, string const directive)
 auto reduce_newlines(vector<Token> input_tokens) -> vector<Token> {
     vector<Token> tokens;
 
-    const auto limit = input_tokens.size();
+    const auto limit                    = input_tokens.size();
     decltype(input_tokens)::size_type i = 0;
     while (i < limit and input_tokens.at(i) == "\n") {
         ++i;
@@ -398,7 +398,7 @@ auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
     decltype(tokens) block_tokens, nested_block_tokens;
     string opened_inside;
 
-    bool block_opened = false;
+    bool block_opened        = false;
     bool nested_block_opened = false;
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
@@ -520,16 +520,16 @@ static auto get_subtokens(
     const vector<Token>& input_tokens,
     std::remove_reference<decltype(input_tokens)>::type::size_type i)
     -> std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned> {
-    string paren_type = input_tokens.at(i);
+    string paren_type         = input_tokens.at(i);
     string closing_paren_type = ((paren_type == "(") ? ")" : "]");
     ++i;
 
     vector<Token> subtokens;
     const auto limit = input_tokens.size();
 
-    unsigned balance = 1;
+    unsigned balance                         = 1;
     unsigned toplevel_subexpressions_balance = 0;
-    unsigned toplevel_subexpressions = 0;
+    unsigned toplevel_subexpressions         = 0;
     while (i < limit) {
         if (input_tokens.at(i) == paren_type) {
             ++balance;
@@ -610,9 +610,9 @@ auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
         }
         if (t == "(" or t == "[") {
             vector<Token> subtokens;
-            unsigned balance = 1;
+            unsigned balance                         = 1;
             unsigned toplevel_subexpressions_balance = 0;
-            unsigned toplevel_subexpressions = 0;
+            unsigned toplevel_subexpressions         = 0;
 
             tie(i, subtokens, balance, toplevel_subexpressions_balance,
                 toplevel_subexpressions) = get_subtokens(input_tokens, i);
@@ -836,7 +836,7 @@ auto replace_named_registers(std::vector<Token> input_tokens)
         }
 
         if (token == ".name:") {
-            Token name = input_tokens.at(i + 2);
+            Token name   = input_tokens.at(i + 2);
             string index = input_tokens.at(i + 1).str();
 
             assert_is_not_reserved_keyword(name, "register name");

@@ -48,7 +48,7 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
         }
     } else if (auto label = dynamic_cast<Label*>(target); label) {
         auto jump_target = ib.marker_map.at(label->tokens.at(0));
-        jump_target = get_line_index_of_instruction(jump_target, ib);
+        jump_target      = get_line_index_of_instruction(jump_target, ib);
         if (jump_target > i) {
             check_register_usage_for_instruction_block_impl(
                 register_usage_profile, ps, ib, jump_target, mnemonic_counter);

@@ -42,7 +42,7 @@ smatch assembler::utils::match_function_name(const string& function_name) {
 }
 
 int assembler::utils::get_function_arity(const string& function_name) {
-    int arity = -1;
+    int arity  = -1;
     auto parts = match_function_name(function_name);
     if (auto a = parts[1].str(); a.size()) {
         arity = stoi(a);

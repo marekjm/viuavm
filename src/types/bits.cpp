@@ -143,15 +143,15 @@ static auto binary_shr(vector<bool> v, decltype(v)::size_type const n,
     }
 
     for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set = i;
-        auto index_of_value = i + n;
+        auto index_to_set            = i;
+        auto index_of_value          = i + n;
         auto index_to_set_in_shifted = i;
 
         if (index_of_value < v.size()) {
             if (index_to_set_in_shifted < n) {
                 shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
             }
-            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_to_set)   = v.at(index_of_value);
             v.at(index_of_value) = padding;
         } else {
             if (index_to_set_in_shifted < n) {
@@ -179,15 +179,15 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
     }
 
     for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set = v.size() - i - 1;
-        auto index_of_value = v.size() - n - i - 1;
+        auto index_to_set            = v.size() - i - 1;
+        auto index_of_value          = v.size() - n - i - 1;
         auto index_to_set_in_shifted = n - i - 1;
 
         if (index_of_value < v.size()) {
             if (index_to_set_in_shifted < n) {
                 shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
             }
-            v.at(index_to_set) = v.at(index_of_value);
+            v.at(index_to_set)   = v.at(index_of_value);
             v.at(index_of_value) = false;
         } else {
             if (index_to_set_in_shifted < n) {
@@ -206,7 +206,7 @@ namespace arithmetic {
 namespace wrapping {
 static auto binary_increment(vector<bool> const& v)
     -> pair<bool, vector<bool>> {
-    auto carry = true;
+    auto carry       = true;
     auto incremented = v;
 
     for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size();
@@ -215,7 +215,7 @@ static auto binary_increment(vector<bool> const& v)
             incremented.at(i) = false;
         } else {
             incremented.at(i) = true;
-            carry = false;
+            carry             = false;
         }
     }
 
@@ -223,17 +223,17 @@ static auto binary_increment(vector<bool> const& v)
 }
 static auto binary_decrement(vector<bool> const& v)
     -> pair<bool, vector<bool>> {
-    auto borrow = false;
+    auto borrow      = false;
     auto decremented = v;
 
     for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
         if (v.at(i)) {
             decremented.at(i) = false;
-            borrow = false;
+            borrow            = false;
             break;
         } else {
             decremented.at(i) = true;
-            borrow = true;
+            borrow            = true;
         }
     }
 
@@ -302,7 +302,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
          */
         if ((not from_rhs) and (not from_lhs)) {
             result.at(i) = carry;
-            carry = false;
+            carry        = false;
             continue;
         }
 
@@ -321,7 +321,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
-            carry = true;
+            carry        = true;
             continue;
         }
 
@@ -411,7 +411,7 @@ static auto binary_division(vector<bool> const& dividend,
 
     auto quotinent = vector<bool>{};
     auto remainder = dividend;
-    auto divisor = rhs;
+    auto divisor   = rhs;
 
     quotinent.reserve(remainder.size());
     std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
@@ -420,8 +420,8 @@ static auto binary_division(vector<bool> const& dividend,
         return binary_increment(quotinent).second;
     }
 
-    auto negative_divisor = binary_is_negative(divisor);
-    auto negative_dividend = binary_is_negative(dividend);
+    auto negative_divisor   = binary_is_negative(divisor);
+    auto negative_dividend  = binary_is_negative(dividend);
     auto negative_quotinent = false;
 
     if (negative_divisor) {
@@ -447,7 +447,7 @@ static auto binary_division(vector<bool> const& dividend,
 }  // namespace wrapping
 namespace checked {
 static auto signed_increment(vector<bool> v) -> vector<bool> {
-    auto carry = true;
+    auto carry       = true;
     auto incremented = v;
 
     for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size();
@@ -456,7 +456,7 @@ static auto signed_increment(vector<bool> v) -> vector<bool> {
             incremented.at(i) = false;
         } else {
             incremented.at(i) = true;
-            carry = false;
+            carry             = false;
         }
     }
 
@@ -563,7 +563,7 @@ static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs)
          */
         if ((not from_rhs) and (not from_lhs)) {
             result.at(i) = carry;
-            carry = false;
+            carry        = false;
             continue;
         }
 
@@ -582,7 +582,7 @@ static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs)
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
-            carry = true;
+            carry        = true;
             continue;
         }
 
@@ -655,8 +655,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
      */
     intermediates.emplace_back(lhs.size() + rhs.size());
 
-    auto lhs_negative = binary_is_negative(lhs);
-    auto rhs_negative = binary_is_negative(rhs);
+    auto lhs_negative              = binary_is_negative(lhs);
+    auto rhs_negative              = binary_is_negative(rhs);
     auto result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
@@ -801,7 +801,7 @@ static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
 
     auto quotinent = vector<bool>{};
     auto remainder = dividend;
-    auto divisor = rhs;
+    auto divisor   = rhs;
 
     quotinent.reserve(remainder.size());
     std::fill_n(std::back_inserter(quotinent), remainder.size(), false);
@@ -810,13 +810,13 @@ static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
         return wrapping::binary_increment(quotinent).second;
     }
 
-    auto negative_divisor = binary_is_negative(divisor);
-    auto negative_dividend = binary_is_negative(dividend);
+    auto negative_divisor   = binary_is_negative(divisor);
+    auto negative_dividend  = binary_is_negative(dividend);
     auto negative_quotinent = false;
 
     try {
-        divisor = absolute(divisor);
-        remainder = absolute(remainder);
+        divisor            = absolute(divisor);
+        remainder          = absolute(remainder);
         negative_quotinent = (negative_divisor xor negative_dividend);
 
         while (wrapping::binary_lte(divisor, remainder)) {
@@ -893,7 +893,7 @@ static auto signed_is_min(vector<bool> const v) -> bool {
 //                return true;
 //            }
 static auto signed_increment(vector<bool> v) -> vector<bool> {
-    auto carry = true;
+    auto carry       = true;
     auto incremented = v;
 
     for (auto i = decltype(incremented)::size_type{0}; carry and i < v.size();
@@ -902,7 +902,7 @@ static auto signed_increment(vector<bool> v) -> vector<bool> {
             incremented.at(i) = false;
         } else {
             incremented.at(i) = true;
-            carry = false;
+            carry             = false;
         }
     }
 
@@ -1005,7 +1005,7 @@ static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
          */
         if ((not from_rhs) and (not from_lhs)) {
             result.at(i) = carry;
-            carry = false;
+            carry        = false;
             continue;
         }
 
@@ -1024,7 +1024,7 @@ static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
-            carry = true;
+            carry        = true;
             continue;
         }
 
@@ -1100,8 +1100,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
      */
     intermediates.emplace_back(lhs.size() + rhs.size());
 
-    auto lhs_negative = binary_is_negative(lhs);
-    auto rhs_negative = binary_is_negative(rhs);
+    auto lhs_negative              = binary_is_negative(lhs);
+    auto rhs_negative              = binary_is_negative(rhs);
     auto result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
@@ -1211,11 +1211,11 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
                  * to return the minimum representable value (as the result is
                  * deep into the negative integers teritory).
                  */
-                result = signed_make_min(lhs.size());
+                result  = signed_make_min(lhs.size());
                 clipped = signed_make_min(lhs.size());
             }
             if (clipped != signed_mul(lhs_abs, rhs_abs)) {
-                result = signed_make_min(lhs.size());
+                result  = signed_make_min(lhs.size());
                 clipped = signed_make_min(lhs.size());
             }
         }
@@ -1228,7 +1228,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          * negative and this check fires when neither is.
          */
         if (not(lhs_negative or rhs_negative)) {
-            result = signed_make_max(lhs.size());
+            result  = signed_make_max(lhs.size());
             clipped = signed_make_max(lhs.size());
         }
     }
@@ -1271,12 +1271,12 @@ static auto signed_div(vector<bool> dividend, vector<bool> divisor)
         return wrapping::binary_increment(quotinent).second;
     }
 
-    auto negative_divisor = binary_is_negative(divisor);
-    auto negative_dividend = binary_is_negative(dividend);
+    auto negative_divisor   = binary_is_negative(divisor);
+    auto negative_dividend  = binary_is_negative(dividend);
     auto negative_quotinent = false;
 
-    divisor = absolute(divisor);
-    remainder = absolute(remainder);
+    divisor            = absolute(divisor);
+    remainder          = absolute(remainder);
     negative_quotinent = (negative_divisor xor negative_dividend);
 
     while (wrapping::binary_lte(divisor, remainder)) {
@@ -1318,7 +1318,7 @@ auto viua::types::Bits::at(size_type i) const -> bool {
 }
 
 auto viua::types::Bits::set(size_type i, const bool value) -> bool {
-    bool was = at(i);
+    bool was               = at(i);
     underlying_array.at(i) = value;
     return was;
 }
@@ -1330,14 +1330,14 @@ auto viua::types::Bits::clear() -> void {
 }
 
 auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
-    auto result = binary_shl(underlying_array, n);
+    auto result      = binary_shl(underlying_array, n);
     underlying_array = std::move(result.second);
     return make_unique<Bits>(result.first);
 }
 
 auto viua::types::Bits::shr(size_type n, const bool padding)
     -> unique_ptr<Bits> {
-    auto result = binary_shr(underlying_array, n, padding);
+    auto result      = binary_shr(underlying_array, n, padding);
     underlying_array = std::move(result.second);
     return make_unique<Bits>(result.first);
 }
@@ -1347,7 +1347,7 @@ auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
-    auto sign = at(underlying_array.size() - 1);
+    auto sign    = at(underlying_array.size() - 1);
     auto shifted = shl(n);
     set(underlying_array.size() - 1, sign);
     return shifted;
@@ -1358,7 +1358,7 @@ auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::rol(size_type n) -> void {
-    auto shifted = shl(n);
+    auto shifted      = shl(n);
     const auto offset = shifted->underlying_array.size();
     for (size_type i = 0; i < offset; ++i) {
         set(i, shifted->at(i));
@@ -1366,7 +1366,7 @@ auto viua::types::Bits::rol(size_type n) -> void {
 }
 
 auto viua::types::Bits::ror(size_type n) -> void {
-    auto shifted = shr(n);
+    auto shifted      = shr(n);
     const auto offset = shifted->underlying_array.size();
     for (size_type i = 0; i < offset; ++i) {
         auto target_index = (underlying_array.size() - 1 - i);

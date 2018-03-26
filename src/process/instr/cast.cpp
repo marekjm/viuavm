@@ -72,7 +72,7 @@ viua::internals::types::byte* viua::process::Process::opstoi(
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    int result_integer = 0;
+    int result_integer     = 0;
     string supplied_string = static_cast<viua::types::String*>(source)->value();
     try {
         result_integer = std::stoi(supplied_string);
@@ -100,8 +100,8 @@ viua::internals::types::byte* viua::process::Process::opstof(
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     string supplied_string = static_cast<viua::types::String*>(source)->value();
-    double convert_from = std::stod(supplied_string);
-    *target = make_unique<viua::types::Float>(convert_from);
+    double convert_from    = std::stod(supplied_string);
+    *target                = make_unique<viua::types::Float>(convert_from);
 
     return addr;
 }

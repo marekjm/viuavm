@@ -94,8 +94,8 @@ enum class ValueTypes : ValueTypesType {
      * either.
      */
     INTEGER = 1 << 2,
-    FLOAT = 1 << 3,
-    NUMBER = (INTEGER | FLOAT),
+    FLOAT   = 1 << 3,
+    NUMBER  = (INTEGER | FLOAT),
 
     /*
      * Produced by comparison ops (e.g. "eq", "lt", "texteq", "atomeq").
@@ -117,8 +117,8 @@ enum class ValueTypes : ValueTypesType {
 
     BITS = 1 << 8,
 
-    FUNCTION = 1 << 9,
-    CLOSURE = 1 << 10,
+    FUNCTION  = 1 << 9,
+    CLOSURE   = 1 << 10,
     INVOCABLE = (FUNCTION | CLOSURE),
 
     ATOM = 1 << 11,

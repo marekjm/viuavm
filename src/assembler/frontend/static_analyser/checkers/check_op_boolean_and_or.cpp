@@ -55,7 +55,7 @@ auto check_op_boolean_and_or(Register_usage_profile& register_usage_profile,
     check_use_of_register(register_usage_profile, *lhs);
     check_use_of_register(register_usage_profile, *rhs);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = ValueTypes::BOOLEAN;
     register_usage_profile.define(val, result->tokens.at(0));
 }

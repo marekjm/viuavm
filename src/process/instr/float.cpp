@@ -34,7 +34,7 @@ viua::internals::types::byte* viua::process::Process::opfloat(
     /*  Run float instruction.
      */
     viua::kernel::Register* target = nullptr;
-    float value = 0.0;
+    float value                    = 0.0;
 
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

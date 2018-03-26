@@ -83,7 +83,7 @@ String* String::add(String* s) {
 String* String::join(Vector* v) {
     /** Use this string to join objects in vector.
      */
-    string s = "";
+    string s       = "";
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
         s += v->at(i)->str();
@@ -117,7 +117,7 @@ void String::represent(Frame* frame, viua::kernel::RegisterSet*,
 void String::startswith(Frame* frame, viua::kernel::RegisterSet*,
                         viua::kernel::RegisterSet*, viua::process::Process*,
                         viua::kernel::Kernel*) {
-    string s = static_cast<String*>(frame->arguments->at(1))->value();
+    string s         = static_cast<String*>(frame->arguments->at(1))->value();
     bool starts_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -137,7 +137,7 @@ void String::startswith(Frame* frame, viua::kernel::RegisterSet*,
 void String::endswith(Frame* frame, viua::kernel::RegisterSet*,
                       viua::kernel::RegisterSet*, viua::process::Process*,
                       viua::kernel::Kernel*) {
-    string s = static_cast<String*>(frame->arguments->at(1))->value();
+    string s       = static_cast<String*>(frame->arguments->at(1))->value();
     bool ends_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -175,7 +175,7 @@ void String::format(Frame* frame, viua::kernel::RegisterSet*,
             string m = i.substr(2, (i.size() - 3));
             string replacement;
             bool is_number = true;
-            int index = -1;
+            int index      = -1;
             try {
                 index = stoi(m);
             } catch (const std::invalid_argument&) { is_number = false; }
@@ -200,7 +200,7 @@ void String::substr(Frame* frame, viua::kernel::RegisterSet*,
                     viua::kernel::RegisterSet*, viua::process::Process*,
                     viua::kernel::Kernel*) {
     Integer::underlying_type begin = 0;
-    Integer::underlying_type end = -1;
+    Integer::underlying_type end   = -1;
 
     assert_arity(frame, 1u, 2u, 3u);
 

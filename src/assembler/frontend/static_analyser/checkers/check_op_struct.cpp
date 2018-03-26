@@ -38,7 +38,7 @@ auto check_op_struct(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *operand);
 
-    auto val = Register{*operand};
+    auto val       = Register{*operand};
     val.value_type = ValueTypes::STRUCT;
     register_usage_profile.define(val, operand->tokens.at(0));
 }

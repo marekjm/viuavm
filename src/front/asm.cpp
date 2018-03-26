@@ -41,7 +41,7 @@ using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
 
 // are we assembling a library?
@@ -50,14 +50,14 @@ bool AS_LIB = false;
 // are we only verifying source code correctness?
 bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
-bool REPORT_BYTECODE_SIZE = false;
+bool REPORT_BYTECODE_SIZE    = false;
 bool PERFORM_STATIC_ANALYSIS = true;
-bool USE_NEW_SA = true;
-bool SHOW_META = false;
+bool USE_NEW_SA              = true;
+bool SHOW_META               = false;
 
 bool VERBOSE = false;
-bool DEBUG = false;
-bool SCREAM = false;
+bool DEBUG   = false;
+bool SCREAM  = false;
 
 
 static bool usage(const char* program, bool show_help, bool show_version,
@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    auto source = read_file(filename);
+    auto source     = read_file(filename);
     auto raw_tokens = viua::cg::lex::tokenise(source);
     decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced,
         normalised_tokens;
@@ -368,10 +368,10 @@ int main(int argc, char* argv[]) {
     }
 
     compilationflags_t flags;
-    flags.as_lib = AS_LIB;
+    flags.as_lib  = AS_LIB;
     flags.verbose = VERBOSE;
-    flags.debug = DEBUG;
-    flags.scream = SCREAM;
+    flags.debug   = DEBUG;
+    flags.scream  = SCREAM;
 
     if (SHOW_META) {
         auto meta = gather_meta_information(cooked_tokens);

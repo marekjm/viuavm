@@ -27,7 +27,7 @@ namespace cg {
 namespace tokenizer {
 auto tokenize(string const& s) -> vector<string> {
     auto tokens = vector<string>{};
-    auto token = ostringstream{};
+    auto token  = ostringstream{};
     token.str("");
     for (auto i = decltype(s.size()){0}; i < s.size(); ++i) {
         if (s[i] == ' ' and token.str().size()) {

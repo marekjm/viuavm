@@ -32,7 +32,7 @@ typedef uint8_t mask_type;
 
 enum REGISTER_MASKS : mask_type {
     COPY_ON_WRITE = (1 << 0),
-    MOVED = (1 << 1),  // marks registers containing moved parameters
+    MOVED         = (1 << 1),  // marks registers containing moved parameters
 };
 
 

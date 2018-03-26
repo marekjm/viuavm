@@ -72,7 +72,7 @@ auto check_op_textsub(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
         register_usage_profile, *key_end);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = viua::internals::ValueTypes::TEXT;
     register_usage_profile.define(val, result->tokens.at(0));
 }

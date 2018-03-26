@@ -46,11 +46,11 @@ static auto alu_impl(viua::internals::types::byte* addr,
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
 
-    Number* lhs = nullptr;
+    Number* lhs    = nullptr;
     tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
-    Number* rhs = nullptr;
+    Number* rhs    = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 

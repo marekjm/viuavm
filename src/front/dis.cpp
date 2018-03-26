@@ -48,14 +48,14 @@ using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
-bool DEBUG = false;
+bool VERBOSE      = false;
+bool DEBUG        = false;
 
-bool DISASSEMBLE_ENTRY = false;
-bool INCLUDE_INFO = false;
-bool LINE_BY_LINE = false;
+bool DISASSEMBLE_ENTRY   = false;
+bool INCLUDE_INFO        = false;
+bool LINE_BY_LINE        = false;
 string SELECTED_FUNCTION = "";
 
 
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     // for getline()
     string dummy;
 
-    string filename = "";
+    string filename   = "";
     string disasmname = "";
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
@@ -188,11 +188,11 @@ int main(int argc, char* argv[]) {
 
     map<string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
-    vector<string> functions = loader.get_functions();
+    vector<string> functions             = loader.get_functions();
     map<string, uint64_t> function_sizes = loader.get_function_sizes();
 
     map<string, uint64_t> block_address_mapping = loader.get_block_addresses();
-    vector<string> blocks = loader.get_blocks();
+    vector<string> blocks                       = loader.get_blocks();
     map<string, uint64_t> block_sizes;
 
     map<string, uint64_t> element_address_mapping;
@@ -211,25 +211,25 @@ int main(int argc, char* argv[]) {
         if (i < (blocks.size() - 1)) {
             long unsigned a = block_address_mapping[name];
             long unsigned b = block_address_mapping[blocks[i + 1]];
-            el_size = (b - a);
+            el_size         = (b - a);
         } else {
             long unsigned a = block_address_mapping[name];
             long unsigned b = function_address_mapping[functions[0]];
-            el_size = (b - a);
+            el_size         = (b - a);
         }
 
         block_sizes[name] = el_size;
 
-        element_sizes[name] = el_size;
-        element_types[name] = "block";
+        element_sizes[name]           = el_size;
+        element_types[name]           = "block";
         element_address_mapping[name] = block_address_mapping[name];
         elements.emplace_back(name);
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        const string name = functions[i];
-        element_sizes[name] = function_sizes[name];
-        element_types[name] = "function";
+        const string name             = functions[i];
+        element_sizes[name]           = function_sizes[name];
+        element_types[name]           = "function";
         element_address_mapping[name] = function_address_mapping[name];
         elements.emplace_back(name);
     }
@@ -289,7 +289,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        const string name = elements[i];
+        const string name  = elements[i];
         const auto el_size = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {

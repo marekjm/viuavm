@@ -100,7 +100,7 @@ viua::internals::types::byte* viua::process::Process::opvinsert(
     }
 
     viua::types::Integer* index_operand = nullptr;
-    int64_t position_operand_index = 0;
+    int64_t position_operand_index      = 0;
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
         tie(addr, index_operand) =
@@ -160,7 +160,7 @@ viua::internals::types::byte* viua::process::Process::opvpop(
             addr, this);
 
     viua::types::Integer* index_operand = nullptr;
-    int64_t position_operand_index = -1;
+    int64_t position_operand_index      = -1;
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
         tie(addr, index_operand) =
@@ -204,7 +204,7 @@ viua::internals::types::byte* viua::process::Process::opvat(
 viua::internals::types::byte* viua::process::Process::opvlen(
     viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    viua::types::Vector* source = nullptr;
+    viua::types::Vector* source    = nullptr;
 
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

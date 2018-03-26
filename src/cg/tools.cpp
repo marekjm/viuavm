@@ -28,7 +28,7 @@ using namespace std;
 
 
 using viua::cg::lex::Token;
-using TokenVector = vector<Token>;
+using TokenVector        = vector<Token>;
 using bytecode_size_type = viua::internals::types::bytecode_size;
 
 
@@ -345,7 +345,7 @@ static auto size_of_hexadecimal_literal_operand(TokenVector const& tokens,
     return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
 }
 
-static auto const size_of_nop = size_of_instruction_with_no_operands;
+static auto const size_of_nop   = size_of_instruction_with_no_operands;
 static auto const size_of_izero = size_of_instruction_with_one_ri_operand;
 static auto size_of_istore(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
@@ -389,11 +389,11 @@ static auto const size_of_add = size_of_instruction_alu;
 static auto const size_of_sub = size_of_instruction_alu;
 static auto const size_of_mul = size_of_instruction_alu;
 static auto const size_of_div = size_of_instruction_alu;
-static auto const size_of_lt = size_of_instruction_alu;
+static auto const size_of_lt  = size_of_instruction_alu;
 static auto const size_of_lte = size_of_instruction_alu;
-static auto const size_of_gt = size_of_instruction_alu;
+static auto const size_of_gt  = size_of_instruction_alu;
 static auto const size_of_gte = size_of_instruction_alu;
-static auto const size_of_eq = size_of_instruction_alu;
+static auto const size_of_eq  = size_of_instruction_alu;
 static auto size_of_string(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size =
@@ -643,7 +643,7 @@ static auto const size_of_delete = size_of_instruction_with_one_ri_operand;
 static auto const size_of_isnull =
     size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto size_of_print = size_of_instruction_with_one_ri_operand;
-static auto size_of_echo = size_of_instruction_with_one_ri_operand;
+static auto size_of_echo  = size_of_instruction_with_one_ri_operand;
 static auto size_of_capture(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
@@ -958,8 +958,8 @@ static auto size_of_catch(TokenVector const& tokens, TokenVector::size_type i)
     calculated_size += tokens.at(i++).str().size() + 1 - 2;  // +1 for null
                                                              // terminator, -2
                                                              // for quotes
-    calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null
-                                                         // terminator
+    calculated_size += tokens.at(i++).str().size() + 1;      // +1 for null
+                                                             // terminator
 
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }

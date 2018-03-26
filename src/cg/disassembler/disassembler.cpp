@@ -238,13 +238,13 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr,
     oss << "0x";
 
     static auto const mask_high = uint8_t{0b00001111};
-    static auto const mask_low = uint8_t{0b11110000};
+    static auto const mask_low  = uint8_t{0b11110000};
 
     for (auto i = std::remove_const_t<decltype(size)>(0); i < size; ++i) {
         auto two_digits = *(ptr + i);
 
         auto high_digit = ((two_digits & mask_low) >> 4);
-        auto low_digit = (two_digits & mask_high);
+        auto low_digit  = (two_digits & mask_high);
 
         oss << decodings.at(static_cast<uint8_t>(high_digit));
         oss << decodings.at(static_cast<uint8_t>(low_digit));
@@ -318,7 +318,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     viua::internals::types::byte* saved_ptr = ptr;
 
     auto const op = OPCODE(*saved_ptr);
-    auto opname = string{};
+    auto opname   = string{};
     try {
         opname = OP_NAMES.at(op);
         ++ptr;

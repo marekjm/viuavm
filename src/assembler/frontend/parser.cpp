@@ -177,28 +177,28 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(ri);
     } else if (str::is_binary_literal(tok)) {
-        auto bits_literal = make_unique<BitsLiteral>();
+        auto bits_literal     = make_unique<BitsLiteral>();
         bits_literal->content = tokens.at(i);
         bits_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(bits_literal);
     } else if (str::isnum(tok, true) and not integer_literal_means_offset) {
-        auto integer_literal = make_unique<IntegerLiteral>();
+        auto integer_literal     = make_unique<IntegerLiteral>();
         integer_literal->content = tokens.at(i);
         integer_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(integer_literal);
     } else if (str::isfloat(tok, true)) {
-        auto float_literal = make_unique<FloatLiteral>();
+        auto float_literal     = make_unique<FloatLiteral>();
         float_literal->content = tokens.at(i);
         float_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(float_literal);
     } else if (str::is_boolean_literal(tok)) {
-        auto boolean_literal = make_unique<BooleanLiteral>();
+        auto boolean_literal     = make_unique<BooleanLiteral>();
         boolean_literal->content = tokens.at(i);
         boolean_literal->add(tokens.at(i));
         ++i;
@@ -221,35 +221,35 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(label);
     } else if (::assembler::utils::is_valid_function_name(tok)) {
-        auto fn_name_literal = make_unique<FunctionNameLiteral>();
+        auto fn_name_literal     = make_unique<FunctionNameLiteral>();
         fn_name_literal->content = tokens.at(i);
         fn_name_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(fn_name_literal);
     } else if (str::isid(tok) and not viua::cg::lex::is_mnemonic(tok)) {
-        auto label = make_unique<Label>();
+        auto label     = make_unique<Label>();
         label->content = tokens.at(i);
         label->add(tokens.at(i));
         ++i;
 
         operand = std::move(label);
     } else if (str::is_atom_literal(tok)) {
-        auto atom_literal = make_unique<AtomLiteral>();
+        auto atom_literal     = make_unique<AtomLiteral>();
         atom_literal->content = tokens.at(i);
         atom_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(atom_literal);
     } else if (str::is_text_literal(tok)) {
-        auto text_literal = make_unique<TextLiteral>();
+        auto text_literal     = make_unique<TextLiteral>();
         text_literal->content = tokens.at(i);
         text_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(text_literal);
     } else if (str::is_timeout_literal(tok)) {
-        auto duration_literal = make_unique<DurationLiteral>();
+        auto duration_literal     = make_unique<DurationLiteral>();
         duration_literal->content = tokens.at(i);
         duration_literal->add(tokens.at(i));
         ++i;
@@ -257,7 +257,7 @@ auto viua::assembler::frontend::parser::parse_operand(
         operand = std::move(duration_literal);
     } else if ((tok.at(0) == '+' and str::isnum(tok.substr(1))) or
                str::isnum(tok, true)) {
-        auto offset = make_unique<Offset>();
+        auto offset     = make_unique<Offset>();
         offset->content = (tok.at(0) == '+' ? tok.substr(1) : tok);
         offset->add(tokens.at(i));
         ++i;
@@ -388,11 +388,11 @@ auto viua::assembler::frontend::parser::parse_line(
     auto i = decltype(tokens)::size_type{0};
     if (tokens.at(0).str().at(0) == '.') {
         auto directive = make_unique<Directive>();
-        i = parse_directive(vector_view<Token>(tokens, 0), directive);
+        i    = parse_directive(vector_view<Token>(tokens, 0), directive);
         line = std::move(directive);
     } else {
         auto instruction = make_unique<Instruction>();
-        i = parse_instruction(vector_view<Token>(tokens, 0), instruction);
+        i    = parse_instruction(vector_view<Token>(tokens, 0), instruction);
         line = std::move(instruction);
     }
 
@@ -487,7 +487,7 @@ auto viua::assembler::frontend::parser::parse_closure(
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
 
     ib.closure = true;
-    ib.name = tokens.at(i);
+    ib.name    = tokens.at(i);
 
     if (not::assembler::utils::is_valid_function_name(ib.name)) {
         throw InvalidSyntax(ib.name,

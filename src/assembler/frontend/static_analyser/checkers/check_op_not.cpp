@@ -47,7 +47,7 @@ auto check_op_not(Register_usage_profile& register_usage_profile,
 
     check_use_of_register(register_usage_profile, *source);
 
-    auto val = Register(*target);
+    auto val       = Register(*target);
     val.value_type = viua::internals::ValueTypes::BOOLEAN;
     register_usage_profile.define(val, target->tokens.at(0));
 }

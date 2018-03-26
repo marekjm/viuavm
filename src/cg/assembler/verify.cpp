@@ -35,7 +35,7 @@ using namespace std;
 
 
 using ErrorReport = pair<unsigned, string>;
-using Token = viua::cg::lex::Token;
+using Token       = viua::cg::lex::Token;
 
 
 static bool is_defined(string function_name,

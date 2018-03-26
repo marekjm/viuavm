@@ -36,7 +36,7 @@ string viua::types::Object::str() const {
 
     oss << object_type_name << '#';
     oss << '{';
-    const auto limit = attributes.size();
+    const auto limit                           = attributes.size();
     std::remove_const<decltype(limit)>::type i = 0;
     for (const auto& each : attributes) {
         oss << each.first << ": " << each.second->repr();

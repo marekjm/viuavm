@@ -54,9 +54,9 @@ auto Register_usage_profile::defined_where(Register const r) const -> Token {
 auto Register_usage_profile::infer(
     Register const r, const viua::internals::ValueTypes value_type_id,
     Token const& t) -> void {
-    auto reg = at(r);
+    auto reg              = at(r);
     reg.second.value_type = value_type_id;
-    reg.second.inferred = {true, t};
+    reg.second.inferred   = {true, t};
 
     auto was_fresh = fresh(r);
     define(reg.second, reg.first);

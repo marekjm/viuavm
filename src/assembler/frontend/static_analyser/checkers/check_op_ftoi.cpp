@@ -52,7 +52,7 @@ auto check_op_ftoi(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::FLOAT>(
         register_usage_profile, *operand);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = viua::internals::ValueTypes::INTEGER;
     register_usage_profile.define(val, result->tokens.at(0));
 }

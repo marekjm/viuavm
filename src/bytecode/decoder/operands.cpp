@@ -129,7 +129,7 @@ static auto extract_register_type_and_index(viua::internals::types::byte* ip,
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
-    auto register_type = viua::internals::RegisterSets::LOCAL;
+    auto register_type  = viua::internals::RegisterSets::LOCAL;
     auto register_index = viua::internals::types::register_index{0};
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or
         (pointers_allowed and ot == OT_POINTER)) {
@@ -169,7 +169,7 @@ auto viua::bytecode::decoder::operands::fetch_register(
     viua::internals::types::byte* ip, viua::process::Process* process)
     -> tuple<viua::internals::types::byte*, viua::kernel::Register*> {
     auto register_type = viua::internals::RegisterSets::LOCAL;
-    auto target = viua::internals::types::register_index{0};
+    auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, process);
     return tuple<viua::internals::types::byte*, viua::kernel::Register*>(
@@ -181,7 +181,7 @@ auto viua::bytecode::decoder::operands::fetch_register_type_and_index(
     -> tuple<viua::internals::types::byte*, viua::internals::RegisterSets,
              viua::internals::types::register_index> {
     auto register_type = viua::internals::RegisterSets::LOCAL;
-    auto target = viua::internals::types::register_index{0};
+    auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, process);
     return tuple<viua::internals::types::byte*, viua::internals::RegisterSets,
@@ -314,7 +314,7 @@ auto viua::bytecode::decoder::operands::fetch_object(
     auto const is_pointer_dereference = (get_operand_type(ip) == OT_POINTER);
 
     auto register_type = viua::internals::RegisterSets::LOCAL;
-    auto target = viua::internals::types::register_index{0};
+    auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, p, true);
 

@@ -56,8 +56,8 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
 
     auto const limit = (pack_range_start->index + pack_range_count->index);
     for (auto j = pack_range_start->index; j < limit; ++j) {
-        auto checker = Register{};
-        checker.index = j;
+        auto checker         = Register{};
+        checker.index        = j;
         checker.register_set = pack_range_start->rss;
         if (not register_usage_profile.defined(checker)) {
             throw InvalidSyntax{pack_range_start->tokens.at(0),
@@ -66,10 +66,10 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
         register_usage_profile.erase(checker, instruction.tokens.at(0));
     }
 
-    auto val = Register{};
-    val.index = operand->index;
+    auto val         = Register{};
+    val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type = viua::internals::ValueTypes::VECTOR;
+    val.value_type   = viua::internals::ValueTypes::VECTOR;
     register_usage_profile.define(val, operand->tokens.at(0));
 }
 }  // namespace checkers

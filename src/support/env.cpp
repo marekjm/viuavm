@@ -29,11 +29,11 @@ auto get_var(string const& var) -> string {
     return (VAR == nullptr ? string("") : string(VAR));
 }
 auto get_paths(string const& var) -> vector<string> {
-    auto path = get_var(var);
+    auto path  = get_var(var);
     auto paths = vector<string>{};
 
     auto a_path = string{};
-    auto i = decltype(path)::size_type{0};
+    auto i      = decltype(path)::size_type{0};
     while (i < path.size()) {
         if (path[i] == ':') {
             if (a_path.size()) {
@@ -71,7 +71,7 @@ auto is_file(string const& path) -> bool {
 namespace viua {
 auto get_mod_path(string const& module, string const& extension,
                   vector<string> const& paths) -> string {
-    auto path = string{""};
+    auto path  = string{""};
     auto found = false;
 
     auto oss = ostringstream{};

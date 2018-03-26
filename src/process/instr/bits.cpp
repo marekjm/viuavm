@@ -172,7 +172,7 @@ viua::internals::types::byte* viua::process::Process::opbitset(
         viua::types::Integer>(addr, this);
 
     bool value = false;
-    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto ot    = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_TRUE) {
         ++addr;  // for operand type
         value = true;

@@ -83,7 +83,7 @@ std::string::size_type lshare(std::string const& s, std::string const& w);
 auto contains(std::string const& s, char const c) -> bool;
 
 using LevenshteinDistance = std::string::size_type;
-using DistancePair = std::pair<LevenshteinDistance, std::string>;
+using DistancePair        = std::pair<LevenshteinDistance, std::string>;
 auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
 auto levenshtein_filter(std::string const, std::vector<std::string> const&,
                         LevenshteinDistance const) -> std::vector<DistancePair>;

@@ -47,7 +47,7 @@ auto check_op_vlen(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::VECTOR>(
         register_usage_profile, *source);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = ValueTypes::INTEGER;
     register_usage_profile.define(val, result->tokens.at(0));
 }

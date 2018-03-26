@@ -38,7 +38,7 @@ auto check_op_argc(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *target);
 
-    auto val = Register(*target);
+    auto val       = Register(*target);
     val.value_type = ValueTypes::INTEGER;
     register_usage_profile.define(val, target->tokens.at(0));
 }

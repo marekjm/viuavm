@@ -108,7 +108,7 @@ viua::internals::types::byte* viua::process::Process::opstructkeys(
             addr, this);
 
     auto struct_keys = struct_operand->keys();
-    auto keys = make_unique<viua::types::Vector>();
+    auto keys        = make_unique<viua::types::Vector>();
     for (const auto& each : struct_keys) {
         keys->push(make_unique<viua::types::Atom>(each));
     }

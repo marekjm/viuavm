@@ -49,7 +49,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
 
     unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
-    auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
+    auto ex        = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
     // cerr << "failed instruction: " <<
@@ -125,7 +125,7 @@ static auto print_stack_trace_json(viua::process::Process* process) -> void {
     oss << '{';
 
     oss << "\"trace\":[";
-    auto trace = process->trace();
+    auto trace                   = process->trace();
     decltype(trace)::size_type i = 0;
     if (support::env::get_var("VIUA_STACK_TRACES") != "full") {
         i = (trace.size() and trace[0]->function_name == "__entry");
@@ -445,7 +445,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         return false;
     }
 
-    bool ticked = false;
+    bool ticked     = false;
     bool any_active = false;
 
     vector<unique_ptr<viua::process::Process>> running_processes_list;
@@ -454,7 +454,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     for (decltype(running_processes_list)::size_type i = 0;
          i < processes.size(); ++i) {
         current_process_index = i;
-        auto th = processes.at(i).get();
+        auto th               = processes.at(i).get();
 
 #if VIUA_VM_DEBUG_LOG
         viua_err("[sched:vps:burst] pid = ", th->pid().get());
@@ -664,7 +664,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
          * fetch a process.
          * Repeat until we're a good, hardworking scheduler.
          */
-        const auto total_processes = attached_kernel->pids();
+        const auto total_processes    = attached_kernel->pids();
         const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
         /*
          * The "<=" check is *FREAKIN' IMPORTANT* because if:
@@ -701,11 +701,11 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(
     const vector<string>& commandline_arguments) {
-    auto initial_frame = make_unique<Frame>(nullptr, 0, 2);
+    auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
     auto cmdline = make_unique<viua::types::Vector>();
-    auto limit = commandline_arguments.size();
+    auto limit   = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
         cmdline->push(
             make_unique<viua::types::String>(commandline_arguments[i]));
@@ -750,14 +750,14 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     : tracing_enabled(that.tracing_enabled) {
     attached_kernel = that.attached_kernel;
 
-    free_processes = that.free_processes;
+    free_processes       = that.free_processes;
     free_processes_mutex = that.free_processes_mutex;
-    free_processes_cv = that.free_processes_cv;
+    free_processes_cv    = that.free_processes_cv;
 
-    main_process = that.main_process;
-    that.main_process = nullptr;
-    processes = std::move(that.processes);
-    current_process_index = that.current_process_index;
+    main_process               = that.main_process;
+    that.main_process          = nullptr;
+    processes                  = std::move(that.processes);
+    current_process_index      = that.current_process_index;
     that.current_process_index = 0;
 
     exit_code = that.exit_code;

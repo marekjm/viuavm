@@ -53,7 +53,7 @@ Program& Program::fill(unique_ptr<viua::internals::types::byte[]> code) {
      *  Previous copy is deleted.
      *  Calling code must not delete passed bytecode.
      */
-    program = std::move(code);
+    program  = std::move(code);
     addr_ptr = program.get();
     return (*this);
 }
@@ -149,7 +149,7 @@ Program::Program(const Program& that)
 }
 Program& Program::operator=(const Program& that) {
     if (this != &that) {
-        bytes = that.bytes;
+        bytes   = that.bytes;
         program = make_unique<viua::internals::types::byte[]>(bytes);
         for (decltype(bytes) i = 0; i < bytes; ++i) {
             program[i] = that.program[i];

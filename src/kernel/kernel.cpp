@@ -73,7 +73,7 @@ auto viua::kernel::Mailbox::size() const -> decltype(messages)::size_type {
 
 
 viua::kernel::ProcessResult::ProcessResult(ProcessResult&& that) {
-    value_returned = std::move(that.value_returned);
+    value_returned   = std::move(that.value_returned);
     exception_thrown = std::move(that.exception_thrown);
     done.store(that.done.load(std::memory_order_acquire),
                std::memory_order_release);
@@ -181,11 +181,11 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(
 
 static auto is_native_module(string module) -> bool {
     auto double_colon = regex{"::"};
-    auto oss = ostringstream{};
+    auto oss          = ostringstream{};
     oss << regex_replace(module, double_colon, "/");
 
     auto const try_path = oss.str();
-    auto path = support::env::viua::get_mod_path(
+    auto path           = support::env::viua::get_mod_path(
         try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
         path = support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
@@ -223,7 +223,7 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
     string try_path = oss.str();
-    auto path = support::env::viua::get_mod_path(
+    auto path       = support::env::viua::get_mod_path(
         try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
         path = support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
@@ -288,7 +288,7 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
             ("failed to open handle: " + module + ": " + dlerror()));
     }
 
-    using ExporterFunction = const ForeignFunctionSpec* (*)();
+    using ExporterFunction   = const ForeignFunctionSpec* (*)();
     ExporterFunction exports = nullptr;
     if ((exports = reinterpret_cast<ExporterFunction>(
              dlsym(handle, "exports"))) == nullptr) {
@@ -394,7 +394,7 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
         entry_point = (bytecode.get() + block_addresses.at(name));
         module_base = bytecode.get();
     } else {
-        auto lf = linked_blocks.at(name);
+        auto lf     = linked_blocks.at(name);
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
@@ -415,7 +415,7 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
         entry_point = (bytecode.get() + function_addresses.at(name));
         module_base = bytecode.get();
     } else {
-        auto lf = linked_functions.at(name);
+        auto lf     = linked_functions.at(name);
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
@@ -586,7 +586,7 @@ static auto no_of_schedulers(
     viua::internals::types::schedulers_count default_limit)
     -> viua::internals::types::schedulers_count {
     decltype(default_limit) limit = default_limit;
-    char* env_limit = getenv(env_name);
+    char* env_limit               = getenv(env_name);
     if (env_limit != nullptr) {
         int raw_limit = stoi(env_limit);
         if (raw_limit > 0) {

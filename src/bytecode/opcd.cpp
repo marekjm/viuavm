@@ -46,7 +46,7 @@ int main() {
 
     for (auto i = viua::internals::types::byte{0};
          i < static_cast<viua::internals::types::byte>(0xff); ++i) {
-        auto opcode = static_cast<OPCODE>(i);
+        auto opcode   = static_cast<OPCODE>(i);
         auto mnemonic = string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);

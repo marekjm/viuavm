@@ -34,7 +34,7 @@ Frame::Frame(viua::internals::types::byte* ra,
     , arguments(nullptr)
     , local_register_set(nullptr)
     , return_register(nullptr) {
-    arguments = make_unique<viua::kernel::RegisterSet>(argsize);
+    arguments          = make_unique<viua::kernel::RegisterSet>(argsize);
     local_register_set = make_unique<viua::kernel::RegisterSet>(regsize);
 }
 Frame::Frame(const Frame& that) {

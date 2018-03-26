@@ -100,7 +100,7 @@ auto fetch_object_of(viua::internals::types::byte* ip,
                      viua::process::Process* p)
     -> std::tuple<viua::internals::types::byte*, RequestedType*> {
     viua::internals::types::byte* addr = nullptr;
-    viua::types::Value* fetched = nullptr;
+    viua::types::Value* fetched        = nullptr;
 
     std::tie(addr, fetched) = fetch_object(ip, p);
 

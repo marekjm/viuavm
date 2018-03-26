@@ -63,7 +63,7 @@ auto check_op_isnull(Register_usage_profile& register_usage_profile,
                         .note("register is defined here"));
     }
 
-    auto val = Register(*target);
+    auto val       = Register(*target);
     val.value_type = ValueTypes::BOOLEAN;
     register_usage_profile.define(val, target->tokens.at(0));
 }

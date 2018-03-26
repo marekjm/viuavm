@@ -50,7 +50,7 @@ auto isnum(std::string const& s, bool negatives) -> bool {
     /*  Returns true if s contains only numerical characters.
      *  Regex equivalent: `^[0-9]+$`
      */
-    bool num = false;
+    bool num                     = false;
     std::string::size_type start = 0;
     if (s[0] == '-' and negatives) {
         // must handle negative numbers
@@ -141,7 +141,7 @@ auto isfloat(std::string const& s, bool negatives) -> bool {
     /*  Returns true if s contains only numerical characters.
      *  Regex equivalent: `^[0-9]+\.[0-9]+$`
      */
-    bool is = false;
+    bool is                      = false;
     std::string::size_type start = 0;
     if (s[0] == '-' and negatives) {
         // to handle negative numbers
@@ -218,7 +218,7 @@ auto chunks(string const& s) -> vector<string> {
     string chnk;
     while (tmp.size()) {
         chnk = chunk(tmp);
-        tmp = lstrip(sub(tmp, chnk.size()));
+        tmp  = lstrip(sub(tmp, chnk.size()));
         chnks.emplace_back(chnk);
     }
     return chnks;
@@ -360,8 +360,8 @@ auto levenshtein(string const source, string const target)
 
             cost = (source.at(i - 1) != target.at(j - 1));
 
-            auto deletion = distance_matrix.at(i - 1).at(j) + 1;
-            auto insertion = distance_matrix.at(i).at(j - 1) + 1;
+            auto deletion     = distance_matrix.at(i - 1).at(j) + 1;
+            auto insertion    = distance_matrix.at(i).at(j - 1) + 1;
             auto substitution = distance_matrix.at(i - 1).at(j - 1) + cost;
 
             distance_matrix.at(i).at(j) =
@@ -499,39 +499,39 @@ auto strencode(string const& s) -> string {
         switch (s[i]) {
         case '\\':
             escape = true;
-            c = '\\';
+            c      = '\\';
             break;
         case '\a':
             escape = true;
-            c = 'a';
+            c      = 'a';
             break;
         case '\b':
             escape = true;
-            c = 'b';
+            c      = 'b';
             break;
         case '\f':
             escape = true;
-            c = 'f';
+            c      = 'f';
             break;
         case '\n':
             escape = true;
-            c = 'n';
+            c      = 'n';
             break;
         case '\r':
             escape = true;
-            c = 'r';
+            c      = 'r';
             break;
         case '\t':
             escape = true;
-            c = 't';
+            c      = 't';
             break;
         case '\v':
             escape = true;
-            c = 'v';
+            c      = 'v';
             break;
         default:
             escape = false;
-            c = s[i];
+            c      = s[i];
         }
         if (escape) {
             encoded << '\\';

@@ -43,20 +43,20 @@ template<class T> class maybe_unique_ptr {
 
   public:
     auto release() -> T* {
-        auto tmp = pointer;
-        pointer = nullptr;
+        auto tmp     = pointer;
+        pointer      = nullptr;
         owns_pointer = false;
         return tmp;
     }
     auto reset(T* ptr, bool own = true) -> void {
         delete_if_owned();
         owns_pointer = own;
-        pointer = ptr;
+        pointer      = ptr;
     }
     auto reset(std::unique_ptr<T> ptr) -> void {
         delete_if_owned();
         owns_pointer = true;
-        pointer = ptr.release();
+        pointer      = ptr.release();
     }
 
     auto operator=(std::unique_ptr<T> ptr) -> maybe_unique_ptr& {

@@ -27,7 +27,7 @@ using namespace std;
 invocables_t gather_functions(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
 
-    invocables.names = assembler::ce::get_function_names(tokens);
+    invocables.names      = assembler::ce::get_function_names(tokens);
     invocables.signatures = assembler::ce::get_signatures(tokens);
     invocables.tokens =
         assembler::ce::get_invokables_token_bodies("function", tokens);
@@ -42,7 +42,7 @@ invocables_t gather_functions(const vector<viua::cg::lex::Token>& tokens) {
 invocables_t gather_blocks(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
 
-    invocables.names = assembler::ce::get_block_names(tokens);
+    invocables.names      = assembler::ce::get_block_names(tokens);
     invocables.signatures = assembler::ce::get_block_signatures(tokens);
     invocables.tokens =
         assembler::ce::get_invokables_token_bodies("block", tokens);
@@ -57,7 +57,7 @@ map<string, string> gather_meta_information(
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
          i < tokens.size(); ++i) {
         if (tokens.at(i) == ".info:") {
-            viua::cg::lex::Token key = tokens.at(i + 1),
+            viua::cg::lex::Token key   = tokens.at(i + 1),
                                  value = tokens.at(i + 2);
             if (key == "\n") {
                 throw viua::cg::lex::InvalidSyntax(

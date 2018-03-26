@@ -49,7 +49,7 @@ auto check_op_bitnot(Register_usage_profile& register_usage_profile,
 
     assert_type_of_register<ValueTypes::BITS>(register_usage_profile, *operand);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = ValueTypes::BITS;
     register_usage_profile.define(val, result->tokens.at(0));
 }

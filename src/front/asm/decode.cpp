@@ -27,9 +27,9 @@ using namespace std;
 auto decode_line_tokens(vector<string> const& tokens)
     -> vector<vector<string>> {
     auto decoded_lines = vector<vector<string>>{};
-    auto main_line = vector<string>{};
+    auto main_line     = vector<string>{};
 
-    auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
+    auto i      = std::remove_reference_t<decltype(tokens)>::size_type{0};
     auto invert = false;
     while (i < tokens.size()) {
         if (tokens.at(i) == "^") {
@@ -65,9 +65,9 @@ auto decode_line_tokens(vector<string> const& tokens)
         if (tokens.at(i) == "[") {
             auto subtokens = vector<string>{};
             ++i;
-            auto balance = unsigned{1};
+            auto balance                  = unsigned{1};
             auto toplevel_subexpr_balance = unsigned{0};
-            auto len = decltype(i){0};
+            auto len                      = decltype(i){0};
             while (i < tokens.size()) {
                 if (tokens.at(i) == "[") {
                     ++balance;

@@ -47,10 +47,10 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
             .note("expected atom literal");
     }
 
-    auto val = Register{};
-    val.index = operand->index;
+    auto val         = Register{};
+    val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type = ValueTypes::ATOM;
+    val.value_type   = ValueTypes::ATOM;
 
     register_usage_profile.define(val, operand->tokens.at(0));
 }

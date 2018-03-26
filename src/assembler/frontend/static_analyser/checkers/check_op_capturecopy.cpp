@@ -64,10 +64,10 @@ auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
         register_usage_profile, *source);
 
-    auto val = Register{};
-    val.index = index->index;
+    auto val         = Register{};
+    val.index        = index->index;
     val.register_set = RegisterSets::LOCAL;
-    val.value_type = register_usage_profile.at(*source).second.value_type;
+    val.value_type   = register_usage_profile.at(*source).second.value_type;
     created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }
 }  // namespace checkers

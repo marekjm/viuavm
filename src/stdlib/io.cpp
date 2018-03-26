@@ -95,9 +95,9 @@ static auto io_file_read(Frame* frame, viua::kernel::RegisterSet*,
                          viua::kernel::RegisterSet*, viua::process::Process*,
                          viua::kernel::Kernel*) -> void {
     auto const path = frame->arguments->get(0)->str();
-    auto in = ifstream{path};
+    auto in         = ifstream{path};
 
-    auto oss = ostringstream{};
+    auto oss  = ostringstream{};
     auto line = string{};
     while (getline(in, line)) {
         oss << line << '\n';

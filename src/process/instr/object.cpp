@@ -122,8 +122,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(
                                                   method_name + "'");
     }
 
-    bool is_native = scheduler->is_native_function(function_name);
-    bool is_foreign = scheduler->is_foreign_function(function_name);
+    bool is_native         = scheduler->is_native_function(function_name);
+    bool is_foreign        = scheduler->is_foreign_function(function_name);
     bool is_foreign_method = scheduler->is_foreign_method(function_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {

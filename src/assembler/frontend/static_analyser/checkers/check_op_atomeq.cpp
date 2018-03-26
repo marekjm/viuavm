@@ -58,7 +58,7 @@ auto check_op_atomeq(Register_usage_profile& register_usage_profile,
     assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *lhs);
     assert_type_of_register<ValueTypes::ATOM>(register_usage_profile, *rhs);
 
-    auto val = Register(*result);
+    auto val       = Register(*result);
     val.value_type = viua::internals::ValueTypes::BOOLEAN;
     register_usage_profile.define(val, result->tokens.at(0));
 }

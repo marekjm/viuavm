@@ -36,7 +36,7 @@ static auto resolveregister(viua::cg::lex::Token const token,
      *  This function MUST return string as teh result is further passed to
      * assembler::operands::getint() function which *expects* string.
      */
-    auto out = ostringstream{};
+    auto out       = ostringstream{};
     auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
@@ -178,10 +178,10 @@ auto assembler::operands::get2(string const s) -> tuple<string, string> {
 
 auto assembler::operands::get3(string const s, bool const fill_third)
     -> tuple<string, string, string> {
-    auto const op_a = str::chunk(s);
+    auto const op_a      = str::chunk(s);
     auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
-    auto const op_b = str::chunk(s_after_a);
+    auto const op_b      = str::chunk(s_after_a);
     auto const s_after_b = str::lstrip(str::sub(s_after_a, op_b.size()));
 
     /* If s is empty and fill_third is true, use first operand as a filler.
@@ -197,7 +197,7 @@ auto assembler::operands::get3(string const s, bool const fill_third)
 
 auto assembler::operands::convert_token_to_bitstring_operand(
     viua::cg::lex::Token const token) -> vector<uint8_t> {
-    auto const s = token.str();
+    auto const s            = token.str();
     auto normalised_version = string{};
     if (s.at(1) == 'b') {
         normalised_version = normalise_binary_literal(s.substr(2));
@@ -215,12 +215,12 @@ auto assembler::operands::convert_token_to_bitstring_operand(
     auto const workable_version = normalised_version;
 
     auto converted = vector<uint8_t>{};
-    auto part = uint8_t{0};
+    auto part      = uint8_t{0};
     for (auto i = decltype(workable_version)::size_type{0};
          i < workable_version.size(); ++i) {
         auto one = uint8_t{1};
         if (workable_version.at(i) == '1') {
-            one = static_cast<uint8_t>(one << (i % 8));
+            one  = static_cast<uint8_t>(one << (i % 8));
             part = (part | one);
         }
         if ((i + 1) % 8 == 0) {

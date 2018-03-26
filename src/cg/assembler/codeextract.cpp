@@ -95,11 +95,11 @@ static auto get_instruction_block_names(vector<Token> const& tokens,
                                         string const directive,
                                         void predicate(Token) = [](Token) {})
     -> vector<string> {
-    auto names = vector<string>{};
-    auto all_names = vector<string>{};
+    auto names         = vector<string>{};
+    auto all_names     = vector<string>{};
     auto defined_where = map<string, Token>{};
 
-    auto const limit = tokens.size();
+    auto const limit       = tokens.size();
     auto const looking_for = string{"." + directive + ":"};
     for (auto i = decltype(tokens.size()){0}; i < limit; ++i) {
         if (looks_like_name_definition(tokens.at(i))) {

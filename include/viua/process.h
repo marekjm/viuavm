@@ -280,7 +280,7 @@ class Process {
      *  multiprocessing.
      */
     std::chrono::steady_clock::time_point waiting_until;
-    bool timeout_active = false;
+    bool timeout_active      = false;
     bool wait_until_infinity = false;
 
     /*  Methods implementing individual instructions.

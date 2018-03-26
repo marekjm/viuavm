@@ -163,7 +163,7 @@ auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
 
 auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
     size_type length_of_common_prefix = 0;
-    auto limit = max(size(), other.size());
+    auto limit                        = max(size(), other.size());
 
     while (length_of_common_prefix < limit and
            text.at(length_of_common_prefix) ==
@@ -176,7 +176,7 @@ auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
 auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
     size_type length_of_common_suffix = 0;
 
-    size_type this_index = size() - 1;
+    size_type this_index  = size() - 1;
     size_type other_index = other.size() - 1;
 
     while ((this_index and other_index) and

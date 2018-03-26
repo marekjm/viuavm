@@ -37,7 +37,7 @@ auto check_op_pamv(Register_usage_profile& register_usage_profile,
     }
     if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
         auto r = *target;
-        r.rss = viua::internals::RegisterSets::LOCAL;
+        r.rss  = viua::internals::RegisterSets::LOCAL;
         check_use_of_register(register_usage_profile, r);
         assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
             register_usage_profile, r);

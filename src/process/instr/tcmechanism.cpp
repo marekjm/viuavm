@@ -100,9 +100,9 @@ viua::internals::types::byte* viua::process::Process::openter(
     viua::internals::types::byte* block_address =
         adjust_jump_base_for_block(block_name);
 
-    stack->try_frame_new->return_address = addr;
+    stack->try_frame_new->return_address   = addr;
     stack->try_frame_new->associated_frame = stack->back().get();
-    stack->try_frame_new->block_name = block_name;
+    stack->try_frame_new->block_name       = block_name;
 
     stack->tryframes.emplace_back(std::move(stack->try_frame_new));
 

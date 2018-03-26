@@ -79,7 +79,7 @@ auto get_line_index_of_instruction(InstructionIndex const n,
                                    InstructionsBlock const& ib)
     -> InstructionIndex {
     auto left = n;
-    auto i = InstructionIndex{0};
+    auto i    = InstructionIndex{0};
     for (; left and i < ib.body.size(); ++i) {
         auto instruction =
             dynamic_cast<viua::assembler::frontend::parser::Instruction*>(
@@ -130,8 +130,8 @@ static auto maybe_mistyped_register_set_helper(
     viua::assembler::frontend::parser::RegisterIndex r,
     TracedSyntaxError& error, RegisterSets rs_id) -> bool {
     if (r.rss != rs_id) {
-        auto val = Register{};
-        val.index = r.index;
+        auto val         = Register{};
+        val.index        = r.index;
         val.register_set = rs_id;
         if (rup.defined(val)) {
             error.errors.back().aside(r.tokens.at(0),
@@ -199,8 +199,8 @@ auto check_use_of_register(Register_usage_profile& rup,
     rup.use(Register(r), r.tokens.at(0));
 }
 
-using ValueTypes = viua::internals::ValueTypes;
-using ValueTypesType = viua::internals::ValueTypesType;
+using ValueTypes            = viua::internals::ValueTypes;
+using ValueTypesType        = viua::internals::ValueTypesType;
 auto const value_type_names = std::map<ValueTypes, std::string>{
     {
         /*
@@ -298,7 +298,7 @@ auto operator!(const ValueTypes v) -> bool {
 }
 auto to_string(ValueTypes const value_type_id) -> std::string {
     auto const has_pointer = not not(value_type_id & ValueTypes::POINTER);
-    auto const type_name = value_type_names.at(
+    auto const type_name   = value_type_names.at(
         has_pointer ? (value_type_id ^ ValueTypes::POINTER) : value_type_id);
     return (has_pointer ? "pointer to " : "") + type_name;
 }

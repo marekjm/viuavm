@@ -49,7 +49,7 @@ auto check_op_structkeys(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::STRUCT>(
         register_usage_profile, *source);
 
-    auto val = Register{*target};
+    auto val       = Register{*target};
     val.value_type = ValueTypes::VECTOR;
     register_usage_profile.define(val, target->tokens.at(0));
 }

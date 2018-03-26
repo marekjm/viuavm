@@ -92,7 +92,7 @@ auto map_names_to_register_indexes(
                 .add(directive->tokens.at(0));
         }
 
-        register_usage_profile.name_to_index[name] = index;
+        register_usage_profile.name_to_index[name]  = index;
         register_usage_profile.index_to_name[index] = name;
     }
 }

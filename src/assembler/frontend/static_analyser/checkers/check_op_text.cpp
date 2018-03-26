@@ -40,10 +40,10 @@ auto check_op_text(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *operand);
 
-    auto val = Register{};
-    val.index = operand->index;
+    auto val         = Register{};
+    val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type = viua::internals::ValueTypes::TEXT;
+    val.value_type   = viua::internals::ValueTypes::TEXT;
 
     register_usage_profile.define(val, operand->tokens.at(0));
 }

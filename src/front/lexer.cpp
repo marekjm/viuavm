@@ -32,12 +32,12 @@ using namespace std;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
+bool VERBOSE      = false;
 
 
-using Token = viua::cg::lex::Token;
+using Token         = viua::cg::lex::Token;
 using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
 
@@ -123,9 +123,9 @@ static string read_file(ifstream& in) {
     return source_in.str();
 }
 
-static bool DISPLAY_SIZE = false;
-static bool DISPLAY_RAW = false;
-static bool MANUAL_REDUCING = false;
+static bool DISPLAY_SIZE      = false;
+static bool DISPLAY_RAW       = false;
+static bool MANUAL_REDUCING   = false;
 static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
@@ -169,16 +169,16 @@ int main(int argc, char* argv[]) {
             DISPLAY_SIZE = true;
             continue;
         } else if (option == "--raw") {
-            DISPLAY_RAW = true;
+            DISPLAY_RAW     = true;
             MANUAL_REDUCING = true;
             continue;
         } else if (option == "--ws") {
             REDUCE_WHITESPACE = true;
-            MANUAL_REDUCING = true;
+            MANUAL_REDUCING   = true;
             continue;
         } else if (option == "--dirs") {
             REDUCE_DIRECTIVES = true;
-            MANUAL_REDUCING = true;
+            MANUAL_REDUCING   = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cerr << "error: unknown option: " << option << endl;

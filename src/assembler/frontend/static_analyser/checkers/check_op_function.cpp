@@ -46,7 +46,7 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
             .note("expected function name literal");
     }
 
-    auto val = Register{*target};
+    auto val       = Register{*target};
     val.value_type = ValueTypes::FUNCTION;
     register_usage_profile.define(val, target->tokens.at(0));
 }

@@ -46,11 +46,11 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
 
 
 static bool usage(const string program, const vector<string>& args) {
-    bool show_help = false;
+    bool show_help    = false;
     bool show_version = false;
-    bool verbose = false;
-    bool show_info = false;
-    bool show_json = false;
+    bool verbose      = false;
+    bool show_info    = false;
+    bool show_json    = false;
 
     for (auto option : args) {
         if (option == "--help" or option == "-h") {
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     }
 
     string filename = "";
-    filename = args[0];
+    filename        = args[0];
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;

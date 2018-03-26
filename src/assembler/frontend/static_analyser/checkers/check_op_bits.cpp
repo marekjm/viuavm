@@ -55,10 +55,10 @@ auto check_op_bits(Register_usage_profile& register_usage_profile,
             register_usage_profile, *source);
     }
 
-    auto val = Register{};
-    val.index = target->index;
+    auto val         = Register{};
+    val.index        = target->index;
     val.register_set = target->rss;
-    val.value_type = viua::internals::ValueTypes::BITS;
+    val.value_type   = viua::internals::ValueTypes::BITS;
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }  // namespace checkers

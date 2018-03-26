@@ -104,7 +104,7 @@ auto InvalidSyntax::aside(string a) -> InvalidSyntax& {
     return *this;
 }
 auto InvalidSyntax::aside(Token t, string a) -> InvalidSyntax& {
-    aside_note = a;
+    aside_note  = a;
     aside_token = t;
     return *this;
 }
@@ -241,15 +241,15 @@ auto tokenise(string const& source) -> vector<Token> {
     ostringstream candidate_token;
     candidate_token.str("");
 
-    decltype(candidate_token.str().size()) line_number = 0,
+    decltype(candidate_token.str().size()) line_number       = 0,
                                            character_in_line = 0;
 
     const auto limit = source.size();
 
-    unsigned hyphens = 0;
+    unsigned hyphens    = 0;
     bool active_comment = false;
     for (decltype(source.size()) i = 0; i < limit; ++i) {
-        char current_char = source.at(i);
+        char current_char             = source.at(i);
         bool found_breaking_character = false;
 
         switch (current_char) {
@@ -328,7 +328,7 @@ auto tokenise(string const& source) -> vector<Token> {
             if (current_char == '\n') {
                 ++line_number;
                 character_in_line = 0;
-                active_comment = false;
+                active_comment    = false;
             }
         }
     }
@@ -441,7 +441,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             string target_register_index = tokens.back();
-            string target_register_set = "current";
+            string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -720,7 +720,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             string target_register_index = tokens.back();
-            string target_register_set = "current";
+            string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1198,7 +1198,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             string target_register_index = tokens.back();
-            string target_register_set = "current";
+            string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1459,7 +1459,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                    token == "wrapadd" or token == "wrapmul") {
             tokens.push_back(input_tokens.at(++i));  // target register
             string target_register_index = tokens.back();
-            string target_register_set = "current";
+            string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),

@@ -304,7 +304,7 @@ static void check_main_function(const string& main_function,
     const int expected_newlines = 3;
 
     int found_newlines = 0;
-    auto i = main_function_tokens.size() - 1;
+    auto i             = main_function_tokens.size() - 1;
     while (i and found_newlines < expected_newlines) {
         if (main_function_tokens.at(i--) == "\n") {
             ++found_newlines;
@@ -797,7 +797,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     map<string, tuple<viua::internals::types::bytecode_size,
                       unique_ptr<viua::internals::types::byte[]>>>
         block_bodies_bytecode;
-    viua::internals::types::bytecode_size functions_section_size = 0;
+    viua::internals::types::bytecode_size functions_section_size    = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
 
     vector<tuple<viua::internals::types::bytecode_size,
@@ -1187,8 +1187,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     // WRITE STATICALLY LINKED LIBRARIES
     viua::internals::types::bytecode_size bytes_offset = current_link_offset;
     for (auto& lnk : linked_libs_bytecode) {
-        string lib_name = get<0>(lnk);
-        viua::internals::types::byte* linked_bytecode = get<2>(lnk).get();
+        string lib_name                                   = get<0>(lnk);
+        viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 
         // tie(lib_name, linked_size, linked_bytecode) = lnk;
@@ -1217,7 +1217,7 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
         viua::internals::types::bytecode_size jmp, jmp_target;
         for (decltype(linked_jumptable)::size_type i = 0;
              i < linked_jumptable.size(); ++i) {
-            jmp = linked_jumptable[i];
+            jmp                      = linked_jumptable[i];
             aligned_read(jmp_target) = (linked_bytecode + jmp);
             if (DEBUG) {
                 cout << send_control_seq(COLOR_FG_WHITE) << filename

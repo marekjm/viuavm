@@ -34,7 +34,7 @@
 using namespace std;
 
 
-using Token = viua::cg::lex::Token;
+using Token       = viua::cg::lex::Token;
 using TokenVector = vector<Token>;
 
 class Registers {
@@ -473,7 +473,7 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "vat" or token == "vpop") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
-            TokenIndex index = source + 2;
+            TokenIndex index  = source + 2;
 
             if (body_tokens.at(target) == "void") {
                 // source is one token earlier since void has no register set
@@ -526,7 +526,7 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "vinsert") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
-            TokenIndex index = source + 2;
+            TokenIndex index  = source + 2;
 
             check_use_of_register(body_tokens, target, i, registers,
                                   named_registers,
@@ -544,7 +544,7 @@ static void check_block_body(const TokenVector& body_tokens,
             continue;
         } else if (token == "insert" or token == "structinsert") {
             TokenIndex target = i + 1;
-            TokenIndex key = target + 2;
+            TokenIndex key    = target + 2;
             TokenIndex source = key + 2;
 
             check_use_of_register(body_tokens, target, i, registers,
@@ -564,7 +564,7 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "remove") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
-            TokenIndex key = source + 2;
+            TokenIndex key    = source + 2;
 
             if (body_tokens.at(target) == "void") {
                 --source;
@@ -642,7 +642,7 @@ static void check_block_body(const TokenVector& body_tokens,
             string register_with_unused_value;
 
             try {
-                auto copied_registers = registers;
+                auto copied_registers       = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens,
                                  in_block_offset(body_tokens, i + 1,
@@ -663,7 +663,7 @@ static void check_block_body(const TokenVector& body_tokens,
                     body_tokens.at(i + 1), "after taking true branch:"));
             }
             try {
-                auto copied_registers = registers;
+                auto copied_registers       = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens,
                                  in_block_offset(body_tokens, i + 2,
@@ -846,7 +846,7 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "vector") {
             ++i;  // the "vector" token
 
-            TokenIndex target = i;
+            TokenIndex target           = i;
             TokenIndex pack_range_start = target + 2;
             TokenIndex pack_range_count = pack_range_start + 2;
 
@@ -886,8 +886,8 @@ static void check_block_body(const TokenVector& body_tokens,
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
-            TokenIndex lhs = target + 2;
-            TokenIndex rhs = lhs + 2;
+            TokenIndex lhs    = target + 2;
+            TokenIndex rhs    = lhs + 2;
 
             check_use_of_register(body_tokens, lhs, i - 1, registers,
                                   named_registers);
@@ -904,8 +904,8 @@ static void check_block_body(const TokenVector& body_tokens,
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
-            TokenIndex lhs = target + 2;
-            TokenIndex rhs = lhs + 2;
+            TokenIndex lhs    = target + 2;
+            TokenIndex rhs    = lhs + 2;
 
             if (body_tokens.at(target) == "void") {
                 --lhs;
@@ -926,8 +926,8 @@ static void check_block_body(const TokenVector& body_tokens,
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
-            TokenIndex lhs = target + 2;
-            TokenIndex rhs = lhs + 2;
+            TokenIndex lhs    = target + 2;
+            TokenIndex rhs    = lhs + 2;
 
             check_use_of_register(body_tokens, lhs, i - 1, registers,
                                   named_registers);
@@ -949,8 +949,8 @@ static void check_block_body(const TokenVector& body_tokens,
 
             TokenIndex target = i;
             TokenIndex source = target + 2;
-            TokenIndex lhs = source + 2;
-            TokenIndex rhs = lhs + 2;
+            TokenIndex lhs    = source + 2;
+            TokenIndex rhs    = lhs + 2;
 
             check_use_of_register(body_tokens, source, i, registers,
                                   named_registers);
@@ -971,8 +971,8 @@ static void check_block_body(const TokenVector& body_tokens,
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
-            TokenIndex lhs = target + 2;
-            TokenIndex rhs = lhs + 2;
+            TokenIndex lhs    = target + 2;
+            TokenIndex rhs    = lhs + 2;
 
             check_use_of_register(body_tokens, lhs, i, registers,
                                   named_registers);
@@ -994,8 +994,8 @@ static void check_block_body(const TokenVector& body_tokens,
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "join") {
-            TokenIndex target = i + 1;
-            TokenIndex source = target + 2;
+            TokenIndex target  = i + 1;
+            TokenIndex source  = target + 2;
             TokenIndex timeout = source + 2;
 
             if (body_tokens.at(target) == "void") {
@@ -1015,7 +1015,7 @@ static void check_block_body(const TokenVector& body_tokens,
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {
-            TokenIndex target = i + 1;
+            TokenIndex target  = i + 1;
             TokenIndex timeout = target + 2;
 
             if (body_tokens.at(target) == "void") {
@@ -1049,7 +1049,7 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "msg" or token == "call" or token == "process") {
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target   = get_token_index_of_operand(body_tokens, i, 1);
             TokenIndex function = target + 2;
 
             if (body_tokens.at(target) != "void") {
@@ -1093,7 +1093,7 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
             string reg_original = body_tokens.at(target),
-                   reg = resolve_register_name(named_registers,
+                   reg          = resolve_register_name(named_registers,
                                                body_tokens.at(target));
             registers.insert(reg, body_tokens.at(target));
             if (debug) {

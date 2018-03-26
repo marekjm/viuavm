@@ -60,14 +60,14 @@ auto viua::process::Stack::state_of() const -> STATE { return current_state; }
 
 auto viua::process::Stack::state_of(const STATE s) -> STATE {
     auto previous_state = current_state;
-    current_state = s;
+    current_state       = s;
     return previous_state;
 }
 
 auto viua::process::Stack::bind(viua::kernel::RegisterSet** curs,
                                 viua::kernel::RegisterSet* gs) -> void {
     currently_used_register_set = curs;
-    global_register_set = gs;
+    global_register_set         = gs;
 }
 
 auto viua::process::Stack::begin() const -> decltype(frames.begin()) {
@@ -155,17 +155,17 @@ auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame)
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for_block(
     const string& call_name) {
     viua::internals::types::byte* entry_point = nullptr;
-    auto ep = scheduler->get_entry_point_of_block(call_name);
+    auto ep     = scheduler->get_entry_point_of_block(call_name);
     entry_point = ep.first;
-    jump_base = ep.second;
+    jump_base   = ep.second;
     return entry_point;
 }
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(
     const string& call_name) {
     viua::internals::types::byte* entry_point = nullptr;
-    auto ep = scheduler->get_entry_point_of(call_name);
+    auto ep     = scheduler->get_entry_point_of(call_name);
     entry_point = ep.first;
-    jump_base = ep.second;
+    jump_base   = ep.second;
     return entry_point;
 }
 
@@ -226,12 +226,12 @@ auto viua::process::Stack::unwind_to(const TryFrame* tframe,
 
 auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
     TryFrame* found_exception_frame = nullptr;
-    string caught_with_type = "";
+    string caught_with_type         = "";
     string handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        TryFrame* tframe = tryframes[(i - 1)].get();
+        TryFrame* tframe   = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
@@ -242,7 +242,7 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
             for (decltype(types_to_check)::size_type j = 0;
                  j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
-                    handler_found = true;
+                    handler_found          = true;
                     handler_found_for_type = types_to_check[j];
                     break;
                 }
@@ -251,7 +251,7 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
 
         if (handler_found) {
             found_exception_frame = tframe;
-            caught_with_type = handler_found_for_type;
+            caught_with_type      = handler_found_for_type;
             break;
         }
     }
@@ -260,7 +260,7 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
 }
 
 auto viua::process::Stack::unwind() -> void {
-    TryFrame* tframe = nullptr;
+    TryFrame* tframe              = nullptr;
     string handler_found_for_type = "";
 
     // Find catch frame for current thrown exception.

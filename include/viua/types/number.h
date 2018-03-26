@@ -47,21 +47,21 @@ class Number : public Value {
 
     std::string type() const override;
     std::string str() const override = 0;
-    bool boolean() const override = 0;
+    bool boolean() const override    = 0;
 
     virtual bool negative() const;
 
     virtual auto as_integer() const -> int64_t = 0;
-    virtual auto as_float() const -> float64 = 0;
+    virtual auto as_float() const -> float64   = 0;
 
     virtual auto operator+(const Number&) const -> std::unique_ptr<Number> = 0;
     virtual auto operator-(const Number&) const -> std::unique_ptr<Number> = 0;
-    virtual auto operator*(const Number&)const -> std::unique_ptr<Number> = 0;
+    virtual auto operator*(const Number&)const -> std::unique_ptr<Number>  = 0;
     virtual auto operator/(const Number&) const -> std::unique_ptr<Number> = 0;
 
     virtual auto operator<(const Number&) const -> std::unique_ptr<Boolean> = 0;
     virtual auto operator<=(const Number&) const
-        -> std::unique_ptr<Boolean> = 0;
+        -> std::unique_ptr<Boolean>                                         = 0;
     virtual auto operator>(const Number&) const -> std::unique_ptr<Boolean> = 0;
     virtual auto operator>=(const Number&) const
         -> std::unique_ptr<Boolean> = 0;

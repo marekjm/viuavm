@@ -85,11 +85,11 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
     cout << ' ';
     indent << ' ';
 
-    bool has_matched = false;
+    bool has_matched           = false;
     bool has_matched_for_aside = false;
     while (i < tokens.size()) {
         const auto& each = tokens.at(i++);
-        bool match = error.match(each);
+        bool match       = error.match(each);
 
         if (each == "\n") {
             cout << send_control_seq(ATTR_RESET);
@@ -229,9 +229,9 @@ auto viua::assembler::util::pretty_printer::display_error_header(
 auto viua::assembler::util::pretty_printer::display_error_location(
     const vector<viua::cg::lex::Token>& tokens,
     const viua::cg::lex::InvalidSyntax error) -> void {
-    const unsigned context_lines = 2;
+    const unsigned context_lines          = 2;
     decltype(error.line()) context_before = 0,
-                           context_after = (error.line() + context_lines);
+                           context_after  = (error.line() + context_lines);
     if (error.line() >= context_lines) {
         context_before = (error.line() - context_lines);
     }

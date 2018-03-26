@@ -74,7 +74,7 @@ viua::internals::types::byte* viua::process::Process::oppamv(
     /** Run pamv instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0,
-                                           source = 0;
+                                           source                     = 0;
     tie(addr, parameter_no_operand_index) =
         viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) =
@@ -178,8 +178,8 @@ viua::internals::types::byte* viua::process::Process::opcall(
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_native         = scheduler->is_native_function(call_name);
+    bool is_foreign        = scheduler->is_foreign_function(call_name);
     bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
@@ -255,8 +255,8 @@ viua::internals::types::byte* viua::process::Process::optailcall(
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_native         = scheduler->is_native_function(call_name);
+    bool is_foreign        = scheduler->is_foreign_function(call_name);
     bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
@@ -302,8 +302,8 @@ viua::internals::types::byte* viua::process::Process::opdefer(
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    bool is_native         = scheduler->is_native_function(call_name);
+    bool is_foreign        = scheduler->is_foreign_function(call_name);
     bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {

@@ -39,9 +39,9 @@ using namespace std;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
+bool VERBOSE      = false;
 
 bool AS_LIB = false;
 
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
     vector<Token> normalised_tokens;
 
     try {
-        tokens = viua::cg::lex::cook(raw_tokens);
+        tokens            = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(

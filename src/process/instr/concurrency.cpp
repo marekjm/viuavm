@@ -61,7 +61,7 @@ viua::internals::types::byte* viua::process::Process::opprocess(
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native = scheduler->is_native_function(call_name);
+    bool is_native  = scheduler->is_native_function(call_name);
     bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
@@ -111,12 +111,12 @@ viua::internals::types::byte* viua::process::Process::opjoin(
     }
 
     if (timeout and not timeout_active) {
-        waiting_until = (std::chrono::steady_clock::now() +
+        waiting_until  = (std::chrono::steady_clock::now() +
                          std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
     } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
-        timeout_active = true;
+        timeout_active      = true;
     }
 
     if (scheduler->is_stopped(thrd->pid())) {
@@ -131,7 +131,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(
         }
     } else if (timeout_active and (not wait_until_infinity) and
                (waiting_until < std::chrono::steady_clock::now())) {
-        timeout_active = false;
+        timeout_active      = false;
         wait_until_infinity = false;
         stack->thrown =
             make_unique<viua::types::Exception>("process did not join");
@@ -183,12 +183,12 @@ viua::internals::types::byte* viua::process::Process::opreceive(
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (timeout and not timeout_active) {
-        waiting_until = (std::chrono::steady_clock::now() +
+        waiting_until  = (std::chrono::steady_clock::now() +
                          std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
     } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
-        timeout_active = true;
+        timeout_active      = true;
     }
 
     if (not is_hidden) {
@@ -200,16 +200,16 @@ viua::internals::types::byte* viua::process::Process::opreceive(
             *target = std::move(message_queue.front());
         }
         message_queue.pop();
-        timeout_active = false;
+        timeout_active      = false;
         wait_until_infinity = false;
-        return_addr = addr;
+        return_addr         = addr;
     } else {
         if (is_hidden) {
             suspend();
         }
         if (timeout_active and (not wait_until_infinity) and
             (waiting_until < std::chrono::steady_clock::now())) {
-            timeout_active = false;
+            timeout_active      = false;
             wait_until_infinity = false;
             stack->thrown =
                 make_unique<viua::types::Exception>("no message received");
@@ -225,7 +225,7 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    bool is_native = scheduler->is_native_function(call_name);
+    bool is_native  = scheduler->is_native_function(call_name);
     bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {

@@ -59,17 +59,17 @@ IdToAddressMapping Loader::loadmap(char* bytedump,
 }
 void Loader::calculate_function_sizes() {
     for (unsigned i = 0; i < functions.size(); ++i) {
-        string name = functions[i];
+        string name      = functions[i];
         uint64_t el_size = 0;
 
         if (i < (functions.size() - 1)) {
             uint64_t a = function_addresses[name];
             uint64_t b = function_addresses[functions[i + 1]];
-            el_size = (b - a);
+            el_size    = (b - a);
         } else {
             uint64_t a = function_addresses[name];
             uint64_t b = size;
-            el_size = (b - a);
+            el_size    = (b - a);
         }
 
         function_sizes[name] = el_size;
@@ -113,7 +113,7 @@ static map<string, string> load_meta_information_map(ifstream& in) {
     map<string, string> meta_information_map;
 
     char* buffer = meta_information_map_buffer.get();
-    uint64_t i = 0;
+    uint64_t i   = 0;
     string key, value;
     while (i < meta_information_map_size) {
         key = string(buffer + i);
@@ -138,7 +138,7 @@ static vector<string> load_string_list(ifstream& in) {
     in.read(signatures_section_buffer.get(),
             static_cast<std::streamsize>(signatures_section_size));
 
-    uint64_t i = 0;
+    uint64_t i   = 0;
     char* buffer = signatures_section_buffer.get();
     string sig;
     vector<string> strings_list;

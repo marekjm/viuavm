@@ -28,7 +28,7 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel,
     loader.executable();
 
     auto const bytes = loader.get_bytecode_size();
-    auto bytecode = loader.get_bytecode();
+    auto bytecode    = loader.get_bytecode();
 
     auto const function_address_mapping = loader.get_function_addresses();
     for (auto const p : function_address_mapping) {

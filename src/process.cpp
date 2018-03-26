@@ -156,8 +156,8 @@ viua::internals::types::byte* viua::process::Process::call_native(
             "function takes no parameters");
     }
 
-    stack->frame_new->function_name = call_name;
-    stack->frame_new->return_address = return_address;
+    stack->frame_new->function_name   = call_name;
+    stack->frame_new->return_address  = return_address;
     stack->frame_new->return_register = return_register;
 
     push_frame();
@@ -173,8 +173,8 @@ viua::internals::types::byte* viua::process::Process::call_foreign(
             "code if the function takes no parameters");
     }
 
-    stack->frame_new->function_name = call_name;
-    stack->frame_new->return_address = return_address;
+    stack->frame_new->function_name   = call_name;
+    stack->frame_new->return_address  = return_address;
     stack->frame_new->return_register = return_register;
 
     suspend();
@@ -191,8 +191,8 @@ viua::internals::types::byte* viua::process::Process::call_foreign_method(
             "foreign method call without a frame");
     }
 
-    stack->frame_new->function_name = call_name;
-    stack->frame_new->return_address = return_address;
+    stack->frame_new->function_name   = call_name;
+    stack->frame_new->return_address  = return_address;
     stack->frame_new->return_register = return_register;
 
     Frame* frame = stack->frame_new.get();
@@ -247,8 +247,8 @@ auto viua::process::Process::push_deferred(string call_name) -> void {
             "function takes no parameters");
     }
 
-    stack->frame_new->function_name = call_name;
-    stack->frame_new->return_address = nullptr;
+    stack->frame_new->function_name   = call_name;
+    stack->frame_new->return_address  = nullptr;
     stack->frame_new->return_register = nullptr;
 
     stack->back()->deferred_calls.push_back(std::move(stack->frame_new));
@@ -460,7 +460,7 @@ viua::internals::types::byte* viua::process::Process::become(
     finished.store(false, std::memory_order_release);
 
     frame_to_use->function_name = function_name;
-    stack->frame_new = std::move(frame_to_use);
+    stack->frame_new            = std::move(frame_to_use);
 
     push_frame();
 
@@ -519,12 +519,12 @@ viua::process::Process::Process(unique_ptr<Frame> frm,
     global_register_set =
         make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
     currently_used_register_set = frm->local_register_set.get();
-    auto s = make_unique<Stack>(frm->function_name, this,
+    auto s                      = make_unique<Stack>(frm->function_name, this,
                                 &currently_used_register_set,
                                 global_register_set.get(), scheduler);
     s->emplace_back(std::move(frm));
     s->bind(&currently_used_register_set, global_register_set.get());
-    stack = s.get();
+    stack           = s.get();
     stacks[s.get()] = std::move(s);
 }
 

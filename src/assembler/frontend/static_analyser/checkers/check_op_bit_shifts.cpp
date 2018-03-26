@@ -63,7 +63,7 @@ auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
         register_usage_profile, *offset);
 
     if (result) {
-        auto val = Register(*result);
+        auto val       = Register(*result);
         val.value_type = ValueTypes::BITS;
         register_usage_profile.define(val, result->tokens.at(0));
     }
