@@ -394,25 +394,25 @@ VIUA_INSTR_FILES_O=build/process/instr/general.o \
 				   build/process/instr/struct.o \
 				   build/process/instr/atom.o
 
-VIUA_TYPES_FILES_O=build/types/vector.o \
-				   build/types/boolean.o \
-				   build/types/function.o \
-				   build/types/closure.o \
-				   build/types/string.o \
-				   build/types/text.o \
-				   build/types/atom.o \
-				   build/types/struct.o \
-				   build/types/number.o \
-				   build/types/integer.o \
+VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/bits.o \
-				   build/types/float.o \
+				   build/types/boolean.o \
+				   build/types/closure.o \
 				   build/types/exception.o \
-				   build/types/prototype.o \
+				   build/types/float.o \
+				   build/types/function.o \
+				   build/types/integer.o \
+				   build/types/number.o \
 				   build/types/object.o \
-				   build/types/reference.o \
+				   build/types/pointer.o \
 				   build/types/process.o \
+				   build/types/prototype.o \
+				   build/types/reference.o \
+				   build/types/string.o \
+				   build/types/struct.o \
+				   build/types/text.o \
 				   build/types/value.o \
-				   build/types/pointer.o 
+				   build/types/vector.o
 
 build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/kernel.o \
