@@ -70,7 +70,7 @@ class ArityException : public viua::types::Exception {
     }
 
     ArityException(decltype(got_arity) a, decltype(valid_arities) v)
-        : got_arity(a), valid_arities(v) {}
+            : got_arity(a), valid_arities(v) {}
     ~ArityException() {}
 };
 
@@ -99,7 +99,7 @@ class TypeException : public viua::types::Exception {
     }
 
     TypeException(decltype(expected) e, decltype(got) g)
-        : expected(e), got(g) {}
+            : expected(e), got(g) {}
     ~TypeException() {}
 };
 

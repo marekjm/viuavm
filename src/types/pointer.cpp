@@ -115,10 +115,10 @@ void viua::types::Pointer::expired(Frame* frm,
 
 
 viua::types::Pointer::Pointer(const viua::process::Process* poi)
-    : points_to(nullptr), valid(false), process_of_origin(poi) {}
+        : points_to(nullptr), valid(false), process_of_origin(poi) {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
                               const viua::process::Process* poi)
-    : points_to(t), valid(true), process_of_origin(poi) {
+        : points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
 viua::types::Pointer::~Pointer() {

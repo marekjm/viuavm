@@ -779,20 +779,20 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     mutex* fp_mtx,
     condition_variable* fp_cv,
     const bool enable_tracing)
-    : attached_kernel(akernel)
-    , tracing_enabled(enable_tracing)
-    , free_processes(fp)
-    , free_processes_mutex(fp_mtx)
-    , free_processes_cv(fp_cv)
-    , main_process(nullptr)
-    , current_process_index(0)
-    , exit_code(0)
-    , current_load(0)
-    , shut_down(false) {}
+        : attached_kernel(akernel)
+        , tracing_enabled(enable_tracing)
+        , free_processes(fp)
+        , free_processes_mutex(fp_mtx)
+        , free_processes_cv(fp_cv)
+        , main_process(nullptr)
+        , current_process_index(0)
+        , exit_code(0)
+        , current_load(0)
+        , shut_down(false) {}
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     VirtualProcessScheduler&& that)
-    : tracing_enabled(that.tracing_enabled) {
+        : tracing_enabled(that.tracing_enabled) {
     attached_kernel = that.attached_kernel;
 
     free_processes       = that.free_processes;

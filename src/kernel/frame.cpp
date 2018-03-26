@@ -30,10 +30,10 @@ void Frame::set_local_register_set(viua::kernel::RegisterSet* rs,
 Frame::Frame(viua::internals::types::byte* ra,
              viua::internals::types::register_index argsize,
              viua::internals::types::register_index regsize)
-    : return_address(ra)
-    , arguments(nullptr)
-    , local_register_set(nullptr)
-    , return_register(nullptr) {
+        : return_address(ra)
+        , arguments(nullptr)
+        , local_register_set(nullptr)
+        , return_register(nullptr) {
     arguments          = make_unique<viua::kernel::RegisterSet>(argsize);
     local_register_set = make_unique<viua::kernel::RegisterSet>(regsize);
 }

@@ -137,7 +137,7 @@ Program::Program(uint64_t bts) : bytes(bts), debug(false), scream(false) {
     addr_ptr = program.get();
 }
 Program::Program(const Program& that)
-    : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
+        : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
     program = make_unique<viua::internals::types::byte[]>(bytes);
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         program[i] = that.program[i];

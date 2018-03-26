@@ -33,7 +33,7 @@ using namespace std;
 
 
 viua::process::PID::PID(const viua::process::Process* p)
-    : associated_process(p) {}
+        : associated_process(p) {}
 bool viua::process::PID::operator==(const viua::process::PID& that) const {
     return (associated_process == that.associated_process);
 }

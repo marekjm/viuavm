@@ -51,7 +51,7 @@ class ForeignFunctionCallRequest {
     ForeignFunctionCallRequest(Frame* fr,
                                viua::process::Process* cp,
                                viua::kernel::Kernel* c)
-        : frame(fr), caller_process(cp), kernel(c) {}
+            : frame(fr), caller_process(cp), kernel(c) {}
     ~ForeignFunctionCallRequest() {}
 };
 

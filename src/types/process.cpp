@@ -58,4 +58,4 @@ viua::process::PID viua::types::Process::pid() const {
 }
 
 viua::types::Process::Process(viua::process::Process* t)
-    : thrd(t), saved_pid(thrd->pid()) {}
+        : thrd(t), saved_pid(thrd->pid()) {}

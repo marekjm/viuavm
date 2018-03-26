@@ -58,6 +58,6 @@ unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
 }
 
 viua::types::Exception::Exception(string s)
-    : cause(s), detailed_type("Exception") {}
+        : cause(s), detailed_type("Exception") {}
 viua::types::Exception::Exception(string ts, string cs)
-    : cause(cs), detailed_type(ts) {}
+        : cause(cs), detailed_type(ts) {}

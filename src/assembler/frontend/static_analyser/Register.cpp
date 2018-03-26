@@ -35,5 +35,5 @@ auto Register::operator==(const Register& that) const -> bool {
 }
 
 Register::Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
-    : index(ri.index), register_set(ri.rss) {}
+        : index(ri.index), register_set(ri.rss) {}
 }}}}  // namespace viua::assembler::frontend::static_analyser

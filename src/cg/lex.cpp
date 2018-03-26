@@ -66,10 +66,10 @@ Token::operator string() const {
 Token::Token(decltype(line_number) line_,
              decltype(character_in_line) character_,
              string content_)
-    : content(content_)
-    , original_content(content)
-    , line_number(line_)
-    , character_in_line(character_) {}
+        : content(content_)
+        , original_content(content)
+        , line_number(line_)
+        , character_in_line(character_) {}
 Token::Token() : Token(0, 0, "") {}
 
 auto InvalidSyntax::what() const -> const char* {
@@ -147,17 +147,17 @@ auto InvalidSyntax::match_aside(Token token) const -> bool {
 InvalidSyntax::InvalidSyntax(decltype(line_number) ln,
                              decltype(character_in_line) ch,
                              string ct)
-    : line_number(ln), character_in_line(ch), content(ct) {}
+        : line_number(ln), character_in_line(ch), content(ct) {}
 InvalidSyntax::InvalidSyntax(Token t, string m)
-    : line_number(t.line())
-    , character_in_line(t.character())
-    , content(t.original())
-    , message(m) {
+        : line_number(t.line())
+        , character_in_line(t.character())
+        , content(t.original())
+        , message(m) {
     add(t);
 }
 
 UnusedValue::UnusedValue(Token token)
-    : InvalidSyntax(token, ("unused value in register " + token.str())) {}
+        : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
 UnusedValue::UnusedValue(Token token, string s) : InvalidSyntax(token, s) {}
 

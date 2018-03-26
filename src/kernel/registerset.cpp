@@ -92,10 +92,10 @@ bool viua::kernel::Register::is_flagged(mask_type filter) const {
 viua::kernel::Register::Register() : value(nullptr), mask(0) {}
 
 viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o)
-    : value(std::move(o)), mask(0) {}
+        : value(std::move(o)), mask(0) {}
 
 viua::kernel::Register::Register(Register&& that)
-    : value(std::move(that.value)), mask(that.mask) {
+        : value(std::move(that.value)), mask(that.mask) {
     that.mask = 0;
 }
 
@@ -417,7 +417,7 @@ unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
 
 viua::kernel::RegisterSet::RegisterSet(
     viua::internals::types::register_index sz)
-    : registerset_size(sz) {
+        : registerset_size(sz) {
     /** Create register set with specified size.
      */
     registers.reserve(sz);
