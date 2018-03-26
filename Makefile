@@ -476,16 +476,23 @@ build/bin/vm/asm: build/front/asm.o \
 	build/program.o \
 	build/programinstructions.o \
 	build/cg/tokenizer/tokenize.o \
-	build/cg/assembler/operands.o build/cg/assembler/codeextract.o \
+	build/cg/assembler/operands.o \
+	build/cg/assembler/codeextract.o \
 	build/cg/lex.o \
 	build/cg/lex/reduce_fns.o \
 	build/cg/lex/cook.o \
 	build/cg/tools.o \
 	build/cg/assembler/verify.o \
 	build/cg/assembler/static_analysis.o \
-	build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o \
-	build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o \
-	build/assembler/frontend/parser.o build/assembler/frontend/static_analyser/verifier.o \
+	build/cg/assembler/utils.o \
+	build/cg/bytecode/instructions.o \
+	build/loader.o \
+	build/machine.o \
+	build/support/string.o \
+	build/support/env.o \
+	build/cg/assembler/binary_literals.o \
+	build/assembler/frontend/parser.o \
+	build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
 	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
 	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
