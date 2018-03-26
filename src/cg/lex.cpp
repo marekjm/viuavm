@@ -47,10 +47,10 @@ namespace viua {
             Token::operator string() const { return str(); }
 
             Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_)
-                : content(content_),
-                  original_content(content),
-                  line_number(line_),
-                  character_in_line(character_) {}
+                : content(content_)
+                , original_content(content)
+                , line_number(line_)
+                , character_in_line(character_) {}
             Token::Token() : Token(0, 0, "") {}
 
             auto InvalidSyntax::what() const -> const char* { return message.c_str(); }

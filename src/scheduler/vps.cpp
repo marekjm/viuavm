@@ -660,16 +660,16 @@ int viua::scheduler::VirtualProcessScheduler::exit() const { return exit_code; }
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     viua::kernel::Kernel* akernel, vector<unique_ptr<viua::process::Process>>* fp, mutex* fp_mtx,
     condition_variable* fp_cv, const bool enable_tracing)
-    : attached_kernel(akernel),
-      tracing_enabled(enable_tracing),
-      free_processes(fp),
-      free_processes_mutex(fp_mtx),
-      free_processes_cv(fp_cv),
-      main_process(nullptr),
-      current_process_index(0),
-      exit_code(0),
-      current_load(0),
-      shut_down(false) {}
+    : attached_kernel(akernel)
+    , tracing_enabled(enable_tracing)
+    , free_processes(fp)
+    , free_processes_mutex(fp_mtx)
+    , free_processes_cv(fp_cv)
+    , main_process(nullptr)
+    , current_process_index(0)
+    , exit_code(0)
+    , current_load(0)
+    , shut_down(false) {}
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcessScheduler&& that)
     : tracing_enabled(that.tracing_enabled) {

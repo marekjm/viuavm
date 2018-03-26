@@ -27,19 +27,19 @@ using namespace std;
 
 viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** curs,
                             viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch)
-    : current_state(STATE::RUNNING),
-      entry_function(fn),
-      parent_process(pp),
-      jump_base(nullptr),
-      instruction_pointer(nullptr),
-      frame_new(nullptr),
-      try_frame_new(nullptr),
-      thrown(nullptr),
-      caught(nullptr),
-      currently_used_register_set(curs),
-      global_register_set(gs),
-      return_value(nullptr),
-      scheduler(sch) {}
+    : current_state(STATE::RUNNING)
+    , entry_function(fn)
+    , parent_process(pp)
+    , jump_base(nullptr)
+    , instruction_pointer(nullptr)
+    , frame_new(nullptr)
+    , try_frame_new(nullptr)
+    , thrown(nullptr)
+    , caught(nullptr)
+    , currently_used_register_set(curs)
+    , global_register_set(gs)
+    , return_value(nullptr)
+    , scheduler(sch) {}
 
 auto viua::process::Stack::set_return_value() -> void {
     // FIXME find better name for this function

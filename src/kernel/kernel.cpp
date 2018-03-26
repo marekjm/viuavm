@@ -590,14 +590,14 @@ int viua::kernel::Kernel::run() {
 }
 
 viua::kernel::Kernel::Kernel()
-    : bytecode(nullptr),
-      bytecode_size(0),
-      executable_offset(0),
-      return_code(0),
-      vp_schedulers_limit(default_vp_schedulers_limit),
-      ffi_schedulers_limit(default_ffi_schedulers_limit),
-      debug(false),
-      errors(false) {
+    : bytecode(nullptr)
+    , bytecode_size(0)
+    , executable_offset(0)
+    , return_code(0)
+    , vp_schedulers_limit(default_vp_schedulers_limit)
+    , ffi_schedulers_limit(default_ffi_schedulers_limit)
+    , debug(false)
+    , errors(false) {
     ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
         foreign_call_workers.emplace_back(make_unique<std::thread>(
