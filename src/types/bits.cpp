@@ -202,8 +202,7 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
 }
 
 
-namespace viua {
-namespace arithmetic {
+namespace viua { namespace arithmetic {
 namespace wrapping {
 static auto binary_increment(vector<bool> const& v)
     -> pair<bool, vector<bool>> {
@@ -1301,8 +1300,7 @@ static auto signed_div(vector<bool> dividend, vector<bool> divisor)
     return quotinent;
 }
 }  // namespace saturating
-}  // namespace arithmetic
-}  // namespace viua
+}}  // namespace viua::arithmetic
 
 
 const string viua::types::Bits::type_name = "Bits";

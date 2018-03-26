@@ -28,8 +28,7 @@
 #include <viua/types/number.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Float : public viua::types::numeric::Number {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
@@ -67,8 +66,7 @@ class Float : public viua::types::numeric::Number {
 
     Float(decltype(number) n = 0);
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

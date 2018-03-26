@@ -36,9 +36,7 @@ class Kernel;
 }  // namespace viua
 
 
-namespace viua {
-namespace scheduler {
-namespace ffi {
+namespace viua { namespace scheduler { namespace ffi {
 class ForeignFunctionCallRequest {
     std::unique_ptr<Frame> frame;
     viua::process::Process* caller_process;
@@ -63,9 +61,7 @@ void ff_call_processor(
     std::mutex* ff_map_mtx,
     std::mutex* mtx,
     std::condition_variable* cv);
-}  // namespace ffi
-}  // namespace scheduler
-}  // namespace viua
+}}}  // namespace viua::scheduler::ffi
 
 
 #endif

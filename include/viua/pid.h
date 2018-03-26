@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace viua {
-namespace process {
+namespace viua { namespace process {
 class Process;
 
 class PID {
@@ -43,8 +42,7 @@ class PID {
 
     PID(const viua::process::Process*);
 };
-}  // namespace process
-}  // namespace viua
+}}  // namespace viua::process
 
 
 #endif

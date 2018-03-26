@@ -25,9 +25,7 @@
 #include <viua/support/string.h>
 using namespace std;
 
-namespace viua {
-namespace cg {
-namespace lex {
+namespace viua { namespace cg { namespace lex {
 auto Token::line() const -> decltype(line_number) {
     return line_number;
 }
@@ -1933,6 +1931,4 @@ auto join_tokens(vector<Token> const tokens,
 
     return joined.str();
 }
-}  // namespace lex
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::lex

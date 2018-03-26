@@ -59,8 +59,7 @@ class ForeignFunctionCallRequest;
 }  // namespace viua
 
 
-namespace viua {
-namespace kernel {
+namespace viua { namespace kernel {
 class Mailbox {
     mutable std::mutex mailbox_mutex;
     std::vector<std::unique_ptr<viua::types::Value>> messages;
@@ -325,7 +324,6 @@ class Kernel {
     Kernel();
     ~Kernel();
 };
-}  // namespace kernel
-}  // namespace viua
+}}  // namespace viua::kernel
 
 #endif

@@ -57,11 +57,8 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
     }
 }
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto map_names_to_register_indexes(
     Register_usage_profile& register_usage_profile,
     InstructionsBlock const& ib) -> void {
@@ -96,19 +93,12 @@ auto map_names_to_register_indexes(
         register_usage_profile.index_to_name[index] = name;
     }
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
 
 using InstructionIndex = InstructionsBlock::size_type;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_register_usage_for_instruction_block_impl(
     Register_usage_profile& register_usage_profile,
     ParsedSource const& ps,
@@ -519,11 +509,7 @@ auto check_register_usage_for_instruction_block_impl(
     check_for_unused_registers(register_usage_profile);
     check_closure_instantiations(register_usage_profile, ps, created_closures);
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
 
 static auto check_register_usage_for_instruction_block(
     const ParsedSource& ps,

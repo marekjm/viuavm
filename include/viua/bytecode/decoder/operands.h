@@ -32,17 +32,12 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace process {
+namespace viua { namespace process {
 class Process;
-}
-}  // namespace viua
+}}  // namespace viua::process
 
 
-namespace viua {
-namespace bytecode {
-namespace decoder {
-namespace operands {
+namespace viua { namespace bytecode { namespace decoder { namespace operands {
 auto get_operand_type(viua::internals::types::byte const* const) -> OperandType;
 
 /*
@@ -135,10 +130,7 @@ auto fetch_raw_float(viua::internals::types::byte*, viua::process::Process*)
  */
 auto extract_primitive_uint64(viua::internals::types::byte*,
                               viua::process::Process*) -> uint64_t;
-}  // namespace operands
-}  // namespace decoder
-}  // namespace bytecode
-}  // namespace viua
+}}}}  // namespace viua::bytecode::decoder::operands
 
 
 #endif

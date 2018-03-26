@@ -41,8 +41,7 @@ class Kernel;
 }  // namespace viua
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class String : public Value {
     /** String type.
      *
@@ -120,8 +119,7 @@ class String : public Value {
 
     String(std::string s = "");
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

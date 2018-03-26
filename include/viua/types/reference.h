@@ -28,8 +28,7 @@
 #include <vector>
 #include <viua/types/value.h>
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Reference : public Value {
     // FIXME maybe just use std::shared_ptr<> ?
     Value** pointer;
@@ -59,8 +58,7 @@ class Reference : public Value {
     Reference(Value* ptr);
     virtual ~Reference();
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

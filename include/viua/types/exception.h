@@ -28,8 +28,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Exception : public Value {
     /** Exception type.
      *
@@ -56,8 +55,7 @@ class Exception : public Value {
     Exception(std::string s = "");
     Exception(std::string ts, std::string cs);
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

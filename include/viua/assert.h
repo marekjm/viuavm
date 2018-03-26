@@ -29,8 +29,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace assertions {
+namespace viua { namespace assertions {
 void assert_typeof(viua::types::Value* object, const std::string& expected);
 
 template<typename T, typename U>
@@ -53,8 +52,7 @@ void assert_arity(const Frame* frame, const A&... valid_arities) {
         throw ex;
     }
 }
-}  // namespace assertions
-}  // namespace viua
+}}  // namespace viua::assertions
 
 
 #endif

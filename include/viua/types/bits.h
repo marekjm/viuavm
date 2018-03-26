@@ -28,8 +28,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Bits : public viua::types::Value {
     std::vector<bool> underlying_array;
 
@@ -99,8 +98,7 @@ class Bits : public viua::types::Value {
     Bits(const size_type);
     Bits(const size_type, const uint8_t*);
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

@@ -61,8 +61,7 @@ enum OperandType : uint8_t {
     OT_FALSE,  // encodes literal false
 };
 
-namespace viua {
-namespace internals {
+namespace viua { namespace internals {
 enum class AccessSpecifier {
     DIRECT,
     REGISTER_INDIRECT,
@@ -136,7 +135,6 @@ enum class ValueTypes : ValueTypesType {
 
     POINTER = 1 << 15,
 };
-}  // namespace internals
-}  // namespace viua
+}}  // namespace viua::internals
 
 #endif

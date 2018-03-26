@@ -34,15 +34,12 @@
 
 
 // we only need a pointer so class declaration will be sufficient
-namespace viua {
-namespace kernel {
+namespace viua { namespace kernel {
 class Kernel;
-}
-}  // namespace viua
+}}  // namespace viua::kernel
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Process : public Value {
     viua::process::Process* thrd;
     viua::process::PID saved_pid;
@@ -68,8 +65,7 @@ class Process : public Value {
 
     Process(viua::process::Process*);
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

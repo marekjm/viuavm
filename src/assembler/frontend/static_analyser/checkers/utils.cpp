@@ -24,11 +24,8 @@
 
 using viua::assembler::frontend::parser::Instruction;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 using viua::assembler::frontend::parser::AtomLiteral;
 using viua::assembler::frontend::parser::BitsLiteral;
 using viua::assembler::frontend::parser::BooleanLiteral;
@@ -310,8 +307,4 @@ auto depointerise_type_if_needed(ValueTypes const t,
     -> ValueTypes {
     return (access_via_pointer_dereference ? (t ^ ValueTypes::POINTER) : t);
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

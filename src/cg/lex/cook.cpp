@@ -25,9 +25,7 @@
 #include <viua/support/string.h>
 using namespace std;
 
-namespace viua {
-namespace cg {
-namespace lex {
+namespace viua { namespace cg { namespace lex {
 auto cook(vector<Token> tokens, const bool with_replaced_names)
     -> vector<Token> {
     /*
@@ -163,6 +161,4 @@ auto cook(vector<Token> tokens, const bool with_replaced_names)
 
     return tokens;
 }
-}  // namespace lex
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::lex

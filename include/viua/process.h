@@ -45,14 +45,11 @@ class HaltException : public std::runtime_error {
 };
 
 
-namespace viua {
-namespace scheduler {
+namespace viua { namespace scheduler {
 class VirtualProcessScheduler;
-}
-}  // namespace viua
+}}  // namespace viua::scheduler
 
-namespace viua {
-namespace process {
+namespace viua { namespace process {
 class Process;
 
 class Stack {
@@ -533,8 +530,7 @@ class Process {
     static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =
         255;
 };
-}  // namespace process
-}  // namespace viua
+}}  // namespace viua::process
 
 
 #endif

@@ -22,11 +22,8 @@
 
 using viua::assembler::frontend::parser::Instruction;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
                           Instruction const& instruction,
                           std::map<Register, Closure>& created_closures)
@@ -70,8 +67,4 @@ auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
     val.value_type   = register_usage_profile.at(*source).second.value_type;
     created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

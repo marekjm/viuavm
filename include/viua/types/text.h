@@ -40,8 +40,7 @@ class Kernel;
 }  // namespace viua
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Text : public Value {
     /**
      *  This type is designed to hold UTF-8 encoded text.
@@ -82,8 +81,7 @@ class Text : public Value {
     Text(Text&&);
     ~Text() {}
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

@@ -26,9 +26,7 @@
 #include <vector>
 
 
-namespace viua {
-namespace cg {
-namespace lex {
+namespace viua { namespace cg { namespace lex {
 class Token {
     std::string content, original_content;
     decltype(content.size()) line_number, character_in_line;
@@ -168,9 +166,7 @@ auto move_inline_blocks_out(std::vector<Token>) -> std::vector<Token>;
 auto unwrap_lines(std::vector<Token>, bool full = true) -> std::vector<Token>;
 
 auto cook(std::vector<Token>, bool const = true) -> std::vector<Token>;
-}  // namespace lex
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::lex
 
 
 #endif

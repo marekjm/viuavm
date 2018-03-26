@@ -28,8 +28,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Struct : public Value {
     /** A generic object class.
      *
@@ -58,8 +57,7 @@ class Struct : public Value {
 
     ~Struct() override = default;
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

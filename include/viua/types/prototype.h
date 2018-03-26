@@ -26,8 +26,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Prototype : public Value {
     /** A prototype of a type.
      *
@@ -70,8 +69,7 @@ class Prototype : public Value {
     Prototype(const std::string& tn);
     virtual ~Prototype();
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

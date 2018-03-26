@@ -32,9 +32,7 @@ using TokenVector        = vector<Token>;
 using bytecode_size_type = viua::internals::types::bytecode_size;
 
 
-namespace viua {
-namespace cg {
-namespace tools {
+namespace viua { namespace cg { namespace tools {
 static auto size_of_register_index_operand_with_rs_type(
     TokenVector const& tokens,
     TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
@@ -1635,6 +1633,4 @@ auto calculate_bytecode_size2(TokenVector const& tokens) -> bytecode_size_type {
     return calculate_bytecode_size_of_first_n_instructions2(tokens,
                                                             tokens.size());
 }
-}  // namespace tools
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::tools

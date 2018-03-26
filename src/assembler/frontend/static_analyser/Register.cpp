@@ -19,9 +19,7 @@
 
 #include <viua/assembler/frontend/static_analyser.h>
 
-namespace viua {
-namespace assembler {
-namespace frontend {
+namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
 auto Register::operator<(const Register& that) const -> bool {
     if (register_set < that.register_set) {
@@ -38,7 +36,4 @@ auto Register::operator==(const Register& that) const -> bool {
 
 Register::Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
     : index(ri.index), register_set(ri.rss) {}
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}  // namespace viua::assembler::frontend::static_analyser

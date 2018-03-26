@@ -25,9 +25,7 @@
 #include <viua/support/string.h>
 using namespace std;
 
-namespace viua {
-namespace cg {
-namespace lex {
+namespace viua { namespace cg { namespace lex {
 static auto is_valid_register_id(string s) -> bool {
     return (str::isnum(s) or str::isid(s));
 }
@@ -934,6 +932,4 @@ auto replace_named_registers(std::vector<Token> input_tokens)
 
     return tokens;
 }
-}  // namespace lex
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::lex

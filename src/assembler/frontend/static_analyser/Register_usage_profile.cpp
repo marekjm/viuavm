@@ -19,9 +19,7 @@
 
 #include <viua/assembler/frontend/static_analyser.h>
 
-namespace viua {
-namespace assembler {
-namespace frontend {
+namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
 using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::Token;
@@ -101,7 +99,4 @@ auto Register_usage_profile::begin() const
 auto Register_usage_profile::end() const -> decltype(defined_registers.end()) {
     return defined_registers.end();
 }
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}  // namespace viua::assembler::frontend::static_analyser

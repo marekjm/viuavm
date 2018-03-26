@@ -42,8 +42,7 @@ class Kernel;
 }  // namespace viua
 
 
-namespace viua {
-namespace scheduler {
+namespace viua { namespace scheduler {
 class VirtualProcessScheduler {
     /** Scheduler of Viua VM virtual processes.
      */
@@ -150,8 +149,7 @@ class VirtualProcessScheduler {
     VirtualProcessScheduler(VirtualProcessScheduler&&);
     ~VirtualProcessScheduler();
 };
-}  // namespace scheduler
-}  // namespace viua
+}}  // namespace viua::scheduler
 
 
 #endif

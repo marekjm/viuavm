@@ -27,8 +27,7 @@
 #include <viua/types/number.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Integer : public viua::types::numeric::Number {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
@@ -70,8 +69,7 @@ class Integer : public viua::types::numeric::Number {
 
     Integer(decltype(number) n = 0) : number(n) {}
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

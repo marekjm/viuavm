@@ -27,9 +27,7 @@
 #include <viua/cg/lex.h>
 
 
-namespace viua {
-namespace cg {
-namespace tools {
+namespace viua { namespace cg { namespace tools {
 template<class T> static auto any(T item, T other) -> bool {
     return (item == other);
 }
@@ -47,9 +45,7 @@ auto calculate_bytecode_size_of_first_n_instructions2(
     -> viua::internals::types::bytecode_size;
 auto calculate_bytecode_size2(std::vector<viua::cg::lex::Token> const&)
     -> viua::internals::types::bytecode_size;
-}  // namespace tools
-}  // namespace cg
-}  // namespace viua
+}}}  // namespace viua::cg::tools
 
 
 #endif

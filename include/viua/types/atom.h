@@ -25,8 +25,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Atom : public Value {
     const std::string value;
 
@@ -50,8 +49,7 @@ class Atom : public Value {
     Atom(std::string);
     ~Atom() override = default;
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

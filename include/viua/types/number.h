@@ -33,8 +33,7 @@ namespace viua {
 using float32 = float;
 using float64 = double;
 
-namespace types {
-namespace numeric {
+namespace types { namespace numeric {
 class Number : public Value {
     /** Base number type.
      *
@@ -71,8 +70,7 @@ class Number : public Value {
     Number();
     virtual ~Number();
 };
-}  // namespace numeric
-}  // namespace types
+}}  // namespace types::numeric
 }  // namespace viua
 
 

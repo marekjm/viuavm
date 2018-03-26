@@ -25,9 +25,9 @@
 #include <viua/cg/lex.h>
 
 namespace viua {
-namespace assembler {
-namespace util {
-namespace pretty_printer {
+    namespace assembler {
+        namespace util {
+            namespace pretty_printer {
 const std::string COLOR_FG_RED          = "\x1b[38;5;1m";
 const std::string COLOR_FG_YELLOW       = "\x1b[38;5;3m";
 const std::string COLOR_FG_CYAN         = "\x1b[38;5;6m";
@@ -62,9 +62,6 @@ auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
                               const viua::cg::lex::TracedSyntaxError error,
                               const std::string& filename) -> void;
-}  // namespace pretty_printer
-}  // namespace util
-}  // namespace assembler
-}  // namespace viua
+}}}}  // namespace viua::assembler::util::pretty_printer
 
 #endif

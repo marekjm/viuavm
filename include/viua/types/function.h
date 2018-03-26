@@ -28,8 +28,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Function : public Value {
   public:
     static const std::string type_name;
@@ -50,8 +49,7 @@ class Function : public Value {
     Function(const std::string& = "");
     virtual ~Function();
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

@@ -36,8 +36,7 @@ enum REGISTER_MASKS : mask_type {
 };
 
 
-namespace viua {
-namespace kernel {
+namespace viua { namespace kernel {
 class Register {
     std::unique_ptr<viua::types::Value> value;
     mask_type mask;
@@ -110,8 +109,7 @@ class RegisterSet {
     RegisterSet(viua::internals::types::register_index sz);
     ~RegisterSet();
 };
-}  // namespace kernel
-}  // namespace viua
+}}  // namespace viua::kernel
 
 
 #endif

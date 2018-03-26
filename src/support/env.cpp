@@ -22,8 +22,7 @@
 #include <viua/support/env.h>
 using namespace std;
 
-namespace support {
-namespace env {
+namespace support { namespace env {
 auto get_var(string const& var) -> string {
     auto const VAR = getenv(var.c_str());
     return (VAR == nullptr ? string("") : string(VAR));
@@ -95,5 +94,4 @@ auto get_mod_path(string const& module,
     return (found ? path : "");
 }
 }  // namespace viua
-}  // namespace env
-}  // namespace support
+}}  // namespace support::env

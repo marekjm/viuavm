@@ -27,8 +27,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Boolean : public viua::types::Value {
     /** Boolean object.
      *
@@ -52,8 +51,7 @@ class Boolean : public viua::types::Value {
 
     Boolean(bool v = false);
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

@@ -24,11 +24,8 @@
 
 using viua::assembler::frontend::parser::Instruction;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_op_iinc(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::RegisterIndex;
@@ -45,8 +42,4 @@ auto check_op_iinc(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
         register_usage_profile, *operand);
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

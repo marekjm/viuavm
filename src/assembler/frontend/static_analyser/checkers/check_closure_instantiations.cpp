@@ -24,11 +24,8 @@ using viua::cg::lex::InvalidSyntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
     ParsedSource const& ps,
@@ -68,8 +65,4 @@ auto check_closure_instantiations(
         }
     }
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

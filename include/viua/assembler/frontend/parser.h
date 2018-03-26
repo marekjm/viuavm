@@ -30,10 +30,7 @@
 #include <viua/cg/lex.h>
 
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace parser {
+namespace viua { namespace assembler { namespace frontend { namespace parser {
 struct Operand {
     std::vector<viua::cg::lex::Token> tokens;
     std::map<std::string, std::string> attributes;
@@ -172,10 +169,7 @@ auto parse_closure(const vector_view<viua::cg::lex::Token> tokens,
 auto parse_block(const vector_view<viua::cg::lex::Token> tokens,
                  InstructionsBlock&) -> decltype(tokens)::size_type;
 auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;
-}  // namespace parser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}  // namespace viua::assembler::frontend::parser
 
 
 #endif

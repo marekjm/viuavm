@@ -22,11 +22,8 @@
 
 using viua::assembler::frontend::parser::Instruction;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_op_delete(Register_usage_profile& register_usage_profile,
                      Instruction const& instruction) -> void {
     using viua::cg::lex::InvalidSyntax;
@@ -47,8 +44,4 @@ auto check_op_delete(Register_usage_profile& register_usage_profile,
     }
     register_usage_profile.erase(Register(*target), instruction.tokens.at(0));
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

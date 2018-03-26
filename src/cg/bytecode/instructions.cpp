@@ -180,8 +180,7 @@ static auto insert_string(viua::internals::types::byte* ptr, const string& s)
     return ptr;
 }
 
-namespace cg {
-namespace bytecode {
+namespace cg { namespace bytecode {
 auto opnop(viua::internals::types::byte* addr_ptr)
     -> viua::internals::types::byte* {
     *(addr_ptr++) = NOP;
@@ -1182,5 +1181,4 @@ auto ophalt(viua::internals::types::byte* addr_ptr)
     *(addr_ptr++) = HALT;
     return addr_ptr;
 }
-}  // namespace bytecode
-}  // namespace cg
+}}  // namespace cg::bytecode

@@ -24,8 +24,7 @@
 
 #include <stdint.h>
 
-namespace viua {
-namespace internals {
+namespace viua { namespace internals {
 namespace types {
 typedef uint8_t byte;
 
@@ -53,7 +52,6 @@ enum class RegisterSets : types::registerset_type_marker {
     LOCAL,
     STATIC,
 };
-}  // namespace internals
-}  // namespace viua
+}}  // namespace viua::internals
 
 #endif

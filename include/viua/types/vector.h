@@ -27,8 +27,7 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Vector : public Value {
     /** Vector type.
      */
@@ -54,8 +53,7 @@ class Vector : public Value {
     Vector(const std::vector<Value*>& v);
     ~Vector();
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

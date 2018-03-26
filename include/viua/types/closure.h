@@ -29,8 +29,7 @@
 #include <viua/types/function.h>
 
 
-namespace viua {
-namespace types {
+namespace viua { namespace types {
 class Closure : public Function {
     std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
     std::string function_name;
@@ -57,8 +56,7 @@ class Closure : public Function {
     Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
     virtual ~Closure();
 };
-}  // namespace types
-}  // namespace viua
+}}  // namespace viua::types
 
 
 #endif

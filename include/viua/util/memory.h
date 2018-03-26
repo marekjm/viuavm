@@ -27,9 +27,7 @@
 #pragma once
 
 
-namespace viua {
-namespace util {
-namespace memory {
+namespace viua { namespace util { namespace memory {
 template<class T> class maybe_unique_ptr {
     bool owns_pointer;
     T* pointer;
@@ -130,9 +128,7 @@ template<class To> class aligned_read_impl {
 template<class To> auto aligned_read(To& target) -> aligned_read_impl<To> {
     return aligned_read_impl<To>(target);
 }
-}  // namespace memory
-}  // namespace util
-}  // namespace viua
+}}}  // namespace viua::util::memory
 
 
 #endif

@@ -64,8 +64,7 @@ struct timeout_op {
 typedef std::tuple<bool, viua::internals::types::byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 
-namespace cg {
-namespace bytecode {
+namespace cg { namespace bytecode {
 auto opnop(viua::internals::types::byte*) -> viua::internals::types::byte*;
 
 auto opizero(viua::internals::types::byte*, int_op)
@@ -376,7 +375,6 @@ auto opremove(viua::internals::types::byte*, int_op, int_op, int_op)
 
 auto opreturn(viua::internals::types::byte*) -> viua::internals::types::byte*;
 auto ophalt(viua::internals::types::byte*) -> viua::internals::types::byte*;
-}  // namespace bytecode
-}  // namespace cg
+}}  // namespace cg::bytecode
 
 #endif

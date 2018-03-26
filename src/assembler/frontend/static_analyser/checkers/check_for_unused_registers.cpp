@@ -23,11 +23,8 @@
 
 using viua::assembler::frontend::parser::Instruction;
 
-namespace viua {
-namespace assembler {
-namespace frontend {
-namespace static_analyser {
-namespace checkers {
+namespace viua { namespace assembler { namespace frontend {
+namespace static_analyser { namespace checkers {
 auto check_for_unused_registers(
     const Register_usage_profile& register_usage_profile) -> void {
     for (const auto& each : register_usage_profile) {
@@ -57,8 +54,4 @@ auto check_for_unused_registers(
         }
     }
 }
-}  // namespace checkers
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

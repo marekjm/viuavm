@@ -26,9 +26,7 @@
 #include <viua/assembler/frontend/parser.h>
 
 
-namespace viua {
-namespace assembler {
-namespace frontend {
+namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
 auto verify_block_tries(const parser::ParsedSource&) -> void;
 auto verify_block_catches(const parser::ParsedSource&) -> void;
@@ -494,9 +492,6 @@ auto get_line_index_of_instruction(InstructionIndex const,
 }  // namespace checkers
 
 auto check_register_usage(parser::ParsedSource const&) -> void;
-}  // namespace static_analyser
-}  // namespace frontend
-}  // namespace assembler
-}  // namespace viua
+}}}}  // namespace viua::assembler::frontend::static_analyser
 
 #endif
