@@ -33,14 +33,14 @@ static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
     if (frame->arguments->at(0) == nullptr) {
         throw make_unique<viua::types::Exception>("expected command to launch (string) as parameter 0");
     }
-    string command = frame->arguments->get(0)->str();
-    int ret = system(command.c_str());
+    auto const command = frame->arguments->get(0)->str();
+    auto const ret = system(command.c_str());
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(ret));
 }
 
 
 const ForeignFunctionSpec functions[] = {
-    {"os::system", &os_system},
+    {"std::os::system/1", &os_system},
     {nullptr, nullptr},
 };
 
