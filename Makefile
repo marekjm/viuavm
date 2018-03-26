@@ -492,22 +492,22 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_argc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arg.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arithmetic.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_atom.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_atomeq.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_atom.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_binary_logic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_arithmetic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_increment.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitnot.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_rotates.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_bits.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitset.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_shifts.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bits.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_boolean_and_or.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_capturecopy.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_capture.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_capturemove.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_capture.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_closure.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_compare.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_copy.o \
@@ -545,9 +545,9 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stoi.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_streq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_string.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structinsert.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structkeys.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structremove.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_swap.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_tailcall.o \
@@ -555,9 +555,9 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textcommonprefix.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textcommonsuffix.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textconcat.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_text.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_texteq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textlength.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_text.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textsub.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_throw.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_vat.o \
