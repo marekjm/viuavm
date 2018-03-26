@@ -36,11 +36,10 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat:   false
 FixNamespaceComments: true
+IncludeBlocks: Regroup
 IncludeCategories: 
-  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+  - Regex:           '^(<|"(viua)/)'
     Priority:        2
-  - Regex:           '^(<|"(gtest|isl|json)/)'
-    Priority:        3
   - Regex:           '.*'
     Priority:        1
 IncludeIsMainRegex: '$'
