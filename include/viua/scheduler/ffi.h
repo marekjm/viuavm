@@ -50,7 +50,8 @@ class ForeignFunctionCallRequest {
     void raise(std::unique_ptr<viua::types::Value>);
     void wakeup();
 
-    ForeignFunctionCallRequest(Frame* fr, viua::process::Process* cp,
+    ForeignFunctionCallRequest(Frame* fr,
+                               viua::process::Process* cp,
                                viua::kernel::Kernel* c)
         : frame(fr), caller_process(cp), kernel(c) {}
     ~ForeignFunctionCallRequest() {}
@@ -59,7 +60,9 @@ class ForeignFunctionCallRequest {
 void ff_call_processor(
     std::vector<std::unique_ptr<ForeignFunctionCallRequest>>* requests,
     std::map<std::string, ForeignFunction*>* foreign_functions,
-    std::mutex* ff_map_mtx, std::mutex* mtx, std::condition_variable* cv);
+    std::mutex* ff_map_mtx,
+    std::mutex* mtx,
+    std::condition_variable* cv);
 }  // namespace ffi
 }  // namespace scheduler
 }  // namespace viua

@@ -30,9 +30,11 @@
 using namespace std;
 
 
-static void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*,
+static void kitchensink_sleep(Frame* frame,
                               viua::kernel::RegisterSet*,
-                              viua::process::Process*, viua::kernel::Kernel*) {
+                              viua::kernel::RegisterSet*,
+                              viua::process::Process*,
+                              viua::kernel::Kernel*) {
     sleep(static_cast<unsigned int>(
         dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))
             ->as_integer()));

@@ -169,7 +169,9 @@ class Stack {
     viua::internals::types::byte* adjust_jump_base_for(const std::string&);
     auto unwind() -> void;
 
-    Stack(std::string, Process*, viua::kernel::RegisterSet**,
+    Stack(std::string,
+          Process*,
+          viua::kernel::RegisterSet**,
           viua::kernel::RegisterSet*,
           viua::scheduler::VirtualProcessScheduler*);
 
@@ -260,8 +262,11 @@ class Process {
     // call foreign method (i.e. method of a pure-C++ class loaded into
     // machine's typesystem)
     viua::internals::types::byte* call_foreign_method(
-        viua::internals::types::byte*, viua::types::Value*, const std::string&,
-        viua::kernel::Register*, const std::string&);
+        viua::internals::types::byte*,
+        viua::types::Value*,
+        const std::string&,
+        viua::kernel::Register*,
+        const std::string&);
 
     auto push_deferred(std::string) -> void;
 
@@ -519,8 +524,10 @@ class Process {
 
     bool empty() const;
 
-    Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*,
-            viua::process::Process*, const bool = false);
+    Process(std::unique_ptr<Frame>,
+            viua::scheduler::VirtualProcessScheduler*,
+            viua::process::Process*,
+            const bool = false);
     ~Process();
 
     static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =

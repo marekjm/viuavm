@@ -138,7 +138,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
-    const string& name, viua::internals::types::bytecode_size address) {
+    const string& name,
+    viua::internals::types::bytecode_size address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
@@ -146,7 +147,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
-    const string& name, viua::internals::types::bytecode_size address) {
+    const string& name,
+    viua::internals::types::bytecode_size address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;
@@ -154,7 +156,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
-    const string& name, ForeignFunction* function_ptr) {
+    const string& name,
+    ForeignFunction* function_ptr) {
     /** Registers external function in viua::kernel::Kernel.
      */
     unique_lock<mutex> lock(foreign_functions_mutex);
@@ -163,7 +166,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_prototype(
-    const string& name, unique_ptr<viua::types::Prototype> proto) {
+    const string& name,
+    unique_ptr<viua::types::Prototype> proto) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
     register_prototype(name, std::move(proto));
@@ -171,7 +175,8 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_prototype(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(
-    const string& name, ForeignMethod method) {
+    const string& name,
+    ForeignMethod method) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
     foreign_methods[name] = method;
@@ -343,7 +348,8 @@ vector<string> viua::kernel::Kernel::inheritance_chain_of(
         if (pushed.count(element)) {
             linearised_inheritance_chain.erase(
                 remove(linearised_inheritance_chain.begin(),
-                       linearised_inheritance_chain.end(), element),
+                       linearised_inheritance_chain.end(),
+                       element),
                 linearised_inheritance_chain.end());
         } else {
             pushed.insert(element);
@@ -403,7 +409,8 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
 }
 
 string viua::kernel::Kernel::resolve_method_name(
-    const string& klass, const string& method_name) const {
+    const string& klass,
+    const string& method_name) const {
     return typesystem.at(klass)->resolves_to(method_name);
 }
 
@@ -424,7 +431,8 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
 }
 
 void viua::kernel::Kernel::register_prototype(
-    const string& type_name, unique_ptr<viua::types::Prototype> proto) {
+    const string& type_name,
+    unique_ptr<viua::types::Prototype> proto) {
     typesystem.emplace(type_name, nullptr);
     typesystem.at(type_name) = std::move(proto);
 }
@@ -435,7 +443,8 @@ void viua::kernel::Kernel::register_prototype(
 }
 
 void viua::kernel::Kernel::request_foreign_function_call(
-    Frame* frame, viua::process::Process* requesting_process) {
+    Frame* frame,
+    viua::process::Process* requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(
         make_unique<viua::scheduler::ffi::ForeignFunctionCallRequest>(
@@ -448,8 +457,11 @@ void viua::kernel::Kernel::request_foreign_function_call(
 }
 
 void viua::kernel::Kernel::request_foreign_method_call(
-    const string& name, viua::types::Value* object, Frame* frame,
-    viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+    const string& name,
+    viua::types::Value* object,
+    Frame* frame,
+    viua::kernel::RegisterSet*,
+    viua::kernel::RegisterSet*,
     viua::process::Process* p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
@@ -629,13 +641,16 @@ int viua::kernel::Kernel::run() {
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);
 
-    vp_schedulers.emplace_back(this, &free_virtual_processes,
+    vp_schedulers.emplace_back(this,
+                               &free_virtual_processes,
                                &free_virtual_processes_mutex,
-                               &free_virtual_processes_cv, enable_tracing);
+                               &free_virtual_processes_cv,
+                               enable_tracing);
     vp_schedulers.front().bootstrap(commandline_arguments);
 
     for (auto i = (vp_schedulers_limit - 1); i; --i) {
-        vp_schedulers.emplace_back(this, &free_virtual_processes,
+        vp_schedulers.emplace_back(this,
+                                   &free_virtual_processes,
                                    &free_virtual_processes_mutex,
                                    &free_virtual_processes_cv);
     }
@@ -665,10 +680,13 @@ viua::kernel::Kernel::Kernel()
     , errors(false) {
     ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
-        foreign_call_workers.emplace_back(make_unique<std::thread>(
-            viua::scheduler::ffi::ff_call_processor, &foreign_call_queue,
-            &foreign_functions, &foreign_functions_mutex,
-            &foreign_call_queue_mutex, &foreign_call_queue_condition));
+        foreign_call_workers.emplace_back(
+            make_unique<std::thread>(viua::scheduler::ffi::ff_call_processor,
+                                     &foreign_call_queue,
+                                     &foreign_functions,
+                                     &foreign_functions_mutex,
+                                     &foreign_call_queue_mutex,
+                                     &foreign_call_queue_condition));
     }
 }
 

@@ -286,8 +286,8 @@ static auto disassemble_ri_operand(ostream& oss,
     return ptr;
 }
 static auto disassemble_ri_operand_with_rs_type(
-    ostream& oss, viua::internals::types::byte* ptr)
-    -> viua::internals::types::byte* {
+    ostream& oss,
+    viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
     switch (*ptr) {

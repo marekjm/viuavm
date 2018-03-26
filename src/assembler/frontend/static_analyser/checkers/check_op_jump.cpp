@@ -29,8 +29,10 @@ namespace frontend {
 namespace static_analyser {
 namespace checkers {
 auto check_op_jump(Register_usage_profile& register_usage_profile,
-                   ParsedSource const& ps, Instruction const& instruction,
-                   InstructionsBlock const& ib, InstructionIndex i,
+                   ParsedSource const& ps,
+                   Instruction const& instruction,
+                   InstructionsBlock const& ib,
+                   InstructionIndex i,
                    InstructionIndex const mnemonic_counter) -> void {
     using viua::assembler::frontend::parser::Label;
     using viua::assembler::frontend::parser::Offset;

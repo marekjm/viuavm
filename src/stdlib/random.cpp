@@ -48,8 +48,10 @@ static auto getrandom() -> long double {
             static_cast<long double>(ULLONG_MAX));
 }
 
-static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*, viua::process::Process*,
+static auto random_drandom(Frame* frame,
+                           viua::kernel::RegisterSet*,
+                           viua::kernel::RegisterSet*,
+                           viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
@@ -66,8 +68,10 @@ static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*,
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-static auto random_durandom(Frame* frame, viua::kernel::RegisterSet*,
-                            viua::kernel::RegisterSet*, viua::process::Process*,
+static auto random_durandom(Frame* frame,
+                            viua::kernel::RegisterSet*,
+                            viua::kernel::RegisterSet*,
+                            viua::process::Process*,
                             viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
@@ -86,8 +90,10 @@ static auto random_durandom(Frame* frame, viua::kernel::RegisterSet*,
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-static auto random_random(Frame* frame, viua::kernel::RegisterSet*,
-                          viua::kernel::RegisterSet*, viua::process::Process*,
+static auto random_random(Frame* frame,
+                          viua::kernel::RegisterSet*,
+                          viua::kernel::RegisterSet*,
+                          viua::process::Process*,
                           viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
      */
@@ -95,8 +101,10 @@ static auto random_random(Frame* frame, viua::kernel::RegisterSet*,
         0, make_unique<viua::types::Float>(getrandom()));
 }
 
-static auto random_randint(Frame* frame, viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*, viua::process::Process*,
+static auto random_randint(Frame* frame,
+                           viua::kernel::RegisterSet*,
+                           viua::kernel::RegisterSet*,
+                           viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
     /** Return random integer from selected range.
      *

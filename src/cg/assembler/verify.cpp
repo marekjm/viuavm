@@ -41,18 +41,20 @@ using Token       = viua::cg::lex::Token;
 static bool is_defined(string function_name,
                        const vector<string>& function_names,
                        const vector<string>& function_signatures) {
-    bool is_undefined = (find(function_names.begin(), function_names.end(),
-                              function_name) == function_names.end());
+    bool is_undefined =
+        (find(function_names.begin(), function_names.end(), function_name) ==
+         function_names.end());
     // if function is undefined, check if we got a signature for it
     if (is_undefined) {
-        is_undefined =
-            (find(function_signatures.begin(), function_signatures.end(),
-                  function_name) == function_signatures.end());
+        is_undefined = (find(function_signatures.begin(),
+                             function_signatures.end(),
+                             function_name) == function_signatures.end());
     }
     return (not is_undefined);
 }
 void assembler::verify::function_calls_are_defined(
-    const vector<Token>& tokens, const vector<string>& function_names,
+    const vector<Token>& tokens,
+    const vector<string>& function_names,
     const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
@@ -67,8 +69,8 @@ void assembler::verify::function_calls_are_defined(
             auto function_name = tokens.at(i + 1);
             if (function_name.str().at(0) != '*' and
                 function_name.str().at(0) != '%') {
-                if (not is_defined(function_name, function_names,
-                                   function_signatures)) {
+                if (not is_defined(
+                        function_name, function_names, function_signatures)) {
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
                         (string(token == "tailcall" ? "tail call to"
@@ -78,8 +80,8 @@ void assembler::verify::function_calls_are_defined(
             }
         } else if (token == "watchdog") {
             auto function_name = tokens.at(i + 1);
-            if (not is_defined(function_name, function_names,
-                               function_signatures)) {
+            if (not is_defined(
+                    function_name, function_names, function_signatures)) {
                 throw viua::cg::lex::InvalidSyntax(
                     function_name,
                     "watchdog from undefined function " + function_name.str());
@@ -91,8 +93,8 @@ void assembler::verify::function_calls_are_defined(
             }
             if (function_name.str().at(0) != '*' and
                 function_name.str().at(0) != '%') {
-                if (not is_defined(function_name, function_names,
-                                   function_signatures)) {
+                if (not is_defined(
+                        function_name, function_names, function_signatures)) {
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
                         (string(token == "call" ? "call to" : "process from") +
@@ -104,10 +106,12 @@ void assembler::verify::function_calls_are_defined(
 }
 
 void assembler::verify::callable_creations(
-    const vector<Token>& tokens, const vector<string>& function_names,
+    const vector<Token>& tokens,
+    const vector<string>& function_names,
     const vector<string>& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
-         i < tokens.size(); ++i) {
+         i < tokens.size();
+         ++i) {
         if (not(tokens.at(i) == "closure" or tokens.at(i) == "function")) {
             // skip while lines to avoid triggering the check by registers named
             // 'function' or 'closure'
@@ -125,13 +129,14 @@ void assembler::verify::callable_creations(
             continue;
         }
 
-        bool is_undefined = (find(function_names.begin(), function_names.end(),
-                                  function) == function_names.end());
+        bool is_undefined =
+            (find(function_names.begin(), function_names.end(), function) ==
+             function_names.end());
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {
-            is_undefined =
-                (find(function_signatures.begin(), function_signatures.end(),
-                      function) == function_signatures.end());
+            is_undefined = (find(function_signatures.begin(),
+                                 function_signatures.end(),
+                                 function) == function_signatures.end());
         }
 
         if (is_undefined) {

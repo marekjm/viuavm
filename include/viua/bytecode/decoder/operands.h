@@ -68,7 +68,8 @@ auto fetch_register(viua::internals::types::byte*, viua::process::Process*)
     -> std::tuple<viua::internals::types::byte*, viua::kernel::Register*>;
 auto fetch_register_type_and_index(viua::internals::types::byte*,
                                    viua::process::Process*)
-    -> std::tuple<viua::internals::types::byte*, viua::internals::RegisterSets,
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::RegisterSets,
                   viua::internals::types::register_index>;
 auto fetch_timeout(viua::internals::types::byte*, viua::process::Process*)
     -> std::tuple<viua::internals::types::byte*,

@@ -133,8 +133,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(
     }
 
     if (is_foreign_method) {
-        return call_foreign_method(addr, obj, function_name, return_register,
-                                   method_name);
+        return call_foreign_method(
+            addr, obj, function_name, return_register, method_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::call_native

@@ -66,7 +66,8 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
             last->local_register_set->size()) {
             unsigned non_empty = 0;
             for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size(); ++r) {
+                 r < last->local_register_set->size();
+                 ++r) {
                 if (last->local_register_set->at(r) != nullptr) {
                     ++non_empty;
                 }
@@ -75,7 +76,8 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
                  << last->local_register_set->size();
             cerr << (non_empty ? ":\n" : "\n");
             for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size(); ++r) {
+                 r < last->local_register_set->size();
+                 ++r) {
                 if (last->local_register_set->at(r) == nullptr) {
                     continue;
                 }
@@ -93,7 +95,8 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
             cerr << "  non-empty arguments (out of " << last->arguments->size()
                  << "):" << endl;
             for (decltype(last->arguments->size()) r = 0;
-                 r < last->arguments->size(); ++r) {
+                 r < last->arguments->size();
+                 ++r) {
                 if (last->arguments->at(r) == nullptr) {
                     continue;
                 }
@@ -240,7 +243,8 @@ bool viua::scheduler::VirtualProcessScheduler::is_class(
 }
 
 bool viua::scheduler::VirtualProcessScheduler::class_accepts(
-    const string& klass, const string& method) const {
+    const string& klass,
+    const string& method) const {
     return attached_kernel->class_accepts(klass, method);
 }
 
@@ -297,7 +301,8 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
 }
 
 string viua::scheduler::VirtualProcessScheduler::resolve_method_name(
-    const string& klass, const string& method) const {
+    const string& klass,
+    const string& method) const {
     return attached_kernel->resolve_method_name(klass, method);
 }
 
@@ -313,16 +318,20 @@ void viua::scheduler::VirtualProcessScheduler::register_prototype(
 }
 
 void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(
-    Frame* frame, viua::process::Process* p) const {
+    Frame* frame,
+    viua::process::Process* p) const {
     attached_kernel->request_foreign_function_call(frame, p);
 }
 
 void viua::scheduler::VirtualProcessScheduler::request_foreign_method_call(
-    const string& name, viua::types::Value* object, Frame* frame,
-    viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+    const string& name,
+    viua::types::Value* object,
+    Frame* frame,
+    viua::kernel::RegisterSet*,
+    viua::kernel::RegisterSet*,
     viua::process::Process* p) {
-    attached_kernel->request_foreign_method_call(name, object, frame, nullptr,
-                                                 nullptr, p);
+    attached_kernel->request_foreign_method_call(
+        name, object, frame, nullptr, nullptr, p);
 }
 
 void viua::scheduler::VirtualProcessScheduler::load_module(string module) {
@@ -350,9 +359,11 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
 }
 
 viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
-    unique_ptr<Frame> frame, viua::process::Process* parent, bool disown) {
-    auto p = make_unique<viua::process::Process>(std::move(frame), this, parent,
-                                                 tracing_enabled);
+    unique_ptr<Frame> frame,
+    viua::process::Process* parent,
+    bool disown) {
+    auto p = make_unique<viua::process::Process>(
+        std::move(frame), this, parent, tracing_enabled);
     p->begin();
     if (disown) {
         p->detach();
@@ -386,13 +397,22 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
     if (processes.size() >
         ((total_processes / running_schedulers) / 100 * 140)) {
 #if VIUA_VM_DEBUG_LOG
-        viua_err("[scheduler:vps:", this, "] posting process ", p.get(), ":",
-                 p->starting_function(), " to kernel");
+        viua_err("[scheduler:vps:",
+                 this,
+                 "] posting process ",
+                 p.get(),
+                 ":",
+                 p->starting_function(),
+                 " to kernel");
 #endif
         attached_kernel->post_free_process(std::move(p));
     } else {
 #if VIUA_VM_DEBUG_LOG
-        viua_err("[scheduler:vps:", this, "] retaining process ", p.get(), ":",
+        viua_err("[scheduler:vps:",
+                 this,
+                 "] retaining process ",
+                 p.get(),
+                 ":",
                  p->starting_function());
 #endif
         processes.emplace_back(std::move(p));
@@ -402,7 +422,8 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
 }
 
 void viua::scheduler::VirtualProcessScheduler::send(
-    const viua::process::PID pid, unique_ptr<viua::types::Value> message) {
+    const viua::process::PID pid,
+    unique_ptr<viua::types::Value> message) {
 #if VIUA_VM_DEBUG_LOG
     viua_err("[sched:vps:send] pid = ", pid.get());
 #endif
@@ -452,7 +473,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0;
-         i < processes.size(); ++i) {
+         i < processes.size();
+         ++i) {
         current_process_index = i;
         auto th               = processes.at(i).get();
 
@@ -515,7 +537,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
                 ostringstream errss;
 #if VIUA_VM_DEBUG_LOG
-                viua_err(errss, "process ", current_process_index,
+                viua_err(errss,
+                         "process ",
+                         current_process_index,
                          " spawned using ");
 #endif
                 if (trace.size() > 1) {
@@ -550,7 +574,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 // push broken process to dead processes_list list to
 // erase it later
 #if VIUA_VM_DEBUG_LOG
-                viua_err("[scheduler:vps] process ", processes.at(i).get(),
+                viua_err("[scheduler:vps] process ",
+                         processes.at(i).get(),
                          ": marked as dead");
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
@@ -570,7 +595,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
 #if VIUA_VM_DEBUG_LOG
                 viua_err("[sched:vps:died:notify-watchdog] pid = ",
-                         th->pid().get(), ", death cause: ", exc->str());
+                         th->pid().get(),
+                         ", death cause: ",
+                         exc->str());
 #endif
 
                 death_message->set("function",
@@ -582,8 +609,13 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 auto death_frame = make_unique<Frame>(nullptr, 1);
                 death_frame->arguments->set(0, std::move(death_message));
 #if VIUA_VM_DEBUG_LOG
-                viua_err("[scheduler:vps:", this, ":watchdogging] process ", th,
-                         ':', th->starting_function(), ": died, becomes ",
+                viua_err("[scheduler:vps:",
+                         this,
+                         ":watchdogging] process ",
+                         th,
+                         ':',
+                         th->starting_function(),
+                         ": died, becomes ",
                          th->watchdog());
 #endif
                 th->become(th->watchdog(), std::move(death_frame));
@@ -650,8 +682,11 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
         if (free_processes->empty()) {
 // this means that shutdown() was received
 #if VIUA_VM_DEBUG_LOG
-            viua_err("[scheduler:vps:", this, "] shutting down with ",
-                     processes.size(), " local processes");
+            viua_err("[scheduler:vps:",
+                     this,
+                     "] shutting down with ",
+                     processes.size(),
+                     " local processes");
 #endif
             break;
         }
@@ -686,15 +721,21 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
             free_processes->erase(free_processes->begin());
             processes.back()->migrate_to(this);
 #if VIUA_VM_DEBUG_LOG
-            viua_err("[scheduler:vps:", this, ":process-grab] grabbed process ",
-                     processes.back().get(), ':',
+            viua_err("[scheduler:vps:",
+                     this,
+                     ":process-grab] grabbed process ",
+                     processes.back().get(),
+                     ':',
                      processes.back()->starting_function());
 #endif
             ++current_load;
         }
     }
 #if VIUA_VM_DEBUG_LOG
-    viua_err("[scheduler:vps:", this, "] shut down with ", processes.size(),
+    viua_err("[scheduler:vps:",
+             this,
+             "] shut down with ",
+             processes.size(),
              " local processes");
 #endif
 }
@@ -732,8 +773,10 @@ int viua::scheduler::VirtualProcessScheduler::exit() const { return exit_code; }
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     viua::kernel::Kernel* akernel,
-    vector<unique_ptr<viua::process::Process>>* fp, mutex* fp_mtx,
-    condition_variable* fp_cv, const bool enable_tracing)
+    vector<unique_ptr<viua::process::Process>>* fp,
+    mutex* fp_mtx,
+    condition_variable* fp_cv,
+    const bool enable_tracing)
     : attached_kernel(akernel)
     , tracing_enabled(enable_tracing)
     , free_processes(fp)

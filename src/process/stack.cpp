@@ -25,7 +25,8 @@
 using namespace std;
 
 
-viua::process::Stack::Stack(string fn, Process* pp,
+viua::process::Stack::Stack(string fn,
+                            Process* pp,
                             viua::kernel::RegisterSet** curs,
                             viua::kernel::RegisterSet* gs,
                             viua::scheduler::VirtualProcessScheduler* sch)
@@ -89,9 +90,11 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
 
 auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     for (auto& each : frame->deferred_calls) {
-        auto s = make_unique<Stack>(each->function_name, parent_process,
+        auto s = make_unique<Stack>(each->function_name,
+                                    parent_process,
                                     currently_used_register_set,
-                                    global_register_set, scheduler);
+                                    global_register_set,
+                                    scheduler);
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
         s->bind(currently_used_register_set, global_register_set);
@@ -120,7 +123,8 @@ auto viua::process::Stack::pop() -> unique_ptr<Frame> {
     frames.pop_back();
 
     for (viua::internals::types::register_index i = 0;
-         i < frame->arguments->size(); ++i) {
+         i < frame->arguments->size();
+         ++i) {
         if (frame->arguments->at(i) != nullptr and
             frame->arguments->isflagged(i, MOVED)) {
             throw make_unique<viua::types::Exception>(
@@ -170,7 +174,8 @@ viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(
 }
 
 auto viua::process::Stack::adjust_instruction_pointer(
-    const TryFrame* tframe, const string handler_found_for_type) -> void {
+    const TryFrame* tframe,
+    const string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(
         tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
@@ -240,7 +245,8 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
             vector<string> types_to_check =
                 scheduler->inheritance_chain_of(handler_found_for_type);
             for (decltype(types_to_check)::size_type j = 0;
-                 j < types_to_check.size(); ++j) {
+                 j < types_to_check.size();
+                 ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found          = true;
                     handler_found_for_type = types_to_check[j];

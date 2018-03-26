@@ -81,7 +81,8 @@ static void strwrite(ofstream& out, const string& s) {
  * your have refreshed your memory. Here is isocpp.org's FAQ about pointers to
  * members (2015-01-17): https://isocpp.org/wiki/faq/pointers-to-members
  */
-typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op, int_op,
+typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op,
+                                                         int_op,
                                                          int_op);
 const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     {"and", &Program::opand},
@@ -97,7 +98,8 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
 
 
 static Program& compile(
-    Program& program, const vector<Token>& tokens,
+    Program& program,
+    const vector<Token>& tokens,
     map<string, std::remove_reference<decltype(tokens)>::type::size_type>&
         marks) {
     /** Compile instructions into bytecode using bytecode generation API.
@@ -172,7 +174,8 @@ map_invocable_addresses(
 }
 
 static viua::internals::types::bytecode_size write_code_blocks_section(
-    ofstream& out, const invocables_t& blocks,
+    ofstream& out,
+    const invocables_t& blocks,
     const vector<string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
@@ -346,7 +349,8 @@ static void check_main_function(const string& main_function,
 static viua::internals::types::bytecode_size generate_entry_function(
     viua::internals::types::bytecode_size bytes,
     map<string, viua::internals::types::bytecode_size> function_addresses,
-    invocables_t& functions, const string& main_function,
+    invocables_t& functions,
+    const string& main_function,
     viua::internals::types::bytecode_size starting_instruction) {
     if (DEBUG) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
@@ -484,8 +488,11 @@ static viua::internals::types::bytecode_size generate_entry_function(
     return bytes;
 }
 
-void generate(vector<Token> const& tokens, invocables_t& functions,
-              invocables_t& blocks, const string& filename, string& compilename,
+void generate(vector<Token> const& tokens,
+              invocables_t& functions,
+              invocables_t& blocks,
+              const string& filename,
+              string& compilename,
               const vector<string>& commandline_given_links,
               const compilationflags_t& flags) {
     //////////////////////////////
@@ -517,8 +524,9 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     // FIXME: this is just a crude check - it does not acctually checks if these
     // instructions set 0 register this must be better implemented or we will
     // receive "function did not set return register" exceptions at runtime
-    bool main_is_defined = (find(functions.names.begin(), functions.names.end(),
-                                 main_function) != functions.names.end());
+    bool main_is_defined =
+        (find(functions.names.begin(), functions.names.end(), main_function) !=
+         functions.names.end());
     if (not flags.as_lib and main_is_defined) {
         check_main_function(main_function, functions.tokens.at(main_function));
     }
@@ -560,7 +568,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<string, viua::internals::types::bytecode_size,
+    vector<tuple<string,
+                 viua::internals::types::bytecode_size,
                  std::unique_ptr<viua::internals::types::byte[]>>>
         linked_libs_bytecode;
     vector<string> linked_function_names;
@@ -665,8 +674,11 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
-        bytes = generate_entry_function(bytes, function_addresses, functions,
-                                        main_function, starting_instruction);
+        bytes = generate_entry_function(bytes,
+                                        function_addresses,
+                                        functions,
+                                        main_function,
+                                        starting_instruction);
     }
 
 
@@ -728,8 +740,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
             }
         }
 
-        linked_libs_bytecode.emplace_back(lnk, loader.get_bytecode_size(),
-                                          loader.get_bytecode());
+        linked_libs_bytecode.emplace_back(
+            lnk, loader.get_bytecode_size(), loader.get_bytecode());
         bytes += loader.get_bytecode_size();
     }
 
@@ -737,10 +749,10 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    assembler::verify::function_calls_are_defined(tokens, functions.names,
-                                                  functions.signatures);
-    assembler::verify::callable_creations(tokens, functions.names,
-                                          functions.signatures);
+    assembler::verify::function_calls_are_defined(
+        tokens, functions.names, functions.signatures);
+    assembler::verify::callable_creations(
+        tokens, functions.names, functions.signatures);
 
 
     /////////////////////////////
@@ -791,11 +803,13 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-    map<string, tuple<viua::internals::types::bytecode_size,
-                      unique_ptr<viua::internals::types::byte[]>>>
+    map<string,
+        tuple<viua::internals::types::bytecode_size,
+              unique_ptr<viua::internals::types::byte[]>>>
         functions_bytecode;
-    map<string, tuple<viua::internals::types::bytecode_size,
-                      unique_ptr<viua::internals::types::byte[]>>>
+    map<string,
+        tuple<viua::internals::types::bytecode_size,
+              unique_ptr<viua::internals::types::byte[]>>>
         block_bodies_bytecode;
     viua::internals::types::bytecode_size functions_section_size    = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
@@ -903,7 +917,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
 
     for (string name : functions.names) {
         // do not generate bytecode for functions that were linked
-        if (find(linked_function_names.begin(), linked_function_names.end(),
+        if (find(linked_function_names.begin(),
+                 linked_function_names.end(),
                  name) != linked_function_names.end()) {
             continue;
         }
@@ -1100,8 +1115,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     viua::internals::types::bytecode_size functions_size_so_far =
         write_code_blocks_section(out, blocks, linked_block_names);
-    write_code_blocks_section(out, functions, linked_function_names,
-                              functions_size_so_far);
+    write_code_blocks_section(
+        out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
@@ -1155,7 +1170,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
     for (string name : functions.names) {
         // linked functions are to be inserted later
-        if (find(linked_function_names.begin(), linked_function_names.end(),
+        if (find(linked_function_names.begin(),
+                 linked_function_names.end(),
                  name) != linked_function_names.end()) {
             continue;
         }
@@ -1216,7 +1232,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions,
 
         viua::internals::types::bytecode_size jmp, jmp_target;
         for (decltype(linked_jumptable)::size_type i = 0;
-             i < linked_jumptable.size(); ++i) {
+             i < linked_jumptable.size();
+             ++i) {
             jmp                      = linked_jumptable[i];
             aligned_read(jmp_target) = (linked_bytecode + jmp);
             if (DEBUG) {

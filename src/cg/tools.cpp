@@ -36,8 +36,8 @@ namespace viua {
 namespace cg {
 namespace tools {
 static auto size_of_register_index_operand_with_rs_type(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
 
     if (tokens.at(i) == "void" or tokens.at(i) == "true" or
@@ -143,8 +143,8 @@ static auto size_of_instruction_with_one_ri_operand(TokenVector const& tokens,
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_instruction_with_one_ri_operand_with_rs_type(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
         sizeof(viua::internals::types::byte)};  // start with the size of a
                                                 // single opcode
@@ -159,8 +159,8 @@ static auto size_of_instruction_with_one_ri_operand_with_rs_type(
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_instruction_with_two_ri_operands_with_rs_types(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
         sizeof(viua::internals::types::byte)};  // start with the size of a
                                                 // single opcode
@@ -199,8 +199,8 @@ static auto size_of_instruction_with_two_ri_operands(TokenVector const& tokens,
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_instruction_with_three_ri_operands_with_rs_types(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
         sizeof(viua::internals::types::byte)};  // start with the size of a
                                                 // single opcode
@@ -225,8 +225,8 @@ static auto size_of_instruction_with_three_ri_operands_with_rs_types(
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_instruction_with_four_ri_operands_with_rs_types(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
         sizeof(viua::internals::types::byte)};  // start with the size of a
                                                 // single opcode
@@ -256,8 +256,8 @@ static auto size_of_instruction_with_four_ri_operands_with_rs_types(
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_instruction_with_three_ri_operands(
-    TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector const& tokens,
+    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
         sizeof(viua::internals::types::byte)};  // start with the size of a
                                                 // single opcode
@@ -1174,7 +1174,8 @@ auto calculate_bytecode_size_of_first_n_instructions2(
     auto counted_instructions =
         std::remove_const_t<decltype(instructions_counter)>{0};
     for (auto i = TokenVector::size_type{0};
-         (i < limit) and (counted_instructions < instructions_counter); ++i) {
+         (i < limit) and (counted_instructions < instructions_counter);
+         ++i) {
         auto const& token = tokens.at(i);
 
         if (token == ".function:" or token == ".closure:" or

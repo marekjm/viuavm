@@ -28,8 +28,10 @@
 using namespace std;
 
 
-static void os_system(Frame* frame, viua::kernel::RegisterSet*,
-                      viua::kernel::RegisterSet*, viua::process::Process*,
+static void os_system(Frame* frame,
+                      viua::kernel::RegisterSet*,
+                      viua::kernel::RegisterSet*,
+                      viua::process::Process*,
                       viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
         throw make_unique<viua::types::Exception>(

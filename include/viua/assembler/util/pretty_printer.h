@@ -46,11 +46,12 @@ auto underline_error_token(const std::vector<viua::cg::lex::Token>& tokens,
                            const viua::cg::lex::InvalidSyntax& error) -> void;
 auto display_error_line(const std::vector<viua::cg::lex::Token>& tokens,
                         const viua::cg::lex::InvalidSyntax& error,
-                        decltype(tokens.size()) i, const size_t) -> decltype(i);
+                        decltype(tokens.size()) i,
+                        const size_t) -> decltype(i);
 auto display_context_line(const std::vector<viua::cg::lex::Token>& tokens,
                           const viua::cg::lex::InvalidSyntax&,
-                          decltype(tokens.size()) i, const size_t)
-    -> decltype(i);
+                          decltype(tokens.size()) i,
+                          const size_t) -> decltype(i);
 auto display_error_header(const viua::cg::lex::InvalidSyntax& error,
                           const std::string& filename) -> void;
 auto display_error_location(const std::vector<viua::cg::lex::Token>& tokens,

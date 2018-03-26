@@ -29,8 +29,10 @@ namespace frontend {
 namespace static_analyser {
 namespace checkers {
 auto check_op_if(Register_usage_profile& register_usage_profile,
-                 ParsedSource const& ps, Instruction const& instruction,
-                 InstructionsBlock const& ib, InstructionIndex i,
+                 ParsedSource const& ps,
+                 Instruction const& instruction,
+                 InstructionsBlock const& ib,
+                 InstructionIndex i,
                  InstructionIndex const mnemonic_counter) -> void {
     using viua::assembler::frontend::parser::Label;
     using viua::assembler::frontend::parser::Offset;
@@ -116,7 +118,10 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             register_usage_profile;
         register_usage_profile_if_true.defresh();
         check_register_usage_for_instruction_block_impl(
-            register_usage_profile_if_true, ps, ib, jump_target_if_true,
+            register_usage_profile_if_true,
+            ps,
+            ib,
+            jump_target_if_true,
             mnemonic_counter);
     } catch (viua::cg::lex::UnusedValue& e) {
         // Do not fail yet, because the value may be used by false branch.
@@ -138,7 +143,10 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             register_usage_profile;
         register_usage_profile_if_false.defresh();
         check_register_usage_for_instruction_block_impl(
-            register_usage_profile_if_false, ps, ib, jump_target_if_false,
+            register_usage_profile_if_false,
+            ps,
+            ib,
+            jump_target_if_false,
             mnemonic_counter);
     } catch (viua::cg::lex::UnusedValue& e) {
         if (register_with_unused_value == e.what()) {

@@ -29,8 +29,10 @@
 using namespace std;
 
 
-static auto typeof(Frame* frame, viua::kernel::RegisterSet*,
-                   viua::kernel::RegisterSet*, viua::process::Process* process,
+static auto typeof(Frame* frame,
+                   viua::kernel::RegisterSet*,
+                   viua::kernel::RegisterSet*,
+                   viua::process::Process* process,
                    viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
         throw make_unique<viua::types::Exception>("requires 1 parameter");

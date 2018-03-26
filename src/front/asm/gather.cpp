@@ -55,7 +55,8 @@ map<string, string> gather_meta_information(
     map<string, string> meta_information;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
-         i < tokens.size(); ++i) {
+         i < tokens.size();
+         ++i) {
         if (tokens.at(i) == ".info:") {
             viua::cg::lex::Token key   = tokens.at(i + 1),
                                  value = tokens.at(i + 2);
@@ -67,8 +68,9 @@ map<string, string> gather_meta_information(
                 throw viua::cg::lex::InvalidSyntax(
                     tokens.at(i), "missing value in .info: directive");
             }
-            meta_information.emplace(key, str::strdecode(value.str().substr(
-                                              1, value.str().size() - 2)));
+            meta_information.emplace(
+                key,
+                str::strdecode(value.str().substr(1, value.str().size() - 2)));
         }
     }
 

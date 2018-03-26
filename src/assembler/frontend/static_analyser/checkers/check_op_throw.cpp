@@ -53,8 +53,8 @@ auto check_op_throw(Register_usage_profile& register_usage_profile,
      */
     try {
         check_for_unused_registers(register_usage_profile);
-        check_closure_instantiations(register_usage_profile, ps,
-                                     created_closures);
+        check_closure_instantiations(
+            register_usage_profile, ps, created_closures);
     } catch (InvalidSyntax& e) {
         throw TracedSyntaxError{}.append(e).append(
             InvalidSyntax{instruction.tokens.at(0), "after a throw here:"});

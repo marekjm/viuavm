@@ -36,8 +36,8 @@ void viua::types::Pointer::attach() {
 }
 void viua::types::Pointer::detach() {
     if (valid) {
-        points_to->pointers.erase(std::find(points_to->pointers.begin(),
-                                            points_to->pointers.end(), this));
+        points_to->pointers.erase(std::find(
+            points_to->pointers.begin(), points_to->pointers.end(), this));
     }
     valid = false;
 }
@@ -98,7 +98,8 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
 }
 
 
-void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*,
+void viua::types::Pointer::expired(Frame* frm,
+                                   viua::kernel::RegisterSet*,
                                    viua::kernel::RegisterSet*,
                                    viua::process::Process*,
                                    viua::kernel::Kernel*) {

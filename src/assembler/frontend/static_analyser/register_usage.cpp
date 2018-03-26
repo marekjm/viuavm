@@ -63,8 +63,8 @@ namespace frontend {
 namespace static_analyser {
 namespace checkers {
 auto map_names_to_register_indexes(
-    Register_usage_profile& register_usage_profile, InstructionsBlock const& ib)
-    -> void {
+    Register_usage_profile& register_usage_profile,
+    InstructionsBlock const& ib) -> void {
     for (const auto& line : ib.body) {
         auto directive =
             dynamic_cast<viua::assembler::frontend::parser::Directive*>(
@@ -110,8 +110,10 @@ namespace frontend {
 namespace static_analyser {
 namespace checkers {
 auto check_register_usage_for_instruction_block_impl(
-    Register_usage_profile& register_usage_profile, ParsedSource const& ps,
-    InstructionsBlock const& ib, InstructionIndex i,
+    Register_usage_profile& register_usage_profile,
+    ParsedSource const& ps,
+    InstructionsBlock const& ib,
+    InstructionIndex i,
     InstructionIndex mnemonic_counter) -> void {
     using namespace viua::assembler::frontend::static_analyser::checkers;
 
@@ -324,20 +326,20 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_print(register_usage_profile, *instruction);
                 break;
             case CAPTURE:
-                check_op_capture(register_usage_profile, *instruction,
-                                 created_closures);
+                check_op_capture(
+                    register_usage_profile, *instruction, created_closures);
                 break;
             case CAPTURECOPY:
-                check_op_capturecopy(register_usage_profile, *instruction,
-                                     created_closures);
+                check_op_capturecopy(
+                    register_usage_profile, *instruction, created_closures);
                 break;
             case CAPTUREMOVE:
-                check_op_capturemove(register_usage_profile, *instruction,
-                                     created_closures);
+                check_op_capturemove(
+                    register_usage_profile, *instruction, created_closures);
                 break;
             case CLOSURE:
-                check_op_closure(register_usage_profile, *instruction,
-                                 created_closures);
+                check_op_closure(
+                    register_usage_profile, *instruction, created_closures);
                 break;
             case FUNCTION:
                 check_op_function(register_usage_profile, *instruction);
@@ -385,7 +387,11 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_watchdog(register_usage_profile, *instruction);
                 break;
             case JUMP:
-                check_op_jump(register_usage_profile, ps, *instruction, ib, i,
+                check_op_jump(register_usage_profile,
+                              ps,
+                              *instruction,
+                              ib,
+                              i,
                               mnemonic_counter);
                 /*
                  * Do not perform further checks after a "jump" instruction.
@@ -395,7 +401,11 @@ auto check_register_usage_for_instruction_block_impl(
                  */
                 return;
             case IF:
-                check_op_if(register_usage_profile, ps, *instruction, ib, i,
+                check_op_if(register_usage_profile,
+                            ps,
+                            *instruction,
+                            ib,
+                            i,
                             mnemonic_counter);
                 /*
                  * Do not perform further checks after an "if" instruction.
@@ -405,8 +415,8 @@ auto check_register_usage_for_instruction_block_impl(
                  */
                 return;
             case THROW:
-                check_op_throw(register_usage_profile, ps, created_closures,
-                               *instruction);
+                check_op_throw(
+                    register_usage_profile, ps, created_closures, *instruction);
                 break;
             case CATCH:
                 // FIXME TODO SA for entered blocks
@@ -516,7 +526,8 @@ auto check_register_usage_for_instruction_block_impl(
 }  // namespace viua
 
 static auto check_register_usage_for_instruction_block(
-    const ParsedSource& ps, const InstructionsBlock& ib) -> void {
+    const ParsedSource& ps,
+    const InstructionsBlock& ib) -> void {
     if (ib.closure) {
         return;
     }
@@ -526,7 +537,10 @@ static auto check_register_usage_for_instruction_block(
         map_names_to_register_indexes(register_usage_profile, ib);
     viua::assembler::frontend::static_analyser::checkers::
         check_register_usage_for_instruction_block_impl(
-            register_usage_profile, ps, ib, 0,
+            register_usage_profile,
+            ps,
+            ib,
+            0,
             static_cast<InstructionIndex>(-1));
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(

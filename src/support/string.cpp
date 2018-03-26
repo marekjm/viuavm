@@ -371,7 +371,8 @@ auto levenshtein(string const source, string const target)
 
     return distance_matrix.at(source.size() - 1).at(target.size() - 1);
 }
-auto levenshtein_filter(string const source, vector<string> const& candidates,
+auto levenshtein_filter(string const source,
+                        vector<string> const& candidates,
                         LevenshteinDistance const limit)
     -> vector<DistancePair> {
     vector<DistancePair> matched;
@@ -384,7 +385,8 @@ auto levenshtein_filter(string const source, vector<string> const& candidates,
 
     return matched;
 }
-auto levenshtein_best(string const source, vector<string> const& candidates,
+auto levenshtein_best(string const source,
+                      vector<string> const& candidates,
                       LevenshteinDistance const limit) -> DistancePair {
     auto best = DistancePair{0, source};
 

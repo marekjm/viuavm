@@ -60,7 +60,9 @@ bool DEBUG   = false;
 bool SCREAM  = false;
 
 
-static bool usage(const char* program, bool show_help, bool show_version,
+static bool usage(const char* program,
+                  bool show_help,
+                  bool show_version,
                   bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM assembler, version ";
@@ -384,8 +386,13 @@ int main(int argc, char* argv[]) {
 
     int ret_code = 0;
     try {
-        generate(cooked_tokens, functions, blocks, filename, compilename,
-                 commandline_given_links, flags);
+        generate(cooked_tokens,
+                 functions,
+                 blocks,
+                 filename,
+                 compilename,
+                 commandline_given_links,
+                 flags);
     } catch (const string& e) {
         ret_code = 1;
         cout << send_control_seq(COLOR_FG_WHITE) << filename

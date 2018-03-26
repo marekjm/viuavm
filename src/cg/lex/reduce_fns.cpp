@@ -128,7 +128,8 @@ auto reduce_token_sequence(vector<Token> input_tokens,
         const auto t = input_tokens.at(i);
         if (match_adjacent(input_tokens, i, sequence)) {
             tokens.emplace_back(
-                t.line(), t.character(),
+                t.line(),
+                t.character(),
                 join_tokens(input_tokens, i, (i + sequence.size())));
             i += (sequence.size() - 1);
             continue;
@@ -236,7 +237,8 @@ auto reduce_function_signatures(vector<Token> input_tokens) -> vector<Token> {
             auto j = i;
             while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
                    str::isid(input_tokens.at(j + 2)) and
-                   adjacent(input_tokens.at(j), input_tokens.at(j + 1),
+                   adjacent(input_tokens.at(j),
+                            input_tokens.at(j + 1),
                             input_tokens.at(j + 2))) {
                 ++j;  // swallow "::" token
                 ++j;  // swallow identifier token
@@ -244,7 +246,8 @@ auto reduce_function_signatures(vector<Token> input_tokens) -> vector<Token> {
             if (j + 1 < limit and input_tokens.at(j + 1).str() == "/") {
                 if (j + 2 < limit and
                     str::isnum(input_tokens.at(j + 2).str(), false)) {
-                    if (adjacent(input_tokens.at(j), input_tokens.at(j + 1),
+                    if (adjacent(input_tokens.at(j),
+                                 input_tokens.at(j + 1),
                                  input_tokens.at(j + 2))) {
                         ++j;  // skip "/" token
                         ++j;  // skip integer encoding arity
@@ -259,7 +262,8 @@ auto reduce_function_signatures(vector<Token> input_tokens) -> vector<Token> {
                     adjacent(input_tokens.at(j - 1), input_tokens.at(j))) {
                     ++j;
                 }
-                tokens.emplace_back(t.line(), t.character(),
+                tokens.emplace_back(t.line(),
+                                    t.character(),
                                     join_tokens(input_tokens, i, j + 1));
                 i = j;
                 continue;
@@ -281,7 +285,8 @@ auto reduce_names(vector<Token> input_tokens) -> vector<Token> {
             auto j = i;
             while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
                    str::isid(input_tokens.at(j + 2)) and
-                   adjacent(input_tokens.at(j), input_tokens.at(j + 1),
+                   adjacent(input_tokens.at(j),
+                            input_tokens.at(j + 1),
                             input_tokens.at(j + 2))) {
                 ++j;  // swallow "::" token
                 ++j;  // swallow identifier token
@@ -297,13 +302,14 @@ auto reduce_names(vector<Token> input_tokens) -> vector<Token> {
                         ++j;  // skip next token, append it to name
                     }
                 }
-                tokens.emplace_back(t.line(), t.character(),
+                tokens.emplace_back(t.line(),
+                                    t.character(),
                                     join_tokens(input_tokens, i, j + 1));
                 i = j;
                 continue;
             }
-            tokens.emplace_back(t.line(), t.character(),
-                                join_tokens(input_tokens, i, j + 1));
+            tokens.emplace_back(
+                t.line(), t.character(), join_tokens(input_tokens, i, j + 1));
             i = j;
             continue;
         }
@@ -323,7 +329,8 @@ auto reduce_offset_jumps(vector<Token> input_tokens) -> vector<Token> {
         if (i + 1 < limit and (t.str() == "+" or t.str() == "-") and
             str::isnum(input_tokens.at(i + 1))) {
             if (adjacent(t, input_tokens.at(i + 1))) {
-                tokens.emplace_back(t.line(), t.character(),
+                tokens.emplace_back(t.line(),
+                                    t.character(),
                                     (t.str() + input_tokens.at(i + 1).str()));
                 ++i;
                 continue;
@@ -345,21 +352,24 @@ auto reduce_at_prefixed_registers(vector<Token> input_tokens) -> vector<Token> {
         if (i + 1 < limit and t.str() == "%" and
             input_tokens.at(i + 1).str() != "\n" and
             is_valid_register_id(input_tokens.at(i + 1))) {
-            tokens.emplace_back(t.line(), t.character(),
+            tokens.emplace_back(t.line(),
+                                t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
             ++i;
             continue;
         } else if (i + 1 < limit and t.str() == "@" and
                    input_tokens.at(i + 1).str() != "\n" and
                    is_valid_register_id(input_tokens.at(i + 1))) {
-            tokens.emplace_back(t.line(), t.character(),
+            tokens.emplace_back(t.line(),
+                                t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
             ++i;
             continue;
         } else if (i + 1 < limit and t.str() == "*" and
                    input_tokens.at(i + 1).str() != "\n" and
                    is_valid_register_id(input_tokens.at(i + 1))) {
-            tokens.emplace_back(t.line(), t.character(),
+            tokens.emplace_back(t.line(),
+                                t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
             ++i;
             continue;
@@ -380,7 +390,8 @@ auto reduce_floats(vector<Token> input_tokens) -> vector<Token> {
             input_tokens.at(i + 1) == "." and
             str::isnum(input_tokens.at(i + 2))) {
             if (adjacent(t, input_tokens.at(i + 1), input_tokens.at(i + 2))) {
-                tokens.emplace_back(t.line(), t.character(),
+                tokens.emplace_back(t.line(),
+                                    t.character(),
                                     join_tokens(input_tokens, i, i + 3));
                 ++i;  // skip "." token
                 ++i;  // skip second numeric part
@@ -423,7 +434,8 @@ auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
                     // must be mangled because we want to allow many functions
                     // to have a nested 'foo' block
                     nested_block_tokens.emplace_back(
-                        token.line(), token.character(),
+                        token.line(),
+                        token.character(),
                         (opened_inside + "__nested__" + token.str()));
                     nested_block_tokens.back().original(token);
                 } else {
@@ -473,8 +485,10 @@ auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
 }
 
 static void push_unwrapped_lines(
-    const bool invert, const Token& inner_target_token,
-    vector<Token>& final_tokens, const vector<Token>& unwrapped_tokens,
+    const bool invert,
+    const Token& inner_target_token,
+    vector<Token>& final_tokens,
+    const vector<Token>& unwrapped_tokens,
     const vector<Token>& input_tokens,
     std::remove_reference<decltype(input_tokens)>::type::size_type& i) {
     const auto limit = input_tokens.size();
@@ -553,7 +567,10 @@ static auto get_subtokens(
     }
 
     return std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned>{
-        i, std::move(subtokens), balance, toplevel_subexpressions_balance,
+        i,
+        std::move(subtokens),
+        balance,
+        toplevel_subexpressions_balance,
         toplevel_subexpressions};
 }
 static auto get_innermost_target_token(const vector<Token>& subtokens,
@@ -590,7 +607,8 @@ static auto get_innermost_target_token(const vector<Token>& subtokens,
 }
 static auto get_counter_token(const vector<Token>& subtokens,
                               const unsigned toplevel_subexpressions) -> Token {
-    return Token{subtokens.at(0).line(), subtokens.at(0).character(),
+    return Token{subtokens.at(0).line(),
+                 subtokens.at(0).character(),
                  ('%' + str::stringify(toplevel_subexpressions, false))};
 }
 auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
@@ -614,7 +632,10 @@ auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
             unsigned toplevel_subexpressions_balance = 0;
             unsigned toplevel_subexpressions         = 0;
 
-            tie(i, subtokens, balance, toplevel_subexpressions_balance,
+            tie(i,
+                subtokens,
+                balance,
+                toplevel_subexpressions_balance,
                 toplevel_subexpressions) = get_subtokens(input_tokens, i);
 
             if (t == "(") {
@@ -623,15 +644,20 @@ auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
                         t, "unbalanced parenthesis in wrapped instruction");
                 }
                 if (subtokens.size() < 2) {
-                    throw InvalidSyntax(t, "at least two tokens are required "
-                                           "in a wrapped instruction");
+                    throw InvalidSyntax(t,
+                                        "at least two tokens are required "
+                                        "in a wrapped instruction");
                 }
 
                 Token inner_target_token =
                     get_innermost_target_token(subtokens, t);
                 unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                push_unwrapped_lines(invert, inner_target_token, final_tokens,
-                                     unwrapped_tokens, input_tokens, i);
+                push_unwrapped_lines(invert,
+                                     inner_target_token,
+                                     final_tokens,
+                                     unwrapped_tokens,
+                                     input_tokens,
+                                     i);
                 if ((not invert) and full) {
                     if (final_tokens.back().str() == "*") {
                         final_tokens.pop_back();
@@ -652,8 +678,12 @@ auto unwrap_lines(vector<Token> input_tokens, bool full) -> vector<Token> {
                 subtokens = unwrap_lines(subtokens, false);
 
                 unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                push_unwrapped_lines(invert, counter_token, final_tokens,
-                                     unwrapped_tokens, input_tokens, i);
+                push_unwrapped_lines(invert,
+                                     counter_token,
+                                     final_tokens,
+                                     unwrapped_tokens,
+                                     input_tokens,
+                                     i);
                 if (not invert) {
                     final_tokens.push_back(counter_token);
                 }
@@ -710,14 +740,16 @@ auto replace_iotas(vector<Token> input_tokens) -> vector<Token> {
         }
 
         if (token == "iota") {
-            tokens.emplace_back(token.line(), token.character(),
+            tokens.emplace_back(token.line(),
+                                token.character(),
                                 str::stringify(iotas.back()++, false));
             tokens.back().original("iota");
         } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or
                     token.str().at(0) == '*') and
                    token.str().substr(1) == "iota") {
             tokens.emplace_back(
-                token.line(), token.character(),
+                token.line(),
+                token.character(),
                 (token.str().at(0) + str::stringify(iotas.back()++, false)));
             tokens.back().original(token);
         } else {
@@ -742,7 +774,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
             match(input_tokens, i, {"process", "default"})) {
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "void");
+                                input_tokens.at(i).character(),
+                                "void");
             tokens.back().original("default");
             continue;
         }
@@ -750,8 +783,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // push target register
                                                      // token
             ++i;
-            tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "0");
+            tokens.emplace_back(
+                input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
             tokens.back().original("default");
             continue;
         }
@@ -760,7 +793,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
                                                      // token
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "0.0");
+                                input_tokens.at(i).character(),
+                                "0.0");
             tokens.back().original("default");
             continue;
         }
@@ -769,7 +803,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
                                                      // token
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "\"\"");
+                                input_tokens.at(i).character(),
+                                "\"\"");
             tokens.back().original("default");
             continue;
         }
@@ -777,7 +812,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
             ++i;
             if (input_tokens.at(i) == "default") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "void");
+                                    input_tokens.at(i).character(),
+                                    "void");
                 tokens.back().original("default");
             } else {
                 tokens.push_back(input_tokens.at(i));  // push target register
@@ -785,7 +821,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
             }
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "infinity");
+                                input_tokens.at(i).character(),
+                                "infinity");
             tokens.back().original("default");
             continue;
         }
@@ -793,7 +830,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
             ++i;
             if (input_tokens.at(i) == "default") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "void");
+                                    input_tokens.at(i).character(),
+                                    "void");
                 tokens.back().original("default");
             } else {
                 tokens.push_back(input_tokens.at(i));  // push target register
@@ -803,7 +841,8 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
                                                      // token
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
-                                input_tokens.at(i).character(), "infinity");
+                                input_tokens.at(i).character(),
+                                "infinity");
             tokens.back().original("default");
             continue;
         }
@@ -864,22 +903,25 @@ auto replace_named_registers(std::vector<Token> input_tokens)
         }
 
         if (names.count(token)) {
-            tokens.emplace_back(token.line(), token.character(),
-                                names.at(token));
+            tokens.emplace_back(
+                token.line(), token.character(), names.at(token));
             tokens.back().original(token.str());
         } else if (token.str().at(0) == '@' and
                    names.count(token.str().substr(1))) {
-            tokens.emplace_back(token.line(), token.character(),
+            tokens.emplace_back(token.line(),
+                                token.character(),
                                 ("@" + names.at(token.str().substr(1))));
             tokens.back().original(token.str());
         } else if (token.str().at(0) == '*' and
                    names.count(token.str().substr(1))) {
-            tokens.emplace_back(token.line(), token.character(),
+            tokens.emplace_back(token.line(),
+                                token.character(),
                                 ("*" + names.at(token.str().substr(1))));
             tokens.back().original(token.str());
         } else if (token.str().at(0) == '%' and
                    names.count(token.str().substr(1))) {
-            tokens.emplace_back(token.line(), token.character(),
+            tokens.emplace_back(token.line(),
+                                token.character(),
                                 ("%" + names.at(token.str().substr(1))));
             tokens.back().original(token.str());
         } else {

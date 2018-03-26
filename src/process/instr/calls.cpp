@@ -202,8 +202,8 @@ viua::internals::types::byte* viua::process::Process::opcall(
                 "foreign method");
         }
         auto obj = stack->frame_new->arguments->at(0);
-        return call_foreign_method(addr, obj, call_name, return_register,
-                                   call_name);
+        return call_foreign_method(
+            addr, obj, call_name, return_register, call_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::call_native

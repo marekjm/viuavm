@@ -126,7 +126,8 @@ static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
 }
 
 
-static auto binary_shr(vector<bool> v, decltype(v)::size_type const n,
+static auto binary_shr(vector<bool> v,
+                       decltype(v)::size_type const n,
                        bool const padding = false)
     -> pair<vector<bool>, vector<bool>> {
     auto shifted = vector<bool>{};
@@ -377,7 +378,8 @@ static auto binary_multiplication(const vector<bool>& lhs,
     intermediates.emplace_back(lhs.size() + rhs.size());
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
-         i < rhs.size(); ++i) {
+         i < rhs.size();
+         ++i) {
         if (not rhs.at(i)) {
             /*
              * Multiplication by 0 just gives a long string of zeroes.
@@ -398,7 +400,9 @@ static auto binary_multiplication(const vector<bool>& lhs,
     }
 
     return std::accumulate(
-        intermediates.begin(), intermediates.end(), vector<bool>{},
+        intermediates.begin(),
+        intermediates.end(),
+        vector<bool>{},
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
             return binary_addition(l, r);
         });
@@ -660,7 +664,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
     auto result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
-         i < rhs.size(); ++i) {
+         i < rhs.size();
+         ++i) {
         if (not rhs.at(i)) {
             /*
              * Multiplication by 0 just gives a long string of zeroes.
@@ -691,7 +696,9 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
     std::fill_n(std::back_inserter(result), lhs.size(), false);
 
     result = std::accumulate(
-        intermediates.begin(), intermediates.end(), result,
+        intermediates.begin(),
+        intermediates.end(),
+        result,
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
@@ -1105,7 +1112,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
     auto result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
-         i < rhs.size(); ++i) {
+         i < rhs.size();
+         ++i) {
         if (not rhs.at(i)) {
             /*
              * Multiplication by 0 just gives a long string of zeroes.
@@ -1136,7 +1144,9 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
     std::fill_n(std::back_inserter(result), lhs.size(), false);
 
     result = std::accumulate(
-        intermediates.begin(), intermediates.end(), result,
+        intermediates.begin(),
+        intermediates.end(),
+        result,
         [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
@@ -1494,7 +1504,8 @@ static auto perform_bitwise_logic(const viua::types::Bits& lhs,
     auto result = make_unique<viua::types::Bits>(lhs.size());
 
     for (auto i = viua::types::Bits::size_type{0};
-         i < min(lhs.size(), rhs.size()); ++i) {
+         i < min(lhs.size(), rhs.size());
+         ++i) {
         result->set(i, T()(lhs.at(i), rhs.at(i)));
     }
 

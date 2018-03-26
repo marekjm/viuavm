@@ -174,10 +174,12 @@ Program& Program::optextat(int_op target, int_op source, int_op index) {
     addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
     return (*this);
 }
-Program& Program::optextsub(int_op target, int_op source, int_op begin_index,
+Program& Program::optextsub(int_op target,
+                            int_op source,
+                            int_op begin_index,
                             int_op end_index) {
-    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index,
-                                       end_index);
+    addr_ptr = cg::bytecode::optextsub(
+        addr_ptr, target, source, begin_index, end_index);
     return (*this);
 }
 Program& Program::optextlength(int_op target, int_op source) {
@@ -197,7 +199,8 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opvector(int_op index, int_op pack_start_index,
+Program& Program::opvector(int_op index,
+                           int_op pack_start_index,
                            int_op pack_length) {
     addr_ptr =
         cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
@@ -543,30 +546,33 @@ Program& Program::opecho(int_op reg) {
     return (*this);
 }
 
-Program& Program::opcapture(int_op target_closure, int_op target_register,
+Program& Program::opcapture(int_op target_closure,
+                            int_op target_register,
                             int_op source_register) {
     /*  Inserts clbing instuction.
      */
-    addr_ptr = cg::bytecode::opcapture(addr_ptr, target_closure,
-                                       target_register, source_register);
+    addr_ptr = cg::bytecode::opcapture(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturecopy(int_op target_closure, int_op target_register,
+Program& Program::opcapturecopy(int_op target_closure,
+                                int_op target_register,
                                 int_op source_register) {
     /*  Inserts opcapturecopy instuction.
      */
-    addr_ptr = cg::bytecode::opcapturecopy(addr_ptr, target_closure,
-                                           target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturecopy(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturemove(int_op target_closure, int_op target_register,
+Program& Program::opcapturemove(int_op target_closure,
+                                int_op target_register,
                                 int_op source_register) {
     /*  Inserts opcapturemove instuction.
      */
-    addr_ptr = cg::bytecode::opcapturemove(addr_ptr, target_closure,
-                                           target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturemove(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
@@ -826,7 +832,8 @@ Program& Program::opderive(int_op reg, const string& base_class_name) {
     return (*this);
 }
 
-Program& Program::opattach(int_op reg, const string& function_name,
+Program& Program::opattach(int_op reg,
+                           const string& function_name,
                            const string& method_name) {
     /*  Inserts attach instuction.
      */

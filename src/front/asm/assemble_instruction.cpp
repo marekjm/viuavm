@@ -50,7 +50,8 @@ using TokenIndex = vector<Token>::size_type;
 
 
 static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
-    Token token, const map<string, vector<Token>::size_type>& marks,
+    Token token,
+    const map<string, vector<Token>::size_type>& marks,
     viua::internals::types::bytecode_size instruction_index) {
     /*  This function is used to resolve jumps in `jump` and `branch`
      * instructions.
@@ -90,8 +91,9 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
                 marks.at(jmp));
         } catch (const std::out_of_range& e) {
             throw viua::cg::lex::InvalidSyntax(
-                token, ("cannot resolve jump to unrecognised marker: " +
-                        str::enquote(str::strencode(jmp))));
+                token,
+                ("cannot resolve jump to unrecognised marker: " +
+                 str::enquote(str::strencode(jmp))));
         }
     }
 
@@ -146,8 +148,9 @@ static string resolveregister(Token token,
         out << reg;
     } else {
         throw viua::cg::lex::InvalidSyntax(
-            token, ("cannot resolve register operand: " +
-                    str::enquote(str::strencode(token.str()))));
+            token,
+            ("cannot resolve register operand: " +
+             str::enquote(str::strencode(token.str()))));
     }
     return out.str();
 }
@@ -249,8 +252,10 @@ static auto convert_token_to_timeout_operand(viua::cg::lex::Token token)
     return timeout_op{timeout_milliseconds};
 }
 viua::internals::types::bytecode_size assemble_instruction(
-    Program& program, viua::internals::types::bytecode_size& instruction,
-    viua::internals::types::bytecode_size i, const vector<Token>& tokens,
+    Program& program,
+    viua::internals::types::bytecode_size& instruction,
+    viua::internals::types::bytecode_size i,
+    const vector<Token>& tokens,
     map<string, std::remove_reference<decltype(tokens)>::type::size_type>&
         marks) {
     /*  This is main assembly loop.
@@ -872,23 +877,23 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(lhs)),
                           resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "wrapincrement") {
-        assemble_increment_instruction<&Program::opwrapincrement>(program,
-                                                                  tokens, i);
+        assemble_increment_instruction<&Program::opwrapincrement>(
+            program, tokens, i);
     } else if (tokens.at(i) == "wrapdecrement") {
-        assemble_increment_instruction<&Program::opwrapdecrement>(program,
-                                                                  tokens, i);
+        assemble_increment_instruction<&Program::opwrapdecrement>(
+            program, tokens, i);
     } else if (tokens.at(i) == "wrapadd") {
-        assemble_arithmetic_instruction<&Program::opwrapadd>(program, tokens,
-                                                             i);
+        assemble_arithmetic_instruction<&Program::opwrapadd>(
+            program, tokens, i);
     } else if (tokens.at(i) == "wrapsub") {
-        assemble_arithmetic_instruction<&Program::opwrapsub>(program, tokens,
-                                                             i);
+        assemble_arithmetic_instruction<&Program::opwrapsub>(
+            program, tokens, i);
     } else if (tokens.at(i) == "wrapmul") {
-        assemble_arithmetic_instruction<&Program::opwrapmul>(program, tokens,
-                                                             i);
+        assemble_arithmetic_instruction<&Program::opwrapmul>(
+            program, tokens, i);
     } else if (tokens.at(i) == "wrapdiv") {
-        assemble_arithmetic_instruction<&Program::opwrapdiv>(program, tokens,
-                                                             i);
+        assemble_arithmetic_instruction<&Program::opwrapdiv>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedsincrement") {
         assemble_increment_instruction<&Program::opcheckedsincrement>(
             program, tokens, i);
@@ -896,17 +901,17 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opcheckedsdecrement>(
             program, tokens, i);
     } else if (tokens.at(i) == "checkedsadd") {
-        assemble_arithmetic_instruction<&Program::opcheckedsadd>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedsadd>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedssub") {
-        assemble_arithmetic_instruction<&Program::opcheckedssub>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedssub>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedsmul") {
-        assemble_arithmetic_instruction<&Program::opcheckedsmul>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedsmul>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedsdiv") {
-        assemble_arithmetic_instruction<&Program::opcheckedsdiv>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedsdiv>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkeduincrement") {
         assemble_increment_instruction<&Program::opcheckeduincrement>(
             program, tokens, i);
@@ -914,17 +919,17 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opcheckedudecrement>(
             program, tokens, i);
     } else if (tokens.at(i) == "checkeduadd") {
-        assemble_arithmetic_instruction<&Program::opcheckeduadd>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckeduadd>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedusub") {
-        assemble_arithmetic_instruction<&Program::opcheckedusub>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedusub>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedumul") {
-        assemble_arithmetic_instruction<&Program::opcheckedumul>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedumul>(
+            program, tokens, i);
     } else if (tokens.at(i) == "checkedudiv") {
-        assemble_arithmetic_instruction<&Program::opcheckedudiv>(program,
-                                                                 tokens, i);
+        assemble_arithmetic_instruction<&Program::opcheckedudiv>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingsincrement") {
         assemble_increment_instruction<&Program::opsaturatingsincrement>(
             program, tokens, i);
@@ -932,17 +937,17 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opsaturatingsdecrement>(
             program, tokens, i);
     } else if (tokens.at(i) == "saturatingsadd") {
-        assemble_arithmetic_instruction<&Program::opsaturatingsadd>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingsadd>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingssub") {
-        assemble_arithmetic_instruction<&Program::opsaturatingssub>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingssub>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingsmul") {
-        assemble_arithmetic_instruction<&Program::opsaturatingsmul>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingsmul>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingsdiv") {
-        assemble_arithmetic_instruction<&Program::opsaturatingsdiv>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingsdiv>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatinguincrement") {
         assemble_increment_instruction<&Program::opsaturatinguincrement>(
             program, tokens, i);
@@ -950,17 +955,17 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_increment_instruction<&Program::opsaturatingudecrement>(
             program, tokens, i);
     } else if (tokens.at(i) == "saturatinguadd") {
-        assemble_arithmetic_instruction<&Program::opsaturatinguadd>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatinguadd>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingusub") {
-        assemble_arithmetic_instruction<&Program::opsaturatingusub>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingusub>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingumul") {
-        assemble_arithmetic_instruction<&Program::opsaturatingumul>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingumul>(
+            program, tokens, i);
     } else if (tokens.at(i) == "saturatingudiv") {
-        assemble_arithmetic_instruction<&Program::opsaturatingudiv>(program,
-                                                                    tokens, i);
+        assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
+            program, tokens, i);
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
@@ -1175,9 +1180,10 @@ viua::internals::types::bytecode_size assemble_instruction(
 
         if (tokens.at(fn).str().at(0) == '*' or
             tokens.at(fn).str().at(0) == '%') {
-            program.opcall(ret, assembler::operands::getint_with_rs_type(
-                                    resolveregister(tokens.at(fn)),
-                                    resolve_rs_type(tokens.at(fn + 1))));
+            program.opcall(ret,
+                           assembler::operands::getint_with_rs_type(
+                               resolveregister(tokens.at(fn)),
+                               resolve_rs_type(tokens.at(fn + 1))));
         } else {
             program.opcall(ret, tokens.at(fn));
         }
@@ -1313,7 +1319,10 @@ viua::internals::types::bytecode_size assemble_instruction(
         program.opif(
             assembler::operands::getint_with_rs_type(
                 resolveregister(condition), resolve_rs_type(tokens.at(i + 2))),
-            addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
+            addrt_target,
+            addrt_jump_type,
+            addrf_target,
+            addrf_jump_type);
     } else if (tokens.at(i) == "jump") {
         /*  Jump instruction can be written in two forms:
          *
@@ -1382,7 +1391,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         program.opattach(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
                              resolve_rs_type(tokens.at(target + 1))),
-                         tokens.at(fn_name), tokens.at(attached_name));
+                         tokens.at(fn_name),
+                         tokens.at(attached_name));
     } else if (tokens.at(i) == "register") {
         TokenIndex target = i + 1;
 
@@ -1493,9 +1503,10 @@ viua::internals::types::bytecode_size assemble_instruction(
 
         if (tokens.at(fn).str().at(0) == '*' or
             tokens.at(fn).str().at(0) == '%') {
-            program.opmsg(ret, assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(fn)),
-                                   resolve_rs_type(tokens.at(fn + 1))));
+            program.opmsg(ret,
+                          assembler::operands::getint_with_rs_type(
+                              resolveregister(tokens.at(fn)),
+                              resolve_rs_type(tokens.at(fn + 1))));
         } else {
             program.opmsg(ret, tokens.at(fn));
         }
@@ -1548,8 +1559,9 @@ viua::internals::types::bytecode_size assemble_instruction(
         // do nothing, it's an assembler directive
     } else {
         throw viua::cg::lex::InvalidSyntax(
-            tokens.at(i), ("unimplemented instruction: " +
-                           str::enquote(str::strencode(tokens.at(i)))));
+            tokens.at(i),
+            ("unimplemented instruction: " +
+             str::enquote(str::strencode(tokens.at(i)))));
     }
 
     if (tokens.at(i).str().substr(0, 1) != ".") {

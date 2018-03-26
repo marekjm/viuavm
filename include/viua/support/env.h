@@ -34,7 +34,8 @@ auto get_var(std::string const&) -> std::string;
 auto is_file(std::string const&) -> bool;
 
 namespace viua {
-auto get_mod_path(std::string const&, std::string const&,
+auto get_mod_path(std::string const&,
+                  std::string const&,
                   std::vector<std::string> const&) -> std::string;
 }
 }  // namespace env

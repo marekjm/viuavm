@@ -69,7 +69,8 @@ auto is_file(string const& path) -> bool {
 }
 
 namespace viua {
-auto get_mod_path(string const& module, string const& extension,
+auto get_mod_path(string const& module,
+                  string const& extension,
                   vector<string> const& paths) -> string {
     auto path  = string{""};
     auto found = false;

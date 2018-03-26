@@ -85,8 +85,8 @@ auto callable_creations(const std::vector<viua::cg::lex::Token>&,
                         const std::vector<std::string>&) -> void;
 auto manipulation_of_defined_registers(
     const std::vector<viua::cg::lex::Token>&,
-    const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool)
-    -> void;
+    const std::map<std::string, std::vector<viua::cg::lex::Token>>&,
+    const bool) -> void;
 }  // namespace verify
 
 namespace utils {

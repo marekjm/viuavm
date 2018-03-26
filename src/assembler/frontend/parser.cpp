@@ -57,8 +57,8 @@ auto viua::assembler::frontend::parser::Line::add(Token t) -> void {
 }
 
 auto viua::assembler::frontend::parser::parse_attribute_value(
-    const vector_view<Token> tokens, string& value)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    string& value) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{1};
 
     if (tokens.at(i) == "}") {
@@ -113,7 +113,8 @@ auto viua::assembler::frontend::parser::parse_attributes(
 }
 
 auto viua::assembler::frontend::parser::parse_operand(
-    const vector_view<Token> tokens, unique_ptr<Operand>& operand,
+    const vector_view<Token> tokens,
+    unique_ptr<Operand>& operand,
     const bool integer_literal_means_offset) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
@@ -295,13 +296,19 @@ static auto get_mnemonics() -> vector<string> {
 }
 static auto get_directives() -> vector<string> {
     return {
-        ".end",   ".function:", ".closure:", ".block:",
-        ".iota:", ".mark:",     ".name:",    ".unused:",
+        ".end",
+        ".function:",
+        ".closure:",
+        ".block:",
+        ".iota:",
+        ".mark:",
+        ".name:",
+        ".unused:",
     };
 }
 auto viua::assembler::frontend::parser::parse_instruction(
-    const vector_view<Token> tokens, unique_ptr<Instruction>& instruction)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    unique_ptr<Instruction>& instruction) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i).str().at(0) == '.') {
@@ -325,7 +332,8 @@ auto viua::assembler::frontend::parser::parse_instruction(
     try {
         while (tokens.at(i) != "\n") {
             unique_ptr<Operand> operand;
-            i += parse_operand(vector_view<Token>(tokens, i), operand,
+            i += parse_operand(vector_view<Token>(tokens, i),
+                               operand,
                                integer_literal_means_offset);
             instruction->operands.push_back(std::move(operand));
         }
@@ -335,14 +343,15 @@ auto viua::assembler::frontend::parser::parse_instruction(
     return i;
 }
 auto viua::assembler::frontend::parser::parse_directive(
-    const vector_view<Token> tokens, unique_ptr<Directive>& directive)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    unique_ptr<Directive>& directive) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
         auto error = InvalidSyntax(tokens.at(0), "unknown directive");
         if (auto suggestion =
-                str::levenshtein_best(tokens.at(i), get_directives(),
+                str::levenshtein_best(tokens.at(i),
+                                      get_directives(),
                                       max_distance_for_misspelled_ids);
             suggestion.first) {
             error.aside("did you mean '" + suggestion.second + "'?");
@@ -383,8 +392,8 @@ auto viua::assembler::frontend::parser::parse_directive(
     return i;
 }
 auto viua::assembler::frontend::parser::parse_line(
-    const vector_view<Token> tokens, unique_ptr<Line>& line)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    unique_ptr<Line>& line) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
     if (tokens.at(0).str().at(0) == '.') {
         auto directive = make_unique<Directive>();
@@ -424,8 +433,8 @@ static auto populate_marker_map(InstructionsBlock& instructions_block) -> void {
     }
 }
 auto viua::assembler::frontend::parser::parse_block_body(
-    const vector_view<Token> tokens, InstructionsBlock& instructions_block)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    InstructionsBlock& instructions_block) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
@@ -444,8 +453,8 @@ auto viua::assembler::frontend::parser::parse_block_body(
 }
 
 auto viua::assembler::frontend::parser::parse_function(
-    const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    InstructionsBlock& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -480,8 +489,8 @@ auto viua::assembler::frontend::parser::parse_function(
     return i;
 }
 auto viua::assembler::frontend::parser::parse_closure(
-    const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    InstructionsBlock& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -521,8 +530,8 @@ auto viua::assembler::frontend::parser::parse_closure(
     return i;
 }
 auto viua::assembler::frontend::parser::parse_block(
-    const vector_view<Token> tokens, InstructionsBlock& ib)
-    -> decltype(tokens)::size_type {
+    const vector_view<Token> tokens,
+    InstructionsBlock& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -556,7 +565,8 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens)
     ParsedSource parsed;
 
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
-         i < tokens.size(); ++i) {
+         i < tokens.size();
+         ++i) {
         if (tokens.at(i) == "\n") {
             continue;
         }

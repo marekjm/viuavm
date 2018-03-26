@@ -82,7 +82,8 @@ uint64_t Program::size() {
 
 using Token = viua::cg::lex::Token;
 Program& Program::calculate_jumps(
-    vector<tuple<uint64_t, uint64_t>> jump_positions, vector<Token>& tokens) {
+    vector<tuple<uint64_t, uint64_t>> jump_positions,
+    vector<Token>& tokens) {
     /** Calculate jump targets in given bytecode.
      */
     uint64_t* ptr = nullptr;

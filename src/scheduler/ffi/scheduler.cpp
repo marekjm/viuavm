@@ -30,15 +30,18 @@ using namespace std;
 void viua::scheduler::ffi::ff_call_processor(
     vector<unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>*
         requests,
-    map<string, ForeignFunction*>* foreign_functions, mutex* ff_map_mtx,
-    mutex* mtx, condition_variable* cv) {
+    map<string, ForeignFunction*>* foreign_functions,
+    mutex* ff_map_mtx,
+    mutex* mtx,
+    condition_variable* cv) {
     while (true) {
         unique_lock<mutex> lock(*mtx);
 
         // wait in a loop, because wait_for() can still return even if the
         // requests queue is empty
-        while (not cv->wait_for(lock, chrono::milliseconds(2000),
-                                [requests]() { return not requests->empty(); }))
+        while (not cv->wait_for(lock, chrono::milliseconds(2000), [requests]() {
+            return not requests->empty();
+        }))
             ;
 
         unique_ptr<ForeignFunctionCallRequest> request(

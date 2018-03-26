@@ -83,16 +83,19 @@ static auto skip_till_next_line(const TokenVector& tokens,
 }
 static auto is_named(const map<string, string>& named_registers, string name)
     -> bool {
-    return (std::find_if(named_registers.begin(), named_registers.end(),
+    return (std::find_if(named_registers.begin(),
+                         named_registers.end(),
                          [name](std::remove_reference<decltype(
                                     named_registers)>::type::value_type t) {
                              return (t.second == name);
                          }) != named_registers.end());
 }
-static auto get_name(const map<string, string>& named_registers, string name,
+static auto get_name(const map<string, string>& named_registers,
+                     string name,
                      Token context) -> string {
     auto it = std::find_if(
-        named_registers.begin(), named_registers.end(),
+        named_registers.begin(),
+        named_registers.end(),
         [name](
             std::remove_reference<decltype(named_registers)>::type::value_type
                 t) { return (t.second == name); });
@@ -103,7 +106,8 @@ static auto get_name(const map<string, string>& named_registers, string name,
     return it->first;
 }
 static string resolve_register_name(const map<string, string>& named_registers,
-                                    Token token, string name,
+                                    Token token,
+                                    string name,
                                     const bool allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::InvalidSyntax(token,
@@ -116,8 +120,9 @@ static string resolve_register_name(const map<string, string>& named_registers,
         name = name.substr(1);
     } else {
         throw viua::cg::lex::InvalidSyntax(
-            token, ("not a valid register accessor: " +
-                    str::enquote(str::strencode(name))));
+            token,
+            ("not a valid register accessor: " +
+             str::enquote(str::strencode(name))));
     }
     if (str::isnum(name, false)) {
         if ((not allow_direct_access) and is_named(named_registers, name) and
@@ -128,9 +133,10 @@ static string resolve_register_name(const map<string, string>& named_registers,
                  token.original().substr(1) == "iota") or
                 token.original() == "\n")) {
             throw viua::cg::lex::InvalidSyntax(
-                token, ("accessing named register using direct index: " +
-                        str::enquote(get_name(named_registers, name, token)) +
-                        " := " + name));
+                token,
+                ("accessing named register using direct index: " +
+                 str::enquote(get_name(named_registers, name, token)) +
+                 " := " + name));
         }
         return name;
     }
@@ -165,14 +171,20 @@ static auto strip_access_mode_sigil(string s) -> string {
                                                                  : s);
 }
 static void check_use_of_register_index(
-    const TokenVector& tokens, long unsigned i, long unsigned by,
-    string register_index, Registers& registers,
-    map<string, string>& named_registers, const string& message_prefix,
+    const TokenVector& tokens,
+    long unsigned i,
+    long unsigned by,
+    string register_index,
+    Registers& registers,
+    map<string, string>& named_registers,
+    const string& message_prefix,
     const bool allow_direct_access_to_target = true) {
     string resolved_register_name;
     try {
         resolved_register_name =
-            resolve_register_name(named_registers, tokens.at(i), register_index,
+            resolve_register_name(named_registers,
+                                  tokens.at(i),
+                                  register_index,
                                   allow_direct_access_to_target);
     } catch (viua::cg::lex::InvalidSyntax& e) {
         e.add(tokens.at(by));
@@ -205,19 +217,34 @@ static void check_use_of_register_index(
     registers.use(resolved_register_name, tokens.at(i));
 }
 static void check_use_of_register(
-    const TokenVector& tokens, long unsigned i, long unsigned by,
-    Registers& registers, map<string, string>& named_registers,
+    const TokenVector& tokens,
+    long unsigned i,
+    long unsigned by,
+    Registers& registers,
+    map<string, string>& named_registers,
     const string& message_prefix,
     const bool allow_direct_access_to_target = true) {
-    check_use_of_register_index(tokens, i, by, tokens.at(i), registers,
-                                named_registers, message_prefix,
+    check_use_of_register_index(tokens,
+                                i,
+                                by,
+                                tokens.at(i),
+                                registers,
+                                named_registers,
+                                message_prefix,
                                 allow_direct_access_to_target);
 }
-static void check_use_of_register(const TokenVector& tokens, long unsigned i,
-                                  long unsigned by, Registers& registers,
+static void check_use_of_register(const TokenVector& tokens,
+                                  long unsigned i,
+                                  long unsigned by,
+                                  Registers& registers,
                                   map<string, string>& named_registers) {
-    check_use_of_register_index(tokens, i, by, tokens.at(i), registers,
-                                named_registers, "use of empty register");
+    check_use_of_register_index(tokens,
+                                i,
+                                by,
+                                tokens.at(i),
+                                registers,
+                                named_registers,
+                                "use of empty register");
 }
 
 static void check_defined_but_unused(Registers& registers) {
@@ -235,7 +262,8 @@ static void check_defined_but_unused(Registers& registers) {
 }
 
 static auto in_block_offset(const TokenVector& body_tokens,
-                            TokenVector::size_type i, Registers& registers,
+                            TokenVector::size_type i,
+                            Registers& registers,
                             map<string, string>& named_registers)
     -> decltype(i) {
     const auto& checked_token = body_tokens.at(i);
@@ -318,14 +346,19 @@ static auto in_block_offset(const TokenVector& body_tokens,
 }
 
 static void check_block_body(const TokenVector& body_tokens,
-                             TokenVector::size_type, Registers&,
-                             const map<string, TokenVector>&, const bool);
-static void check_block_body(const TokenVector&, Registers&,
-                             const map<string, TokenVector>&, const bool);
+                             TokenVector::size_type,
+                             Registers&,
+                             const map<string, TokenVector>&,
+                             const bool);
+static void check_block_body(const TokenVector&,
+                             Registers&,
+                             const map<string, TokenVector>&,
+                             const bool);
 
 static void erase_register(Registers& registers,
                            map<string, string>& named_registers,
-                           const Token& name, const Token& context) {
+                           const Token& name,
+                           const Token& context) {
     /*
      * Even if normally an instruction would erase a register, when it is a
      * pointer dereference that is given as the opernad the "move an object"
@@ -369,7 +402,8 @@ static auto get_token_index_of_operand(const TokenVector& tokens,
 }
 
 static void check_block_body(const TokenVector& body_tokens,
-                             TokenVector::size_type i, Registers& registers,
+                             TokenVector::size_type i,
+                             Registers& registers,
                              map<string, string> named_registers,
                              const map<string, TokenVector>& block_bodies,
                              const bool debug) {
@@ -429,19 +463,24 @@ static void check_block_body(const TokenVector& body_tokens,
 
         if (token == "enter") {
             try {
-                check_block_body(block_bodies.at(body_tokens.at(i + 1)), 0,
-                                 registers, block_bodies, debug);
+                check_block_body(block_bodies.at(body_tokens.at(i + 1)),
+                                 0,
+                                 registers,
+                                 block_bodies,
+                                 debug);
             } catch (viua::cg::lex::InvalidSyntax& e) {
                 viua::cg::lex::InvalidSyntax base_error{
-                    token, ("after entering block " +
-                            str::enquote(body_tokens.at(i + 1).original()))};
+                    token,
+                    ("after entering block " +
+                     str::enquote(body_tokens.at(i + 1).original()))};
                 base_error.add(body_tokens.at(i + 1));
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(
                     base_error);
             } catch (viua::cg::lex::TracedSyntaxError& e) {
                 viua::cg::lex::InvalidSyntax base_error{
-                    token, ("after entering block " +
-                            str::enquote(body_tokens.at(i + 1).original()))};
+                    token,
+                    ("after entering block " +
+                     str::enquote(body_tokens.at(i + 1).original()))};
                 base_error.add(body_tokens.at(i + 1));
                 throw e.append(base_error);
             }
@@ -450,8 +489,8 @@ static void check_block_body(const TokenVector& body_tokens,
         }
 
         if (token == "jump") {
-            i = in_block_offset(body_tokens, i + 1, registers,
-                                named_registers) -
+            i = in_block_offset(
+                    body_tokens, i + 1, registers, named_registers) -
                 1;
             continue;
         }
@@ -460,13 +499,17 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "move from empty register");
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "move from empty register");
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
                 body_tokens.at(target));
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -481,11 +524,17 @@ static void check_block_body(const TokenVector& body_tokens,
                 --index;
             }
 
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " from empty register"));
             if (body_tokens.at(index) != "void") {
-                check_use_of_register(body_tokens, index, i, registers,
+                check_use_of_register(body_tokens,
+                                      index,
+                                      i,
+                                      registers,
                                       named_registers,
                                       ("using empty register for indexing"));
             }
@@ -499,7 +548,10 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " from empty register"));
             registers.insert(
@@ -512,14 +564,20 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, target, i, registers,
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " into empty register"));
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " from empty register"));
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -528,17 +586,26 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex source = target + 2;
             TokenIndex index  = source + 2;
 
-            check_use_of_register(body_tokens, target, i, registers,
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " into empty register"));
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " from empty register"));
-            check_use_of_register(body_tokens, index, i, registers,
+            check_use_of_register(body_tokens,
+                                  index,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " index from empty register"));
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -547,17 +614,26 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex key    = target + 2;
             TokenIndex source = key + 2;
 
-            check_use_of_register(body_tokens, target, i, registers,
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "insert into empty register");
-            check_use_of_register(body_tokens, key, i, registers,
+            check_use_of_register(body_tokens,
+                                  key,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "insert key from empty register");
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "insert from empty register");
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -571,10 +647,16 @@ static void check_block_body(const TokenVector& body_tokens,
                 --key;
             }
 
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "remove from empty register");
-            check_use_of_register(body_tokens, key, i, registers,
+            check_use_of_register(body_tokens,
+                                  key,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "remove key from empty register");
 
@@ -589,19 +671,27 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "delete") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
-            check_use_of_register(body_tokens, target, i, registers,
-                                  named_registers, "delete of empty register");
-            erase_register(registers, named_registers, body_tokens.at(target),
-                           token);
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "delete of empty register");
+            erase_register(
+                registers, named_registers, body_tokens.at(target), token);
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "throw") {
             TokenIndex source = i + 1;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "throw from empty register");
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "throw from empty register");
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "isnull") {
@@ -635,7 +725,10 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex source = i;
             ++i;  // for register set type specifier
 
-            check_use_of_register(body_tokens, source, i - 1, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i - 1,
+                                  registers,
                                   named_registers,
                                   "branch depends on empty register");
 
@@ -645,11 +738,14 @@ static void check_block_body(const TokenVector& body_tokens,
                 auto copied_registers       = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens,
-                                 in_block_offset(body_tokens, i + 1,
+                                 in_block_offset(body_tokens,
+                                                 i + 1,
                                                  copied_registers,
                                                  copied_named_registers),
-                                 copied_registers, copied_named_registers,
-                                 block_bodies, debug);
+                                 copied_registers,
+                                 copied_named_registers,
+                                 block_bodies,
+                                 debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 // do not fail yet, because the value may be used by false
                 // branch save the error for later
@@ -666,11 +762,14 @@ static void check_block_body(const TokenVector& body_tokens,
                 auto copied_registers       = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens,
-                                 in_block_offset(body_tokens, i + 2,
+                                 in_block_offset(body_tokens,
+                                                 i + 2,
                                                  copied_registers,
                                                  copied_named_registers),
-                                 copied_registers, copied_named_registers,
-                                 block_bodies, debug);
+                                 copied_registers,
+                                 copied_named_registers,
+                                 block_bodies,
+                                 debug);
             } catch (viua::cg::lex::UnusedValue& e) {
                 if (register_with_unused_value == e.what()) {
                     throw viua::cg::lex::TracedSyntaxError().append(e).append(
@@ -692,16 +791,23 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "echo" or token == "print") {
             TokenIndex source = get_token_index_of_operand(body_tokens, i, 1);
 
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
-                                  (token.str() + " of empty register"), false);
+                                  (token.str() + " of empty register"),
+                                  false);
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "not" or token == "bitnot") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
                                   named_registers,
                                   (token.str() + " of empty register"));
             registers.insert(
@@ -719,7 +825,11 @@ static void check_block_body(const TokenVector& body_tokens,
                 // literal bit string, FIXME add validation
             } else {
                 check_use_of_register(
-                    body_tokens, source, i, registers, named_registers,
+                    body_tokens,
+                    source,
+                    i,
+                    registers,
+                    named_registers,
                     ("use of empty register in " + token.str()));
             }
 
@@ -737,13 +847,17 @@ static void check_block_body(const TokenVector& body_tokens,
                      << endl;
             }
             check_use_of_register(
-                body_tokens, source, i, registers, named_registers,
+                body_tokens,
+                source,
+                i,
+                registers,
+                named_registers,
                 ("parameter " +
                  string(token.str() == "pamv" ? "move" : "pass") +
                  " from empty register"));
             if (token == "pamv") {
-                erase_register(registers, named_registers,
-                               body_tokens.at(source), token);
+                erase_register(
+                    registers, named_registers, body_tokens.at(source), token);
             }
 
             i = skip_till_next_line(body_tokens, i);
@@ -753,8 +867,12 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex source = i + 4;
 
             // FIXME check if target is not empty
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "closure of empty register");
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "closure of empty register");
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "copy" or token == "ptr" or token == "textlength" or
@@ -764,7 +882,11 @@ static void check_block_body(const TokenVector& body_tokens,
 
             string opcode_name = token;
             check_use_of_register(
-                body_tokens, source, i, registers, named_registers,
+                body_tokens,
+                source,
+                i,
+                registers,
+                named_registers,
                 ((opcode_name == "ptr" ? "pointer" : opcode_name) +
                  " from empty register"));
             registers.insert(
@@ -777,10 +899,10 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, target, i, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, source, i, registers, named_registers);
+            check_use_of_register(
+                body_tokens, target, i, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
                 body_tokens.at(target));
@@ -794,7 +916,10 @@ static void check_block_body(const TokenVector& body_tokens,
             if (body_tokens.at(i).str().at(0) == '%' or
                 body_tokens.at(i).str().at(0) == '*' or
                 body_tokens.at(i).str().at(0) == '@') {
-                check_use_of_register(body_tokens, source, i, registers,
+                check_use_of_register(body_tokens,
+                                      source,
+                                      i,
+                                      registers,
                                       named_registers,
                                       "text from empty register");
             }
@@ -809,13 +934,20 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "send from empty register");
-            check_use_of_register(body_tokens, target, i, registers,
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "send from empty register");
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "send target from empty register");
-            erase_register(registers, named_registers, body_tokens.at(source),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -823,10 +955,18 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, target, i, registers,
-                                  named_registers, "swap with empty register");
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "swap with empty register");
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "swap with empty register");
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "swap with empty register");
 
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -835,8 +975,8 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, source, i, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
                 body_tokens.at(target));
@@ -864,11 +1004,16 @@ static void check_block_body(const TokenVector& body_tokens,
                 stoi(body_tokens.at(pack_range_count).str().substr(1));
             if (registers_to_pack) {
                 for (int j = starting_register;
-                     j < (starting_register + registers_to_pack); ++j) {
+                     j < (starting_register + registers_to_pack);
+                     ++j) {
                     check_use_of_register_index(
-                        body_tokens, i - 1, i - 1,
-                        ('%' + str::stringify(j, false)), registers,
-                        named_registers, "packing empty register");
+                        body_tokens,
+                        i - 1,
+                        i - 1,
+                        ('%' + str::stringify(j, false)),
+                        registers,
+                        named_registers,
+                        "packing empty register");
                     registers.erase(str::stringify(j, false), token);
                 }
             }
@@ -889,10 +1034,10 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex lhs    = target + 2;
             TokenIndex rhs    = lhs + 2;
 
-            check_use_of_register(body_tokens, lhs, i - 1, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, rhs, i - 1, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, lhs, i - 1, registers, named_registers);
+            check_use_of_register(
+                body_tokens, rhs, i - 1, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(i)),
                 body_tokens.at(i));
@@ -912,10 +1057,10 @@ static void check_block_body(const TokenVector& body_tokens,
                 --rhs;
             }
 
-            check_use_of_register(body_tokens, lhs, i - 1, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, rhs, i - 1, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, lhs, i - 1, registers, named_registers);
+            check_use_of_register(
+                body_tokens, rhs, i - 1, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(i)),
                 body_tokens.at(i));
@@ -929,13 +1074,13 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex lhs    = target + 2;
             TokenIndex rhs    = lhs + 2;
 
-            check_use_of_register(body_tokens, lhs, i - 1, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, lhs, i - 1, registers, named_registers);
 
             if (not(body_tokens.at(rhs) == "true" or
                     body_tokens.at(rhs) == "false")) {
-                check_use_of_register(body_tokens, rhs, i - 1, registers,
-                                      named_registers);
+                check_use_of_register(
+                    body_tokens, rhs, i - 1, registers, named_registers);
             }
 
             registers.insert(
@@ -952,12 +1097,12 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex lhs    = source + 2;
             TokenIndex rhs    = lhs + 2;
 
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, lhs, i, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, rhs, i, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, source, i, registers, named_registers);
+            check_use_of_register(
+                body_tokens, lhs, i, registers, named_registers);
+            check_use_of_register(
+                body_tokens, rhs, i, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(i)),
                 body_tokens.at(i));
@@ -974,10 +1119,10 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex lhs    = target + 2;
             TokenIndex rhs    = lhs + 2;
 
-            check_use_of_register(body_tokens, lhs, i, registers,
-                                  named_registers);
-            check_use_of_register(body_tokens, rhs, i, registers,
-                                  named_registers);
+            check_use_of_register(
+                body_tokens, lhs, i, registers, named_registers);
+            check_use_of_register(
+                body_tokens, rhs, i, registers, named_registers);
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(i)),
                 body_tokens.at(i));
@@ -1004,8 +1149,12 @@ static void check_block_body(const TokenVector& body_tokens,
             }
 
             check_timeout_operand(body_tokens.at(timeout));
-            check_use_of_register(body_tokens, source, i, registers,
-                                  named_registers, "join from empty register");
+            check_use_of_register(body_tokens,
+                                  source,
+                                  i,
+                                  registers,
+                                  named_registers,
+                                  "join from empty register");
             if (body_tokens.at(target) != "void") {
                 registers.insert(resolve_register_name(named_registers,
                                                        body_tokens.at(target)),
@@ -1034,18 +1183,25 @@ static void check_block_body(const TokenVector& body_tokens,
                    token == "wrapincrement" or token == "wrapdecrement") {
             // skip mnemonic
             ++i;
-            check_use_of_register(body_tokens, i, i - 1, registers,
-                                  named_registers, "use of empty register");
+            check_use_of_register(body_tokens,
+                                  i,
+                                  i - 1,
+                                  registers,
+                                  named_registers,
+                                  "use of empty register");
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "register") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
-            check_use_of_register(body_tokens, target, i, registers,
+            check_use_of_register(body_tokens,
+                                  target,
+                                  i,
+                                  registers,
                                   named_registers,
                                   "registering class from empty register");
-            erase_register(registers, named_registers, body_tokens.at(target),
-                           token);
+            erase_register(
+                registers, named_registers, body_tokens.at(target), token);
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "msg" or token == "call" or token == "process") {
@@ -1061,8 +1217,11 @@ static void check_block_body(const TokenVector& body_tokens,
             }
             if (body_tokens.at(function).str().at(0) == '%' or
                 body_tokens.at(function).str().at(0) == '*') {
-                check_use_of_register(body_tokens, function, function,
-                                      registers, named_registers,
+                check_use_of_register(body_tokens,
+                                      function,
+                                      function,
+                                      registers,
+                                      named_registers,
                                       "call from empty register");
             }
             i = skip_till_next_line(body_tokens, i);
@@ -1072,8 +1231,11 @@ static void check_block_body(const TokenVector& body_tokens,
 
             if (body_tokens.at(function).str().at(0) == '%' or
                 body_tokens.at(function).str().at(0) == '*') {
-                check_use_of_register(body_tokens, function, function,
-                                      registers, named_registers,
+                check_use_of_register(body_tokens,
+                                      function,
+                                      function,
+                                      registers,
+                                      named_registers,
                                       "call from empty register");
             }
             i = skip_till_next_line(body_tokens, i);
@@ -1111,12 +1273,13 @@ static void check_block_body(const TokenVector& body_tokens,
     check_defined_but_unused(registers);
 }
 static void check_block_body(const TokenVector& body_tokens,
-                             TokenVector::size_type i, Registers& registers,
+                             TokenVector::size_type i,
+                             Registers& registers,
                              const map<string, TokenVector>& block_bodies,
                              const bool debug) {
     map<string, string> named_registers;
-    check_block_body(body_tokens, i, registers, named_registers, block_bodies,
-                     debug);
+    check_block_body(
+        body_tokens, i, registers, named_registers, block_bodies, debug);
 }
 static void check_block_body(const TokenVector& body_tokens,
                              Registers& registers,
@@ -1126,7 +1289,8 @@ static void check_block_body(const TokenVector& body_tokens,
 }
 
 void assembler::verify::manipulation_of_defined_registers(
-    const TokenVector& tokens, const map<string, TokenVector>& block_bodies,
+    const TokenVector& tokens,
+    const map<string, TokenVector>& block_bodies,
     const bool debug) {
     string opened_function;
     set<string> attributes;

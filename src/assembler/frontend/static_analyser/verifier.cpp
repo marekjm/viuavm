@@ -34,7 +34,8 @@ static auto invalid_syntax(const vector<Token>& tokens, const string message)
     -> InvalidSyntax {
     auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
-         i < tokens.size(); ++i) {
+         i < tokens.size();
+         ++i) {
         invalid_syntax_error.add(tokens.at(i));
     }
     return invalid_syntax_error;
@@ -79,7 +80,8 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
 static auto is_defined_block_name(const ParsedSource& source, const string name)
     -> bool {
     auto is_undefined = (source.blocks.end() ==
-                         find_if(source.blocks.begin(), source.blocks.end(),
+                         find_if(source.blocks.begin(),
+                                 source.blocks.end(),
                                  [name](const InstructionsBlock& ib) -> bool {
                                      return (ib.name == name);
                                  }));
@@ -137,8 +139,9 @@ auto viua::assembler::frontend::static_analyser::verify_block_catches(
 
                 if (not is_defined_block_name(source, block_name)) {
                     throw InvalidSyntax(
-                        block_name, ("cannot catch using undefined block: " +
-                                     block_name.str()))
+                        block_name,
+                        ("cannot catch using undefined block: " +
+                         block_name.str()))
                         .add(instruction->tokens.at(0));
                 }
             }
@@ -428,7 +431,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                 if (slot_index_detection_is_reliable) {
                     for (auto j = decltype(frame_parameters_count){0};
-                         j < frame_parameters_count; ++j) {
+                         j < frame_parameters_count;
+                         ++j) {
                         if (not filled_slots[j]) {
                             throw TracedSyntaxError()
                                 .append(InvalidSyntax(last_frame->tokens.at(0),
@@ -445,7 +449,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
 using InstructionIndex = decltype(
     viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
-static auto validate_jump(const Token token, const string& extracted_jump,
+static auto validate_jump(const Token token,
+                          const string& extracted_jump,
                           const InstructionIndex instruction_counter,
                           const InstructionIndex current_instruction_counter,
                           const map<string, InstructionIndex>& jump_targets)
@@ -500,7 +505,9 @@ static auto validate_jump(const Token token, const string& extracted_jump,
     return target;
 }
 static auto validate_jump_pair(
-    const Token& branch_token, const Token& when_true, const Token& when_false,
+    const Token& branch_token,
+    const Token& when_true,
+    const Token& when_false,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
     const map<string, InstructionIndex>& jump_targets) -> void {
@@ -510,12 +517,16 @@ static auto validate_jump_pair(
             "useless branch: both targets point to the same instruction");
     }
 
-    auto true_target =
-        validate_jump(when_true, when_true.str(), instruction_counter,
-                      current_instruction_counter, jump_targets);
-    auto false_target =
-        validate_jump(when_false, when_false.str(), instruction_counter,
-                      current_instruction_counter, jump_targets);
+    auto true_target  = validate_jump(when_true,
+                                     when_true.str(),
+                                     instruction_counter,
+                                     current_instruction_counter,
+                                     jump_targets);
+    auto false_target = validate_jump(when_false,
+                                      when_false.str(),
+                                      instruction_counter,
+                                      current_instruction_counter,
+                                      jump_targets);
 
     if (true_target == false_target) {
         throw viua::cg::lex::InvalidSyntax(
@@ -559,16 +570,20 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
 
                 using viua::assembler::frontend::parser::Instruction;
                 if (mnemonic == "jump") {
-                    validate_jump(line->tokens.at(1), line->tokens.at(1),
+                    validate_jump(line->tokens.at(1),
+                                  line->tokens.at(1),
                                   instruction_counter,
-                                  current_instruction_counter, jump_targets);
+                                  current_instruction_counter,
+                                  jump_targets);
                 } else if (auto op = dynamic_cast<Instruction*>(line.get());
                            op and op->opcode == IF) {
                     Token when_true  = op->operands.at(1)->tokens.at(0);
                     Token when_false = op->operands.at(2)->tokens.at(0);
 
-                    validate_jump_pair(line->tokens.at(0), when_true,
-                                       when_false, instruction_counter,
+                    validate_jump_pair(line->tokens.at(0),
+                                       when_true,
+                                       when_false,
+                                       instruction_counter,
                                        current_instruction_counter,
                                        jump_targets);
                 }

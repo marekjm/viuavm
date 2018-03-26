@@ -144,8 +144,10 @@ viua::internals::types::byte* viua::process::Process::adjust_jump_base_for(
     return stack->adjust_jump_base_for(call_name);
 }
 viua::internals::types::byte* viua::process::Process::call_native(
-    viua::internals::types::byte* return_address, const string& call_name,
-    viua::kernel::Register* return_register, const string&) {
+    viua::internals::types::byte* return_address,
+    const string& call_name,
+    viua::kernel::Register* return_register,
+    const string&) {
     viua::internals::types::byte* call_address =
         adjust_jump_base_for(call_name);
 
@@ -165,8 +167,10 @@ viua::internals::types::byte* viua::process::Process::call_native(
     return call_address;
 }
 viua::internals::types::byte* viua::process::Process::call_foreign(
-    viua::internals::types::byte* return_address, const string& call_name,
-    viua::kernel::Register* return_register, const string&) {
+    viua::internals::types::byte* return_address,
+    const string& call_name,
+    viua::kernel::Register* return_register,
+    const string&) {
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
             "external function call without a frame: use `frame 0' in source "
@@ -183,8 +187,10 @@ viua::internals::types::byte* viua::process::Process::call_foreign(
     return return_address;
 }
 viua::internals::types::byte* viua::process::Process::call_foreign_method(
-    viua::internals::types::byte* return_address, viua::types::Value* object,
-    const string& call_name, viua::kernel::Register* return_register,
+    viua::internals::types::byte* return_address,
+    viua::types::Value* object,
+    const string& call_name,
+    viua::kernel::Register* return_register,
     const string&) {
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
@@ -211,8 +217,8 @@ viua::internals::types::byte* viua::process::Process::call_foreign_method(
 
     try {
         // FIXME: supply static and global registers to foreign functions
-        scheduler->request_foreign_method_call(call_name, object, frame,
-                                               nullptr, nullptr, this);
+        scheduler->request_foreign_method_call(
+            call_name, object, frame, nullptr, nullptr, this);
     } catch (const std::out_of_range& e) {
         throw make_unique<viua::types::Exception>(e.what());
     }
@@ -448,7 +454,8 @@ bool viua::process::Process::watchdogged() const {
 }
 string viua::process::Process::watchdog() const { return watchdog_function; }
 viua::internals::types::byte* viua::process::Process::become(
-    const string& function_name, std::unique_ptr<Frame> frame_to_use) {
+    const string& function_name,
+    std::unique_ptr<Frame> frame_to_use) {
     if (not scheduler->is_native_function(function_name)) {
         throw make_unique<viua::types::Exception>(
             "process from undefined function: " + function_name);
@@ -519,9 +526,11 @@ viua::process::Process::Process(unique_ptr<Frame> frm,
     global_register_set =
         make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
     currently_used_register_set = frm->local_register_set.get();
-    auto s                      = make_unique<Stack>(frm->function_name, this,
+    auto s                      = make_unique<Stack>(frm->function_name,
+                                this,
                                 &currently_used_register_set,
-                                global_register_set.get(), scheduler);
+                                global_register_set.get(),
+                                scheduler);
     s->emplace_back(std::move(frm));
     s->bind(&currently_used_register_set, global_register_set.get());
     stack           = s.get();

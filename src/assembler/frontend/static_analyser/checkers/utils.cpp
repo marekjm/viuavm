@@ -69,7 +69,8 @@ auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
     -> InvalidSyntax {
     auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
-         i < tokens.size(); ++i) {
+         i < tokens.size();
+         ++i) {
         invalid_syntax_error.add(tokens.at(i));
     }
     return invalid_syntax_error;
@@ -92,7 +93,8 @@ auto get_line_index_of_instruction(InstructionIndex const n,
 }
 
 auto erase_if_direct_access(
-    Register_usage_profile& register_usage_profile, RegisterIndex* const r,
+    Register_usage_profile& register_usage_profile,
+    RegisterIndex* const r,
     viua::assembler::frontend::parser::Instruction const& instruction) -> void {
     if (r->as == viua::internals::AccessSpecifier::DIRECT) {
         register_usage_profile.erase(Register(*r), instruction.tokens.at(0));
@@ -128,7 +130,8 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
 static auto maybe_mistyped_register_set_helper(
     Register_usage_profile& rup,
     viua::assembler::frontend::parser::RegisterIndex r,
-    TracedSyntaxError& error, RegisterSets rs_id) -> bool {
+    TracedSyntaxError& error,
+    RegisterSets rs_id) -> bool {
     if (r.rss != rs_id) {
         auto val         = Register{};
         val.index        = r.index;
@@ -151,12 +154,12 @@ static auto maybe_mistyped_register_set(
     Register_usage_profile& rup,
     viua::assembler::frontend::parser::RegisterIndex r,
     TracedSyntaxError& error) -> void {
-    if (maybe_mistyped_register_set_helper(rup, r, error,
-                                           RegisterSets::LOCAL)) {
+    if (maybe_mistyped_register_set_helper(
+            rup, r, error, RegisterSets::LOCAL)) {
         return;
     }
-    if (maybe_mistyped_register_set_helper(rup, r, error,
-                                           RegisterSets::STATIC)) {
+    if (maybe_mistyped_register_set_helper(
+            rup, r, error, RegisterSets::STATIC)) {
         return;
     }
 }

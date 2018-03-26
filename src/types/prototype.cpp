@@ -55,7 +55,8 @@ viua::types::Prototype* viua::types::Prototype::derive(
 }
 
 viua::types::Prototype* viua::types::Prototype::attach(
-    const string& function_name, const string& method_name) {
+    const string& function_name,
+    const string& method_name) {
     methods[method_name] = function_name;
     return this;
 }

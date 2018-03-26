@@ -104,7 +104,8 @@ auto assembler::operands::getint(string const& s,
 }
 
 auto assembler::operands::getint_with_rs_type(
-    string const& s, viua::internals::RegisterSets const rs_type,
+    string const& s,
+    viua::internals::RegisterSets const rs_type,
     bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
@@ -113,10 +114,11 @@ auto assembler::operands::getint_with_rs_type(
     if (s == "void") {
         return int_op(IntegerOperandType::VOID);
     } else if (s.at(0) == '@') {
-        return int_op(IntegerOperandType::REGISTER_REFERENCE, rs_type,
-                      stoi(s.substr(1)));
+        return int_op(
+            IntegerOperandType::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        return int_op(IntegerOperandType::POINTER_DEREFERENCE, rs_type,
+        return int_op(IntegerOperandType::POINTER_DEREFERENCE,
+                      rs_type,
                       stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         return int_op(IntegerOperandType::INDEX, rs_type, stoi(s.substr(1)));
@@ -217,7 +219,8 @@ auto assembler::operands::convert_token_to_bitstring_operand(
     auto converted = vector<uint8_t>{};
     auto part      = uint8_t{0};
     for (auto i = decltype(workable_version)::size_type{0};
-         i < workable_version.size(); ++i) {
+         i < workable_version.size();
+         ++i) {
         auto one = uint8_t{1};
         if (workable_version.at(i) == '1') {
             one  = static_cast<uint8_t>(one << (i % 8));

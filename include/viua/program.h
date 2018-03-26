@@ -199,8 +199,11 @@ class Program {
     Program& opreceive(int_op, timeout_op);
     Program& opwatchdog(const std::string&);
     Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
-    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE,
-                  viua::internals::types::bytecode_size, enum JUMPTYPE);
+    Program& opif(int_op,
+                  viua::internals::types::bytecode_size,
+                  enum JUMPTYPE,
+                  viua::internals::types::bytecode_size,
+                  enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);

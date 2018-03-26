@@ -45,8 +45,9 @@ auto is_text_literal(std::string const) -> bool;
 auto is_timeout_literal(std::string const s) -> bool;
 auto is_register_set_name(std::string const) -> bool;
 
-auto sub(std::string const& s, std::string::size_type b = 0,
-         ssize_t const e = -1) -> std::string;
+auto sub(std::string const& s,
+         std::string::size_type b = 0,
+         ssize_t const e          = -1) -> std::string;
 
 auto extract(std::string const& s) -> std::string;
 auto chunk(std::string const& s, bool const ignore_leading_ws = true)
@@ -85,9 +86,11 @@ auto contains(std::string const& s, char const c) -> bool;
 using LevenshteinDistance = std::string::size_type;
 using DistancePair        = std::pair<LevenshteinDistance, std::string>;
 auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
-auto levenshtein_filter(std::string const, std::vector<std::string> const&,
+auto levenshtein_filter(std::string const,
+                        std::vector<std::string> const&,
                         LevenshteinDistance const) -> std::vector<DistancePair>;
-auto levenshtein_best(std::string const, std::vector<std::string> const&,
+auto levenshtein_best(std::string const,
+                      std::vector<std::string> const&,
                       LevenshteinDistance const) -> DistancePair;
 
 auto enquote(std::string const&, char const = '"') -> std::string;

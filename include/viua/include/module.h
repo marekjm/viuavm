@@ -76,11 +76,17 @@ typedef void(ForeignFunction)(
  * more interested in the ForeignFunction typedef defined above.
  */
 typedef void (viua::types::Value::*ForeignMethodMemberPointer)(
-    Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-    viua::process::Process*, viua::kernel::Kernel*);
-typedef std::function<void(
-    viua::types::Value*, Frame*, viua::kernel::RegisterSet*,
-    viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)>
+    Frame*,
+    viua::kernel::RegisterSet*,
+    viua::kernel::RegisterSet*,
+    viua::process::Process*,
+    viua::kernel::Kernel*);
+typedef std::function<void(viua::types::Value*,
+                           Frame*,
+                           viua::kernel::RegisterSet*,
+                           viua::kernel::RegisterSet*,
+                           viua::process::Process*,
+                           viua::kernel::Kernel*)>
     ForeignMethod;
 
 

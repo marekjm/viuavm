@@ -282,8 +282,10 @@ class Kernel {
     Kernel& register_foreign_method(const std::string&, ForeignMethod);
 
     void request_foreign_function_call(Frame*, viua::process::Process*);
-    void request_foreign_method_call(const std::string&, viua::types::Value*,
-                                     Frame*, viua::kernel::RegisterSet*,
+    void request_foreign_method_call(const std::string&,
+                                     viua::types::Value*,
+                                     Frame*,
+                                     viua::kernel::RegisterSet*,
                                      viua::kernel::RegisterSet*,
                                      viua::process::Process*);
 

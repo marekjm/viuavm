@@ -121,7 +121,8 @@ class Register_usage_profile {
     std::map<std::string, viua::internals::types::register_index> name_to_index;
     std::map<viua::internals::types::register_index, std::string> index_to_name;
 
-    auto define(Register const r, viua::cg::lex::Token const t,
+    auto define(Register const r,
+                viua::cg::lex::Token const t,
                 bool const = false) -> void;
     auto defined(Register const r) const -> bool;
     auto defined_where(Register const r) const -> viua::cg::lex::Token;
@@ -241,7 +242,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         auto inferred_type = (expected_type | (access_via_pointer_dereference
                                                    ? ValueTypes::POINTER
                                                    : ValueTypes::UNDEFINED));
-        register_usage_profile.infer(Register(register_index), inferred_type,
+        register_usage_profile.infer(Register(register_index),
+                                     inferred_type,
                                      register_index.tokens.at(0));
         return depointerise_type_if_needed(inferred_type,
                                            access_via_pointer_dereference);
@@ -425,20 +427,25 @@ auto check_op_receive(Register_usage_profile& register_usage_profile,
 auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction)
     -> void;
 auto check_op_throw(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps, std::map<Register, Closure>&,
+                    ParsedSource const& ps,
+                    std::map<Register, Closure>&,
                     Instruction const&) -> void;
 auto check_op_draw(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_enter(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps, Instruction const& instruction)
-    -> void;
+                    ParsedSource const& ps,
+                    Instruction const& instruction) -> void;
 auto check_op_jump(Register_usage_profile& register_usage_profile,
-                   ParsedSource const& ps, Instruction const& instruction,
-                   InstructionsBlock const& ib, InstructionIndex i,
+                   ParsedSource const& ps,
+                   Instruction const& instruction,
+                   InstructionsBlock const& ib,
+                   InstructionIndex i,
                    InstructionIndex const mnemonic_counter) -> void;
 auto check_op_if(Register_usage_profile& register_usage_profile,
-                 ParsedSource const& ps, Instruction const& instruction,
-                 InstructionsBlock const& ib, InstructionIndex i,
+                 ParsedSource const& ps,
+                 Instruction const& instruction,
+                 InstructionsBlock const& ib,
+                 InstructionIndex i,
                  InstructionIndex const mnemonic_counter) -> void;
 auto check_op_atom(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
@@ -465,8 +472,8 @@ auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void;
 auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
-    ParsedSource const& ps, std::map<Register, Closure> const& created_closures)
-    -> void;
+    ParsedSource const& ps,
+    std::map<Register, Closure> const& created_closures) -> void;
 
 auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
                                                      ParsedSource const&,
@@ -477,7 +484,8 @@ auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
 auto map_names_to_register_indexes(Register_usage_profile&,
                                    InstructionsBlock const&) -> void;
 auto erase_if_direct_access(
-    Register_usage_profile&, RegisterIndex* const,
+    Register_usage_profile&,
+    RegisterIndex* const,
     viua::assembler::frontend::parser::Instruction const&) -> void;
 auto get_line_index_of_instruction(InstructionIndex const,
                                    InstructionsBlock const&)

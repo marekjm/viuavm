@@ -81,7 +81,8 @@ struct InvalidSyntax {
     auto aside() const -> std::string;
     auto match_aside(Token) const -> bool;
 
-    InvalidSyntax(decltype(line_number), decltype(character_in_line),
+    InvalidSyntax(decltype(line_number),
+                  decltype(character_in_line),
                   std::string);
     InvalidSyntax(Token, std::string = "");
 };

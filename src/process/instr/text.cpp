@@ -76,8 +76,8 @@ viua::internals::types::byte* viua::process::Process::optexteq(
 
 
 static auto convert_signed_integer_to_text_size_type(
-    const viua::types::Text* text, const int64_t signed_index)
-    -> viua::types::Text::size_type {
+    const viua::types::Text* text,
+    const int64_t signed_index) -> viua::types::Text::size_type {
     /*
      *  Cast jugglery to satisfy Clang++ with -Wsign-conversion enabled.
      */

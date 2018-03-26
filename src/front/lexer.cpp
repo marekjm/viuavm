@@ -79,7 +79,9 @@ static void encode_json(const string& filename, const vector<Token>& tokens) {
     cout << "]}\n";
 }
 
-static bool usage(const char* program, bool show_help, bool show_version,
+static bool usage(const char* program,
+                  bool show_help,
+                  bool show_version,
                   bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM lexer, version ";

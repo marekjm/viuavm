@@ -54,14 +54,19 @@ std::map<std::string, std::string> gather_meta_information(
     const std::vector<viua::cg::lex::Token>&);
 
 viua::internals::types::bytecode_size assemble_instruction(
-    Program& program, viua::internals::types::bytecode_size& instruction,
+    Program& program,
+    viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
     const std::vector<viua::cg::lex::Token>& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks);
-void generate(std::vector<viua::cg::lex::Token> const&, invocables_t&,
-              invocables_t&, const std::string&, std::string&,
-              const std::vector<std::string>&, const compilationflags_t&);
+void generate(std::vector<viua::cg::lex::Token> const&,
+              invocables_t&,
+              invocables_t&,
+              const std::string&,
+              std::string&,
+              const std::vector<std::string>&,
+              const compilationflags_t&);
 
 
 #endif

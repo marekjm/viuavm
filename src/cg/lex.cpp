@@ -52,7 +52,8 @@ auto Token::operator!=(string const& s) const -> bool { return (content != s); }
 Token::operator string() const { return str(); }
 
 Token::Token(decltype(line_number) line_,
-             decltype(character_in_line) character_, string content_)
+             decltype(character_in_line) character_,
+             string content_)
     : content(content_)
     , original_content(content)
     , line_number(line_)
@@ -126,7 +127,8 @@ auto InvalidSyntax::match_aside(Token token) const -> bool {
 }
 
 InvalidSyntax::InvalidSyntax(decltype(line_number) ln,
-                             decltype(character_in_line) ch, string ct)
+                             decltype(character_in_line) ch,
+                             string ct)
     : line_number(ln), character_in_line(ch), content(ct) {}
 InvalidSyntax::InvalidSyntax(Token t, string m)
     : line_number(t.line())
@@ -305,8 +307,8 @@ auto tokenise(string const& source) -> vector<Token> {
 
         if (found_breaking_character) {
             if (candidate_token.str().size()) {
-                tokens.emplace_back(line_number, character_in_line,
-                                    candidate_token.str());
+                tokens.emplace_back(
+                    line_number, character_in_line, candidate_token.str());
                 character_in_line += candidate_token.str().size();
                 candidate_token.str("");
             }
@@ -319,8 +321,8 @@ auto tokenise(string const& source) -> vector<Token> {
                 i += (s.size() - 1);
             } else {
                 candidate_token << current_char;
-                tokens.emplace_back(line_number, character_in_line,
-                                    candidate_token.str());
+                tokens.emplace_back(
+                    line_number, character_in_line, candidate_token.str());
                 candidate_token.str("");
             }
 
@@ -355,15 +357,16 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                 (input_tokens.at(i + 1) == "void")) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "void");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "void");
             }
             if (is_register_index(tokens.back())) {
                 if (is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -373,7 +376,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -387,7 +391,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -398,9 +403,11 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
                 input_tokens.at(i + 1).str() == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%0");
+                                    input_tokens.at(i + 1).character(),
+                                    "%0");
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%16");
+                                    input_tokens.at(i + 1).character(),
+                                    "%16");
                 continue;
             }
 
@@ -408,7 +415,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
                 input_tokens.at(i + 1).str() == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%16");
+                                    input_tokens.at(i + 1).character(),
+                                    "%16");
             }
         } else if (token == "param" or token == "pamv") {
             tokens.push_back(token);  // mnemonic
@@ -417,8 +425,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -429,7 +437,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 } else {
                     tokens.push_back(input_tokens.at(++i));
                 }
@@ -453,8 +462,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "%0");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "%0");
                 tokens.back().original("\n");
 
                 tokens.emplace_back(tokens.back().line(),
@@ -462,8 +471,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                                     target_register_set);
                 tokens.back().original("\n");
 
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "%0");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "%0");
                 tokens.back().original("\n");
                 continue;
             }
@@ -504,15 +513,16 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "void");
+                                    input_tokens.at(i + 1).character(),
+                                    "void");
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -529,8 +539,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
             string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 target_register_set = tokens.back().str();
@@ -538,8 +548,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -579,39 +589,39 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             if (input_tokens.at(i + 1).str() == "\n") {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "void");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "void");
             }
         } else if (token == "vpush") {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -620,24 +630,24 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // key register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -648,7 +658,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 } else {
                     tokens.push_back(input_tokens.at(++i));
                 }
@@ -656,16 +667,16 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // key register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -678,7 +689,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -686,8 +698,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             if (input_tokens.at(i + 1).str() == "\n") {
@@ -704,7 +716,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -775,8 +788,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             // lhs operand
@@ -784,8 +797,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             // rhs operand
@@ -793,8 +806,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
         } else if (token == "capture" or token == "capturecopy" or
                    token == "capturemove") {
@@ -802,8 +815,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -822,15 +835,15 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
                                     tokens.back().str());
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
                 continue;
             } else {
                 tokens.push_back(input_tokens.at(++i));  // source register
             }
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -839,18 +852,21 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
         } else if (token == "integer") {
             tokens.push_back(token);                 // mnemonic
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "0");
+                                    input_tokens.at(i).character(),
+                                    "0");
             }
             continue;
         } else if (token == "float") {
@@ -858,11 +874,13 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "0.0");
+                                    input_tokens.at(i).character(),
+                                    "0.0");
             }
             continue;
         } else if (token == "string") {
@@ -870,11 +888,13 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "\"\"");
+                                    input_tokens.at(i).character(),
+                                    "\"\"");
             }
             continue;
         } else if (token == "text") {
@@ -882,11 +902,13 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "\"\"");
+                                    input_tokens.at(i).character(),
+                                    "\"\"");
                 continue;
             }
             if (is_register_index(input_tokens.at(i + 1))) {
@@ -903,7 +925,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
                 continue;
             }
@@ -912,24 +935,24 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // lhs register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // rhs register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -938,7 +961,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             continue;
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or
@@ -951,7 +975,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -967,7 +992,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
                                     target_index);
                 // copy target register set
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), target_rs);
+                                    input_tokens.at(i).character(),
+                                    target_rs);
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -986,8 +1012,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // checked register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1000,7 +1026,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target if true branch
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "+1");
+                                    input_tokens.at(i).character(),
+                                    "+1");
             }
             continue;
         } else if (token == "not") {
@@ -1076,8 +1103,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);                 // mnemonic
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
                 tokens.back().original(input_tokens.at(i));
             }
         } else if (token == "izero" or token == "print" or token == "argc" or
@@ -1121,15 +1148,16 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                 (input_tokens.at(i + 1) == "void")) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "void");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "void");
             }
             if (is_register_index(tokens.back())) {
                 if (is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -1139,7 +1167,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -1151,7 +1180,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -1160,9 +1190,11 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
                 input_tokens.at(i + 1).str() == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%0");
+                                    input_tokens.at(i + 1).character(),
+                                    "%0");
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%16");
+                                    input_tokens.at(i + 1).character(),
+                                    "%16");
                 continue;
             }
 
@@ -1170,15 +1202,16 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
                 input_tokens.at(i + 1).str() == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "%16");
+                                    input_tokens.at(i + 1).character(),
+                                    "%16");
             }
         } else if (token == "param" or token == "pamv") {
             tokens.push_back(input_tokens.at(++i));  // target register
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1187,7 +1220,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 } else {
                     tokens.push_back(input_tokens.at(++i));
                 }
@@ -1210,8 +1244,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "%0");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "%0");
                 tokens.back().original("\n");
 
                 tokens.emplace_back(tokens.back().line(),
@@ -1219,8 +1253,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                                     target_register_set);
                 tokens.back().original("\n");
 
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "%0");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "%0");
                 tokens.back().original("\n");
                 continue;
             }
@@ -1259,15 +1293,16 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
-                                    input_tokens.at(i + 1).character(), "void");
+                                    input_tokens.at(i + 1).character(),
+                                    "void");
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -1282,8 +1317,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
             string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 target_register_set = tokens.back().str();
@@ -1291,8 +1326,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1328,61 +1363,61 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
         } else if (token == "vinsert") {
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             if (input_tokens.at(i + 1).str() == "\n") {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "%0");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "%0");
             }
         } else if (token == "vpush") {
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
         } else if (token == "insert" or token == "structinsert") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // key register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1391,7 +1426,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 } else {
                     tokens.push_back(input_tokens.at(++i));
                 }
@@ -1399,16 +1435,16 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // source register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // key register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1419,7 +1455,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -1427,8 +1464,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             if (input_tokens.at(i + 1).str() == "\n") {
@@ -1444,7 +1481,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                     tokens.push_back(input_tokens.at(++i));
                 } else {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
             }
 
@@ -1512,8 +1550,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             // lhs operand
@@ -1521,8 +1559,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
 
             // rhs operand
@@ -1530,15 +1568,15 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             if (is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.push_back(input_tokens.at(++i));
             } else {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             }
         } else if (token == "capture" or token == "capturecopy" or
                    token == "capturemove") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1557,15 +1595,15 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
                                     tokens.back().str());
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
                 continue;
             } else {
                 tokens.push_back(input_tokens.at(++i));  // source register
             }
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1573,50 +1611,59 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
         } else if (token == "integer") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "0");
+                                    input_tokens.at(i).character(),
+                                    "0");
             }
             continue;
         } else if (token == "float") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "0.0");
+                                    input_tokens.at(i).character(),
+                                    "0.0");
             }
             continue;
         } else if (token == "string") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "\"\"");
+                                    input_tokens.at(i).character(),
+                                    "\"\"");
             }
             continue;
         } else if (token == "text") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "\"\"");
+                                    input_tokens.at(i).character(),
+                                    "\"\"");
                 continue;
             }
             if (is_register_index(input_tokens.at(i + 1))) {
@@ -1633,31 +1680,32 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
-                                        tokens.back().character(), "current");
+                                        tokens.back().character(),
+                                        "current");
                 }
                 continue;
             }
         } else if (token == "texteq" or token == "atomeq") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // lhs register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
 
             tokens.push_back(input_tokens.at(++i));  // rhs register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1665,7 +1713,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             }
             continue;
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or
@@ -1676,7 +1725,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "current");
+                                    input_tokens.at(i).character(),
+                                    "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1692,7 +1742,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                                     target_index);
                 // copy target register set
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), target_rs);
+                                    input_tokens.at(i).character(),
+                                    target_rs);
             } else {
                 tokens.push_back(input_tokens.at(++i));
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -1710,8 +1761,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // checked register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
@@ -1724,7 +1775,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));  // target if true branch
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(), "+1");
+                                    input_tokens.at(i).character(),
+                                    "+1");
             }
             continue;
         } else if (token == "not") {
@@ -1813,8 +1865,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                    token == "register" or token == "new") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "current");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "current");
                 tokens.back().original(input_tokens.at(i));
             }
         } else if (token == "izero" or token == "print" or token == "argc" or
@@ -1833,11 +1885,11 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
         } else if (token == ".function:" or token == ".closure:" or
                    token == ".block:") {
             if (input_tokens.at(i + 1) != "[[") {
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "[[");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "[[");
                 tokens.back().original(input_tokens.at(i));
-                tokens.emplace_back(tokens.back().line(),
-                                    tokens.back().character(), "]]");
+                tokens.emplace_back(
+                    tokens.back().line(), tokens.back().character(), "]]");
                 tokens.back().original(input_tokens.at(i));
             }
             continue;

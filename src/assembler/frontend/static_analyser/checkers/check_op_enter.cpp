@@ -28,8 +28,8 @@ namespace frontend {
 namespace static_analyser {
 namespace checkers {
 auto check_op_enter(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps, Instruction const& instruction)
-    -> void {
+                    ParsedSource const& ps,
+                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::Label;
     using viua::cg::lex::InvalidSyntax;
     using viua::cg::lex::TracedSyntaxError;

@@ -99,8 +99,10 @@ class VirtualProcessScheduler {
     void register_prototype(std::unique_ptr<viua::types::Prototype>);
 
     void request_foreign_function_call(Frame*, viua::process::Process*) const;
-    void request_foreign_method_call(const std::string&, viua::types::Value*,
-                                     Frame*, viua::kernel::RegisterSet*,
+    void request_foreign_method_call(const std::string&,
+                                     viua::types::Value*,
+                                     Frame*,
+                                     viua::kernel::RegisterSet*,
                                      viua::kernel::RegisterSet*,
                                      viua::process::Process*);
 
@@ -112,7 +114,8 @@ class VirtualProcessScheduler {
     viua::process::Process* process(decltype(processes)::size_type);
     viua::process::Process* process();
     viua::process::Process* spawn(std::unique_ptr<Frame>,
-                                  viua::process::Process*, bool);
+                                  viua::process::Process*,
+                                  bool);
 
     void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
     void receive(const viua::process::PID,
@@ -140,8 +143,10 @@ class VirtualProcessScheduler {
 
     VirtualProcessScheduler(
         viua::kernel::Kernel*,
-        std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*,
-        std::condition_variable*, const bool = false);
+        std::vector<std::unique_ptr<viua::process::Process>>*,
+        std::mutex*,
+        std::condition_variable*,
+        const bool = false);
     VirtualProcessScheduler(VirtualProcessScheduler&&);
     ~VirtualProcessScheduler();
 };

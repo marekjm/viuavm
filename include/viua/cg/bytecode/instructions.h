@@ -44,7 +44,8 @@ struct int_op {
 
     int_op();
     int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
-    int_op(IntegerOperandType, viua::internals::RegisterSets,
+    int_op(IntegerOperandType,
+           viua::internals::RegisterSets,
            viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };
@@ -76,7 +77,8 @@ auto opiinc(viua::internals::types::byte*, int_op)
 auto opidec(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
 
-auto opfloat(viua::internals::types::byte*, int_op,
+auto opfloat(viua::internals::types::byte*,
+             int_op,
              viua::internals::types::plain_float)
     -> viua::internals::types::byte*;
 
@@ -315,13 +317,15 @@ auto opwatchdog(viua::internals::types::byte*, const std::string&)
 auto opjump(viua::internals::types::byte*,
             viua::internals::types::bytecode_size)
     -> viua::internals::types::byte*;
-auto opif(viua::internals::types::byte*, int_op,
+auto opif(viua::internals::types::byte*,
+          int_op,
           viua::internals::types::bytecode_size,
           viua::internals::types::bytecode_size)
     -> viua::internals::types::byte*;
 
 auto optry(viua::internals::types::byte*) -> viua::internals::types::byte*;
-auto opcatch(viua::internals::types::byte*, const std::string&,
+auto opcatch(viua::internals::types::byte*,
+             const std::string&,
              const std::string&) -> viua::internals::types::byte*;
 auto opdraw(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
@@ -338,7 +342,9 @@ auto opclass(viua::internals::types::byte*, int_op, const std::string&)
     -> viua::internals::types::byte*;
 auto opderive(viua::internals::types::byte*, int_op, const std::string&)
     -> viua::internals::types::byte*;
-auto opattach(viua::internals::types::byte*, int_op, const std::string&,
+auto opattach(viua::internals::types::byte*,
+              int_op,
+              const std::string&,
               const std::string&) -> viua::internals::types::byte*;
 auto opregister(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;

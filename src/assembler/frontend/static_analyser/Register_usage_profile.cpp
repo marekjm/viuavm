@@ -33,7 +33,8 @@ auto Register_usage_profile::fresh(Register const r) const -> bool {
 
 auto Register_usage_profile::defresh() -> void { fresh_registers.clear(); }
 
-auto Register_usage_profile::define(Register const r, Token const t,
+auto Register_usage_profile::define(Register const r,
+                                    Token const t,
                                     bool const allow_overwrites) -> void {
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw TracedSyntaxError{}
@@ -52,7 +53,8 @@ auto Register_usage_profile::defined_where(Register const r) const -> Token {
 }
 
 auto Register_usage_profile::infer(
-    Register const r, const viua::internals::ValueTypes value_type_id,
+    Register const r,
+    const viua::internals::ValueTypes value_type_id,
     Token const& t) -> void {
     auto reg              = at(r);
     reg.second.value_type = value_type_id;

@@ -66,7 +66,9 @@ static auto enumerate(const vector<T>& v)
     return enumerated_vector;
 }
 
-static bool usage(const char* program, bool show_help, bool show_version,
+static bool usage(const char* program,
+                  bool show_help,
+                  bool show_version,
                   bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM lexer, version ";

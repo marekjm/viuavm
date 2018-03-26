@@ -270,7 +270,8 @@ void viua::kernel::RegisterSet::free(
 
 
 void viua::kernel::RegisterSet::flag(
-    viua::internals::types::register_index index, mask_type filter) {
+    viua::internals::types::register_index index,
+    mask_type filter) {
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -289,7 +290,8 @@ void viua::kernel::RegisterSet::flag(
 }
 
 void viua::kernel::RegisterSet::unflag(
-    viua::internals::types::register_index index, mask_type filter) {
+    viua::internals::types::register_index index,
+    mask_type filter) {
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -321,7 +323,8 @@ void viua::kernel::RegisterSet::clear(
 }
 
 bool viua::kernel::RegisterSet::isflagged(
-    viua::internals::types::register_index index, mask_type filter) {
+    viua::internals::types::register_index index,
+    mask_type filter) {
     /** Returns true if given filter is enabled for register specified by given
      * index. Returns false otherwise.
      *
@@ -340,7 +343,8 @@ bool viua::kernel::RegisterSet::isflagged(
 }
 
 void viua::kernel::RegisterSet::setmask(
-    viua::internals::types::register_index index, mask_type mask) {
+    viua::internals::types::register_index index,
+    mask_type mask) {
     /** Set mask for a register.
      *
      *  Performs bounds checking.
