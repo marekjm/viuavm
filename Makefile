@@ -382,7 +382,7 @@ VIUA_INSTR_FILES_O=build/process/instr/atom.o \
 				   build/process/instr/closure.o \
 				   build/process/instr/concurrency.o \
 				   build/process/instr/float.o \
-				   build/process/instr/general.o
+				   build/process/instr/general.o \
 				   build/process/instr/int.o \
 				   build/process/instr/linking.o \
 				   build/process/instr/object.o \
