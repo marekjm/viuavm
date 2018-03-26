@@ -36,9 +36,9 @@ string viua::types::Value::str() const {
 string viua::types::Value::repr() const { return str(); }
 bool viua::types::Value::boolean() const {
     /*  Boolean defaults to false.
-     *  This is because in if, loops etc. we will NOT execute code depending on unknown state.
-     *  If a derived object overrides this method it is free to return true as it sees fit, but
-     *  the default is to NOT carry any actions.
+     *  This is because in if, loops etc. we will NOT execute code depending on
+     * unknown state. If a derived object overrides this method it is free to
+     * return true as it sees fit, but the default is to NOT carry any actions.
      */
     return false;
 }
@@ -50,8 +50,12 @@ unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
 }
 
 
-vector<string> viua::types::Value::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Value::inheritancechain() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Value::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Value::inheritancechain() const {
+    return vector<string>{"Value"};
+}
 
 
 viua::types::Value::~Value() {

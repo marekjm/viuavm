@@ -29,15 +29,20 @@
 using namespace std;
 
 
-static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                   viua::process::Process* process, viua::kernel::Kernel*) -> void {
+static auto typeof(Frame* frame, viua::kernel::RegisterSet*,
+                   viua::kernel::RegisterSet*, viua::process::Process* process,
+                   viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
         throw make_unique<viua::types::Exception>("requires 1 parameter");
     }
-    if (auto const pointer = dynamic_cast<viua::types::Pointer*>(frame->arguments->get(0)); pointer) {
-        frame->local_register_set->set(0, make_unique<viua::types::String>(pointer->to(process)->type()));
+    if (auto const pointer =
+            dynamic_cast<viua::types::Pointer*>(frame->arguments->get(0));
+        pointer) {
+        frame->local_register_set->set(
+            0, make_unique<viua::types::String>(pointer->to(process)->type()));
     } else {
-        throw make_unique<viua::types::Exception>("expected a pointer as parameter 0");
+        throw make_unique<viua::types::Exception>(
+            "expected a pointer as parameter 0");
     }
 }
 

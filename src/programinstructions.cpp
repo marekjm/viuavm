@@ -174,8 +174,10 @@ Program& Program::optextat(int_op target, int_op source, int_op index) {
     addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
     return (*this);
 }
-Program& Program::optextsub(int_op target, int_op source, int_op begin_index, int_op end_index) {
-    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index, end_index);
+Program& Program::optextsub(int_op target, int_op source, int_op begin_index,
+                            int_op end_index) {
+    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index,
+                                       end_index);
     return (*this);
 }
 Program& Program::optextlength(int_op target, int_op source) {
@@ -195,8 +197,10 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opvector(int_op index, int_op pack_start_index, int_op pack_length) {
-    addr_ptr = cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
+Program& Program::opvector(int_op index, int_op pack_start_index,
+                           int_op pack_length) {
+    addr_ptr =
+        cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 
@@ -539,24 +543,30 @@ Program& Program::opecho(int_op reg) {
     return (*this);
 }
 
-Program& Program::opcapture(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapture(int_op target_closure, int_op target_register,
+                            int_op source_register) {
     /*  Inserts clbing instuction.
      */
-    addr_ptr = cg::bytecode::opcapture(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapture(addr_ptr, target_closure,
+                                       target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturecopy(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapturecopy(int_op target_closure, int_op target_register,
+                                int_op source_register) {
     /*  Inserts opcapturecopy instuction.
      */
-    addr_ptr = cg::bytecode::opcapturecopy(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturecopy(addr_ptr, target_closure,
+                                           target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturemove(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapturemove(int_op target_closure, int_op target_register,
+                                int_op source_register) {
     /*  Inserts opcapturemove instuction.
      */
-    addr_ptr = cg::bytecode::opcapturemove(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturemove(addr_ptr, target_closure,
+                                           target_register, source_register);
     return (*this);
 }
 
@@ -704,7 +714,8 @@ Program& Program::opwatchdog(const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTYPE is_absolute) {
+Program& Program::opjump(viua::internals::types::bytecode_size addr,
+                         enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -720,17 +731,22 @@ Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTY
     return (*this);
 }
 
-Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth,
-                       enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false,
+Program& Program::opif(int_op regc,
+                       viua::internals::types::bytecode_size addr_truth,
+                       enum JUMPTYPE absolute_truth,
+                       viua::internals::types::bytecode_size addr_false,
                        enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
     viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for opcode
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for operand-type marker
-    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets);  // for rs-type marker
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::types::byte);  // for opcode
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::types::byte);  // for operand-type marker
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::RegisterSets);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
@@ -810,10 +826,12 @@ Program& Program::opderive(int_op reg, const string& base_class_name) {
     return (*this);
 }
 
-Program& Program::opattach(int_op reg, const string& function_name, const string& method_name) {
+Program& Program::opattach(int_op reg, const string& function_name,
+                           const string& method_name) {
     /*  Inserts attach instuction.
      */
-    addr_ptr = cg::bytecode::opattach(addr_ptr, reg, function_name, method_name);
+    addr_ptr =
+        cg::bytecode::opattach(addr_ptr, reg, function_name, method_name);
     return (*this);
 }
 

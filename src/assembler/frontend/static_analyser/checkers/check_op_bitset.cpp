@@ -23,53 +23,56 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_bitset(Register_usage_profile& register_usage_profile,
-                                         Instruction const& instruction) -> void {
-                        using viua::assembler::frontend::parser::BitsLiteral;
-                        using viua::assembler::frontend::parser::BooleanLiteral;
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_bitset(Register_usage_profile& register_usage_profile,
+                     Instruction const& instruction) -> void {
+    using viua::assembler::frontend::parser::BitsLiteral;
+    using viua::assembler::frontend::parser::BooleanLiteral;
 
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_use_of_register(register_usage_profile, *target);
-                        assert_type_of_register<viua::internals::ValueTypes::BITS>(register_usage_profile,
-                                                                                   *target);
+    check_use_of_register(register_usage_profile, *target);
+    assert_type_of_register<viua::internals::ValueTypes::BITS>(
+        register_usage_profile, *target);
 
-                        auto index = get_operand<RegisterIndex>(instruction, 1);
-                        if (not index) {
-                            if (not get_operand<BitsLiteral>(instruction, 1)) {
-                                throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                    .note("expected register index or bits literal");
-                            }
-                        }
+    auto index = get_operand<RegisterIndex>(instruction, 1);
+    if (not index) {
+        if (not get_operand<BitsLiteral>(instruction, 1)) {
+            throw invalid_syntax(instruction.operands.at(1)->tokens,
+                                 "invalid operand")
+                .note("expected register index or bits literal");
+        }
+    }
 
-                        check_use_of_register(register_usage_profile, *index);
-                        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
-                                                                                      *index);
+    check_use_of_register(register_usage_profile, *index);
+    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        register_usage_profile, *index);
 
-                        auto value = get_operand<RegisterIndex>(instruction, 2);
-                        if (not value) {
-                            if (not get_operand<BooleanLiteral>(instruction, 2)) {
-                                throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                    .note("expected register index or boolean literal");
-                            }
-                        }
+    auto value = get_operand<RegisterIndex>(instruction, 2);
+    if (not value) {
+        if (not get_operand<BooleanLiteral>(instruction, 2)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens,
+                                 "invalid operand")
+                .note("expected register index or boolean literal");
+        }
+    }
 
-                        if (value) {
-                            check_use_of_register(register_usage_profile, *value);
-                            assert_type_of_register<viua::internals::ValueTypes::BOOLEAN>(
-                                register_usage_profile, *value);
-                        }
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    if (value) {
+        check_use_of_register(register_usage_profile, *value);
+        assert_type_of_register<viua::internals::ValueTypes::BOOLEAN>(
+            register_usage_profile, *value);
+    }
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

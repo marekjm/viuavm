@@ -33,7 +33,8 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/machine.h>
 
-typedef std::tuple<std::vector<std::string>, std::map<std::string, viua::internals::types::bytecode_size>>
+typedef std::tuple<std::vector<std::string>,
+                   std::map<std::string, viua::internals::types::bytecode_size>>
     IdToAddressMapping;
 
 template<class T> void readinto(std::ifstream& in, T* object) {
@@ -53,13 +54,16 @@ class Loader {
     std::vector<std::string> external_signatures;
     std::vector<std::string> external_signatures_block;
 
-    std::map<std::string, viua::internals::types::bytecode_size> function_addresses;
+    std::map<std::string, viua::internals::types::bytecode_size>
+        function_addresses;
     std::map<std::string, viua::internals::types::bytecode_size> function_sizes;
     std::vector<std::string> functions;
-    std::map<std::string, viua::internals::types::bytecode_size> block_addresses;
+    std::map<std::string, viua::internals::types::bytecode_size>
+        block_addresses;
     std::vector<std::string> blocks;
 
-    IdToAddressMapping loadmap(char*, const viua::internals::types::bytecode_size&);
+    IdToAddressMapping loadmap(char*,
+                               const viua::internals::types::bytecode_size&);
     void calculate_function_sizes();
 
     void load_magic_number(std::ifstream&);
@@ -88,11 +92,14 @@ class Loader {
     std::vector<std::string> get_external_signatures();
     std::vector<std::string> get_external_block_signatures();
 
-    std::map<std::string, viua::internals::types::bytecode_size> get_function_addresses();
-    std::map<std::string, viua::internals::types::bytecode_size> get_function_sizes();
+    std::map<std::string, viua::internals::types::bytecode_size>
+    get_function_addresses();
+    std::map<std::string, viua::internals::types::bytecode_size>
+    get_function_sizes();
     std::vector<std::string> get_functions();
 
-    std::map<std::string, viua::internals::types::bytecode_size> get_block_addresses();
+    std::map<std::string, viua::internals::types::bytecode_size>
+    get_block_addresses();
     std::vector<std::string> get_blocks();
 
     Loader(std::string pth) : path(pth), size(0), bytecode(nullptr) {}

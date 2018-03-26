@@ -33,97 +33,110 @@
 
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
+namespace process {
+class Process;
+}
 }  // namespace viua
 
 
 namespace viua {
-    namespace bytecode {
-        namespace decoder {
-            namespace operands {
-                auto get_operand_type(viua::internals::types::byte const* const) -> OperandType;
+namespace bytecode {
+namespace decoder {
+namespace operands {
+auto get_operand_type(viua::internals::types::byte const* const) -> OperandType;
 
-                /*
-                 *  Fetch fully specified operands, possibly stored in registers.
-                 *  These functions will correctly decode and return:
-                 *
-                 *  - immediates
-                 *  - values from registers specified as register indexes
-                 *  - values from registers specified as register references
-                 *
-                 *  These functions are used most often by majority of the instructions.
-                 *
-                 */
-                auto is_void(viua::internals::types::byte const* const) -> bool;
-                auto fetch_void(viua::internals::types::byte*) -> viua::internals::types::byte*;
-                auto fetch_operand_type(viua::internals::types::byte*)
-                    -> std::tuple<viua::internals::types::byte*, OperandType>;
-                auto fetch_register_index(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
-                auto fetch_register(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::kernel::Register*>;
-                auto fetch_register_type_and_index(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::RegisterSets,
-                                  viua::internals::types::register_index>;
-                auto fetch_timeout(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::timeout>;
-                auto fetch_registerset_type(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*,
-                                  viua::internals::types::registerset_type_marker>;
-                auto fetch_primitive_uint(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
-                auto fetch_primitive_uint64(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, uint64_t>;
-                auto fetch_primitive_int(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_int>;
-                auto fetch_primitive_string(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, std::string>;
-                auto fetch_atom(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, std::string>;
-                auto fetch_object(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::types::Value*>;
+/*
+ *  Fetch fully specified operands, possibly stored in registers.
+ *  These functions will correctly decode and return:
+ *
+ *  - immediates
+ *  - values from registers specified as register indexes
+ *  - values from registers specified as register references
+ *
+ *  These functions are used most often by majority of the instructions.
+ *
+ */
+auto is_void(viua::internals::types::byte const* const) -> bool;
+auto fetch_void(viua::internals::types::byte*) -> viua::internals::types::byte*;
+auto fetch_operand_type(viua::internals::types::byte*)
+    -> std::tuple<viua::internals::types::byte*, OperandType>;
+auto fetch_register_index(viua::internals::types::byte*,
+                          viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::register_index>;
+auto fetch_register(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, viua::kernel::Register*>;
+auto fetch_register_type_and_index(viua::internals::types::byte*,
+                                   viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, viua::internals::RegisterSets,
+                  viua::internals::types::register_index>;
+auto fetch_timeout(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::timeout>;
+auto fetch_registerset_type(viua::internals::types::byte*,
+                            viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::registerset_type_marker>;
+auto fetch_primitive_uint(viua::internals::types::byte*,
+                          viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::register_index>;
+auto fetch_primitive_uint64(viua::internals::types::byte*,
+                            viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, uint64_t>;
+auto fetch_primitive_int(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::plain_int>;
+auto fetch_primitive_string(viua::internals::types::byte*,
+                            viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, std::string>;
+auto fetch_atom(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, std::string>;
+auto fetch_object(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*, viua::types::Value*>;
 
-                template<typename RequestedType>
-                auto fetch_object_of(viua::internals::types::byte* ip, viua::process::Process* p)
-                    -> std::tuple<viua::internals::types::byte*, RequestedType*> {
-                    viua::internals::types::byte* addr = nullptr;
-                    viua::types::Value* fetched = nullptr;
+template<typename RequestedType>
+auto fetch_object_of(viua::internals::types::byte* ip,
+                     viua::process::Process* p)
+    -> std::tuple<viua::internals::types::byte*, RequestedType*> {
+    viua::internals::types::byte* addr = nullptr;
+    viua::types::Value* fetched = nullptr;
 
-                    std::tie(addr, fetched) = fetch_object(ip, p);
+    std::tie(addr, fetched) = fetch_object(ip, p);
 
-                    RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
-                    if (not converted) {
-                        throw std::make_unique<viua::types::Exception>("fetched invalid type: expected '" +
-                                                                       RequestedType::type_name +
-                                                                       "' but got '" + fetched->type() + "'");
-                    }
-                    return {addr, converted};
-                }
+    RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
+    if (not converted) {
+        throw std::make_unique<viua::types::Exception>(
+            "fetched invalid type: expected '" + RequestedType::type_name +
+            "' but got '" + fetched->type() + "'");
+    }
+    return {addr, converted};
+}
 
-                /*
-                 *  Fetch raw data decoding it directly from bytecode.
-                 *  No register access is neccessary.
-                 *  These functions are used by instructions whose operands are always
-                 *  immediates.
-                 */
-                auto fetch_raw_int(viua::internals::types::byte* ip, viua::process::Process* p)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_int>;
-                auto fetch_raw_float(viua::internals::types::byte*, viua::process::Process*)
-                    -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_float>;
+/*
+ *  Fetch raw data decoding it directly from bytecode.
+ *  No register access is neccessary.
+ *  These functions are used by instructions whose operands are always
+ *  immediates.
+ */
+auto fetch_raw_int(viua::internals::types::byte* ip, viua::process::Process* p)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::plain_int>;
+auto fetch_raw_float(viua::internals::types::byte*, viua::process::Process*)
+    -> std::tuple<viua::internals::types::byte*,
+                  viua::internals::types::plain_float>;
 
-                /*
-                 *  Extract data decoding it from bytecode without advancing the bytecode
-                 *  pointer.
-                 *  These functions are used by instructions whose operands are always
-                 *  immediates.
-                 */
-                auto extract_primitive_uint64(viua::internals::types::byte*, viua::process::Process*)
-                    -> uint64_t;
-            }  // namespace operands
-        }      // namespace decoder
-    }          // namespace bytecode
+/*
+ *  Extract data decoding it from bytecode without advancing the bytecode
+ *  pointer.
+ *  These functions are used by instructions whose operands are always
+ *  immediates.
+ */
+auto extract_primitive_uint64(viua::internals::types::byte*,
+                              viua::process::Process*) -> uint64_t;
+}  // namespace operands
+}  // namespace decoder
+}  // namespace bytecode
 }  // namespace viua
 
 

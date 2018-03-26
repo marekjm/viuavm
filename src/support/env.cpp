@@ -23,76 +23,76 @@
 using namespace std;
 
 namespace support {
-    namespace env {
-        auto get_var(string const& var) -> string {
-            auto const VAR = getenv(var.c_str());
-            return (VAR == nullptr ? string("") : string(VAR));
-        }
-        auto get_paths(string const& var) -> vector<string> {
-            auto path = get_var(var);
-            auto paths = vector<string>{};
+namespace env {
+auto get_var(string const& var) -> string {
+    auto const VAR = getenv(var.c_str());
+    return (VAR == nullptr ? string("") : string(VAR));
+}
+auto get_paths(string const& var) -> vector<string> {
+    auto path = get_var(var);
+    auto paths = vector<string>{};
 
-            auto a_path = string{};
-            auto i = decltype(path)::size_type{0};
-            while (i < path.size()) {
-                if (path[i] == ':') {
-                    if (a_path.size()) {
-                        paths.emplace_back(a_path);
-                        a_path = "";
-                        ++i;
-                    }
-                }
-                a_path += path[i];
-                ++i;
-            }
+    auto a_path = string{};
+    auto i = decltype(path)::size_type{0};
+    while (i < path.size()) {
+        if (path[i] == ':') {
             if (a_path.size()) {
                 paths.emplace_back(a_path);
+                a_path = "";
+                ++i;
             }
-
-            return paths;
         }
+        a_path += path[i];
+        ++i;
+    }
+    if (a_path.size()) {
+        paths.emplace_back(a_path);
+    }
 
-        auto is_file(string const& path) -> bool {
-            struct stat sf;
+    return paths;
+}
 
-            // not a file if stat returned error
-            if (stat(path.c_str(), &sf) == -1) {
-                return false;
-            }
-            // not a file if S_ISREG() macro returned false
-            if (not S_ISREG(sf.st_mode)) {
-                return false;
-            }
+auto is_file(string const& path) -> bool {
+    struct stat sf;
 
-            // file otherwise
-            return true;
+    // not a file if stat returned error
+    if (stat(path.c_str(), &sf) == -1) {
+        return false;
+    }
+    // not a file if S_ISREG() macro returned false
+    if (not S_ISREG(sf.st_mode)) {
+        return false;
+    }
+
+    // file otherwise
+    return true;
+}
+
+namespace viua {
+auto get_mod_path(string const& module, string const& extension,
+                  vector<string> const& paths) -> string {
+    auto path = string{""};
+    auto found = false;
+
+    auto oss = ostringstream{};
+    for (auto const& each : paths) {
+        oss.str("");
+        oss << each << '/' << module << '.' << extension;
+        path = oss.str();
+        if (path[0] == '~') {
+            oss.str("");
+            oss << getenv("HOME") << path.substr(1);
+            path = oss.str();
         }
+        std::cerr << path << std::endl;
 
-        namespace viua {
-            auto get_mod_path(string const& module, string const& extension, vector<string> const& paths)
-                -> string {
-                auto path = string{""};
-                auto found = false;
+        if ((found = support::env::is_file(path))) {
+            break;
+        }
+    }
 
-                auto oss = ostringstream{};
-                for (auto const& each : paths) {
-                    oss.str("");
-                    oss << each << '/' << module << '.' << extension;
-                    path = oss.str();
-                    if (path[0] == '~') {
-                        oss.str("");
-                        oss << getenv("HOME") << path.substr(1);
-                        path = oss.str();
-                    }
-                    std::cerr << path << std::endl;
-
-                    if ((found = support::env::is_file(path))) {
-                        break;
-                    }
-                }
-
-                return (found ? path : "");
-            }
-        }  // namespace viua
-    }      // namespace env
+    return (found ? path : "");
+}
+}  // namespace viua
+}  // namespace env
 }  // namespace support

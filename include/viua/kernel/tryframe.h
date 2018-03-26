@@ -38,7 +38,9 @@ class TryFrame {
 
     std::map<std::string, std::unique_ptr<Catcher>> catchers;
 
-    inline viua::internals::types::byte* ret_address() { return return_address; }
+    inline viua::internals::types::byte* ret_address() {
+        return return_address;
+    }
 
     TryFrame() : return_address(nullptr), associated_frame(nullptr) {}
 };

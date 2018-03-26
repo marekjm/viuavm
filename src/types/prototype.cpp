@@ -27,10 +27,16 @@ const string viua::types::Prototype::type_name = "Prototype";
 string viua::types::Prototype::type() const { return "viua::types::Prototype"; }
 bool viua::types::Prototype::boolean() const { return true; }
 
-vector<string> viua::types::Prototype::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Prototype::inheritancechain() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Prototype::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Prototype::inheritancechain() const {
+    return vector<string>{"Value"};
+}
 
-string viua::types::Prototype::str() const { return ("Prototype for " + prototype_name); }
+string viua::types::Prototype::str() const {
+    return ("Prototype for " + prototype_name);
+}
 
 unique_ptr<viua::types::Value> viua::types::Prototype::copy() const {
     return make_unique<Prototype>(prototype_name);
@@ -38,20 +44,25 @@ unique_ptr<viua::types::Value> viua::types::Prototype::copy() const {
 
 
 string viua::types::Prototype::get_type_name() const { return prototype_name; }
-vector<string> viua::types::Prototype::get_ancestors() const { return ancestors; }
+vector<string> viua::types::Prototype::get_ancestors() const {
+    return ancestors;
+}
 
-viua::types::Prototype* viua::types::Prototype::derive(const string& base_class_name) {
+viua::types::Prototype* viua::types::Prototype::derive(
+    const string& base_class_name) {
     ancestors.emplace_back(base_class_name);
     return this;
 }
 
-viua::types::Prototype* viua::types::Prototype::attach(const string& function_name,
-                                                       const string& method_name) {
+viua::types::Prototype* viua::types::Prototype::attach(
+    const string& function_name, const string& method_name) {
     methods[method_name] = function_name;
     return this;
 }
 
-bool viua::types::Prototype::accepts(const string& method_name) const { return methods.count(method_name); }
+bool viua::types::Prototype::accepts(const string& method_name) const {
+    return methods.count(method_name);
+}
 
 string viua::types::Prototype::resolves_to(const string& method_name) const {
     return methods.at(method_name);

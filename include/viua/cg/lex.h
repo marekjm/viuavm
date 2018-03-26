@@ -27,145 +27,148 @@
 
 
 namespace viua {
-    namespace cg {
-        namespace lex {
-            class Token {
-                std::string content, original_content;
-                decltype(content.size()) line_number, character_in_line;
+namespace cg {
+namespace lex {
+class Token {
+    std::string content, original_content;
+    decltype(content.size()) line_number, character_in_line;
 
-              public:
-                auto line() const -> decltype(line_number);
-                auto character() const -> decltype(character_in_line);
+  public:
+    auto line() const -> decltype(line_number);
+    auto character() const -> decltype(character_in_line);
 
-                auto str() const -> decltype(content);
-                auto str(std::string) -> void;
+    auto str() const -> decltype(content);
+    auto str(std::string) -> void;
 
-                auto original() const -> decltype(original_content);
-                auto original(std::string) -> void;
+    auto original() const -> decltype(original_content);
+    auto original(std::string) -> void;
 
-                auto ends(bool const = false) const -> decltype(character_in_line);
+    auto ends(bool const = false) const -> decltype(character_in_line);
 
-                auto operator==(std::string const& s) const -> bool;
-                auto operator!=(std::string const& s) const -> bool;
+    auto operator==(std::string const& s) const -> bool;
+    auto operator!=(std::string const& s) const -> bool;
 
-                operator std::string() const;
+    operator std::string() const;
 
-                Token(decltype(line_number), decltype(character_in_line), std::string);
-                Token();
-            };
+    Token(decltype(line_number), decltype(character_in_line), std::string);
+    Token();
+};
 
-            struct InvalidSyntax {
-                std::vector<Token>::size_type line_number, character_in_line;
-                std::string content;
-                std::string message;
+struct InvalidSyntax {
+    std::vector<Token>::size_type line_number, character_in_line;
+    std::string content;
+    std::string message;
 
-                std::vector<Token> tokens;
-                std::vector<std::string> attached_notes;
-                std::string aside_note;
-                Token aside_token;
+    std::vector<Token> tokens;
+    std::vector<std::string> attached_notes;
+    std::string aside_note;
+    Token aside_token;
 
-                auto what() const -> const char*;
-                auto str() const -> std::string;
+    auto what() const -> const char*;
+    auto str() const -> std::string;
 
-                auto line() const -> decltype(line_number);
-                auto character() const -> decltype(character_in_line);
-                auto match(Token const) const -> bool;
+    auto line() const -> decltype(line_number);
+    auto character() const -> decltype(character_in_line);
+    auto match(Token const) const -> bool;
 
-                auto add(Token) -> InvalidSyntax&;
+    auto add(Token) -> InvalidSyntax&;
 
-                auto note(std::string) -> InvalidSyntax&;
-                auto notes() const -> const decltype(attached_notes)&;
+    auto note(std::string) -> InvalidSyntax&;
+    auto notes() const -> const decltype(attached_notes)&;
 
-                auto aside(std::string) -> InvalidSyntax&;
-                auto aside(Token, std::string) -> InvalidSyntax&;
-                auto aside() const -> std::string;
-                auto match_aside(Token) const -> bool;
+    auto aside(std::string) -> InvalidSyntax&;
+    auto aside(Token, std::string) -> InvalidSyntax&;
+    auto aside() const -> std::string;
+    auto match_aside(Token) const -> bool;
 
-                InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
-                InvalidSyntax(Token, std::string = "");
-            };
+    InvalidSyntax(decltype(line_number), decltype(character_in_line),
+                  std::string);
+    InvalidSyntax(Token, std::string = "");
+};
 
-            struct UnusedValue : public InvalidSyntax {
-                UnusedValue(Token);
-                UnusedValue(Token, std::string);
-            };
+struct UnusedValue : public InvalidSyntax {
+    UnusedValue(Token);
+    UnusedValue(Token, std::string);
+};
 
-            struct TracedSyntaxError {
-                std::vector<InvalidSyntax> errors;
+struct TracedSyntaxError {
+    std::vector<InvalidSyntax> errors;
 
-                auto what() const -> const char*;
+    auto what() const -> const char*;
 
-                auto line() const -> decltype(errors.front().line());
-                auto character() const -> decltype(errors.front().character());
+    auto line() const -> decltype(errors.front().line());
+    auto character() const -> decltype(errors.front().character());
 
-                auto append(InvalidSyntax const&) -> TracedSyntaxError&;
-            };
+    auto append(InvalidSyntax const&) -> TracedSyntaxError&;
+};
 
-            auto is_reserved_keyword(std::string const&) -> bool;
-            auto is_mnemonic(std::string const&) -> bool;
-            auto assert_is_not_reserved_keyword(Token, std::string const&) -> void;
+auto is_reserved_keyword(std::string const&) -> bool;
+auto is_mnemonic(std::string const&) -> bool;
+auto assert_is_not_reserved_keyword(Token, std::string const&) -> void;
 
-            auto tokenise(std::string const&) -> std::vector<Token>;
-            auto standardise(std::vector<Token>) -> std::vector<Token>;
-            auto normalise(std::vector<Token>) -> std::vector<Token>;
+auto tokenise(std::string const&) -> std::vector<Token>;
+auto standardise(std::vector<Token>) -> std::vector<Token>;
+auto normalise(std::vector<Token>) -> std::vector<Token>;
 
-            template<class T, typename... R> bool adjacent(T first, T second) {
-                if (first.line() != second.line()) {
-                    return false;
-                }
-                if (first.ends() != second.character()) {
-                    return false;
-                }
-                return true;
-            }
-            template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
-                if (first.line() != second.line()) {
-                    return false;
-                }
-                if (first.ends() != second.character()) {
-                    return false;
-                }
-                return adjacent(second, rest...);
-            }
+template<class T, typename... R> bool adjacent(T first, T second) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return true;
+}
+template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return adjacent(second, rest...);
+}
 
-            auto join_tokens(std::vector<Token> const tokens, decltype(tokens)::size_type const from,
-                             decltype(from) const to) -> std::string;
+auto join_tokens(std::vector<Token> const tokens,
+                 decltype(tokens)::size_type const from,
+                 decltype(from) const to) -> std::string;
 
-            auto reduce_token_sequence(std::vector<Token>, std::vector<std::string> const)
-                -> std::vector<Token>;
-            auto reduce_directive(std::vector<Token>, std::string const) -> std::vector<Token>;
-            auto remove_spaces(std::vector<Token>) -> std::vector<Token>;
-            auto remove_comments(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_newlines(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_mark_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_name_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_info_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_import_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_function_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_closure_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_end_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_signature_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_bsignature_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_block_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_iota_directive(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_double_colon(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_left_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_right_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_function_signatures(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_names(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_offset_jumps(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_at_prefixed_registers(std::vector<Token>) -> std::vector<Token>;
-            auto reduce_floats(std::vector<Token>) -> std::vector<Token>;
+auto reduce_token_sequence(std::vector<Token>, std::vector<std::string> const)
+    -> std::vector<Token>;
+auto reduce_directive(std::vector<Token>, std::string const)
+    -> std::vector<Token>;
+auto remove_spaces(std::vector<Token>) -> std::vector<Token>;
+auto remove_comments(std::vector<Token>) -> std::vector<Token>;
+auto reduce_newlines(std::vector<Token>) -> std::vector<Token>;
+auto reduce_mark_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_name_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_info_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_import_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_function_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_closure_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_end_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_signature_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_bsignature_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_block_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_iota_directive(std::vector<Token>) -> std::vector<Token>;
+auto reduce_double_colon(std::vector<Token>) -> std::vector<Token>;
+auto reduce_left_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
+auto reduce_right_attribute_bracket(std::vector<Token>) -> std::vector<Token>;
+auto reduce_function_signatures(std::vector<Token>) -> std::vector<Token>;
+auto reduce_names(std::vector<Token>) -> std::vector<Token>;
+auto reduce_offset_jumps(std::vector<Token>) -> std::vector<Token>;
+auto reduce_at_prefixed_registers(std::vector<Token>) -> std::vector<Token>;
+auto reduce_floats(std::vector<Token>) -> std::vector<Token>;
 
-            auto replace_iotas(std::vector<Token>) -> std::vector<Token>;
-            auto replace_defaults(std::vector<Token>) -> std::vector<Token>;
-            auto replace_named_registers(std::vector<Token>) -> std::vector<Token>;
-            auto move_inline_blocks_out(std::vector<Token>) -> std::vector<Token>;
-            auto unwrap_lines(std::vector<Token>, bool full = true) -> std::vector<Token>;
+auto replace_iotas(std::vector<Token>) -> std::vector<Token>;
+auto replace_defaults(std::vector<Token>) -> std::vector<Token>;
+auto replace_named_registers(std::vector<Token>) -> std::vector<Token>;
+auto move_inline_blocks_out(std::vector<Token>) -> std::vector<Token>;
+auto unwrap_lines(std::vector<Token>, bool full = true) -> std::vector<Token>;
 
-            auto cook(std::vector<Token>, bool const = true) -> std::vector<Token>;
-        }  // namespace lex
-    }      // namespace cg
+auto cook(std::vector<Token>, bool const = true) -> std::vector<Token>;
+}  // namespace lex
+}  // namespace cg
 }  // namespace viua
 
 

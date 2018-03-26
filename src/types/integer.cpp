@@ -48,33 +48,44 @@ auto Integer::as_unsigned() const -> uint64_t {
 
 auto Integer::as_integer() const -> int64_t { return number; }
 
-auto Integer::as_float() const -> viua::float64 { return static_cast<viua::float64>(number); }
+auto Integer::as_float() const -> viua::float64 {
+    return static_cast<viua::float64>(number);
+}
 
-auto Integer::operator+(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+auto Integer::operator+(const numeric::Number& that) const
+    -> unique_ptr<numeric::Number> {
     return make_unique<Integer>(number + that.as_integer());
 }
-auto Integer::operator-(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+auto Integer::operator-(const numeric::Number& that) const
+    -> unique_ptr<numeric::Number> {
     return make_unique<Integer>(number - that.as_integer());
 }
-auto Integer::operator*(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+auto Integer::operator*(const numeric::Number& that) const
+    -> unique_ptr<numeric::Number> {
     return make_unique<Integer>(number * that.as_integer());
 }
-auto Integer::operator/(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+auto Integer::operator/(const numeric::Number& that) const
+    -> unique_ptr<numeric::Number> {
     return make_unique<Integer>(number / that.as_integer());
 }
 
-auto Integer::operator<(const numeric::Number& that) const -> unique_ptr<Boolean> {
+auto Integer::operator<(const numeric::Number& that) const
+    -> unique_ptr<Boolean> {
     return make_unique<Boolean>(number < that.as_integer());
 }
-auto Integer::operator<=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+auto Integer::operator<=(const numeric::Number& that) const
+    -> unique_ptr<Boolean> {
     return make_unique<Boolean>(number <= that.as_integer());
 }
-auto Integer::operator>(const numeric::Number& that) const -> unique_ptr<Boolean> {
+auto Integer::operator>(const numeric::Number& that) const
+    -> unique_ptr<Boolean> {
     return make_unique<Boolean>(number > that.as_integer());
 }
-auto Integer::operator>=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+auto Integer::operator>=(const numeric::Number& that) const
+    -> unique_ptr<Boolean> {
     return make_unique<Boolean>(number >= that.as_integer());
 }
-auto Integer::operator==(const numeric::Number& that) const -> unique_ptr<Boolean> {
+auto Integer::operator==(const numeric::Number& that) const
+    -> unique_ptr<Boolean> {
     return make_unique<Boolean>(number == that.as_integer());
 }

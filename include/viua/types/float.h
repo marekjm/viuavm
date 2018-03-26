@@ -29,45 +29,45 @@
 
 
 namespace viua {
-    namespace types {
-        class Float : public viua::types::numeric::Number {
-            /** Basic integer type.
-             *  It is suitable for mathematical operations.
-             */
-          public:
-            using underlying_type = double;
+namespace types {
+class Float : public viua::types::numeric::Number {
+    /** Basic integer type.
+     *  It is suitable for mathematical operations.
+     */
+  public:
+    using underlying_type = double;
 
-          private:
-            underlying_type number;
+  private:
+    underlying_type number;
 
-          public:
-            static const std::string type_name;
+  public:
+    static const std::string type_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            bool boolean() const override;
+    std::string type() const override;
+    std::string str() const override;
+    bool boolean() const override;
 
-            auto value() -> decltype(number)&;
+    auto value() -> decltype(number)&;
 
-            std::unique_ptr<Value> copy() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            auto as_integer() const -> int64_t override;
-            auto as_float() const -> float64 override;
+    auto as_integer() const -> int64_t override;
+    auto as_float() const -> float64 override;
 
-            auto operator+(const Number&) const -> std::unique_ptr<Number> override;
-            auto operator-(const Number&) const -> std::unique_ptr<Number> override;
-            auto operator*(const Number&)const -> std::unique_ptr<Number> override;
-            auto operator/(const Number&) const -> std::unique_ptr<Number> override;
+    auto operator+(const Number&) const -> std::unique_ptr<Number> override;
+    auto operator-(const Number&) const -> std::unique_ptr<Number> override;
+    auto operator*(const Number&)const -> std::unique_ptr<Number> override;
+    auto operator/(const Number&) const -> std::unique_ptr<Number> override;
 
-            auto operator<(const Number&) const -> std::unique_ptr<Boolean> override;
-            auto operator<=(const Number&) const -> std::unique_ptr<Boolean> override;
-            auto operator>(const Number&) const -> std::unique_ptr<Boolean> override;
-            auto operator>=(const Number&) const -> std::unique_ptr<Boolean> override;
-            auto operator==(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator<(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator<=(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator>(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator>=(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator==(const Number&) const -> std::unique_ptr<Boolean> override;
 
-            Float(decltype(number) n = 0);
-        };
-    }  // namespace types
+    Float(decltype(number) n = 0);
+};
+}  // namespace types
 }  // namespace viua
 
 

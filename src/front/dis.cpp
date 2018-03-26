@@ -59,7 +59,8 @@ bool LINE_BY_LINE = false;
 string SELECTED_FUNCTION = "";
 
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program, bool show_help, bool show_version,
+                  bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM disassembler, version ";
     }
@@ -68,7 +69,8 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] [-o <outfile>] <infile>\n" << endl;
+        cout << "    " << program << " [option...] [-o <outfile>] <infile>\n"
+             << endl;
         cout << "OPTIONS:\n";
         cout << "    "
              << "-V, --version            - show version\n"
@@ -77,15 +79,19 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    "
              << "-v, --verbose            - show verbose output\n"
              << "    "
-             << "-o, --out                - output to given path (by default prints to cout)\n"
+             << "-o, --out                - output to given path (by default "
+                "prints to cout)\n"
              << "    "
-             << "-i, --info               - include information about executable in output\n"
+             << "-i, --info               - include information about "
+                "executable in output\n"
              << "    "
-             << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME << " function in disassembly\n"
+             << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME
+             << " function in disassembly\n"
              << "    "
              << "-L, --line-by-line       - display output line by line\n"
              << "    "
-             << "-F, --function <name>    - disassemble only selected function\n";
+             << "-F, --function <name>    - disassemble only selected "
+                "function\n";
     }
 
     return (show_help or show_version);
@@ -121,7 +127,8 @@ int main(int argc, char* argv[]) {
             if (i < argc - 1) {
                 SELECTED_FUNCTION = string(argv[++i]);
             } else {
-                cout << "error: option '" << argv[i] << "' requires an argument: function name" << endl;
+                cout << "error: option '" << argv[i]
+                     << "' requires an argument: function name" << endl;
                 exit(1);
             }
             continue;
@@ -129,14 +136,17 @@ int main(int argc, char* argv[]) {
             if (i < argc - 1) {
                 disasmname = string(argv[++i]);
             } else {
-                cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
+                cout << "error: option '" << argv[i]
+                     << "' requires an argument: filename" << endl;
                 exit(1);
             }
             continue;
         } else if (str::startswith(option, "-")) {
-            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_RED) << "error"
+                 << send_control_seq(ATTR_RESET);
             cerr << ": unknown option: ";
-            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_WHITE) << option
+                 << send_control_seq(ATTR_RESET);
             cerr << endl;
             return 1;
         } else {
@@ -176,7 +186,8 @@ int main(int argc, char* argv[]) {
     uint64_t bytes = loader.get_bytecode_size();
     unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
 
-    map<string, uint64_t> function_address_mapping = loader.get_function_addresses();
+    map<string, uint64_t> function_address_mapping =
+        loader.get_function_addresses();
     vector<string> functions = loader.get_functions();
     map<string, uint64_t> function_sizes = loader.get_function_sizes();
 
@@ -229,8 +240,10 @@ int main(int argc, char* argv[]) {
         (DEBUG ? cout : oss) << "-- functions:\n";
         for (unsigned i = 0; i < functions.size(); ++i) {
             const auto function_name = functions[i];
-            (DEBUG ? cout : oss) << "--   " << function_name << " -> " << function_sizes[function_name]
-                                 << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
+            (DEBUG ? cout : oss)
+                << "--   " << function_name << " -> "
+                << function_sizes[function_name] << " bytes at byte "
+                << function_address_mapping[functions[i]] << '\n';
         }
         (DEBUG ? cout : oss) << "\n\n";
 
@@ -244,7 +257,8 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("; meta information\n");
     }
     for (const auto each : meta_information) {
-        disassembled_lines.emplace_back(assembler::utils::lines::make_info(each.first, each.second) + "\n");
+        disassembled_lines.emplace_back(
+            assembler::utils::lines::make_info(each.first, each.second) + "\n");
     }
     if (meta_information.size()) {
         disassembled_lines.emplace_back("\n");
@@ -255,7 +269,8 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("; external function signatures\n");
     }
     for (const auto each : signatures) {
-        disassembled_lines.emplace_back(assembler::utils::lines::make_function_signature(each) + "\n");
+        disassembled_lines.emplace_back(
+            assembler::utils::lines::make_function_signature(each) + "\n");
     }
     if (signatures.size()) {
         disassembled_lines.emplace_back("\n");
@@ -266,7 +281,8 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("; external block signatures\n");
     }
     for (const auto each : block_signatures) {
-        disassembled_lines.emplace_back(assembler::utils::lines::make_block_signature(each) + "\n");
+        disassembled_lines.emplace_back(
+            assembler::utils::lines::make_block_signature(each) + "\n");
     }
     if (block_signatures.size()) {
         disassembled_lines.emplace_back("\n");
@@ -282,7 +298,8 @@ int main(int argc, char* argv[]) {
 
         oss.str("");
 
-        (DEBUG ? cout : oss) << '.' << element_types[name] << ": " << name << '\n';
+        (DEBUG ? cout : oss)
+            << '.' << element_types[name] << ": " << name << '\n';
         if (LINE_BY_LINE) {
             (DEBUG ? cout : oss) << '.' << element_types[name] << ": " << name;
             getline(cin, dummy);
@@ -294,34 +311,37 @@ int main(int argc, char* argv[]) {
             string instruction;
             try {
                 unsigned size;
-                tie(instruction, size) =
-                    disassembler::instruction((bytecode.get() + element_address_mapping[name] + j));
+                tie(instruction, size) = disassembler::instruction(
+                    (bytecode.get() + element_address_mapping[name] + j));
                 if (DEBUG) {
                     if (j != 0) {
                         (DEBUG ? cout : oss) << '\n';
                     }
-                    (DEBUG ? cout : oss) << "    ; size: " << size << " bytes\n";
-                    (DEBUG ? cout : oss) << "    ; address: 0x" << hex << j << dec << '\n';
+                    (DEBUG ? cout : oss)
+                        << "    ; size: " << size << " bytes\n";
+                    (DEBUG ? cout : oss)
+                        << "    ; address: 0x" << hex << j << dec << '\n';
                 }
                 (DEBUG ? cout : oss) << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? cout : oss)
-                    << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing "
+                                        "an instance of std::out_of_range\n";
                 (DEBUG ? cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
             } catch (const string& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? cout : oss)
-                    << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing "
+                                        "an instance of std::out_of_range\n";
                 (DEBUG ? cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
             } catch (const char* e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of const char*\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing "
+                                        "an instance of const char*\n";
                 (DEBUG ? cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;

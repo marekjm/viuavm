@@ -23,23 +23,25 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction) -> void {
-                        using viua::assembler::frontend::parser::AtomLiteral;
-                        using viua::assembler::frontend::parser::FunctionNameLiteral;
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction)
+    -> void {
+    using viua::assembler::frontend::parser::AtomLiteral;
+    using viua::assembler::frontend::parser::FunctionNameLiteral;
 
-                        auto fn = instruction.operands.at(0).get();
-                        if ((not dynamic_cast<AtomLiteral*>(fn)) and
-                            (not dynamic_cast<FunctionNameLiteral*>(fn))) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name or atom literal");
-                        }
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    auto fn = instruction.operands.at(0).get();
+    if ((not dynamic_cast<AtomLiteral*>(fn)) and
+        (not dynamic_cast<FunctionNameLiteral*>(fn))) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
+                             "invalid operand")
+            .note("expected function name or atom literal");
+    }
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

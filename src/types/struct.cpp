@@ -48,10 +48,15 @@ string viua::types::Struct::str() const {
 
 string viua::types::Struct::repr() const { return str(); }
 
-vector<string> viua::types::Struct::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Struct::inheritancechain() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Struct::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Struct::inheritancechain() const {
+    return vector<string>{"Value"};
+}
 
-void viua::types::Struct::insert(const string& key, unique_ptr<viua::types::Value> value) {
+void viua::types::Struct::insert(const string& key,
+                                 unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
 }
 

@@ -60,7 +60,8 @@ bool DEBUG = false;
 bool SCREAM = false;
 
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program, bool show_help, bool show_version,
+                  bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM assembler, version ";
     }
@@ -69,7 +70,9 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n" << endl;
+        cout << "    " << program
+             << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n"
+             << endl;
         cout << "OPTIONS:\n";
 
         // generic options
@@ -84,26 +87,32 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    "
              << "-d, --debug              - show debugging output\n"
              << "    "
-             << "    --scream             - show so much debugging output it becomes noisy\n"
+             << "    --scream             - show so much debugging output it "
+                "becomes noisy\n"
 
              // warning reporting level control
              << "    "
              << "-W, --Wall               - warn about everything\n"
              << "    "
-             << "    --Wmissing-return    - warn about missing 'return' instruction at the end of functions\n"
+             << "    --Wmissing-return    - warn about missing 'return' "
+                "instruction at the end of functions\n"
              << "    "
-             << "    --Wundefined-arity   - warn about functions declared with undefined arity\n"
+             << "    --Wundefined-arity   - warn about functions declared with "
+                "undefined arity\n"
 
              // error reporting level control
              << "    "
              << "-E, --Eall               - treat all warnings as errors\n"
              << "    "
-             << "    --Emissing-return    - treat missing 'return' instruction at the end of function as "
+             << "    --Emissing-return    - treat missing 'return' instruction "
+                "at the end of function as "
                 "error\n"
              << "    "
-             << "    --Eundefined-arity   - treat functions declared with undefined arity as errors\n"
+             << "    --Eundefined-arity   - treat functions declared with "
+                "undefined arity as errors\n"
              << "    "
-             << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function "
+             << "    --Ehalt-is-last      - treat 'halt' being used as last "
+                "instruction of 'main' function "
                 "as error\n"
 
              // compilation options
@@ -112,18 +121,24 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    "
              << "-c, --lib                - assemble as a library\n"
              << "    "
-             << "-C, --verify             - verify source code correctness without actually compiling it\n"
+             << "-C, --verify             - verify source code correctness "
+                "without actually compiling it\n"
              << "    "
-             << "                           this option turns assembler into source level debugger and "
+             << "                           this option turns assembler into "
+                "source level debugger and "
                 "static code analyzer hybrid\n"
              << "    "
-             << "    --size               - calculate and report final bytecode size\n"
+             << "    --size               - calculate and report final "
+                "bytecode size\n"
              << "    "
-             << "    --meta               - display information embedded in source code and exit\n"
+             << "    --meta               - display information embedded in "
+                "source code and exit\n"
              << "    "
-             << "    --no-sa              - disable static checking of register accesses (use in case of "
+             << "    --no-sa              - disable static checking of "
+                "register accesses (use in case of "
                 "false positives)\n"
-             << "    --new-sa             - use new static analyser (more precise, with better features, but "
+             << "    --new-sa             - use new static analyser (more "
+                "precise, with better features, but "
                 "without coverage of all instructions yet)\n";
     }
 
@@ -171,9 +186,11 @@ int main(int argc, char* argv[]) {
             if (i < argc - 1) {
                 compilename = string(argv[++i]);
             } else {
-                cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
-                cout << ": option '" << send_control_seq(COLOR_FG_WHITE) << argv[i]
-                     << send_control_seq(ATTR_RESET) << "' requires an argument: filename";
+                cout << send_control_seq(COLOR_FG_RED) << "error"
+                     << send_control_seq(ATTR_RESET);
+                cout << ": option '" << send_control_seq(COLOR_FG_WHITE)
+                     << argv[i] << send_control_seq(ATTR_RESET)
+                     << "' requires an argument: filename";
                 cout << endl;
                 exit(1);
             }
@@ -197,9 +214,11 @@ int main(int argc, char* argv[]) {
             USE_NEW_SA = true;
             continue;
         } else if (str::startswith(option, "-")) {
-            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_RED) << "error"
+                 << send_control_seq(ATTR_RESET);
             cerr << ": unknown option: ";
-            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_WHITE) << option
+                 << send_control_seq(ATTR_RESET);
             cerr << endl;
             return 1;
         }
@@ -211,7 +230,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (args.size() == 0) {
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET);
         cout << ": no input file" << endl;
         return 1;
     }
@@ -220,13 +240,16 @@ int main(int argc, char* argv[]) {
     // FIND FILENAME AND COMPILENAME
     filename = args[0];
     if (!filename.size()) {
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET);
         cout << ": no file to assemble" << endl;
         return 1;
     }
     if (!support::env::is_file(filename)) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_WHITE) << filename
+             << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET);
         cout << ": could not open file" << endl;
         return 1;
     }
@@ -240,12 +263,15 @@ int main(int argc, char* argv[]) {
     }
 
     if (VERBOSE or DEBUG) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_WHITE) << filename
+             << send_control_seq(ATTR_RESET);
         cout << ": ";
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
+             << send_control_seq(ATTR_RESET);
         cout << ": ";
         cout << "assembling to \"";
-        cout << send_control_seq(COLOR_FG_WHITE) << compilename << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_WHITE) << compilename
+             << send_control_seq(ATTR_RESET);
         cout << "\"\n";
     }
 
@@ -260,17 +286,22 @@ int main(int argc, char* argv[]) {
 
     auto source = read_file(filename);
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced, normalised_tokens;
+    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced,
+        normalised_tokens;
     try {
-        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
+        cooked_tokens =
+            viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
         cooked_tokens_without_names_replaced =
             viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
-        normalised_tokens = viua::cg::lex::normalise(viua::cg::lex::cook(raw_tokens));
+        normalised_tokens =
+            viua::cg::lex::normalise(viua::cg::lex::cook(raw_tokens));
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
@@ -278,10 +309,12 @@ int main(int argc, char* argv[]) {
     try {
         functions = gather_functions(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
@@ -289,32 +322,38 @@ int main(int argc, char* argv[]) {
     try {
         blocks = gather_blocks(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     try {
-        auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        auto parsed_source =
+            viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
         if (PERFORM_STATIC_ANALYSIS) {
             if (USE_NEW_SA) {
-                viua::assembler::frontend::static_analyser::check_register_usage(parsed_source);
+                viua::assembler::frontend::static_analyser::
+                    check_register_usage(parsed_source);
             } else {
-                assembler::verify::manipulation_of_defined_registers(cooked_tokens_without_names_replaced,
-                                                                     blocks.tokens, DEBUG);
+                assembler::verify::manipulation_of_defined_registers(
+                    cooked_tokens_without_names_replaced, blocks.tokens, DEBUG);
             }
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
@@ -323,7 +362,8 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     if (REPORT_BYTECODE_SIZE) {
-        cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens) << endl;
+        cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens)
+             << endl;
         return 0;
     }
 
@@ -336,29 +376,37 @@ int main(int argc, char* argv[]) {
     if (SHOW_META) {
         auto meta = gather_meta_information(cooked_tokens);
         for (auto each : meta) {
-            cout << each.first << " = " << str::enquote(str::strencode(each.second)) << endl;
+            cout << each.first << " = "
+                 << str::enquote(str::strencode(each.second)) << endl;
         }
         return 0;
     }
 
     int ret_code = 0;
     try {
-        generate(cooked_tokens, functions, blocks, filename, compilename, commandline_given_links, flags);
+        generate(cooked_tokens, functions, blocks, filename, compilename,
+                 commandline_given_links, flags);
     } catch (const string& e) {
         ret_code = 1;
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_WHITE) << filename
+             << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET);
         cout << ": " << e << endl;
     } catch (const char* e) {
         ret_code = 1;
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_WHITE) << filename
+             << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET);
         cout << ": " << e << endl;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 

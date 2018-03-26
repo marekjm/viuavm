@@ -25,44 +25,47 @@ using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_closure_instantiations(Register_usage_profile const& register_usage_profile,
-                                                      ParsedSource const& ps,
-                                                      std::map<Register, Closure> const& created_closures)
-                        -> void {
-                        for (const auto& each : created_closures) {
-                            Register_usage_profile closure_register_usage_profile;
-                            const auto& fn = *std::find_if(
-                                ps.functions.begin(), ps.functions.end(),
-                                [&each](const InstructionsBlock& b) { return b.name == each.second.name; });
-                            for (auto& captured_value : each.second.defined_registers) {
-                                closure_register_usage_profile.define(captured_value.second.second,
-                                                                      captured_value.second.first);
-                            }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_closure_instantiations(
+    Register_usage_profile const& register_usage_profile,
+    ParsedSource const& ps, std::map<Register, Closure> const& created_closures)
+    -> void {
+    for (const auto& each : created_closures) {
+        Register_usage_profile closure_register_usage_profile;
+        const auto& fn = *std::find_if(ps.functions.begin(), ps.functions.end(),
+                                       [&each](const InstructionsBlock& b) {
+                                           return b.name == each.second.name;
+                                       });
+        for (auto& captured_value : each.second.defined_registers) {
+            closure_register_usage_profile.define(captured_value.second.second,
+                                                  captured_value.second.first);
+        }
 
-                            try {
-                                map_names_to_register_indexes(closure_register_usage_profile, fn);
-                                check_register_usage_for_instruction_block_impl(
-                                    closure_register_usage_profile, ps, fn, 0,
-                                    static_cast<InstructionIndex>(-1));
-                            } catch (InvalidSyntax& e) {
-                                throw TracedSyntaxError{}
-                                    .append(e)
-                                    .append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                                    .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
-                                                          "when instantiated here:"});
-                            } catch (TracedSyntaxError& e) {
-                                throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                                    .append(InvalidSyntax{register_usage_profile.defined_where(each.first),
-                                                          "when instantiated here:"});
-                            }
-                        }
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+        try {
+            map_names_to_register_indexes(closure_register_usage_profile, fn);
+            check_register_usage_for_instruction_block_impl(
+                closure_register_usage_profile, ps, fn, 0,
+                static_cast<InstructionIndex>(-1));
+        } catch (InvalidSyntax& e) {
+            throw TracedSyntaxError{}
+                .append(e)
+                .append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{
+                    register_usage_profile.defined_where(each.first),
+                    "when instantiated here:"});
+        } catch (TracedSyntaxError& e) {
+            throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
+                .append(InvalidSyntax{
+                    register_usage_profile.defined_where(each.first),
+                    "when instantiated here:"});
+        }
+    }
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

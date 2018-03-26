@@ -23,33 +23,35 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_function(Register_usage_profile& register_usage_profile,
-                                           Instruction const& instruction) -> void {
-                        using viua::assembler::frontend::parser::FunctionNameLiteral;
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_function(Register_usage_profile& register_usage_profile,
+                       Instruction const& instruction) -> void {
+    using viua::assembler::frontend::parser::FunctionNameLiteral;
 
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_if_name_resolved(register_usage_profile, *target);
+    check_if_name_resolved(register_usage_profile, *target);
 
-                        if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected function name literal");
-                        }
+    if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
+                             "invalid operand")
+            .note("expected function name literal");
+    }
 
-                        auto val = Register{*target};
-                        val.value_type = ValueTypes::FUNCTION;
-                        register_usage_profile.define(val, target->tokens.at(0));
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    auto val = Register{*target};
+    val.value_type = ValueTypes::FUNCTION;
+    register_usage_profile.define(val, target->tokens.at(0));
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

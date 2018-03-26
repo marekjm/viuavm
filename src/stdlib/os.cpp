@@ -28,10 +28,12 @@
 using namespace std;
 
 
-static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
+static void os_system(Frame* frame, viua::kernel::RegisterSet*,
+                      viua::kernel::RegisterSet*, viua::process::Process*,
+                      viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
-        throw make_unique<viua::types::Exception>("expected command to launch (string) as parameter 0");
+        throw make_unique<viua::types::Exception>(
+            "expected command to launch (string) as parameter 0");
     }
     auto const command = frame->arguments->get(0)->str();
     auto const ret = system(command.c_str());

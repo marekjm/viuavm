@@ -22,13 +22,18 @@
 using std::make_unique;
 
 
-void Frame::set_local_register_set(viua::kernel::RegisterSet* rs, bool receives_ownership) {
+void Frame::set_local_register_set(viua::kernel::RegisterSet* rs,
+                                   bool receives_ownership) {
     local_register_set.reset(rs, receives_ownership);
 }
 
-Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_index argsize,
+Frame::Frame(viua::internals::types::byte* ra,
+             viua::internals::types::register_index argsize,
              viua::internals::types::register_index regsize)
-    : return_address(ra), arguments(nullptr), local_register_set(nullptr), return_register(nullptr) {
+    : return_address(ra)
+    , arguments(nullptr)
+    , local_register_set(nullptr)
+    , return_register(nullptr) {
     arguments = make_unique<viua::kernel::RegisterSet>(argsize);
     local_register_set = make_unique<viua::kernel::RegisterSet>(regsize);
 }

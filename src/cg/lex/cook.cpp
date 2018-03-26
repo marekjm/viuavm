@@ -26,143 +26,143 @@
 using namespace std;
 
 namespace viua {
-    namespace cg {
-        namespace lex {
-            auto cook(vector<Token> tokens, const bool with_replaced_names) -> vector<Token> {
-                /*
-                 * Remove whitespace as first step to reduce noise in token stream.
-                 * Remember not to remove newlines ('\n') because they act as separators
-                 * in Viua assembly language, and are thus quite important.
-                 */
-                tokens = remove_spaces(tokens);
-                tokens = remove_comments(tokens);
+namespace cg {
+namespace lex {
+auto cook(vector<Token> tokens, const bool with_replaced_names)
+    -> vector<Token> {
+    /*
+     * Remove whitespace as first step to reduce noise in token stream.
+     * Remember not to remove newlines ('\n') because they act as separators
+     * in Viua assembly language, and are thus quite important.
+     */
+    tokens = remove_spaces(tokens);
+    tokens = remove_comments(tokens);
 
-                /*
-                 * Reduce consecutive newline tokens to a single newline.
-                 * For example, ["foo", "\n", "\n", "\n", "bar"] is reduced to ["foo", "\n", "bar"].
-                 * This further reduces noise, and allows later reductions to make the assumption
-                 * that there is always only one newline when newline may appear.
-                 */
-                tokens = reduce_newlines(tokens);
+    /*
+     * Reduce consecutive newline tokens to a single newline.
+     * For example, ["foo", "\n", "\n", "\n", "bar"] is reduced to ["foo", "\n",
+     * "bar"]. This further reduces noise, and allows later reductions to make
+     * the assumption that there is always only one newline when newline may
+     * appear.
+     */
+    tokens = reduce_newlines(tokens);
 
-                /*
-                 * Reduce directives as lexer emits them as multiple tokens.
-                 * This lets later reductions to check jsut one token to see if it is an assembler
-                 * directive instead of looking two or three tokens ahead.
-                 */
-                tokens = reduce_function_directive(tokens);
-                tokens = reduce_closure_directive(tokens);
-                tokens = reduce_end_directive(tokens);
-                tokens = reduce_signature_directive(tokens);
-                tokens = reduce_bsignature_directive(tokens);
-                tokens = reduce_block_directive(tokens);
-                tokens = reduce_info_directive(tokens);
-                tokens = reduce_name_directive(tokens);
-                tokens = reduce_import_directive(tokens);
-                tokens = reduce_mark_directive(tokens);
-                tokens = reduce_iota_directive(tokens);
+    /*
+     * Reduce directives as lexer emits them as multiple tokens.
+     * This lets later reductions to check jsut one token to see if it is an
+     * assembler directive instead of looking two or three tokens ahead.
+     */
+    tokens = reduce_function_directive(tokens);
+    tokens = reduce_closure_directive(tokens);
+    tokens = reduce_end_directive(tokens);
+    tokens = reduce_signature_directive(tokens);
+    tokens = reduce_bsignature_directive(tokens);
+    tokens = reduce_block_directive(tokens);
+    tokens = reduce_info_directive(tokens);
+    tokens = reduce_name_directive(tokens);
+    tokens = reduce_import_directive(tokens);
+    tokens = reduce_mark_directive(tokens);
+    tokens = reduce_iota_directive(tokens);
 
-                /*
-                 * Reduce directive-looking strings.
-                 */
-                tokens = reduce_token_sequence(tokens, {".", "", ":"});
+    /*
+     * Reduce directive-looking strings.
+     */
+    tokens = reduce_token_sequence(tokens, {".", "", ":"});
 
-                /*
-                 * Reduce double-colon token to make life easier for name reductions.
-                 */
-                tokens = reduce_double_colon(tokens);
+    /*
+     * Reduce double-colon token to make life easier for name reductions.
+     */
+    tokens = reduce_double_colon(tokens);
 
-                tokens = reduce_left_attribute_bracket(tokens);
-                tokens = reduce_right_attribute_bracket(tokens);
+    tokens = reduce_left_attribute_bracket(tokens);
+    tokens = reduce_right_attribute_bracket(tokens);
 
-                /*
-                 * Then, reduce function signatues and names.
-                 * Reduce function names first because they have the arity suffix ('/<integer>') apart
-                 * from the 'name ("::" name)*' core which both reducers recognise.
-                 */
-                tokens = reduce_function_signatures(tokens);
-                tokens = reduce_names(tokens);
+    /*
+     * Then, reduce function signatues and names.
+     * Reduce function names first because they have the arity suffix
+     * ('/<integer>') apart from the 'name ("::" name)*' core which both
+     * reducers recognise.
+     */
+    tokens = reduce_function_signatures(tokens);
+    tokens = reduce_names(tokens);
 
-                /*
-                 * Reduce other tokens that are not lexed as single entities, e.g. floating-point literals, or
-                 * @-prefixed registers.
-                 *
-                 * The order should not be changed as the functions make assumptions about input list, and
-                 * parsing may break if the assumptions are false.
-                 * Order may be changed if the externally visible outputs from assembler (i.e. compiled
-                 * bytecode)
-                 * do not change.
-                 */
-                tokens = reduce_offset_jumps(tokens);
-                tokens = reduce_at_prefixed_registers(tokens);
-                tokens = reduce_floats(tokens);
+    /*
+     * Reduce other tokens that are not lexed as single entities, e.g.
+     * floating-point literals, or
+     * @-prefixed registers.
+     *
+     * The order should not be changed as the functions make assumptions about
+     * input list, and parsing may break if the assumptions are false. Order may
+     * be changed if the externally visible outputs from assembler (i.e.
+     * compiled bytecode) do not change.
+     */
+    tokens = reduce_offset_jumps(tokens);
+    tokens = reduce_at_prefixed_registers(tokens);
+    tokens = reduce_floats(tokens);
 
-                /*
-                 * Replace 'iota' keywords with their integers.
-                 * This **MUST** be run before unwrapping instructions because '[]' are needed to correctly
-                 * replace iotas inside them (the '[]' create new iota scopes).
-                 */
-                tokens = replace_iotas(tokens);
+    /*
+     * Replace 'iota' keywords with their integers.
+     * This **MUST** be run before unwrapping instructions because '[]' are
+     * needed to correctly replace iotas inside them (the '[]' create new iota
+     * scopes).
+     */
+    tokens = replace_iotas(tokens);
 
-                /*
-                 * Replace 'default' keywords with their values.
-                 * This **MUST** be run before unwrapping instructions because unwrapping copies and
-                 * rearranges tokens in a list so "default" may be copied somewhere where the expansion would
-                 * be
-                 * incorrect, or illegal.
-                 */
-                tokens = replace_defaults(tokens);
+    /*
+     * Replace 'default' keywords with their values.
+     * This **MUST** be run before unwrapping instructions because unwrapping
+     * copies and rearranges tokens in a list so "default" may be copied
+     * somewhere where the expansion would be incorrect, or illegal.
+     */
+    tokens = replace_defaults(tokens);
 
-                /*
-                 * Unroll instruction wrapped in '()' and '[]'.
-                 * This makes assembler's and static analyser's work easier since they can deal with linear
-                 * token sequence.
-                 */
-                tokens = unwrap_lines(tokens);
+    /*
+     * Unroll instruction wrapped in '()' and '[]'.
+     * This makes assembler's and static analyser's work easier since they can
+     * deal with linear token sequence.
+     */
+    tokens = unwrap_lines(tokens);
 
-                /*
-                 * Reduce @- and *-prefixed registers once more.
-                 * This is to support constructions like this:
-                 *
-                 *  print *(ptr X A)
-                 *
-                 * where the prefix and register name are disconnected before the lines are unwrapped.
-                 */
-                tokens = reduce_at_prefixed_registers(tokens);
+    /*
+     * Reduce @- and *-prefixed registers once more.
+     * This is to support constructions like this:
+     *
+     *  print *(ptr X A)
+     *
+     * where the prefix and register name are disconnected before the lines are
+     * unwrapped.
+     */
+    tokens = reduce_at_prefixed_registers(tokens);
 
-                /*
-                 * Replace register names set by '.name:' directive by their register indexes.
-                 * At later processing stages functions need not concern themselves with names and
-                 * may operate on register indexes only.
-                 */
-                if (with_replaced_names) {
-                    tokens = replace_named_registers(tokens);
-                }
+    /*
+     * Replace register names set by '.name:' directive by their register
+     * indexes. At later processing stages functions need not concern themselves
+     * with names and may operate on register indexes only.
+     */
+    if (with_replaced_names) {
+        tokens = replace_named_registers(tokens);
+    }
 
-                /*
-                 * Move inlined blocks out of their functions.
-                 * This makes life easier for functions at later processing stages as they do not have to deal
-                 * with
-                 * nested blocks.
-                 *
-                 * Still, this must be run after iota expansion because nested blocks should share iotas with
-                 * their
-                 * functions.
-                 */
-                tokens = move_inline_blocks_out(tokens);
+    /*
+     * Move inlined blocks out of their functions.
+     * This makes life easier for functions at later processing stages as they
+     * do not have to deal with nested blocks.
+     *
+     * Still, this must be run after iota expansion because nested blocks should
+     * share iotas with their functions.
+     */
+    tokens = move_inline_blocks_out(tokens);
 
-                /*
-                 * Reduce newlines once more, since unwrap_lines() may sometimes insert a spurious newline
-                 * into the
-                 * token stream.
-                 * It's easier to just clean the newlines up after unwrap_lines() than to add extra ifs to it,
-                 * and
-                 * it also helps readability (unwrap_lines() may be less convulted).
-                 */
-                tokens = reduce_newlines(tokens);
+    /*
+     * Reduce newlines once more, since unwrap_lines() may sometimes insert a
+     * spurious newline into the token stream. It's easier to just clean the
+     * newlines up after unwrap_lines() than to add extra ifs to it, and it also
+     * helps readability (unwrap_lines() may be less convulted).
+     */
+    tokens = reduce_newlines(tokens);
 
-                return tokens;
-            }
-        }  // namespace lex
-    }      // namespace cg
+    return tokens;
+}
+}  // namespace lex
+}  // namespace cg
 }  // namespace viua

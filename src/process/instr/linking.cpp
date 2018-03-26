@@ -28,11 +28,13 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opimport(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opimport(
+    viua::internals::types::byte* addr) {
     /** Run import instruction.
      */
     string module;
-    tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, module) =
+        viua::bytecode::decoder::operands::fetch_atom(addr, this);
     scheduler->load_module(module);
     return addr;
 }

@@ -26,31 +26,31 @@
 
 
 namespace viua {
-    namespace types {
-        class Atom : public Value {
-            const std::string value;
+namespace types {
+class Atom : public Value {
+    const std::string value;
 
-          public:
-            static const std::string type_name;
+  public:
+    static const std::string type_name;
 
-            virtual std::string type() const override;
-            virtual bool boolean() const override;
+    virtual std::string type() const override;
+    virtual bool boolean() const override;
 
-            virtual std::string str() const override;
-            virtual std::string repr() const override;
+    virtual std::string str() const override;
+    virtual std::string repr() const override;
 
-            virtual std::vector<std::string> bases() const override;
-            virtual std::vector<std::string> inheritancechain() const override;
+    virtual std::vector<std::string> bases() const override;
+    virtual std::vector<std::string> inheritancechain() const override;
 
-            operator std::string() const;
-            auto operator==(const Atom&) const -> bool;
+    operator std::string() const;
+    auto operator==(const Atom&) const -> bool;
 
-            virtual std::unique_ptr<Value> copy() const override;
+    virtual std::unique_ptr<Value> copy() const override;
 
-            Atom(std::string);
-            ~Atom() override = default;
-        };
-    }  // namespace types
+    Atom(std::string);
+    ~Atom() override = default;
+};
+}  // namespace types
 }  // namespace viua
 
 

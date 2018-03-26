@@ -41,8 +41,8 @@ using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
-const char* NOTE_LOADED_ASM =
-    "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
+                              "which cannot be run without prior compilation";
 
 
 static bool usage(const string program, const vector<string>& args) {
@@ -68,9 +68,11 @@ static bool usage(const string program, const vector<string>& args) {
         } else if (option == "--json") {
             show_json = true;
         } else if (str::startswith(option, "-")) {
-            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_RED) << "error"
+                 << send_control_seq(ATTR_RESET);
             cerr << ": unknown option: ";
-            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_WHITE) << option
+                 << send_control_seq(ATTR_RESET);
             cerr << endl;
             exit(1);
         } else {
@@ -81,8 +83,10 @@ static bool usage(const string program, const vector<string>& args) {
 
     if (show_json) {
         cout << "{\"version\": \"" << VERSION << '.' << MICRO
-             << "\", \"sched\": {\"ffi\": " << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
-        cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers() << "}}\n";
+             << "\", \"sched\": {\"ffi\": "
+             << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
+        cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers()
+             << "}}\n";
         return true;
     }
 
@@ -97,25 +101,29 @@ static bool usage(const string program, const vector<string>& args) {
     }
     if (show_info) {
         cout << ' ';
-        cout << "[sched:ffi=" << viua::kernel::Kernel::no_of_ffi_schedulers() << ']';
+        cout << "[sched:ffi=" << viua::kernel::Kernel::no_of_ffi_schedulers()
+             << ']';
         cout << ' ';
-        cout << "[sched:vp=" << viua::kernel::Kernel::no_of_vp_schedulers() << ']' << endl;
+        cout << "[sched:vp=" << viua::kernel::Kernel::no_of_vp_schedulers()
+             << ']' << endl;
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] <executable>\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
-             << "    "
-             << "-v, --verbose            - show verbose output\n"
-             << "    "
-             << "-i, --info               - show information about VM configuration (number of schedulers, "
-                "version etc.)\n"
-             << "    "
-             << "    --json               - same as --info but in JSON format\n";
+        cout
+            << "    "
+            << "-V, --version            - show version\n"
+            << "    "
+            << "-h, --help               - display this message\n"
+            << "    "
+            << "-v, --verbose            - show verbose output\n"
+            << "    "
+            << "-i, --info               - show information about VM "
+               "configuration (number of schedulers, "
+               "version etc.)\n"
+            << "    "
+            << "    --json               - same as --info but in JSON format\n";
     }
 
     return (show_help or show_version or show_info);
@@ -174,14 +182,16 @@ int main(int argc, char* argv[]) {
     try {
         kernel.run();
     } catch (const viua::types::Exception* e) {
-        cout << "VM error: an irrecoverable VM exception occured: " << e->what() << endl;
+        cout << "VM error: an irrecoverable VM exception occured: " << e->what()
+             << endl;
         return 1;
     } catch (const std::exception& e) {
-        cout << "VM error: an irrecoverable host exception occured: " << e.what() << endl;
+        cout << "VM error: an irrecoverable host exception occured: "
+             << e.what() << endl;
         return 1;
     }
-    // the catch (...) is intentionally omitted, if we can't provide useful information about
-    // the error it's better to just crash
+    // the catch (...) is intentionally omitted, if we can't provide useful
+    // information about the error it's better to just crash
 
     return kernel.exit();
 }

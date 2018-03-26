@@ -38,54 +38,55 @@ const auto VIUAPATH = std::vector<std::string>{
     "/usr/local/lib/viua/site",
     "/usr/lib/viua",
     "/usr/lib/viua/site",
-    "" /* this path may cause confusing exception about "failing to extract the interface" from a library if
-        * name of Viua lib is the same as one of the system libs, and Viua version has not been found
+    "" /* this path may cause confusing exception about "failing to extract the
+        * interface" from a library if name of Viua lib is the same as one of
+        * the system libs, and Viua version has not been found
         */
 };
 
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
-    namespace kernel {
-        class Kernel;
-    }
+namespace process {
+class Process;
+}
+namespace kernel {
+class Kernel;
+}
 }  // namespace viua
 
 
 // External functions must have this signature
-typedef void(ForeignFunction)(Frame*,  // call frame; contains parameters, local registers, name of the
-                                       // function etc.
-                              viua::kernel::RegisterSet*,  // static register set (may be nullptr)
-                              viua::kernel::RegisterSet*,  // global register set (may be nullptr)
-                              viua::process::Process*,     // calling process
-                              viua::kernel::Kernel*  // VM viua::kernel::Kernel the calling process is running
-                                                     // on
+typedef void(ForeignFunction)(
+    Frame*,  // call frame; contains parameters, local registers, name of the
+             // function etc.
+    viua::kernel::RegisterSet*,  // static register set (may be nullptr)
+    viua::kernel::RegisterSet*,  // global register set (may be nullptr)
+    viua::process::Process*,     // calling process
+    viua::kernel::Kernel*  // VM viua::kernel::Kernel the calling process is
+                           // running on
 );
 
-/** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of
- * bookkeeping.
- *  The only thing Viua needs to use a pure-C++ class is a string-name-to-member-function-pointer mapping as
+/** Custom types for Viua VM can be written in C++ and loaded into the
+ * typesystem with minimal amount of bookkeeping. The only thing Viua needs to
+ * use a pure-C++ class is a string-name-to-member-function-pointer mapping as
  *  the machine must be able to somehow dispatch the methods.
- *  One downside this approach has is that all method calls are performed via the vtable which may not be the
- * most
- *  efficient way.
- *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more
- * interested
- *  in the ForeignFunction typedef defined above.
+ *  One downside this approach has is that all method calls are performed via
+ * the vtable which may not be the most efficient way. Of course, you can also
+ * use the struct-and-a-bunch-of-free-functions strategy, in which case you are
+ * more interested in the ForeignFunction typedef defined above.
  */
-typedef void (viua::types::Value::*ForeignMethodMemberPointer)(Frame*, viua::kernel::RegisterSet*,
-                                                               viua::kernel::RegisterSet*,
-                                                               viua::process::Process*,
-                                                               viua::kernel::Kernel*);
-typedef std::function<void(viua::types::Value*, Frame*, viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)>
+typedef void (viua::types::Value::*ForeignMethodMemberPointer)(
+    Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+    viua::process::Process*, viua::kernel::Kernel*);
+typedef std::function<void(
+    viua::types::Value*, Frame*, viua::kernel::RegisterSet*,
+    viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)>
     ForeignMethod;
 
 
 /** External modules must export the "exports()" function.
- *  Should a module fail to provide this function, it is deemed invalid and is rejected by the VM.
+ *  Should a module fail to provide this function, it is deemed invalid and is
+ * rejected by the VM.
  *
  *  The "exports()" function returns an array of below structures.
  */

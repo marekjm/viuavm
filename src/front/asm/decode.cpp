@@ -24,7 +24,8 @@
 using namespace std;
 
 
-auto decode_line_tokens(vector<string> const& tokens) -> vector<vector<string>> {
+auto decode_line_tokens(vector<string> const& tokens)
+    -> vector<vector<string>> {
     auto decoded_lines = vector<vector<string>>{};
     auto main_line = vector<string>{};
 

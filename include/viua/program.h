@@ -51,8 +51,9 @@ class Program {
     viua::internals::types::byte* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
-     *  Jumps must be recalculated because each function is compiled separately with jump offset 0, but
-     *  when they are assembled into a single binary the offsets change.
+     *  Jumps must be recalculated because each function is compiled separately
+     * with jump offset 0, but when they are assembled into a single binary the
+     * offsets change.
      */
     std::vector<viua::internals::types::byte*> branches;
 
@@ -234,11 +235,12 @@ class Program {
 
 
     /** Functions driving after-insertion calculations.
-     *  These must be called after the bytecode is already generated as they must know
-     *  size of the program.
+     *  These must be called after the bytecode is already generated as they
+     * must know size of the program.
      */
     Program& calculate_jumps(
-        std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>,
+        std::vector<std::tuple<viua::internals::types::bytecode_size,
+                               viua::internals::types::bytecode_size>>,
         std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 

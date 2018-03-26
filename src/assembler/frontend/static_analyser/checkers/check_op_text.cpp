@@ -25,29 +25,30 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_text(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto operand = get_operand<RegisterIndex>(instruction, 0);
-                        if (not operand) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_text(Register_usage_profile& register_usage_profile,
+                   Instruction const& instruction) -> void {
+    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    if (not operand) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_if_name_resolved(register_usage_profile, *operand);
+    check_if_name_resolved(register_usage_profile, *operand);
 
-                        auto val = Register{};
-                        val.index = operand->index;
-                        val.register_set = operand->rss;
-                        val.value_type = viua::internals::ValueTypes::TEXT;
+    auto val = Register{};
+    val.index = operand->index;
+    val.register_set = operand->rss;
+    val.value_type = viua::internals::ValueTypes::TEXT;
 
-                        register_usage_profile.define(val, operand->tokens.at(0));
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    register_usage_profile.define(val, operand->tokens.at(0));
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

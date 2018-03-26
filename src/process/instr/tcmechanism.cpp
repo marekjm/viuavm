@@ -26,7 +26,8 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::optry(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::optry(
+    viua::internals::types::byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (stack->try_frame_new) {
@@ -36,24 +37,30 @@ viua::internals::types::byte* viua::process::Process::optry(viua::internals::typ
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcatch(
+    viua::internals::types::byte* addr) {
     /** Run catch instruction.
      */
     string type_name, catcher_block_name;
-    tie(addr, type_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, type_name) =
+        viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, catcher_block_name) =
+        viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->is_block(catcher_block_name)) {
-        throw make_unique<viua::types::Exception>("registering undefined handler block '" +
-                                                  catcher_block_name + "' to handle " + type_name);
+        throw make_unique<viua::types::Exception>(
+            "registering undefined handler block '" + catcher_block_name +
+            "' to handle " + type_name);
     }
 
-    stack->try_frame_new->catchers[type_name] = make_unique<Catcher>(type_name, catcher_block_name);
+    stack->try_frame_new->catchers[type_name] =
+        make_unique<Catcher>(type_name, catcher_block_name);
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opdraw(
+    viua::internals::types::byte* addr) {
     /** Run draw instruction.
      */
     if (viua::bytecode::decoder::operands::is_void(addr)) {
@@ -64,10 +71,12 @@ viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::ty
         stack->caught.reset(nullptr);
     } else {
         viua::kernel::Register* target = nullptr;
-        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+        tie(addr, target) =
+            viua::bytecode::decoder::operands::fetch_register(addr, this);
 
         if (not stack->caught) {
-            throw make_unique<viua::types::Exception>("no caught object to draw");
+            throw make_unique<viua::types::Exception>(
+                "no caught object to draw");
         }
         *target = std::move(stack->caught);
     }
@@ -75,17 +84,21 @@ viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::ty
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::openter(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::openter(
+    viua::internals::types::byte* addr) {
     /*  Run enter instruction.
      */
     string block_name;
-    tie(addr, block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, block_name) =
+        viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->is_block(block_name)) {
-        throw make_unique<viua::types::Exception>("cannot enter undefined block: " + block_name);
+        throw make_unique<viua::types::Exception>(
+            "cannot enter undefined block: " + block_name);
     }
 
-    viua::internals::types::byte* block_address = adjust_jump_base_for_block(block_name);
+    viua::internals::types::byte* block_address =
+        adjust_jump_base_for_block(block_name);
 
     stack->try_frame_new->return_address = addr;
     stack->try_frame_new->associated_frame = stack->back().get();
@@ -96,11 +109,13 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
     return block_address;
 }
 
-viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opthrow(
+    viua::internals::types::byte* addr) {
     /** Run throw instruction.
      */
     viua::kernel::Register* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (source->empty()) {
         ostringstream oss;
@@ -112,11 +127,13 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opleave(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opleave(
+    viua::internals::types::byte* addr) {
     /*  Run leave instruction.
      */
     if (stack->tryframes.size() == 0) {
-        throw make_unique<viua::types::Exception>("bad leave: no block has been entered");
+        throw make_unique<viua::types::Exception>(
+            "bad leave: no block has been entered");
     }
     addr = stack->tryframes.back()->return_address;
     stack->tryframes.pop_back();

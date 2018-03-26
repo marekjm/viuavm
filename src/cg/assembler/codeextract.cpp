@@ -39,10 +39,10 @@ auto assembler::ce::getmarks(vector<viua::cg::lex::Token> const& tokens)
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
      */
-    auto instruction =
-        std::remove_reference<decltype(tokens)>::type::size_type{0};  // we need separate instruction counter
-                                                                      // because number of lines is not
-                                                                      // exactly number of instructions
+    auto instruction = std::remove_reference<decltype(tokens)>::type::size_type{
+        0};  // we need separate instruction counter
+             // because number of lines is not
+             // exactly number of instructions
     auto marks = map<string, decltype(instruction)>{};
 
     for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
@@ -67,7 +67,8 @@ auto assembler::ce::getmarks(vector<viua::cg::lex::Token> const& tokens)
     return marks;
 }
 
-auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens) -> vector<string> {
+auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens)
+    -> vector<string> {
     /** This function will pass over all instructions and
      * gather .import: assembler instructions.
      */
@@ -76,7 +77,8 @@ auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens) -> vect
         if (tokens.at(i) == ".import:") {
             ++i;  // skip '.import:' token
             if (tokens.at(i) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing module name in import directive");
+                throw viua::cg::lex::InvalidSyntax(
+                    tokens.at(i), "missing module name in import directive");
             }
             links.emplace_back(tokens.at(i));
             ++i;  // skip module name token
@@ -86,11 +88,13 @@ auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens) -> vect
 }
 
 static auto looks_like_name_definition(Token const t) -> bool {
-    return (t == ".function:" or t == ".closure:" or t == ".block:" or t == ".signature:" or
-            t == ".bsignature:");
+    return (t == ".function:" or t == ".closure:" or t == ".block:" or
+            t == ".signature:" or t == ".bsignature:");
 }
-static auto get_instruction_block_names(vector<Token> const& tokens, string const directive,
-                                        void predicate(Token) = [](Token) {}) -> vector<string> {
+static auto get_instruction_block_names(vector<Token> const& tokens,
+                                        string const directive,
+                                        void predicate(Token) = [](Token) {})
+    -> vector<string> {
     auto names = vector<string>{};
     auto all_names = vector<string>{};
     auto defined_where = map<string, Token>{};
@@ -114,10 +118,12 @@ static auto get_instruction_block_names(vector<Token> const& tokens, string cons
 
             if (defined_where.count(tokens.at(i)) > 0) {
                 throw viua::cg::lex::TracedSyntaxError()
-                    .append(viua::cg::lex::InvalidSyntax(tokens.at(i),
-                                                         ("duplicated name: " + tokens.at(i).str())))
-                    .append(viua::cg::lex::InvalidSyntax(defined_where.at(tokens.at(i)),
-                                                         "already defined here:"));
+                    .append(viua::cg::lex::InvalidSyntax(
+                        tokens.at(i),
+                        ("duplicated name: " + tokens.at(i).str())))
+                    .append(viua::cg::lex::InvalidSyntax(
+                        defined_where.at(tokens.at(i)),
+                        "already defined here:"));
             }
 
             if (tokens.at(first_token_of_block_header_at) != looking_for) {
@@ -132,29 +138,38 @@ static auto get_instruction_block_names(vector<Token> const& tokens, string cons
 
     return names;
 }
-auto assembler::ce::get_function_names(vector<Token> const& tokens) -> vector<string> {
-    auto names = get_instruction_block_names(
-        tokens, "function", [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
+auto assembler::ce::get_function_names(vector<Token> const& tokens)
+    -> vector<string> {
+    auto names = get_instruction_block_names(tokens, "function", [](Token t) {
+        assert_is_not_reserved_keyword(t, "function name");
+    });
     for (const auto& each : get_instruction_block_names(tokens, "closure")) {
         names.push_back(each);
     }
     return names;
 }
-auto assembler::ce::get_signatures(vector<Token> const& tokens) -> vector<string> {
-    return get_instruction_block_names(tokens, "signature",
-                                       [](Token t) { assert_is_not_reserved_keyword(t, "function name"); });
+auto assembler::ce::get_signatures(vector<Token> const& tokens)
+    -> vector<string> {
+    return get_instruction_block_names(tokens, "signature", [](Token t) {
+        assert_is_not_reserved_keyword(t, "function name");
+    });
 }
-auto assembler::ce::get_block_names(vector<Token> const& tokens) -> vector<string> {
-    return get_instruction_block_names(tokens, "block",
-                                       [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
+auto assembler::ce::get_block_names(vector<Token> const& tokens)
+    -> vector<string> {
+    return get_instruction_block_names(tokens, "block", [](Token t) {
+        assert_is_not_reserved_keyword(t, "block name");
+    });
 }
-auto assembler::ce::get_block_signatures(vector<Token> const& tokens) -> vector<string> {
-    return get_instruction_block_names(tokens, "bsignature",
-                                       [](Token t) { assert_is_not_reserved_keyword(t, "block name"); });
+auto assembler::ce::get_block_signatures(vector<Token> const& tokens)
+    -> vector<string> {
+    return get_instruction_block_names(tokens, "bsignature", [](Token t) {
+        assert_is_not_reserved_keyword(t, "block name");
+    });
 }
 
 
-static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens)
+static auto get_raw_block_bodies(string const& type,
+                                 vector<Token> const& tokens)
     -> map<string, vector<Token>> {
     auto invokables = map<string, vector<Token>>{};
 
@@ -177,8 +192,10 @@ static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens
             while (i < tokens.size() and tokens[i].str() != ".end") {
                 if (tokens[i] == looking_for) {
                     throw viua::cg::lex::InvalidSyntax(
-                        tokens[i], ("another " + type + " opened before assembler reached .end after '" +
-                                    name + "' " + type));
+                        tokens[i],
+                        ("another " + type +
+                         " opened before assembler reached .end after '" +
+                         name + "' " + type));
                 }
                 body.push_back(tokens[i]);
                 ++i;
@@ -192,7 +209,8 @@ static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens
 
     return invokables;
 }
-auto assembler::ce::get_invokables_token_bodies(const string& type, const vector<Token>& tokens)
+auto assembler::ce::get_invokables_token_bodies(const string& type,
+                                                const vector<Token>& tokens)
     -> map<string, vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }

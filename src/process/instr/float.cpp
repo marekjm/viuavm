@@ -29,14 +29,17 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opfloat(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfloat(
+    viua::internals::types::byte* addr) {
     /*  Run float instruction.
      */
     viua::kernel::Register* target = nullptr;
     float value = 0.0;
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, value) =
+        viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
     *target = make_unique<viua::types::Float>(value);
 

@@ -28,14 +28,17 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opstring(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opstring(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     ++addr;  // for operand type
 
     string s;
-    tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+    tie(addr, s) =
+        viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
     *target = make_unique<viua::types::String>(str::strdecode(s));
 

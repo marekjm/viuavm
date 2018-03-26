@@ -33,7 +33,8 @@ class Frame {
   public:
     viua::internals::types::byte* return_address;
     std::unique_ptr<viua::kernel::RegisterSet> arguments;
-    viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
+    viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet>
+        local_register_set;
 
     viua::kernel::Register* return_register;
 
@@ -41,9 +42,12 @@ class Frame {
 
     std::string function_name;
 
-    inline viua::internals::types::byte* ret_address() { return return_address; }
+    inline viua::internals::types::byte* ret_address() {
+        return return_address;
+    }
 
-    void set_local_register_set(viua::kernel::RegisterSet*, bool receives_ownership = true);
+    void set_local_register_set(viua::kernel::RegisterSet*,
+                                bool receives_ownership = true);
 
     Frame(viua::internals::types::byte*, viua::internals::types::register_index,
           viua::internals::types::register_index = 16);

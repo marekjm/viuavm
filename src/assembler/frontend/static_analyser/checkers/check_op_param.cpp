@@ -23,38 +23,40 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_param(Register_usage_profile& register_usage_profile,
-                                        Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_param(Register_usage_profile& register_usage_profile,
+                    Instruction const& instruction) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
-                            auto r = *target;
-                            r.rss = viua::internals::RegisterSets::LOCAL;
-                            check_use_of_register(register_usage_profile, r);
-                            assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
-                                register_usage_profile, r);
-                        }
+    if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+        auto r = *target;
+        r.rss = viua::internals::RegisterSets::LOCAL;
+        check_use_of_register(register_usage_profile, r);
+        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+            register_usage_profile, r);
+    }
 
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_use_of_register(register_usage_profile, *source);
-                        assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
-                            register_usage_profile, *source);
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    check_use_of_register(register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+        register_usage_profile, *source);
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

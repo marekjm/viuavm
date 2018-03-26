@@ -26,40 +26,53 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opnot(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opnot(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     *target = make_unique<viua::types::Boolean>(not source->boolean());
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opand(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opand(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, first) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, second) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Boolean>(first->boolean() and second->boolean());
+    *target = make_unique<viua::types::Boolean>(first->boolean() and
+                                                second->boolean());
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opor(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opor(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, first) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, second) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Boolean>(first->boolean() or second->boolean());
+    *target = make_unique<viua::types::Boolean>(first->boolean() or
+                                                second->boolean());
 
     return addr;
 }

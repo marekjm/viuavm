@@ -80,7 +80,8 @@ enum OPCODE : viua::internals::types::byte {
     /*
      *  Return a copy of a part of the given text between given indexes.
      *
-     *  textsub {result-register} {string-register} {begin-index-register} {end-index:register|void}
+     *  textsub {result-register} {string-register} {begin-index-register}
+     * {end-index:register|void}
      */
     TEXTSUB,
 
@@ -94,14 +95,16 @@ enum OPCODE : viua::internals::types::byte {
     /*
      *  Return length of common prefix of two text values.
      *
-     *  textcommonprefix {result-register} {lhs-string-register} {rhs-string-register}
+     *  textcommonprefix {result-register} {lhs-string-register}
+     * {rhs-string-register}
      */
     TEXTCOMMONPREFIX,
 
     /*
      *  Return length of common suffix of two text values.
      *
-     *  textcommonsuffix {result-register} {lhs-string-register} {rhs-string-register}
+     *  textcommonsuffix {result-register} {lhs-string-register}
+     * {rhs-string-register}
      */
     TEXTCOMMONSUFFIX,
 
@@ -128,7 +131,8 @@ enum OPCODE : viua::internals::types::byte {
     AND,   // logical and of any two values
     OR,    // logical or of any two values
 
-    BITS,    // create a bits value from a literal, or a zero-filled value of a specified width
+    BITS,    // create a bits value from a literal, or a zero-filled value of a
+             // specified width
     BITAND,  // binary and of two bits values
     BITOR,   // binary or of two bits values
     BITNOT,  // negation of a bits value
@@ -154,9 +158,9 @@ enum OPCODE : viua::internals::types::byte {
      * ends with the least significant bit.
      *
      * Longer string is *always* greater; '00' is greater than '0'.
-     * This is because the strings are compared as if they were equal in width, and
-     * the shorter one is padded on the left with a magic "very small value" that
-     * is actually lesser than '0' bit.
+     * This is because the strings are compared as if they were equal in width,
+     * and the shorter one is padded on the left with a magic "very small value"
+     * that is actually lesser than '0' bit.
      *
      * Some example comparisons evaluating to truth:
      *
@@ -327,16 +331,21 @@ enum OPCODE : viua::internals::types::byte {
     FUNCTION,
 
     // Opcodes related to functions.
-    FRAME,     // create new frame (required before param and pamv) for future function call
-    PARAM,     // copy object from a register to parameter register (pass-by-value),
-    PAMV,      // move object from a register to parameter register (pass-by-move),
-    CALL,      // call given function with parameters set in parameter register,
+    FRAME,  // create new frame (required before param and pamv) for future
+            // function call
+    PARAM,  // copy object from a register to parameter register
+            // (pass-by-value),
+    PAMV,   // move object from a register to parameter register (pass-by-move),
+    CALL,   // call given function with parameters set in parameter register,
     TAILCALL,  // perform a tail call to a function
-    DEFER,     // call a function just after the frame it was called in is popped off the stack
-    ARG,       // move an object from argument register to a normal register (inside a function call),
-    ARGC,      // store number of supplied parameters in a register
+    DEFER,  // call a function just after the frame it was called in is popped
+            // off the stack
+    ARG,   // move an object from argument register to a normal register (inside
+           // a function call),
+    ARGC,  // store number of supplied parameters in a register
 
-    PROCESS,   // spawn a process (call a function and run it in a different process)
+    PROCESS,   // spawn a process (call a function and run it in a different
+               // process)
     SELF,      // store a PID of the running process in a register
     JOIN,      // join a process
     SEND,      // send a message to a process
@@ -348,18 +357,20 @@ enum OPCODE : viua::internals::types::byte {
 
     THROW,  // throw an object
     CATCH,  // register a catcher block for given type
-    DRAW,   // move caught object into a register (it becomes local object for current frame)
-            // the "draw" name has been chosen because the sequence of events:
-            //
-            //  1) an object is thrown
-            //  2) that object is caught
-            //  3) the catcher draws the object into a register
-            //
-            // nicely describes the situation these instructions model.
+    DRAW,   // move caught object into a register (it becomes local object for
+           // current frame) the "draw" name has been chosen because the
+           // sequence of events:
+           //
+           //  1) an object is thrown
+           //  2) that object is caught
+           //  3) the catcher draws the object into a register
+           //
+           // nicely describes the situation these instructions model.
 
     TRY,    // create a frame for try block
-    ENTER,  // enter a block, if an exception is thrown and no catcher claims it, it is propagated up
-            // ENTER instructions do not require any CATCH to precede them
+    ENTER,  // enter a block, if an exception is thrown and no catcher claims
+            // it, it is propagated up ENTER instructions do not require any
+            // CATCH to precede them
     LEAVE,  // leave a block and resume execution after last enter instruction
 
     IMPORT,  // dynamically link code modules
@@ -371,7 +382,8 @@ enum OPCODE : viua::internals::types::byte {
 
     /*
      *  Create an atom.
-     *  Atoms can be compared for equality, and encode symbols (function names, type names, etc.).
+     *  Atoms can be compared for equality, and encode symbols (function names,
+     * type names, etc.).
      *
      *  atom {target-register} '{atom-value}'
      */
@@ -415,8 +427,9 @@ enum OPCODE : viua::internals::types::byte {
      */
     STRUCTKEYS,
 
-    NEW,     // construct new instance of a class in a register
-    MSG,     // send a message to an object (used for dynamic dispatch, for static use plain "CALL")
+    NEW,  // construct new instance of a class in a register
+    MSG,  // send a message to an object (used for dynamic dispatch, for static
+          // use plain "CALL")
     INSERT,  // insert an object as a value of an attribute of another object
     REMOVE,  // remove an attribute from an object
 

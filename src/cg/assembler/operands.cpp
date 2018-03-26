@@ -28,31 +28,31 @@
 using namespace std;
 
 
-static auto resolveregister(viua::cg::lex::Token const token, bool const allow_bare_integers = false)
-    -> string {
-    /*  This function is used to register numbers when a register is accessed, e.g.
-     *  in `integer` instruction or in `branch` in condition operand.
+static auto resolveregister(viua::cg::lex::Token const token,
+                            bool const allow_bare_integers = false) -> string {
+    /*  This function is used to register numbers when a register is accessed,
+     * e.g. in `integer` instruction or in `branch` in condition operand.
      *
-     *  This function MUST return string as teh result is further passed to assembler::operands::getint()
-     * function which *expects* string.
+     *  This function MUST return string as teh result is further passed to
+     * assembler::operands::getint() function which *expects* string.
      */
     auto out = ostringstream{};
     auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and
-         * simple.
+        /*  Basic case - the register index is taken from another register,
+         * everything is still nice and simple.
          */
         if (stoi(reg.substr(1)) < 0) {
             throw("register indexes cannot be negative: " + reg);
         }
 
-        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value
-        // suitable to use
-        // as register reference)
+        // FIXME: analyse source and detect if the referenced register really
+        // holds an integer (the only value suitable to use as register
+        // reference)
         out.str(reg);
     } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and
-         * simple.
+        /*  Basic case - the register index is taken from another register,
+         * everything is still nice and simple.
          */
         if (stoi(reg.substr(1)) < 0) {
             throw("register indexes cannot be negative: " + reg);
@@ -60,8 +60,8 @@ static auto resolveregister(viua::cg::lex::Token const token, bool const allow_b
 
         out.str(reg);
     } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and
-         * simple.
+        /*  Basic case - the register index is taken from another register,
+         * everything is still nice and simple.
          */
         if (stoi(reg.substr(1)) < 0) {
             throw("register indexes cannot be negative: " + reg);
@@ -73,13 +73,15 @@ static auto resolveregister(viua::cg::lex::Token const token, bool const allow_b
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, ("illegal operand: " + token.str()));
+        throw viua::cg::lex::InvalidSyntax(token,
+                                           ("illegal operand: " + token.str()));
     }
     return out.str();
 }
 
 
-auto assembler::operands::getint(string const& s, bool const allow_bare_integers) -> int_op {
+auto assembler::operands::getint(string const& s,
+                                 bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -87,9 +89,11 @@ auto assembler::operands::getint(string const& s, bool const allow_bare_integers
     if (s == "void") {
         return int_op(IntegerOperandType::VOID);
     } else if (s.at(0) == '@') {
-        return int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
+        return int_op(IntegerOperandType::REGISTER_REFERENCE,
+                      stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        return int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
+        return int_op(IntegerOperandType::POINTER_DEREFERENCE,
+                      stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         return int_op(stoi(s.substr(1)));
     } else if (allow_bare_integers and str::isnum(s)) {
@@ -99,8 +103,9 @@ auto assembler::operands::getint(string const& s, bool const allow_bare_integers
     }
 }
 
-auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::RegisterSets const rs_type,
-                                              bool const allow_bare_integers) -> int_op {
+auto assembler::operands::getint_with_rs_type(
+    string const& s, viua::internals::RegisterSets const rs_type,
+    bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -108,9 +113,11 @@ auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::
     if (s == "void") {
         return int_op(IntegerOperandType::VOID);
     } else if (s.at(0) == '@') {
-        return int_op(IntegerOperandType::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
+        return int_op(IntegerOperandType::REGISTER_REFERENCE, rs_type,
+                      stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        return int_op(IntegerOperandType::POINTER_DEREFERENCE, rs_type, stoi(s.substr(1)));
+        return int_op(IntegerOperandType::POINTER_DEREFERENCE, rs_type,
+                      stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         return int_op(IntegerOperandType::INDEX, rs_type, stoi(s.substr(1)));
     } else if (allow_bare_integers and str::isnum(s)) {
@@ -120,8 +127,8 @@ auto assembler::operands::getint_with_rs_type(string const& s, viua::internals::
     }
 }
 
-auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, decltype(tokens.size()) const i)
-    -> int_op {
+auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens,
+                                 decltype(tokens.size()) const i) -> int_op {
     auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {
@@ -136,11 +143,13 @@ auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, dec
     if (s.at(0) == '@') {
         iop = int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        iop = int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
+        iop =
+            int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         iop = int_op(stoi(s.substr(1)));
     } else {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "cannot convert to register index");
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                           "cannot convert to register index");
     }
 
     // FIXME set iop.rs_type according to rs specifier for given operand
@@ -150,7 +159,8 @@ auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens, dec
 
 auto assembler::operands::getbyte(string const& s) -> byte_op {
     auto const ref = (s[0] == '@');
-    return tuple<bool, char>(ref, static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
+    return tuple<bool, char>(ref,
+                             static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
 auto assembler::operands::getfloat(string const& s) -> float_op {
@@ -166,7 +176,8 @@ auto assembler::operands::get2(string const s) -> tuple<string, string> {
     return tuple<string, string>(op_a, op_b);
 }
 
-auto assembler::operands::get3(string const s, bool const fill_third) -> tuple<string, string, string> {
+auto assembler::operands::get3(string const s, bool const fill_third)
+    -> tuple<string, string, string> {
     auto const op_a = str::chunk(s);
     auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
@@ -178,21 +189,24 @@ auto assembler::operands::get3(string const s, bool const fill_third) -> tuple<s
      * The chunk of empty string will give us empty string and
      * it is a valid (and sometimes wanted) value to return.
      */
-    auto const op_c = (s.size() == 0 and fill_third ? op_a : str::chunk(s_after_b));
+    auto const op_c =
+        (s.size() == 0 and fill_third ? op_a : str::chunk(s_after_b));
 
     return tuple<string, string, string>(op_a, op_b, op_c);
 }
 
-auto assembler::operands::convert_token_to_bitstring_operand(viua::cg::lex::Token const token)
-    -> vector<uint8_t> {
+auto assembler::operands::convert_token_to_bitstring_operand(
+    viua::cg::lex::Token const token) -> vector<uint8_t> {
     auto const s = token.str();
     auto normalised_version = string{};
     if (s.at(1) == 'b') {
         normalised_version = normalise_binary_literal(s.substr(2));
     } else if (s.at(1) == 'o') {
-        normalised_version = normalise_binary_literal(octal_to_binary_literal(s));
+        normalised_version =
+            normalise_binary_literal(octal_to_binary_literal(s));
     } else if (s.at(1) == 'x') {
-        normalised_version = normalise_binary_literal(hexadecimal_to_binary_literal(s));
+        normalised_version =
+            normalise_binary_literal(hexadecimal_to_binary_literal(s));
     } else {
         throw viua::cg::lex::InvalidSyntax(token);
     }
@@ -202,7 +216,8 @@ auto assembler::operands::convert_token_to_bitstring_operand(viua::cg::lex::Toke
 
     auto converted = vector<uint8_t>{};
     auto part = uint8_t{0};
-    for (auto i = decltype(workable_version)::size_type{0}; i < workable_version.size(); ++i) {
+    for (auto i = decltype(workable_version)::size_type{0};
+         i < workable_version.size(); ++i) {
         auto one = uint8_t{1};
         if (workable_version.at(i) == '1') {
             one = static_cast<uint8_t>(one << (i % 8));

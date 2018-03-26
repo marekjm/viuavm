@@ -36,7 +36,8 @@ void viua::types::Pointer::attach() {
 }
 void viua::types::Pointer::detach() {
     if (valid) {
-        points_to->pointers.erase(std::find(points_to->pointers.begin(), points_to->pointers.end(), this));
+        points_to->pointers.erase(std::find(points_to->pointers.begin(),
+                                            points_to->pointers.end(), this));
     }
     valid = false;
 }
@@ -47,12 +48,13 @@ void viua::types::Pointer::invalidate(viua::types::Value* t) {
     }
 }
 bool viua::types::Pointer::expired() { return !valid; }
-auto viua::types::Pointer::authenticate(const viua::process::Process* process) -> void {
+auto viua::types::Pointer::authenticate(const viua::process::Process* process)
+    -> void {
     /*
      *  Pointers should automatically expire upon crossing process boundaries.
      *  This method should be called before any other method every time the VM
-     *  code passes the pointer object to user-process to ensure that Pointer's state
-     *  is properly accounted for.
+     *  code passes the pointer object to user-process to ensure that Pointer's
+     * state is properly accounted for.
      */
     valid = (valid and (process_of_origin == process));
 }
@@ -64,7 +66,8 @@ void viua::types::Pointer::reset(viua::types::Value* t) {
 viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     if (process_of_origin != p) {
         // Dereferencing pointers outside of their original process is illegal.
-        throw make_unique<viua::types::Exception>("InvalidDereference: outside of original process");
+        throw make_unique<viua::types::Exception>(
+            "InvalidDereference: outside of original process");
     }
     if (not valid) {
         throw make_unique<viua::types::Exception>("expired pointer exception");
@@ -72,12 +75,18 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     return points_to;
 }
 
-string viua::types::Pointer::type() const { return ((valid ? points_to->type() : "Expired") + "Pointer"); }
+string viua::types::Pointer::type() const {
+    return ((valid ? points_to->type() : "Expired") + "Pointer");
+}
 
 bool viua::types::Pointer::boolean() const { return valid; }
 
-vector<string> viua::types::Pointer::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Pointer::inheritancechain() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Pointer::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Pointer::inheritancechain() const {
+    return vector<string>{"Value"};
+}
 
 string viua::types::Pointer::str() const { return type(); }
 
@@ -89,15 +98,19 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
 }
 
 
-void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                                   viua::process::Process*, viua::kernel::Kernel*) {
-    frm->local_register_set->set(0, make_unique<viua::types::Boolean>(expired()));
+void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*,
+                                   viua::kernel::RegisterSet*,
+                                   viua::process::Process*,
+                                   viua::kernel::Kernel*) {
+    frm->local_register_set->set(0,
+                                 make_unique<viua::types::Boolean>(expired()));
 }
 
 
 viua::types::Pointer::Pointer(const viua::process::Process* poi)
     : points_to(nullptr), valid(false), process_of_origin(poi) {}
-viua::types::Pointer::Pointer(viua::types::Value* t, const viua::process::Process* poi)
+viua::types::Pointer::Pointer(viua::types::Value* t,
+                              const viua::process::Process* poi)
     : points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }

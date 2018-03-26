@@ -23,34 +23,37 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_copy(Register_usage_profile& register_usage_profile,
-                                       Instruction const& instruction) -> void {
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_copy(Register_usage_profile& register_usage_profile,
+                   Instruction const& instruction) -> void {
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_use_of_register(register_usage_profile, *source, "copy from");
-                        auto type_of_source = assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
-                            register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *source, "copy from");
+    auto type_of_source =
+        assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+            register_usage_profile, *source);
 
-                        auto val = Register(*target);
-                        val.value_type = type_of_source;
-                        register_usage_profile.define(val, target->tokens.at(0));
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    auto val = Register(*target);
+    val.value_type = type_of_source;
+    register_usage_profile.define(val, target->tokens.at(0));
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

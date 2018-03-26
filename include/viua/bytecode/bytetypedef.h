@@ -25,35 +25,35 @@
 #include <stdint.h>
 
 namespace viua {
-    namespace internals {
-        namespace types {
-            typedef uint8_t byte;
+namespace internals {
+namespace types {
+typedef uint8_t byte;
 
-            typedef uint64_t bytecode_size;
-            typedef uint32_t register_index;
+typedef uint64_t bytecode_size;
+typedef uint32_t register_index;
 
-            typedef uint32_t schedulers_count;
-            typedef uint64_t processes_count;
+typedef uint32_t schedulers_count;
+typedef uint64_t processes_count;
 
-            typedef uint16_t process_time_slice_type;
+typedef uint16_t process_time_slice_type;
 
-            typedef int32_t plain_int;
-            typedef double plain_float;
+typedef int32_t plain_int;
+typedef double plain_float;
 
-            typedef uint32_t timeout;
+typedef uint32_t timeout;
 
-            typedef uint8_t registerset_type_marker;
+typedef uint8_t registerset_type_marker;
 
-            typedef uint64_t bits_size;
-        }  // namespace types
+typedef uint64_t bits_size;
+}  // namespace types
 
-        enum class RegisterSets : types::registerset_type_marker {
-            CURRENT = 0,
-            GLOBAL,
-            LOCAL,
-            STATIC,
-        };
-    }  // namespace internals
+enum class RegisterSets : types::registerset_type_marker {
+    CURRENT = 0,
+    GLOBAL,
+    LOCAL,
+    STATIC,
+};
+}  // namespace internals
 }  // namespace viua
 
 #endif

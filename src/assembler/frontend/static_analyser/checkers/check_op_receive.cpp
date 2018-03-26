@@ -23,31 +23,32 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_receive(Register_usage_profile& register_usage_profile,
-                                          Instruction const& instruction) -> void {
-                        using viua::assembler::frontend::parser::VoidLiteral;
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_receive(Register_usage_profile& register_usage_profile,
+                      Instruction const& instruction) -> void {
+    using viua::assembler::frontend::parser::VoidLiteral;
 
-                        auto target = get_operand<RegisterIndex>(instruction, 0);
-                        if (not target) {
-                            if (not get_operand<VoidLiteral>(instruction, 0)) {
-                                throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                    .note("expected register index or void");
-                            }
-                        }
+    auto target = get_operand<RegisterIndex>(instruction, 0);
+    if (not target) {
+        if (not get_operand<VoidLiteral>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens,
+                                 "invalid operand")
+                .note("expected register index or void");
+        }
+    }
 
-                        if (target) {
-                            check_if_name_resolved(register_usage_profile, *target);
+    if (target) {
+        check_if_name_resolved(register_usage_profile, *target);
 
-                            auto val = Register{*target};
-                            register_usage_profile.define(val, target->tokens.at(0));
-                        }
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+        auto val = Register{*target};
+        register_usage_profile.define(val, target->tokens.at(0));
+    }
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

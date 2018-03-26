@@ -30,38 +30,47 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opizero(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opizero(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     *target = make_unique<viua::types::Integer>(0);
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opinteger(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opinteger(
+    viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     int integer = 0;
-    tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
+    tie(addr, integer) =
+        viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
     *target = make_unique<viua::types::Integer>(integer);
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opiinc(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opiinc(
+    viua::internals::types::byte* addr) {
     viua::types::Integer* target{nullptr};
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Integer>(addr, this);
 
     target->increment();
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opidec(viua::internals::types::byte* addr) {
+viua::internals::types::byte* viua::process::Process::opidec(
+    viua::internals::types::byte* addr) {
     viua::types::Integer* target{nullptr};
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Integer>(addr, this);
 
     target->decrement();
 

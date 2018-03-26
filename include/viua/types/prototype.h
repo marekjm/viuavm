@@ -27,50 +27,50 @@
 
 
 namespace viua {
-    namespace types {
-        class Prototype : public Value {
-            /** A prototype of a type.
-             *
-             *  This type is used internally inside the VM.
-             */
+namespace types {
+class Prototype : public Value {
+    /** A prototype of a type.
+     *
+     *  This type is used internally inside the VM.
+     */
 
-            std::string prototype_name;
-            std::vector<std::string> ancestors;
-            std::map<std::string, std::string> methods;
-            std::vector<std::string> attributes;
+    std::string prototype_name;
+    std::vector<std::string> ancestors;
+    std::map<std::string, std::string> methods;
+    std::vector<std::string> attributes;
 
-          public:
-            static const std::string type_name;
+  public:
+    static const std::string type_name;
 
-            std::string type() const override;
-            bool boolean() const override;
+    std::string type() const override;
+    bool boolean() const override;
 
-            std::string str() const override;
+    std::string str() const override;
 
-            std::string get_type_name() const;
-            std::vector<std::string> get_ancestors() const;
+    std::string get_type_name() const;
+    std::vector<std::string> get_ancestors() const;
 
-            // attach a function as a method to the prototype
-            Prototype* attach(const std::string&, const std::string&);
-            bool accepts(const std::string&) const;
-            std::string resolves_to(const std::string&) const;
+    // attach a function as a method to the prototype
+    Prototype* attach(const std::string&, const std::string&);
+    bool accepts(const std::string&) const;
+    std::string resolves_to(const std::string&) const;
 
-            // add an attribute to the prototype
-            Prototype* add(const std::string&);
+    // add an attribute to the prototype
+    Prototype* add(const std::string&);
 
-            // push a type to the inheritance chain of the prototype
-            Prototype* derive(const std::string&);
+    // push a type to the inheritance chain of the prototype
+    Prototype* derive(const std::string&);
 
 
-            std::vector<std::string> bases() const override;
-            std::vector<std::string> inheritancechain() const override;
+    std::vector<std::string> bases() const override;
+    std::vector<std::string> inheritancechain() const override;
 
-            std::unique_ptr<Value> copy() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            Prototype(const std::string& tn);
-            virtual ~Prototype();
-        };
-    }  // namespace types
+    Prototype(const std::string& tn);
+    virtual ~Prototype();
+};
+}  // namespace types
 }  // namespace viua
 
 

@@ -26,9 +26,11 @@
 using namespace std;
 
 
-auto viua::assembler::util::pretty_printer::send_control_seq(const string& mode) -> string {
+auto viua::assembler::util::pretty_printer::send_control_seq(const string& mode)
+    -> string {
     static auto is_terminal = isatty(1);
-    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
+    static string env_color_flag{
+        getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
 
     bool colorise = is_terminal;
     if (env_color_flag == "default") {
@@ -49,14 +51,14 @@ auto viua::assembler::util::pretty_printer::send_control_seq(const string& mode)
 }
 
 
-auto viua::assembler::util::pretty_printer::underline_error_token(const vector<viua::cg::lex::Token>& tokens,
-                                                                  decltype(tokens.size()) i,
-                                                                  const viua::cg::lex::InvalidSyntax& error)
-    -> void {
+auto viua::assembler::util::pretty_printer::underline_error_token(
+    const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i,
+    const viua::cg::lex::InvalidSyntax& error) -> void {
     /*
      * Indent is needed to align an aside note correctly.
-     * The aside note is a additional piece of text that is attached to the first underlined token, and
-     * servers as additional comment for the error or note.
+     * The aside note is a additional piece of text that is attached to the
+     * first underlined token, and servers as additional comment for the error
+     * or note.
      */
     ostringstream indent;
 
@@ -67,7 +69,8 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
     indent << "     ";
 
     /*
-     * Account for width of the stringified line number when indenting error lines.
+     * Account for width of the stringified line number when indenting error
+     * lines.
      */
     auto len = str::stringify((error.line() + 1), false).size();
     while (len--) {
@@ -76,7 +79,8 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
     }
 
     /*
-     * Insert additional space between line number and source code listing to aid readability.
+     * Insert additional space between line number and source code listing to
+     * aid readability.
      */
     cout << ' ';
     indent << ' ';
@@ -100,10 +104,11 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 
         has_matched = (has_matched or match);
         /*
-         * Indentation for the aside should be increased as long as the token the aside is
-         * attached to is not matched.
+         * Indentation for the aside should be increased as long as the token
+         * the aside is attached to is not matched.
          */
-        has_matched_for_aside = (has_matched_for_aside or error.match_aside(each));
+        has_matched_for_aside =
+            (has_matched_for_aside or error.match_aside(each));
         if (not has_matched_for_aside) {
             for (auto j = each.str().size(); j; --j) {
                 indent << ' ';
@@ -114,9 +119,9 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 
         /*
          * A singular decrement, and underlining character switch if neccessary.
-         * Doing the check outside the loop to add significance to the fact that only the first
-         * character of the underline is '^' and all subsequent ones are '~'.
-         * We want underlining to look line this:
+         * Doing the check outside the loop to add significance to the fact that
+         * only the first character of the underline is '^' and all subsequent
+         * ones are '~'. We want underlining to look line this:
          *
          *      some tokens to underline
          *           ^~~~~~
@@ -143,14 +148,15 @@ auto viua::assembler::util::pretty_printer::underline_error_token(const vector<v
 
     if (error.aside().size()) {
         cout << indent.str();
-        cout << send_control_seq(COLOR_FG_RED_1) << '^' << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' '
-             << error.aside() << send_control_seq(ATTR_RESET) << endl;
+        cout << send_control_seq(COLOR_FG_RED_1) << '^'
+             << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside()
+             << send_control_seq(ATTR_RESET) << endl;
     }
 }
-auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua::cg::lex::Token>& tokens,
-                                                               const viua::cg::lex::InvalidSyntax& error,
-                                                               decltype(tokens.size()) i,
-                                                               const size_t line_no_width) -> decltype(i) {
+auto viua::assembler::util::pretty_printer::display_error_line(
+    const vector<viua::cg::lex::Token>& tokens,
+    const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i,
+    const size_t line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << send_control_seq(COLOR_FG_RED);
@@ -183,10 +189,10 @@ auto viua::assembler::util::pretty_printer::display_error_line(const vector<viua
 
     return i;
 }
-auto viua::assembler::util::pretty_printer::display_context_line(const vector<viua::cg::lex::Token>& tokens,
-                                                                 const viua::cg::lex::InvalidSyntax&,
-                                                                 decltype(tokens.size()) i,
-                                                                 const size_t line_no_width) -> decltype(i) {
+auto viua::assembler::util::pretty_printer::display_context_line(
+    const vector<viua::cg::lex::Token>& tokens,
+    const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i,
+    const size_t line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << "    ";  // message indent, ">>>>" on error line
@@ -201,35 +207,39 @@ auto viua::assembler::util::pretty_printer::display_context_line(const vector<vi
 
     return i;
 }
-auto viua::assembler::util::pretty_printer::display_error_header(const viua::cg::lex::InvalidSyntax& error,
-                                                                 const string& filename) -> void {
+auto viua::assembler::util::pretty_printer::display_error_header(
+    const viua::cg::lex::InvalidSyntax& error, const string& filename) -> void {
     if (error.str().size()) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
-             << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": "
-             << error.what() << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
+             << error.line() + 1 << ':' << error.character() + 1 << ':'
+             << send_control_seq(ATTR_RESET) << ' ';
+        cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET) << ": " << error.what() << endl;
     }
     if (error.notes().size()) {
         for (const auto& note : error.notes()) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
-                 << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
-            cout << send_control_seq(COLOR_FG_CYAN) << "note" << send_control_seq(ATTR_RESET) << ": " << note
-                 << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
+                 << error.line() + 1 << ':' << error.character() + 1 << ':'
+                 << send_control_seq(ATTR_RESET) << ' ';
+            cout << send_control_seq(COLOR_FG_CYAN) << "note"
+                 << send_control_seq(ATTR_RESET) << ": " << note << endl;
         }
     }
 }
-auto viua::assembler::util::pretty_printer::display_error_location(const vector<viua::cg::lex::Token>& tokens,
-                                                                   const viua::cg::lex::InvalidSyntax error)
-    -> void {
+auto viua::assembler::util::pretty_printer::display_error_location(
+    const vector<viua::cg::lex::Token>& tokens,
+    const viua::cg::lex::InvalidSyntax error) -> void {
     const unsigned context_lines = 2;
-    decltype(error.line()) context_before = 0, context_after = (error.line() + context_lines);
+    decltype(error.line()) context_before = 0,
+                           context_after = (error.line() + context_lines);
     if (error.line() >= context_lines) {
         context_before = (error.line() - context_lines);
     }
 
     const auto line_no_width = std::to_string(context_after).size();
 
-    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size();) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
+         i < tokens.size();) {
         if (tokens.at(i).line() > context_after) {
             break;
         }
@@ -245,15 +255,16 @@ auto viua::assembler::util::pretty_printer::display_error_location(const vector<
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_in_context(
-    const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax error,
-    const string& filename) -> void {
+    const vector<viua::cg::lex::Token>& tokens,
+    const viua::cg::lex::InvalidSyntax error, const string& filename) -> void {
     display_error_header(error, filename);
     cout << "\n";
     display_error_location(tokens, error);
 }
 auto viua::assembler::util::pretty_printer::display_error_in_context(
-    const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::TracedSyntaxError error,
-    const string& filename) -> void {
+    const vector<viua::cg::lex::Token>& tokens,
+    const viua::cg::lex::TracedSyntaxError error, const string& filename)
+    -> void {
     for (auto const& e : error.errors) {
         display_error_in_context(tokens, e, filename);
         cout << "\n";

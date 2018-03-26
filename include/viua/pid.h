@@ -26,24 +26,24 @@
 
 
 namespace viua {
-    namespace process {
-        class Process;
+namespace process {
+class Process;
 
-        class PID {
-            const viua::process::Process* associated_process;
+class PID {
+    const viua::process::Process* associated_process;
 
-          public:
-            bool operator==(const viua::process::PID&) const;
-            bool operator==(const viua::process::Process*) const;
-            bool operator<(const viua::process::PID&) const;
-            bool operator>(const viua::process::PID&) const;
+  public:
+    bool operator==(const viua::process::PID&) const;
+    bool operator==(const viua::process::Process*) const;
+    bool operator<(const viua::process::PID&) const;
+    bool operator>(const viua::process::PID&) const;
 
-            auto get() const -> decltype(associated_process);
-            auto str() const -> std::string;
+    auto get() const -> decltype(associated_process);
+    auto str() const -> std::string;
 
-            PID(const viua::process::Process*);
-        };
-    }  // namespace process
+    PID(const viua::process::Process*);
+};
+}  // namespace process
 }  // namespace viua
 
 

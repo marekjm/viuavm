@@ -25,55 +25,59 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_textsub(Register_usage_profile& register_usage_profile,
-                                          Instruction const& instruction) -> void {
-                        auto result = get_operand<RegisterIndex>(instruction, 0);
-                        if (not result) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_textsub(Register_usage_profile& register_usage_profile,
+                      Instruction const& instruction) -> void {
+    auto result = get_operand<RegisterIndex>(instruction, 0);
+    if (not result) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_if_name_resolved(register_usage_profile, *result);
+    check_if_name_resolved(register_usage_profile, *result);
 
-                        auto source = get_operand<RegisterIndex>(instruction, 1);
-                        if (not source) {
-                            throw invalid_syntax(instruction.operands.at(1)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (not source) {
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        auto key_begin = get_operand<RegisterIndex>(instruction, 2);
-                        if (not key_begin) {
-                            throw invalid_syntax(instruction.operands.at(2)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto key_begin = get_operand<RegisterIndex>(instruction, 2);
+    if (not key_begin) {
+        throw invalid_syntax(instruction.operands.at(2)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        auto key_end = get_operand<RegisterIndex>(instruction, 3);
-                        if (not key_end) {
-                            throw invalid_syntax(instruction.operands.at(3)->tokens, "invalid operand")
-                                .note("expected register index");
-                        }
+    auto key_end = get_operand<RegisterIndex>(instruction, 3);
+    if (not key_end) {
+        throw invalid_syntax(instruction.operands.at(3)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
 
-                        check_use_of_register(register_usage_profile, *source);
-                        check_use_of_register(register_usage_profile, *key_begin);
-                        check_use_of_register(register_usage_profile, *key_end);
+    check_use_of_register(register_usage_profile, *source);
+    check_use_of_register(register_usage_profile, *key_begin);
+    check_use_of_register(register_usage_profile, *key_end);
 
-                        assert_type_of_register<viua::internals::ValueTypes::TEXT>(register_usage_profile,
-                                                                                   *source);
-                        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
-                                                                                      *key_begin);
-                        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(register_usage_profile,
-                                                                                      *key_end);
+    assert_type_of_register<viua::internals::ValueTypes::TEXT>(
+        register_usage_profile, *source);
+    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        register_usage_profile, *key_begin);
+    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        register_usage_profile, *key_end);
 
-                        auto val = Register(*result);
-                        val.value_type = viua::internals::ValueTypes::TEXT;
-                        register_usage_profile.define(val, result->tokens.at(0));
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    auto val = Register(*result);
+    val.value_type = viua::internals::ValueTypes::TEXT;
+    register_usage_profile.define(val, result->tokens.at(0));
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

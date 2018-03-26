@@ -23,37 +23,39 @@
 using viua::assembler::frontend::parser::Instruction;
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                namespace checkers {
-                    auto check_op_enter(Register_usage_profile& register_usage_profile,
-                                        ParsedSource const& ps, Instruction const& instruction) -> void {
-                        using viua::assembler::frontend::parser::Label;
-                        using viua::cg::lex::InvalidSyntax;
-                        using viua::cg::lex::TracedSyntaxError;
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+namespace checkers {
+auto check_op_enter(Register_usage_profile& register_usage_profile,
+                    ParsedSource const& ps, Instruction const& instruction)
+    -> void {
+    using viua::assembler::frontend::parser::Label;
+    using viua::cg::lex::InvalidSyntax;
+    using viua::cg::lex::TracedSyntaxError;
 
-                        auto const label = get_operand<Label>(instruction, 0);
-                        if (not label) {
-                            throw invalid_syntax(instruction.operands.at(0)->tokens, "invalid operand")
-                                .note("expected a block name");
-                        }
+    auto const label = get_operand<Label>(instruction, 0);
+    if (not label) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected a block name");
+    }
 
-                        auto const block_name = label->tokens.at(0).str();
+    auto const block_name = label->tokens.at(0).str();
 
-                        try {
-                            check_register_usage_for_instruction_block_impl(register_usage_profile, ps,
-                                                                            ps.block(block_name), 0, 0);
-                        } catch (InvalidSyntax& e) {
-                            throw TracedSyntaxError{}.append(e).append(
-                                InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                        } catch (TracedSyntaxError& e) {
-                            throw e.append(
-                                InvalidSyntax{label->tokens.at(0), "after entering block " + block_name});
-                        }
-                    }
-                }  // namespace checkers
-            }      // namespace static_analyser
-        }          // namespace frontend
-    }              // namespace assembler
+    try {
+        check_register_usage_for_instruction_block_impl(
+            register_usage_profile, ps, ps.block(block_name), 0, 0);
+    } catch (InvalidSyntax& e) {
+        throw TracedSyntaxError{}.append(e).append(InvalidSyntax{
+            label->tokens.at(0), "after entering block " + block_name});
+    } catch (TracedSyntaxError& e) {
+        throw e.append(InvalidSyntax{label->tokens.at(0),
+                                     "after entering block " + block_name});
+    }
+}
+}  // namespace checkers
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

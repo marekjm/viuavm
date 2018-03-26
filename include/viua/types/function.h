@@ -29,28 +29,28 @@
 
 
 namespace viua {
-    namespace types {
-        class Function : public Value {
-          public:
-            static const std::string type_name;
+namespace types {
+class Function : public Value {
+  public:
+    static const std::string type_name;
 
-            std::string function_name;
+    std::string function_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            std::string repr() const override;
+    std::string type() const override;
+    std::string str() const override;
+    std::string repr() const override;
 
-            bool boolean() const override;
+    bool boolean() const override;
 
-            std::unique_ptr<Value> copy() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            virtual std::string name() const;
+    virtual std::string name() const;
 
-            // FIXME: implement real dtor
-            Function(const std::string& = "");
-            virtual ~Function();
-        };
-    }  // namespace types
+    // FIXME: implement real dtor
+    Function(const std::string& = "");
+    virtual ~Function();
+};
+}  // namespace types
 }  // namespace viua
 
 

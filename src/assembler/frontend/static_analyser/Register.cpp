@@ -20,25 +20,25 @@
 #include <viua/assembler/frontend/static_analyser.h>
 
 namespace viua {
-    namespace assembler {
-        namespace frontend {
-            namespace static_analyser {
-                auto Register::operator<(const Register& that) const -> bool {
-                    if (register_set < that.register_set) {
-                        return true;
-                    }
-                    if (register_set == that.register_set and index < that.index) {
-                        return true;
-                    }
-                    return false;
-                }
-                auto Register::operator==(const Register& that) const -> bool {
-                    return (register_set == that.register_set) and (index == that.index);
-                }
+namespace assembler {
+namespace frontend {
+namespace static_analyser {
+auto Register::operator<(const Register& that) const -> bool {
+    if (register_set < that.register_set) {
+        return true;
+    }
+    if (register_set == that.register_set and index < that.index) {
+        return true;
+    }
+    return false;
+}
+auto Register::operator==(const Register& that) const -> bool {
+    return (register_set == that.register_set) and (index == that.index);
+}
 
-                Register::Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
-                    : index(ri.index), register_set(ri.rss) {}
-            }  // namespace static_analyser
-        }      // namespace frontend
-    }          // namespace assembler
+Register::Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
+    : index(ri.index), register_set(ri.rss) {}
+}  // namespace static_analyser
+}  // namespace frontend
+}  // namespace assembler
 }  // namespace viua

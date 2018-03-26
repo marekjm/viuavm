@@ -23,12 +23,14 @@
 using namespace std;
 
 
-void viua::assertions::assert_typeof(viua::types::Value* object, const string& expected) {
+void viua::assertions::assert_typeof(viua::types::Value* object,
+                                     const string& expected) {
     /** Use this assertion when strict type checking is required.
      *
      *  Example: checking if an object is an Integer.
      */
     if (object->type() != expected) {
-        throw viua::util::exceptions::make_unique_exception<TypeException>(expected, object->type());
+        throw viua::util::exceptions::make_unique_exception<TypeException>(
+            expected, object->type());
     }
 }

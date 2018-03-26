@@ -53,7 +53,8 @@ using viua::cg::lex::TracedSyntaxError;
 
 
 template<class T>
-static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
+static auto enumerate(const vector<T>& v)
+    -> vector<pair<typename vector<T>::size_type, T>> {
     vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
 
     typename vector<T>::size_type i = 0;
@@ -65,7 +66,8 @@ static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::siz
     return enumerated_vector;
 }
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program, bool show_help, bool show_version,
+                  bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM lexer, version ";
     }
@@ -169,22 +171,27 @@ int main(int argc, char* argv[]) {
         tokens = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
     try {
-        auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        auto parsed_source =
+            viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 

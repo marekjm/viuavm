@@ -26,12 +26,15 @@ auto assembler::operands::normalise_binary_literal(string const s) -> string {
 
     if (s.size() == 0) {
         // FIXME create InternalError class
-        throw("internal error: invalid binary literal: cannot normalise empty string");
+        throw("internal error: invalid binary literal: cannot normalise empty "
+              "string");
     }
 
     if (s.size() > 2 and s.at(1) == 'b') {
         // FIXME create InternalError class
-        throw("internal error: invalid binary literal: cannot normalise literals with '0b' prefix: " + s);
+        throw("internal error: invalid binary literal: cannot normalise "
+              "literals with '0b' prefix: " +
+              s);
     }
 
     auto n = decltype(s)::size_type{0};
@@ -91,7 +94,8 @@ auto assembler::operands::octal_to_binary_literal(string const s) -> string {
     }
     return strip_leading_zeroes(oss.str());
 }
-auto assembler::operands::hexadecimal_to_binary_literal(string const s) -> string {
+auto assembler::operands::hexadecimal_to_binary_literal(string const s)
+    -> string {
     ostringstream oss;
     static map<const char, const string> const lookup = {
         {

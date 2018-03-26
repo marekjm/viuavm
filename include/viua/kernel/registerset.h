@@ -37,73 +37,80 @@ enum REGISTER_MASKS : mask_type {
 
 
 namespace viua {
-    namespace kernel {
-        class Register {
-            std::unique_ptr<viua::types::Value> value;
-            mask_type mask;
+namespace kernel {
+class Register {
+    std::unique_ptr<viua::types::Value> value;
+    mask_type mask;
 
-          public:
-            void reset(std::unique_ptr<viua::types::Value>);
-            bool empty() const;
+  public:
+    void reset(std::unique_ptr<viua::types::Value>);
+    bool empty() const;
 
-            viua::types::Value* get();
-            viua::types::Value* release();
-            std::unique_ptr<viua::types::Value> give();
+    viua::types::Value* get();
+    viua::types::Value* release();
+    std::unique_ptr<viua::types::Value> give();
 
-            void swap(Register&);
+    void swap(Register&);
 
-            mask_type set_mask(mask_type);
-            mask_type get_mask() const;
-            mask_type flag(mask_type);
-            mask_type unflag(mask_type);
-            bool is_flagged(mask_type) const;
+    mask_type set_mask(mask_type);
+    mask_type get_mask() const;
+    mask_type flag(mask_type);
+    mask_type unflag(mask_type);
+    bool is_flagged(mask_type) const;
 
-            Register();
-            Register(std::unique_ptr<viua::types::Value>);
-            Register(Register&&);
+    Register();
+    Register(std::unique_ptr<viua::types::Value>);
+    Register(Register&&);
 
-            operator bool() const;
-            auto operator=(Register &&) -> Register&;
-            auto operator=(decltype(value)&&) -> Register&;
-        };
+    operator bool() const;
+    auto operator=(Register &&) -> Register&;
+    auto operator=(decltype(value)&&) -> Register&;
+};
 
-        class RegisterSet {
-            viua::internals::types::register_index registerset_size;
-            std::vector<Register> registers;
+class RegisterSet {
+    viua::internals::types::register_index registerset_size;
+    std::vector<Register> registers;
 
-          public:
-            // basic access to registers
-            void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
-            std::unique_ptr<viua::types::Value> pop(viua::internals::types::register_index);
-            void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
-            viua::types::Value* get(viua::internals::types::register_index);
-            viua::types::Value* at(viua::internals::types::register_index);
+  public:
+    // basic access to registers
+    void put(viua::internals::types::register_index,
+             std::unique_ptr<viua::types::Value>);
+    std::unique_ptr<viua::types::Value> pop(
+        viua::internals::types::register_index);
+    void set(viua::internals::types::register_index,
+             std::unique_ptr<viua::types::Value>);
+    viua::types::Value* get(viua::internals::types::register_index);
+    viua::types::Value* at(viua::internals::types::register_index);
 
-            Register* register_at(viua::internals::types::register_index);
+    Register* register_at(viua::internals::types::register_index);
 
-            // register modifications
-            void move(viua::internals::types::register_index, viua::internals::types::register_index);
-            void swap(viua::internals::types::register_index, viua::internals::types::register_index);
-            void empty(viua::internals::types::register_index);
-            void free(viua::internals::types::register_index);
+    // register modifications
+    void move(viua::internals::types::register_index,
+              viua::internals::types::register_index);
+    void swap(viua::internals::types::register_index,
+              viua::internals::types::register_index);
+    void empty(viua::internals::types::register_index);
+    void free(viua::internals::types::register_index);
 
-            // mask inspection and manipulation
-            void flag(viua::internals::types::register_index, mask_type);
-            void unflag(viua::internals::types::register_index, mask_type);
-            void clear(viua::internals::types::register_index);
-            bool isflagged(viua::internals::types::register_index, mask_type);
-            void setmask(viua::internals::types::register_index, mask_type);
-            mask_type getmask(viua::internals::types::register_index);
+    // mask inspection and manipulation
+    void flag(viua::internals::types::register_index, mask_type);
+    void unflag(viua::internals::types::register_index, mask_type);
+    void clear(viua::internals::types::register_index);
+    bool isflagged(viua::internals::types::register_index, mask_type);
+    void setmask(viua::internals::types::register_index, mask_type);
+    mask_type getmask(viua::internals::types::register_index);
 
-            void drop();
-            inline viua::internals::types::register_index size() { return registerset_size; }
+    void drop();
+    inline viua::internals::types::register_index size() {
+        return registerset_size;
+    }
 
-            std::unique_ptr<RegisterSet> copy();
+    std::unique_ptr<RegisterSet> copy();
 
-            RegisterSet(viua::internals::types::register_index sz);
-            ~RegisterSet();
-        };
-    }  // namespace kernel
+    RegisterSet(viua::internals::types::register_index sz);
+    ~RegisterSet();
+};
+}  // namespace kernel
 }  // namespace viua
 
 
