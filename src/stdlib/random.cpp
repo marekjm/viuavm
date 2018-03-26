@@ -101,10 +101,10 @@ static auto random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kerne
 }
 
 const ForeignFunctionSpec functions[] = {
-    {"std::random::device::random", &random_drandom},
-    {"std::random::device::urandom", &random_durandom},
-    {"std::random::random", &random_random},
-    {"std::random::randint", &random_randint},
+    {"std::random::device::random/0", &random_drandom},
+    {"std::random::device::urandom/0", &random_durandom},
+    {"std::random::random/0", &random_random},
+    {"std::random::randint/2", &random_randint},
     {nullptr, nullptr},
 };
 
