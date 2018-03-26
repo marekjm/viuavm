@@ -589,9 +589,13 @@ void viua::kernel::Kernel::receive(
 #endif
 }
 
-uint64_t viua::kernel::Kernel::pids() const { return running_processes; }
+uint64_t viua::kernel::Kernel::pids() const {
+    return running_processes;
+}
 
-int viua::kernel::Kernel::exit() const { return return_code; }
+int viua::kernel::Kernel::exit() const {
+    return return_code;
+}
 
 static auto no_of_schedulers(
     const char* env_name,

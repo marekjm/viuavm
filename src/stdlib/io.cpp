@@ -34,10 +34,18 @@ class Ifstream : public viua::types::Value {
     string const filename;
 
   public:
-    auto type() const -> string override { return "Ifstream"; }
-    auto str() const -> string override { return type(); }
-    auto repr() const -> string override { return str(); }
-    auto boolean() const -> bool override { return in.is_open(); }
+    auto type() const -> string override {
+        return "Ifstream";
+    }
+    auto str() const -> string override {
+        return type();
+    }
+    auto repr() const -> string override {
+        return str();
+    }
+    auto boolean() const -> bool override {
+        return in.is_open();
+    }
 
     virtual auto bases() const -> vector<string> override {
         return vector<string>{"viua::types::Value"};
@@ -60,7 +68,9 @@ class Ifstream : public viua::types::Value {
         throw make_unique<viua::types::Exception>("Ifstream is not copyable");
     }
 
-    Ifstream(string const& path) : filename(path) { in.open(filename); }
+    Ifstream(string const& path) : filename(path) {
+        in.open(filename);
+    }
     virtual ~Ifstream() {
         if (in.is_open()) {
             in.close();
@@ -155,4 +165,6 @@ const ForeignFunctionSpec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const ForeignFunctionSpec* exports() {
+    return functions;
+}

@@ -1307,9 +1307,13 @@ static auto signed_div(vector<bool> dividend, vector<bool> divisor)
 
 const string viua::types::Bits::type_name = "Bits";
 
-string viua::types::Bits::type() const { return type_name; }
+string viua::types::Bits::type() const {
+    return type_name;
+}
 
-string viua::types::Bits::str() const { return to_string(underlying_array); }
+string viua::types::Bits::str() const {
+    return to_string(underlying_array);
+}
 
 bool viua::types::Bits::boolean() const {
     return binary_to_bool(underlying_array);
@@ -1523,9 +1527,13 @@ auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
     return perform_bitwise_logic<bit_xor<bool>>(*this, that);
 }
 
-viua::types::Bits::Bits(vector<bool>&& bs) { underlying_array = std::move(bs); }
+viua::types::Bits::Bits(vector<bool>&& bs) {
+    underlying_array = std::move(bs);
+}
 
-viua::types::Bits::Bits(vector<bool> const& bs) { underlying_array = bs; }
+viua::types::Bits::Bits(vector<bool> const& bs) {
+    underlying_array = bs;
+}
 
 viua::types::Bits::Bits(size_type i) {
     underlying_array.reserve(i);

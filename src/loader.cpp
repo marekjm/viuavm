@@ -259,7 +259,9 @@ Loader& Loader::executable() {
     return (*this);
 }
 
-uint64_t Loader::get_bytecode_size() { return size; }
+uint64_t Loader::get_bytecode_size() {
+    return size;
+}
 unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
     auto copy = make_unique<viua::internals::types::byte[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
@@ -268,11 +270,17 @@ unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
     return copy;
 }
 
-vector<uint64_t> Loader::get_jumps() { return jumps; }
+vector<uint64_t> Loader::get_jumps() {
+    return jumps;
+}
 
-map<string, string> Loader::get_meta_information() { return meta_information; }
+map<string, string> Loader::get_meta_information() {
+    return meta_information;
+}
 
-vector<string> Loader::get_external_signatures() { return external_signatures; }
+vector<string> Loader::get_external_signatures() {
+    return external_signatures;
+}
 
 vector<string> Loader::get_external_block_signatures() {
     return external_signatures_block;
@@ -281,8 +289,16 @@ vector<string> Loader::get_external_block_signatures() {
 map<string, uint64_t> Loader::get_function_addresses() {
     return function_addresses;
 }
-map<string, uint64_t> Loader::get_function_sizes() { return function_sizes; }
-vector<string> Loader::get_functions() { return functions; }
+map<string, uint64_t> Loader::get_function_sizes() {
+    return function_sizes;
+}
+vector<string> Loader::get_functions() {
+    return functions;
+}
 
-map<string, uint64_t> Loader::get_block_addresses() { return block_addresses; }
-vector<string> Loader::get_blocks() { return blocks; }
+map<string, uint64_t> Loader::get_block_addresses() {
+    return block_addresses;
+}
+vector<string> Loader::get_blocks() {
+    return blocks;
+}

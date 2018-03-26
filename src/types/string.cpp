@@ -39,14 +39,26 @@ using namespace viua::types;
 
 const string viua::types::String::type_name = "String";
 
-string String::type() const { return "String"; }
-string String::str() const { return svalue; }
-string String::repr() const { return str::enquote(svalue); }
-bool String::boolean() const { return svalue.size() != 0; }
+string String::type() const {
+    return "String";
+}
+string String::str() const {
+    return svalue;
+}
+string String::repr() const {
+    return str::enquote(svalue);
+}
+bool String::boolean() const {
+    return svalue.size() != 0;
+}
 
-unique_ptr<Value> String::copy() const { return make_unique<String>(svalue); }
+unique_ptr<Value> String::copy() const {
+    return make_unique<String>(svalue);
+}
 
-string& String::value() { return svalue; }
+string& String::value() {
+    return svalue;
+}
 
 Integer* String::size() {
     /** Return size of the string.
@@ -189,7 +201,9 @@ void String::format(Frame* frame,
             int index      = -1;
             try {
                 index = stoi(m);
-            } catch (const std::invalid_argument&) { is_number = false; }
+            } catch (const std::invalid_argument&) {
+                is_number = false;
+            }
             if (is_number) {
                 replacement = static_cast<Vector*>(frame->arguments->at(1))
                                   ->at(index)

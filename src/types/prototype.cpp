@@ -24,8 +24,12 @@ using namespace std;
 
 const string viua::types::Prototype::type_name = "Prototype";
 
-string viua::types::Prototype::type() const { return "viua::types::Prototype"; }
-bool viua::types::Prototype::boolean() const { return true; }
+string viua::types::Prototype::type() const {
+    return "viua::types::Prototype";
+}
+bool viua::types::Prototype::boolean() const {
+    return true;
+}
 
 vector<string> viua::types::Prototype::bases() const {
     return vector<string>{"Value"};
@@ -43,7 +47,9 @@ unique_ptr<viua::types::Value> viua::types::Prototype::copy() const {
 }
 
 
-string viua::types::Prototype::get_type_name() const { return prototype_name; }
+string viua::types::Prototype::get_type_name() const {
+    return prototype_name;
+}
 vector<string> viua::types::Prototype::get_ancestors() const {
     return ancestors;
 }

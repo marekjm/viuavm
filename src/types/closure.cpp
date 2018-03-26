@@ -33,7 +33,9 @@ viua::types::Closure::Closure(const string& name,
 viua::types::Closure::~Closure() {}
 
 
-string viua::types::Closure::type() const { return "Closure"; }
+string viua::types::Closure::type() const {
+    return "Closure";
+}
 
 string viua::types::Closure::str() const {
     ostringstream oss;
@@ -41,16 +43,22 @@ string viua::types::Closure::str() const {
     return oss.str();
 }
 
-string viua::types::Closure::repr() const { return str(); }
+string viua::types::Closure::repr() const {
+    return str();
+}
 
-bool viua::types::Closure::boolean() const { return true; }
+bool viua::types::Closure::boolean() const {
+    return true;
+}
 
 unique_ptr<viua::types::Value> viua::types::Closure::copy() const {
     return make_unique<Closure>(function_name, local_register_set->copy());
 }
 
 
-string viua::types::Closure::name() const { return function_name; }
+string viua::types::Closure::name() const {
+    return function_name;
+}
 
 viua::kernel::RegisterSet* viua::types::Closure::rs() const {
     return local_register_set.get();

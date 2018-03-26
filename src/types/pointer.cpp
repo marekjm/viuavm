@@ -47,7 +47,9 @@ void viua::types::Pointer::invalidate(viua::types::Value* t) {
         valid = false;
     }
 }
-bool viua::types::Pointer::expired() { return !valid; }
+bool viua::types::Pointer::expired() {
+    return !valid;
+}
 auto viua::types::Pointer::authenticate(const viua::process::Process* process)
     -> void {
     /*
@@ -79,7 +81,9 @@ string viua::types::Pointer::type() const {
     return ((valid ? points_to->type() : "Expired") + "Pointer");
 }
 
-bool viua::types::Pointer::boolean() const { return valid; }
+bool viua::types::Pointer::boolean() const {
+    return valid;
+}
 
 vector<string> viua::types::Pointer::bases() const {
     return vector<string>{"Value"};
@@ -88,7 +92,9 @@ vector<string> viua::types::Pointer::inheritancechain() const {
     return vector<string>{"Value"};
 }
 
-string viua::types::Pointer::str() const { return type(); }
+string viua::types::Pointer::str() const {
+    return type();
+}
 
 unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
@@ -115,4 +121,6 @@ viua::types::Pointer::Pointer(viua::types::Value* t,
     : points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
-viua::types::Pointer::~Pointer() { detach(); }
+viua::types::Pointer::~Pointer() {
+    detach();
+}

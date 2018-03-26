@@ -135,7 +135,9 @@ template<typename T> class vector_view {
     auto at(const decltype(offset) i) const -> const T& {
         return vec.at(offset + i);
     }
-    auto size() const -> size_type { return vec.size(); }
+    auto size() const -> size_type {
+        return vec.size();
+    }
 
     vector_view(const decltype(vec) v, const decltype(offset) o)
         : vec(v), offset(o) {}

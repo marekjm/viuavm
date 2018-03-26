@@ -42,11 +42,19 @@ void viua::types::Reference::rebind(unique_ptr<viua::types::Value> ptr) {
 }
 
 
-string viua::types::Reference::type() const { return (*pointer)->type(); }
+string viua::types::Reference::type() const {
+    return (*pointer)->type();
+}
 
-string viua::types::Reference::str() const { return (*pointer)->str(); }
-string viua::types::Reference::repr() const { return (*pointer)->repr(); }
-bool viua::types::Reference::boolean() const { return (*pointer)->boolean(); }
+string viua::types::Reference::str() const {
+    return (*pointer)->str();
+}
+string viua::types::Reference::repr() const {
+    return (*pointer)->repr();
+}
+bool viua::types::Reference::boolean() const {
+    return (*pointer)->boolean();
+}
 
 vector<string> viua::types::Reference::bases() const {
     return vector<string>({});

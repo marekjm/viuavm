@@ -338,7 +338,9 @@ auto viua::assembler::frontend::parser::parse_instruction(
             instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
-    } catch (InvalidSyntax& e) { throw e.add(tokens.at(0)); }
+    } catch (InvalidSyntax& e) {
+        throw e.add(tokens.at(0));
+    }
 
     return i;
 }

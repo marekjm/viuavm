@@ -44,8 +44,12 @@ class Registers {
     set<string> maybe_unused_registers;
 
   public:
-    bool defined(const string& r) { return (defined_registers.count(r) == 1); }
-    Token defined_where(string r) { return defined_registers.at(r); }
+    bool defined(const string& r) {
+        return (defined_registers.count(r) == 1);
+    }
+    Token defined_where(string r) {
+        return defined_registers.at(r);
+    }
     void insert(string r, Token where) {
         if (r != "void") {
             defined_registers.emplace(r, where);
@@ -55,12 +59,22 @@ class Registers {
         erased_registers.emplace(r, token);
         defined_registers.erase(defined_registers.find(r));
     }
-    bool erased(const string& r) { return (erased_registers.count(r) == 1); }
-    Token erased_by(const string& r) { return erased_registers.at(r); }
-    void use(string r, Token where) { used_registers.emplace(r, where); }
-    bool used(string r) { return used_registers.count(r); }
+    bool erased(const string& r) {
+        return (erased_registers.count(r) == 1);
+    }
+    Token erased_by(const string& r) {
+        return erased_registers.at(r);
+    }
+    void use(string r, Token where) {
+        used_registers.emplace(r, where);
+    }
+    bool used(string r) {
+        return used_registers.count(r);
+    }
 
-    void unused(string r) { maybe_unused_registers.insert(r); }
+    void unused(string r) {
+        maybe_unused_registers.insert(r);
+    }
     auto maybe_unused(string r) -> bool {
         return (maybe_unused_registers.count(r) != 0);
     }

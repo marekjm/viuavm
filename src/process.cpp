@@ -260,7 +260,9 @@ auto viua::process::Process::push_deferred(string call_name) -> void {
     stack->back()->deferred_calls.push_back(std::move(stack->frame_new));
 }
 
-void viua::process::Process::handle_active_exception() { stack->unwind(); }
+void viua::process::Process::handle_active_exception() {
+    stack->unwind();
+}
 viua::internals::types::byte* viua::process::Process::tick() {
     viua::internals::types::byte* previous_instruction_pointer =
         stack->instruction_pointer;
@@ -452,7 +454,9 @@ unique_ptr<viua::types::Value> viua::process::Process::get_return_value() {
 bool viua::process::Process::watchdogged() const {
     return (not watchdog_function.empty());
 }
-string viua::process::Process::watchdog() const { return watchdog_function; }
+string viua::process::Process::watchdog() const {
+    return watchdog_function;
+}
 viua::internals::types::byte* viua::process::Process::become(
     const string& function_name,
     std::unique_ptr<Frame> frame_to_use) {
@@ -496,11 +500,19 @@ vector<Frame*> viua::process::Process::trace() const {
     return tr;
 }
 
-viua::process::PID viua::process::Process::pid() const { return process_id; }
-bool viua::process::Process::hidden() const { return is_hidden; }
-void viua::process::Process::hidden(bool state) { is_hidden = state; }
+viua::process::PID viua::process::Process::pid() const {
+    return process_id;
+}
+bool viua::process::Process::hidden() const {
+    return is_hidden;
+}
+void viua::process::Process::hidden(bool state) {
+    is_hidden = state;
+}
 
-bool viua::process::Process::empty() const { return message_queue.empty(); }
+bool viua::process::Process::empty() const {
+    return message_queue.empty();
+}
 
 void viua::process::Process::migrate_to(
     viua::scheduler::VirtualProcessScheduler* sch) {

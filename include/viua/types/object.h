@@ -54,7 +54,9 @@ class Object : public Value {
     std::unique_ptr<Value> remove(const std::string& key);
 
     void set(const std::string&, std::unique_ptr<Value>);
-    inline Value* at(const std::string& s) { return attributes.at(s).get(); }
+    inline Value* at(const std::string& s) {
+        return attributes.at(s).get();
+    }
 
     virtual std::unique_ptr<Value> copy() const override;
 

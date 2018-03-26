@@ -95,7 +95,9 @@ auto is_boolean_literal(string const s) -> bool {
     return (s == "true" or s == "false");
 }
 
-auto is_void(string const s) -> bool { return (s == "void"); }
+auto is_void(string const s) -> bool {
+    return (s == "void");
+}
 
 auto is_atom_literal(string const s) -> bool {
     /*

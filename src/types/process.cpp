@@ -29,7 +29,9 @@ using namespace std;
 
 const string viua::types::Process::type_name = "Process";
 
-string viua::types::Process::type() const { return "Process"; }
+string viua::types::Process::type() const {
+    return "Process";
+}
 
 string viua::types::Process::str() const {
     ostringstream oss;
@@ -37,7 +39,9 @@ string viua::types::Process::str() const {
     return oss.str();
 }
 
-string viua::types::Process::repr() const { return str(); }
+string viua::types::Process::repr() const {
+    return str();
+}
 
 bool viua::types::Process::boolean() const {
     // There is no good reason why evaluating process as boolean should return
@@ -49,7 +53,9 @@ unique_ptr<viua::types::Value> viua::types::Process::copy() const {
     return make_unique<Process>(thrd);
 }
 
-viua::process::PID viua::types::Process::pid() const { return saved_pid; }
+viua::process::PID viua::types::Process::pid() const {
+    return saved_pid;
+}
 
 viua::types::Process::Process(viua::process::Process* t)
     : thrd(t), saved_pid(thrd->pid()) {}

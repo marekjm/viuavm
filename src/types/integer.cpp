@@ -28,16 +28,30 @@ using namespace viua::types;
 
 const string viua::types::Integer::type_name = "Integer";
 
-string Integer::type() const { return "Integer"; }
-string Integer::str() const { return to_string(number); }
-bool Integer::boolean() const { return (number != 0); }
+string Integer::type() const {
+    return "Integer";
+}
+string Integer::str() const {
+    return to_string(number);
+}
+bool Integer::boolean() const {
+    return (number != 0);
+}
 
-auto Integer::value() -> decltype(number) { return number; }
+auto Integer::value() -> decltype(number) {
+    return number;
+}
 
-int64_t Integer::increment() { return (++number); }
-int64_t Integer::decrement() { return (--number); }
+int64_t Integer::increment() {
+    return (++number);
+}
+int64_t Integer::decrement() {
+    return (--number);
+}
 
-unique_ptr<Value> Integer::copy() const { return make_unique<Integer>(number); }
+unique_ptr<Value> Integer::copy() const {
+    return make_unique<Integer>(number);
+}
 
 auto Integer::as_unsigned() const -> uint64_t {
     if (number < 0) {
@@ -46,7 +60,9 @@ auto Integer::as_unsigned() const -> uint64_t {
     return static_cast<uint64_t>(number);
 }
 
-auto Integer::as_integer() const -> int64_t { return number; }
+auto Integer::as_integer() const -> int64_t {
+    return number;
+}
 
 auto Integer::as_float() const -> viua::float64 {
     return static_cast<viua::float64>(number);

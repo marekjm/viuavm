@@ -769,7 +769,9 @@ void viua::scheduler::VirtualProcessScheduler::join() {
     scheduler_thread.join();
 }
 
-int viua::scheduler::VirtualProcessScheduler::exit() const { return exit_code; }
+int viua::scheduler::VirtualProcessScheduler::exit() const {
+    return exit_code;
+}
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     viua::kernel::Kernel* akernel,

@@ -180,7 +180,8 @@ static auto get_raw_block_bodies(string const& type,
             ++i;  // skip directive
 
             if (tokens.at(i) == "[[") {
-                while (tokens.at(++i) != "]]") {}
+                while (tokens.at(++i) != "]]") {
+                }
                 ++i;  // skip closing ]]
             }
 

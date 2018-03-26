@@ -124,7 +124,9 @@ int viua::types::Vector::len() {
     return static_cast<int>(internal_object.size());
 }
 
-string viua::types::Vector::type() const { return "Vector"; }
+string viua::types::Vector::type() const {
+    return "Vector";
+}
 
 string viua::types::Vector::str() const {
     ostringstream oss;

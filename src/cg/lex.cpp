@@ -28,28 +28,42 @@ using namespace std;
 namespace viua {
 namespace cg {
 namespace lex {
-auto Token::line() const -> decltype(line_number) { return line_number; }
+auto Token::line() const -> decltype(line_number) {
+    return line_number;
+}
 auto Token::character() const -> decltype(character_in_line) {
     return character_in_line;
 }
 
-auto Token::str() const -> decltype(content) { return content; }
-auto Token::str(string s) -> void { content = s; }
+auto Token::str() const -> decltype(content) {
+    return content;
+}
+auto Token::str(string s) -> void {
+    content = s;
+}
 
 auto Token::original() const -> decltype(original_content) {
     return original_content;
 }
-auto Token::original(string s) -> void { original_content = s; }
+auto Token::original(string s) -> void {
+    original_content = s;
+}
 
 auto Token::ends(bool const as_original) const -> decltype(character_in_line) {
     return (character_in_line +
             (as_original ? original_content : content).size());
 }
 
-auto Token::operator==(string const& s) const -> bool { return (content == s); }
-auto Token::operator!=(string const& s) const -> bool { return (content != s); }
+auto Token::operator==(string const& s) const -> bool {
+    return (content == s);
+}
+auto Token::operator!=(string const& s) const -> bool {
+    return (content != s);
+}
 
-Token::operator string() const { return str(); }
+Token::operator string() const {
+    return str();
+}
 
 Token::Token(decltype(line_number) line_,
              decltype(character_in_line) character_,
@@ -60,8 +74,12 @@ Token::Token(decltype(line_number) line_,
     , character_in_line(character_) {}
 Token::Token() : Token(0, 0, "") {}
 
-auto InvalidSyntax::what() const -> const char* { return message.c_str(); }
-auto InvalidSyntax::str() const -> string { return message; }
+auto InvalidSyntax::what() const -> const char* {
+    return message.c_str();
+}
+auto InvalidSyntax::str() const -> string {
+    return message;
+}
 
 auto InvalidSyntax::line() const -> decltype(line_number) {
     return line_number;
@@ -109,7 +127,9 @@ auto InvalidSyntax::aside(Token t, string a) -> InvalidSyntax& {
     aside_token = t;
     return *this;
 }
-auto InvalidSyntax::aside() const -> string { return aside_note; }
+auto InvalidSyntax::aside() const -> string {
+    return aside_note;
+}
 
 auto InvalidSyntax::match_aside(Token token) const -> bool {
     if (token.line() == aside_token.line() and

@@ -28,8 +28,12 @@ using namespace std;
 
 const string viua::types::Object::type_name = "Object";
 
-string viua::types::Object::type() const { return object_type_name; }
-bool viua::types::Object::boolean() const { return true; }
+string viua::types::Object::type() const {
+    return object_type_name;
+}
+bool viua::types::Object::boolean() const {
+    return true;
+}
 
 string viua::types::Object::str() const {
     ostringstream oss;

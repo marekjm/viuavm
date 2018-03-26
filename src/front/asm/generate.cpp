@@ -945,7 +945,9 @@ void generate(vector<Token> const& tokens,
             }
         } catch (const string& e) {
             throw("failed function size count (during pre-assembling): " + e);
-        } catch (const std::out_of_range& e) { throw e.what(); }
+        } catch (const std::out_of_range& e) {
+            throw e.what();
+        }
 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);

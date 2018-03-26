@@ -102,7 +102,9 @@ viua::types::Text::Text(string s) : text(parse(s)) {}
 viua::types::Text::Text(vector<Character> s) : text(std::move(s)) {}
 viua::types::Text::Text(Text&& s) : text(std::move(s.text)) {}
 
-string viua::types::Text::type() const { return "Text"; }
+string viua::types::Text::type() const {
+    return "Text";
+}
 
 string viua::types::Text::str() const {
     ostringstream oss;
@@ -112,9 +114,13 @@ string viua::types::Text::str() const {
     return oss.str();
 }
 
-string viua::types::Text::repr() const { return str::enquote(str()); }
+string viua::types::Text::repr() const {
+    return str::enquote(str());
+}
 
-bool viua::types::Text::boolean() const { return false; }
+bool viua::types::Text::boolean() const {
+    return false;
+}
 
 std::unique_ptr<viua::types::Value> viua::types::Text::copy() const {
     return std::make_unique<Text>(text);
@@ -145,7 +151,9 @@ auto viua::types::Text::at(const size_type i) const -> Character {
 auto viua::types::Text::signed_size() const -> int64_t {
     return static_cast<int64_t>(text.size());
 }
-auto viua::types::Text::size() const -> size_type { return text.size(); }
+auto viua::types::Text::size() const -> size_type {
+    return text.size();
+}
 
 
 auto viua::types::Text::sub(size_type first_index, size_type last_index) const

@@ -37,9 +37,13 @@ void viua::kernel::Register::reset(unique_ptr<viua::types::Value> o) {
     }
 }
 
-bool viua::kernel::Register::empty() const { return value == nullptr; }
+bool viua::kernel::Register::empty() const {
+    return value == nullptr;
+}
 
-viua::types::Value* viua::kernel::Register::get() { return value.get(); }
+viua::types::Value* viua::kernel::Register::get() {
+    return value.get();
+}
 
 viua::types::Value* viua::kernel::Register::release() {
     mask = 0;
@@ -77,7 +81,9 @@ mask_type viua::kernel::Register::unflag(mask_type new_mask) {
     return tmp;
 }
 
-mask_type viua::kernel::Register::get_mask() const { return mask; }
+mask_type viua::kernel::Register::get_mask() const {
+    return mask;
+}
 
 bool viua::kernel::Register::is_flagged(mask_type filter) const {
     return (mask & filter);
@@ -93,7 +99,9 @@ viua::kernel::Register::Register(Register&& that)
     that.mask = 0;
 }
 
-viua::kernel::Register::operator bool() const { return not empty(); }
+viua::kernel::Register::operator bool() const {
+    return not empty();
+}
 
 auto viua::kernel::Register::operator=(Register&& that) -> Register& {
     reset(std::move(that.value));

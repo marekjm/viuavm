@@ -31,7 +31,9 @@ auto Register_usage_profile::fresh(Register const r) const -> bool {
     return fresh_registers.count(r);
 }
 
-auto Register_usage_profile::defresh() -> void { fresh_registers.clear(); }
+auto Register_usage_profile::defresh() -> void {
+    fresh_registers.clear();
+}
 
 auto Register_usage_profile::define(Register const r,
                                     Token const t,

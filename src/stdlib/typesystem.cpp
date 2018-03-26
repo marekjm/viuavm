@@ -54,4 +54,6 @@ const ForeignFunctionSpec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const ForeignFunctionSpec* exports() {
+    return functions;
+}

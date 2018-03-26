@@ -31,7 +31,9 @@
 
 class OutOfRangeException : public viua::types::Exception {
   public:
-    std::string type() const { return "OutOfRangeException"; }
+    std::string type() const {
+        return "OutOfRangeException";
+    }
     OutOfRangeException(const std::string& s) : viua::types::Exception(s) {}
 };
 
@@ -40,7 +42,9 @@ class ArityException : public viua::types::Exception {
     std::vector<decltype(got_arity)> valid_arities;
 
   public:
-    std::string type() const override { return "ArityException"; }
+    std::string type() const override {
+        return "ArityException";
+    }
 
     std::string str() const override {
         std::ostringstream oss;
@@ -61,7 +65,9 @@ class ArityException : public viua::types::Exception {
             got_arity, valid_arities);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 
     ArityException(decltype(got_arity) a, decltype(valid_arities) v)
         : got_arity(a), valid_arities(v) {}
@@ -73,7 +79,9 @@ class TypeException : public viua::types::Exception {
     std::string got;
 
   public:
-    std::string type() const override { return "TypeException"; }
+    std::string type() const override {
+        return "TypeException";
+    }
 
     std::string str() const override {
         std::ostringstream oss;
@@ -86,7 +94,9 @@ class TypeException : public viua::types::Exception {
             expected, got);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 
     TypeException(decltype(expected) e, decltype(got) g)
         : expected(e), got(g) {}
@@ -97,7 +107,9 @@ class UnresolvedAtomException : public viua::types::Exception {
     std::string atom;
 
   public:
-    std::string type() const override { return "UnresolvedAtomException"; }
+    std::string type() const override {
+        return "UnresolvedAtomException";
+    }
 
     std::string str() const override {
         return ("atom '" + atom + "' could not be resolved");
@@ -108,7 +120,9 @@ class UnresolvedAtomException : public viua::types::Exception {
             UnresolvedAtomException>(atom);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 
     UnresolvedAtomException(decltype(atom) a) : atom(a) {}
     ~UnresolvedAtomException() {}
@@ -116,16 +130,22 @@ class UnresolvedAtomException : public viua::types::Exception {
 
 class OperandTypeException : public viua::types::Exception {
   public:
-    std::string type() const override { return "OperandTypeException"; }
+    std::string type() const override {
+        return "OperandTypeException";
+    }
 
-    std::string str() const override { return "invalid operand type"; }
+    std::string str() const override {
+        return "invalid operand type";
+    }
 
     std::unique_ptr<Value> copy() const override {
         return viua::util::exceptions::make_unique_exception<
             OperandTypeException>();
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 };
 
 #endif

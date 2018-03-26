@@ -40,12 +40,18 @@ string viua::types::Exception::etype() const {
     return detailed_type;
 }
 
-string viua::types::Exception::type() const { return "Exception"; }
-string viua::types::Exception::str() const { return cause; }
+string viua::types::Exception::type() const {
+    return "Exception";
+}
+string viua::types::Exception::str() const {
+    return cause;
+}
 string viua::types::Exception::repr() const {
     return (etype() + ": " + str::enquote(cause));
 }
-bool viua::types::Exception::boolean() const { return true; }
+bool viua::types::Exception::boolean() const {
+    return true;
+}
 
 unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
     return make_unique<Exception>(cause);
