@@ -437,8 +437,8 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(const
 
             using viua::assembler::frontend::parser::Directive;
             if (auto mark = dynamic_cast<Directive*>(line.get()); mark and mark->directive == ".mark:") {
-                jump_targets[mark->operands.at(0)] =
-                    instruction_counter + 1;  // marker points at the *next* instruction
+                jump_targets[mark->operands.at(0)] = instruction_counter + 1;  // marker points at the *next*
+                                                                               // instruction
             }
 
             if (mnemonic.str().at(0) != '.') {

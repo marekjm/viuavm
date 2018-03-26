@@ -83,7 +83,7 @@ namespace viua {
                 attached_notes.push_back(n);
                 return *this;
             }
-            auto InvalidSyntax::notes() const -> const decltype(attached_notes) & { return attached_notes; }
+            auto InvalidSyntax::notes() const -> const decltype(attached_notes)& { return attached_notes; }
 
             auto InvalidSyntax::aside(string a) -> InvalidSyntax& {
                 aside_note = a;

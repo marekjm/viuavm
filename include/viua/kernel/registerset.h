@@ -64,7 +64,7 @@ namespace viua {
 
             operator bool() const;
             auto operator=(Register &&) -> Register&;
-            auto operator=(decltype(value) &&) -> Register&;
+            auto operator=(decltype(value)&&) -> Register&;
         };
 
         class RegisterSet {

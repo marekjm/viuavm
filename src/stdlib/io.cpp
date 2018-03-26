@@ -24,8 +24,8 @@
 #include <string>
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
-#include <viua/types/string.h>
 #include <viua/types/pointer.h>
+#include <viua/types/string.h>
 using namespace std;
 
 
@@ -40,7 +40,9 @@ class Ifstream : public viua::types::Value {
     auto boolean() const -> bool override { return in.is_open(); }
 
     virtual auto bases() const -> vector<string> override { return vector<string>{"viua::types::Value"}; }
-    virtual auto inheritancechain() const -> vector<string> override { return vector<string>{"viua::types::Value"}; }
+    virtual auto inheritancechain() const -> vector<string> override {
+        return vector<string>{"viua::types::Value"};
+    }
 
     auto getline() const -> string {
         if (in.eof()) {
@@ -99,7 +101,7 @@ static auto io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel:
 
 static auto io_file_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
-    auto out = ofstream{ frame->arguments->get(0)->str() };
+    auto out = ofstream{frame->arguments->get(0)->str()};
     out << frame->arguments->get(1)->str();
     out.close();
 }

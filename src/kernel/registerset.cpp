@@ -98,7 +98,7 @@ auto viua::kernel::Register::operator=(Register&& that) -> Register& {
     return *this;
 }
 
-auto viua::kernel::Register::operator=(decltype(value) && o) -> Register& {
+auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register& {
     reset(std::move(o));
     mask = 0;
     return *this;

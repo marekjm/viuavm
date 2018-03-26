@@ -47,7 +47,7 @@ namespace viua {
             std::string str() const override;
             bool boolean() const override;
 
-            auto value() -> decltype(number) &;
+            auto value() -> decltype(number)&;
 
             std::unique_ptr<Value> copy() const override;
 

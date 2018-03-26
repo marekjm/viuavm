@@ -165,8 +165,7 @@ static auto get_raw_block_bodies(string const& type, vector<Token> const& tokens
             ++i;  // skip directive
 
             if (tokens.at(i) == "[[") {
-                while (tokens.at(++i) != "]]") {
-                }
+                while (tokens.at(++i) != "]]") {}
                 ++i;  // skip closing ]]
             }
 

@@ -487,8 +487,8 @@ void generate(vector<Token> const& tokens, invocables_t& functions, invocables_t
     // MAP FUNCTIONS TO ADDRESSES AND
     // MAP BLOCKS TO ADDRESSES AND
     // SET STARTING INSTRUCTION
-    viua::internals::types::bytecode_size starting_instruction =
-        0;  // the bytecode offset to first executable instruction
+    viua::internals::types::bytecode_size starting_instruction = 0;  // the bytecode offset to first
+                                                                     // executable instruction
     map<string, viua::internals::types::bytecode_size> function_addresses;
     map<string, viua::internals::types::bytecode_size> block_addresses;
     try {

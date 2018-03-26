@@ -31,7 +31,7 @@ string Float::type() const { return "Float"; }
 string Float::str() const { return to_string(number); }
 bool Float::boolean() const { return (number != 0); }
 
-auto Float::value() -> decltype(number) & { return number; }
+auto Float::value() -> decltype(number)& { return number; }
 
 unique_ptr<viua::types::Value> Float::copy() const { return make_unique<Float>(number); }
 

@@ -74,7 +74,7 @@ namespace viua {
                 auto add(Token) -> InvalidSyntax&;
 
                 auto note(std::string) -> InvalidSyntax&;
-                auto notes() const -> const decltype(attached_notes) &;
+                auto notes() const -> const decltype(attached_notes)&;
 
                 auto aside(std::string) -> InvalidSyntax&;
                 auto aside(Token, std::string) -> InvalidSyntax&;

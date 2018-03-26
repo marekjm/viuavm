@@ -71,7 +71,7 @@ auto viua::assembler::frontend::parser::parse_attribute_value(const vector_view<
     return i;
 }
 auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token> tokens,
-                                                         decltype(InstructionsBlock::attributes) & attributes)
+                                                         decltype(InstructionsBlock::attributes)& attributes)
     -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 

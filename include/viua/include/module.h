@@ -55,12 +55,13 @@ namespace viua {
 
 
 // External functions must have this signature
-typedef void(ForeignFunction)(
-    Frame*,  // call frame; contains parameters, local registers, name of the function etc.
-    viua::kernel::RegisterSet*,  // static register set (may be nullptr)
-    viua::kernel::RegisterSet*,  // global register set (may be nullptr)
-    viua::process::Process*,     // calling process
-    viua::kernel::Kernel*        // VM viua::kernel::Kernel the calling process is running on
+typedef void(ForeignFunction)(Frame*,  // call frame; contains parameters, local registers, name of the
+                                       // function etc.
+                              viua::kernel::RegisterSet*,  // static register set (may be nullptr)
+                              viua::kernel::RegisterSet*,  // global register set (may be nullptr)
+                              viua::process::Process*,     // calling process
+                              viua::kernel::Kernel*  // VM viua::kernel::Kernel the calling process is running
+                                                     // on
 );
 
 /** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of
