@@ -109,6 +109,13 @@ CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS) $(CXX_EXTRA_F
 
 CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
+
+# Expose symbols in the VM kernel binary to the shared libraries that are linked at runtime.
+# It is done this way to avoid making every library carry its own copy of functions used to access
+# registers, types, the kernel, etc.
+# I don't yet know how this will affect library compatibility. Runtime crashes because a symbol has
+# been moved? Shouldn't happen because the symbol will be located dynamically.
+# I guess we'll see.
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo -rdynamic
 
 VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o \
