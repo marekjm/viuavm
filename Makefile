@@ -286,10 +286,10 @@ build/kernel/%.o: src/kernel/%.cpp
 build/stdlib/std/%.vlib: src/stdlib/viua/%.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
-build/stdlib/%.o: src/stdlib/%.cpp
+build/stdlib/std/%.o: src/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/%.so: build/stdlib/%.o
+build/stdlib/std/%.so: build/stdlib/std/%.o
 	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 	# $(CXX) $(CXXFLAGS) -Wl,--no-undefined -fPIC -shared -o $@ $^
 
@@ -471,43 +471,46 @@ build/kernel/frame.o: src/kernel/frame.cpp include/viua/kernel/frame.h
 standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib \
 	build/stdlib/std/misc.vlib
 
-stdlib: build/bin/vm/asm standardlibrary build/stdlib/typesystem.so build/stdlib/io.so \
-	build/stdlib/random.so build/stdlib/kitchensink.so
+stdlib: build/bin/vm/asm \
+	standardlibrary \
+	build/stdlib/std/typesystem.so \
+	build/stdlib/std/os.so \
+	build/stdlib/std/io.so \
+	build/stdlib/std/random.so \
+	build/stdlib/std/kitchensink.so
 
 ####
 #### Fix for Travis CI.
 #### Once GNU Make is upgraded to 4.2 or later, these targets will not
 #### be needed.
 ####
-build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
+build/stdlib/std/typesystem.o: src/stdlib/typesystem.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/io.o: src/stdlib/io.cpp
+build/stdlib/std/os.o: src/stdlib/os.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/random.o: src/stdlib/random.cpp
+build/stdlib/std/io.o: src/stdlib/io.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
+build/stdlib/std/random.o: src/stdlib/random.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+
+build/stdlib/std/kitchensink.o: src/stdlib/kitchensink.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
 ####
 #### End of fix for Travis CI.
 ####
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/types/exception.o \
-	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
-	build/platform/types/pointer.o build/platform/types/integer.o build/platform/types/bits.o \
-	build/platform/types/number.o build/platform/kernel/registerset.o build/platform/support/string.o
+build/stdlib/std/typesystem.so: build/stdlib/std/typesystem.o
 
-build/stdlib/io.so: build/stdlib/io.o
+build/stdlib/std/os.so: build/stdlib/std/os.o
 
-build/stdlib/random.so: build/stdlib/random.o build/platform/types/exception.o build/platform/types/vector.o \
-	build/platform/types/string.o build/platform/types/value.o build/platform/types/pointer.o \
-	build/platform/kernel/registerset.o build/platform/support/string.o
+build/stdlib/std/io.so: build/stdlib/std/io.o
 
-build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/types/exception.o \
-	build/platform/types/vector.o build/platform/types/string.o build/platform/types/value.o \
-	build/platform/types/pointer.o build/platform/kernel/registerset.o build/platform/support/string.o
+build/stdlib/std/random.so: build/stdlib/std/random.o
+
+build/stdlib/std/kitchensink.so: build/stdlib/std/kitchensink.o
 
 
 ############################################################
