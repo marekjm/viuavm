@@ -25,57 +25,25 @@
 #include <viua/kernel/registerset.h>
 #include <viua/types/exception.h>
 #include <viua/types/string.h>
-#include <viua/types/value.h>
-#include <viua/types/vector.h>
+#include <viua/types/pointer.h>
 using namespace std;
 
 
 static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                   viua::process::Process*, viua::kernel::Kernel*) -> void {
+                   viua::process::Process* process, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw make_unique<viua::types::Exception>("expected object as parameter 0");
+        throw make_unique<viua::types::Exception>("requires 1 parameter");
     }
-    frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
-}
-
-static auto inheritance_chain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                              viua::process::Process*, viua::kernel::Kernel*) -> void {
-    if (not frame->arguments->at(0)) {
-        throw make_unique<viua::types::Exception>("expected object as parameter 0");
+    if (auto const pointer = dynamic_cast<viua::types::Pointer*>(frame->arguments->get(0)); pointer) {
+        frame->local_register_set->set(0, make_unique<viua::types::String>(pointer->to(process)->type()));
+    } else {
+        throw make_unique<viua::types::Exception>("expected a pointer as parameter 0");
     }
-
-    auto ic = frame->arguments->at(0)->inheritancechain();
-    auto icv = make_unique<viua::types::Vector>();
-
-    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
-        icv->push(make_unique<viua::types::String>(ic[i]));
-    }
-
-    frame->local_register_set->set(0, std::move(icv));
-}
-
-static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                  viua::process::Process*, viua::kernel::Kernel*) -> void {
-    if (not frame->arguments->at(0)) {
-        throw make_unique<viua::types::Exception>("expected object as parameter 0");
-    }
-
-    viua::types::Value* object = frame->arguments->at(0);
-    auto ic = object->bases();
-    auto icv = make_unique<viua::types::Vector>();
-
-    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
-        icv->push(make_unique<viua::types::String>(ic[i]));
-    }
-
-    frame->local_register_set->set(0, std::move(icv));
 }
 
 
 const ForeignFunctionSpec functions[] = {
-    {"typesystem::typeof/1", &typeof},
-    {"typesystem::inheritance_chain/1", &inheritance_chain},
-    {"typesystem::bases/1", &bases},
+    {"std::typesystem::typeof/1", &typeof},
     {nullptr, nullptr},
 };
 
