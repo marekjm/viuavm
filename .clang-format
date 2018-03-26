@@ -36,7 +36,6 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: true
-BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit:     110
 CommentPragmas:  '^ IWYU pragma:'
@@ -59,16 +58,11 @@ IncludeIsMainRegex: '$'
 IndentCaseLabels: true
 IndentWidth:     4
 IndentWrappedFunctionNames: false
-JavaScriptQuotes: Leave
-JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
-ObjCBlockIndentWidth: 2
-ObjCSpaceAfterProperty: false
-ObjCSpaceBeforeProtocolList: true
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 30
 PenaltyBreakFirstLessLess: 120
