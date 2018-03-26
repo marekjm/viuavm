@@ -373,26 +373,26 @@ build/cg/%.o: src/cg/%.cpp
 
 ############################################################
 # VIRTUAL MACHINE CODE
-VIUA_INSTR_FILES_O=build/process/instr/general.o \
-				   build/process/instr/registers.o \
-				   build/process/instr/calls.o \
-				   build/process/instr/concurrency.o \
-				   build/process/instr/linking.o \
-				   build/process/instr/tcmechanism.o \
-				   build/process/instr/closure.o \
-				   build/process/instr/int.o \
-				   build/process/instr/float.o \
+VIUA_INSTR_FILES_O=build/process/instr/atom.o \
 				   build/process/instr/arithmetic.o \
-				   build/process/instr/str.o \
-				   build/process/instr/text.o \
-				   build/process/instr/bool.o \
 				   build/process/instr/bits.o \
+				   build/process/instr/bool.o \
+				   build/process/instr/calls.o \
 				   build/process/instr/cast.o \
-				   build/process/instr/vector.o \
-				   build/process/instr/prototype.o \
+				   build/process/instr/closure.o \
+				   build/process/instr/concurrency.o \
+				   build/process/instr/float.o \
+				   build/process/instr/general.o
+				   build/process/instr/int.o \
+				   build/process/instr/linking.o \
 				   build/process/instr/object.o \
+				   build/process/instr/prototype.o \
+				   build/process/instr/registers.o \
+				   build/process/instr/str.o \
 				   build/process/instr/struct.o \
-				   build/process/instr/atom.o
+				   build/process/instr/tcmechanism.o \
+				   build/process/instr/text.o \
+				   build/process/instr/vector.o
 
 VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/bits.o \
