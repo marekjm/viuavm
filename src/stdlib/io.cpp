@@ -30,33 +30,33 @@ using namespace std;
 
 
 class Ifstream : public viua::types::Value {
-    ifstream in;
-    const string filename;
+    mutable ifstream in;
+    string const filename;
 
   public:
-    string type() const override { return "Ifstream"; }
-    string str() const override { return type(); }
-    string repr() const override { return str(); }
-    bool boolean() const override { return in.is_open(); }
+    auto type() const -> string override { return "Ifstream"; }
+    auto str() const -> string override { return type(); }
+    auto repr() const -> string override { return str(); }
+    auto boolean() const -> bool override { return in.is_open(); }
 
-    virtual vector<string> bases() const override { return vector<string>{"viua::types::Value"}; }
-    virtual vector<string> inheritancechain() const override { return vector<string>{"viua::types::Value"}; }
+    virtual auto bases() const -> vector<string> override { return vector<string>{"viua::types::Value"}; }
+    virtual auto inheritancechain() const -> vector<string> override { return vector<string>{"viua::types::Value"}; }
 
-    string getline() {
+    auto getline() const -> string {
         if (in.eof()) {
             throw make_unique<viua::types::Exception>("EOF");
         }
 
-        string line;
+        auto line = string{};
         ::std::getline(in, line);
         return line;
     }
 
-    unique_ptr<viua::types::Value> copy() const override {
+    auto copy() const -> unique_ptr<viua::types::Value> override {
         throw make_unique<viua::types::Exception>("Ifstream is not copyable");
     }
 
-    Ifstream(const string& path) : filename(path) { in.open(filename); }
+    Ifstream(string const& path) : filename(path) { in.open(filename); }
     virtual ~Ifstream() {
         if (in.is_open()) {
             in.close();
@@ -67,7 +67,7 @@ class Ifstream : public viua::types::Value {
 
 static auto io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
-    string line;
+    auto line = string{};
     getline(cin, line);
     frame->local_register_set->set(0, make_unique<viua::types::String>(line));
 }
@@ -85,11 +85,11 @@ static auto io_stderr_write(Frame* frame, viua::kernel::RegisterSet*, viua::kern
 
 static auto io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                          viua::process::Process*, viua::kernel::Kernel*) -> void {
-    string path = frame->arguments->get(0)->str();
-    ifstream in(path);
+    auto const path = frame->arguments->get(0)->str();
+    auto in = ifstream{path};
 
-    ostringstream oss;
-    string line;
+    auto oss = ostringstream{};
+    auto line = string{};
     while (getline(in, line)) {
         oss << line << '\n';
     }
@@ -99,7 +99,7 @@ static auto io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel:
 
 static auto io_file_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
-    ofstream out(frame->arguments->get(0)->str());
+    auto out = ofstream{ frame->arguments->get(0)->str() };
     out << frame->arguments->get(1)->str();
     out.close();
 }
@@ -111,7 +111,7 @@ static auto io_ifstream_open(Frame* frame, viua::kernel::RegisterSet*, viua::ker
 
 static auto io_ifstream_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                                 viua::process::Process* p, viua::kernel::Kernel*) -> void {
-    Ifstream* in =
+    auto const in =
         dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
     frame->local_register_set->set(0, make_unique<viua::types::String>(in->getline()));
 }
