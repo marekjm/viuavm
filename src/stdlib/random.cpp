@@ -44,8 +44,8 @@ static auto getrandom() -> long double {
     }
     unsigned long long int rullint = 0;
     in.read(reinterpret_cast<char*>(&rullint), sizeof(rullint));
-    return (static_cast<long double>(rullint) /
-            static_cast<long double>(ULLONG_MAX));
+    return (static_cast<long double>(rullint)
+            / static_cast<long double>(ULLONG_MAX));
 }
 
 static auto random_drandom(Frame* frame,

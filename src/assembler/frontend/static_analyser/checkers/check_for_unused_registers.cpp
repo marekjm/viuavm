@@ -43,8 +43,8 @@ auto check_for_unused_registers(
         // attribute (later).
         if (not register_usage_profile.used(each.first)) {
             auto msg = std::ostringstream{};
-            msg << "unused " + to_string(each.second.second.value_type) +
-                       " in register "
+            msg << "unused " + to_string(each.second.second.value_type)
+                       + " in register "
                 << str::enquote(std::to_string(each.first.index));
             if (register_usage_profile.index_to_name.count(each.first.index)) {
                 msg << " (named "

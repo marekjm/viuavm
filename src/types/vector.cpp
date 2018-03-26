@@ -36,14 +36,16 @@ void viua::types::Vector::insert(long int index,
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
-    if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >
-                          internal_object.size()) {
+    if (index > 0
+        and static_cast<decltype(internal_object)::size_type>(index)
+                > internal_object.size()) {
         ostringstream oss;
         oss << "positive vector index out of range: index = " << index
             << ", size = " << internal_object.size();
         throw make_unique_exception<OutOfRangeException>(oss.str());
-    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(
-                                 -index) > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<OutOfRangeException>(
             "negative vector index out of range");
     }
@@ -68,12 +70,14 @@ unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
     if (internal_object.size() == 0) {
         throw make_unique_exception<OutOfRangeException>(
             "empty vector index out of range");
-    } else if (index > 0 and static_cast<decltype(internal_object)::size_type>(
-                                 index) >= internal_object.size()) {
+    } else if (index > 0
+               and static_cast<decltype(internal_object)::size_type>(index)
+                       >= internal_object.size()) {
         throw make_unique_exception<OutOfRangeException>(
             "positive vector index out of range");
-    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(
-                                 -index) > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<OutOfRangeException>(
             "negative vector index out of range");
     }
@@ -97,12 +101,14 @@ viua::types::Value* viua::types::Vector::at(long int index) {
     if (internal_object.size() == 0) {
         throw make_unique_exception<OutOfRangeException>(
             "empty vector index out of range");
-    } else if (index > 0 and static_cast<decltype(internal_object)::size_type>(
-                                 index) >= internal_object.size()) {
+    } else if (index > 0
+               and static_cast<decltype(internal_object)::size_type>(index)
+                       >= internal_object.size()) {
         throw make_unique_exception<OutOfRangeException>(
             "positive vector index out of range");
-    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(
-                                 -index) > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<OutOfRangeException>(
             "negative vector index out of range");
     }

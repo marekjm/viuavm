@@ -137,8 +137,8 @@ auto viua::assembler::frontend::parser::parse_operand(
             ri->resolved = true;
         } else if (str::isnum(tok.substr(1), true)) {
             throw InvalidSyntax(tokens.at(0),
-                                "register indexes cannot be negative: " +
-                                    tok.substr(1));
+                                "register indexes cannot be negative: "
+                                    + tok.substr(1));
         } else {
             // FIXME Throw this error during register usage analysis, when we
             // have a full map of names built so "did you mean...?" note can be
@@ -256,8 +256,8 @@ auto viua::assembler::frontend::parser::parse_operand(
         ++i;
 
         operand = std::move(duration_literal);
-    } else if ((tok.at(0) == '+' and str::isnum(tok.substr(1))) or
-               str::isnum(tok, true)) {
+    } else if ((tok.at(0) == '+' and str::isnum(tok.substr(1)))
+               or str::isnum(tok, true)) {
         auto offset     = make_unique<Offset>();
         offset->content = (tok.at(0) == '+' ? tok.substr(1) : tok);
         offset->add(tokens.at(i));
@@ -361,8 +361,8 @@ auto viua::assembler::frontend::parser::parse_directive(
         throw error;
     }
 
-    if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:" or
-        tokens.at(0) == ".closure:") {
+    if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:"
+        or tokens.at(0) == ".closure:") {
         throw InvalidSyntax(tokens.at(0), "no '.end' between definitions");
     }
 

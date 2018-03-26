@@ -49,9 +49,9 @@ viua::internals::types::byte* viua::process::Process::opprint(
 viua::internals::types::byte* viua::process::Process::opjump(
     viua::internals::types::byte* addr) {
     viua::internals::types::byte* target =
-        (stack->jump_base +
-         viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
-                                                                     this));
+        (stack->jump_base
+         + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
+                                                                       this));
     if (target == addr) {
         throw make_unique<viua::types::Exception>(
             "aborting: JUMP instruction pointing to itself");

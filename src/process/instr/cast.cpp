@@ -77,11 +77,11 @@ viua::internals::types::byte* viua::process::Process::opstoi(
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
-        throw make_unique<viua::types::Exception>("out of range: " +
-                                                  supplied_string);
+        throw make_unique<viua::types::Exception>("out of range: "
+                                                  + supplied_string);
     } catch (const std::invalid_argument& e) {
-        throw make_unique<viua::types::Exception>("invalid argument: " +
-                                                  supplied_string);
+        throw make_unique<viua::types::Exception>("invalid argument: "
+                                                  + supplied_string);
     }
 
     *target = make_unique<viua::types::Integer>(result_integer);

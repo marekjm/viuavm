@@ -120,9 +120,9 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
             suggestion.first) {
             error.aside(
                 r.tokens.at(0),
-                "did you mean '" + suggestion.second + "' (name of " +
-                    std::to_string(rup.name_to_index.at(suggestion.second)) +
-                    ")?");
+                "did you mean '" + suggestion.second + "' (name of "
+                    + std::to_string(rup.name_to_index.at(suggestion.second))
+                    + ")?");
         }
         throw error;
     }
@@ -138,13 +138,13 @@ static auto maybe_mistyped_register_set_helper(
         val.register_set = rs_id;
         if (rup.defined(val)) {
             error.errors.back().aside(r.tokens.at(0),
-                                      "did you mean " + to_string(rs_id) +
-                                          " register " +
-                                          std::to_string(r.index) + "?");
+                                      "did you mean " + to_string(rs_id)
+                                          + " register "
+                                          + std::to_string(r.index) + "?");
             error.append(InvalidSyntax(rup.defined_where(val), "")
-                             .note(to_string(rs_id) + " register " +
-                                   std::to_string(r.index) +
-                                   " was defined here"));
+                             .note(to_string(rs_id) + " register "
+                                   + std::to_string(r.index)
+                                   + " was defined here"));
             return true;
         }
     }
@@ -283,18 +283,18 @@ auto const value_type_names = std::map<ValueTypes, std::string>{
 };
 auto operator|(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) |
-                                   static_cast<ValueTypesType>(rhs));
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+                                   | static_cast<ValueTypesType>(rhs));
 }
 auto operator&(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) &
-                                   static_cast<ValueTypesType>(rhs));
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+                                   & static_cast<ValueTypesType>(rhs));
 }
 auto operator^(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs) ^
-                                   static_cast<ValueTypesType>(rhs));
+    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+                                   ^ static_cast<ValueTypesType>(rhs));
 }
 auto operator!(const ValueTypes v) -> bool {
     return not static_cast<ValueTypesType>(v);

@@ -98,8 +98,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             oss << "static";
             break;
         default:
-            if (support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES") ==
-                "yes") {
+            if (support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES")
+                == "yes") {
                 oss << "<invalid=" << static_cast<int>(*ptr) << '>';
             } else {
                 throw "invalid register set detected";
@@ -343,8 +343,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     } else if (op == TEXT) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
-        if (OperandType(*ptr) == OT_REGISTER_INDEX or
-            OperandType(*ptr) == OT_POINTER) {
+        if (OperandType(*ptr) == OT_REGISTER_INDEX
+            or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
             ++ptr;  // for operand type
@@ -376,8 +376,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
 
         oss << ' ';
 
-        if (OperandType(*ptr) == OT_REGISTER_INDEX or
-            OperandType(*ptr) == OT_POINTER) {
+        if (OperandType(*ptr) == OT_REGISTER_INDEX
+            or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
             auto const fn_name = string{reinterpret_cast<char*>(ptr)};
@@ -398,8 +398,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     } else if (op == TAILCALL or op == DEFER) {
         oss << ' ';
 
-        if (OperandType(*ptr) == OT_REGISTER_INDEX or
-            OperandType(*ptr) == OT_POINTER) {
+        if (OperandType(*ptr) == OT_REGISTER_INDEX
+            or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         } else {
             auto const fn_name = string{reinterpret_cast<char*>(ptr)};
@@ -745,8 +745,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     }
 
     if (ptr < saved_ptr) {
-        throw("bytecode pointer increase less than zero: near " +
-              OP_NAMES.at(op) + " instruction");
+        throw("bytecode pointer increase less than zero: near "
+              + OP_NAMES.at(op) + " instruction");
     }
     // we already *know* that the result will not be negative
     auto const increase =

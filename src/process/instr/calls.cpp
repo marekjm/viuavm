@@ -183,8 +183,8 @@ viua::internals::types::byte* viua::process::Process::opcall(
     bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
     if (not(is_native or is_foreign or is_foreign_method)) {
-        throw make_unique<viua::types::Exception>(
-            "call to undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("call to undefined function: "
+                                                  + call_name);
     }
 
     if (is_foreign_method) {
@@ -227,8 +227,8 @@ viua::internals::types::byte* viua::process::Process::optailcall(
         }
     }
 
-    if (stack->state_of() !=
-        viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+    if (stack->state_of()
+        != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
         throw make_unique<viua::types::Exception>(
             "stack left in an invalid state");
     }
@@ -338,8 +338,8 @@ viua::internals::types::byte* viua::process::Process::opreturn(
         }
     }
 
-    if (stack->state_of() !=
-        viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+    if (stack->state_of()
+        != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
         throw make_unique<viua::types::Exception>(
             "stack left in an invalid state");
     }

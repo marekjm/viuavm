@@ -49,8 +49,8 @@ auto check_op_ptr(Register_usage_profile& register_usage_profile,
 
     auto val = Register(*result);
     val.value_type =
-        (register_usage_profile.at(Register(*operand)).second.value_type |
-         viua::internals::ValueTypes::POINTER);
+        (register_usage_profile.at(Register(*operand)).second.value_type
+         | viua::internals::ValueTypes::POINTER);
     register_usage_profile.define(val, result->tokens.at(0));
 }
 }  // namespace checkers

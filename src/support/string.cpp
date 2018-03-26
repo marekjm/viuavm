@@ -125,8 +125,8 @@ auto is_timeout_literal(string const s) -> bool {
     if (size < 2) {
         return false;
     }
-    if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and
-        str::isnum(s.substr(0, size - 2))) {
+    if (s.at(size - 2) == 'm' and s.at(size - 1) == 's'
+        and str::isnum(s.substr(0, size - 2))) {
         return true;
     }
     if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
@@ -159,8 +159,8 @@ auto isfloat(std::string const& s, bool negatives) -> bool {
     if (dot == -1) {
         return false;
     }
-    is = isnum(sub(s, 0, dot), negatives) and
-         isnum(sub(s, (static_cast<unsigned>(dot) + 1)));
+    is = isnum(sub(s, 0, dot), negatives)
+         and isnum(sub(s, (static_cast<unsigned>(dot) + 1)));
     return is;
 }
 

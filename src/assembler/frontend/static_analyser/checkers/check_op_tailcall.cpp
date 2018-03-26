@@ -34,9 +34,9 @@ auto check_op_tailcall(Register_usage_profile& register_usage_profile,
     using viua::assembler::frontend::parser::VoidLiteral;
 
     auto fn = instruction.operands.at(0).get();
-    if ((not dynamic_cast<AtomLiteral*>(fn)) and
-        (not dynamic_cast<FunctionNameLiteral*>(fn)) and
-        (not dynamic_cast<RegisterIndex*>(fn))) {
+    if ((not dynamic_cast<AtomLiteral*>(fn))
+        and (not dynamic_cast<FunctionNameLiteral*>(fn))
+        and (not dynamic_cast<RegisterIndex*>(fn))) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected function name, atom literal, or register index");

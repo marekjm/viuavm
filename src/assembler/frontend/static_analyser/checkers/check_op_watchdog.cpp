@@ -33,8 +33,8 @@ auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction)
     using viua::assembler::frontend::parser::FunctionNameLiteral;
 
     auto fn = instruction.operands.at(0).get();
-    if ((not dynamic_cast<AtomLiteral*>(fn)) and
-        (not dynamic_cast<FunctionNameLiteral*>(fn))) {
+    if ((not dynamic_cast<AtomLiteral*>(fn))
+        and (not dynamic_cast<FunctionNameLiteral*>(fn))) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected function name or atom literal");

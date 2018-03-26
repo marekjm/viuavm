@@ -77,9 +77,9 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
             oss << "instruction_index = " << instruction_index;
             throw viua::cg::lex::InvalidSyntax(token, oss.str());
         }
-        addr = (instruction_index -
-                static_cast<viua::internals::types::bytecode_size>(-1 *
-                                                                   jump_value));
+        addr = (instruction_index
+                - static_cast<viua::internals::types::bytecode_size>(
+                      -1 * jump_value));
     } else if (jmp[0] == '+') {
         addr = (instruction_index + stoul(jmp.substr(1)));
     } else {
@@ -92,8 +92,8 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
         } catch (const std::out_of_range& e) {
             throw viua::cg::lex::InvalidSyntax(
                 token,
-                ("cannot resolve jump to unrecognised marker: " +
-                 str::enquote(str::strencode(jmp))));
+                ("cannot resolve jump to unrecognised marker: "
+                 + str::enquote(str::strencode(jmp))));
         }
     }
 
@@ -149,8 +149,8 @@ static string resolveregister(Token token,
     } else {
         throw viua::cg::lex::InvalidSyntax(
             token,
-            ("cannot resolve register operand: " +
-             str::enquote(str::strencode(token.str()))));
+            ("cannot resolve register operand: "
+             + str::enquote(str::strencode(token.str()))));
     }
     return out.str();
 }
@@ -491,8 +491,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         auto target_operand = assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1)));
-        if (tokens.at(source).str().at(0) == '*' or
-            tokens.at(source).str().at(0) == '%') {
+        if (tokens.at(source).str().at(0) == '*'
+            or tokens.at(source).str().at(0) == '%') {
             program.optext(target_operand,
                            assembler::operands::getint_with_rs_type(
                                resolveregister(tokens.at(source)),
@@ -742,8 +742,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         TokenIndex lhs    = target + 2;
 
         auto src = tokens.at(lhs).str();
-        if (src.at(0) == '0' and
-            (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
+        if (src.at(0) == '0'
+            and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
             program.opbits(
                 assembler::operands::getint_with_rs_type(
                     resolveregister(tokens.at(target)),
@@ -1178,8 +1178,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                 resolve_rs_type(tokens.at(target + 1)));
         }
 
-        if (tokens.at(fn).str().at(0) == '*' or
-            tokens.at(fn).str().at(0) == '%') {
+        if (tokens.at(fn).str().at(0) == '*'
+            or tokens.at(fn).str().at(0) == '%') {
             program.opcall(ret,
                            assembler::operands::getint_with_rs_type(
                                resolveregister(tokens.at(fn)),
@@ -1188,8 +1188,8 @@ viua::internals::types::bytecode_size assemble_instruction(
             program.opcall(ret, tokens.at(fn));
         }
     } else if (tokens.at(i) == "tailcall") {
-        if (tokens.at(i + 1).str().at(0) == '*' or
-            tokens.at(i + 1).str().at(0) == '%') {
+        if (tokens.at(i + 1).str().at(0) == '*'
+            or tokens.at(i + 1).str().at(0) == '%') {
             program.optailcall(assembler::operands::getint_with_rs_type(
                 resolveregister(tokens.at(i + 1)),
                 resolve_rs_type(tokens.at(i + 2))));
@@ -1197,8 +1197,8 @@ viua::internals::types::bytecode_size assemble_instruction(
             program.optailcall(tokens.at(i + 1));
         }
     } else if (tokens.at(i) == "defer") {
-        if (tokens.at(i + 1).str().at(0) == '*' or
-            tokens.at(i + 1).str().at(0) == '%') {
+        if (tokens.at(i + 1).str().at(0) == '*'
+            or tokens.at(i + 1).str().at(0) == '%') {
             program.opdefer(assembler::operands::getint_with_rs_type(
                 resolveregister(tokens.at(i + 1)),
                 resolve_rs_type(tokens.at(i + 2))));
@@ -1501,8 +1501,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                 resolve_rs_type(tokens.at(target + 1)));
         }
 
-        if (tokens.at(fn).str().at(0) == '*' or
-            tokens.at(fn).str().at(0) == '%') {
+        if (tokens.at(fn).str().at(0) == '*'
+            or tokens.at(fn).str().at(0) == '%') {
             program.opmsg(ret,
                           assembler::operands::getint_with_rs_type(
                               resolveregister(tokens.at(fn)),
@@ -1560,8 +1560,8 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else {
         throw viua::cg::lex::InvalidSyntax(
             tokens.at(i),
-            ("unimplemented instruction: " +
-             str::enquote(str::strencode(tokens.at(i)))));
+            ("unimplemented instruction: "
+             + str::enquote(str::strencode(tokens.at(i)))));
     }
 
     if (tokens.at(i).str().substr(0, 1) != ".") {

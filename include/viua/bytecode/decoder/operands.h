@@ -108,8 +108,8 @@ auto fetch_object_of(viua::internals::types::byte* ip,
     RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
     if (not converted) {
         throw std::make_unique<viua::types::Exception>(
-            "fetched invalid type: expected '" + RequestedType::type_name +
-            "' but got '" + fetched->type() + "'");
+            "fetched invalid type: expected '" + RequestedType::type_name
+            + "' but got '" + fetched->type() + "'");
     }
     return {addr, converted};
 }

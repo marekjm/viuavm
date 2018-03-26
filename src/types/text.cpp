@@ -73,18 +73,18 @@ auto viua::types::Text::parse(string s) -> decltype(text) {
 
         if ((UTF8_1ST_ROW_NORMALISER & ss[0]) == UTF8_1ST_ROW) {
             // do nothing
-        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW and
-                   is_continuation_byte(ss[1])) {
+        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW
+                   and is_continuation_byte(ss[1])) {
             ++i;
-        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW and
-                   is_continuation_byte(ss[1]) and
-                   is_continuation_byte(ss[2])) {
+        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])) {
             ++i;
             ++i;
-        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW and
-                   is_continuation_byte(ss[1]) and
-                   is_continuation_byte(ss[2]) and
-                   is_continuation_byte(ss[3])) {
+        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])
+                   and is_continuation_byte(ss[3])) {
             ++i;
             ++i;
             ++i;
@@ -173,9 +173,9 @@ auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
     size_type length_of_common_prefix = 0;
     auto limit                        = max(size(), other.size());
 
-    while (length_of_common_prefix < limit and
-           text.at(length_of_common_prefix) ==
-               other.at(length_of_common_prefix)) {
+    while (length_of_common_prefix < limit
+           and text.at(length_of_common_prefix)
+                   == other.at(length_of_common_prefix)) {
         ++length_of_common_prefix;
     }
 
@@ -187,8 +187,8 @@ auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
     size_type this_index  = size() - 1;
     size_type other_index = other.size() - 1;
 
-    while ((this_index and other_index) and
-           text.at(this_index) == other.at(other_index)) {
+    while ((this_index and other_index)
+           and text.at(this_index) == other.at(other_index)) {
         ++length_of_common_suffix;
         --this_index;
         --other_index;

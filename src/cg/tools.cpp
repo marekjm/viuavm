@@ -40,19 +40,19 @@ static auto size_of_register_index_operand_with_rs_type(
     TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
 
-    if (tokens.at(i) == "void" or tokens.at(i) == "true" or
-        tokens.at(i) == "false") {
+    if (tokens.at(i) == "void" or tokens.at(i) == "true"
+        or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    } else if (tokens.at(i).str().at(0) == '%' and
-               str::isnum(tokens.at(i).str().substr(1))) {
+    } else if (tokens.at(i).str().at(0) == '%'
+               and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::RegisterSets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local" or
-            tokens.at(i) == "static" or tokens.at(i) == "global") {
+        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+            or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
     } else if (tokens.at(i).str().at(0) == '@') {
@@ -61,8 +61,8 @@ static auto size_of_register_index_operand_with_rs_type(
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local" or
-            tokens.at(i) == "static" or tokens.at(i) == "global") {
+        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+            or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
     } else if (tokens.at(i).str().at(0) == '*') {
@@ -71,8 +71,8 @@ static auto size_of_register_index_operand_with_rs_type(
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local" or
-            tokens.at(i) == "static" or tokens.at(i) == "global") {
+        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+            or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
     } else {
@@ -87,17 +87,17 @@ static auto size_of_register_index_operand(TokenVector const& tokens,
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
 
-    if (tokens.at(i) == "static" or tokens.at(i) == "local" or
-        tokens.at(i) == "global") {
+    if (tokens.at(i) == "static" or tokens.at(i) == "local"
+        or tokens.at(i) == "global") {
         ++i;
     }
 
-    if (tokens.at(i) == "void" or tokens.at(i) == "true" or
-        tokens.at(i) == "false") {
+    if (tokens.at(i) == "void" or tokens.at(i) == "true"
+        or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    } else if (tokens.at(i).str().at(0) == '%' and
-               str::isnum(tokens.at(i).str().substr(1))) {
+    } else if (tokens.at(i).str().at(0) == '%'
+               and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::RegisterSets);
         calculated_size += sizeof(viua::internals::types::register_index);
@@ -320,8 +320,8 @@ static auto size_of_octal_literal_operand(TokenVector const& tokens,
     calculated_size +=
         (assembler::operands::normalise_binary_literal(
              assembler::operands::octal_to_binary_literal(literal))
-             .size() /
-         8);
+             .size()
+         / 8);
 
     return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
 }
@@ -339,8 +339,8 @@ static auto size_of_hexadecimal_literal_operand(TokenVector const& tokens,
     calculated_size +=
         (assembler::operands::normalise_binary_literal(
              assembler::operands::hexadecimal_to_binary_literal(literal))
-             .size() /
-         8);
+             .size()
+         / 8);
 
     return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
 }
@@ -1178,10 +1178,10 @@ auto calculate_bytecode_size_of_first_n_instructions2(
          ++i) {
         auto const& token = tokens.at(i);
 
-        if (token == ".function:" or token == ".closure:" or
-            token == ".block:" or token == ".mark:" or token == ".import:" or
-            token == ".signature:" or token == ".bsignature:" or
-            token == ".unused:") {
+        if (token == ".function:" or token == ".closure:" or token == ".block:"
+            or token == ".mark:" or token == ".import:"
+            or token == ".signature:" or token == ".bsignature:"
+            or token == ".unused:") {
             ++i;
 
             if (tokens.at(i) == "[[") {

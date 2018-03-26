@@ -204,24 +204,24 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         register_usage_profile.at(Register(register_index)).second.value_type;
 
     auto access_via_pointer_dereference =
-        (register_index.as ==
-         viua::internals::AccessSpecifier::POINTER_DEREFERENCE);
+        (register_index.as
+         == viua::internals::AccessSpecifier::POINTER_DEREFERENCE);
     if (access_via_pointer_dereference) {
         /*
          * Throw only if the type is not UNDEFINED.
          * If the type is UNDEFINED let the inferencer do its job.
          */
-        if ((actual_type != ValueTypes::UNDEFINED) and
-            not(actual_type & ValueTypes::POINTER)) {
+        if ((actual_type != ValueTypes::UNDEFINED)
+            and not(actual_type & ValueTypes::POINTER)) {
             auto error =
                 viua::cg::lex::TracedSyntaxError{}
                     .append(InvalidSyntax(
                                 register_index.tokens.at(0),
                                 "invalid type of value contained in register "
                                 "for this access type")
-                                .note("need pointer to " +
-                                      to_string(expected_type) + ", got " +
-                                      to_string(actual_type)))
+                                .note("need pointer to "
+                                      + to_string(expected_type) + ", got "
+                                      + to_string(actual_type)))
                     .append(InvalidSyntax(register_usage_profile.defined_where(
                                               Register(register_index)),
                                           "")
@@ -239,9 +239,10 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
     }
 
     if (actual_type == ValueTypes::UNDEFINED) {
-        auto inferred_type = (expected_type | (access_via_pointer_dereference
-                                                   ? ValueTypes::POINTER
-                                                   : ValueTypes::UNDEFINED));
+        auto inferred_type =
+            (expected_type
+             | (access_via_pointer_dereference ? ValueTypes::POINTER
+                                               : ValueTypes::UNDEFINED));
         register_usage_profile.infer(Register(register_index),
                                      inferred_type,
                                      register_index.tokens.at(0));
@@ -259,8 +260,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                 .append(
                     InvalidSyntax(register_index.tokens.at(0),
                                   "invalid type of value contained in register")
-                        .note("expected " + to_string(expected_type) +
-                              ", got " + to_string(actual_type)))
+                        .note("expected " + to_string(expected_type) + ", got "
+                              + to_string(actual_type)))
                 .append(InvalidSyntax(register_usage_profile.defined_where(
                                           Register(register_index)),
                                       "")
@@ -270,8 +271,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
             error.append(InvalidSyntax(r.inferred.second, "")
                              .note("type inferred here")
                              .aside(r.inferred.second,
-                                    "deduced type is '" +
-                                        to_string(r.value_type) + "'"));
+                                    "deduced type is '"
+                                        + to_string(r.value_type) + "'"));
         }
         throw error;
     }
@@ -285,9 +286,9 @@ auto get_input_operand(
     viua::assembler::frontend::parser::Instruction const& instruction,
     size_t operand_index) -> T* {
     auto operand = get_operand<T>(instruction, operand_index);
-    if ((not operand) and
-        dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(
-            instruction.operands.at(operand_index).get())) {
+    if ((not operand)
+        and dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(
+                instruction.operands.at(operand_index).get())) {
         throw viua::cg::lex::InvalidSyntax{
             instruction.operands.at(operand_index)->tokens.at(0),
             "use of void as input register:"};

@@ -255,8 +255,8 @@ void String::concatenate(Frame* frame,
     frame->local_register_set->set(
         0,
         make_unique<String>(
-            static_cast<String*>(frame->arguments->at(0))->value() +
-            static_cast<String*>(frame->arguments->at(1))->value()));
+            static_cast<String*>(frame->arguments->at(0))->value()
+            + static_cast<String*>(frame->arguments->at(1))->value()));
 }
 
 void String::join(Frame*,

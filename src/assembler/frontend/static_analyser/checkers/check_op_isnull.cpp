@@ -49,8 +49,8 @@ auto check_op_isnull(Register_usage_profile& register_usage_profile,
     if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
         throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
             .note("can only check using direct access mode")
-            .aside("did you mean '%" + source->tokens.at(0).str().substr(1) +
-                   "'?");
+            .aside("did you mean '%" + source->tokens.at(0).str().substr(1)
+                   + "'?");
     }
 
     if (register_usage_profile.defined(Register{*source})) {

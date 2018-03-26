@@ -334,12 +334,12 @@ viua::internals::types::byte* viua::process::Process::tick() {
      *      - an object has been thrown, as the instruction pointer will be
      * adjusted by catchers or execution will be halted on unhandled types,
      */
-    if (stack->instruction_pointer == previous_instruction_pointer and
-        stack->state_of() == viua::process::Stack::STATE::RUNNING and
-        (OPCODE(*stack->instruction_pointer) != RETURN and
-         OPCODE(*stack->instruction_pointer) != JOIN and
-         OPCODE(*stack->instruction_pointer) != RECEIVE) and
-        (not stack->thrown)) {
+    if (stack->instruction_pointer == previous_instruction_pointer
+        and stack->state_of() == viua::process::Stack::STATE::RUNNING
+        and (OPCODE(*stack->instruction_pointer) != RETURN
+             and OPCODE(*stack->instruction_pointer) != JOIN
+             and OPCODE(*stack->instruction_pointer) != RECEIVE)
+        and (not stack->thrown)) {
         stack->thrown =
             make_unique<viua::types::Exception>("InstructionUnchanged");
     }
@@ -356,9 +356,9 @@ viua::internals::types::byte* viua::process::Process::tick() {
         stack->frame_new.reset(nullptr);
     }
 
-    if (stack->thrown or
-        (stack->state_of() ==
-         Stack::STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING)) {
+    if (stack->thrown
+        or (stack->state_of()
+            == Stack::STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING)) {
         handle_active_exception();
     }
 

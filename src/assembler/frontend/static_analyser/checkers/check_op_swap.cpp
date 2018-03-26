@@ -43,8 +43,8 @@ auto check_op_swap(Register_usage_profile& register_usage_profile,
         throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
             .note("can only swap using direct access mode")
             .aside(target->tokens.at(0),
-                   "did you mean '%" + target->tokens.at(0).str().substr(1) +
-                       "'?");
+                   "did you mean '%" + target->tokens.at(0).str().substr(1)
+                       + "'?");
     }
 
     auto source = get_operand<RegisterIndex>(instruction, 1);
@@ -59,8 +59,8 @@ auto check_op_swap(Register_usage_profile& register_usage_profile,
         throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
             .note("can only swap using direct access mode")
             .aside(source->tokens.at(0),
-                   "did you mean '%" + source->tokens.at(0).str().substr(1) +
-                       "'?");
+                   "did you mean '%" + source->tokens.at(0).str().substr(1)
+                       + "'?");
     }
 
     auto val_target = Register(*target);

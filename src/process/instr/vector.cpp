@@ -50,8 +50,8 @@ viua::internals::types::byte* viua::process::Process::opvector(
     tie(addr, pack_size) =
         viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if ((target_ri > pack_start_ri) and
-        (target_ri < (pack_start_ri + pack_size))) {
+    if ((target_ri > pack_start_ri)
+        and (target_ri < (pack_start_ri + pack_size))) {
         // FIXME vector is inserted into a register after packing, so this
         // exception is not entirely well thought-out allow packing target
         // register
@@ -86,8 +86,8 @@ viua::internals::types::byte* viua::process::Process::opvinsert(
             addr, this);
 
     unique_ptr<viua::types::Value> object;
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) ==
-        OT_POINTER) {
+    if (viua::bytecode::decoder::operands::get_operand_type(addr)
+        == OT_POINTER) {
         viua::types::Value* source = nullptr;
         tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
@@ -124,8 +124,8 @@ viua::internals::types::byte* viua::process::Process::opvpush(
             addr, this);
 
     unique_ptr<viua::types::Value> object;
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) ==
-        OT_POINTER) {
+    if (viua::bytecode::decoder::operands::get_operand_type(addr)
+        == OT_POINTER) {
         viua::types::Value* source = nullptr;
         tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);

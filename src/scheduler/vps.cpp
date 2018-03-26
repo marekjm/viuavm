@@ -62,8 +62,8 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
 
     if (trace.size()) {
         Frame* last = trace.back();
-        if (last->local_register_set.owns() and
-            last->local_register_set->size()) {
+        if (last->local_register_set.owns()
+            and last->local_register_set->size()) {
             unsigned non_empty = 0;
             for (decltype(last->local_register_set->size()) r = 0;
                  r < last->local_register_set->size();
@@ -394,8 +394,8 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
      * processes in the "N bottles of beer" bechmark: 16384 bottles, 8
      * schedulers, on a CPU with 4 physical cores.
      */
-    if (processes.size() >
-        ((total_processes / running_schedulers) / 100 * 140)) {
+    if (processes.size()
+        > ((total_processes / running_schedulers) / 100 * 140)) {
 #if VIUA_VM_DEBUG_LOG
         viua_err("[scheduler:vps:",
                  this,
@@ -523,8 +523,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
             continue;
         }
 
-        if (th->terminated() and not th->joinable() and
-            th->parent() == nullptr) {
+        if (th->terminated() and not th->joinable()
+            and th->parent() == nullptr) {
 #if VIUA_VM_DEBUG_LOG
             viua_err("[sched:vps:died] pid = ", th->pid().get());
 #endif
@@ -715,8 +715,8 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
          * *REMEMBER* about corner cases, or they will come back to bite you
          * when you least expect it.
          */
-        while (current_load <= (total_processes / running_schedulers) and
-               not free_processes->empty()) {
+        while (current_load <= (total_processes / running_schedulers)
+               and not free_processes->empty()) {
             processes.emplace_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
             processes.back()->migrate_to(this);

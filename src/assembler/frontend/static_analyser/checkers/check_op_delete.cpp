@@ -42,8 +42,8 @@ auto check_op_delete(Register_usage_profile& register_usage_profile,
     if (target->as != viua::internals::AccessSpecifier::DIRECT) {
         throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
             .note("can only delete using direct access mode")
-            .aside("did you mean '%" + target->tokens.at(0).str().substr(1) +
-                   "'?");
+            .aside("did you mean '%" + target->tokens.at(0).str().substr(1)
+                   + "'?");
     }
     register_usage_profile.erase(Register(*target), instruction.tokens.at(0));
 }

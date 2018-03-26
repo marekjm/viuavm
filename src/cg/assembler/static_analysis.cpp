@@ -102,7 +102,8 @@ static auto is_named(const map<string, string>& named_registers, string name)
                          [name](std::remove_reference<decltype(
                                     named_registers)>::type::value_type t) {
                              return (t.second == name);
-                         }) != named_registers.end());
+                         })
+            != named_registers.end());
 }
 static auto get_name(const map<string, string>& named_registers,
                      string name,
@@ -135,22 +136,22 @@ static string resolve_register_name(const map<string, string>& named_registers,
     } else {
         throw viua::cg::lex::InvalidSyntax(
             token,
-            ("not a valid register accessor: " +
-             str::enquote(str::strencode(name))));
+            ("not a valid register accessor: "
+             + str::enquote(str::strencode(name))));
     }
     if (str::isnum(name, false)) {
-        if ((not allow_direct_access) and is_named(named_registers, name) and
-            not(token.original() == "iota" or
-                ((token.original().at(0) == '%' or
-                  token.original().at(0) == '@' or
-                  token.original().at(0) == '*') and
-                 token.original().substr(1) == "iota") or
-                token.original() == "\n")) {
+        if ((not allow_direct_access) and is_named(named_registers, name)
+            and not(token.original() == "iota"
+                    or ((token.original().at(0) == '%'
+                         or token.original().at(0) == '@'
+                         or token.original().at(0) == '*')
+                        and token.original().substr(1) == "iota")
+                    or token.original() == "\n")) {
             throw viua::cg::lex::InvalidSyntax(
                 token,
-                ("accessing named register using direct index: " +
-                 str::enquote(get_name(named_registers, name, token)) +
-                 " := " + name));
+                ("accessing named register using direct index: "
+                 + str::enquote(get_name(named_registers, name, token))
+                 + " := " + name));
         }
         return name;
     }
@@ -212,8 +213,8 @@ static void check_use_of_register_index(
     }
     if (not registers.defined(resolved_register_name)) {
         string message =
-            (message_prefix + ": " +
-             str::strencode(strip_access_mode_sigil(register_index)));
+            (message_prefix + ": "
+             + str::strencode(strip_access_mode_sigil(register_index)));
         if (resolved_register_name != strip_access_mode_sigil(register_index)) {
             message += (" := " + resolved_register_name);
         }
@@ -267,9 +268,9 @@ static void check_defined_but_unused(Registers& registers) {
         if (each.first == "0") {
             continue;
         }
-        if ((not registers.used(each.first)) and
-            (not registers.erased(each.first)) and
-            (not registers.maybe_unused(each.first))) {
+        if ((not registers.used(each.first))
+            and (not registers.erased(each.first))
+            and (not registers.maybe_unused(each.first))) {
             throw viua::cg::lex::UnusedValue(each.second);
         }
     }
@@ -294,15 +295,15 @@ static auto in_block_offset(const TokenVector& body_tokens,
                 if (named_registers.count(body_tokens.at(i + 2))) {
                     throw viua::cg::lex::InvalidSyntax(
                         body_tokens.at(i + 2),
-                        ("register name already taken: " +
-                         str::strencode(body_tokens.at(i + 2))));
+                        ("register name already taken: "
+                         + str::strencode(body_tokens.at(i + 2))));
                 }
                 if (registers.defined(body_tokens.at(i + 1))) {
                     throw viua::cg::lex::InvalidSyntax(
                         body_tokens.at(i + 1),
-                        ("register defined before being named: " +
-                         str::strencode(body_tokens.at(i + 1)) + " = " +
-                         str::strencode(body_tokens.at(i + 2))));
+                        ("register defined before being named: "
+                         + str::strencode(body_tokens.at(i + 1)) + " = "
+                         + str::strencode(body_tokens.at(i + 2))));
                 }
                 named_registers[body_tokens.at(i + 2)] =
                     strip_access_mode_sigil(body_tokens.at(i + 1));
@@ -325,24 +326,24 @@ static auto in_block_offset(const TokenVector& body_tokens,
         i = skip_till_next_line(body_tokens, i);
     } else {
         auto saved_i = i;
-        while (i < body_tokens.size() - 1 and
-               not(body_tokens.at(i) == ".mark:" and
-                   body_tokens.at(i + 1) == checked_token.str())) {
+        while (i < body_tokens.size() - 1
+               and not(body_tokens.at(i) == ".mark:"
+                       and body_tokens.at(i + 1) == checked_token.str())) {
             i = skip_till_next_line(body_tokens, i);
             ++i;
             if (i < body_tokens.size() - 1 and body_tokens.at(i) == ".name:") {
                 if (named_registers.count(body_tokens.at(i + 2))) {
                     throw viua::cg::lex::InvalidSyntax(
                         body_tokens.at(i + 2),
-                        ("register name already taken: " +
-                         str::strencode(body_tokens.at(i + 2))));
+                        ("register name already taken: "
+                         + str::strencode(body_tokens.at(i + 2))));
                 }
                 if (registers.defined(body_tokens.at(i + 1))) {
                     throw viua::cg::lex::InvalidSyntax(
                         body_tokens.at(i + 1),
-                        ("register defined before being named: " +
-                         str::strencode(body_tokens.at(i + 1)) + " = " +
-                         str::strencode(body_tokens.at(i + 2))));
+                        ("register defined before being named: "
+                         + str::strencode(body_tokens.at(i + 1)) + " = "
+                         + str::strencode(body_tokens.at(i + 2))));
                 }
                 named_registers[body_tokens.at(i + 2)] =
                     strip_access_mode_sigil(body_tokens.at(i + 1));
@@ -394,14 +395,14 @@ static auto get_token_index_of_operand(const TokenVector& tokens,
         // viua::cg::lex::is_reserved_keyword(tokens.at(i)))) {
         auto token = tokens.at(i);
         bool is_valid_operand =
-            (str::isnum(token, false) or str::isid(token) or
-             ((token.str().at(0) == '%' or token.str().at(0) == '@' or
-               token.str().at(0) == '*') and
-              (str::isnum(token.str().substr(1)) or
-               str::isid(token.str().substr(1)))));
+            (str::isnum(token, false) or str::isid(token)
+             or ((token.str().at(0) == '%' or token.str().at(0) == '@'
+                  or token.str().at(0) == '*')
+                 and (str::isnum(token.str().substr(1))
+                      or str::isid(token.str().substr(1)))));
         bool is_valid_operand_area_token =
-            (token == "," or token == "static" or token == "local" or
-             token == "global");
+            (token == "," or token == "static" or token == "local"
+             or token == "global");
         if (is_valid_operand_area_token) {
             ++i;
         } else if (is_valid_operand) {
@@ -432,15 +433,15 @@ static void check_block_body(const TokenVector& body_tokens,
             if (named_registers.count(body_tokens.at(i + 2))) {
                 throw viua::cg::lex::InvalidSyntax(
                     body_tokens.at(i + 2),
-                    ("register name already taken: " +
-                     str::strencode(body_tokens.at(i + 2))));
+                    ("register name already taken: "
+                     + str::strencode(body_tokens.at(i + 2))));
             }
             if (registers.defined(body_tokens.at(i + 1))) {
                 throw viua::cg::lex::InvalidSyntax(
                     body_tokens.at(i + 1),
-                    ("register defined before being named: " +
-                     str::strencode(body_tokens.at(i + 1)) + " = " +
-                     str::strencode(body_tokens.at(i + 2))));
+                    ("register defined before being named: "
+                     + str::strencode(body_tokens.at(i + 1)) + " = "
+                     + str::strencode(body_tokens.at(i + 2))));
             }
             named_registers[body_tokens.at(i + 2)] =
                 strip_access_mode_sigil(body_tokens.at(i + 1));
@@ -467,10 +468,10 @@ static void check_block_body(const TokenVector& body_tokens,
             check_defined_but_unused(registers);
             return;
         }
-        if (token == ".mark:" or token == ".import:" or token == "nop" or
-            token == "tryframe" or token == "try" or token == "catch" or
-            token == "frame" or token == "halt" or token == "watchdog" or
-            token == "import") {
+        if (token == ".mark:" or token == ".import:" or token == "nop"
+            or token == "tryframe" or token == "try" or token == "catch"
+            or token == "frame" or token == "halt" or token == "watchdog"
+            or token == "import") {
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
@@ -485,16 +486,16 @@ static void check_block_body(const TokenVector& body_tokens,
             } catch (viua::cg::lex::InvalidSyntax& e) {
                 viua::cg::lex::InvalidSyntax base_error{
                     token,
-                    ("after entering block " +
-                     str::enquote(body_tokens.at(i + 1).original()))};
+                    ("after entering block "
+                     + str::enquote(body_tokens.at(i + 1).original()))};
                 base_error.add(body_tokens.at(i + 1));
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(
                     base_error);
             } catch (viua::cg::lex::TracedSyntaxError& e) {
                 viua::cg::lex::InvalidSyntax base_error{
                     token,
-                    ("after entering block " +
-                     str::enquote(body_tokens.at(i + 1).original()))};
+                    ("after entering block "
+                     + str::enquote(body_tokens.at(i + 1).original()))};
                 base_error.add(body_tokens.at(i + 1));
                 throw e.append(base_error);
             }
@@ -503,9 +504,8 @@ static void check_block_body(const TokenVector& body_tokens,
         }
 
         if (token == "jump") {
-            i = in_block_offset(
-                    body_tokens, i + 1, registers, named_registers) -
-                1;
+            i = in_block_offset(body_tokens, i + 1, registers, named_registers)
+                - 1;
             continue;
         }
 
@@ -724,9 +724,9 @@ static void check_block_body(const TokenVector& body_tokens,
                     named_registers, body_tokens.at(source)))) {
                 throw viua::cg::lex::InvalidSyntax(
                     body_tokens.at(target),
-                    ("useless check, register will always be defined: " +
-                     str::strencode(
-                         strip_access_mode_sigil(body_tokens.at(source)))));
+                    ("useless check, register will always be defined: "
+                     + str::strencode(
+                           strip_access_mode_sigil(body_tokens.at(source)))));
             }
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
@@ -834,8 +834,9 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex source = target + 2;
 
             auto src = body_tokens.at(source).str();
-            if (src.at(0) == '0' and
-                (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
+            if (src.at(0) == '0'
+                and (src.at(1) == 'b' or src.at(1) == 'o'
+                     or src.at(1) == 'x')) {
                 // literal bit string, FIXME add validation
             } else {
                 check_use_of_register(
@@ -866,9 +867,8 @@ static void check_block_body(const TokenVector& body_tokens,
                 i,
                 registers,
                 named_registers,
-                ("parameter " +
-                 string(token.str() == "pamv" ? "move" : "pass") +
-                 " from empty register"));
+                ("parameter " + string(token.str() == "pamv" ? "move" : "pass")
+                 + " from empty register"));
             if (token == "pamv") {
                 erase_register(
                     registers, named_registers, body_tokens.at(source), token);
@@ -876,8 +876,8 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "capture" or token == "capturecopy" or
-                   token == "capturemove") {
+        } else if (token == "capture" or token == "capturecopy"
+                   or token == "capturemove") {
             TokenIndex source = i + 4;
 
             // FIXME check if target is not empty
@@ -889,8 +889,8 @@ static void check_block_body(const TokenVector& body_tokens,
                                   "closure of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "copy" or token == "ptr" or token == "textlength" or
-                   token == "structkeys") {
+        } else if (token == "copy" or token == "ptr" or token == "textlength"
+                   or token == "structkeys") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -901,8 +901,8 @@ static void check_block_body(const TokenVector& body_tokens,
                 i,
                 registers,
                 named_registers,
-                ((opcode_name == "ptr" ? "pointer" : opcode_name) +
-                 " from empty register"));
+                ((opcode_name == "ptr" ? "pointer" : opcode_name)
+                 + " from empty register"));
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
                 body_tokens.at(target));
@@ -927,9 +927,9 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            if (body_tokens.at(i).str().at(0) == '%' or
-                body_tokens.at(i).str().at(0) == '*' or
-                body_tokens.at(i).str().at(0) == '@') {
+            if (body_tokens.at(i).str().at(0) == '%'
+                or body_tokens.at(i).str().at(0) == '*'
+                or body_tokens.at(i).str().at(0) == '@') {
                 check_use_of_register(body_tokens,
                                       source,
                                       i,
@@ -984,8 +984,8 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "itof" or token == "ftoi" or token == "stoi" or
-                   token == "stof") {
+        } else if (token == "itof" or token == "ftoi" or token == "stoi"
+                   or token == "stof") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -1037,11 +1037,11 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "and" or token == "or" or token == "texteq" or
-                   token == "textat" or token == "textcommonprefix" or
-                   token == "textcommonsuffix" or token == "textconcat" or
-                   token == "atomeq" or token == "bitand" or token == "bitor" or
-                   token == "bitxor" or token == "bitat") {
+        } else if (token == "and" or token == "or" or token == "texteq"
+                   or token == "textat" or token == "textcommonprefix"
+                   or token == "textcommonsuffix" or token == "textconcat"
+                   or token == "atomeq" or token == "bitand" or token == "bitor"
+                   or token == "bitxor" or token == "bitat") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1058,8 +1058,8 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "shl" or token == "shr" or token == "ashl" or
-                   token == "ashr") {
+        } else if (token == "shl" or token == "shr" or token == "ashl"
+                   or token == "ashr") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1091,8 +1091,8 @@ static void check_block_body(const TokenVector& body_tokens,
             check_use_of_register(
                 body_tokens, lhs, i - 1, registers, named_registers);
 
-            if (not(body_tokens.at(rhs) == "true" or
-                    body_tokens.at(rhs) == "false")) {
+            if (not(body_tokens.at(rhs) == "true"
+                    or body_tokens.at(rhs) == "false")) {
                 check_use_of_register(
                     body_tokens, rhs, i - 1, registers, named_registers);
             }
@@ -1123,10 +1123,10 @@ static void check_block_body(const TokenVector& body_tokens,
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "add" or token == "sub" or token == "mul" or
-                   token == "div" or token == "lt" or token == "lte" or
-                   token == "gt" or token == "gte" or token == "eq" or
-                   token == "wrapadd" or token == "wrapmul") {
+        } else if (token == "add" or token == "sub" or token == "mul"
+                   or token == "div" or token == "lt" or token == "lte"
+                   or token == "gt" or token == "gte" or token == "eq"
+                   or token == "wrapadd" or token == "wrapmul") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1193,8 +1193,8 @@ static void check_block_body(const TokenVector& body_tokens,
             }
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "iinc" or token == "idec" or
-                   token == "wrapincrement" or token == "wrapdecrement") {
+        } else if (token == "iinc" or token == "idec"
+                   or token == "wrapincrement" or token == "wrapdecrement") {
             // skip mnemonic
             ++i;
             check_use_of_register(body_tokens,
@@ -1229,8 +1229,8 @@ static void check_block_body(const TokenVector& body_tokens,
             } else {
                 --function;
             }
-            if (body_tokens.at(function).str().at(0) == '%' or
-                body_tokens.at(function).str().at(0) == '*') {
+            if (body_tokens.at(function).str().at(0) == '%'
+                or body_tokens.at(function).str().at(0) == '*') {
                 check_use_of_register(body_tokens,
                                       function,
                                       function,
@@ -1243,8 +1243,8 @@ static void check_block_body(const TokenVector& body_tokens,
         } else if (token == "tailcall" or token == "defer") {
             TokenIndex function = i + 1;
 
-            if (body_tokens.at(function).str().at(0) == '%' or
-                body_tokens.at(function).str().at(0) == '*') {
+            if (body_tokens.at(function).str().at(0) == '%'
+                or body_tokens.at(function).str().at(0) == '*') {
                 check_use_of_register(body_tokens,
                                       function,
                                       function,

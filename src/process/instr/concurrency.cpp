@@ -65,8 +65,8 @@ viua::internals::types::byte* viua::process::Process::opprocess(
     bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>(
-            "call to undefined function: " + call_name);
+        throw make_unique<viua::types::Exception>("call to undefined function: "
+                                                  + call_name);
     }
 
     stack->frame_new->function_name = call_name;
@@ -111,8 +111,8 @@ viua::internals::types::byte* viua::process::Process::opjoin(
     }
 
     if (timeout and not timeout_active) {
-        waiting_until  = (std::chrono::steady_clock::now() +
-                         std::chrono::milliseconds(timeout - 1));
+        waiting_until  = (std::chrono::steady_clock::now()
+                         + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
     } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
@@ -129,8 +129,8 @@ viua::internals::types::byte* viua::process::Process::opjoin(
                 *target = std::move(result);
             }
         }
-    } else if (timeout_active and (not wait_until_infinity) and
-               (waiting_until < std::chrono::steady_clock::now())) {
+    } else if (timeout_active and (not wait_until_infinity)
+               and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active      = false;
         wait_until_infinity = false;
         stack->thrown =
@@ -183,8 +183,8 @@ viua::internals::types::byte* viua::process::Process::opreceive(
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (timeout and not timeout_active) {
-        waiting_until  = (std::chrono::steady_clock::now() +
-                         std::chrono::milliseconds(timeout - 1));
+        waiting_until  = (std::chrono::steady_clock::now()
+                         + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
     } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
@@ -207,8 +207,8 @@ viua::internals::types::byte* viua::process::Process::opreceive(
         if (is_hidden) {
             suspend();
         }
-        if (timeout_active and (not wait_until_infinity) and
-            (waiting_until < std::chrono::steady_clock::now())) {
+        if (timeout_active and (not wait_until_infinity)
+            and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active      = false;
             wait_until_infinity = false;
             stack->thrown =
@@ -234,8 +234,8 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(
     }
     if (not is_native) {
         throw make_unique<viua::types::Exception>(
-            "watchdog process must be a native function, used foreign " +
-            call_name);
+            "watchdog process must be a native function, used foreign "
+            + call_name);
     }
 
     if (not watchdog_function.empty()) {

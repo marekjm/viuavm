@@ -88,8 +88,8 @@ auto assembler::ce::getlinks(vector<viua::cg::lex::Token> const& tokens)
 }
 
 static auto looks_like_name_definition(Token const t) -> bool {
-    return (t == ".function:" or t == ".closure:" or t == ".block:" or
-            t == ".signature:" or t == ".bsignature:");
+    return (t == ".function:" or t == ".closure:" or t == ".block:"
+            or t == ".signature:" or t == ".bsignature:");
 }
 static auto get_instruction_block_names(vector<Token> const& tokens,
                                         string const directive,
@@ -194,9 +194,9 @@ static auto get_raw_block_bodies(string const& type,
                 if (tokens[i] == looking_for) {
                     throw viua::cg::lex::InvalidSyntax(
                         tokens[i],
-                        ("another " + type +
-                         " opened before assembler reached .end after '" +
-                         name + "' " + type));
+                        ("another " + type
+                         + " opened before assembler reached .end after '"
+                         + name + "' " + type));
                 }
                 body.push_back(tokens[i]);
                 ++i;

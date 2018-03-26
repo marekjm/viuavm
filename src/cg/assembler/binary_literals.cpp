@@ -33,8 +33,8 @@ auto assembler::operands::normalise_binary_literal(string const s) -> string {
     if (s.size() > 2 and s.at(1) == 'b') {
         // FIXME create InternalError class
         throw("internal error: invalid binary literal: cannot normalise "
-              "literals with '0b' prefix: " +
-              s);
+              "literals with '0b' prefix: "
+              + s);
     }
 
     auto n = decltype(s)::size_type{0};

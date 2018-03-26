@@ -295,8 +295,8 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
 
     using ExporterFunction   = const ForeignFunctionSpec* (*)();
     ExporterFunction exports = nullptr;
-    if ((exports = reinterpret_cast<ExporterFunction>(
-             dlsym(handle, "exports"))) == nullptr) {
+    if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports")))
+        == nullptr) {
         throw make_unique<viua::types::Exception>(
             "failed to extract interface from module: " + module);
     }
@@ -328,8 +328,8 @@ vector<string> viua::kernel::Kernel::inheritance_chain_of(
      */
     if (typesystem.count(type_name) == 0) {
         // FIXME: better exception message
-        throw make_unique<viua::types::Exception>("unregistered type: " +
-                                                  type_name);
+        throw make_unique<viua::types::Exception>("unregistered type: "
+                                                  + type_name);
     }
     vector<string> ichain = typesystem.at(type_name)->get_ancestors();
     for (unsigned i = 0; i < ichain.size(); ++i) {
@@ -626,8 +626,8 @@ auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
     if (env_text) {
         viua_enable_tracing = string(env_text);
     }
-    return (viua_enable_tracing == "yes" or viua_enable_tracing == "true" or
-            viua_enable_tracing == "1");
+    return (viua_enable_tracing == "yes" or viua_enable_tracing == "true"
+            or viua_enable_tracing == "1");
 }
 
 int viua::kernel::Kernel::run() {

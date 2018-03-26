@@ -95,8 +95,8 @@ static auto extract_register_index(viua::internals::types::byte* ip,
     ++ip;
 
     auto register_index = viua::internals::types::register_index{0};
-    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or
-        (pointers_allowed and ot == OT_POINTER)) {
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE
+        or (pointers_allowed and ot == OT_POINTER)) {
         register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
 
@@ -105,8 +105,8 @@ static auto extract_register_index(viua::internals::types::byte* ip,
     } else {
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
-            "OT_REGISTER_REFERENCE" +
-            (pointers_allowed ? string(", OT_POINTER") : string("")));
+            "OT_REGISTER_REFERENCE"
+            + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i =
@@ -132,8 +132,8 @@ static auto extract_register_type_and_index(viua::internals::types::byte* ip,
 
     auto register_type  = viua::internals::RegisterSets::LOCAL;
     auto register_index = viua::internals::types::register_index{0};
-    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or
-        (pointers_allowed and ot == OT_POINTER)) {
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE
+        or (pointers_allowed and ot == OT_POINTER)) {
         register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
 
@@ -142,8 +142,8 @@ static auto extract_register_type_and_index(viua::internals::types::byte* ip,
     } else {
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
-            "OT_REGISTER_REFERENCE" +
-            (pointers_allowed ? string(", OT_POINTER") : string("")));
+            "OT_REGISTER_REFERENCE"
+            + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto const i =

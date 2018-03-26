@@ -98,8 +98,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(
     }
     if (not scheduler->is_class(obj->type())) {
         throw make_unique<viua::types::Exception>(
-            "unregistered type cannot be used for dynamic dispatch: " +
-            obj->type());
+            "unregistered type cannot be used for dynamic dispatch: "
+            + obj->type());
     }
     vector<string> mro = scheduler->inheritance_chain_of(obj->type());
     mro.insert(mro.begin(), obj->type());
@@ -108,8 +108,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(
     for (decltype(mro.size()) i = 0; i < mro.size(); ++i) {
         if (not scheduler->is_class(mro[i])) {
             throw make_unique<viua::types::Exception>(
-                "unavailable base type in inheritance hierarchy of " + mro[0] +
-                ": " + mro[i]);
+                "unavailable base type in inheritance hierarchy of " + mro[0]
+                + ": " + mro[i]);
         }
         if (scheduler->class_accepts(mro[i], method_name)) {
             function_name = scheduler->resolve_method_name(mro[i], method_name);
@@ -117,9 +117,9 @@ viua::internals::types::byte* viua::process::Process::opmsg(
         }
     }
     if (function_name.size() == 0) {
-        throw make_unique<viua::types::Exception>("class '" + obj->type() +
-                                                  "' does not accept method '" +
-                                                  method_name + "'");
+        throw make_unique<viua::types::Exception>("class '" + obj->type()
+                                                  + "' does not accept method '"
+                                                  + method_name + "'");
     }
 
     bool is_native         = scheduler->is_native_function(function_name);
@@ -128,8 +128,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(
 
     if (not(is_native or is_foreign or is_foreign_method)) {
         throw make_unique<viua::types::Exception>(
-            "method '" + method_name + "' resolves to undefined function '" +
-            function_name + "' on class '" + obj->type() + "'");
+            "method '" + method_name + "' resolves to undefined function '"
+            + function_name + "' on class '" + obj->type() + "'");
     }
 
     if (is_foreign_method) {
@@ -156,8 +156,8 @@ viua::internals::types::byte* viua::process::Process::opinsert(
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(
             addr, this);
 
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) ==
-        OT_POINTER) {
+    if (viua::bytecode::decoder::operands::get_operand_type(addr)
+        == OT_POINTER) {
         viua::types::Value* source = nullptr;
         tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);

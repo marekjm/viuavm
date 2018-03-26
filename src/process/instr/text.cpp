@@ -83,8 +83,8 @@ static auto convert_signed_integer_to_text_size_type(
      */
     viua::types::Text::size_type index = 0;
     if (signed_index < 0) {
-        index = (text->size() -
-                 static_cast<viua::types::Text::size_type>(-signed_index));
+        index = (text->size()
+                 - static_cast<viua::types::Text::size_type>(-signed_index));
     } else {
         index = static_cast<viua::types::Text::size_type>(signed_index);
     }

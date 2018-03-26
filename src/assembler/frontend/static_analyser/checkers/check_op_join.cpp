@@ -46,8 +46,8 @@ auto check_op_join(Register_usage_profile& register_usage_profile,
         if (target->as != viua::internals::AccessSpecifier::DIRECT) {
             throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
                 .note("can only join using direct access mode")
-                .aside("did you mean '%" +
-                       target->tokens.at(0).str().substr(1) + "'?");
+                .aside("did you mean '%" + target->tokens.at(0).str().substr(1)
+                       + "'?");
         }
     }
 

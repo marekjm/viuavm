@@ -45,16 +45,16 @@ bool viua::process::PID::operator<(const viua::process::PID& that) const {
     // they are either equal or not, and that's it
     // less-than relation is implemented only so that viua::process::PID objects
     // may be used as keys in std::map<>
-    return (reinterpret_cast<uint64_t>(associated_process) <
-            reinterpret_cast<uint64_t>(that.associated_process));
+    return (reinterpret_cast<uint64_t>(associated_process)
+            < reinterpret_cast<uint64_t>(that.associated_process));
 }
 bool viua::process::PID::operator>(const viua::process::PID& that) const {
     // PIDs can't really have a greater-than relation
     // they are either equal or not, and that's it
     // greater-than relation is implemented only so that viua::process::PID
     // objects may be used as keys in std::map<>
-    return (reinterpret_cast<uint64_t>(associated_process) >
-            reinterpret_cast<uint64_t>(that.associated_process));
+    return (reinterpret_cast<uint64_t>(associated_process)
+            > reinterpret_cast<uint64_t>(that.associated_process));
 }
 
 auto viua::process::PID::get() const -> decltype(associated_process) {

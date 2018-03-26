@@ -144,8 +144,8 @@ Program::Program(const Program& that)
     }
     addr_ptr = program.get() + (that.addr_ptr - that.program.get());
     for (unsigned i = 0; i < that.branches.size(); ++i) {
-        branches.push_back(program.get() +
-                           (that.branches[i] - that.program.get()));
+        branches.push_back(program.get()
+                           + (that.branches[i] - that.program.get()));
     }
 }
 Program& Program::operator=(const Program& that) {
@@ -160,8 +160,8 @@ Program& Program::operator=(const Program& that) {
             branches.pop_back();
         }
         for (unsigned i = 0; i < that.branches.size(); ++i) {
-            branches.push_back(program.get() +
-                               (that.branches[i] - that.program.get()));
+            branches.push_back(program.get()
+                               + (that.branches[i] - that.program.get()));
         }
     }
     return (*this);

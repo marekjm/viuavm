@@ -161,8 +161,8 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
              */
         }
     } catch (InvalidSyntax& e) {
-        if (register_with_unused_value != e.what() and
-            std::string{e.what()}.substr(0, 6) == "unused") {
+        if (register_with_unused_value != e.what()
+            and std::string{e.what()}.substr(0, 6) == "unused") {
             /*
              * If an error was thrown for a different register it means that the
              * register that was unused in true branch was used in the false one
@@ -176,8 +176,8 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
                     .add(instruction.operands.at(2)->tokens.at(0)));
         }
     } catch (TracedSyntaxError& e) {
-        if (register_with_unused_value != e.errors.front().what() and
-            std::string{e.errors.front().what()}.substr(0, 6) == "unused") {
+        if (register_with_unused_value != e.errors.front().what()
+            and std::string{e.errors.front().what()}.substr(0, 6) == "unused") {
             /*
              * If an error was thrown for a different register it means that the
              * register that was unused in true branch was used in the false one

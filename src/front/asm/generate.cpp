@@ -219,8 +219,8 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
                  << send_control_seq(ATTR_RESET);
             cout << "' to block address table";
         }
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) !=
-            linked_block_names.end()) {
+        if (find(linked_block_names.begin(), linked_block_names.end(), name)
+            != linked_block_names.end()) {
             if (DEBUG) {
                 cout << ": delayed" << endl;
             }
@@ -254,8 +254,8 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
                 viua::cg::tools::calculate_bytecode_size2(
                     blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
-            throw("could not find block '" + name +
-                  "' during address table write");
+            throw("could not find block '" + name
+                  + "' during address table write");
         }
     }
 
@@ -320,9 +320,9 @@ static void check_main_function(const string& main_function,
         i += 2;
     }
     auto last_instruction = main_function_tokens.at(i);
-    if (not(last_instruction == "copy" or last_instruction == "move" or
-            last_instruction == "swap" or last_instruction == "izero" or
-            last_instruction == "integer")) {
+    if (not(last_instruction == "copy" or last_instruction == "move"
+            or last_instruction == "swap" or last_instruction == "izero"
+            or last_instruction == "integer")) {
         throw viua::cg::lex::InvalidSyntax(
             last_instruction,
             ("main function does not return a value: " + main_function));
@@ -340,8 +340,8 @@ static void check_main_function(const string& main_function,
     if (main_function_tokens.at(i + 2) != "local") {
         throw viua::cg::lex::InvalidSyntax(
             last_instruction,
-            ("main function uses invalid register set to return a value: " +
-             main_function_tokens.at(i + 2).str()))
+            ("main function uses invalid register set to return a value: "
+             + main_function_tokens.at(i + 2).str()))
             .add(main_function_tokens.at(i + 2));
     }
 }
@@ -373,28 +373,28 @@ static viua::internals::types::bytecode_size generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "izero");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 sizeof(viua::internals::types::byte) +
-                 sizeof(viua::internals::RegisterSets) +
-                 sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + sizeof(viua::internals::types::byte)
+                 + sizeof(viua::internals::RegisterSets)
+                 + sizeof(viua::internals::types::register_index);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -405,10 +405,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 3 * sizeof(viua::internals::types::byte) +
-                 3 * sizeof(viua::internals::RegisterSets) +
-                 3 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 3 * sizeof(viua::internals::types::byte)
+                 + 3 * sizeof(viua::internals::RegisterSets)
+                 + 3 * sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
@@ -416,10 +416,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -428,10 +428,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -440,20 +440,20 @@ static viua::internals::types::bytecode_size generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::types::byte) +
-                 2 * sizeof(viua::internals::RegisterSets) +
-                 2 * sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::types::byte)
+                 + 2 * sizeof(viua::internals::RegisterSets)
+                 + 2 * sizeof(viua::internals::types::register_index);
     }
 
     entry_function_tokens.emplace_back(0, 0, "call");
@@ -461,10 +461,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) +
-             sizeof(viua::internals::types::byte) +
-             sizeof(viua::internals::RegisterSets) +
-             sizeof(viua::internals::types::register_index);
+    bytes += sizeof(viua::internals::types::byte)
+             + sizeof(viua::internals::types::byte)
+             + sizeof(viua::internals::RegisterSets)
+             + sizeof(viua::internals::types::register_index);
     bytes += main_function.size() + 1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
@@ -474,10 +474,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) +
-             2 * sizeof(viua::internals::types::byte) +
-             2 * sizeof(viua::internals::RegisterSets) +
-             2 * sizeof(viua::internals::types::register_index);
+    bytes += sizeof(viua::internals::types::byte)
+             + 2 * sizeof(viua::internals::types::byte)
+             + 2 * sizeof(viua::internals::RegisterSets)
+             + 2 * sizeof(viua::internals::types::register_index);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");
@@ -503,9 +503,9 @@ void generate(vector<Token> const& tokens,
     /////////////////////////
     // GET MAIN FUNCTION NAME
     string main_function = get_main_function(functions.names);
-    if (((VERBOSE and main_function != "main/1" and main_function != "") or
-         DEBUG) and
-        not flags.as_lib) {
+    if (((VERBOSE and main_function != "main/1" and main_function != "")
+         or DEBUG)
+        and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -525,8 +525,8 @@ void generate(vector<Token> const& tokens,
     // instructions set 0 register this must be better implemented or we will
     // receive "function did not set return register" exceptions at runtime
     bool main_is_defined =
-        (find(functions.names.begin(), functions.names.end(), main_function) !=
-         functions.names.end());
+        (find(functions.names.begin(), functions.names.end(), main_function)
+         != functions.names.end());
     if (not flags.as_lib and main_is_defined) {
         check_main_function(main_function, functions.tokens.at(main_function));
     }
@@ -599,9 +599,9 @@ void generate(vector<Token> const& tokens,
         vector<string> fn_names = loader.get_functions();
         for (string fn : fn_names) {
             if (function_addresses.count(fn)) {
-                throw("duplicate symbol '" + fn + "' found when linking '" +
-                      lnk + "' (previously found in '" + symbol_sources.at(fn) +
-                      "')");
+                throw("duplicate symbol '" + fn + "' found when linking '" + lnk
+                      + "' (previously found in '" + symbol_sources.at(fn)
+                      + "')");
             }
         }
 
@@ -820,8 +820,8 @@ void generate(vector<Token> const& tokens,
 
     for (string name : blocks.names) {
         // do not generate bytecode for blocks that were linked
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) !=
-            linked_block_names.end()) {
+        if (find(linked_block_names.begin(), linked_block_names.end(), name)
+            != linked_block_names.end()) {
             continue;
         }
 
@@ -919,7 +919,8 @@ void generate(vector<Token> const& tokens,
         // do not generate bytecode for functions that were linked
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),
-                 name) != linked_function_names.end()) {
+                 name)
+            != linked_function_names.end()) {
             continue;
         }
 
@@ -967,18 +968,18 @@ void generate(vector<Token> const& tokens,
             assemble(func, strip_attributes(functions.tokens.at(name)));
         } catch (const string& e) {
             string msg =
-                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) +
-                 name + send_control_seq(ATTR_RESET) + "': " + e);
+                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                 + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const char*& e) {
             string msg =
-                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) +
-                 name + send_control_seq(ATTR_RESET) + "': " + e);
+                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                 + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const std::out_of_range& e) {
             string msg =
-                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) +
-                 name + send_control_seq(ATTR_RESET) + "': " + e.what());
+                ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                 + send_control_seq(ATTR_RESET) + "': " + e.what());
             throw msg;
         }
 
@@ -1139,8 +1140,8 @@ void generate(vector<Token> const& tokens,
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
     for (string name : blocks.names) {
         // linked blocks are to be inserted later
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) !=
-            linked_block_names.end()) {
+        if (find(linked_block_names.begin(), linked_block_names.end(), name)
+            != linked_block_names.end()) {
             continue;
         }
 
@@ -1174,7 +1175,8 @@ void generate(vector<Token> const& tokens,
         // linked functions are to be inserted later
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),
-                 name) != linked_function_names.end()) {
+                 name)
+            != linked_function_names.end()) {
             continue;
         }
 
@@ -1228,8 +1230,8 @@ void generate(vector<Token> const& tokens,
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {
-            throw("[linker] could not find jumptable for '" + lib_name +
-                  "' (maybe not loaded?)");
+            throw("[linker] could not find jumptable for '" + lib_name
+                  + "' (maybe not loaded?)");
         }
 
         viua::internals::types::bytecode_size jmp, jmp_target;

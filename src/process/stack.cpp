@@ -127,8 +127,8 @@ auto viua::process::Stack::pop() -> unique_ptr<Frame> {
     for (viua::internals::types::register_index i = 0;
          i < frame->arguments->size();
          ++i) {
-        if (frame->arguments->at(i) != nullptr and
-            frame->arguments->isflagged(i, MOVED)) {
+        if (frame->arguments->at(i) != nullptr
+            and frame->arguments->isflagged(i, MOVED)) {
             throw make_unique<viua::types::Exception>(
                 "unused pass-by-move parameter");
         }
@@ -244,8 +244,8 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
-        if ((not handler_found) and
-            scheduler->is_class(handler_found_for_type)) {
+        if ((not handler_found)
+            and scheduler->is_class(handler_found_for_type)) {
             vector<string> types_to_check =
                 scheduler->inheritance_chain_of(handler_found_for_type);
             for (decltype(types_to_check)::size_type j = 0;

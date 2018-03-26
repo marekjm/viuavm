@@ -53,8 +53,8 @@ viua::internals::types::byte* viua::process::Process::opand(
     tie(addr, second) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Boolean>(first->boolean() and
-                                                second->boolean());
+    *target = make_unique<viua::types::Boolean>(first->boolean()
+                                                and second->boolean());
 
     return addr;
 }
@@ -71,8 +71,8 @@ viua::internals::types::byte* viua::process::Process::opor(
     tie(addr, second) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Boolean>(first->boolean() or
-                                                second->boolean());
+    *target = make_unique<viua::types::Boolean>(first->boolean()
+                                                or second->boolean());
 
     return addr;
 }

@@ -50,8 +50,8 @@ viua::internals::types::byte* viua::process::Process::opstructinsert(
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
             addr, this);
 
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) ==
-        OT_POINTER) {
+    if (viua::bytecode::decoder::operands::get_operand_type(addr)
+        == OT_POINTER) {
         viua::types::Value* source = nullptr;
         tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);

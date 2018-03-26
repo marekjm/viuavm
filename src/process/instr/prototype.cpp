@@ -85,12 +85,12 @@ viua::internals::types::byte* viua::process::Process::opattach(
     viua::types::Prototype* proto =
         static_cast<viua::types::Prototype*>(target->get());
 
-    if (not(scheduler->is_native_function(function_name) or
-            scheduler->is_foreign_function(function_name))) {
+    if (not(scheduler->is_native_function(function_name)
+            or scheduler->is_foreign_function(function_name))) {
         throw make_unique<viua::types::Exception>(
-            "cannot attach undefined function '" + function_name +
-            "' as a method '" + method_name + "' of prototype '" +
-            proto->get_type_name() + "'");
+            "cannot attach undefined function '" + function_name
+            + "' as a method '" + method_name + "' of prototype '"
+            + proto->get_type_name() + "'");
     }
 
     proto->attach(function_name, method_name);

@@ -41,8 +41,8 @@ static auto match(vector<Token> const& tokens,
     decltype(i) n = 0;
     while (n < sequence.size()) {
         // empty string in the sequence means "any token"
-        if ((not sequence.at(n).empty()) and
-            tokens.at(i + n) != sequence.at(n)) {
+        if ((not sequence.at(n).empty())
+            and tokens.at(i + n) != sequence.at(n)) {
             return false;
         }
         ++n;
@@ -62,8 +62,8 @@ static auto match_adjacent(
     decltype(i) n = 0;
     while (n < sequence.size()) {
         // empty string in the sequence means "any token"
-        if ((not sequence.at(n).empty()) and
-            tokens.at(i + n) != sequence.at(n)) {
+        if ((not sequence.at(n).empty())
+            and tokens.at(i + n) != sequence.at(n)) {
             return false;
         }
         if (n and not adjacent(tokens.at(i + n - 1), tokens.at(i + n))) {
@@ -102,8 +102,9 @@ auto remove_comments(vector<Token> input_tokens) -> vector<Token> {
             if (i < limit) {
                 tokens.push_back(input_tokens.at(i));
             }
-        } else if (i + 2 < limit and adjacent(token, input_tokens.at(i + 1)) and
-                   token.str() == "-" and input_tokens.at(i + 1).str() == "-") {
+        } else if (i + 2 < limit and adjacent(token, input_tokens.at(i + 1))
+                   and token.str() == "-"
+                   and input_tokens.at(i + 1).str() == "-") {
             // FIXME this is ugly as hell
             do {
                 ++i;
@@ -235,31 +236,31 @@ auto reduce_function_signatures(vector<Token> input_tokens) -> vector<Token> {
         const auto t = input_tokens.at(i);
         if (str::isid(t)) {
             auto j = i;
-            while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
-                   str::isid(input_tokens.at(j + 2)) and
-                   adjacent(input_tokens.at(j),
-                            input_tokens.at(j + 1),
-                            input_tokens.at(j + 2))) {
+            while (j + 2 < limit and input_tokens.at(j + 1).str() == "::"
+                   and str::isid(input_tokens.at(j + 2))
+                   and adjacent(input_tokens.at(j),
+                                input_tokens.at(j + 1),
+                                input_tokens.at(j + 2))) {
                 ++j;  // swallow "::" token
                 ++j;  // swallow identifier token
             }
             if (j + 1 < limit and input_tokens.at(j + 1).str() == "/") {
-                if (j + 2 < limit and
-                    str::isnum(input_tokens.at(j + 2).str(), false)) {
+                if (j + 2 < limit
+                    and str::isnum(input_tokens.at(j + 2).str(), false)) {
                     if (adjacent(input_tokens.at(j),
                                  input_tokens.at(j + 1),
                                  input_tokens.at(j + 2))) {
                         ++j;  // skip "/" token
                         ++j;  // skip integer encoding arity
                     }
-                } else if (j + 2 < limit and
-                           input_tokens.at(j + 2).str() == "\n") {
+                } else if (j + 2 < limit
+                           and input_tokens.at(j + 2).str() == "\n") {
                     if (adjacent(input_tokens.at(j), input_tokens.at(j + 1))) {
                         ++j;  // skip "/" token
                     }
                 }
-                if (j < limit and str::isid(input_tokens.at(j)) and
-                    adjacent(input_tokens.at(j - 1), input_tokens.at(j))) {
+                if (j < limit and str::isid(input_tokens.at(j))
+                    and adjacent(input_tokens.at(j - 1), input_tokens.at(j))) {
                     ++j;
                 }
                 tokens.emplace_back(t.line(),
@@ -283,21 +284,21 @@ auto reduce_names(vector<Token> input_tokens) -> vector<Token> {
         const auto t = input_tokens.at(i);
         if (str::isid(t)) {
             auto j = i;
-            while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
-                   str::isid(input_tokens.at(j + 2)) and
-                   adjacent(input_tokens.at(j),
-                            input_tokens.at(j + 1),
-                            input_tokens.at(j + 2))) {
+            while (j + 2 < limit and input_tokens.at(j + 1).str() == "::"
+                   and str::isid(input_tokens.at(j + 2))
+                   and adjacent(input_tokens.at(j),
+                                input_tokens.at(j + 1),
+                                input_tokens.at(j + 2))) {
                 ++j;  // swallow "::" token
                 ++j;  // swallow identifier token
             }
             if (j + 1 < limit and input_tokens.at(j + 1).str() == "/") {
                 ++j;  // skip "/" token
                 auto next_token = input_tokens.at(j + 1).str();
-                if (j + 1 < limit and
-                    (next_token != "\n" and next_token != "^" and
-                     next_token != "(" and next_token != ")" and
-                     next_token != "[" and next_token != "]")) {
+                if (j + 1 < limit
+                    and (next_token != "\n" and next_token != "^"
+                         and next_token != "(" and next_token != ")"
+                         and next_token != "[" and next_token != "]")) {
                     if (adjacent(input_tokens.at(j), input_tokens.at(j + 1))) {
                         ++j;  // skip next token, append it to name
                     }
@@ -326,8 +327,8 @@ auto reduce_offset_jumps(vector<Token> input_tokens) -> vector<Token> {
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         const auto t = input_tokens.at(i);
 
-        if (i + 1 < limit and (t.str() == "+" or t.str() == "-") and
-            str::isnum(input_tokens.at(i + 1))) {
+        if (i + 1 < limit and (t.str() == "+" or t.str() == "-")
+            and str::isnum(input_tokens.at(i + 1))) {
             if (adjacent(t, input_tokens.at(i + 1))) {
                 tokens.emplace_back(t.line(),
                                     t.character(),
@@ -349,25 +350,25 @@ auto reduce_at_prefixed_registers(vector<Token> input_tokens) -> vector<Token> {
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         const auto t = input_tokens.at(i);
 
-        if (i + 1 < limit and t.str() == "%" and
-            input_tokens.at(i + 1).str() != "\n" and
-            is_valid_register_id(input_tokens.at(i + 1))) {
+        if (i + 1 < limit and t.str() == "%"
+            and input_tokens.at(i + 1).str() != "\n"
+            and is_valid_register_id(input_tokens.at(i + 1))) {
             tokens.emplace_back(t.line(),
                                 t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
             ++i;
             continue;
-        } else if (i + 1 < limit and t.str() == "@" and
-                   input_tokens.at(i + 1).str() != "\n" and
-                   is_valid_register_id(input_tokens.at(i + 1))) {
+        } else if (i + 1 < limit and t.str() == "@"
+                   and input_tokens.at(i + 1).str() != "\n"
+                   and is_valid_register_id(input_tokens.at(i + 1))) {
             tokens.emplace_back(t.line(),
                                 t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
             ++i;
             continue;
-        } else if (i + 1 < limit and t.str() == "*" and
-                   input_tokens.at(i + 1).str() != "\n" and
-                   is_valid_register_id(input_tokens.at(i + 1))) {
+        } else if (i + 1 < limit and t.str() == "*"
+                   and input_tokens.at(i + 1).str() != "\n"
+                   and is_valid_register_id(input_tokens.at(i + 1))) {
             tokens.emplace_back(t.line(),
                                 t.character(),
                                 (t.str() + input_tokens.at(i + 1).str()));
@@ -386,9 +387,8 @@ auto reduce_floats(vector<Token> input_tokens) -> vector<Token> {
     const auto limit = input_tokens.size();
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         const auto t = input_tokens.at(i);
-        if (str::isnum(t) and i < limit - 2 and
-            input_tokens.at(i + 1) == "." and
-            str::isnum(input_tokens.at(i + 2))) {
+        if (str::isnum(t) and i < limit - 2 and input_tokens.at(i + 1) == "."
+            and str::isnum(input_tokens.at(i + 2))) {
             if (adjacent(t, input_tokens.at(i + 1), input_tokens.at(i + 2))) {
                 tokens.emplace_back(t.line(),
                                     t.character(),
@@ -416,8 +416,8 @@ auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
          ++i) {
         const auto& token = input_tokens.at(i);
 
-        if (token == ".block:" or token == ".function:" or
-            token == ".closure:") {
+        if (token == ".block:" or token == ".function:"
+            or token == ".closure:") {
             if (block_opened and token == ".block:") {
                 nested_block_opened = true;
             }
@@ -507,8 +507,8 @@ static void push_unwrapped_lines(
         }
     } else {
         vector<Token> last_line;
-        while (final_tokens.size() and
-               final_tokens.at(final_tokens.size() - 1) != "\n") {
+        while (final_tokens.size()
+               and final_tokens.at(final_tokens.size() - 1) != "\n") {
             last_line.insert(last_line.begin(), final_tokens.back());
             final_tokens.pop_back();
         }
@@ -718,8 +718,8 @@ auto replace_iotas(vector<Token> input_tokens) -> vector<Token> {
             if (not str::isnum(input_tokens.at(i + 1))) {
                 throw viua::cg::lex::InvalidSyntax(
                     input_tokens.at(i + 1),
-                    ("invalid argument to '.iota:' directive: " +
-                     str::strencode(input_tokens.at(i + 1))));
+                    ("invalid argument to '.iota:' directive: "
+                     + str::strencode(input_tokens.at(i + 1))));
             }
 
             iotas.back() = stoul(input_tokens.at(i + 1));
@@ -728,8 +728,8 @@ auto replace_iotas(vector<Token> input_tokens) -> vector<Token> {
             continue;
         }
 
-        if (token == ".function:" or token == ".closure:" or
-            token == ".block:") {
+        if (token == ".function:" or token == ".closure:"
+            or token == ".block:") {
             iotas.push_back(1);
         }
         if (token == "[") {
@@ -744,9 +744,9 @@ auto replace_iotas(vector<Token> input_tokens) -> vector<Token> {
                                 token.character(),
                                 str::stringify(iotas.back()++, false));
             tokens.back().original("iota");
-        } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or
-                    token.str().at(0) == '*') and
-                   token.str().substr(1) == "iota") {
+        } else if ((token.str().at(0) == '%' or token.str().at(0) == '@'
+                    or token.str().at(0) == '*')
+                   and token.str().substr(1) == "iota") {
             tokens.emplace_back(
                 token.line(),
                 token.character(),
@@ -768,10 +768,10 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
         const auto& token = input_tokens.at(i);
         tokens.push_back(token);
 
-        if (match(input_tokens, i, {"arg", "default"}) or
-            match(input_tokens, i, {"call", "default"}) or
-            match(input_tokens, i, {"msg", "default"}) or
-            match(input_tokens, i, {"process", "default"})) {
+        if (match(input_tokens, i, {"arg", "default"})
+            or match(input_tokens, i, {"call", "default"})
+            or match(input_tokens, i, {"msg", "default"})
+            or match(input_tokens, i, {"process", "default"})) {
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),
                                 input_tokens.at(i).character(),
@@ -866,8 +866,8 @@ auto replace_named_registers(std::vector<Token> input_tokens)
             continue;
         }
 
-        if (token == ".function:" or token == ".closure:" or
-            token == ".block:") {
+        if (token == ".function:" or token == ".closure:"
+            or token == ".block:") {
             ++open_blocks;
         }
         if (token == ".end") {
@@ -880,17 +880,16 @@ auto replace_named_registers(std::vector<Token> input_tokens)
 
             assert_is_not_reserved_keyword(name, "register name");
 
-            if ((index.at(0) == '%' or index.at(0) == '@' or
-                 index.at(0) == '*') and
-                str::isnum(index.substr(1), false)) {
+            if ((index.at(0) == '%' or index.at(0) == '@' or index.at(0) == '*')
+                and str::isnum(index.substr(1), false)) {
                 index = index.substr(1);
             }
 
             if (not str::isnum(index)) {
                 throw viua::cg::lex::InvalidSyntax(
                     input_tokens.at(i + 1),
-                    ("invalid register index: " + str::strencode(name) +
-                     " := " + str::enquote(str::strencode(index))));
+                    ("invalid register index: " + str::strencode(name)
+                     + " := " + str::enquote(str::strencode(index))));
             }
 
             names[name] = index;
@@ -906,20 +905,20 @@ auto replace_named_registers(std::vector<Token> input_tokens)
             tokens.emplace_back(
                 token.line(), token.character(), names.at(token));
             tokens.back().original(token.str());
-        } else if (token.str().at(0) == '@' and
-                   names.count(token.str().substr(1))) {
+        } else if (token.str().at(0) == '@'
+                   and names.count(token.str().substr(1))) {
             tokens.emplace_back(token.line(),
                                 token.character(),
                                 ("@" + names.at(token.str().substr(1))));
             tokens.back().original(token.str());
-        } else if (token.str().at(0) == '*' and
-                   names.count(token.str().substr(1))) {
+        } else if (token.str().at(0) == '*'
+                   and names.count(token.str().substr(1))) {
             tokens.emplace_back(token.line(),
                                 token.character(),
                                 ("*" + names.at(token.str().substr(1))));
             tokens.back().original(token.str());
-        } else if (token.str().at(0) == '%' and
-                   names.count(token.str().substr(1))) {
+        } else if (token.str().at(0) == '%'
+                   and names.count(token.str().substr(1))) {
             tokens.emplace_back(token.line(),
                                 token.character(),
                                 ("%" + names.at(token.str().substr(1))));

@@ -79,19 +79,20 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
 
 static auto is_defined_block_name(const ParsedSource& source, const string name)
     -> bool {
-    auto is_undefined = (source.blocks.end() ==
-                         find_if(source.blocks.begin(),
-                                 source.blocks.end(),
-                                 [name](const InstructionsBlock& ib) -> bool {
-                                     return (ib.name == name);
-                                 }));
+    auto is_undefined =
+        (source.blocks.end()
+         == find_if(source.blocks.begin(),
+                    source.blocks.end(),
+                    [name](const InstructionsBlock& ib) -> bool {
+                        return (ib.name == name);
+                    }));
     if (is_undefined) {
-        is_undefined = (source.block_signatures.end() ==
-                        find_if(source.block_signatures.begin(),
-                                source.block_signatures.end(),
-                                [name](const Token& block_name) -> bool {
-                                    return (block_name.str() == name);
-                                }));
+        is_undefined = (source.block_signatures.end()
+                        == find_if(source.block_signatures.begin(),
+                                   source.block_signatures.end(),
+                                   [name](const Token& block_name) -> bool {
+                                       return (block_name.str() == name);
+                                   }));
     }
     return (not is_undefined);
 }
@@ -138,10 +139,9 @@ auto viua::assembler::frontend::static_analyser::verify_block_catches(
                 auto block_name = instruction->tokens.at(2);
 
                 if (not is_defined_block_name(source, block_name)) {
-                    throw InvalidSyntax(
-                        block_name,
-                        ("cannot catch using undefined block: " +
-                         block_name.str()))
+                    throw InvalidSyntax(block_name,
+                                        ("cannot catch using undefined block: "
+                                         + block_name.str()))
                         .add(instruction->tokens.at(0));
                 }
             }
@@ -159,8 +159,8 @@ auto viua::assembler::frontend::static_analyser::verify_block_endings(
                                      "invalid end of block: expected mnemonic");
             }
             auto opcode = last_instruction->opcode;
-            if (not(opcode == LEAVE or opcode == RETURN or
-                    opcode == TAILCALL)) {
+            if (not(opcode == LEAVE or opcode == RETURN
+                    or opcode == TAILCALL)) {
                 // FIXME throw more specific error (i.e. with different message
                 // for blocks and functions)
                 throw viua::cg::lex::InvalidSyntax(
@@ -185,15 +185,15 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
                 }
 
                 auto opcode = instruction->opcode;
-                if (not(opcode == CALL or opcode == TAILCALL or
-                        opcode == DEFER or opcode == PROCESS or
-                        opcode == FRAME or opcode == MSG or opcode == RETURN or
-                        opcode == LEAVE or opcode == THROW)) {
+                if (not(opcode == CALL or opcode == TAILCALL or opcode == DEFER
+                        or opcode == PROCESS or opcode == FRAME or opcode == MSG
+                        or opcode == RETURN or opcode == LEAVE
+                        or opcode == THROW)) {
                     continue;
                 }
 
-                if (opcode == CALL or opcode == TAILCALL or opcode == DEFER or
-                    opcode == PROCESS or opcode == MSG) {
+                if (opcode == CALL or opcode == TAILCALL or opcode == DEFER
+                    or opcode == PROCESS or opcode == MSG) {
                     --balance;
                 } else if (opcode == FRAME) {
                     ++balance;
@@ -201,9 +201,9 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
 
                 if (balance < 0) {
                     throw InvalidSyntax(instruction->tokens.at(0),
-                                        ("call with '" +
-                                         instruction->tokens.at(0).str() +
-                                         "' without a frame"));
+                                        ("call with '"
+                                         + instruction->tokens.at(0).str()
+                                         + "' without a frame"));
                 }
 
                 if (balance > 1) {
@@ -214,8 +214,8 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
                                     .note("unused frame:"));
                 }
 
-                if ((opcode == RETURN or opcode == LEAVE or opcode == THROW) and
-                    balance > 0) {
+                if ((opcode == RETURN or opcode == LEAVE or opcode == THROW)
+                    and balance > 0) {
                     throw viua::cg::lex::TracedSyntaxError()
                         .append(InvalidSyntax(instruction->tokens.at(0),
                                               "lost frame at:"))
@@ -244,8 +244,8 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                 }
 
                 auto opcode = instruction->opcode;
-                if (not(opcode == CALL or opcode == PROCESS or
-                        opcode == DEFER or opcode == MSG or opcode == FRAME)) {
+                if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
+                        or opcode == MSG or opcode == FRAME)) {
                     continue;
                 }
 
@@ -352,9 +352,9 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 }
 
                 auto opcode = instruction->opcode;
-                if (not(opcode == CALL or opcode == PROCESS or opcode == MSG or
-                        opcode == DEFER or opcode == FRAME or opcode == PARAM or
-                        opcode == PAMV)) {
+                if (not(opcode == CALL or opcode == PROCESS or opcode == MSG
+                        or opcode == DEFER or opcode == FRAME or opcode == PARAM
+                        or opcode == PAMV)) {
                     continue;
                 }
 
@@ -387,16 +387,15 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                     if (parameter_index_token.str().at(0) == '@') {
                         slot_index_detection_is_reliable = false;
                     }
-                    if (parameter_index_token.str().at(0) == '%' and
-                        str::isnum(parameter_index_token.str().substr(1))) {
+                    if (parameter_index_token.str().at(0) == '%'
+                        and str::isnum(parameter_index_token.str().substr(1))) {
                         slot_index =
                             stoul(parameter_index_token.str().substr(1));
                         detected_slot_index = true;
                     }
 
-                    if (detected_slot_index and
-                        detected_frame_parameters_count and
-                        slot_index >= frame_parameters_count) {
+                    if (detected_slot_index and detected_frame_parameters_count
+                        and slot_index >= frame_parameters_count) {
                         ostringstream report;
                         report << "pass to parameter slot " << slot_index
                                << " in frame with only "
@@ -404,14 +403,14 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                         throw viua::cg::lex::InvalidSyntax(
                             instruction->tokens.at(0), report.str());
                     }
-                    if (detected_slot_index and
-                        detected_frame_parameters_count) {
+                    if (detected_slot_index
+                        and detected_frame_parameters_count) {
                         if (filled_slots[slot_index]) {
                             throw TracedSyntaxError()
                                 .append(InvalidSyntax(
                                             instruction->tokens.at(0),
-                                            "double pass to parameter slot " +
-                                                to_string(slot_index))
+                                            "double pass to parameter slot "
+                                                + to_string(slot_index))
 
                                             .add(instruction->operands.at(0)
                                                      ->tokens.at(0)))
@@ -438,8 +437,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                                 .append(InvalidSyntax(last_frame->tokens.at(0),
                                                       "gap in frame"))
                                 .append(InvalidSyntax(instruction->tokens.at(0),
-                                                      ("slot " + to_string(j) +
-                                                       " left empty at")));
+                                                      ("slot " + to_string(j)
+                                                       + " left empty at")));
                         }
                     }
                 }
@@ -458,15 +457,15 @@ static auto validate_jump(const Token token,
     auto target = InstructionIndex{0};
     if (str::isnum(extracted_jump, false)) {
         target = stoul(extracted_jump);
-    } else if (str::startswith(extracted_jump, "+") and
-               str::isnum(extracted_jump.substr(1), false)) {
+    } else if (str::startswith(extracted_jump, "+")
+               and str::isnum(extracted_jump.substr(1), false)) {
         auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         target = (current_instruction_counter + jump_offset);
-    } else if (str::startswith(extracted_jump, "-") and
-               str::isnum(extracted_jump.substr(1), false)) {
+    } else if (str::startswith(extracted_jump, "-")
+               and str::isnum(extracted_jump.substr(1), false)) {
         auto jump_offset = stoul(extracted_jump.substr(1));
         if (jump_offset == 0) {
             throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");

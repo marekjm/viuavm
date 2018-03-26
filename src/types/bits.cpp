@@ -434,8 +434,8 @@ static auto binary_division(vector<bool> const& dividend,
     if (negative_dividend) {
         remainder = take_twos_complement(remainder);
     }
-    negative_quotinent = ((negative_divisor or negative_dividend) and
-                          not(negative_divisor and negative_dividend));
+    negative_quotinent = ((negative_divisor or negative_dividend)
+                          and not(negative_divisor and negative_dividend));
 
     while (binary_lte(divisor, remainder)) {
         remainder = binary_subtraction(remainder, divisor);
@@ -755,8 +755,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          * easy to understand. If you ever find something better - feel free to
          * implement it. The test suite should catch your mistakes.
          */
-        if ((not result_should_be_negative) and
-            (lhs_negative or rhs_negative)) {
+        if ((not result_should_be_negative)
+            and (lhs_negative or rhs_negative)) {
             auto lhs_abs = vector<bool>{};
             auto rhs_abs = vector<bool>{};
             try {
@@ -1203,8 +1203,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          * easy to understand. If you ever find something better - feel free to
          * implement it. The test suite should catch your mistakes.
          */
-        if ((not result_should_be_negative) and
-            (lhs_negative or rhs_negative)) {
+        if ((not result_should_be_negative)
+            and (lhs_negative or rhs_negative)) {
             auto lhs_abs = vector<bool>{};
             auto rhs_abs = vector<bool>{};
             try {
@@ -1497,8 +1497,8 @@ auto viua::types::Bits::saturating_signed_div(const Bits& that) const
 }
 
 auto viua::types::Bits::operator==(const Bits& that) const -> bool {
-    return (size() == that.size() and
-            underlying_array == that.underlying_array);
+    return (size() == that.size()
+            and underlying_array == that.underlying_array);
 }
 
 template<typename T>
@@ -1553,8 +1553,8 @@ viua::types::Bits::Bits(const size_type size, const uint8_t* source) {
 
         for (auto i = 0u; i < 8; ++i) {
             auto mask = static_cast<decltype(one)>(one << i);
-            underlying_array.at((size * 8) - 1 -
-                                ((byte_index * 8) + (7u - i))) =
+            underlying_array.at((size * 8) - 1
+                                - ((byte_index * 8) + (7u - i))) =
                 (a_byte & mask);
         }
     }
