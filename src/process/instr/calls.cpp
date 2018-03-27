@@ -70,12 +70,13 @@ auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
     /** Run pamv instruction.
      */
-    viua::internals::types::register_index parameter_no_operand_index = 0,
-                                           source                     = 0;
+    viua::internals::types::register_index parameter_no_operand_index = 0;
+    viua::kernel::Register* source = nullptr;
+
     tie(addr, parameter_no_operand_index) =
         viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
         throw make_unique<viua::types::Exception>(
@@ -84,7 +85,7 @@ auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
             "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index,
-                                     currently_used_register_set->pop(source));
+                                     source->give());
     stack->frame_new->arguments->clear(parameter_no_operand_index);
     stack->frame_new->arguments->flag(parameter_no_operand_index, MOVED);
 
