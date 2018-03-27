@@ -17,19 +17,19 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.signature: typesystem::typeof/1
+.signature: std::typesystem::typeof/1
 
 .function: main/0
-    string %1 "Hello World!"
-    ptr %2 %1
-    delete %1
+    string %1 local "Hello World!"
+    ptr %2 local %1 local
+    delete %1 local
 
-    import "typesystem"
+    import "std/typesystem"
 
-    frame ^[(param %0 %2)]
-    call %3 typesystem::typeof/1
+    frame ^[(param %0 (ptr %3 local %2 local) local)]
+    call %3 local std::typesystem::typeof/1
 
-    print %3
+    print %3 local
 
     izero %0 local
     return

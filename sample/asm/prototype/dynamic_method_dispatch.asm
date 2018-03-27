@@ -17,8 +17,8 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; this program requires standard "typesystem" module to be available
-.signature: typesystem::typeof/1
+; this program requires standard "std::typesystem" module to be available
+.signature: std::typesystem::typeof/1
 
 
 .function: typesystem_setup/0
@@ -31,27 +31,27 @@
 
 .function: fn_base/1
     echo (string %1 "Good day from ")
-    frame ^[(param %0 (arg %2 %0))]
-    print (call %3 typesystem::typeof/1)
+    frame ^[(pamv %0 (ptr %3 local (arg %2 local %0) local))]
+    print (call %3 std::typesystem::typeof/1)
     return
 .end
 
 .function: fn_derived/1
     echo (string %1 "Hello from ")
-    frame ^[(param %0 (arg %2 %0))]
-    print (call %3 typesystem::typeof/1)
+    frame ^[(pamv %0 (ptr %3 local (arg %2 local %0) local))]
+    print (call %3 std::typesystem::typeof/1)
     return
 .end
 
 .function: fn_more_derived/1
     echo (string %1 "Hi from ")
-    frame ^[(param %0 (arg %2 %0))]
-    print (call %3 typesystem::typeof/1)
+    frame ^[(pamv %0 (ptr %3 local (arg %2 local %0) local))]
+    print (call %3 std::typesystem::typeof/1)
     return
 .end
 
 .function: main/1
-    import "typesystem"
+    import "std/typesystem"
 
     ; setup the typesystem
     frame %0
