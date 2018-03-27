@@ -132,6 +132,7 @@ def run(path, expected_exit_code=0, pipe_error=False):
     return (exit_code, output.decode('utf-8'), (error if error is not None else b'').decode('utf-8'))
 
 FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
+FLAG_TEST_SKIP_DISASM = bool(int(os.environ.get('VIUA_TEST_SKIP_DISASM', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
 MEMORY_LEAK_CHECKS_RUN = 0
 MEMORY_LEAK_CHECKS_ENABLE = bool(int(os.environ.get('VIUA_TEST_SUITE_VALGRIND_CHECKS', 1)))
@@ -322,7 +323,7 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
             print('test failed: check file {}'.format(assembly_path))
             raise
 
-    if not test_disasm:
+    if (not test_disasm) or FLAG_TEST_SKIP_DISASM:
         return
 
     disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
