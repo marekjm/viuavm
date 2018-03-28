@@ -29,6 +29,9 @@
 #include <viua/types/vector.h>
 using namespace std;
 
+using viua::bytecode::decoder::operands::fetch_and_advance_addr;
+using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
+using Register_index = viua::internals::types::register_index;
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     viua::internals::Register_sets target_rs =
@@ -45,9 +48,8 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
                                                                          this);
 
-    viua::internals::types::register_index pack_size = 0;
-    tie(addr, pack_size) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const pack_size = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
     if ((target_ri > pack_start_ri)
         and (target_ri < (pack_start_ri + pack_size))) {
@@ -60,7 +62,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
         throw make_unique<viua::types::Exception>(
             "vector: packing outside of register set range");
     }
-    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+    for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
             throw make_unique<viua::types::Exception>(
                 "vector: cannot pack null register");
@@ -68,7 +70,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     }
 
     auto v = make_unique<viua::types::Vector>();
-    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+    for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         v->push(register_at(pack_start_ri + i, pack_start_rs)->give());
     }
 
