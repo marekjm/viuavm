@@ -34,19 +34,11 @@ using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
 using Register_index = viua::internals::types::register_index;
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
-    viua::internals::Register_sets target_rs =
-        viua::internals::Register_sets::CURRENT;
-    viua::internals::types::register_index target_ri = 0;
-    tie(addr, target_rs, target_ri) =
-        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
-                                                                         this);
+    auto const [ target_rs, target_ri ] = fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
 
-    viua::internals::Register_sets pack_start_rs =
-        viua::internals::Register_sets::CURRENT;
-    viua::internals::types::register_index pack_start_ri = 0;
-    tie(addr, pack_start_rs, pack_start_ri) =
-        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
-                                                                         this);
+    auto const [ pack_start_rs, pack_start_ri ] = fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
 
     auto const pack_size = fetch_and_advance_addr<Register_index>(
         viua::bytecode::decoder::operands::fetch_register_index, addr, this);
