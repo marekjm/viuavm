@@ -75,13 +75,12 @@ auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
     /** Run param instruction.
      */
-    viua::internals::types::register_index parameter_no_operand_index = 0;
-    tie(addr, parameter_no_operand_index) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const parameter_no_operand_index =
+        fetch_and_advance_addr<Register_index>(
+            fetch_register_index, addr, this);
 
-    viua::types::Value* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto const source = fetch_and_advance_addr<viua::types::Value*>(
+        viua::bytecode::decoder::operands::fetch_object, addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
         throw make_unique<viua::types::Exception>(
