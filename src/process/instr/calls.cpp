@@ -120,19 +120,10 @@ auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
     /** Run arg instruction.
      */
-    viua::kernel::Register* target = nullptr;
-    bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
-
-    if (not destination_is_void) {
-        tie(addr, target) =
-            viua::bytecode::decoder::operands::fetch_register(addr, this);
-    } else {
-        addr = viua::bytecode::decoder::operands::fetch_void(addr);
-    }
-
-    viua::internals::types::register_index parameter_no_operand_index = 0;
-    tie(addr, parameter_no_operand_index) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const target = fetch_optional_and_advance_addr<viua::kernel::Register*>(
+            fetch_register, addr, this);
+    auto const parameter_no_operand_index =
+        fetch_and_advance_addr<Register_index>(fetch_register_index, addr, this);
 
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
         auto oss = ostringstream{};
@@ -151,8 +142,8 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
             stack->back()->arguments->get(parameter_no_operand_index)->copy();
     }
 
-    if (not destination_is_void) {
-        *target = std::move(argument);
+    if (target) {
+        *target.value() = std::move(argument);
     }
 
     return addr;
