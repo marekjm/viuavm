@@ -124,13 +124,11 @@ auto viua::process::Process::opclosure(Op_address_type addr)
     -> Op_address_type {
     /** Create a closure from a function.
      */
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
-    auto function_name = std::string{};
-    tie(addr, function_name) =
-        viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto const function_name = fetch_and_advance_addr<std::string>(
+        viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
     auto rs = make_unique<viua::kernel::RegisterSet>(
         stack->back()->local_register_set->size());
