@@ -99,17 +99,15 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr)
 
 auto viua::process::Process::opcapturemove(Op_address_type addr)
     -> Op_address_type {
-    viua::types::Closure* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Closure>(addr, this);
+    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
+    viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Closure>, addr, this);
 
-    viua::internals::types::register_index target_register = 0;
-    tie(addr, target_register) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const target_register = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
-    viua::kernel::Register* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
     if (target_register >= target->rs()->size()) {
         throw make_unique<viua::types::Exception>(
