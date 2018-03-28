@@ -34,8 +34,14 @@ using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
 using Register_index = viua::internals::types::register_index;
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
-    auto const [ target_rs, target_ri ] = fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
-        viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
+    // FIXME This could be reduced if there was a Attached_register type which would know
+    // the register set to which it is attached, and what is its index.
+    // The plain Register type does not know this information.
+    auto const [target_rs, target_ri] =
+        fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
+            viua::bytecode::decoder::operands::fetch_register_type_and_index,
+            addr,
+            this);
 
     auto const [ pack_start_rs, pack_start_ri ] = fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
         viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
