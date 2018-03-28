@@ -56,14 +56,16 @@ static auto fetch_optional_and_advance_addr(Fetch_fn<Result> const& fn,
     return {result};
 }
 
+using viua::bytecode::decoder::operands::fetch_register_index;
+using Register_index = viua::internals::types::register_index;
+
 auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
     /** Create new frame for function calls.
      */
-    viua::internals::types::register_index arguments = 0, local_registers = 0;
-    tie(addr, arguments) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, local_registers) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const arguments = fetch_and_advance_addr<Register_index>(
+        fetch_register_index, addr, this);
+    auto const local_registers = fetch_and_advance_addr<Register_index>(
+        fetch_register_index, addr, this);
 
     request_new_frame(arguments, local_registers);
 
