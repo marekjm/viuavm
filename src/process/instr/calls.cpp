@@ -258,9 +258,9 @@ auto viua::process::Process::optailcall(Op_address_type addr)
     auto call_name = std::string{};
     auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        viua::types::Function* fn = nullptr;
-        tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Function>(addr, this);
+        auto const fn = fetch_and_advance_addr<viua::types::Function*>(
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Function>, addr, this);
 
         call_name = fn->name();
 
@@ -271,8 +271,8 @@ auto viua::process::Process::optailcall(Op_address_type addr)
                 stack->back()->local_register_set.get();
         }
     } else {
-        tie(addr, call_name) =
-            viua::bytecode::decoder::operands::fetch_atom(addr, this);
+        call_name = fetch_and_advance_addr<decltype(call_name)>(
+            viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
 
     auto const is_native  = scheduler->is_native_function(call_name);
