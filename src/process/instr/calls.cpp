@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <optional>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -28,6 +29,32 @@
 #include <viua/types/reference.h>
 using namespace std;
 
+template<typename Result>
+using Fetch_fn =
+    std::function<std::tuple<viua::internals::types::byte*, Result>(
+        viua::internals::types::byte*,
+        viua::process::Process*)>;
+template<typename Result>
+static auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
+                            viua::internals::types::byte*& addr,
+                            viua::process::Process* process) -> Result {
+    auto [addr_, result] = fn(addr, process);
+    addr                 = addr_;
+    return result;
+}
+template<typename Result>
+static auto fetch_optional_and_advance_addr(Fetch_fn<Result> const& fn,
+                            viua::internals::types::byte*& addr,
+                            viua::process::Process* process) -> std::optional<Result> {
+    if (viua::bytecode::decoder::operands::is_void(addr)) {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+        return {};
+    }
+
+    auto [addr_, result] = fn(addr, process);
+    addr                 = addr_;
+    return {result};
+}
 
 auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
     /** Create new frame for function calls.
