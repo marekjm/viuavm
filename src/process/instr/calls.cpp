@@ -150,9 +150,8 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
 }
 
 auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
+        fetch_register, addr, this);
 
     *target = make_unique<viua::types::Integer>(
         static_cast<int>(stack->back()->arguments->size()));
