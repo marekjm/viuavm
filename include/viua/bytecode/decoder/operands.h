@@ -142,9 +142,10 @@ using Fetchs_fn =
 template<typename A, typename B>
 auto fetch_and_advance_addr(Fetchs_fn<A, B> const& fn,
                             viua::internals::types::byte*& addr,
-                            viua::process::Process* process) -> std::tuple<A, B> {
+                            viua::process::Process* process)
+    -> std::tuple<A, B> {
     auto [addr_, a, b] = fn(addr, process);
-    addr                 = addr_;
+    addr               = addr_;
     return std::tuple<A, B>{a, b};
 }
 template<typename Result>
