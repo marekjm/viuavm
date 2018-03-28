@@ -135,7 +135,7 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
-        ostringstream oss;
+        auto oss = ostringstream{};
         oss << "invalid read: read from argument register out of bounds: "
             << parameter_no_operand_index;
         throw make_unique<viua::types::Exception>(oss.str());
@@ -198,8 +198,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native  = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = scheduler->is_native_function(call_name);
+    auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: "
@@ -255,8 +255,8 @@ auto viua::process::Process::optailcall(Op_address_type addr)
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native  = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = scheduler->is_native_function(call_name);
+    auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
@@ -300,8 +300,8 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native  = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = scheduler->is_native_function(call_name);
+    auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
