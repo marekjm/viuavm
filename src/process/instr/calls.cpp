@@ -18,7 +18,6 @@
  */
 
 #include <memory>
-#include <optional>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -29,33 +28,8 @@
 #include <viua/types/reference.h>
 using namespace std;
 
-template<typename Result>
-using Fetch_fn =
-    std::function<std::tuple<viua::internals::types::byte*, Result>(
-        viua::internals::types::byte*,
-        viua::process::Process*)>;
-template<typename Result>
-static auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
-                            viua::internals::types::byte*& addr,
-                            viua::process::Process* process) -> Result {
-    auto [addr_, result] = fn(addr, process);
-    addr                 = addr_;
-    return result;
-}
-template<typename Result>
-static auto fetch_optional_and_advance_addr(Fetch_fn<Result> const& fn,
-                            viua::internals::types::byte*& addr,
-                            viua::process::Process* process) -> std::optional<Result> {
-    if (viua::bytecode::decoder::operands::is_void(addr)) {
-        addr = viua::bytecode::decoder::operands::fetch_void(addr);
-        return {};
-    }
-
-    auto [addr_, result] = fn(addr, process);
-    addr                 = addr_;
-    return {result};
-}
-
+using viua::bytecode::decoder::operands::fetch_and_advance_addr;
+using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
 using viua::bytecode::decoder::operands::fetch_register;
 using viua::bytecode::decoder::operands::fetch_register_index;
 using Register_index = viua::internals::types::register_index;

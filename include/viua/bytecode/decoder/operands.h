@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
@@ -116,8 +118,36 @@ auto fetch_raw_float(Op_address_type, viua::process::Process*)
  *  These functions are used by instructions whose operands are always
  *  immediates.
  */
-auto extract_primitive_uint64(Op_address_type, viua::process::Process*)
-    -> uint64_t;
+auto extract_primitive_uint64(Op_address_type,
+                              viua::process::Process*) -> uint64_t;
+
+template<typename Result>
+using Fetch_fn =
+    std::function<std::tuple<Op_address_type, Result>(
+        Op_address_type,
+        viua::process::Process*)>;
+template<typename Result>
+auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
+                            Op_address_type& addr,
+                            viua::process::Process* process) -> Result {
+    auto [addr_, result] = fn(addr, process);
+    addr                 = addr_;
+    return result;
+}
+template<typename Result>
+auto fetch_optional_and_advance_addr(Fetch_fn<Result> const& fn,
+                                     Op_address_type& addr,
+                                     viua::process::Process* process)
+    -> std::optional<Result> {
+    if (viua::bytecode::decoder::operands::is_void(addr)) {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+        return {};
+    }
+
+    auto [addr_, result] = fn(addr, process);
+    addr                 = addr_;
+    return {result};
+}
 }}}}  // namespace viua::bytecode::decoder::operands
 
 
