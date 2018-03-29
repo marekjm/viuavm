@@ -84,11 +84,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         oss << ' ';
-        switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
-        case viua::internals::Register_sets::CURRENT:
-            oss << "current";
-            break;
-        case viua::internals::Register_sets::GLOBAL:
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+        case viua::internals::RegisterSets::GLOBAL:
             oss << "global";
             break;
         case viua::internals::Register_sets::LOCAL:
@@ -112,11 +109,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         oss << ' ';
-        switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
-        case viua::internals::Register_sets::CURRENT:
-            oss << "current";
-            break;
-        case viua::internals::Register_sets::GLOBAL:
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+        case viua::internals::RegisterSets::GLOBAL:
             oss << "global";
             break;
         case viua::internals::Register_sets::LOCAL:
@@ -135,11 +129,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         oss << ' ';
-        switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
-        case viua::internals::Register_sets::CURRENT:
-            oss << "current";
-            break;
-        case viua::internals::Register_sets::GLOBAL:
+        switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+        case viua::internals::RegisterSets::GLOBAL:
             oss << "global";
             break;
         case viua::internals::Register_sets::LOCAL:
