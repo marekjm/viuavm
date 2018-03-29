@@ -101,7 +101,7 @@
 
     frame %0
     process %2 a_joined_concurrent_process/0
-    join %0 %2
+    join void %2
 
     frame %0
     call log_exiting_main/0
