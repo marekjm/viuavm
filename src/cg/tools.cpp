@@ -49,7 +49,7 @@ static auto size_of_register_index_operand_with_rs_type(
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+        if (tokens.at(i) == "local"
             or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
@@ -59,7 +59,7 @@ static auto size_of_register_index_operand_with_rs_type(
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+        if (tokens.at(i) == "local"
             or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
@@ -69,7 +69,7 @@ static auto size_of_register_index_operand_with_rs_type(
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        if (tokens.at(i) == "current" or tokens.at(i) == "local"
+        if (tokens.at(i) == "local"
             or tokens.at(i) == "static" or tokens.at(i) == "global") {
             ++i;
         }
