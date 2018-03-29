@@ -7,3 +7,5 @@ running.
 After the target finishes running, this instruction will either transfer a return value
 of the joined process into the current process, or transfer the exception that killed
 the joined process into the current one (by rethrowing it).
+
+Using `void` as the target register causes the value returned by the process to be dropped.
