@@ -439,7 +439,6 @@ class Process {
     void put(viua::internals::types::register_index,
              std::unique_ptr<viua::types::Value>);
 
-    viua::kernel::Register* register_at(viua::internals::types::register_index);
     viua::kernel::Register* register_at(viua::internals::types::register_index,
                                         viua::internals::Register_sets);
 

@@ -1505,10 +1505,6 @@ class FunctionTests(unittest.TestCase):
     def testObtainingNumberOfParameters(self):
         runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
 
-    def testObtainingVectorWithPassedParameters(self):
-        assemble('./src/stdlib/viua/misc.asm', './misc.vlib', opts=('-c',))
-        runTest(self, 'parameters_vector.asm', '[0, 1, 2, 3]', assembly_opts=('--no-sa',))
-
     def testReturningReferences(self):
         # FIXME: disassembler must understand the .closure: directive
         # for now, the --no-sa flag and everything's gonna be find, believe me

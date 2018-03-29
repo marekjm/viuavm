@@ -36,11 +36,6 @@ viua::internals::types::register_index const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
 
 viua::kernel::Register* viua::process::Process::register_at(
-    viua::internals::types::register_index i) {
-    return currently_used_register_set->register_at(i);
-}
-
-viua::kernel::Register* viua::process::Process::register_at(
     viua::internals::types::register_index i,
     viua::internals::Register_sets rs) {
     if (rs == viua::internals::Register_sets::CURRENT) {
