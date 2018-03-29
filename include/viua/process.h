@@ -232,7 +232,6 @@ class Process {
 
     std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
-    viua::types::Value* fetch(viua::internals::types::register_index) const;
     std::unique_ptr<viua::types::Value> pop(
         viua::internals::types::register_index);
     void place(viua::internals::types::register_index,

@@ -36,7 +36,7 @@ viua::internals::types::register_index const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
 
 
-viua::types::Value* viua::process::Process::fetch(
+viua::types::Value* viua::process::Process::obtain(
     viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
@@ -47,10 +47,6 @@ viua::types::Value* viua::process::Process::fetch(
         object = static_cast<viua::types::Reference*>(object)->points_to();
     }
     return object;
-}
-viua::types::Value* viua::process::Process::obtain(
-    viua::internals::types::register_index index) const {
-    return fetch(index);
 }
 
 viua::kernel::Register* viua::process::Process::register_at(
