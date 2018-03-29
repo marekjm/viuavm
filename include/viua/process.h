@@ -232,10 +232,6 @@ class Process {
 
     std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
-    std::unique_ptr<viua::types::Value> pop(
-        viua::internals::types::register_index);
-    void place(viua::internals::types::register_index,
-               std::unique_ptr<viua::types::Value>);
     void ensure_static_registers(std::string);
 
     /*  Methods dealing with stack and frame manipulation, and
@@ -435,9 +431,6 @@ class Process {
   public:
     auto dispatch(Op_address_type) -> Op_address_type;
     auto tick() -> Op_address_type;
-
-    void put(viua::internals::types::register_index,
-             std::unique_ptr<viua::types::Value>);
 
     viua::kernel::Register* register_at(viua::internals::types::register_index,
                                         viua::internals::Register_sets);

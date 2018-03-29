@@ -54,25 +54,6 @@ viua::kernel::Register* viua::process::Process::register_at(
     }
 }
 
-std::unique_ptr<viua::types::Value> viua::process::Process::pop(
-    viua::internals::types::register_index index) {
-    return currently_used_register_set->pop(index);
-}
-void viua::process::Process::place(viua::internals::types::register_index index,
-                                   std::unique_ptr<viua::types::Value> obj) {
-    /** Place an object in register with given index.
-     *
-     *  Before placing an object in register, a check is preformed if the
-     * register is empty. If not - the `viua::types::Value` previously stored in
-     * it is destroyed.
-     *
-     */
-    currently_used_register_set->set(index, std::move(obj));
-}
-void viua::process::Process::put(viua::internals::types::register_index index,
-                                 std::unique_ptr<viua::types::Value> o) {
-    place(index, std::move(o));
-}
 void viua::process::Process::ensure_static_registers(
     std::string function_name) {
     /** Makes sure that static register set for requested function is
