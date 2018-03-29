@@ -47,9 +47,8 @@ typedef uint8_t registerset_type_marker;
 typedef uint64_t bits_size;
 }  // namespace types
 
-enum class Register_sets : types::registerset_type_marker {
-    CURRENT = 0,
-    GLOBAL,
+enum class RegisterSets : types::registerset_type_marker {
+    GLOBAL = 0,
     LOCAL,
     STATIC,
 };
