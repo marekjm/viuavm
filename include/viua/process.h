@@ -132,7 +132,6 @@ class Stack {
     auto unwind_to(const Try_frame*, std::string const) -> void;
     auto find_catch_frame() -> std::tuple<Try_frame*, std::string>;
 
-  public:
     auto set_return_value() -> void;
 
     auto state_of() const -> STATE;
