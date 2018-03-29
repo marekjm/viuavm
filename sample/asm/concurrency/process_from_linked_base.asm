@@ -25,7 +25,7 @@
     frame %0
     process %1 test_module::test_function/0
 
-    join %0 %1
+    join void %1
 
     izero %0 local
     return
