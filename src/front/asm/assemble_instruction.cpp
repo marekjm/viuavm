@@ -161,11 +161,8 @@ auto ::assembler::operands::resolve_register(Token const token,
 }
 
 auto ::assembler::operands::resolve_rs_type(Token const token)
-    -> viua::internals::Register_sets {
-    if (token == "current") {
-        return viua::internals::Register_sets::CURRENT;
-    } else if (token == "local") {
-        return viua::internals::Register_sets::LOCAL;
+    if (token == "local") {
+        return viua::internals::RegisterSets::LOCAL;
     } else if (token == "static") {
         return viua::internals::Register_sets::STATIC;
     } else if (token == "global") {

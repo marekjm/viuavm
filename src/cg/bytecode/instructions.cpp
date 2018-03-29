@@ -27,18 +27,18 @@ using viua::util::memory::aligned_write;
 
 
 int_op::int_op()
-        : type(Integer_operand_type::PLAIN)
-        , rs_type(viua::internals::Register_sets::CURRENT)
+        : type(IntegerOperandType::PLAIN)
+        , rs_type(viua::internals::RegisterSets::LOCAL)
         , value(0) {}
-int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
-        : type(t), rs_type(viua::internals::Register_sets::CURRENT), value(n) {}
-int_op::int_op(Integer_operand_type t,
-               viua::internals::Register_sets rst,
+int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n)
+        : type(t), rs_type(viua::internals::RegisterSets::LOCAL), value(n) {}
+int_op::int_op(IntegerOperandType t,
+               viua::internals::RegisterSets rst,
                viua::internals::types::plain_int n)
         : type(t), rs_type(rst), value(n) {}
 int_op::int_op(viua::internals::types::plain_int n)
-        : type(Integer_operand_type::PLAIN)
-        , rs_type(viua::internals::Register_sets::CURRENT)
+        : type(IntegerOperandType::PLAIN)
+        , rs_type(viua::internals::RegisterSets::LOCAL)
         , value(n) {}
 
 timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
