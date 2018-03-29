@@ -106,7 +106,7 @@ static auto extract_register_index(Op_address_type ip,
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i =
-            static_cast<viua::types::Integer*>(process->obtain(register_index));
+            static_cast<viua::types::Integer*>(process->register_at(register_index)->get());
         // FIXME Number::negative() -> bool is needed
         if (i->as_integer() < 0) {
             throw make_unique<viua::types::Exception>(
@@ -144,7 +144,7 @@ static auto extract_register_type_and_index(Op_address_type ip,
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto const i =
-            static_cast<viua::types::Integer*>(process->obtain(register_index));
+            static_cast<viua::types::Integer*>(process->register_at(register_index)->get());
         // FIXME Number::negative() -> bool is needed
         if (i->as_integer() < 0) {
             throw make_unique<viua::types::Exception>(

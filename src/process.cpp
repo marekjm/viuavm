@@ -35,20 +35,6 @@ using namespace std;
 viua::internals::types::register_index const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
 
-
-viua::types::Value* viua::process::Process::obtain(
-    viua::internals::types::register_index index) const {
-    /*  Return pointer to object at given register.
-     *  This method safeguards against reaching for out-of-bounds registers and
-     *  reading from an empty register.
-     */
-    viua::types::Value* object = currently_used_register_set->get(index);
-    if (dynamic_cast<viua::types::Reference*>(object)) {
-        object = static_cast<viua::types::Reference*>(object)->points_to();
-    }
-    return object;
-}
-
 viua::kernel::Register* viua::process::Process::register_at(
     viua::internals::types::register_index i) {
     return currently_used_register_set->register_at(i);
