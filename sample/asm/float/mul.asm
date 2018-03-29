@@ -20,10 +20,10 @@
 ; This script tests float multiplication.
 
 .function: main/1
-    float %1 4.0
-    float %2 2.001
-    mul %3 %1 %2
-    print %3
+    float %1 local 4.0
+    float %2 local 2.001
+    mul %3 local %1 local %2 local
+    print %3 local
     izero %0 local
     return
 .end

@@ -21,19 +21,19 @@
 ; Basically, it justs tests correctness of the .boolean() method override in Integer objects.
 
 .function: main/1
-    float %1 0.0001
+    float %1 local 0.0001
 
     ; generate false
-    integer %2 0
-    integer %3 1
-    eq %2 %2 %3
+    integer %2 local 0
+    integer %3 local 1
+    eq %2 local %2 local %3 local
 
     ; check
-    if %1 ok fin
+    if %1 local ok fin
     .mark: ok
-    not %2
+    not %2 local
     .mark: fin
-    print %2
+    print %2 local
     izero %0 local
     return
 .end

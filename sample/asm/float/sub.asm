@@ -20,10 +20,10 @@
 ; This script tests float subtraction.
 
 .function: main/1
-    float %1 3.098
-    float %2 2.083
-    sub %3 %1 %2
-    print %3
+    float %1 local 3.098
+    float %2 local 2.083
+    sub %3 local %1 local %2 local
+    print %3 local
     izero %0 local
     return
 .end
