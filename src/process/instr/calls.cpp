@@ -188,8 +188,6 @@ auto viua::process::Process::optailcall(Op_address_type addr)
         if (not stacks_order.empty()) {
             stack = stacks_order.top();
             stacks_order.pop();
-            currently_used_register_set =
-                stack->back()->local_register_set.get();
             return (addr - 1);
         }
     }
@@ -216,8 +214,6 @@ auto viua::process::Process::optailcall(Op_address_type addr)
         if (fn->type() == "Closure") {
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
-            currently_used_register_set =
-                stack->back()->local_register_set.get();
         }
     } else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
@@ -263,8 +259,6 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
         if (fn->type() == "Closure") {
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
-            currently_used_register_set =
-                stack->back()->local_register_set.get();
         }
     } else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
@@ -299,8 +293,6 @@ auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
         if (not stacks_order.empty()) {
             stack = stacks_order.top();
             stacks_order.pop();
-            currently_used_register_set =
-                stack->back()->local_register_set.get();
             return addr;
         }
     }
