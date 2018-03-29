@@ -48,12 +48,12 @@ auto viua::process::Stack::set_return_value() -> void {
     // FIXME find better name for this function
     if (back()->return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
-        if ((*currently_used_register_set)->at(0) == nullptr) {
+        if (back()->local_register_set->at(0) == nullptr) {
             throw make_unique<viua::types::Exception>(
                 "return value requested by frame but function did not set "
                 "return register");
         }
-        return_value = (*currently_used_register_set)->pop(0);
+        return_value = back()->local_register_set->pop(0);
     }
 }
 
