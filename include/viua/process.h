@@ -113,11 +113,9 @@ class Stack {
     std::unique_ptr<viua::types::Value> caught;
 
     /*
-     *  Currently used register, and
-     *  global register set of parent process.
+     *  Global register set of parent process.
      */
-    viua::kernel::Register_set** currently_used_register_set;
-    viua::kernel::Register_set* global_register_set;
+    viua::kernel::RegisterSet* global_register_set;
 
     /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -139,8 +137,7 @@ class Stack {
 
     viua::scheduler::Virtual_process_scheduler* scheduler;
 
-    auto bind(viua::kernel::Register_set**, viua::kernel::Register_set*)
-        -> void;
+    auto bind(viua::kernel::RegisterSet*) -> void;
 
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
@@ -170,9 +167,8 @@ class Stack {
 
     Stack(std::string,
           Process*,
-          viua::kernel::Register_set**,
-          viua::kernel::Register_set*,
-          viua::scheduler::Virtual_process_scheduler*);
+          viua::kernel::RegisterSet*,
+          viua::scheduler::VirtualProcessScheduler*);
 
     static uint16_t const MAX_STACK_SIZE = 8192;
 };
@@ -209,15 +205,6 @@ class Process {
     bool watchdog_failed{false};
 
     std::unique_ptr<viua::kernel::Register_set> global_register_set;
-
-    /*
-     * This pointer points different register sets during the process's
-     * lifetime. It can be explicitly adjusted by the user code (using "ress"
-     * instruction), or implicitly by the VM (e.g. when calling a closure).
-     * FIXME Remove this. It is not needed after "ress" was removed. The
-     * "current" pseudo-register set must also be removed for this to be viable.
-     */
-    viua::kernel::Register_set* currently_used_register_set;
 
     // Static registers
     std::map<std::string, std::unique_ptr<viua::kernel::Register_set>>
