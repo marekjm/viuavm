@@ -1065,9 +1065,9 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(),
-                                    input_tokens.at(i).str());
+                tokens.emplace_back(tokens.at(tokens.size()-2).line(),
+                                    tokens.at(tokens.size()-2).character(),
+                                    tokens.at(tokens.size()-2).str());
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
                                     target_register_set);
@@ -1806,9 +1806,9 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                tokens.emplace_back(input_tokens.at(i).line(),
-                                    input_tokens.at(i).character(),
-                                    input_tokens.at(i).str());
+                tokens.emplace_back(tokens.at(tokens.size()-2).line(),
+                                    tokens.at(tokens.size()-2).character(),
+                                    tokens.at(tokens.size()-2).str());
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
                                     target_register_set);
