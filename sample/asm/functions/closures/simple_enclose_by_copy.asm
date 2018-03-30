@@ -19,13 +19,14 @@
 
 .function: foo/0
     ; register 1 is captured from 'returns_closure' function
-    print %1
+    print %1 local
     return
 .end
 
 .function: returns_closure/0
-    closure %2 foo/0
-    move %0 (capturecopy %2 %1 (integer %1 42))
+    closure %2 local foo/0
+    capturecopy %2 local %1 (integer %1 local 42) local
+    move %0 local %2 local
     return
 .end
 
@@ -33,12 +34,12 @@
     .name: 1 bar
     ; call function that returns the closure
     frame %0
-    call %bar returns_closure/0
+    call %bar local returns_closure/0
 
     ; create frame for our closure and
     ; call it
     frame %0 %0
-    call void %bar
+    call void %bar local
 
     izero %0 local
     return

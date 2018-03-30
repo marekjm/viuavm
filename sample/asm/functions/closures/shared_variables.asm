@@ -19,15 +19,15 @@
 
 .function: closure_printer/0
     ; it has to be 2, because 2 register has been bound
-    print %2
+    print %2 local
     return
 .end
 
 .function: closure_setter/1
-    arg %1 %0
+    arg %1 local %0
 
     ; overwrite bound value with whatever we got
-    copy %2 %1
+    copy %2 local %1 local
     return
 .end
 
@@ -36,41 +36,41 @@
     vector %1 local %0 local %0
 
     ; create a value to be bound in both closures
-    integer %2 42
+    integer %2 local 42
 
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
-    closure %3 closure_printer/0
-    capture %3 %2 %2
+    closure %3 local closure_printer/0
+    capture %3 local %2 %2 local
 
-    closure %4 closure_setter/1
-    capture %4 %2 %2
+    closure %4 local closure_setter/1
+    capture %4 local %2 %2 local
 
     ; push closures to vector...
-    vpush %1 %3
-    vpush %1 %4
+    vpush %1 local %3 local
+    vpush %1 local %4 local
 
     ; ...and return the vector
     ; vectors can be used to return multiple values as
     ; they can hold any Type-derived type
-    move %0 %1
+    move %0 local %1 local
     return
 .end
 
 .function: main/1
     frame %0
-    call (.name: %iota the_closures) returns_closures/0
+    call (.name: %iota the_closures) local returns_closures/0
 
     frame %0
-    vat (.name: %iota printer_closure) %the_closures (izero %iota)
-    call void *printer_closure
+    vat (.name: %iota printer_closure) local %the_closures local (izero %iota local) local
+    call void *printer_closure local
 
-    frame ^[(param %0 (integer %iota 69))]
-    vat (.name: %iota setter_closure) %the_closures (integer %iota 1)
-    call void *setter_closure
+    frame ^[(param %0 (integer %iota local 69) local)]
+    vat (.name: %iota setter_closure) local %the_closures local (integer %iota local 1) local
+    call void *setter_closure local
 
     frame %0
-    call void *printer_closure
+    call void *printer_closure local
 
     izero %0 local
     return

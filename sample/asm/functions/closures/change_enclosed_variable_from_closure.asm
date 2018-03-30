@@ -19,24 +19,24 @@
 
 .function: variable_changing_function/0
     ; expects register 1 to be an captured object
-    integer %1 42
+    integer %1 local 42
     return
 .end
 
 .function: main/1
     ; create a closure and capture object in register 1 with it
-    closure %2 variable_changing_function/0
-    capture %2 %1 (string %1 "Hello World!")
+    closure %2 local variable_changing_function/0
+    capture %2 local %1 (string %1 local "Hello World!") local
 
     ; should print "Hello World!"
-    print %1
+    print %1 local
 
     ; call the closure
     frame %0
-    call void %2
+    call void %2 local
 
     ; should print "42"
-    print %1
+    print %1 local
 
     izero %0 local
     return
