@@ -18,9 +18,9 @@
 ;
 
 .function: main/1
-    float %1 3.14159
-    ftoi %2 %1
-    print %2
+    float %1 local 3.14159
+    ftoi %2 local %1 local
+    print %2 local
     izero %0 local
     return
 .end
