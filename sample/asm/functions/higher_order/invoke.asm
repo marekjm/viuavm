@@ -20,26 +20,41 @@
 .function: sum/4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
-    add %0 (arg %4 %3) (add %0 (arg %3 %2) (add %0 (arg %1 %0) (arg %2 %1)))
+    .name: %iota a
+    .name: %iota b
+    .name: %iota c
+    .name: %iota d
+
+    arg %a local %0
+    arg %b local %1
+    arg %c local %2
+    arg %d local %3
+
+    add %0 local %a local %b local  ; x = a + b
+    add %0 local %0 local %c local  ; x = x + c
+    add %0 local %0 local %d local  ; x = x + d
+
     return
 .end
 
 .function: invoke/2
     ; this function takes two parameters:
-    ;    1) a function object
-    ;    2) a vector of parameters for function given as first parameter
+    ;    1) local a function object
+    ;    2) local a vector of parameters for function given as first parameter
     ;
     ; it then creates a frame with required number of parameter slots (as
-    ; specified by length of the vector), and calls given function with this
+    ; specified by length of the vector) local, and calls given function with this
     ; frame
-    arg (.name: %iota fn_to_call) local %0
-    arg (.name: %iota parameters_list) local %1
+    .name: %iota fn_to_call
+    .name: %iota parameters_list
+    arg %fn_to_call local %0
+    arg %parameters_list local %1
 
     ; take length of the vector
     .name: %iota vector_length
     ;vlen %vector_length local %2 local
     vlen %vector_length local %parameters_list local
-    frame @vector_length
+    frame @vector_length local
 
     ; zero loop counter
     .name: %iota loop_counter
@@ -47,12 +62,12 @@
     .mark: while_begin
 
     ; simple condition:
-    ; while (loop_counter < vector_length) {
+    ; while (loop_counter < vector_length) local {
     if (gte %iota local %loop_counter local %vector_length local) local while_end while_body
 
     .mark: while_body
 
-    .name: %iota slot
+    .name: %iota local slot
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
@@ -74,23 +89,23 @@
 
 .function: main/1
     ; create the vector
-    vpush (vector %1) (integer %2 20)
-    vpush %1 (integer %3 16)
-    vpush %1 (integer %4 8)
-    vpush %1 (integer %5 -2)
+    vpush (vector %1 local) local (integer %2 local 20) local
+    vpush %1 local (integer %3 local 16) local
+    vpush %1 local (integer %4 local 8) local
+    vpush %1 local (integer %5 local -2) local
 
-    integer %2 20
-    integer %3 16
-    integer %4 8
-    integer %5 -2
+    integer %2 local 20
+    integer %3 local 16
+    integer %4 local 8
+    integer %5 local -2
 
-    ; call sum/4() function
-    frame ^[(param %0 %2) (param %1 %3) (param %2 %4) (param %3 %5)]
-    print (call %6 sum/4)
+    ; call sum/4() local function
+    frame ^[(param %0 %2 local) (param %1 %3 local) (param %2 %4 local) (param %3 %5 local)]
+    print (call %6 local sum/4) local
 
     ; call sum/4 function via invoke/2 function
-    frame ^[(param %0 (function %7 sum/4)) (param %1 %1)]
-    print (call %8 invoke/2)
+    frame ^[(param %0 (function %7 local sum/4) local) (param %1 %1 local)]
+    print (call %8 local invoke/2) local
 
     izero %0 local
     return

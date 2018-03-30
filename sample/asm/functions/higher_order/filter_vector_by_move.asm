@@ -18,80 +18,80 @@
 ;
 
 .function: is_divisible_by_2/1
-    arg %1 %0
-    integer %2 2
+    arg %1 local %0
+    integer %2 local 2
 
     .mark: loop_begin
-    if (lt %3 %1 %2) loop_end +1
+    if (lt %3 local %1 local %2 local) local loop_end +1
 
-    sub %1 %1 %2
+    sub %1 local %1 local %2 local
     jump loop_begin
 
     ; make zero "true" and
     ; non-zero values "false"
     .mark: loop_end
-    not (move %0 %1)
+    not (move %0 local %1 local) local
 
     return
 .end
 
 .function: filter/2
-    ; classic filter() function
+    ; classic filter() local function
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg %1 %0
-    arg %2 %1
+    arg %1 local %0
+    arg %2 local %1
 
     ; vector for filtered values
-    vector %3
+    vector %3 local
 
     ; initial loop counter and
     ; loop termination variable
-    izero %4
-    vlen %5 %2
+    izero %4 local
+    vlen %5 local %2 local
 
-    ; while (...) {
+    ; while (...) local {
     .mark: loop_begin
-    if (gte %6 %4 %5) loop_end +1
+    if (gte %6 local %4 local %5 local) local loop_end +1
 
     ; call filtering function to determine whether current element
     ; is a valid value...
-    frame ^[(param %0 *(vat %7 %2 %4))]
+    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)]
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if (call %8 %1) element_ok next_iter
+    if (call %8 local %1 local) local element_ok next_iter
 
     .mark: element_ok
-    vpush %3 *7
+    vpush %3 local *7 local
 
     .mark: next_iter
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
     ; }
-    iinc %4
+    iinc %4 local
     jump loop_begin
 
     .mark: loop_end
 
     ; move result vector into return register
-    move %0 %3
+    move %0 local %3 local
     return
 .end
 
 .function: main/1
-    vpush (vector %1) (integer %2 1)
-    vpush %1 (integer %2 2)
-    vpush %1 (integer %2 3)
-    vpush %1 (integer %2 4)
-    vpush %1 (integer %2 5)
+    vpush (vector %1 local) local (integer %2 local 1) local
+    vpush %1 local (integer %2 local 2) local
+    vpush %1 local (integer %2 local 3) local
+    vpush %1 local (integer %2 local 4) local
+    vpush %1 local (integer %2 local 5) local
 
-    print %1
+    print %1 local
 
-    frame ^[(param %0 (function %3 is_divisible_by_2/1)) (pamv %1 %1)]
-    print (call %4 filter/2)
+    frame ^[(param %0 (function %3 local is_divisible_by_2/1) local) (pamv %1 %1 local)]
+    print (call %4 local filter/2) local
 
     izero %0 local
     return
