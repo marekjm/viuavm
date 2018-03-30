@@ -22,14 +22,14 @@
     .name: 2 zero
 
     ; unpack arguments
-    arg %counter %0
-    arg %zero %1
+    arg %counter local %0
+    arg %zero local %1
 
     ; decrease counter and check if it's less than zero
-    if (lt %3 (idec %counter) %zero) break_rec
-    print %counter
+    if (lt %3 local (idec %counter local) local %zero local) break_rec
+    print %counter local
 
-    frame ^[(param %0 %counter) (pamv %1 %zero)]
+    frame ^[(param %0 %counter local) (pamv %1 %zero local)]
     call recursive/2
 
     .mark: break_rec
@@ -38,7 +38,7 @@
 
 .function: main/1
     ; create frame and set initial parameters
-    frame ^[(param %0 (integer %1 10)) (pamv %1 (integer %2 0))]
+    frame ^[(param %0 (integer %1 local 10) local) (pamv %1 (integer %2 local 0) local)]
     call recursive/2
 
     izero %0 local

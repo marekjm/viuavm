@@ -18,26 +18,26 @@
 ;
 
 .function: foo/0
-    print (integer %1 42)
+    print (integer %1 local 42) local
     return
 .end
 
 .function: bar/0
-    print (integer %1 69)
+    print (integer %1 local 69) local
     frame %0
     call void foo/0
     return
 .end
 
 .function: baz/0
-    print (integer %1 1995)
+    print (integer %1 local 1995) local
     frame %0
     call void bar/0
     return
 .end
 
 .function: bay/0
-    print (integer %1 2015)
+    print (integer %1 local 2015) local
     frame %0
     call void baz/0
     return
@@ -48,6 +48,6 @@
     frame %0
     call void bay/0
 
-    izero %0 local
+    izero %0 local local
     return
 .end

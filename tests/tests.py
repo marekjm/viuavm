@@ -1517,14 +1517,6 @@ class FunctionTests(unittest.TestCase):
     def testCallWithPassByMove(self):
         runTestSplitlines(self, 'pass_by_move.asm', ['42', '42', '42',])
 
-    @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
-    def testNeverendingFunction(self):
-        runTestSplitlines(self, 'neverending.asm', ['42', '48'], assembly_opts=('--no-sa',))
-
-    @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
-    def testNeverendingFunction0(self):
-        runTestThrowsException(self, 'neverending0.asm', ('Exception', 'stack size (8192) exceeded with call to \'one/0\'',), assembly_opts=('--no-sa',))
-
 
 class HigherOrderFunctionTests(unittest.TestCase):
     """Tests for higher-order function support.

@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    integer %1 42
-    print %1
+    integer %1 local 42
+    print %1 local
     izero %0 local
     return
 .end
