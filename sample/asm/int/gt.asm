@@ -17,14 +17,11 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script tests support for integer greater-than checking.
-; Its expected output is "true".
-
 .function: main/1
-    integer %1 4
-    integer %2 1
-    gt %1 %1 %2
-    print %1
+    integer %1 local 4
+    integer %2 local 1
+    gt %1 local %1 local %2 local
+    print %1 local
     izero %0 local
     return
 .end

@@ -17,14 +17,11 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script tests support for integer less-than-or-equal-to checking.
-; Its expected output is "true".
-
 .function: main/1
-    integer %1 2
-    integer %2 1
-    lte %3 %2 %1
-    print %3
+    integer %1 local 2
+    integer %2 local 1
+    lte %3 local %2 local %1 local
+    print %3 local
     izero %0 local
     return
 .end

@@ -23,12 +23,12 @@
 ; true porpose of this script, though.
 
 .function: main/1
-    integer %1 4
-    integer %2 -3
-    add %3 %1 %2
-    integer %4 0
-    add %3 %3 %4
-    print %3
+    integer %1 local 4
+    integer %2 local -3
+    add %3 local %1 local %2 local
+    integer %4 local 0
+    add %3 local %3 local %4 local
+    print %3 local
     izero %0 local
     return
 .end

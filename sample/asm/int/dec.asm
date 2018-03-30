@@ -17,12 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; Test support for idec instruction.
-
 .function: main/1
-    integer %1 2
-    idec %1
-    print %1
+    integer %1 local 2
+    idec %1 local
+    print %1 local
     izero %0 local
     return
 .end

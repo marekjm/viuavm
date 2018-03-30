@@ -464,9 +464,6 @@ class IntegerInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/int'
 
-    def testIstoreDefault(self):
-        runTest(self, 'istore_default.asm', '0', 0)
-
     def testIADD(self):
         runTest(self, 'add.asm', '1', 0)
 

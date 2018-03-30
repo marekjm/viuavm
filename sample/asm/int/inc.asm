@@ -17,12 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script tests support for iinc i++. instruction, i.e.
-
 .function: main/1
-    integer %1 0
-    iinc %1
-    print %1
+    integer %1 local 0
+    iinc %1 local
+    print %1 local
     izero %0 local
     return
 .end
