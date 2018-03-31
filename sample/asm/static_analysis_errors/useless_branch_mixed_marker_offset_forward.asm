@@ -18,10 +18,10 @@
 ;
 
 .function: main/0
-    if (izero %0) here +1
+    if (izero %0 local) local here +1
 
     .mark: here
-    print (string %1 "Hello World!")
+    print (string %1 local "Hello World!") local
 
     izero %0 local
     return

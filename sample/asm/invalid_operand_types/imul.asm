@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    string %1 local "Hello World!"
-    float %2 local 1.0
+    float %1 local 1.0
+    string %2 local "Hello World!"
     mul %3 local %1 local %2 local
     print %3 local
 

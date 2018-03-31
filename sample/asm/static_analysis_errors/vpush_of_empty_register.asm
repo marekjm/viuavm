@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vpush (vector %2) %1
+    vpush (vector %2 local) local %1 local
 
     izero %0 local
     return

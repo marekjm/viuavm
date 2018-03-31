@@ -21,10 +21,10 @@
     jump after
 
     .mark: here
-    print (string %1 "Hello World!")
+    print (string %1 local "Hello World!") local
 
     .mark: after
-    if (not (not (izero %0))) here -5
+    if (not (not (izero %0 local) local) local) local here -5
 
     izero %0 local
     return

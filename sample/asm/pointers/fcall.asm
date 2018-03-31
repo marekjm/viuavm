@@ -18,39 +18,39 @@
 ;
 
 .function: add/2
-    arg (.name: %iota lhs) %0
-    arg (.name: %iota rhs) %0
+    arg (.name: %iota lhs) local %0
+    arg (.name: %iota rhs) local %0
 
-    add %0 %lhs %rhs
+    add %0 local %lhs local %rhs local
 
     return
 .end
 
 .function: multiply/2
-    arg (.name: %iota lhs) %0
-    arg (.name: %iota rhs) %0
+    arg (.name: %iota lhs) local %0
+    arg (.name: %iota rhs) local %0
 
-    mul %0 %lhs %rhs
+    mul %0 local %lhs local %rhs local
 
     return
 .end
 
 .function: main/0
-    function (.name: %iota adder) add/2
-    function (.name: %iota multipler) multiply/2
+    function (.name: %iota adder) local add/2
+    function (.name: %iota multipler) local multiply/2
 
-    integer (.name: %iota one) 1
+    integer (.name: %iota one) local 1
 
     .name: %iota pointer
     .name: %iota result
 
-    ptr %pointer %adder
-    frame ^[(param %iota %one) (param %iota %one)]
-    print (call %result *pointer)
+    ptr %pointer local %adder local
+    frame ^[(param %iota %one local) (param %iota %one local)]
+    print (call %result local *pointer local) local
 
-    ptr %pointer %multipler
-    frame ^[(param %iota %one) (param %iota %one)]
-    print (call %result *pointer)
+    ptr %pointer local %multipler local
+    frame ^[(param %iota %one local) (param %iota %one local)]
+    print (call %result local *pointer local) local
 
     izero %0 local
     return

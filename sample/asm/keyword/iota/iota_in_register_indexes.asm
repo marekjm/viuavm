@@ -18,11 +18,11 @@
 ;
 
 .function: main/0
-    string %iota "Hello World!"
-    integer %iota 42
+    string %iota local "Hello World!"
+    integer %iota local 42
 
-    print %1 ; should print "Hello World!"
-    print %2 ; should print 42
+    print %1 local ; should print "Hello World!"
+    print %2 local ; should print 42
 
     izero %0 local
     return

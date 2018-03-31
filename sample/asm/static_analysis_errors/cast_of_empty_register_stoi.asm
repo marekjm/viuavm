@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    stoi %2 %1
+    stoi %2 local %1 local
 
     izero %0 local
     return

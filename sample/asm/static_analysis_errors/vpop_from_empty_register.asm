@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vpop %2 %1
+    vpop %2 local %1 local
 
     izero %0 local
     return

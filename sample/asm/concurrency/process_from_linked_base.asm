@@ -23,9 +23,9 @@
     import "test_module"
 
     frame %0
-    process %1 test_module::test_function/0
+    process %1 local test_module::test_function/0
 
-    join void %1
+    join void %1 local
 
     izero %0 local
     return

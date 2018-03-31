@@ -23,7 +23,7 @@
 .end
 
 .function: main/0
-    frame ^[(pamv %iota (izero %iota))]
+    frame ^[(pamv %iota (izero %iota local) local)]
     call void foo/1
 
     izero %0 local

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    if (izero %1) 3 3
+    if (izero %1 local) local 3 3
 
     izero %0 local
     return

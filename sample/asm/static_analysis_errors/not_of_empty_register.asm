@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    not %1
+    not %1 local
 
     izero %0 local
     return

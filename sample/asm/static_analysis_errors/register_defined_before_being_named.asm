@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    izero %1
+    izero %1 local
     .name: 1 named_register
 
     izero %0 local

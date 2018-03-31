@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    if (izero %1) here here
+    if (izero %1 local) local here here
 
     .mark: here
     izero %0 local

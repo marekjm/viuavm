@@ -23,13 +23,13 @@
 .function: main/1
     import "std::vector"
 
-    frame ^[(pamv %0 (integer %1 8))]
-    call %1 std::vector::of_ints/1
-    print %1
+    frame ^[(pamv %0 (integer %1 local 8) local)]
+    call %1 local std::vector::of_ints/1
+    print %1 local
 
-    frame ^[(param %0 %1)]
-    call %2 std::vector::reverse/1
-    print %2
+    frame ^[(param %0 %1 local)]
+    call %2 local std::vector::reverse/1
+    print %2 local
 
     izero %0 local
     return

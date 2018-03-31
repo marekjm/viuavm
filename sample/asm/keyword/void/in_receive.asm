@@ -18,12 +18,12 @@
 ;
 
 .function: sender/1
-    send (arg (.name: %iota pid) %0) (string %iota "Hello World!")
+    send (arg (.name: %iota pid) local %0) local (string %iota local "Hello World!") local
     return
 .end
 
 .function: main/0
-    frame ^[(pamv %iota (self %iota))]
+    frame ^[(pamv %iota (self %iota local) local)]
     process void sender/1
 
     receive void infinity

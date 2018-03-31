@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    send (self %1) (string %2 "Hello World (from self)!")
-    print (receive %2)
+    send (self %1 local) local (string %2 local "Hello World (from self)!") local
+    print (receive %2 local) local
 
     izero %0 local
     return

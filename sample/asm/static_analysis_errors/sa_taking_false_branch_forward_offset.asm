@@ -18,13 +18,13 @@
 ;
 
 .function: main/0
-    integer (.name: %iota value) 42
+    integer (.name: %iota value) local 42
 
-    if %value +2 go_here
+    if %value local +2 go_here
     .mark: go_here
-    delete %value
+    delete %value local
 
-    print %value
+    print %value local
 
     izero %0 local
     return

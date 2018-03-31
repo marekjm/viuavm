@@ -23,9 +23,9 @@
 
 .function: main/0
     frame %0
-    process %1 foo/0
+    process %1 local foo/0
 
-    join void %1
+    join void %1 local
 
     izero %0 local
     return

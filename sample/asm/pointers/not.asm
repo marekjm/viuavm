@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer_to_a) (integer (.name: %iota a) 0)
+    ptr (.name: %iota pointer_to_a) local (integer (.name: %iota a) local 0) local
 
-    print (not %iota *pointer_to_a)
+    print (not %iota local *pointer_to_a local) local
 
     izero %0 local
     return

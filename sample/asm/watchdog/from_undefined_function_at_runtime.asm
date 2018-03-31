@@ -51,7 +51,7 @@
     nop
     nop
     nop
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
     return
 .end
 

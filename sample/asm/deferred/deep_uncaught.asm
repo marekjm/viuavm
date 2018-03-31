@@ -18,7 +18,7 @@
 ;
 
 .function: by_quux/0
-    print (text %iota "Hello from by_quux/0")
+    print (text %iota local "Hello from by_quux/0") local
     return
 .end
 
@@ -26,13 +26,13 @@
     frame %0
     defer by_quux/0
 
-    throw (integer %iota 666)
+    throw (integer %iota local 666) local
 
     return
 .end
 
 .function: by_bax/0
-    print (text %iota "Hello from by_bax/0")
+    print (text %iota local "Hello from by_bax/0") local
     return
 .end
 
@@ -47,7 +47,7 @@
 .end
 
 .function: by_bay/0
-    print (text %iota "Hello from by_bay/0")
+    print (text %iota local "Hello from by_bay/0") local
     return
 .end
 
@@ -62,7 +62,7 @@
 .end
 
 .function: by_baz/0
-    print (text %iota "Hello from by_baz/0")
+    print (text %iota local "Hello from by_baz/0") local
     return
 .end
 
@@ -77,7 +77,7 @@
 .end
 
 .function: by_bar/0
-    print (text %iota "Hello from by_bar/0")
+    print (text %iota local "Hello from by_bar/0") local
     return
 .end
 
@@ -92,7 +92,7 @@
 .end
 
 .function: by_foo/0
-    print (text %iota "Hello from by_foo/0")
+    print (text %iota local "Hello from by_foo/0") local
     return
 .end
 
@@ -107,7 +107,7 @@
 .end
 
 .function: by_main/0
-    print (text %iota "Hello from by_main/0")
+    print (text %iota local "Hello from by_main/0") local
     return
 .end
 

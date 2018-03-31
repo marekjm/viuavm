@@ -18,6 +18,6 @@
 ;
 
 .function: test_module::test_function/0
-    print (string %1 "Hello World!")
+    print (string %1 local "Hello World!") local
     return
 .end

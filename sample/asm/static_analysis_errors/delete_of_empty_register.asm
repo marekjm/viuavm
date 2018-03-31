@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    delete %1
+    delete %1 local
 
     izero %0 local
     return

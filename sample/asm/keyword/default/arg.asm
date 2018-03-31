@@ -23,7 +23,7 @@
 .end
 
 .function: main/0
-    frame ^[(pamv %0 (string %1 "Hello default World!"))]
+    frame ^[(pamv %0 (string %1 local "Hello default World!") local)]
     call foo/1
 
     izero %0 local

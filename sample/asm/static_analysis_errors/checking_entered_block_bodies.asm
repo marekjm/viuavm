@@ -18,7 +18,7 @@
 ;
 
 .block: a_block
-    string %1 "Hello World!"
+    string %1 local "Hello World!"
     leave
 .end
 
@@ -26,7 +26,7 @@
     try
     enter a_block
 
-    print %1
+    print %1 local
 
     izero %0 local
     return
