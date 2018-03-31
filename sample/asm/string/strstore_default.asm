@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    print (string %1)
+    print (string %1 local) local
 
     izero %0 local
     return

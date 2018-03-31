@@ -18,11 +18,11 @@
 ;
 
 .function: print_N::print_42/0
-    print (integer %1 42)
+    print (integer %1 local 42) local
     return
 .end
 
 .function: print_N::print_69/0
-    print (integer %1 69)
+    print (integer %1 local 69) local
     return
 .end

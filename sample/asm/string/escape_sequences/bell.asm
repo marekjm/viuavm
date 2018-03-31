@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    string %1 "Hello \aWorld!"
-    print %1
+    string %1 local "Hello \aWorld!"
+    print %1 local
     izero %0 local
     return
 .end

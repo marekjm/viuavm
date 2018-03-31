@@ -18,9 +18,9 @@
 ;
 
 .function: main/1
-    vector %1
-    vpush %1 (integer %3 42)
-    vat %2 %1 (integer %4 4)
+    vector %1 local
+    vpush %1 local (integer %3 local 42) local
+    vat %2 local %1 local (integer %4 local 4) local
     print *2
 
     izero %0 local
