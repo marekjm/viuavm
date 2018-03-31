@@ -19,7 +19,7 @@
 
 .function: main/0
     frame
-    throw (integer %1)
+    throw (integer %1 local) local
 
     izero %0 local
     return

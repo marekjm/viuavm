@@ -2413,7 +2413,7 @@ class AssemblerErrorTests(unittest.TestCase):
 
     def testIsNotAValidFunctionName(self):
         runTestFailsToAssembleDetailed(self, 'is_not_a_valid_function_name.asm', [
-            "26:10: error: not a valid function name",
+            "26:15: error: not a valid function name",
             "24:12: error: in function main/0",
         ])
 
@@ -2449,7 +2449,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:20:9: error: block with empty body: foo")
 
     def testCallToUndefinedFunction(self):
-        runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22:10: error: call to undefined function foo/1")
+        runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22:15: error: call to undefined function foo/1")
 
     def testTailCallToUndefinedFunction(self):
         runTestFailsToAssemble(self, 'tail_call_to_undefined_function.asm', "./sample/asm/errors/tail_call_to_undefined_function.asm:22:14: error: tail call to undefined function foo/0")
@@ -2562,70 +2562,81 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:5: error: branch without a target")
 
     def testBranchTrueBackwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_true_backward_out_of_range.asm', "./sample/asm/errors/branch_true_backward_out_of_range.asm:23:11: error: backward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_backward_out_of_range.asm', "./sample/asm/errors/branch_true_backward_out_of_range.asm:23:17: error: backward out-of-range jump")
 
     def testBranchTrueForwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range.asm', "./sample/asm/errors/branch_true_forward_out_of_range.asm:23:11: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range.asm',
+                "./sample/asm/errors/branch_true_forward_out_of_range.asm:23:17: error: forward out-of-range jump")
 
     def testBranchFalseBackwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_false_backward_out_of_range.asm', "./sample/asm/errors/branch_false_backward_out_of_range.asm:23:14: error: backward out-of-range jump")
+        runTestFailsToAssembleDetailed(self, 'branch_false_backward_out_of_range.asm', [
+            '23:20: error: backward out-of-range jump',
+            '20:12: error: in function main/0',
+        ])
 
     def testBranchFalseForwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range.asm', "./sample/asm/errors/branch_false_forward_out_of_range.asm:23:14: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range.asm',
+                "./sample/asm/errors/branch_false_forward_out_of_range.asm:23:20: error: forward out-of-range jump"
+        )
 
     def testBranchTrueForwardOutOfRangeNonrelative(self):
-        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23:11: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23:17: error: forward out-of-range jump")
 
     def testBranchFalseForwardOutOfRangeNonrelative(self):
-        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23:14: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm',
+                "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23:20: error: forward out-of-range jump")
 
     def testBranchTrueToUnrecognisedMarker(self):
-        runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23:11: error: jump to unrecognised marker: foo")
+        runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23:17: error: jump to unrecognised marker: foo")
 
     def testBranchFalseToUnrecognisedMarker(self):
-        runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm', "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23:14: error: jump to unrecognised marker: foo")
+        runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm',
+                "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23:20: error: jump to unrecognised marker: foo")
 
     def testZeroDistanceBackwardFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21:13: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21:19: error: zero-distance jump")
 
     def testZeroDistanceBackwardJump(self):
         runTestFailsToAssemble(self, 'zero_distance_backward_jump.asm', "./sample/asm/errors/zero_distance_backward_jump.asm:21:10: error: zero-distance jump")
 
     def testZeroDistanceBackwardTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_backward_true_branch.asm', "./sample/asm/errors/zero_distance_backward_true_branch.asm:21:11: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_backward_true_branch.asm', "./sample/asm/errors/zero_distance_backward_true_branch.asm:21:17: error: zero-distance jump")
 
     def testZeroDistanceFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_false_branch.asm', "./sample/asm/errors/zero_distance_false_branch.asm:24:13: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_false_branch.asm', "./sample/asm/errors/zero_distance_false_branch.asm:24:19: error: zero-distance jump")
 
     def testZeroDistanceForwardFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_forward_false_branch.asm', "./sample/asm/errors/zero_distance_forward_false_branch.asm:21:13: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_forward_false_branch.asm', "./sample/asm/errors/zero_distance_forward_false_branch.asm:21:19: error: zero-distance jump")
 
     def testZeroDistanceForwardJump(self):
         runTestFailsToAssemble(self, 'zero_distance_forward_jump.asm', "./sample/asm/errors/zero_distance_forward_jump.asm:21:10: error: zero-distance jump")
 
     def testZeroDistanceForwardTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_forward_true_branch.asm', "./sample/asm/errors/zero_distance_forward_true_branch.asm:21:11: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_forward_true_branch.asm', "./sample/asm/errors/zero_distance_forward_true_branch.asm:21:17: error: zero-distance jump")
 
     def testZeroDistanceJump(self):
         runTestFailsToAssemble(self, 'zero_distance_jump.asm', "./sample/asm/errors/zero_distance_jump.asm:24:10: error: zero-distance jump")
 
     def testZeroDistanceMarkerFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_marker_false_branch.asm', "./sample/asm/errors/zero_distance_marker_false_branch.asm:25:13: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_marker_false_branch.asm', "./sample/asm/errors/zero_distance_marker_false_branch.asm:25:19: error: zero-distance jump")
 
     def testZeroDistanceMarkerJump(self):
         runTestFailsToAssemble(self, 'zero_distance_marker_jump.asm', "./sample/asm/errors/zero_distance_marker_jump.asm:24:10: error: zero-distance jump")
 
     def testZeroDistanceMarkerTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_marker_true_branch.asm', "./sample/asm/errors/zero_distance_marker_true_branch.asm:25:11: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_marker_true_branch.asm', "./sample/asm/errors/zero_distance_marker_true_branch.asm:25:17: error: zero-distance jump")
 
     def testZeroDistanceTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_true_branch.asm', "./sample/asm/errors/zero_distance_true_branch.asm:24:11: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_true_branch.asm', "./sample/asm/errors/zero_distance_true_branch.asm:24:17: error: zero-distance jump")
 
     def testAtLeastTwoTokensAreRequiredInAWrappedInstruction(self):
         runTestFailsToAssemble(self, 'at_least_two_tokens_required_in_a_wrapped_instruction.asm', "./sample/asm/errors/at_least_two_tokens_required_in_a_wrapped_instruction.asm:25:28: error: at least two tokens are required in a wrapped instruction")
 
     def testInvalidRegisterIndexInNameDirective(self):
-        runTestFailsToAssemble(self, 'invalid_register_index_in_name_directive.asm', "./sample/asm/errors/invalid_register_index_in_name_directive.asm: error: in function 'main/0': invalid register index in name directive: named_register := \"bad\"")
+        runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name_directive.asm', [
+            '21:12: error: invalid register index: named_register := "bad"',
+            '                   ^~~',
+        ])
 
     def testInvalidRegisterIndexInNameDirective(self):
         runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:13: error: missing module name in import directive")
@@ -2643,12 +2654,6 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'duplicated_block_and_function_name.asm', [
             "24:9: error: duplicated name: foo/0",
             "20:12: error: already defined here:",
-        ])
-
-    def testInvalidRegisterIndexInName(self):
-        runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name.asm', [
-            '21:12: error: invalid register index: a_name := "a"',
-            '                   ^       ',
         ])
 
 
