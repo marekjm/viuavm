@@ -18,10 +18,10 @@
 ;
 
 .function: main/1
-    integer %1 0
+    integer %1 local 0
 
-    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vector %2) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) %1
-    print (vlen %3 %2)
+    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vector %2 local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local %1 local
+    print (vlen %3 local %2 local) local
 
     izero %0 local
     return

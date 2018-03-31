@@ -1,12 +1,12 @@
 .function: main/0
-    string %1 "answer to life"
-    integer %2 42
+    string %1 local "answer to life"
+    integer %2 local 42
 
     -- this would pack
     -- the vector inside itself
-    vector %3 %1 %3
+    vector %3 local %1 local %3
 
-    print %3
+    print %3 local
 
     izero %0 local
     return

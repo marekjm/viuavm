@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    izero %1
-    and %3 %1 %2
+    izero %1 local
+    and %3 local %1 local %2 local
 
     izero %0 local
     return

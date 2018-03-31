@@ -3,7 +3,7 @@
     integer %3 local 42
 
     -- this would pack outside of available
-    -- register %set index range
+    -- register set index range
     vector %1 local %2 local %20
 
     print %1 local
