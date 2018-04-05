@@ -22,10 +22,10 @@
 .function: main/1
     import "std::vector"
 
-    frame ^[(pamv %0 (integer %1 8))]
-    call %1 std::vector::of_ints/1
+    frame ^[(pamv %0 (integer %1 local 8) local)]
+    call %1 local std::vector::of_ints/1
 
-    print %1
+    print %1 local
     
     izero %0 local
     return

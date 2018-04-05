@@ -21,20 +21,20 @@
 ; integer related instructions.
 
 .function: foo/0
-    integer %1 %16
-    integer %16 1
+    integer %1 local 16
+    integer %16 local 1
 
-    print %1
-    print @1
-    print %16
-    print @16
+    print %1 local
+    print @1 local
+    print %16 local
+    print @16 local
 
     return
 .end
 
 .function: main/1
     frame %0 %17
-    call foo/0
+    call void foo/0
     izero %0 local
     return
 .end

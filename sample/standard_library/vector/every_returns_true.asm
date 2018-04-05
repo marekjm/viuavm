@@ -18,7 +18,7 @@
 ;
 
 .function: is_not_negative/1
-    gte %0 (arg %1 %0) (izero %2)
+    gte %0 local (arg %1 local %0) local (izero %2 local) local
     return
 .end
 
@@ -28,12 +28,12 @@
 .function: main/1
     import "std::vector"
 
-    frame ^[(param %0 (integer %1 20))]
-    call %2 std::vector::of_ints/1
+    frame ^[(param %0 (integer %1 local 20) local)]
+    call %2 local std::vector::of_ints/1
 
-    frame ^[(param %0 %2) (pamv %1 (function %4 is_not_negative/1))]
-    call %5 std::vector::every/2
-    print %5
+    frame ^[(param %0 %2 local) (pamv %1 (function %4 local is_not_negative/1) local)]
+    call %5 local std::vector::every/2
+    print %5 local
 
     izero %0 local
     return

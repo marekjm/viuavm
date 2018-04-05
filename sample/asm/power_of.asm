@@ -32,39 +32,39 @@
     .name: 6 result
 
     ; store operands of the power-of operation
-    arg %base %0
+    arg %base local %0
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    if (not (eq %4 (arg %exponent %1) (izero %zero))) algorithm +1
-    integer %result 1
+    if (not (eq %4 local (arg %exponent local %1) local (izero %zero local) local) local) local algorithm +1
+    integer %result local 1
     jump final
 
     ; now, we multiply in a loop
     .mark: algorithm
     .name: 5 counter
-    integer %counter 1
+    integer %counter local 1
     ; in register 6, store the base of power as
     ; we will need it for multiplication
-    copy %result %base
+    copy %result local %base local
 
     .mark: loop
-    if (lt %4 %counter %exponent) +1 final
-    mul %result %result %base
+    if (lt %4 local %counter local %exponent local) local +1 final
+    mul %result local %result local %base local
     nop
-    iinc %counter
+    iinc %counter local
     jump loop
 
     ; final instructions
     .mark: final
     ; return result
-    move %0 %result
+    move %0 local %result local
     return
 .end
 
 .function: main/1
-    frame ^[(param %0 (integer %1 4)) (param %1 (integer %2 3))]
-    print (call %1 power_of/2)
+    frame ^[(param %0 (integer %1 local 4) local) (param %1 (integer %2 local 3) local)]
+    print (call %1 local power_of/2) local
 
     izero %0 local
     return

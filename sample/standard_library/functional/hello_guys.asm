@@ -18,9 +18,9 @@
 ;
 
 .function: greetings/1
-    echo (string %1 "Hello ")
-    echo (arg %1 %0)
-    print (string %1 '!')
+    echo (string %1 local "Hello ") local
+    echo (arg %1 local %0) local
+    print (string %1 local '!') local
     return
 .end
 
@@ -29,15 +29,15 @@
 .function: main/1
     import "std::functional"
 
-    function %1 greetings/1
+    function %1 local greetings/1
 
-    frame ^[(param %0 %1) (param %1 (string %2 "World"))]
+    frame ^[(param %0 %1 local) (param %1 (string %2 local "World") local)]
     call std::functional::apply/2
 
-    frame ^[(param %0 %1) (param %1 (string %2 "Joe"))]
+    frame ^[(param %0 %1 local) (param %1 (string %2 local "Joe") local)]
     call std::functional::apply/2
 
-    frame ^[(param %0 %1) (param %1 (string %2 "Mike"))]
+    frame ^[(param %0 %1 local) (param %1 (string %2 local "Mike") local)]
     call std::functional::apply/2
 
     izero %0 local

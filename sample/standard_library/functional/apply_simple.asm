@@ -18,7 +18,7 @@
 ;
 
 .function: adder/1
-    add %0 (arg %0 %0) (integer %1 21)
+    add %0 local (arg %0 local %0) local (integer %1 local 21) local
     return
 .end
 
@@ -27,9 +27,9 @@
 .function: main/1
     import "std::functional"
 
-    frame ^[(pamv %0 (function %1 adder/1)) (pamv %1 (integer %1 21))]
-    call %1 std::functional::apply/2
-    print %1
+    frame ^[(pamv %0 (function %1 local adder/1) local) (pamv %1 (integer %1 local 21) local)]
+    call %1 local std::functional::apply/2
+    print %1 local
 
     izero %0 local
     return

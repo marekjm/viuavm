@@ -26,7 +26,7 @@
     ; this call can block if not enough entropy bytes can be found
     ; to form an integer, but is safe
     frame %0
-    print (call %1 std::random::device::random)
+    print (call %1 local std::random::device::random) local
 
     izero %0 local
     return
