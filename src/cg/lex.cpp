@@ -358,7 +358,7 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
     return tokens;
 }
 
-static auto is_register_set_name(string const s) -> bool {
+auto is_register_set_name(string const& s) -> bool {
     return (s == "local" or s == "static" or s == "global");
 }
 static auto is_register_index(std::string const s) -> bool {

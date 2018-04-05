@@ -103,6 +103,7 @@ struct Traced_syntax_error {
 
 auto is_reserved_keyword(std::string const&) -> bool;
 auto is_mnemonic(std::string const&) -> bool;
+auto is_register_set_name(std::string const&) -> bool;
 auto assert_is_not_reserved_keyword(Token, std::string const&) -> void;
 
 auto tokenise(std::string const&) -> std::vector<Token>;
