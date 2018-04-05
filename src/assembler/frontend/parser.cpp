@@ -314,6 +314,10 @@ auto viua::assembler::frontend::parser::parse_instruction(
     if (tokens.at(i).str().at(0) == '.') {
         throw Invalid_syntax(tokens.at(i), "expected mnemonic");
     }
+    if (viua::cg::lex::is_register_set_name(tokens.at(i).str())) {
+        auto error = InvalidSyntax(tokens.at(i), "register set specifier does not follow register index");
+        throw error;
+    }
     if (not viua::cg::lex::is_mnemonic(tokens.at(i).str())) {
         auto error = Invalid_syntax(tokens.at(i), "unknown instruction");
         if (auto suggestion = str::levenshtein_best(
