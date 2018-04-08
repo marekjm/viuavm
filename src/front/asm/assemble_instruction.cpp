@@ -634,11 +634,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "iinc") {
         assemble_single_register_op<&Program::opiinc>(program, tokens, i);
     } else if (tokens.at(i) == "idec") {
-        Token_index target = i + 1;
-
-        program.opidec(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+        assemble_single_register_op<&Program::opidec>(program, tokens, i);
     } else if (tokens.at(i) == "float") {
         assemble_op_float(program, tokens, i);
     } else if (tokens.at(i) == "itof") {
