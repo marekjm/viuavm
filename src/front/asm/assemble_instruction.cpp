@@ -436,8 +436,8 @@ static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
 }
 static auto assemble_op_if(Program& program, std::vector<Token> const& tokens,
         Token_index const i,
-        viua::internals::types::bytecode_size& instruction,
-        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) -> void {
+        viua::internals::types::bytecode_size const& instruction,
+        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type> const& marks) -> void {
         /*  If branch is given three operands, it means its full, three-operands
          * form is being used. Otherwise, it is short, two-operands form
          * instruction and assembler should fill third operand accordingly.
