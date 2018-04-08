@@ -356,6 +356,32 @@ static auto assemble_op_bits(Program& program, std::vector<Token> const& tokens,
                            resolve_rs_type(tokens.at(lhs + 1))));
     }
 }
+static auto assemble_op_bitset(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index lhs    = target + 2;
+    Token_index rhs    = lhs + 2;
+
+    if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
+        program.opbitset(assembler::operands::getint_with_rs_type(
+                             resolveregister(tokens.at(target)),
+                             resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(
+                             resolveregister(tokens.at(lhs)),
+                             resolve_rs_type(tokens.at(lhs + 1))),
+                         (tokens.at(rhs) == "true"));
+    } else {
+        program.opbitset(assembler::operands::getint_with_rs_type(
+                             resolveregister(tokens.at(target)),
+                             resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(
+                             resolveregister(tokens.at(lhs)),
+                             resolve_rs_type(tokens.at(lhs + 1))),
+                         assembler::operands::getint_with_rs_type(
+                             resolveregister(tokens.at(rhs)),
+                             resolve_rs_type(tokens.at(rhs + 1))));
+    }
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -847,29 +873,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                             resolveregister(tokens.at(rhs)),
                             resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bitset") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-        Token_index rhs    = lhs + 2;
-
-        if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
-            program.opbitset(assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(target)),
-                                 resolve_rs_type(tokens.at(target + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(lhs)),
-                                 resolve_rs_type(tokens.at(lhs + 1))),
-                             (tokens.at(rhs) == "true"));
-        } else {
-            program.opbitset(assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(target)),
-                                 resolve_rs_type(tokens.at(target + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(lhs)),
-                                 resolve_rs_type(tokens.at(lhs + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(rhs)),
-                                 resolve_rs_type(tokens.at(rhs + 1))));
-        }
+        assemble_op_bitset(program, tokens, i);
     } else if (tokens.at(i) == "shl") {
         assemble_bit_shift_instruction<&Program::opshl>(program, tokens, i);
     } else if (tokens.at(i) == "ashl") {
