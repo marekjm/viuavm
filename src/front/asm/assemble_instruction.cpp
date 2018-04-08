@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -46,7 +46,7 @@ using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 using Token      = viua::cg::lex::Token;
-using TokenIndex = vector<Token>::size_type;
+using Token_index = vector<Token>::size_type;
 
 
 static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
@@ -185,10 +185,10 @@ using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 static auto assemble_bit_shift_instruction(Program& program,
                                            const vector<Token>& tokens,
-                                           const TokenIndex i) -> void {
-    TokenIndex target = i + 1;
-    TokenIndex lhs    = target + 2;
-    TokenIndex rhs    = lhs + 2;
+                                           const Token_index i) -> void {
+    Token_index target = i + 1;
+    Token_index lhs    = target + 2;
+    Token_index rhs    = lhs + 2;
 
     int_op ret;
     if (tokens.at(target) == "void") {
@@ -214,8 +214,8 @@ using IncrementOp = Program& (Program::*)(int_op);
 template<IncrementOp const op>
 static auto assemble_increment_instruction(Program& program,
                                            vector<Token> const& tokens,
-                                           TokenIndex const i) -> void {
-    TokenIndex target = i + 1;
+                                           Token_index const i) -> void {
+    Token_index target = i + 1;
 
     (program.*op)(assembler::operands::getint_with_rs_type(
         resolveregister(tokens.at(target)),
@@ -226,10 +226,10 @@ using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
 template<ArithmeticOp const op>
 static auto assemble_arithmetic_instruction(Program& program,
                                             vector<Token> const& tokens,
-                                            TokenIndex const i) -> void {
-    TokenIndex target = i + 1;
-    TokenIndex lhs    = target + 2;
-    TokenIndex rhs    = lhs + 2;
+                                            Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index lhs    = target + 2;
+    Token_index rhs    = lhs + 2;
 
     (program.*op)(assembler::operands::getint_with_rs_type(
                       resolveregister(tokens.at(target)),
@@ -276,14 +276,14 @@ viua::internals::types::bytecode_size assemble_instruction(
     if (tokens.at(i) == "nop") {
         program.opnop();
     } else if (tokens.at(i) == "izero") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opizero(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "integer") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opinteger(assembler::operands::getint_with_rs_type(
                               resolveregister(tokens.at(target)),
@@ -291,28 +291,28 @@ viua::internals::types::bytecode_size assemble_instruction(
                           assembler::operands::getint(
                               resolveregister(tokens.at(source), true), true));
     } else if (tokens.at(i) == "iinc") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opiinc(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "idec") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opidec(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "float") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opfloat(assembler::operands::getint_with_rs_type(
                             resolveregister(tokens.at(target)),
                             resolve_rs_type(tokens.at(target + 1))),
                         stod(tokens.at(source).str()));
     } else if (tokens.at(i) == "itof") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opitof(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -321,8 +321,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "ftoi") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opftoi(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -331,8 +331,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "stoi") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opstoi(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -341,8 +341,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "stof") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opstof(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -351,9 +351,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "add") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opadd(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -365,9 +365,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "sub") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opsub(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -379,9 +379,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "mul") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opmul(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -393,9 +393,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "div") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opdiv(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -407,9 +407,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "lt") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.oplt(assembler::operands::getint_with_rs_type(
                          resolveregister(tokens.at(target)),
@@ -421,9 +421,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                          resolveregister(tokens.at(rhs)),
                          resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "lte") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.oplte(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -435,9 +435,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "gt") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opgt(assembler::operands::getint_with_rs_type(
                          resolveregister(tokens.at(target)),
@@ -449,9 +449,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                          resolveregister(tokens.at(rhs)),
                          resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "gte") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opgte(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -463,9 +463,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "eq") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opeq(assembler::operands::getint_with_rs_type(
                          resolveregister(tokens.at(target)),
@@ -477,16 +477,16 @@ viua::internals::types::bytecode_size assemble_instruction(
                          resolveregister(tokens.at(rhs)),
                          resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "string") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opstring(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
                              resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(source));
     } else if (tokens.at(i) == "text") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         auto target_operand = assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
@@ -501,9 +501,9 @@ viua::internals::types::bytecode_size assemble_instruction(
             program.optext(target_operand, tokens.at(source));
         }
     } else if (tokens.at(i) == "texteq") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.optexteq(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -515,9 +515,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(rhs)),
                              resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "textat") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
-        TokenIndex index  = source + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+        Token_index index  = source + 2;
 
         program.optextat(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -529,10 +529,10 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(index)),
                              resolve_rs_type(tokens.at(index + 1))));
     } else if (tokens.at(i) == "textsub") {
-        TokenIndex target      = i + 1;
-        TokenIndex source      = target + 2;
-        TokenIndex begin_index = source + 2;
-        TokenIndex end_index   = begin_index + 2;
+        Token_index target      = i + 1;
+        Token_index source      = target + 2;
+        Token_index begin_index = source + 2;
+        Token_index end_index   = begin_index + 2;
 
         program.optextsub(assembler::operands::getint_with_rs_type(
                               resolveregister(tokens.at(target)),
@@ -547,8 +547,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                               resolveregister(tokens.at(end_index)),
                               resolve_rs_type(tokens.at(end_index + 1))));
     } else if (tokens.at(i) == "textlength") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.optextlength(assembler::operands::getint_with_rs_type(
                                  resolveregister(tokens.at(target)),
@@ -557,9 +557,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                  resolveregister(tokens.at(source)),
                                  resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "textcommonprefix") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.optextcommonprefix(assembler::operands::getint_with_rs_type(
                                        resolveregister(tokens.at(target)),
@@ -571,9 +571,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                        resolveregister(tokens.at(rhs)),
                                        resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "textcommonsuffix") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.optextcommonsuffix(assembler::operands::getint_with_rs_type(
                                        resolveregister(tokens.at(target)),
@@ -585,9 +585,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                        resolveregister(tokens.at(rhs)),
                                        resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "textconcat") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.optextconcat(assembler::operands::getint_with_rs_type(
                                  resolveregister(tokens.at(target)),
@@ -599,9 +599,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                  resolveregister(tokens.at(rhs)),
                                  resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "vector") {
-        TokenIndex target           = i + 1;
-        TokenIndex pack_range_start = target + 2;
-        TokenIndex pack_range_count = pack_range_start + 2;
+        Token_index target           = i + 1;
+        Token_index pack_range_start = target + 2;
+        Token_index pack_range_count = pack_range_start + 2;
 
         program.opvector(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -612,9 +612,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                          assembler::operands::getint(
                              resolveregister(tokens.at(pack_range_count))));
     } else if (tokens.at(i) == "vinsert") {
-        TokenIndex target   = i + 1;
-        TokenIndex source   = target + 2;
-        TokenIndex position = source + 2;
+        Token_index target   = i + 1;
+        Token_index source   = target + 2;
+        Token_index position = source + 2;
 
         int_op position_op;
         if (tokens.at(position) == "void") {
@@ -634,8 +634,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                               resolve_rs_type(tokens.at(source + 1))),
                           position_op);
     } else if (tokens.at(i) == "vpush") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opvpush(assembler::operands::getint_with_rs_type(
                             resolveregister(tokens.at(target)),
@@ -644,9 +644,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                             resolveregister(tokens.at(source)),
                             resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "vpop") {
-        TokenIndex target   = i + 1;
-        TokenIndex source   = target + 2;
-        TokenIndex position = source + 2;
+        Token_index target   = i + 1;
+        Token_index source   = target + 2;
+        Token_index position = source + 2;
 
         int_op target_op, source_op, position_op;
 
@@ -676,9 +676,9 @@ viua::internals::types::bytecode_size assemble_instruction(
 
         program.opvpop(target_op, source_op, position_op);
     } else if (tokens.at(i) == "vat") {
-        TokenIndex target   = i + 1;
-        TokenIndex source   = target + 2;
-        TokenIndex position = source + 2;
+        Token_index target   = i + 1;
+        Token_index source   = target + 2;
+        Token_index position = source + 2;
 
         program.opvat(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -690,8 +690,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(position)),
                           resolve_rs_type(tokens.at(position + 1))));
     } else if (tokens.at(i) == "vlen") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opvlen(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -700,8 +700,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "not") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opnot(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -710,9 +710,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(source)),
                           resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "and") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opand(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -724,9 +724,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(rhs)),
                           resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "or") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opor(assembler::operands::getint_with_rs_type(
                          resolveregister(tokens.at(target)),
@@ -738,8 +738,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                          resolveregister(tokens.at(rhs)),
                          resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bits") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
 
         auto src = tokens.at(lhs).str();
         if (src.at(0) == '0'
@@ -759,9 +759,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                resolve_rs_type(tokens.at(lhs + 1))));
         }
     } else if (tokens.at(i) == "bitand") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opbitand(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -773,9 +773,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(rhs)),
                              resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bitor") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opbitor(assembler::operands::getint_with_rs_type(
                             resolveregister(tokens.at(target)),
@@ -787,8 +787,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                             resolveregister(tokens.at(rhs)),
                             resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bitnot") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
 
         program.opbitnot(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -797,9 +797,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(lhs)),
                              resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "bitxor") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opbitxor(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -811,9 +811,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(rhs)),
                              resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bitat") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opbitat(assembler::operands::getint_with_rs_type(
                             resolveregister(tokens.at(target)),
@@ -825,9 +825,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                             resolveregister(tokens.at(rhs)),
                             resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bitset") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
             program.opbitset(assembler::operands::getint_with_rs_type(
@@ -857,8 +857,8 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "ashr") {
         assemble_bit_shift_instruction<&Program::opashr>(program, tokens, i);
     } else if (tokens.at(i) == "rol") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
 
         program.oprol(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -867,8 +867,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(lhs)),
                           resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "ror") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
 
         program.opror(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -967,8 +967,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
             program, tokens, i);
     } else if (tokens.at(i) == "move") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opmove(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -977,8 +977,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "copy") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opcopy(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -987,8 +987,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "ptr") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opptr(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
@@ -997,8 +997,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolveregister(tokens.at(source)),
                           resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "swap") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opswap(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -1007,14 +1007,14 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "delete") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opdelete(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "isnull") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opisnull(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -1023,21 +1023,21 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(source)),
                              resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "print") {
-        TokenIndex source = i + 1;
+        Token_index source = i + 1;
 
         program.opprint(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(source)),
             resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "echo") {
-        TokenIndex source = i + 1;
+        Token_index source = i + 1;
 
         program.opecho(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(source)),
             resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "capture") {
-        TokenIndex target       = i + 1;
-        TokenIndex inside_index = target + 2;
-        TokenIndex source       = inside_index + 1;
+        Token_index target       = i + 1;
+        Token_index inside_index = target + 2;
+        Token_index source       = inside_index + 1;
 
         program.opcapture(assembler::operands::getint_with_rs_type(
                               resolveregister(tokens.at(target)),
@@ -1048,9 +1048,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                               resolveregister(tokens.at(source)),
                               resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "capturecopy") {
-        TokenIndex target       = i + 1;
-        TokenIndex inside_index = target + 2;
-        TokenIndex source       = inside_index + 1;
+        Token_index target       = i + 1;
+        Token_index inside_index = target + 2;
+        Token_index source       = inside_index + 1;
 
         program.opcapturecopy(assembler::operands::getint_with_rs_type(
                                   resolveregister(tokens.at(target)),
@@ -1061,9 +1061,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                   resolveregister(tokens.at(source)),
                                   resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "capturemove") {
-        TokenIndex target       = i + 1;
-        TokenIndex inside_index = target + 2;
-        TokenIndex source       = inside_index + 1;
+        Token_index target       = i + 1;
+        Token_index inside_index = target + 2;
+        Token_index source       = inside_index + 1;
 
         program.opcapturemove(assembler::operands::getint_with_rs_type(
                                   resolveregister(tokens.at(target)),
@@ -1074,31 +1074,31 @@ viua::internals::types::bytecode_size assemble_instruction(
                                   resolveregister(tokens.at(source)),
                                   resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "closure") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opclosure(assembler::operands::getint_with_rs_type(
                               resolveregister(tokens.at(target)),
                               resolve_rs_type(tokens.at(target + 1))),
                           tokens.at(source));
     } else if (tokens.at(i) == "function") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opfunction(assembler::operands::getint_with_rs_type(
                                resolveregister(tokens.at(target)),
                                resolve_rs_type(tokens.at(target + 1))),
                            tokens.at(source));
     } else if (tokens.at(i) == "frame") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 1;
+        Token_index target = i + 1;
+        Token_index source = target + 1;
 
         program.opframe(
             assembler::operands::getint(resolveregister(tokens.at(target))),
             assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "param") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 1;
+        Token_index target = i + 1;
+        Token_index source = target + 1;
 
         program.opparam(
             assembler::operands::getint(resolveregister(tokens.at(target))),
@@ -1106,8 +1106,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                 resolveregister(tokens.at(source)),
                 resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "pamv") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 1;
+        Token_index target = i + 1;
+        Token_index source = target + 1;
 
         program.oppamv(
             assembler::operands::getint(resolveregister(tokens.at(target))),
@@ -1115,8 +1115,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                 resolveregister(tokens.at(source)),
                 resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "arg") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         if (tokens.at(target) == "void") {
             --source;
@@ -1132,7 +1132,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                               resolveregister(tokens.at(source))));
         }
     } else if (tokens.at(i) == "argc") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opargc(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
@@ -1164,8 +1164,8 @@ viua::internals::types::bytecode_size assemble_instruction(
          *
          *  Good luck with debugging your code, then.
          */
-        TokenIndex target = i + 1;
-        TokenIndex fn     = target + 2;
+        Token_index target = i + 1;
+        Token_index fn     = target + 2;
 
         int_op ret;
         if (tokens.at(target) == "void") {
@@ -1206,8 +1206,8 @@ viua::internals::types::bytecode_size assemble_instruction(
             program.opdefer(tokens.at(i + 1));
         }
     } else if (tokens.at(i) == "process") {
-        TokenIndex target = i + 1;
-        TokenIndex fn     = target + 2;
+        Token_index target = i + 1;
+        Token_index fn     = target + 2;
 
         int_op ret;
         if (tokens.at(target) == "void") {
@@ -1222,15 +1222,15 @@ viua::internals::types::bytecode_size assemble_instruction(
 
         program.opprocess(ret, tokens.at(fn));
     } else if (tokens.at(i) == "self") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opself(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "join") {
-        TokenIndex target        = i + 1;
-        TokenIndex process       = target + 2;
-        TokenIndex timeout_index = process + 2;
+        Token_index target        = i + 1;
+        Token_index process       = target + 2;
+        Token_index timeout_index = process + 2;
 
         int_op target_operand;
         if (tokens.at(target) == "void") {
@@ -1252,8 +1252,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolve_rs_type(tokens.at(process + 1))),
                        timeout);
     } else if (tokens.at(i) == "send") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opsend(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
@@ -1262,8 +1262,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                            resolveregister(tokens.at(source)),
                            resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "receive") {
-        TokenIndex target        = i + 1;
-        TokenIndex timeout_index = target + 2;
+        Token_index target        = i + 1;
+        Token_index timeout_index = target + 2;
 
         int_op target_operand;
         if (tokens.at(target) == "void") {
@@ -1350,7 +1350,7 @@ viua::internals::types::bytecode_size assemble_instruction(
         string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i + 1), tokens.at(i + 2));
     } else if (tokens.at(i) == "draw") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opdraw(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
@@ -1358,7 +1358,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i + 1));
     } else if (tokens.at(i) == "throw") {
-        TokenIndex source = i + 1;
+        Token_index source = i + 1;
 
         program.opthrow(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(source)),
@@ -1368,25 +1368,25 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "import") {
         program.opimport(tokens.at(i + 1));
     } else if (tokens.at(i) == "class") {
-        TokenIndex target     = i + 1;
-        TokenIndex class_name = target + 2;
+        Token_index target     = i + 1;
+        Token_index class_name = target + 2;
 
         program.opclass(assembler::operands::getint_with_rs_type(
                             resolveregister(tokens.at(target)),
                             resolve_rs_type(tokens.at(target + 1))),
                         tokens.at(class_name));
     } else if (tokens.at(i) == "derive") {
-        TokenIndex target     = i + 1;
-        TokenIndex class_name = target + 2;
+        Token_index target     = i + 1;
+        Token_index class_name = target + 2;
 
         program.opderive(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
                              resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(class_name));
     } else if (tokens.at(i) == "attach") {
-        TokenIndex target        = i + 1;
-        TokenIndex fn_name       = target + 2;
-        TokenIndex attached_name = fn_name + 1;
+        Token_index target        = i + 1;
+        Token_index fn_name       = target + 2;
+        Token_index attached_name = fn_name + 1;
 
         program.opattach(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -1394,23 +1394,23 @@ viua::internals::types::bytecode_size assemble_instruction(
                          tokens.at(fn_name),
                          tokens.at(attached_name));
     } else if (tokens.at(i) == "register") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opregister(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "atom") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opatom(assembler::operands::getint_with_rs_type(
                            resolveregister(tokens.at(target)),
                            resolve_rs_type(tokens.at(target + 1))),
                        tokens.at(source));
     } else if (tokens.at(i) == "atomeq") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs    = target + 2;
-        TokenIndex rhs    = lhs + 2;
+        Token_index target = i + 1;
+        Token_index lhs    = target + 2;
+        Token_index rhs    = lhs + 2;
 
         program.opatomeq(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -1422,15 +1422,15 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(rhs)),
                              resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "struct") {
-        TokenIndex target = i + 1;
+        Token_index target = i + 1;
 
         program.opstruct(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "structinsert") {
-        TokenIndex target = i + 1;
-        TokenIndex key    = target + 2;
-        TokenIndex source = key + 2;
+        Token_index target = i + 1;
+        Token_index key    = target + 2;
+        Token_index source = key + 2;
 
         program.opstructinsert(assembler::operands::getint_with_rs_type(
                                    resolveregister(tokens.at(target)),
@@ -1442,9 +1442,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                                    resolveregister(tokens.at(source)),
                                    resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "structremove") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
-        TokenIndex key    = source + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+        Token_index key    = source + 2;
 
         if (tokens.at(target) == "void") {
             --source;
@@ -1469,8 +1469,8 @@ viua::internals::types::bytecode_size assemble_instruction(
                                        resolve_rs_type(tokens.at(key + 1))));
         }
     } else if (tokens.at(i) == "structkeys") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
 
         program.opstructkeys(assembler::operands::getint_with_rs_type(
                                  resolveregister(tokens.at(target)),
@@ -1479,16 +1479,16 @@ viua::internals::types::bytecode_size assemble_instruction(
                                  resolveregister(tokens.at(source)),
                                  resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "new") {
-        TokenIndex target     = i + 1;
-        TokenIndex class_name = target + 2;
+        Token_index target     = i + 1;
+        Token_index class_name = target + 2;
 
         program.opnew(assembler::operands::getint_with_rs_type(
                           resolveregister(tokens.at(target)),
                           resolve_rs_type(tokens.at(target + 1))),
                       tokens.at(class_name));
     } else if (tokens.at(i) == "msg") {
-        TokenIndex target = i + 1;
-        TokenIndex fn     = target + 2;
+        Token_index target = i + 1;
+        Token_index fn     = target + 2;
 
         int_op ret;
         if (tokens.at(target) == "void") {
@@ -1511,9 +1511,9 @@ viua::internals::types::bytecode_size assemble_instruction(
             program.opmsg(ret, tokens.at(fn));
         }
     } else if (tokens.at(i) == "insert") {
-        TokenIndex target = i + 1;
-        TokenIndex key    = target + 2;
-        TokenIndex source = key + 2;
+        Token_index target = i + 1;
+        Token_index key    = target + 2;
+        Token_index source = key + 2;
 
         program.opinsert(assembler::operands::getint_with_rs_type(
                              resolveregister(tokens.at(target)),
@@ -1525,9 +1525,9 @@ viua::internals::types::bytecode_size assemble_instruction(
                              resolveregister(tokens.at(source)),
                              resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "remove") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
-        TokenIndex key    = source + 2;
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+        Token_index key    = source + 2;
 
         if (tokens.at(target) == "void") {
             --source;
