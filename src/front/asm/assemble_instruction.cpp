@@ -333,6 +333,29 @@ static auto assemble_op_vpop(Program& program, std::vector<Token> const& tokens,
 
     program.opvpop(target_op, source_op, position_op);
 }
+static auto assemble_op_bits(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index lhs    = target + 2;
+
+    auto src = tokens.at(lhs).str();
+    if (src.at(0) == '0'
+        and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
+        program.opbits(
+            assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target)),
+                resolve_rs_type(tokens.at(target + 1))),
+            assembler::operands::convert_token_to_bitstring_operand(
+                tokens.at(lhs)));
+    } else {
+        program.opbits(assembler::operands::getint_with_rs_type(
+                           resolveregister(tokens.at(target)),
+                           resolve_rs_type(tokens.at(target + 1))),
+                       assembler::operands::getint_with_rs_type(
+                           resolveregister(tokens.at(lhs)),
+                           resolve_rs_type(tokens.at(lhs + 1))));
+    }
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -756,26 +779,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                          resolveregister(tokens.at(rhs)),
                          resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "bits") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-
-        auto src = tokens.at(lhs).str();
-        if (src.at(0) == '0'
-            and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
-            program.opbits(
-                assembler::operands::getint_with_rs_type(
-                    resolveregister(tokens.at(target)),
-                    resolve_rs_type(tokens.at(target + 1))),
-                assembler::operands::convert_token_to_bitstring_operand(
-                    tokens.at(lhs)));
-        } else {
-            program.opbits(assembler::operands::getint_with_rs_type(
-                               resolveregister(tokens.at(target)),
-                               resolve_rs_type(tokens.at(target + 1))),
-                           assembler::operands::getint_with_rs_type(
-                               resolveregister(tokens.at(lhs)),
-                               resolve_rs_type(tokens.at(lhs + 1))));
-        }
+        assemble_op_bits(program, tokens, i);
     } else if (tokens.at(i) == "bitand") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
