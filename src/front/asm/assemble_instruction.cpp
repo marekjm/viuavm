@@ -181,6 +181,28 @@ static viua::internals::types::timeout timeout_to_int(const string& timeout) {
     }
 }
 
+static auto convert_token_to_timeout_operand(viua::cg::lex::Token token)
+    -> timeout_op {
+    viua::internals::types::timeout timeout_milliseconds = 0;
+    if (token != "infinity") {
+        timeout_milliseconds = timeout_to_int(token);
+        ++timeout_milliseconds;
+    }
+    return timeout_op{timeout_milliseconds};
+}
+static auto log_location_being_assembled(const Token& token) -> void {
+    if (DEBUG and SCREAM) {
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "debug"
+             << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "<file>:" << token.line() << ':' << token.character();
+        cout << ": assembling '";
+        cout << send_control_seq(COLOR_FG_WHITE) << token.str()
+             << send_control_seq(ATTR_RESET);
+        cout << "' instruction\n";
+    }
+}
+
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 static auto assemble_bit_shift_instruction(Program& program,
@@ -240,28 +262,6 @@ static auto assemble_arithmetic_instruction(Program& program,
                   assembler::operands::getint_with_rs_type(
                       resolveregister(tokens.at(rhs)),
                       resolve_rs_type(tokens.at(rhs + 1))));
-}
-
-static auto convert_token_to_timeout_operand(viua::cg::lex::Token token)
-    -> timeout_op {
-    viua::internals::types::timeout timeout_milliseconds = 0;
-    if (token != "infinity") {
-        timeout_milliseconds = timeout_to_int(token);
-        ++timeout_milliseconds;
-    }
-    return timeout_op{timeout_milliseconds};
-}
-static auto log_location_being_assembled(const Token& token) -> void {
-    if (DEBUG and SCREAM) {
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "debug"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "<file>:" << token.line() << ':' << token.character();
-        cout << ": assembling '";
-        cout << send_control_seq(COLOR_FG_WHITE) << token.str()
-             << send_control_seq(ATTR_RESET);
-        cout << "' instruction\n";
-    }
 }
 
 static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
