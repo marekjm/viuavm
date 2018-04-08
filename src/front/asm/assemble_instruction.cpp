@@ -533,6 +533,32 @@ static auto assemble_op_structremove(Program& program, std::vector<Token> const&
                                    resolve_rs_type(tokens.at(key + 1))));
     }
 }
+static auto assemble_op_msg(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index fn     = target + 2;
+
+        int_op ret;
+        if (tokens.at(target) == "void") {
+            --fn;
+            ret =
+                assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            ret = assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target)),
+                resolve_rs_type(tokens.at(target + 1)));
+        }
+
+        if (tokens.at(fn).str().at(0) == '*'
+            or tokens.at(fn).str().at(0) == '%') {
+            program.opmsg(ret,
+                          assembler::operands::getint_with_rs_type(
+                              resolveregister(tokens.at(fn)),
+                              resolve_rs_type(tokens.at(fn + 1))));
+        } else {
+            program.opmsg(ret, tokens.at(fn));
+        }
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -1533,29 +1559,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                           resolve_rs_type(tokens.at(target + 1))),
                       tokens.at(class_name));
     } else if (tokens.at(i) == "msg") {
-        Token_index target = i + 1;
-        Token_index fn     = target + 2;
-
-        int_op ret;
-        if (tokens.at(target) == "void") {
-            --fn;
-            ret =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
-        } else {
-            ret = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
-        }
-
-        if (tokens.at(fn).str().at(0) == '*'
-            or tokens.at(fn).str().at(0) == '%') {
-            program.opmsg(ret,
-                          assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(fn)),
-                              resolve_rs_type(tokens.at(fn + 1))));
-        } else {
-            program.opmsg(ret, tokens.at(fn));
-        }
+        assemble_op_msg(program, tokens, i);
     } else if (tokens.at(i) == "insert") {
         Token_index target = i + 1;
         Token_index key    = target + 2;
