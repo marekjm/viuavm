@@ -263,6 +263,17 @@ static auto log_location_being_assembled(const Token& token) -> void {
         cout << "' instruction\n";
     }
 }
+static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index source = target + 2;
+
+    program.opinteger(assembler::operands::getint_with_rs_type(
+                          resolveregister(tokens.at(target)),
+                          resolve_rs_type(tokens.at(target + 1))),
+                      assembler::operands::getint(
+                          resolveregister(tokens.at(source), true), true));
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -287,14 +298,7 @@ viua::internals::types::bytecode_size assemble_instruction(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "integer") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opinteger(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint(
-                              resolveregister(tokens.at(source), true), true));
+        assemble_op_integer(program, tokens, i);
     } else if (tokens.at(i) == "iinc") {
         Token_index target = i + 1;
 
