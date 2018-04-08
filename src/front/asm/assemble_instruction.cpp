@@ -600,6 +600,16 @@ static auto assemble_op_remove(Program& program, std::vector<Token> const& token
                                  resolve_rs_type(tokens.at(key + 1))));
         }
 }
+static auto assemble_op_float(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+
+        program.opfloat(assembler::operands::getint_with_rs_type(
+                            resolveregister(tokens.at(target)),
+                            resolve_rs_type(tokens.at(target + 1))),
+                        stod(tokens.at(source).str()));
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -634,13 +644,7 @@ viua::internals::types::bytecode_size assemble_instruction(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "float") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opfloat(assembler::operands::getint_with_rs_type(
-                            resolveregister(tokens.at(target)),
-                            resolve_rs_type(tokens.at(target + 1))),
-                        stod(tokens.at(source).str()));
+        assemble_op_float(program, tokens, i);
     } else if (tokens.at(i) == "itof") {
         Token_index target = i + 1;
         Token_index source = target + 2;
