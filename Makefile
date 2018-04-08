@@ -26,6 +26,8 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 # 	-Wpadded            -- maybe, but throws errors on current code
 #	-Wsuggest-override  -- definitely, but it is a matter of style so not now
 #	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
+#	-Winline			-- fails if GCC tries to inline calls that are unlikely and
+#							the code size would grow
 GENERIC_CXXFLAGS=-Wall \
 				 -Wextra \
 				 -Wctor-dtor-privacy \
@@ -59,7 +61,6 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wconversion \
 				 -Wsign-conversion \
 				 -Wrestrict \
-				 -Winline \
 				 -Wstack-protector \
 				 -Werror \
 				 -Wfatal-errors \
