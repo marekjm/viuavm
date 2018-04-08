@@ -140,7 +140,7 @@ CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS) $(CXX_EXTRA_F
 # By default, the VM is compiled using no optimisations.
 # This makes for shorter compile times, but prevents speed-testing the VM.
 # You should run the VM with -O3 every once in a while to see how it's doing.
-CXXOPTIMIZATIONFLAGS=-O0
+CXXOPTIMIZATIONFLAGS=-O2
 COPTIMIZATIONFLAGS=
 
 # Expose symbols in the VM kernel binary to the shared libraries that are linked at runtime.
