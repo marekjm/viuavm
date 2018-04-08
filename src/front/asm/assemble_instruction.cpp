@@ -382,6 +382,58 @@ static auto assemble_op_bitset(Program& program, std::vector<Token> const& token
                              resolve_rs_type(tokens.at(rhs + 1))));
     }
 }
+static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    /** Full form of call instruction has two operands: function name and
+     *  return value register index.
+     *  If call is given only one operand it means it is the function name
+     * and returned value is discarded. To explicitly state that return
+     * value should be discarderd put `void` as return register index.
+     */
+    /** Why is the function supplied as a *string* and
+     *  not direct instruction pointer?
+     *  That would be faster - c'mon couldn't assembler just calculate
+     * offsets and insert them?
+     *
+     *  Nope.
+     *
+     *  Yes, it *would* be faster if calls were just precalculated jumps.
+     *  However, by them being strings we get plenty of flexibility,
+     * good-quality stack traces, and a place to put plenty of debugging
+     * info. All that at a cost of just one map lookup; the overhead is
+     * minimal and gains are big. What's not to love?
+     *
+     *  Of course, you, my dear reader, are free to take this code (it's GPL
+     * after all!) and modify it to suit your particular needs - in that
+     * case that would be calculating call jumps at compile time and
+     * exchanging CALL instructions with JUMP instructions.
+     *
+     *  Good luck with debugging your code, then.
+     */
+    Token_index target = i + 1;
+    Token_index fn     = target + 2;
+
+    int_op ret;
+    if (tokens.at(target) == "void") {
+        --fn;
+        ret =
+            assembler::operands::getint(resolveregister(tokens.at(target)));
+    } else {
+        ret = assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(target)),
+            resolve_rs_type(tokens.at(target + 1)));
+    }
+
+    if (tokens.at(fn).str().at(0) == '*'
+        or tokens.at(fn).str().at(0) == '%') {
+        program.opcall(ret,
+                       assembler::operands::getint_with_rs_type(
+                           resolveregister(tokens.at(fn)),
+                           resolve_rs_type(tokens.at(fn + 1))));
+    } else {
+        program.opcall(ret, tokens.at(fn));
+    }
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -1164,55 +1216,7 @@ viua::internals::types::bytecode_size assemble_instruction(
             resolveregister(tokens.at(target)),
             resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "call") {
-        /** Full form of call instruction has two operands: function name and
-         *  return value register index.
-         *  If call is given only one operand it means it is the function name
-         * and returned value is discarded. To explicitly state that return
-         * value should be discarderd put `void` as return register index.
-         */
-        /** Why is the function supplied as a *string* and
-         *  not direct instruction pointer?
-         *  That would be faster - c'mon couldn't assembler just calculate
-         * offsets and insert them?
-         *
-         *  Nope.
-         *
-         *  Yes, it *would* be faster if calls were just precalculated jumps.
-         *  However, by them being strings we get plenty of flexibility,
-         * good-quality stack traces, and a place to put plenty of debugging
-         * info. All that at a cost of just one map lookup; the overhead is
-         * minimal and gains are big. What's not to love?
-         *
-         *  Of course, you, my dear reader, are free to take this code (it's GPL
-         * after all!) and modify it to suit your particular needs - in that
-         * case that would be calculating call jumps at compile time and
-         * exchanging CALL instructions with JUMP instructions.
-         *
-         *  Good luck with debugging your code, then.
-         */
-        Token_index target = i + 1;
-        Token_index fn     = target + 2;
-
-        int_op ret;
-        if (tokens.at(target) == "void") {
-            --fn;
-            ret =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
-        } else {
-            ret = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
-        }
-
-        if (tokens.at(fn).str().at(0) == '*'
-            or tokens.at(fn).str().at(0) == '%') {
-            program.opcall(ret,
-                           assembler::operands::getint_with_rs_type(
-                               resolveregister(tokens.at(fn)),
-                               resolve_rs_type(tokens.at(fn + 1))));
-        } else {
-            program.opcall(ret, tokens.at(fn));
-        }
+        assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {
         if (tokens.at(i + 1).str().at(0) == '*'
             or tokens.at(i + 1).str().at(0) == '%') {
