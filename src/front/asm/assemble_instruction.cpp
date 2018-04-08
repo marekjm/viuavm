@@ -479,6 +479,31 @@ static auto assemble_op_if(Program& program, std::vector<Token> const& tokens,
             addrf_target,
             addrf_jump_type);
 }
+static auto assemble_op_jump(Program& program, std::vector<Token> const& tokens,
+        Token_index const i,
+        viua::internals::types::bytecode_size const& instruction,
+        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type> const& marks) -> void {
+    /*  Jump instruction can be written in two forms:
+     *
+     *      * `jump <index>`
+     *      * `jump :<marker>`
+     *
+     *  Assembler must distinguish between these two forms, and so it does.
+     *  Here, we use a function from string support lib to determine
+     *  if the jump is numeric, and thus an index, or
+     *  a string - in which case we consider it a marker jump.
+     *
+     *  If it is a marker jump, assembler will look the marker up in a map
+     * and if it is not found throw an exception about unrecognised marker
+     * being used.
+     */
+    viua::internals::types::bytecode_size jump_target;
+    enum JUMPTYPE jump_type;
+    tie(jump_target, jump_type) =
+        resolvejump(tokens.at(i + 1), marks, instruction);
+
+    program.opjump(jump_target, jump_type);
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -1360,26 +1385,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "if") {
         assemble_op_if(program, tokens, i, instruction, marks);
     } else if (tokens.at(i) == "jump") {
-        /*  Jump instruction can be written in two forms:
-         *
-         *      * `jump <index>`
-         *      * `jump :<marker>`
-         *
-         *  Assembler must distinguish between these two forms, and so it does.
-         *  Here, we use a function from string support lib to determine
-         *  if the jump is numeric, and thus an index, or
-         *  a string - in which case we consider it a marker jump.
-         *
-         *  If it is a marker jump, assembler will look the marker up in a map
-         * and if it is not found throw an exception about unrecognised marker
-         * being used.
-         */
-        viua::internals::types::bytecode_size jump_target;
-        enum JUMPTYPE jump_type;
-        tie(jump_target, jump_type) =
-            resolvejump(tokens.at(i + 1), marks, instruction);
-
-        program.opjump(jump_target, jump_type);
+        assemble_op_jump(program, tokens, i, instruction, marks);
     } else if (tokens.at(i) == "try") {
         program.optry();
     } else if (tokens.at(i) == "catch") {
