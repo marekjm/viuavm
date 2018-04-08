@@ -276,6 +276,22 @@ static auto assemble_single_register_op(Program& program,
             resolve_rs_type(tokens.at(target + 1))));
 }
 
+using Double_register_op = Program& (Program::*)(int_op, int_op);
+template<Double_register_op const op>
+static auto assemble_double_register_op(Program& program,
+        std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+
+        (program.*op)(assembler::operands::getint_with_rs_type(
+                           resolveregister(tokens.at(target)),
+                           resolve_rs_type(tokens.at(target + 1))),
+                       assembler::operands::getint_with_rs_type(
+                           resolveregister(tokens.at(source)),
+                           resolve_rs_type(tokens.at(source + 1))));
+}
+
 static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
         Token_index const i) -> void {
     Token_index target = i + 1;
@@ -638,15 +654,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "float") {
         assemble_op_float(program, tokens, i);
     } else if (tokens.at(i) == "itof") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opitof(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(source)),
-                           resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::opitof>(program, tokens, i);
     } else if (tokens.at(i) == "ftoi") {
         Token_index target = i + 1;
         Token_index source = target + 2;
