@@ -434,6 +434,51 @@ static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
         program.opcall(ret, tokens.at(fn));
     }
 }
+static auto assemble_op_if(Program& program, std::vector<Token> const& tokens,
+        Token_index const i,
+        viua::internals::types::bytecode_size& instruction,
+        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) -> void {
+        /*  If branch is given three operands, it means its full, three-operands
+         * form is being used. Otherwise, it is short, two-operands form
+         * instruction and assembler should fill third operand accordingly.
+         *
+         *  In case of short-form `branch` instruction:
+         *
+         *      * first operand is index of the register to check,
+         *      * second operand is the address to which to jump if register is
+         * true,
+         *      * third operand is assumed to be the *next instruction*, i.e.
+         * instruction after the branch instruction,
+         *
+         *  In full (with three operands) form of `branch` instruction:
+         *
+         *      * third operands is the address to which to jump if register is
+         * false,
+         */
+        Token condition = tokens.at(i + 1);
+        Token if_true   = tokens.at(i + 3);
+        Token if_false  = tokens.at(i + 4);
+
+        viua::internals::types::bytecode_size addrt_target, addrf_target;
+        enum JUMPTYPE addrt_jump_type, addrf_jump_type;
+        tie(addrt_target, addrt_jump_type) =
+            resolvejump(tokens.at(i + 3), marks, instruction);
+        if (if_false != "\n") {
+            tie(addrf_target, addrf_jump_type) =
+                resolvejump(tokens.at(i + 4), marks, instruction);
+        } else {
+            addrf_jump_type = JMP_RELATIVE;
+            addrf_target    = instruction + 1;
+        }
+
+        program.opif(
+            assembler::operands::getint_with_rs_type(
+                resolveregister(condition), resolve_rs_type(tokens.at(i + 2))),
+            addrt_target,
+            addrt_jump_type,
+            addrf_target,
+            addrf_jump_type);
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -1313,46 +1358,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i + 1));
     } else if (tokens.at(i) == "if") {
-        /*  If branch is given three operands, it means its full, three-operands
-         * form is being used. Otherwise, it is short, two-operands form
-         * instruction and assembler should fill third operand accordingly.
-         *
-         *  In case of short-form `branch` instruction:
-         *
-         *      * first operand is index of the register to check,
-         *      * second operand is the address to which to jump if register is
-         * true,
-         *      * third operand is assumed to be the *next instruction*, i.e.
-         * instruction after the branch instruction,
-         *
-         *  In full (with three operands) form of `branch` instruction:
-         *
-         *      * third operands is the address to which to jump if register is
-         * false,
-         */
-        Token condition = tokens.at(i + 1);
-        Token if_true   = tokens.at(i + 3);
-        Token if_false  = tokens.at(i + 4);
-
-        viua::internals::types::bytecode_size addrt_target, addrf_target;
-        enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-        tie(addrt_target, addrt_jump_type) =
-            resolvejump(tokens.at(i + 3), marks, instruction);
-        if (if_false != "\n") {
-            tie(addrf_target, addrf_jump_type) =
-                resolvejump(tokens.at(i + 4), marks, instruction);
-        } else {
-            addrf_jump_type = JMP_RELATIVE;
-            addrf_target    = instruction + 1;
-        }
-
-        program.opif(
-            assembler::operands::getint_with_rs_type(
-                resolveregister(condition), resolve_rs_type(tokens.at(i + 2))),
-            addrt_target,
-            addrt_jump_type,
-            addrf_target,
-            addrf_jump_type);
+        assemble_op_if(program, tokens, i, instruction, marks);
     } else if (tokens.at(i) == "jump") {
         /*  Jump instruction can be written in two forms:
          *
