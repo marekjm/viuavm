@@ -299,6 +299,40 @@ static auto assemble_op_vinsert(Program& program, std::vector<Token> const& toke
                           resolve_rs_type(tokens.at(source + 1))),
                       position_op);
 }
+static auto assemble_op_vpop(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    Token_index target   = i + 1;
+    Token_index source   = target + 2;
+    Token_index position = source + 2;
+
+    int_op target_op, source_op, position_op;
+
+    if (tokens.at(target) == "void") {
+        --source;
+        --position;
+        target_op =
+            assembler::operands::getint(resolveregister(tokens.at(target)));
+    } else {
+        target_op = assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(target)),
+            resolve_rs_type(tokens.at(target + 1)));
+    }
+
+    source_op = assembler::operands::getint_with_rs_type(
+        resolveregister(tokens.at(source)),
+        resolve_rs_type(tokens.at(source + 1)));
+
+    if (tokens.at(position) == "void") {
+        position_op = assembler::operands::getint(
+            resolveregister(tokens.at(position)));
+    } else {
+        position_op = assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(position)),
+            resolve_rs_type(tokens.at(position + 1)));
+    }
+
+    program.opvpop(target_op, source_op, position_op);
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -658,37 +692,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                             resolveregister(tokens.at(source)),
                             resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "vpop") {
-        Token_index target   = i + 1;
-        Token_index source   = target + 2;
-        Token_index position = source + 2;
-
-        int_op target_op, source_op, position_op;
-
-        if (tokens.at(target) == "void") {
-            --source;
-            --position;
-            target_op =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
-        } else {
-            target_op = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
-        }
-
-        source_op = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(source)),
-            resolve_rs_type(tokens.at(source + 1)));
-
-        if (tokens.at(position) == "void") {
-            position_op = assembler::operands::getint(
-                resolveregister(tokens.at(position)));
-        } else {
-            position_op = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(position)),
-                resolve_rs_type(tokens.at(position + 1)));
-        }
-
-        program.opvpop(target_op, source_op, position_op);
+        assemble_op_vpop(program, tokens, i);
     } else if (tokens.at(i) == "vat") {
         Token_index target   = i + 1;
         Token_index source   = target + 2;
