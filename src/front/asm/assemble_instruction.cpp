@@ -264,6 +264,18 @@ static auto assemble_arithmetic_instruction(Program& program,
                       resolve_rs_type(tokens.at(rhs + 1))));
 }
 
+using Single_register_op = Program& (Program::*)(int_op);
+template<Single_register_op const op>
+static auto assemble_single_register_op(Program& program,
+        std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+
+        (program.*op)(assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(target)),
+            resolve_rs_type(tokens.at(target + 1))));
+}
+
 static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
         Token_index const i) -> void {
     Token_index target = i + 1;
@@ -606,11 +618,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     if (tokens.at(i) == "nop") {
         program.opnop();
     } else if (tokens.at(i) == "izero") {
-        Token_index target = i + 1;
-
-        program.opizero(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+        assemble_single_register_op<&Program::opizero>(program, tokens, i);
     } else if (tokens.at(i) == "integer") {
         assemble_op_integer(program, tokens, i);
     } else if (tokens.at(i) == "iinc") {
