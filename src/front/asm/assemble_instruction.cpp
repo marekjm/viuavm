@@ -251,6 +251,19 @@ static auto convert_token_to_timeout_operand(viua::cg::lex::Token token)
     }
     return timeout_op{timeout_milliseconds};
 }
+static auto log_location_being_assembled(const Token& token) -> void {
+    if (DEBUG and SCREAM) {
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "debug"
+             << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "<file>:" << token.line() << ':' << token.character();
+        cout << ": assembling '";
+        cout << send_control_seq(COLOR_FG_WHITE) << token.str()
+             << send_control_seq(ATTR_RESET);
+        cout << "' instruction\n";
+    }
+}
+
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
@@ -263,15 +276,7 @@ viua::internals::types::bytecode_size assemble_instruction(
      *  uses bytecode generation API to fill the program with instructions and
      *  from them generate the bytecode.
      */
-    if (DEBUG and SCREAM) {
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "assembling '";
-        cout << send_control_seq(COLOR_FG_WHITE) << tokens.at(i).str()
-             << send_control_seq(ATTR_RESET);
-        cout << "' instruction\n";
-    }
+    log_location_being_assembled(tokens.at(i));
 
     if (tokens.at(i) == "nop") {
         program.opnop();
