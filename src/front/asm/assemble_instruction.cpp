@@ -504,6 +504,35 @@ static auto assemble_op_jump(Program& program, std::vector<Token> const& tokens,
 
     program.opjump(jump_target, jump_type);
 }
+static auto assemble_op_structremove(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index source = target + 2;
+    Token_index key    = source + 2;
+
+    if (tokens.at(target) == "void") {
+        --source;
+        --key;
+        program.opstructremove(
+            assembler::operands::getint(resolveregister(tokens.at(target))),
+            assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(source)),
+                resolve_rs_type(tokens.at(source + 1))),
+            assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(key)),
+                resolve_rs_type(tokens.at(key + 1))));
+    } else {
+        program.opstructremove(assembler::operands::getint_with_rs_type(
+                                   resolveregister(tokens.at(target)),
+                                   resolve_rs_type(tokens.at(target + 1))),
+                               assembler::operands::getint_with_rs_type(
+                                   resolveregister(tokens.at(source)),
+                                   resolve_rs_type(tokens.at(source + 1))),
+                               assembler::operands::getint_with_rs_type(
+                                   resolveregister(tokens.at(key)),
+                                   resolve_rs_type(tokens.at(key + 1))));
+    }
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -1484,32 +1513,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                                    resolveregister(tokens.at(source)),
                                    resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "structremove") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-        Token_index key    = source + 2;
-
-        if (tokens.at(target) == "void") {
-            --source;
-            --key;
-            program.opstructremove(
-                assembler::operands::getint(resolveregister(tokens.at(target))),
-                assembler::operands::getint_with_rs_type(
-                    resolveregister(tokens.at(source)),
-                    resolve_rs_type(tokens.at(source + 1))),
-                assembler::operands::getint_with_rs_type(
-                    resolveregister(tokens.at(key)),
-                    resolve_rs_type(tokens.at(key + 1))));
-        } else {
-            program.opstructremove(assembler::operands::getint_with_rs_type(
-                                       resolveregister(tokens.at(target)),
-                                       resolve_rs_type(tokens.at(target + 1))),
-                                   assembler::operands::getint_with_rs_type(
-                                       resolveregister(tokens.at(source)),
-                                       resolve_rs_type(tokens.at(source + 1))),
-                                   assembler::operands::getint_with_rs_type(
-                                       resolveregister(tokens.at(key)),
-                                       resolve_rs_type(tokens.at(key + 1))));
-        }
+        assemble_op_structremove(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         Token_index target = i + 1;
         Token_index source = target + 2;
