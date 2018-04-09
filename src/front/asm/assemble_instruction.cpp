@@ -513,13 +513,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "register") {
         assemble_single_register_op<&Program::opregister>(program, tokens, i);
     } else if (tokens.at(i) == "atom") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opatom(assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(target)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                       tokens.at(source));
+        assemble_fn_ctor_op<&Program::opatom>(program, tokens, i);
     } else if (tokens.at(i) == "atomeq") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
