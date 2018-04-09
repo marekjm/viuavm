@@ -152,6 +152,21 @@ auto assemble_no_result_call_op(Program& program,
         }
 }
 
+using Parameter_op = Program& (Program::*)(int_op, int_op);
+template<Parameter_op const op>
+auto assemble_parameter_op(Program& program,
+        std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index source = target + 1;
+
+        (program.*op)(
+            ::assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
+            ::assembler::operands::getint_with_rs_type(
+                ::assembler::operands::resolve_register(tokens.at(source)),
+                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+}
+
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 auto assemble_bit_shift_instruction(Program& program,
@@ -246,6 +261,14 @@ auto assemble_op_string(Program&, std::vector<Token> const&,
 auto assemble_op_text(Program&, std::vector<Token> const&,
         Token_index const) -> void;
 auto assemble_op_vector(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_arg(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_process(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_join(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_receive(Program&, std::vector<Token> const&,
         Token_index const) -> void;
 }}}}  // namespace viua::assembler::backend::op_assemblers
 

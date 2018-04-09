@@ -471,6 +471,7 @@ build/bin/vm/vdb: build/front/wdb.o \
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
 OP_ASSEMBLERS= \
+	build/assembler/backend/op_assemblers/assemble_op_arg.o \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
 	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
 	build/assembler/backend/op_assemblers/assemble_op_call.o \
@@ -478,11 +479,15 @@ OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_frame.o \
 	build/assembler/backend/op_assemblers/assemble_op_if.o \
 	build/assembler/backend/op_assemblers/assemble_op_integer.o \
+	build/assembler/backend/op_assemblers/assemble_op_join.o \
 	build/assembler/backend/op_assemblers/assemble_op_jump.o \
 	build/assembler/backend/op_assemblers/assemble_op_msg.o \
+	build/assembler/backend/op_assemblers/assemble_op_process.o \
+	build/assembler/backend/op_assemblers/assemble_op_receive.o \
 	build/assembler/backend/op_assemblers/assemble_op_remove.o \
 	build/assembler/backend/op_assemblers/assemble_op_string.o \
 	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
+	build/assembler/backend/op_assemblers/assemble_op_join.o \
 	build/assembler/backend/op_assemblers/assemble_op_text.o \
 	build/assembler/backend/op_assemblers/assemble_op_vector.o \
 	build/assembler/backend/op_assemblers/assemble_op_vinsert.o \
