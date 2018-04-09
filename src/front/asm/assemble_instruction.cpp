@@ -283,21 +283,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "string") {
         viua::assembler::backend::op_assemblers::assemble_op_string(program, tokens, i);
     } else if (tokens.at(i) == "text") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        auto target_operand = assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(target)),
-            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-        if (tokens.at(source).str().at(0) == '*'
-            or tokens.at(source).str().at(0) == '%') {
-            program.optext(target_operand,
-                           assembler::operands::getint_with_rs_type(
-                               ::assembler::operands::resolve_register(tokens.at(source)),
-                               ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
-        } else {
-            program.optext(target_operand, tokens.at(source));
-        }
+        viua::assembler::backend::op_assemblers::assemble_op_text(program, tokens, i);
     } else if (tokens.at(i) == "texteq") {
         assemble_three_register_op<&Program::optexteq>(program, tokens, i);
     } else if (tokens.at(i) == "textat") {

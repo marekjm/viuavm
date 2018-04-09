@@ -227,6 +227,8 @@ auto assemble_op_frame(Program&, std::vector<Token> const&,
         Token_index const) -> void;
 auto assemble_op_string(Program&, std::vector<Token> const&,
         Token_index const) -> void;
+auto assemble_op_text(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
 }}}}  // namespace viua::assembler::backend::op_assemblers
 
 
