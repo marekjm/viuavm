@@ -783,11 +783,6 @@ viua::internals::types::bytecode_size assemble_instruction(
 
     if (tokens.at(i).str().substr(0, 1) != ".") {
         ++instruction;
-        /* cout << "increased instruction count to " << instruction << ": " <<
-         * tokens.at(i).str() << endl; */
-    } else {
-        /* cout << "not increasing instruction count: " << tokens.at(i).str() <<
-         * endl; */
     }
 
     while (tokens.at(++i) != "\n")
