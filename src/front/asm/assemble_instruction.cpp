@@ -331,6 +331,20 @@ static auto assemble_capture_op(Program& program,
                               resolve_rs_type(tokens.at(source + 1))));
 }
 
+using Fn_ctor_op = Program& (Program::*)(int_op, std::string const&);
+template<Fn_ctor_op const op>
+static auto assemble_fn_ctor_op(Program& program,
+        std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+
+        (program.*op)(assembler::operands::getint_with_rs_type(
+                              resolveregister(tokens.at(target)),
+                              resolve_rs_type(tokens.at(target + 1))),
+                          tokens.at(source));
+}
+
 static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
         Token_index const i) -> void {
     Token_index target = i + 1;
@@ -940,13 +954,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "capturemove") {
         assemble_capture_op<&Program::opcapturemove>(program, tokens, i);
     } else if (tokens.at(i) == "closure") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opclosure(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
-                          tokens.at(source));
+        assemble_fn_ctor_op<&Program::opclosure>(program, tokens, i);
     } else if (tokens.at(i) == "function") {
         Token_index target = i + 1;
         Token_index source = target + 2;
