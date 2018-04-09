@@ -907,11 +907,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "swap") {
         assemble_double_register_op<&Program::opswap>(program, tokens, i);
     } else if (tokens.at(i) == "delete") {
-        Token_index target = i + 1;
-
-        program.opdelete(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+        assemble_single_register_op<&Program::opdelete>(program, tokens, i);
     } else if (tokens.at(i) == "isnull") {
         Token_index target = i + 1;
         Token_index source = target + 2;
