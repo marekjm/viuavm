@@ -281,13 +281,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "eq") {
         assemble_three_register_op<&Program::opeq>(program, tokens, i);
     } else if (tokens.at(i) == "string") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opstring(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         tokens.at(source));
+        viua::assembler::backend::op_assemblers::assemble_op_string(program, tokens, i);
     } else if (tokens.at(i) == "text") {
         Token_index target = i + 1;
         Token_index source = target + 2;
