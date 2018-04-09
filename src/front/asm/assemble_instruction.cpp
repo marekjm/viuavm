@@ -726,19 +726,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "texteq") {
         assemble_three_register_op<&Program::optexteq>(program, tokens, i);
     } else if (tokens.at(i) == "textat") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-        Token_index index  = source + 2;
-
-        program.optextat(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(source)),
-                             resolve_rs_type(tokens.at(source + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(index)),
-                             resolve_rs_type(tokens.at(index + 1))));
+        assemble_three_register_op<&Program::optextat>(program, tokens, i);
     } else if (tokens.at(i) == "textsub") {
         Token_index target      = i + 1;
         Token_index source      = target + 2;
