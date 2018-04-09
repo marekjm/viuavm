@@ -690,19 +690,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "div") {
         assemble_three_register_op<&Program::opdiv>(program, tokens, i);
     } else if (tokens.at(i) == "lt") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-        Token_index rhs    = lhs + 2;
-
-        program.oplt(assembler::operands::getint_with_rs_type(
-                         resolveregister(tokens.at(target)),
-                         resolve_rs_type(tokens.at(target + 1))),
-                     assembler::operands::getint_with_rs_type(
-                         resolveregister(tokens.at(lhs)),
-                         resolve_rs_type(tokens.at(lhs + 1))),
-                     assembler::operands::getint_with_rs_type(
-                         resolveregister(tokens.at(rhs)),
-                         resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_three_register_op<&Program::oplt>(program, tokens, i);
     } else if (tokens.at(i) == "lte") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
