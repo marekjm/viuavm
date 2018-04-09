@@ -903,15 +903,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "copy") {
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);
     } else if (tokens.at(i) == "ptr") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opptr(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(source)),
-                          resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::opptr>(program, tokens, i);
     } else if (tokens.at(i) == "swap") {
         Token_index target = i + 1;
         Token_index source = target + 2;
