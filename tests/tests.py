@@ -1778,61 +1778,6 @@ class TryCatchBlockTests(unittest.TestCase):
         runTest(self, 'catching_builtin_type.asm', '42')
 
 
-class PrototypeSystemTests(unittest.TestCase):
-    """Tests for prototype system inside the machine.
-    """
-    PATH = './sample/asm/prototype'
-
-    ASM_FLAGS = ('--no-sa',)
-
-    def testSimplePrototypeRegistrationAndInstantation(self):
-        runTestSplitlines(self, 'simple.asm', ["Prototype for Custom", "Custom#{}"])
-
-    def testExceptionThrownOnUnknownTypeInstantation(self):
-        runTest(self, 'unregistered_type_instantation.asm', "cannot create new instance of unregistered type: Nonexistent")
-
-    def testCatchingDerivedTypesWithBaseClassHandlers(self):
-        runTest(self, 'derived_class_catching.asm', "Derived#{}")
-
-    def testCatchingDeeplyDerivedTypesWithBaseClassHandlers(self):
-        runTest(self, 'deeply_derived_class_catching.asm', "DeeplyDerived#{}")
-
-    def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
-        runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "Combined#{}")
-
-    def testCatchingObjectsUsingMultipleInheritanceWithSharedBases(self):
-        runTest(self, 'shared_bases.asm', "Combined#{}")
-
-    def testDynamicDispatch(self):
-        global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
-        # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
-        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (74351, 74367, 74383, 72736, 74399, 74375)
-        #skipValgrind(self)
-        runTestSplitlines(self, 'dynamic_method_dispatch.asm',
-            [
-                'Good day from Derived',
-                'Hello from Derived',
-                '',
-                'Good day from MoreDerived',
-                'Hello from MoreDerived',
-                'Hi from MoreDerived',
-            ],
-        )
-        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
-
-    def testOverridingMethods(self):
-        runTestSplitlines(self, 'overriding_methods.asm',
-            [
-                'Hello Base World!',
-                'Hello Derived World!',
-                'Hello Base World!',
-            ],
-        )
-
-    def testMsgFromFunctionObject(self):
-        runTest(self, 'msg_from_function.asm', 'Hello World!')
-
-
 @unittest.skip('new SA is almost ready')
 class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     PATH = './sample/asm/static_analysis_errors'
