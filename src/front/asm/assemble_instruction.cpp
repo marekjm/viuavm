@@ -207,6 +207,7 @@ static auto log_location_being_assembled(const Token& token) -> void {
 using viua::assembler::backend::op_assemblers::assemble_single_register_op;
 using viua::assembler::backend::op_assemblers::assemble_double_register_op;
 using viua::assembler::backend::op_assemblers::assemble_three_register_op;
+using viua::assembler::backend::op_assemblers::assemble_four_register_op;
 using viua::assembler::backend::op_assemblers::assemble_capture_op;
 using viua::assembler::backend::op_assemblers::assemble_fn_ctor_op;
 using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
@@ -308,23 +309,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "textat") {
         assemble_three_register_op<&Program::optextat>(program, tokens, i);
     } else if (tokens.at(i) == "textsub") {
-        Token_index target      = i + 1;
-        Token_index source      = target + 2;
-        Token_index begin_index = source + 2;
-        Token_index end_index   = begin_index + 2;
-
-        program.optextsub(assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(target)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(source)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                          assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(begin_index)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(begin_index + 1))),
-                          assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(end_index)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(end_index + 1))));
+        assemble_four_register_op<&Program::optextsub>(program, tokens, i);
     } else if (tokens.at(i) == "textlength") {
         assemble_double_register_op<&Program::optextlength>(program, tokens, i);
     } else if (tokens.at(i) == "textcommonprefix") {
