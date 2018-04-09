@@ -505,13 +505,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "import") {
         program.opimport(tokens.at(i + 1));
     } else if (tokens.at(i) == "class") {
-        Token_index target     = i + 1;
-        Token_index class_name = target + 2;
-
-        program.opclass(assembler::operands::getint_with_rs_type(
-                            ::assembler::operands::resolve_register(tokens.at(target)),
-                            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                        tokens.at(class_name));
+        assemble_fn_ctor_op<&Program::opclass>(program, tokens, i);
     } else if (tokens.at(i) == "derive") {
         Token_index target     = i + 1;
         Token_index class_name = target + 2;
