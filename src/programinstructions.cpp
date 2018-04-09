@@ -576,14 +576,14 @@ Program& Program::opcapturemove(int_op target_closure,
     return (*this);
 }
 
-Program& Program::opclosure(int_op reg, const string& fn) {
+Program& Program::opclosure(int_op reg, std::string const& fn) {
     /*  Inserts closure instuction.
      */
     addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
     return (*this);
 }
 
-Program& Program::opfunction(int_op reg, const string& fn) {
+Program& Program::opfunction(int_op reg, std::string const& fn) {
     /*  Inserts function instuction.
      */
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);

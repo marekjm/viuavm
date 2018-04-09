@@ -175,9 +175,9 @@ class Program {
     Program& opcapture(int_op, int_op, int_op);
     Program& opcapturecopy(int_op, int_op, int_op);
     Program& opcapturemove(int_op, int_op, int_op);
-    Program& opclosure(int_op, const std::string&);
+    Program& opclosure(int_op, std::string const&);
 
-    Program& opfunction(int_op, const std::string&);
+    Program& opfunction(int_op, std::string const&);
 
     Program& opframe(int_op, int_op);
     Program& opparam(int_op, int_op);
