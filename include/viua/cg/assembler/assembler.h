@@ -35,8 +35,14 @@ namespace assembler {
 namespace operands {
 
 auto resolve_register(viua::cg::lex::Token const,
-                              bool const allow_bare_integers = false) -> std::string;
-auto resolve_rs_type(viua::cg::lex::Token const) -> viua::internals::RegisterSets;
+                      bool const allow_bare_integers = false) -> std::string;
+auto resolve_rs_type(viua::cg::lex::Token const)
+    -> viua::internals::RegisterSets;
+auto resolve_jump(
+    viua::cg::lex::Token const,
+    std::map<std::string, std::vector<viua::cg::lex::Token>::size_type> const&,
+    viua::internals::types::bytecode_size)
+    -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>;
 
 auto getint(const std::string& s, const bool = false) -> int_op;
 auto getint_with_rs_type(const std::string&,

@@ -50,10 +50,10 @@ using Token      = viua::cg::lex::Token;
 using viua::assembler::backend::op_assemblers::Token_index;
 
 
-static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
+auto ::assembler::operands::resolve_jump(
     Token token,
-    const map<string, vector<Token>::size_type>& marks,
-    viua::internals::types::bytecode_size instruction_index) {
+    std::map<std::string, std::vector<Token>::size_type> const& marks,
+    viua::internals::types::bytecode_size instruction_index) -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> {
     /*  This function is used to resolve jumps in `jump` and `branch`
      * instructions.
      */
@@ -204,350 +204,6 @@ static auto log_location_being_assembled(const Token& token) -> void {
     }
 }
 
-static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target = i + 1;
-    Token_index source = target + 2;
-
-    program.opinteger(assembler::operands::getint_with_rs_type(
-                          ::assembler::operands::resolve_register(tokens.at(target)),
-                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint(
-                          ::assembler::operands::resolve_register(tokens.at(source), true), true));
-}
-static auto assemble_op_vinsert(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target   = i + 1;
-    Token_index source   = target + 2;
-    Token_index position = source + 2;
-
-    auto position_op = int_op{};
-    if (tokens.at(position) == "void") {
-        position_op = assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(position)));
-    } else {
-        position_op = assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(position)),
-            ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));
-    }
-
-    program.opvinsert(assembler::operands::getint_with_rs_type(
-                          ::assembler::operands::resolve_register(tokens.at(target)),
-                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          ::assembler::operands::resolve_register(tokens.at(source)),
-                          ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                      position_op);
-}
-static auto assemble_op_vpop(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target   = i + 1;
-    Token_index source   = target + 2;
-    Token_index position = source + 2;
-
-    int_op target_op, source_op, position_op;
-
-    if (tokens.at(target) == "void") {
-        --source;
-        --position;
-        target_op =
-            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
-    } else {
-        target_op = assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(target)),
-            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-    }
-
-    source_op = assembler::operands::getint_with_rs_type(
-        ::assembler::operands::resolve_register(tokens.at(source)),
-        ::assembler::operands::resolve_rs_type(tokens.at(source + 1)));
-
-    if (tokens.at(position) == "void") {
-        position_op = assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(position)));
-    } else {
-        position_op = assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(position)),
-            ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));
-    }
-
-    program.opvpop(target_op, source_op, position_op);
-}
-static auto assemble_op_bits(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target = i + 1;
-    Token_index lhs    = target + 2;
-
-    auto src = tokens.at(lhs).str();
-    if (src.at(0) == '0'
-        and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
-        program.opbits(
-            assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(target)),
-                ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-            assembler::operands::convert_token_to_bitstring_operand(
-                tokens.at(lhs)));
-    } else {
-        program.opbits(assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(target)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(lhs)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))));
-    }
-}
-static auto assemble_op_bitset(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target = i + 1;
-    Token_index lhs    = target + 2;
-    Token_index rhs    = lhs + 2;
-
-    if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
-        program.opbitset(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(lhs)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-                         (tokens.at(rhs) == "true"));
-    } else {
-        program.opbitset(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(lhs)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(rhs)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
-    }
-}
-static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    /** Full form of call instruction has two operands: function name and
-     *  return value register index.
-     *  If call is given only one operand it means it is the function name
-     * and returned value is discarded. To explicitly state that return
-     * value should be discarderd put `void` as return register index.
-     */
-    /** Why is the function supplied as a *string* and
-     *  not direct instruction pointer?
-     *  That would be faster - c'mon couldn't assembler just calculate
-     * offsets and insert them?
-     *
-     *  Nope.
-     *
-     *  Yes, it *would* be faster if calls were just precalculated jumps.
-     *  However, by them being strings we get plenty of flexibility,
-     * good-quality stack traces, and a place to put plenty of debugging
-     * info. All that at a cost of just one map lookup; the overhead is
-     * minimal and gains are big. What's not to love?
-     *
-     *  Of course, you, my dear reader, are free to take this code (it's GPL
-     * after all!) and modify it to suit your particular needs - in that
-     * case that would be calculating call jumps at compile time and
-     * exchanging CALL instructions with JUMP instructions.
-     *
-     *  Good luck with debugging your code, then.
-     */
-    Token_index target = i + 1;
-    Token_index fn     = target + 2;
-
-    int_op ret;
-    if (tokens.at(target) == "void") {
-        --fn;
-        ret =
-            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
-    } else {
-        ret = assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(target)),
-            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-    }
-
-    if (tokens.at(fn).str().at(0) == '*'
-        or tokens.at(fn).str().at(0) == '%') {
-        program.opcall(ret,
-                       assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(fn)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
-    } else {
-        program.opcall(ret, tokens.at(fn));
-    }
-}
-static auto assemble_op_if(Program& program, std::vector<Token> const& tokens,
-        Token_index const i,
-        viua::internals::types::bytecode_size const& instruction,
-        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type> const& marks) -> void {
-        /*  If branch is given three operands, it means its full, three-operands
-         * form is being used. Otherwise, it is short, two-operands form
-         * instruction and assembler should fill third operand accordingly.
-         *
-         *  In case of short-form `branch` instruction:
-         *
-         *      * first operand is index of the register to check,
-         *      * second operand is the address to which to jump if register is
-         * true,
-         *      * third operand is assumed to be the *next instruction*, i.e.
-         * instruction after the branch instruction,
-         *
-         *  In full (with three operands) form of `branch` instruction:
-         *
-         *      * third operands is the address to which to jump if register is
-         * false,
-         */
-        Token condition = tokens.at(i + 1);
-        Token if_true   = tokens.at(i + 3);
-        Token if_false  = tokens.at(i + 4);
-
-        viua::internals::types::bytecode_size addrt_target, addrf_target;
-        enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-        tie(addrt_target, addrt_jump_type) =
-            resolvejump(tokens.at(i + 3), marks, instruction);
-        if (if_false != "\n") {
-            tie(addrf_target, addrf_jump_type) =
-                resolvejump(tokens.at(i + 4), marks, instruction);
-        } else {
-            addrf_jump_type = JMP_RELATIVE;
-            addrf_target    = instruction + 1;
-        }
-
-        program.opif(
-            assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(condition), ::assembler::operands::resolve_rs_type(tokens.at(i + 2))),
-            addrt_target,
-            addrt_jump_type,
-            addrf_target,
-            addrf_jump_type);
-}
-static auto assemble_op_jump(Program& program, std::vector<Token> const& tokens,
-        Token_index const i,
-        viua::internals::types::bytecode_size const& instruction,
-        std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type> const& marks) -> void {
-    /*  Jump instruction can be written in two forms:
-     *
-     *      * `jump <index>`
-     *      * `jump :<marker>`
-     *
-     *  Assembler must distinguish between these two forms, and so it does.
-     *  Here, we use a function from string support lib to determine
-     *  if the jump is numeric, and thus an index, or
-     *  a string - in which case we consider it a marker jump.
-     *
-     *  If it is a marker jump, assembler will look the marker up in a map
-     * and if it is not found throw an exception about unrecognised marker
-     * being used.
-     */
-    viua::internals::types::bytecode_size jump_target;
-    enum JUMPTYPE jump_type;
-    tie(jump_target, jump_type) =
-        resolvejump(tokens.at(i + 1), marks, instruction);
-
-    program.opjump(jump_target, jump_type);
-}
-static auto assemble_op_structremove(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-    Token_index target = i + 1;
-    Token_index source = target + 2;
-    Token_index key    = source + 2;
-
-    if (tokens.at(target) == "void") {
-        --source;
-        --key;
-        program.opstructremove(
-            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
-            assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(source)),
-                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-            assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(key)),
-                ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-    } else {
-        program.opstructremove(assembler::operands::getint_with_rs_type(
-                                   ::assembler::operands::resolve_register(tokens.at(target)),
-                                   ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                               assembler::operands::getint_with_rs_type(
-                                   ::assembler::operands::resolve_register(tokens.at(source)),
-                                   ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                               assembler::operands::getint_with_rs_type(
-                                   ::assembler::operands::resolve_register(tokens.at(key)),
-                                   ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-    }
-}
-static auto assemble_op_msg(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index fn     = target + 2;
-
-        int_op ret;
-        if (tokens.at(target) == "void") {
-            --fn;
-            ret =
-                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
-        } else {
-            ret = assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(target)),
-                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-        }
-
-        if (tokens.at(fn).str().at(0) == '*'
-            or tokens.at(fn).str().at(0) == '%') {
-            program.opmsg(ret,
-                          assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(fn)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
-        } else {
-            program.opmsg(ret, tokens.at(fn));
-        }
-}
-static auto assemble_op_remove(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-        Token_index key    = source + 2;
-
-        if (tokens.at(target) == "void") {
-            --source;
-            --key;
-            program.opremove(
-                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
-                assembler::operands::getint_with_rs_type(
-                    ::assembler::operands::resolve_register(tokens.at(source)),
-                    ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                assembler::operands::getint_with_rs_type(
-                    ::assembler::operands::resolve_register(tokens.at(key)),
-                    ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-        } else {
-            program.opremove(assembler::operands::getint_with_rs_type(
-                                 ::assembler::operands::resolve_register(tokens.at(target)),
-                                 ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 ::assembler::operands::resolve_register(tokens.at(source)),
-                                 ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 ::assembler::operands::resolve_register(tokens.at(key)),
-                                 ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-        }
-}
-static auto assemble_op_float(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opfloat(assembler::operands::getint_with_rs_type(
-                            ::assembler::operands::resolve_register(tokens.at(target)),
-                            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                        stod(tokens.at(source).str()));
-}
-static auto assemble_op_frame(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 1;
-
-        program.opframe(
-            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
-            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(source))));
-}
-
 using viua::assembler::backend::op_assemblers::assemble_single_register_op;
 using viua::assembler::backend::op_assemblers::assemble_double_register_op;
 using viua::assembler::backend::op_assemblers::assemble_three_register_op;
@@ -556,6 +212,20 @@ using viua::assembler::backend::op_assemblers::assemble_fn_ctor_op;
 using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
 using viua::assembler::backend::op_assemblers::assemble_increment_instruction;
 using viua::assembler::backend::op_assemblers::assemble_arithmetic_instruction;
+
+using viua::assembler::backend::op_assemblers::assemble_op_integer;
+using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
+using viua::assembler::backend::op_assemblers::assemble_op_vpop;
+using viua::assembler::backend::op_assemblers::assemble_op_bits;
+using viua::assembler::backend::op_assemblers::assemble_op_bitset;
+using viua::assembler::backend::op_assemblers::assemble_op_call;
+using viua::assembler::backend::op_assemblers::assemble_op_if;
+using viua::assembler::backend::op_assemblers::assemble_op_jump;
+using viua::assembler::backend::op_assemblers::assemble_op_structremove;
+using viua::assembler::backend::op_assemblers::assemble_op_msg;
+using viua::assembler::backend::op_assemblers::assemble_op_remove;
+using viua::assembler::backend::op_assemblers::assemble_op_float;
+using viua::assembler::backend::op_assemblers::assemble_op_frame;
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,

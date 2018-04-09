@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -172,6 +172,35 @@ static auto assemble_arithmetic_instruction(Program& program,
                       ::assembler::operands::resolve_register(tokens.at(rhs)),
                       ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
 }
+
+auto assemble_op_integer(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_vinsert(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_vpop(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_bits(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_bitset(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_call(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_if(Program&, std::vector<Token> const&,
+        Token_index const, viua::internals::types::bytecode_size const&,
+        std::map<std::string, Token_index> const&) -> void;
+auto assemble_op_jump(Program&, std::vector<Token> const&,
+        Token_index const, viua::internals::types::bytecode_size const&,
+        std::map<std::string, Token_index> const&) -> void;
+auto assemble_op_structremove(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_msg(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_remove(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_float(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
+auto assemble_op_frame(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
 }}}}  // namespace viua::assembler::backend::op_assemblers
 
 

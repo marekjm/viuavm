@@ -470,8 +470,24 @@ build/bin/vm/vdb: build/front/wdb.o \
 	$(VIUA_TYPES_FILES_O)
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
+op_assemblers: \
+	build/assembler/backend/op_assemblers/assemble_op_bits.o \
+	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
+	build/assembler/backend/op_assemblers/assemble_op_call.o \
+	build/assembler/backend/op_assemblers/assemble_op_float.o \
+	build/assembler/backend/op_assemblers/assemble_op_frame.o \
+	build/assembler/backend/op_assemblers/assemble_op_if.o \
+	build/assembler/backend/op_assemblers/assemble_op_integer.o \
+	build/assembler/backend/op_assemblers/assemble_op_jump.o \
+	build/assembler/backend/op_assemblers/assemble_op_msg.o \
+	build/assembler/backend/op_assemblers/assemble_op_remove.o \
+	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
+	build/assembler/backend/op_assemblers/assemble_op_vinsert.o \
+	build/assembler/backend/op_assemblers/assemble_op_vpop.o
+
 build/bin/vm/asm: build/front/asm.o \
 	build/front/asm/generate.o \
+	$(op_assemblers) \
 	build/front/asm/assemble_instruction.o \
 	build/front/asm/gather.o \
 	build/front/asm/decode.o \
