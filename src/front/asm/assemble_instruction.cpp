@@ -956,13 +956,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "closure") {
         assemble_fn_ctor_op<&Program::opclosure>(program, tokens, i);
     } else if (tokens.at(i) == "function") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opfunction(assembler::operands::getint_with_rs_type(
-                               resolveregister(tokens.at(target)),
-                               resolve_rs_type(tokens.at(target + 1))),
-                           tokens.at(source));
+        assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
     } else if (tokens.at(i) == "frame") {
         Token_index target = i + 1;
         Token_index source = target + 1;
