@@ -899,15 +899,7 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
             program, tokens, i);
     } else if (tokens.at(i) == "move") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opmove(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(source)),
-                           resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::opmove>(program, tokens, i);
     } else if (tokens.at(i) == "copy") {
         Token_index target = i + 1;
         Token_index source = target + 2;
