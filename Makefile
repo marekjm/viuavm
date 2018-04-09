@@ -473,6 +473,7 @@ build/bin/vm/vdb: build/front/wdb.o \
 
 OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_arg.o \
+	build/assembler/backend/op_assemblers/assemble_op_attach.o \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
 	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
 	build/assembler/backend/op_assemblers/assemble_op_call.o \

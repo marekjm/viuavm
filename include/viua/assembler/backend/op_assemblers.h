@@ -270,6 +270,8 @@ auto assemble_op_join(Program&, std::vector<Token> const&,
         Token_index const) -> void;
 auto assemble_op_receive(Program&, std::vector<Token> const&,
         Token_index const) -> void;
+auto assemble_op_attach(Program&, std::vector<Token> const&,
+        Token_index const) -> void;
 }}}}  // namespace viua::assembler::backend::op_assemblers
 
 

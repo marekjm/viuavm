@@ -521,15 +521,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                              ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(class_name));
     } else if (tokens.at(i) == "attach") {
-        Token_index target        = i + 1;
-        Token_index fn_name       = target + 2;
-        Token_index attached_name = fn_name + 1;
-
-        program.opattach(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         tokens.at(fn_name),
-                         tokens.at(attached_name));
+        viua::assembler::backend::op_assemblers::assemble_op_attach(program, tokens, i);
     } else if (tokens.at(i) == "register") {
         Token_index target = i + 1;
 
