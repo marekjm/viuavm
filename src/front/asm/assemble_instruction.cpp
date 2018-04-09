@@ -515,19 +515,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "atom") {
         assemble_fn_ctor_op<&Program::opatom>(program, tokens, i);
     } else if (tokens.at(i) == "atomeq") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-        Token_index rhs    = lhs + 2;
-
-        program.opatomeq(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(lhs)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(rhs)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_three_register_op<&Program::opatomeq>(program, tokens, i);
     } else if (tokens.at(i) == "struct") {
         Token_index target = i + 1;
 
