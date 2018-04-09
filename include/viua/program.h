@@ -219,7 +219,7 @@ class Program {
     Program& opattach(int_op, const std::string&, const std::string&);
     Program& opregister(int_op);
 
-    Program& opatom(int_op, std::string);
+    Program& opatom(int_op, std::string const&);
     Program& opatomeq(int_op, int_op, int_op);
 
     Program& opstruct(int_op);

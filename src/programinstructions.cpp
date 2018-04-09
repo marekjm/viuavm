@@ -849,7 +849,7 @@ Program& Program::opregister(int_op reg) {
     return (*this);
 }
 
-Program& Program::opatom(int_op reg, string s) {
+Program& Program::opatom(int_op reg, string const& s) {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
 }
