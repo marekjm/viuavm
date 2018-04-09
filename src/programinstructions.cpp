@@ -660,7 +660,7 @@ Program& Program::opcall(int_op reg, int_op fn) {
     return (*this);
 }
 
-Program& Program::optailcall(const string& fn_name) {
+Program& Program::optailcall(std::string const& fn_name) {
     /*  Inserts tailcall instruction.
      *  Byte offset is calculated automatically.
      */
@@ -673,7 +673,7 @@ Program& Program::optailcall(int_op fn) {
     return (*this);
 }
 
-Program& Program::opdefer(const string& fn_name) {
+Program& Program::opdefer(std::string const& fn_name) {
     addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
     return (*this);
 }

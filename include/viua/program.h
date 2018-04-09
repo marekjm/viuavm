@@ -187,9 +187,9 @@ class Program {
 
     Program& opcall(int_op, const std::string&);
     Program& opcall(int_op, int_op);
-    Program& optailcall(const std::string&);
+    Program& optailcall(std::string const&);
     Program& optailcall(int_op);
-    Program& opdefer(const std::string&);
+    Program& opdefer(std::string const&);
     Program& opdefer(int_op);
     Program& opprocess(int_op, const std::string&);
     Program& opprocess(int_op, int_op);
