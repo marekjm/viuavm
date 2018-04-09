@@ -499,11 +499,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i + 1));
     } else if (tokens.at(i) == "throw") {
-        Token_index source = i + 1;
-
-        program.opthrow(assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(source)),
-            ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        assemble_single_register_op<&Program::opthrow>(program, tokens, i);
     } else if (tokens.at(i) == "leave") {
         program.opleave();
     } else if (tokens.at(i) == "import") {
