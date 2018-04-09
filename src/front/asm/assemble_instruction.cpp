@@ -911,11 +911,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "isnull") {
         assemble_double_register_op<&Program::opisnull>(program, tokens, i);
     } else if (tokens.at(i) == "print") {
-        Token_index source = i + 1;
-
-        program.opprint(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(source)),
-            resolve_rs_type(tokens.at(source + 1))));
+        assemble_single_register_op<&Program::opprint>(program, tokens, i);
     } else if (tokens.at(i) == "echo") {
         Token_index source = i + 1;
 
