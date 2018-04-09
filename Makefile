@@ -484,6 +484,7 @@ OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_string.o \
 	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
 	build/assembler/backend/op_assemblers/assemble_op_text.o \
+	build/assembler/backend/op_assemblers/assemble_op_vector.o \
 	build/assembler/backend/op_assemblers/assemble_op_vinsert.o \
 	build/assembler/backend/op_assemblers/assemble_op_vpop.o
 

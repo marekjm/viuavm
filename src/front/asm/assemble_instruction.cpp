@@ -299,18 +299,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "textconcat") {
         assemble_three_register_op<&Program::optextconcat>(program, tokens, i);
     } else if (tokens.at(i) == "vector") {
-        Token_index target           = i + 1;
-        Token_index pack_range_start = target + 2;
-        Token_index pack_range_count = pack_range_start + 2;
-
-        program.opvector(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(pack_range_start)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(pack_range_start + 1))),
-                         assembler::operands::getint(
-                             ::assembler::operands::resolve_register(tokens.at(pack_range_count))));
+        viua::assembler::backend::op_assemblers::assemble_op_vector(program, tokens, i);
     } else if (tokens.at(i) == "vinsert") {
         assemble_op_vinsert(program, tokens, i);
     } else if (tokens.at(i) == "vpush") {
