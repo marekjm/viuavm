@@ -679,6 +679,15 @@ static auto assemble_op_float(Program& program, std::vector<Token> const& tokens
                             resolve_rs_type(tokens.at(target + 1))),
                         stod(tokens.at(source).str()));
 }
+static auto assemble_op_frame(Program& program, std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        Token_index target = i + 1;
+        Token_index source = target + 1;
+
+        program.opframe(
+            assembler::operands::getint(resolveregister(tokens.at(target))),
+            assembler::operands::getint(resolveregister(tokens.at(source))));
+}
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
@@ -958,12 +967,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "function") {
         assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
     } else if (tokens.at(i) == "frame") {
-        Token_index target = i + 1;
-        Token_index source = target + 1;
-
-        program.opframe(
-            assembler::operands::getint(resolveregister(tokens.at(target))),
-            assembler::operands::getint(resolveregister(tokens.at(source))));
+        assemble_op_frame(program, tokens, i);
     } else if (tokens.at(i) == "param") {
         Token_index target = i + 1;
         Token_index source = target + 1;
