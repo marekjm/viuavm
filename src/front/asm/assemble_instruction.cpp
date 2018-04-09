@@ -529,19 +529,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "msg") {
         assemble_op_msg(program, tokens, i);
     } else if (tokens.at(i) == "insert") {
-        Token_index target = i + 1;
-        Token_index key    = target + 2;
-        Token_index source = key + 2;
-
-        program.opinsert(assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(key)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(key + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(source)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        assemble_three_register_op<&Program::opinsert>(program, tokens, i);
     } else if (tokens.at(i) == "remove") {
         assemble_op_remove(program, tokens, i);
     } else if (tokens.at(i) == "return") {
