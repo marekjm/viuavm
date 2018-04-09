@@ -30,6 +30,7 @@
 #include <viua/front/asm.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
+#include <viua/assembler/backend/op_assemblers.h>
 #include <viua/program.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
@@ -46,7 +47,7 @@ using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 using Token      = viua::cg::lex::Token;
-using Token_index = vector<Token>::size_type;
+using viua::assembler::backend::op_assemblers::Token_index;
 
 
 static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
@@ -201,148 +202,6 @@ static auto log_location_being_assembled(const Token& token) -> void {
              << send_control_seq(ATTR_RESET);
         cout << "' instruction\n";
     }
-}
-
-using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
-template<const ShiftOp op>
-static auto assemble_bit_shift_instruction(Program& program,
-                                           const vector<Token>& tokens,
-                                           const Token_index i) -> void {
-    Token_index target = i + 1;
-    Token_index lhs    = target + 2;
-    Token_index rhs    = lhs + 2;
-
-    int_op ret;
-    if (tokens.at(target) == "void") {
-        --lhs;
-        --rhs;
-        ret = assembler::operands::getint(resolveregister(tokens.at(target)));
-    } else {
-        ret = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1)));
-    }
-
-    (program.*op)(ret,
-                  assembler::operands::getint_with_rs_type(
-                      resolveregister(tokens.at(lhs)),
-                      resolve_rs_type(tokens.at(lhs + 1))),
-                  assembler::operands::getint_with_rs_type(
-                      resolveregister(tokens.at(rhs)),
-                      resolve_rs_type(tokens.at(rhs + 1))));
-}
-
-using IncrementOp = Program& (Program::*)(int_op);
-template<IncrementOp const op>
-static auto assemble_increment_instruction(Program& program,
-                                           vector<Token> const& tokens,
-                                           Token_index const i) -> void {
-    Token_index target = i + 1;
-
-    (program.*op)(assembler::operands::getint_with_rs_type(
-        resolveregister(tokens.at(target)),
-        resolve_rs_type(tokens.at(target + 1))));
-}
-
-using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
-template<ArithmeticOp const op>
-static auto assemble_arithmetic_instruction(Program& program,
-                                            vector<Token> const& tokens,
-                                            Token_index const i) -> void {
-    Token_index target = i + 1;
-    Token_index lhs    = target + 2;
-    Token_index rhs    = lhs + 2;
-
-    (program.*op)(assembler::operands::getint_with_rs_type(
-                      resolveregister(tokens.at(target)),
-                      resolve_rs_type(tokens.at(target + 1))),
-                  assembler::operands::getint_with_rs_type(
-                      resolveregister(tokens.at(lhs)),
-                      resolve_rs_type(tokens.at(lhs + 1))),
-                  assembler::operands::getint_with_rs_type(
-                      resolveregister(tokens.at(rhs)),
-                      resolve_rs_type(tokens.at(rhs + 1))));
-}
-
-using Single_register_op = Program& (Program::*)(int_op);
-template<Single_register_op const op>
-static auto assemble_single_register_op(Program& program,
-        std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-
-        (program.*op)(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
-}
-
-using Double_register_op = Program& (Program::*)(int_op, int_op);
-template<Double_register_op const op>
-static auto assemble_double_register_op(Program& program,
-        std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        (program.*op)(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(source)),
-                           resolve_rs_type(tokens.at(source + 1))));
-}
-
-using Three_register_op = Program& (Program::*)(int_op, int_op, int_op);
-template<Three_register_op const op>
-static auto assemble_three_register_op(Program& program,
-        std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-        Token_index rhs    = lhs + 2;
-
-        (program.*op)(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(lhs)),
-                          resolve_rs_type(tokens.at(lhs + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(rhs)),
-                          resolve_rs_type(tokens.at(rhs + 1))));
-}
-
-using Capture_op = Program& (Program::*)(int_op, int_op, int_op);
-template<Capture_op const op>
-static auto assemble_capture_op(Program& program,
-        std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target       = i + 1;
-        Token_index inside_index = target + 2;
-        Token_index source       = inside_index + 1;
-
-        (program.*op)(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
-                          assembler::operands::getint(
-                              resolveregister(tokens.at(inside_index))),
-                          assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(source)),
-                              resolve_rs_type(tokens.at(source + 1))));
-}
-
-using Fn_ctor_op = Program& (Program::*)(int_op, std::string const&);
-template<Fn_ctor_op const op>
-static auto assemble_fn_ctor_op(Program& program,
-        std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        (program.*op)(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
-                          tokens.at(source));
 }
 
 static auto assemble_op_integer(Program& program, std::vector<Token> const& tokens,
@@ -688,6 +547,15 @@ static auto assemble_op_frame(Program& program, std::vector<Token> const& tokens
             assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
             assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(source))));
 }
+
+using viua::assembler::backend::op_assemblers::assemble_single_register_op;
+using viua::assembler::backend::op_assemblers::assemble_double_register_op;
+using viua::assembler::backend::op_assemblers::assemble_three_register_op;
+using viua::assembler::backend::op_assemblers::assemble_capture_op;
+using viua::assembler::backend::op_assemblers::assemble_fn_ctor_op;
+using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
+using viua::assembler::backend::op_assemblers::assemble_increment_instruction;
+using viua::assembler::backend::op_assemblers::assemble_arithmetic_instruction;
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
