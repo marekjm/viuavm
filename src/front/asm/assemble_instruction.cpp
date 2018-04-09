@@ -785,19 +785,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "bits") {
         assemble_op_bits(program, tokens, i);
     } else if (tokens.at(i) == "bitand") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-        Token_index rhs    = lhs + 2;
-
-        program.opbitand(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(lhs)),
-                             resolve_rs_type(tokens.at(lhs + 1))),
-                         assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(rhs)),
-                             resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_three_register_op<&Program::opbitand>(program, tokens, i);
     } else if (tokens.at(i) == "bitor") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
