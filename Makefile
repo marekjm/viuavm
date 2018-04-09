@@ -308,7 +308,6 @@ version:
 	touch src/front/asm.cpp
 	touch src/front/dis.cpp
 	touch src/front/kernel.cpp
-	touch src/front/wdb.cpp
 
 
 ############################################################
