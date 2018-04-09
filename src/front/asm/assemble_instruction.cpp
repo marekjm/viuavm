@@ -493,7 +493,6 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "try") {
         program.optry();
     } else if (tokens.at(i) == "catch") {
-        string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i + 1), tokens.at(i + 2));
     } else if (tokens.at(i) == "draw") {
         Token_index target = i + 1;
