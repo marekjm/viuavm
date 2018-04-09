@@ -33,7 +33,7 @@ using Token_index = std::vector<viua::cg::lex::Token>::size_type;
 
 using Single_register_op = Program& (Program::*)(int_op);
 template<Single_register_op const op>
-static auto assemble_single_register_op(Program& program,
+auto assemble_single_register_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target = i + 1;
@@ -45,7 +45,7 @@ static auto assemble_single_register_op(Program& program,
 
 using Double_register_op = Program& (Program::*)(int_op, int_op);
 template<Double_register_op const op>
-static auto assemble_double_register_op(Program& program,
+auto assemble_double_register_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target = i + 1;
@@ -61,7 +61,7 @@ static auto assemble_double_register_op(Program& program,
 
 using Three_register_op = Program& (Program::*)(int_op, int_op, int_op);
 template<Three_register_op const op>
-static auto assemble_three_register_op(Program& program,
+auto assemble_three_register_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target = i + 1;
@@ -81,7 +81,7 @@ static auto assemble_three_register_op(Program& program,
 
 using Four_register_op = Program& (Program::*)(int_op, int_op, int_op, int_op);
 template<Four_register_op const op>
-static auto assemble_four_register_op(Program& program,
+auto assemble_four_register_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target      = i + 1;
@@ -105,7 +105,7 @@ static auto assemble_four_register_op(Program& program,
 
 using Capture_op = Program& (Program::*)(int_op, int_op, int_op);
 template<Capture_op const op>
-static auto assemble_capture_op(Program& program,
+auto assemble_capture_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target       = i + 1;
@@ -124,7 +124,7 @@ static auto assemble_capture_op(Program& program,
 
 using Fn_ctor_op = Program& (Program::*)(int_op, std::string const&);
 template<Fn_ctor_op const op>
-static auto assemble_fn_ctor_op(Program& program,
+auto assemble_fn_ctor_op(Program& program,
         std::vector<Token> const& tokens,
         Token_index const i) -> void {
         Token_index target = i + 1;
@@ -138,7 +138,7 @@ static auto assemble_fn_ctor_op(Program& program,
 
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
-static auto assemble_bit_shift_instruction(Program& program,
+auto assemble_bit_shift_instruction(Program& program,
                                            const std::vector<Token>& tokens,
                                            const Token_index i) -> void {
     Token_index target = i + 1;
@@ -167,7 +167,7 @@ static auto assemble_bit_shift_instruction(Program& program,
 
 using IncrementOp = Program& (Program::*)(int_op);
 template<IncrementOp const op>
-static auto assemble_increment_instruction(Program& program,
+auto assemble_increment_instruction(Program& program,
                                            std::vector<Token> const& tokens,
                                            Token_index const i) -> void {
     Token_index target = i + 1;
@@ -179,7 +179,7 @@ static auto assemble_increment_instruction(Program& program,
 
 using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
 template<ArithmeticOp const op>
-static auto assemble_arithmetic_instruction(Program& program,
+auto assemble_arithmetic_instruction(Program& program,
                                             std::vector<Token> const& tokens,
                                             Token_index const i) -> void {
     Token_index target = i + 1;
