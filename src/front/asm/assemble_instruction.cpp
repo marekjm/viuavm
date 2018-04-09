@@ -769,15 +769,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "vinsert") {
         assemble_op_vinsert(program, tokens, i);
     } else if (tokens.at(i) == "vpush") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opvpush(assembler::operands::getint_with_rs_type(
-                            resolveregister(tokens.at(target)),
-                            resolve_rs_type(tokens.at(target + 1))),
-                        assembler::operands::getint_with_rs_type(
-                            resolveregister(tokens.at(source)),
-                            resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::opvpush>(program, tokens, i);
     } else if (tokens.at(i) == "vpop") {
         assemble_op_vpop(program, tokens, i);
     } else if (tokens.at(i) == "vat") {
