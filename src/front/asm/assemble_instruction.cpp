@@ -504,14 +504,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {
-        if (tokens.at(i + 1).str().at(0) == '*'
-            or tokens.at(i + 1).str().at(0) == '%') {
-            program.optailcall(assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(i + 1)),
-                ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
-        } else {
-            program.optailcall(tokens.at(i + 1));
-        }
+        viua::assembler::backend::op_assemblers::assemble_no_result_call_op<&Program::optailcall, &Program::optailcall>(program, tokens, i);
     } else if (tokens.at(i) == "defer") {
         viua::assembler::backend::op_assemblers::assemble_no_result_call_op<&Program::opdefer, &Program::opdefer>(program, tokens, i);
     } else if (tokens.at(i) == "process") {
