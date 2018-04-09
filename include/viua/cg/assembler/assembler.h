@@ -33,6 +33,11 @@
 
 namespace assembler {
 namespace operands {
+
+auto resolve_register(viua::cg::lex::Token const,
+                              bool const allow_bare_integers = false) -> std::string;
+auto resolve_rs_type(viua::cg::lex::Token const) -> viua::internals::RegisterSets;
+
 auto getint(const std::string& s, const bool = false) -> int_op;
 auto getint_with_rs_type(const std::string&,
                          const viua::internals::RegisterSets,

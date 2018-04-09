@@ -102,16 +102,16 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
         addr, jump_type);
 }
 
-static string resolveregister(Token token,
-                              const bool allow_bare_integers = false) {
+auto ::assembler::operands::resolve_register(Token const token,
+                              bool const allow_bare_integers) -> std::string {
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
      *  This function MUST return string as teh result is further passed to
      * assembler::operands::getint() function which *expects* string.
      */
-    ostringstream out;
-    string reg = token.str();
+    auto out = ostringstream{};
+    auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
          * everything is still nice and simple.
@@ -155,7 +155,7 @@ static string resolveregister(Token token,
     return out.str();
 }
 
-static viua::internals::RegisterSets resolve_rs_type(Token token) {
+auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internals::RegisterSets {
     if (token == "current") {
         return viua::internals::RegisterSets::CURRENT;
     } else if (token == "local") {
@@ -351,10 +351,10 @@ static auto assemble_op_integer(Program& program, std::vector<Token> const& toke
     Token_index source = target + 2;
 
     program.opinteger(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
+                          ::assembler::operands::resolve_register(tokens.at(target)),
+                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                       assembler::operands::getint(
-                          resolveregister(tokens.at(source), true), true));
+                          ::assembler::operands::resolve_register(tokens.at(source), true), true));
 }
 static auto assemble_op_vinsert(Program& program, std::vector<Token> const& tokens,
         Token_index const i) -> void {
@@ -365,19 +365,19 @@ static auto assemble_op_vinsert(Program& program, std::vector<Token> const& toke
     auto position_op = int_op{};
     if (tokens.at(position) == "void") {
         position_op = assembler::operands::getint(
-            resolveregister(tokens.at(position)));
+            ::assembler::operands::resolve_register(tokens.at(position)));
     } else {
         position_op = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(position)),
-            resolve_rs_type(tokens.at(position + 1)));
+            ::assembler::operands::resolve_register(tokens.at(position)),
+            ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));
     }
 
     program.opvinsert(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
+                          ::assembler::operands::resolve_register(tokens.at(target)),
+                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                       assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(source)),
-                          resolve_rs_type(tokens.at(source + 1))),
+                          ::assembler::operands::resolve_register(tokens.at(source)),
+                          ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
                       position_op);
 }
 static auto assemble_op_vpop(Program& program, std::vector<Token> const& tokens,
@@ -392,24 +392,24 @@ static auto assemble_op_vpop(Program& program, std::vector<Token> const& tokens,
         --source;
         --position;
         target_op =
-            assembler::operands::getint(resolveregister(tokens.at(target)));
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
     } else {
         target_op = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1)));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
     }
 
     source_op = assembler::operands::getint_with_rs_type(
-        resolveregister(tokens.at(source)),
-        resolve_rs_type(tokens.at(source + 1)));
+        ::assembler::operands::resolve_register(tokens.at(source)),
+        ::assembler::operands::resolve_rs_type(tokens.at(source + 1)));
 
     if (tokens.at(position) == "void") {
         position_op = assembler::operands::getint(
-            resolveregister(tokens.at(position)));
+            ::assembler::operands::resolve_register(tokens.at(position)));
     } else {
         position_op = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(position)),
-            resolve_rs_type(tokens.at(position + 1)));
+            ::assembler::operands::resolve_register(tokens.at(position)),
+            ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));
     }
 
     program.opvpop(target_op, source_op, position_op);
@@ -424,17 +424,17 @@ static auto assemble_op_bits(Program& program, std::vector<Token> const& tokens,
         and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
         program.opbits(
             assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1))),
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
             assembler::operands::convert_token_to_bitstring_operand(
                 tokens.at(lhs)));
     } else {
         program.opbits(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
+                           ::assembler::operands::resolve_register(tokens.at(target)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                        assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(lhs)),
-                           resolve_rs_type(tokens.at(lhs + 1))));
+                           ::assembler::operands::resolve_register(tokens.at(lhs)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))));
     }
 }
 static auto assemble_op_bitset(Program& program, std::vector<Token> const& tokens,
@@ -445,22 +445,22 @@ static auto assemble_op_bitset(Program& program, std::vector<Token> const& token
 
     if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
         program.opbitset(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(lhs)),
-                             resolve_rs_type(tokens.at(lhs + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(lhs)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
                          (tokens.at(rhs) == "true"));
     } else {
         program.opbitset(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(lhs)),
-                             resolve_rs_type(tokens.at(lhs + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(lhs)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(rhs)),
-                             resolve_rs_type(tokens.at(rhs + 1))));
+                             ::assembler::operands::resolve_register(tokens.at(rhs)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
     }
 }
 static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
@@ -498,19 +498,19 @@ static auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
     if (tokens.at(target) == "void") {
         --fn;
         ret =
-            assembler::operands::getint(resolveregister(tokens.at(target)));
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
     } else {
         ret = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1)));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
     }
 
     if (tokens.at(fn).str().at(0) == '*'
         or tokens.at(fn).str().at(0) == '%') {
         program.opcall(ret,
                        assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(fn)),
-                           resolve_rs_type(tokens.at(fn + 1))));
+                           ::assembler::operands::resolve_register(tokens.at(fn)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
     } else {
         program.opcall(ret, tokens.at(fn));
     }
@@ -554,7 +554,7 @@ static auto assemble_op_if(Program& program, std::vector<Token> const& tokens,
 
         program.opif(
             assembler::operands::getint_with_rs_type(
-                resolveregister(condition), resolve_rs_type(tokens.at(i + 2))),
+                ::assembler::operands::resolve_register(condition), ::assembler::operands::resolve_rs_type(tokens.at(i + 2))),
             addrt_target,
             addrt_jump_type,
             addrf_target,
@@ -595,23 +595,23 @@ static auto assemble_op_structremove(Program& program, std::vector<Token> const&
         --source;
         --key;
         program.opstructremove(
-            assembler::operands::getint(resolveregister(tokens.at(target))),
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
             assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(source)),
-                resolve_rs_type(tokens.at(source + 1))),
+                ::assembler::operands::resolve_register(tokens.at(source)),
+                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
             assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(key)),
-                resolve_rs_type(tokens.at(key + 1))));
+                ::assembler::operands::resolve_register(tokens.at(key)),
+                ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
     } else {
         program.opstructremove(assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(target)),
-                                   resolve_rs_type(tokens.at(target + 1))),
+                                   ::assembler::operands::resolve_register(tokens.at(target)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                                assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(source)),
-                                   resolve_rs_type(tokens.at(source + 1))),
+                                   ::assembler::operands::resolve_register(tokens.at(source)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
                                assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(key)),
-                                   resolve_rs_type(tokens.at(key + 1))));
+                                   ::assembler::operands::resolve_register(tokens.at(key)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
     }
 }
 static auto assemble_op_msg(Program& program, std::vector<Token> const& tokens,
@@ -623,19 +623,19 @@ static auto assemble_op_msg(Program& program, std::vector<Token> const& tokens,
         if (tokens.at(target) == "void") {
             --fn;
             ret =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
         } else {
             ret = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
         }
 
         if (tokens.at(fn).str().at(0) == '*'
             or tokens.at(fn).str().at(0) == '%') {
             program.opmsg(ret,
                           assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(fn)),
-                              resolve_rs_type(tokens.at(fn + 1))));
+                              ::assembler::operands::resolve_register(tokens.at(fn)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
         } else {
             program.opmsg(ret, tokens.at(fn));
         }
@@ -650,23 +650,23 @@ static auto assemble_op_remove(Program& program, std::vector<Token> const& token
             --source;
             --key;
             program.opremove(
-                assembler::operands::getint(resolveregister(tokens.at(target))),
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
                 assembler::operands::getint_with_rs_type(
-                    resolveregister(tokens.at(source)),
-                    resolve_rs_type(tokens.at(source + 1))),
+                    ::assembler::operands::resolve_register(tokens.at(source)),
+                    ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
                 assembler::operands::getint_with_rs_type(
-                    resolveregister(tokens.at(key)),
-                    resolve_rs_type(tokens.at(key + 1))));
+                    ::assembler::operands::resolve_register(tokens.at(key)),
+                    ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
         } else {
             program.opremove(assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(target)),
-                                 resolve_rs_type(tokens.at(target + 1))),
+                                 ::assembler::operands::resolve_register(tokens.at(target)),
+                                 ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                              assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(source)),
-                                 resolve_rs_type(tokens.at(source + 1))),
+                                 ::assembler::operands::resolve_register(tokens.at(source)),
+                                 ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
                              assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(key)),
-                                 resolve_rs_type(tokens.at(key + 1))));
+                                 ::assembler::operands::resolve_register(tokens.at(key)),
+                                 ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
         }
 }
 static auto assemble_op_float(Program& program, std::vector<Token> const& tokens,
@@ -675,8 +675,8 @@ static auto assemble_op_float(Program& program, std::vector<Token> const& tokens
         Token_index source = target + 2;
 
         program.opfloat(assembler::operands::getint_with_rs_type(
-                            resolveregister(tokens.at(target)),
-                            resolve_rs_type(tokens.at(target + 1))),
+                            ::assembler::operands::resolve_register(tokens.at(target)),
+                            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                         stod(tokens.at(source).str()));
 }
 static auto assemble_op_frame(Program& program, std::vector<Token> const& tokens,
@@ -685,8 +685,8 @@ static auto assemble_op_frame(Program& program, std::vector<Token> const& tokens
         Token_index source = target + 1;
 
         program.opframe(
-            assembler::operands::getint(resolveregister(tokens.at(target))),
-            assembler::operands::getint(resolveregister(tokens.at(source))));
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(source))));
 }
 
 viua::internals::types::bytecode_size assemble_instruction(
@@ -746,22 +746,22 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index source = target + 2;
 
         program.opstring(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(source));
     } else if (tokens.at(i) == "text") {
         Token_index target = i + 1;
         Token_index source = target + 2;
 
         auto target_operand = assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1)));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
         if (tokens.at(source).str().at(0) == '*'
             or tokens.at(source).str().at(0) == '%') {
             program.optext(target_operand,
                            assembler::operands::getint_with_rs_type(
-                               resolveregister(tokens.at(source)),
-                               resolve_rs_type(tokens.at(source + 1))));
+                               ::assembler::operands::resolve_register(tokens.at(source)),
+                               ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
         } else {
             program.optext(target_operand, tokens.at(source));
         }
@@ -776,17 +776,17 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index end_index   = begin_index + 2;
 
         program.optextsub(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
+                              ::assembler::operands::resolve_register(tokens.at(target)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                           assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(source)),
-                              resolve_rs_type(tokens.at(source + 1))),
+                              ::assembler::operands::resolve_register(tokens.at(source)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
                           assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(begin_index)),
-                              resolve_rs_type(tokens.at(begin_index + 1))),
+                              ::assembler::operands::resolve_register(tokens.at(begin_index)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(begin_index + 1))),
                           assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(end_index)),
-                              resolve_rs_type(tokens.at(end_index + 1))));
+                              ::assembler::operands::resolve_register(tokens.at(end_index)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(end_index + 1))));
     } else if (tokens.at(i) == "textlength") {
         assemble_double_register_op<&Program::optextlength>(program, tokens, i);
     } else if (tokens.at(i) == "textcommonprefix") {
@@ -801,13 +801,13 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index pack_range_count = pack_range_start + 2;
 
         program.opvector(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(pack_range_start)),
-                             resolve_rs_type(tokens.at(pack_range_start + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(pack_range_start)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(pack_range_start + 1))),
                          assembler::operands::getint(
-                             resolveregister(tokens.at(pack_range_count))));
+                             ::assembler::operands::resolve_register(tokens.at(pack_range_count))));
     } else if (tokens.at(i) == "vinsert") {
         assemble_op_vinsert(program, tokens, i);
     } else if (tokens.at(i) == "vpush") {
@@ -973,19 +973,19 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index source = target + 1;
 
         program.opparam(
-            assembler::operands::getint(resolveregister(tokens.at(target))),
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
             assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(source)),
-                resolve_rs_type(tokens.at(source + 1))));
+                ::assembler::operands::resolve_register(tokens.at(source)),
+                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "pamv") {
         Token_index target = i + 1;
         Token_index source = target + 1;
 
         program.oppamv(
-            assembler::operands::getint(resolveregister(tokens.at(target))),
+            assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
             assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(source)),
-                resolve_rs_type(tokens.at(source + 1))));
+                ::assembler::operands::resolve_register(tokens.at(source)),
+                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "arg") {
         Token_index target = i + 1;
         Token_index source = target + 2;
@@ -993,30 +993,30 @@ viua::internals::types::bytecode_size assemble_instruction(
         if (tokens.at(target) == "void") {
             --source;
             program.oparg(
-                assembler::operands::getint(resolveregister(tokens.at(target))),
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
                 assembler::operands::getint(
-                    resolveregister(tokens.at(source))));
+                    ::assembler::operands::resolve_register(tokens.at(source))));
         } else {
             program.oparg(assembler::operands::getint_with_rs_type(
-                              resolveregister(tokens.at(target)),
-                              resolve_rs_type(tokens.at(target + 1))),
+                              ::assembler::operands::resolve_register(tokens.at(target)),
+                              ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                           assembler::operands::getint(
-                              resolveregister(tokens.at(source))));
+                              ::assembler::operands::resolve_register(tokens.at(source))));
         }
     } else if (tokens.at(i) == "argc") {
         Token_index target = i + 1;
 
         program.opargc(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {
         if (tokens.at(i + 1).str().at(0) == '*'
             or tokens.at(i + 1).str().at(0) == '%') {
             program.optailcall(assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(i + 1)),
-                resolve_rs_type(tokens.at(i + 2))));
+                ::assembler::operands::resolve_register(tokens.at(i + 1)),
+                ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
         } else {
             program.optailcall(tokens.at(i + 1));
         }
@@ -1024,8 +1024,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         if (tokens.at(i + 1).str().at(0) == '*'
             or tokens.at(i + 1).str().at(0) == '%') {
             program.opdefer(assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(i + 1)),
-                resolve_rs_type(tokens.at(i + 2))));
+                ::assembler::operands::resolve_register(tokens.at(i + 1)),
+                ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
         } else {
             program.opdefer(tokens.at(i + 1));
         }
@@ -1037,11 +1037,11 @@ viua::internals::types::bytecode_size assemble_instruction(
         if (tokens.at(target) == "void") {
             --fn;
             ret =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
         } else {
             ret = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
         }
 
         program.opprocess(ret, tokens.at(fn));
@@ -1049,8 +1049,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index target = i + 1;
 
         program.opself(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "join") {
         Token_index target        = i + 1;
         Token_index process       = target + 2;
@@ -1061,30 +1061,30 @@ viua::internals::types::bytecode_size assemble_instruction(
             --process;
             --timeout_index;
             target_operand =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
         } else {
             target_operand = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
         }
 
         timeout_op timeout =
             convert_token_to_timeout_operand(tokens.at(timeout_index));
         program.opjoin(target_operand,
                        assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(process)),
-                           resolve_rs_type(tokens.at(process + 1))),
+                           ::assembler::operands::resolve_register(tokens.at(process)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(process + 1))),
                        timeout);
     } else if (tokens.at(i) == "send") {
         Token_index target = i + 1;
         Token_index source = target + 2;
 
         program.opsend(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
+                           ::assembler::operands::resolve_register(tokens.at(target)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                        assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(source)),
-                           resolve_rs_type(tokens.at(source + 1))));
+                           ::assembler::operands::resolve_register(tokens.at(source)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "receive") {
         Token_index target        = i + 1;
         Token_index timeout_index = target + 2;
@@ -1093,11 +1093,11 @@ viua::internals::types::bytecode_size assemble_instruction(
         if (tokens.at(target) == "void") {
             --timeout_index;
             target_operand =
-                assembler::operands::getint(resolveregister(tokens.at(target)));
+                assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
         } else {
             target_operand = assembler::operands::getint_with_rs_type(
-                resolveregister(tokens.at(target)),
-                resolve_rs_type(tokens.at(target + 1)));
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
         }
 
         timeout_op timeout =
@@ -1119,16 +1119,16 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index target = i + 1;
 
         program.opdraw(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i + 1));
     } else if (tokens.at(i) == "throw") {
         Token_index source = i + 1;
 
         program.opthrow(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(source)),
-            resolve_rs_type(tokens.at(source + 1))));
+            ::assembler::operands::resolve_register(tokens.at(source)),
+            ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "leave") {
         program.opleave();
     } else if (tokens.at(i) == "import") {
@@ -1138,16 +1138,16 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index class_name = target + 2;
 
         program.opclass(assembler::operands::getint_with_rs_type(
-                            resolveregister(tokens.at(target)),
-                            resolve_rs_type(tokens.at(target + 1))),
+                            ::assembler::operands::resolve_register(tokens.at(target)),
+                            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                         tokens.at(class_name));
     } else if (tokens.at(i) == "derive") {
         Token_index target     = i + 1;
         Token_index class_name = target + 2;
 
         program.opderive(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(class_name));
     } else if (tokens.at(i) == "attach") {
         Token_index target        = i + 1;
@@ -1155,23 +1155,23 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index attached_name = fn_name + 1;
 
         program.opattach(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          tokens.at(fn_name),
                          tokens.at(attached_name));
     } else if (tokens.at(i) == "register") {
         Token_index target = i + 1;
 
         program.opregister(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "atom") {
         Token_index target = i + 1;
         Token_index source = target + 2;
 
         program.opatom(assembler::operands::getint_with_rs_type(
-                           resolveregister(tokens.at(target)),
-                           resolve_rs_type(tokens.at(target + 1))),
+                           ::assembler::operands::resolve_register(tokens.at(target)),
+                           ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                        tokens.at(source));
     } else if (tokens.at(i) == "atomeq") {
         Token_index target = i + 1;
@@ -1179,34 +1179,34 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index rhs    = lhs + 2;
 
         program.opatomeq(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(lhs)),
-                             resolve_rs_type(tokens.at(lhs + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(lhs)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(rhs)),
-                             resolve_rs_type(tokens.at(rhs + 1))));
+                             ::assembler::operands::resolve_register(tokens.at(rhs)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "struct") {
         Token_index target = i + 1;
 
         program.opstruct(assembler::operands::getint_with_rs_type(
-            resolveregister(tokens.at(target)),
-            resolve_rs_type(tokens.at(target + 1))));
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "structinsert") {
         Token_index target = i + 1;
         Token_index key    = target + 2;
         Token_index source = key + 2;
 
         program.opstructinsert(assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(target)),
-                                   resolve_rs_type(tokens.at(target + 1))),
+                                   ::assembler::operands::resolve_register(tokens.at(target)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                                assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(key)),
-                                   resolve_rs_type(tokens.at(key + 1))),
+                                   ::assembler::operands::resolve_register(tokens.at(key)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(key + 1))),
                                assembler::operands::getint_with_rs_type(
-                                   resolveregister(tokens.at(source)),
-                                   resolve_rs_type(tokens.at(source + 1))));
+                                   ::assembler::operands::resolve_register(tokens.at(source)),
+                                   ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "structremove") {
         assemble_op_structremove(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
@@ -1214,18 +1214,18 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index source = target + 2;
 
         program.opstructkeys(assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(target)),
-                                 resolve_rs_type(tokens.at(target + 1))),
+                                 ::assembler::operands::resolve_register(tokens.at(target)),
+                                 ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                              assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(source)),
-                                 resolve_rs_type(tokens.at(source + 1))));
+                                 ::assembler::operands::resolve_register(tokens.at(source)),
+                                 ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "new") {
         Token_index target     = i + 1;
         Token_index class_name = target + 2;
 
         program.opnew(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
+                          ::assembler::operands::resolve_register(tokens.at(target)),
+                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                       tokens.at(class_name));
     } else if (tokens.at(i) == "msg") {
         assemble_op_msg(program, tokens, i);
@@ -1235,14 +1235,14 @@ viua::internals::types::bytecode_size assemble_instruction(
         Token_index source = key + 2;
 
         program.opinsert(assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(target)),
-                             resolve_rs_type(tokens.at(target + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(target)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(key)),
-                             resolve_rs_type(tokens.at(key + 1))),
+                             ::assembler::operands::resolve_register(tokens.at(key)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(key + 1))),
                          assembler::operands::getint_with_rs_type(
-                             resolveregister(tokens.at(source)),
-                             resolve_rs_type(tokens.at(source + 1))));
+                             ::assembler::operands::resolve_register(tokens.at(source)),
+                             ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
     } else if (tokens.at(i) == "remove") {
         assemble_op_remove(program, tokens, i);
     } else if (tokens.at(i) == "return") {
