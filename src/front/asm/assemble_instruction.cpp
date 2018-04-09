@@ -936,18 +936,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "capture") {
         assemble_capture_op<&Program::opcapture>(program, tokens, i);
     } else if (tokens.at(i) == "capturecopy") {
-        Token_index target       = i + 1;
-        Token_index inside_index = target + 2;
-        Token_index source       = inside_index + 1;
-
-        program.opcapturecopy(assembler::operands::getint_with_rs_type(
-                                  resolveregister(tokens.at(target)),
-                                  resolve_rs_type(tokens.at(target + 1))),
-                              assembler::operands::getint(
-                                  resolveregister(tokens.at(inside_index))),
-                              assembler::operands::getint_with_rs_type(
-                                  resolveregister(tokens.at(source)),
-                                  resolve_rs_type(tokens.at(source + 1))));
+        assemble_capture_op<&Program::opcapturecopy>(program, tokens, i);
     } else if (tokens.at(i) == "capturemove") {
         Token_index target       = i + 1;
         Token_index inside_index = target + 2;
