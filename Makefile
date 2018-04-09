@@ -25,6 +25,8 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 # Additional flags:
 # 	-Wpadded            -- maybe, but throws errors on current code
 #	-Wsuggest-override  -- definitely, but it is a matter of style so not now
+#	-Wsuggest-final-types	-- ditto
+#	-Wsuggest-final-methods	-- ditto
 #	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
 #	-Winline			-- fails if GCC tries to inline calls that are unlikely and
 #							the code size would grow
@@ -56,8 +58,6 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wunused-const-variable=2 \
 				 -Wduplicated-branches \
 				 -Wduplicated-cond \
-				 -Wsuggest-final-types \
-				 -Wsuggest-final-methods \
 				 -Wconversion \
 				 -Wsign-conversion \
 				 -Wrestrict \
