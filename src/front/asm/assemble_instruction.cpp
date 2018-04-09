@@ -777,15 +777,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "vlen") {
         assemble_double_register_op<&Program::opvlen>(program, tokens, i);
     } else if (tokens.at(i) == "not") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.opnot(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(source)),
-                          resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::opnot>(program, tokens, i);
     } else if (tokens.at(i) == "and") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
