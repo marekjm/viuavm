@@ -104,7 +104,8 @@ COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 
 ifeq ($(CXX), g++)
 COMPILER_FLAGS=$(GENERIC_CXXFLAGS) \
-			   --param max-gcse-memory=135275200
+			   --param max-gcse-memory=134217728
+			   #--param max-gcse-memory=67108864
 SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), g++-7)
 COMPILER_FLAGS=-Wall \
