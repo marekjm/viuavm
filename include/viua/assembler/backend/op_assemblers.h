@@ -136,6 +136,22 @@ auto assemble_fn_ctor_op(Program& program,
                           tokens.at(source));
 }
 
+using No_result_name_call_op = Program& (Program::*)(int_op);
+using No_result_value_call_op = Program& (Program::*)(std::string const&);
+template<No_result_value_call_op const op_name, No_result_name_call_op const op_value>
+auto assemble_no_result_call_op(Program& program,
+        std::vector<Token> const& tokens,
+        Token_index const i) -> void {
+        if (tokens.at(i + 1).str().at(0) == '*'
+            or tokens.at(i + 1).str().at(0) == '%') {
+            (program.*op_value)(::assembler::operands::getint_with_rs_type(
+                ::assembler::operands::resolve_register(tokens.at(i + 1)),
+                ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
+        } else {
+            (program.*op_name)(tokens.at(i + 1));
+        }
+}
+
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 auto assemble_bit_shift_instruction(Program& program,
