@@ -495,11 +495,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "catch") {
         program.opcatch(tokens.at(i + 1), tokens.at(i + 2));
     } else if (tokens.at(i) == "draw") {
-        Token_index target = i + 1;
-
-        program.opdraw(assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(target)),
-            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))));
+        assemble_single_register_op<&Program::opdraw>(program, tokens, i);
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i + 1));
     } else if (tokens.at(i) == "throw") {
