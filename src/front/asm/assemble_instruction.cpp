@@ -805,15 +805,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "ashr") {
         assemble_bit_shift_instruction<&Program::opashr>(program, tokens, i);
     } else if (tokens.at(i) == "rol") {
-        Token_index target = i + 1;
-        Token_index lhs    = target + 2;
-
-        program.oprol(assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(target)),
-                          resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(
-                          resolveregister(tokens.at(lhs)),
-                          resolve_rs_type(tokens.at(lhs + 1))));
+        assemble_double_register_op<&Program::oprol>(program, tokens, i);
     } else if (tokens.at(i) == "ror") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
