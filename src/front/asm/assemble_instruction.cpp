@@ -746,15 +746,7 @@ viua::internals::types::bytecode_size assemble_instruction(
                               resolveregister(tokens.at(end_index)),
                               resolve_rs_type(tokens.at(end_index + 1))));
     } else if (tokens.at(i) == "textlength") {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
-
-        program.optextlength(assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(target)),
-                                 resolve_rs_type(tokens.at(target + 1))),
-                             assembler::operands::getint_with_rs_type(
-                                 resolveregister(tokens.at(source)),
-                                 resolve_rs_type(tokens.at(source + 1))));
+        assemble_double_register_op<&Program::optextlength>(program, tokens, i);
     } else if (tokens.at(i) == "textcommonprefix") {
         Token_index target = i + 1;
         Token_index lhs    = target + 2;
