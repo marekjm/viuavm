@@ -323,7 +323,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "bitor") {
         assemble_three_register_op<&Program::opbitor>(program, tokens, i);
     } else if (tokens.at(i) == "bitnot") {
-        assemble_double_register_op<&Program::opnot>(program, tokens, i);
+        assemble_double_register_op<&Program::opbitnot>(program, tokens, i);
     } else if (tokens.at(i) == "bitxor") {
         assemble_three_register_op<&Program::opbitxor>(program, tokens, i);
     } else if (tokens.at(i) == "bitat") {
