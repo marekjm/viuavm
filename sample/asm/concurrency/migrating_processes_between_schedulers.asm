@@ -24,7 +24,9 @@
     call std::misc::cycle/1
 
     .name: %iota hello
+    .name: %iota exclamation_mark
     text %hello local "Hello "
+    text %exclamation_mark local "!"
 
     .name: %iota something
     arg %something local %0
@@ -34,6 +36,7 @@
 
     .name: %iota to_print
     textconcat %to_print local %hello local %textified local
+    textconcat %to_print local %to_print local %exclamation_mark local
 
     print %to_print local
 
