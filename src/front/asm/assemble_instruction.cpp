@@ -504,14 +504,6 @@ viua::internals::types::bytecode_size assemble_instruction(
         program.opleave();
     } else if (tokens.at(i) == "import") {
         program.opimport(tokens.at(i + 1));
-    } else if (tokens.at(i) == "class") {
-        assemble_fn_ctor_op<&Program::opclass>(program, tokens, i);
-    } else if (tokens.at(i) == "derive") {
-        assemble_fn_ctor_op<&Program::opderive>(program, tokens, i);
-    } else if (tokens.at(i) == "attach") {
-        viua::assembler::backend::op_assemblers::assemble_op_attach(program, tokens, i);
-    } else if (tokens.at(i) == "register") {
-        assemble_single_register_op<&Program::opregister>(program, tokens, i);
     } else if (tokens.at(i) == "atom") {
         assemble_fn_ctor_op<&Program::opatom>(program, tokens, i);
     } else if (tokens.at(i) == "atomeq") {
@@ -524,14 +516,6 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_op_structremove(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
-    } else if (tokens.at(i) == "new") {
-        assemble_fn_ctor_op<&Program::opnew>(program, tokens, i);
-    } else if (tokens.at(i) == "msg") {
-        assemble_op_msg(program, tokens, i);
-    } else if (tokens.at(i) == "insert") {
-        assemble_three_register_op<&Program::opinsert>(program, tokens, i);
-    } else if (tokens.at(i) == "remove") {
-        assemble_op_remove(program, tokens, i);
     } else if (tokens.at(i) == "return") {
         program.opreturn();
     } else if (tokens.at(i) == "halt") {
