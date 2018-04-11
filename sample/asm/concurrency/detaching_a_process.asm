@@ -24,11 +24,15 @@
 
     .name: %iota format_parameters
     .name: %iota n
+    .name: %iota textified
+    .name: %iota to_print
+
     .mark: loop
     if (gte %iota local %counter local %limit local) local after_loop
 
-    frame ^[(param %iota %report_text_format local) (param %iota (vector %format_parameters local (copy %n local %counter local) local %1) local)]
-    print (msg %iota local format/) local
+    text %textified local %counter local
+    textconcat %to_print local %report_text_format local %textified local
+    print %to_print local
 
     iinc %counter local
 
