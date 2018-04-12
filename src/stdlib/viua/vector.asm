@@ -49,22 +49,22 @@
     ;
     .name: 1 limit
     .name: 2 fn
-    arg %limit %0
-    arg %fn %1
+    arg %limit local %0
+    arg %fn local %1
 
     .name: 0 vec
-    vector %vec
+    vector %vec local
 
     .name: 3 counter
     .name: 4 to_push
-    izero %counter
+    izero %counter local
 
     .mark: begin_loop
-    frame ^[(pamv %0 (copy %to_push %counter))]
-    vpush %vec (call %to_push %fn)
-    iinc %counter
+    frame ^[(pamv %0 (copy %to_push local %counter local) local)]
+    vpush %vec local (call %to_push local %fn local) local
+    iinc %counter local
     ; reuse 'to_push' register since it's empty
-    if (gte %to_push %counter %limit) +1 begin_loop
+    if (gte %to_push local %counter local %limit local) local +1 begin_loop
 
     return
 .end

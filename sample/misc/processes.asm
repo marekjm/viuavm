@@ -18,9 +18,25 @@
 ;
 
 .function: run_in_a_process/1
-    echo (string %1 "spawned process ")
-    echo (arg %1 %0)
-    print (string %1 " exiting")
+    arg %1 local %0
+
+    text %2 local "spawned process "
+    text %3 local %1 local
+    textconcat %2 local %2 local %3 local
+
+    print %2 local
+
+    integer %4 local 4000
+    .mark: loop
+    if (not %2 local %4 local) local done +1
+    idec %4 local
+    jump loop
+
+    .mark: done
+
+    text %2 local "exiting process "
+    textconcat %2 local %2 local %3 local
+    print %2 local
     return
 .end
 
@@ -61,11 +77,8 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (integer %1 100000))]
+    frame ^[(param %0 (integer %1 4000))]
     process %1 process_spawner/1
-
-    frame ^[(param %0 %1) (param %1 (integer %2 512))]
-    msg void setPriority/2
 
     join %0 %1
 

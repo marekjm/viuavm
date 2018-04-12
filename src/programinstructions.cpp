@@ -576,14 +576,14 @@ Program& Program::opcapturemove(int_op target_closure,
     return (*this);
 }
 
-Program& Program::opclosure(int_op reg, const string& fn) {
+Program& Program::opclosure(int_op reg, std::string const& fn) {
     /*  Inserts closure instuction.
      */
     addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
     return (*this);
 }
 
-Program& Program::opfunction(int_op reg, const string& fn) {
+Program& Program::opfunction(int_op reg, std::string const& fn) {
     /*  Inserts function instuction.
      */
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
@@ -660,7 +660,7 @@ Program& Program::opcall(int_op reg, int_op fn) {
     return (*this);
 }
 
-Program& Program::optailcall(const string& fn_name) {
+Program& Program::optailcall(std::string const& fn_name) {
     /*  Inserts tailcall instruction.
      *  Byte offset is calculated automatically.
      */
@@ -673,7 +673,7 @@ Program& Program::optailcall(int_op fn) {
     return (*this);
 }
 
-Program& Program::opdefer(const string& fn_name) {
+Program& Program::opdefer(std::string const& fn_name) {
     addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
     return (*this);
 }
@@ -849,7 +849,7 @@ Program& Program::opregister(int_op reg) {
     return (*this);
 }
 
-Program& Program::opatom(int_op reg, string s) {
+Program& Program::opatom(int_op reg, string const& s) {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
 }

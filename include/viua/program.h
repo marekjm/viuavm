@@ -175,9 +175,9 @@ class Program {
     Program& opcapture(int_op, int_op, int_op);
     Program& opcapturecopy(int_op, int_op, int_op);
     Program& opcapturemove(int_op, int_op, int_op);
-    Program& opclosure(int_op, const std::string&);
+    Program& opclosure(int_op, std::string const&);
 
-    Program& opfunction(int_op, const std::string&);
+    Program& opfunction(int_op, std::string const&);
 
     Program& opframe(int_op, int_op);
     Program& opparam(int_op, int_op);
@@ -187,9 +187,9 @@ class Program {
 
     Program& opcall(int_op, const std::string&);
     Program& opcall(int_op, int_op);
-    Program& optailcall(const std::string&);
+    Program& optailcall(std::string const&);
     Program& optailcall(int_op);
-    Program& opdefer(const std::string&);
+    Program& opdefer(std::string const&);
     Program& opdefer(int_op);
     Program& opprocess(int_op, const std::string&);
     Program& opprocess(int_op, int_op);
@@ -219,7 +219,7 @@ class Program {
     Program& opattach(int_op, const std::string&, const std::string&);
     Program& opregister(int_op);
 
-    Program& opatom(int_op, std::string);
+    Program& opatom(int_op, std::string const&);
     Program& opatomeq(int_op, int_op, int_op);
 
     Program& opstruct(int_op);

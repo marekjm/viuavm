@@ -25,7 +25,11 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 # Additional flags:
 # 	-Wpadded            -- maybe, but throws errors on current code
 #	-Wsuggest-override  -- definitely, but it is a matter of style so not now
+#	-Wsuggest-final-types	-- ditto
+#	-Wsuggest-final-methods	-- ditto
 #	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
+#	-Winline			-- fails if GCC tries to inline calls that are unlikely and
+#							the code size would grow
 GENERIC_CXXFLAGS=-Wall \
 				 -Wextra \
 				 -Wctor-dtor-privacy \
@@ -54,12 +58,9 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wunused-const-variable=2 \
 				 -Wduplicated-branches \
 				 -Wduplicated-cond \
-				 -Wsuggest-final-types \
-				 -Wsuggest-final-methods \
 				 -Wconversion \
 				 -Wsign-conversion \
 				 -Wrestrict \
-				 -Winline \
 				 -Wstack-protector \
 				 -Werror \
 				 -Wfatal-errors \
@@ -102,7 +103,9 @@ SANITISER_FLAGS=$(GENERIC_SANITISER_FLAGS)
 COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 
 ifeq ($(CXX), g++)
-COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
+COMPILER_FLAGS=$(GENERIC_CXXFLAGS) \
+			   --param max-gcse-memory=134217728
+			   #--param max-gcse-memory=67108864
 SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), g++-7)
 COMPILER_FLAGS=-Wall \
@@ -139,7 +142,7 @@ CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS) $(CXX_EXTRA_F
 # By default, the VM is compiled using no optimisations.
 # This makes for shorter compile times, but prevents speed-testing the VM.
 # You should run the VM with -O3 every once in a while to see how it's doing.
-CXXOPTIMIZATIONFLAGS=-O0
+CXXOPTIMIZATIONFLAGS=-O2
 COPTIMIZATIONFLAGS=
 
 # Expose symbols in the VM kernel binary to the shared libraries that are linked at runtime.
@@ -305,7 +308,6 @@ version:
 	touch src/front/asm.cpp
 	touch src/front/dis.cpp
 	touch src/front/kernel.cpp
-	touch src/front/wdb.cpp
 
 
 ############################################################
@@ -468,8 +470,33 @@ build/bin/vm/vdb: build/front/wdb.o \
 	$(VIUA_TYPES_FILES_O)
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
+OP_ASSEMBLERS= \
+	build/assembler/backend/op_assemblers/assemble_op_arg.o \
+	build/assembler/backend/op_assemblers/assemble_op_attach.o \
+	build/assembler/backend/op_assemblers/assemble_op_bits.o \
+	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
+	build/assembler/backend/op_assemblers/assemble_op_call.o \
+	build/assembler/backend/op_assemblers/assemble_op_float.o \
+	build/assembler/backend/op_assemblers/assemble_op_frame.o \
+	build/assembler/backend/op_assemblers/assemble_op_if.o \
+	build/assembler/backend/op_assemblers/assemble_op_integer.o \
+	build/assembler/backend/op_assemblers/assemble_op_join.o \
+	build/assembler/backend/op_assemblers/assemble_op_jump.o \
+	build/assembler/backend/op_assemblers/assemble_op_msg.o \
+	build/assembler/backend/op_assemblers/assemble_op_process.o \
+	build/assembler/backend/op_assemblers/assemble_op_receive.o \
+	build/assembler/backend/op_assemblers/assemble_op_remove.o \
+	build/assembler/backend/op_assemblers/assemble_op_string.o \
+	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
+	build/assembler/backend/op_assemblers/assemble_op_join.o \
+	build/assembler/backend/op_assemblers/assemble_op_text.o \
+	build/assembler/backend/op_assemblers/assemble_op_vector.o \
+	build/assembler/backend/op_assemblers/assemble_op_vinsert.o \
+	build/assembler/backend/op_assemblers/assemble_op_vpop.o
+
 build/bin/vm/asm: build/front/asm.o \
 	build/front/asm/generate.o \
+	$(OP_ASSEMBLERS) \
 	build/front/asm/assemble_instruction.o \
 	build/front/asm/gather.o \
 	build/front/asm/decode.o \
