@@ -581,8 +581,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
                 auto death_message = make_unique<viua::types::Object>("Object");
-                unique_ptr<viua::types::Value> exc(
-                    th->transfer_active_exception());
+                auto exc =
+                    th->transfer_active_exception();
+
                 auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args =
                     th->trace().at(0)->arguments.get();
