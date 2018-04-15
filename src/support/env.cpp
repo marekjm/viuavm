@@ -17,7 +17,6 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <sstream>
 #include <viua/support/env.h>
 using namespace std;
@@ -84,7 +83,6 @@ auto get_mod_path(string const& module,
             oss << getenv("HOME") << path.substr(1);
             path = oss.str();
         }
-        std::cerr << path << std::endl;
 
         if ((found = support::env::is_file(path))) {
             break;
