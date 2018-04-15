@@ -18,15 +18,20 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) %0
-    remove (.name: %iota exception) %1 (string %exception "exception")
-    remove (.name: %iota aborted_function) %1 (string %aborted_function "function")
+    .name: %iota death_message
+    .name: %iota exception
+    .name: %iota aborted_function
 
-    echo (string (.name: %iota message) "[WARNING] process '")
-    echo %aborted_function
-    echo (string %message "' killed by >>>")
-    echo %exception
-    print (string %message "<<<")
+    arg %death_message local %0
+    structremove %exception local %death_message local (atom %exception local 'exception') local
+    structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
+
+    .name: %iota message
+    echo (string %message local "[WARNING] process '") local
+    echo %aborted_function local
+    echo (string %message local "' killed by >>>") local
+    echo %exception local
+    print (string %message local "<<<") local
 
     return
 .end

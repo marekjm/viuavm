@@ -33,7 +33,7 @@
     arg (.name: %iota death_message) local %0
 
     .name: %iota exception
-    remove %exception local %death_message local (string %exception local "exception") local
+    structremove %exception local %death_message local (atom %exception local 'exception') local
     print %exception local
 
     return
