@@ -27,6 +27,7 @@
 #include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
+#include <viua/types/struct.h>
 #include <viua/types/exception.h>
 #include <viua/types/function.h>
 #include <viua/types/pointer.h>
@@ -611,12 +612,12 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                          exc->str());
 #endif
 
-                auto death_message = make_unique<viua::types::Object>("Object");
-                death_message->set("function",
+                auto death_message = make_unique<viua::types::Struct>();
+                death_message->insert("function",
                                    make_unique<viua::types::Function>(
                                        th->trace().at(0)->function_name));
-                death_message->set("exception", std::move(exc));
-                death_message->set("parameters", std::move(parameters));
+                death_message->insert("exception", std::move(exc));
+                death_message->insert("parameters", std::move(parameters));
 
                 auto death_frame = make_unique<Frame>(nullptr, 1);
                 death_frame->arguments->set(0, std::move(death_message));
