@@ -580,7 +580,6 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                auto death_message = make_unique<viua::types::Object>("Object");
                 auto exc =
                     th->transfer_active_exception();
 
@@ -601,6 +600,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                          exc->str());
 #endif
 
+                auto death_message = make_unique<viua::types::Object>("Object");
                 death_message->set("function",
                                    make_unique<viua::types::Function>(
                                        th->trace().at(0)->function_name));
