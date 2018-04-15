@@ -18,21 +18,29 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) %0
-    remove (.name: %iota exception) %1 (string %exception "exception")
-    remove (.name: %iota aborted_function) %1 (string %aborted_function "function")
-    remove (.name: %iota parameters) %1 (string %parameters "parameters")
+    .name: %iota death_message
+    .name: %iota exception
+    .name: %iota aborted_function
+    .name: %iota parameters
+
+    arg %death_message local %0
+    structremove %exception local %death_message local (atom %exception local 'exception') local
+    structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
+    structremove %parameters local %death_message local (atom %parameters local 'parameters') local
 
     .name: %iota message
-    echo (string %message "[WARNING] process '")
-    echo %aborted_function
-    echo %parameters
-    echo (string %message "' killed by >>>")
-    echo %exception
-    print (string %message "<<<")
+    echo (string %message local "[WARNING] process '") local
+    echo %aborted_function local
+    echo %parameters local
+    echo (string %message local "' killed by >>>") local
+    echo %exception local
+    print (string %message local "<<<") local
 
-    copy (.name: %iota i) *(vat %i %parameters (integer %iota 1))
-    frame ^[(param %0 *(vat %message %parameters (integer %iota 0))) (param %1 (iinc %i))]
+    .name: %iota i
+    vat %i local %parameters local (integer %iota local 1) local
+    copy %i local *i local
+    vat %message local %parameters local (integer %iota local 0) local
+    frame ^[(param %0 *message local) (param %1 (iinc %i local) local)]
     process void a_division_executing_process/2
 
     return

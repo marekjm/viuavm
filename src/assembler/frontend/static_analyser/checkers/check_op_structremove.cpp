@@ -38,7 +38,7 @@ auto check_op_structremove(Register_usage_profile& register_usage_profile,
     }
 
     if (target) {
-        check_use_of_register(register_usage_profile, *target);
+        check_if_name_resolved(register_usage_profile, *target);
     }
 
     auto source = get_operand<RegisterIndex>(instruction, 1);

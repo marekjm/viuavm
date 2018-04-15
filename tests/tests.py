@@ -1697,14 +1697,8 @@ class ObjectInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/objects'
 
-    def testInsertRemoveInstructions(self):
-        runTestReturnsIntegers(self, 'basic_insert_remove.asm', [42, 42])
-
     def testInsertMoves(self):
         runTest(self, 'insert_moves.asm', 'true')
-
-    def testMoveSemanticsForInsertAndRemove(self):
-        runTest(self, 'move_semantics.asm', custom_assert=partiallyAppliedSameLines(2))
 
 
 class StaticLinkingTests(unittest.TestCase):
@@ -1895,9 +1889,6 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testInsertFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'insert_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:48: error: insert from empty register: value := 3")
-
-    def testRemoveKeyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:41: error: remove key from empty register: key := 3")
 
     def testRemoveFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'remove_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:20: error: remove from empty register: source := 2")
@@ -2127,26 +2118,6 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testVlenOnEmptyRegister(self):
         runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', './sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:13: error: use of empty current register "1"')
-
-    @unittest.skip('deprecated OO instructions')
-    def testInsertIntoEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_into_empty_register.asm', './sample/asm/static_analysis_errors/insert_into_empty_register.asm:23:12: error: insert into empty current register "1" (named "target")')
-
-    @unittest.skip('deprecated OO instructions')
-    def testInsertKeyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_key_from_empty_register.asm', './sample/asm/static_analysis_errors/insert_key_from_empty_register.asm:23:28: error: insert key from empty current register "2" (named "key")')
-
-    @unittest.skip('deprecated OO instructions')
-    def testInsertFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_from_empty_register.asm', './sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:48: error: insert from empty current register "3" (named "value")')
-
-    @unittest.skip('deprecated OO instructions')
-    def testRemoveKeyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', './sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:41: error: remove key from empty current register "3" (named "key")')
-
-    @unittest.skip('deprecated OO instructions')
-    def testRemoveFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'remove_from_empty_register.asm', './sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:20: error: remove from empty current register "2" (named "source")')
 
     def testPointerFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', './sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:12: error: pointer from empty current register "1"')
@@ -2757,9 +2728,6 @@ class KeywordVoidTests(unittest.TestCase):
 
     def testVoidInReceive(self):
         runTest(self, 'in_receive.asm', '')
-
-    def testRemoveVoidTarget(self):
-        runTest(self, 'remove_void_target.asm', 'Object#{}')
 
     def testVpopVoidTarget(self):
         runTest(self, 'vpop_void_target.asm', '[]')

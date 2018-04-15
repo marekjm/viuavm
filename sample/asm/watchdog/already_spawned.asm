@@ -21,10 +21,10 @@
     arg (.name: %iota death_message) %0
 
     .name: %iota exception
-    remove %exception %1 (string %exception "exception")
+    structremove %exception %1 (atom %exception 'exception')
 
     .name: %iota aborted_function
-    remove %aborted_function %1 (string %aborted_function "function")
+    structremove %aborted_function %1 (atom %aborted_function 'function')
 
     echo (string (.name: %iota message) "process spawned with <")
     echo %aborted_function

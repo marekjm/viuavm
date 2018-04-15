@@ -27,6 +27,7 @@
 #include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
+#include <viua/types/struct.h>
 #include <viua/types/exception.h>
 #include <viua/types/function.h>
 #include <viua/types/pointer.h>
@@ -580,9 +581,19 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                auto death_message = make_unique<viua::types::Object>("Object");
-                unique_ptr<viua::types::Value> exc(
-                    th->transfer_active_exception());
+                if (th->trace().at(0)->function_name == th->watchdog()) {
+#if VIUA_VM_DEBUG_LOG
+                    viua_err("[sched:vps:died:in-watchdog] pid = ",
+                             th->pid().get(),
+                             "; process reaped, death cause: ",
+                             exc->str());
+#endif
+
+                    print_stack_trace(th);
+                    dead_processes_list.emplace_back(std::move(processes.at(i)));
+                    continue;
+                }
+
                 auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args =
                     th->trace().at(0)->arguments.get();
@@ -600,11 +611,14 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                          exc->str());
 #endif
 
-                death_message->set("function",
+                auto death_message = make_unique<viua::types::Struct>();
+                death_message->insert("function",
                                    make_unique<viua::types::Function>(
                                        th->trace().at(0)->function_name));
-                death_message->set("exception", std::move(exc));
-                death_message->set("parameters", std::move(parameters));
+                auto exc =
+                    th->transfer_active_exception();
+                death_message->insert("exception", std::move(exc));
+                death_message->insert("parameters", std::move(parameters));
 
                 auto death_frame = make_unique<Frame>(nullptr, 1);
                 death_frame->arguments->set(0, std::move(death_message));
