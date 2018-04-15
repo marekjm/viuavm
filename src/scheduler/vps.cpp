@@ -580,8 +580,19 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
+
                 auto exc =
                     th->transfer_active_exception();
+                if (th->trace().at(0)->function_name == th->watchdog()) {
+#if VIUA_VM_DEBUG_LOG
+                    viua_err("[sched:vps:died:in-watchdog] pid = ",
+                             th->pid().get(),
+                             "; process reaped, death cause: ",
+                             exc->str());
+#endif
+                    dead_processes_list.emplace_back(std::move(processes.at(i)));
+                    continue;
+                }
 
                 auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args =
