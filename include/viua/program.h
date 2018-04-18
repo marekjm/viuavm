@@ -214,11 +214,6 @@ class Program {
 
     Program& opimport(std::string);
 
-    Program& opclass(int_op, const std::string&);
-    Program& opderive(int_op, const std::string&);
-    Program& opattach(int_op, const std::string&, const std::string&);
-    Program& opregister(int_op);
-
     Program& opatom(int_op, std::string const&);
     Program& opatomeq(int_op, int_op, int_op);
 
@@ -226,12 +221,6 @@ class Program {
     Program& opstructinsert(int_op, int_op, int_op);
     Program& opstructremove(int_op, int_op, int_op);
     Program& opstructkeys(int_op, int_op);
-
-    Program& opnew(int_op, const std::string&);
-    Program& opmsg(int_op, const std::string&);
-    Program& opmsg(int_op, int_op);
-    Program& opinsert(int_op, int_op, int_op);
-    Program& opremove(int_op, int_op, int_op);
 
     Program& opreturn();
     Program& ophalt();

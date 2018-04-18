@@ -186,11 +186,6 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
 
     {IMPORT, "import"},
 
-    {CLASS, "class"},
-    {DERIVE, "derive"},
-    {ATTACH, "attach"},
-    {REGISTER, "register"},
-
     {ATOM, "atom"},
     {ATOMEQ, "atomeq"},
 
@@ -198,11 +193,6 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {STRUCTINSERT, "structinsert"},
     {STRUCTREMOVE, "structremove"},
     {STRUCTKEYS, "structkeys"},
-
-    {NEW, "new"},
-    {MSG, "msg"},
-    {INSERT, "insert"},
-    {REMOVE, "remove"},
 
     {RETURN, "return"},
     {HALT, "halt"},

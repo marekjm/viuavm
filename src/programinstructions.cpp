@@ -818,37 +818,6 @@ Program& Program::opimport(string module_name) {
     return (*this);
 }
 
-Program& Program::opclass(int_op reg, const string& class_name) {
-    /*  Inserts class instuction.
-     */
-    addr_ptr = cg::bytecode::opclass(addr_ptr, reg, class_name);
-    return (*this);
-}
-
-Program& Program::opderive(int_op reg, const string& base_class_name) {
-    /*  Inserts derive instuction.
-     */
-    addr_ptr = cg::bytecode::opderive(addr_ptr, reg, base_class_name);
-    return (*this);
-}
-
-Program& Program::opattach(int_op reg,
-                           const string& function_name,
-                           const string& method_name) {
-    /*  Inserts attach instuction.
-     */
-    addr_ptr =
-        cg::bytecode::opattach(addr_ptr, reg, function_name, method_name);
-    return (*this);
-}
-
-Program& Program::opregister(int_op reg) {
-    /*  Inserts register instuction.
-     */
-    addr_ptr = cg::bytecode::opregister(addr_ptr, reg);
-    return (*this);
-}
-
 Program& Program::opatom(int_op reg, string const& s) {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
@@ -876,35 +845,6 @@ Program& Program::opstructremove(int_op target, int_op key, int_op source) {
 
 Program& Program::opstructkeys(int_op a, int_op b) {
     addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
-    return (*this);
-}
-
-Program& Program::opnew(int_op reg, const string& class_name) {
-    addr_ptr = cg::bytecode::opnew(addr_ptr, reg, class_name);
-    return (*this);
-}
-
-Program& Program::opmsg(int_op reg, const string& method_name) {
-    /*  Inserts msg instuction.
-     */
-    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
-    return (*this);
-}
-
-Program& Program::opmsg(int_op reg, int_op method_name) {
-    /*  Inserts msg instuction.
-     */
-    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
-    return (*this);
-}
-
-Program& Program::opinsert(int_op target, int_op key, int_op source) {
-    addr_ptr = cg::bytecode::opinsert(addr_ptr, target, key, source);
-    return (*this);
-}
-
-Program& Program::opremove(int_op target, int_op key, int_op source) {
-    addr_ptr = cg::bytecode::opremove(addr_ptr, target, key, source);
     return (*this);
 }
 

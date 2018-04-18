@@ -91,9 +91,6 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     {"capture", &Program::opcapture},
     {"capturecopy", &Program::opcapturecopy},
     {"capturemove", &Program::opcapturemove},
-
-    {"insert", &Program::opinsert},
-    {"remove", &Program::opremove},
 };
 
 

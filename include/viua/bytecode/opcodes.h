@@ -375,11 +375,6 @@ enum OPCODE : viua::internals::types::byte {
 
     IMPORT,  // dynamically link code modules
 
-    CLASS,     // create a prototype for new class
-    DERIVE,    // derive a prototype from an existing class
-    ATTACH,    // attach a method to the prototype
-    REGISTER,  // register a prototype in VM's typesystem
-
     /*
      *  Create an atom.
      *  Atoms can be compared for equality, and encode symbols (function names,
@@ -426,12 +421,6 @@ enum OPCODE : viua::internals::types::byte {
      *  structkeys {result} {source-struct-register}
      */
     STRUCTKEYS,
-
-    NEW,  // construct new instance of a class in a register
-    MSG,  // send a message to an object (used for dynamic dispatch, for static
-          // use plain "CALL")
-    INSERT,  // insert an object as a value of an attribute of another object
-    REMOVE,  // remove an attribute from an object
 
     RETURN,
     HALT,

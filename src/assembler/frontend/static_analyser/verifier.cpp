@@ -186,14 +186,14 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == TAILCALL or opcode == DEFER
-                        or opcode == PROCESS or opcode == FRAME or opcode == MSG
+                        or opcode == PROCESS or opcode == FRAME
                         or opcode == RETURN or opcode == LEAVE
                         or opcode == THROW)) {
                     continue;
                 }
 
                 if (opcode == CALL or opcode == TAILCALL or opcode == DEFER
-                    or opcode == PROCESS or opcode == MSG) {
+                    or opcode == PROCESS) {
                     --balance;
                 } else if (opcode == FRAME) {
                     ++balance;
@@ -245,7 +245,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
-                        or opcode == MSG or opcode == FRAME)) {
+                        or opcode == FRAME)) {
                     continue;
                 }
 
@@ -267,7 +267,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
 
                 viua::assembler::frontend::parser::Operand* operand = nullptr;
                 Token operand_token;
-                if (opcode == CALL or opcode == PROCESS or opcode == MSG) {
+                if (opcode == CALL or opcode == PROCESS) {
                     operand = instruction->operands.at(1).get();
                 } else if (opcode == DEFER) {
                     operand = instruction->operands.at(0).get();
@@ -300,14 +300,6 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                     throw InvalidSyntax(operand->tokens.at(0),
                                         "invalid operand: expected function "
                                         "name, atom, or register index");
-                }
-
-                if (opcode == MSG and frame_parameters_count == 0) {
-                    throw InvalidSyntax(
-                        instruction->tokens.at(0),
-                        "invalid number of parameters in dynamic dispatch")
-                        .note("expected at least 1 parameter, got 0")
-                        .add(operand->tokens.at(0));
                 }
 
                 auto arity =
@@ -352,7 +344,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 }
 
                 auto opcode = instruction->opcode;
-                if (not(opcode == CALL or opcode == PROCESS or opcode == MSG
+                if (not(opcode == CALL or opcode == PROCESS
                         or opcode == DEFER or opcode == FRAME or opcode == PARAM
                         or opcode == PAMV)) {
                     continue;

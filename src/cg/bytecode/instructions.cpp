@@ -1060,38 +1060,6 @@ auto opimport(viua::internals::types::byte* addr_ptr, const string& module_name)
                          module_name.substr(1, module_name.size() - 2));
 }
 
-auto opclass(viua::internals::types::byte* addr_ptr,
-             int_op reg,
-             const string& class_name) -> viua::internals::types::byte* {
-    *(addr_ptr++) = CLASS;
-    addr_ptr      = insert_ri_operand(addr_ptr, reg);
-    return insert_string(addr_ptr, class_name);
-}
-
-auto opderive(viua::internals::types::byte* addr_ptr,
-              int_op reg,
-              const string& base_class_name) -> viua::internals::types::byte* {
-    *(addr_ptr++) = DERIVE;
-    addr_ptr      = insert_ri_operand(addr_ptr, reg);
-    return insert_string(addr_ptr, base_class_name);
-}
-
-auto opattach(viua::internals::types::byte* addr_ptr,
-              int_op reg,
-              const string& function_name,
-              const string& method_name) -> viua::internals::types::byte* {
-    *(addr_ptr++) = ATTACH;
-    addr_ptr      = insert_ri_operand(addr_ptr, reg);
-    addr_ptr      = insert_string(addr_ptr, function_name);
-    return insert_string(addr_ptr, method_name);
-}
-
-auto opregister(viua::internals::types::byte* addr_ptr, int_op regno)
-    -> viua::internals::types::byte* {
-    *(addr_ptr++) = REGISTER;
-    return insert_ri_operand(addr_ptr, regno);
-}
-
 auto opatom(viua::internals::types::byte* addr_ptr, int_op reg, string s)
     -> viua::internals::types::byte* {
     *(addr_ptr++) = ATOM;
@@ -1132,42 +1100,6 @@ auto opstructkeys(viua::internals::types::byte* addr_ptr,
                   int_op target,
                   int_op source) -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, STRUCTKEYS, target, source);
-}
-
-auto opnew(viua::internals::types::byte* addr_ptr,
-           int_op reg,
-           const string& class_name) -> viua::internals::types::byte* {
-    *(addr_ptr++) = NEW;
-    addr_ptr      = insert_ri_operand(addr_ptr, reg);
-    return insert_string(addr_ptr, class_name);
-}
-
-auto opmsg(viua::internals::types::byte* addr_ptr,
-           int_op reg,
-           const string& method_name) -> viua::internals::types::byte* {
-    *(addr_ptr++) = MSG;
-    addr_ptr      = insert_ri_operand(addr_ptr, reg);
-    return insert_string(addr_ptr, method_name);
-}
-
-auto opmsg(viua::internals::types::byte* addr_ptr,
-           int_op reg,
-           int_op method_name) -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, MSG, reg, method_name);
-}
-
-auto opinsert(viua::internals::types::byte* addr_ptr,
-              int_op rega,
-              int_op regb,
-              int_op regr) -> viua::internals::types::byte* {
-    return insert_three_ri_instruction(addr_ptr, INSERT, rega, regb, regr);
-}
-
-auto opremove(viua::internals::types::byte* addr_ptr,
-              int_op rega,
-              int_op regb,
-              int_op regr) -> viua::internals::types::byte* {
-    return insert_three_ri_instruction(addr_ptr, REMOVE, rega, regb, regr);
 }
 
 auto opreturn(viua::internals::types::byte* addr_ptr)

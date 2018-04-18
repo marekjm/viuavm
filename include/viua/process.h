@@ -445,11 +445,6 @@ class Process {
     viua::internals::types::byte* opthrow(viua::internals::types::byte*);
     viua::internals::types::byte* opleave(viua::internals::types::byte*);
 
-    viua::internals::types::byte* opclass(viua::internals::types::byte*);
-    viua::internals::types::byte* opderive(viua::internals::types::byte*);
-    viua::internals::types::byte* opattach(viua::internals::types::byte*);
-    viua::internals::types::byte* opregister(viua::internals::types::byte*);
-
     viua::internals::types::byte* opatom(viua::internals::types::byte*);
     viua::internals::types::byte* opatomeq(viua::internals::types::byte*);
 
@@ -457,11 +452,6 @@ class Process {
     viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
     viua::internals::types::byte* opstructremove(viua::internals::types::byte*);
     viua::internals::types::byte* opstructkeys(viua::internals::types::byte*);
-
-    viua::internals::types::byte* opnew(viua::internals::types::byte*);
-    viua::internals::types::byte* opmsg(viua::internals::types::byte*);
-    viua::internals::types::byte* opinsert(viua::internals::types::byte*);
-    viua::internals::types::byte* opremove(viua::internals::types::byte*);
 
     viua::internals::types::byte* opimport(viua::internals::types::byte*);
 
