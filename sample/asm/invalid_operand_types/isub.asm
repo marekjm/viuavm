@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,10 +18,10 @@
 ;
 
 .function: main/1
-    integer %1 1
-    string %2 "Hello World!"
-    sub %3 %1 %2
-    print %3
+    integer %1 local 1
+    string %2 local "Hello World!"
+    sub %3 local %1 local %2 local
+    print %3 local
 
     izero %0 local
     return

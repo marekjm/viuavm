@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#   Copyright (C) 2015, 2016, 2017 Marek Marecki
+#   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 #
 #   This file is part of Viua VM.
 #
@@ -1430,15 +1430,6 @@ class PointersTests(unittest.TestCase):
     def testIf(self):
         runTest(self, 'if.asm', 'Nope')
 
-    def testInsertPointerDereference(self):
-        runTestSplitlines(self, 'insert_pointer_dereference.asm', ['Object#{foo: "bar"}', 'bar'])
-
-    def testInsertPointerDereferenceAsKey(self):
-        runTest(self, 'insert_pointer_dereference_as_key.asm', 'Object#{foo: "bar"}')
-
-    def testInsertPointerDereferenceAsTarget(self):
-        runTest(self, 'insert_pointer_dereference_as_target.asm', 'Object#{foo: "bar"}')
-
     def testVinsertPointerDereferenceAsSource(self):
         runTestSplitlines(self, 'vinsert_pointer_dereference_as_source.asm', ['[0]', '0'])
 
@@ -1527,7 +1518,7 @@ class FunctionTests(unittest.TestCase):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)], assembly_opts=('--no-sa',))
 
     def testCallWithPassByMove(self):
-        runTest(self, 'pass_by_move.asm', None, custom_assert=partiallyAppliedSameLines(3))
+        runTestSplitlines(self, 'pass_by_move.asm', ['42', '42', '42',])
 
     @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
     def testNeverendingFunction(self):
@@ -1644,61 +1635,67 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
         runTestThrowsException(self, 'idiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILT(self):
-        runTestThrowsException(self, 'ilt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
+        runTestThrowsException(self, 'ilt.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILTE(self):
-        runTestThrowsException(self, 'ilte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'ilte.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testIGT(self):
-        runTestThrowsException(self, 'igt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'igt.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testIGTE(self):
-        runTestThrowsException(self, 'igte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'igte.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testIEQ(self):
-        runTestThrowsException(self, 'ieq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'ieq.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testIINC(self):
-        runTestThrowsException(self, 'iinc.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Foo'",))
+        runTestThrowsException(self, 'iinc.asm',
+                ('Exception', "fetched invalid type: expected 'Integer' but got 'Text'",))
 
     def testIDEC(self):
         runTestThrowsException(self, 'idec.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Function'",))
 
     def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fadd.asm',
+        ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fsub.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fmul.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fdiv.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFLT(self):
-        runTestThrowsException(self, 'flt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'flt.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'flte.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fgt.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
+        runTestThrowsException(self, 'fgte.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
     def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
-
-
-class ObjectInstructionsTests(unittest.TestCase):
-    """Tests checking detection of invalid operand type during instruction execution.
-    """
-    PATH = './sample/asm/objects'
-
-    def testInsertMoves(self):
-        runTest(self, 'insert_moves.asm', 'true')
+        runTestThrowsException(self, 'feq.asm',
+                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
 
 
 class StaticLinkingTests(unittest.TestCase):
@@ -2447,24 +2444,10 @@ class AssemblerErrorTests(unittest.TestCase):
         # FIXME test for all lines of traced error
         runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2")
 
-    def testMsgRequiresAtLeastOneParameter(self):
-        runTestFailsToAssembleDetailed(self, 'msg_requires_at_least_one_parameter.asm', [
-            "22:5: error: invalid number of parameters in dynamic dispatch",
-            "22:5: note: expected at least 1 parameter, got 0",
-            "20:12: error: in function main/1",
-        ])
-
-    def testNotAValidFunctionNameMsg(self):
-        runTestFailsToAssembleDetailed(self, 'not_a_valid_function_name_msg.asm', [
-            "22:14: error: not a valid function name",
+    def testNotAValidFunctionNameCall(self):
+        runTestFailsToAssembleDetailed(self, 'not_a_valid_function_name_call.asm', [
+            "22:15: error: not a valid function name",
             "20:12: error: in function main/0",
-        ])
-
-    def testMsgArityMismatch(self):
-        runTestFailsToAssembleDetailed(self, 'msg_arity_mismatch.asm', [
-            "22:5: error: invalid number of parameters in call to function add/2: expected 2, got 1",
-            "21:5: error: from frame spawned here",
-            "20:12: error: in function main/1",
         ])
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
@@ -3232,28 +3215,6 @@ class StandardRuntimeLibraryModuleFunctional(unittest.TestCase):
         runTest(self, 'apply_simple.asm', '42')
 
 
-class TypeStringTests(unittest.TestCase):
-    PATH = './sample/types/String'
-
-    def testMessageSize(self):
-        runTest(self, 'size.asm', '12')
-
-    def testMessageConcatenate(self):
-        runTest(self, 'concatenate.asm', ['Hello ', 'World!', 'Hello World!'], 0, lambda o: o.splitlines())
-
-    def testMessageFormat(self):
-        runTest(self, 'format.asm', 'Hello, formatted World!')
-
-    def testMessageSubstr(self):
-        runTest(self, 'substr.asm', 'Hello, World!\nHello\nWorld!')
-
-    def testMessageStartswith(self):
-        runTest(self, 'startswith.asm', 'true\nfalse')
-
-    def testMessageEndswith(self):
-        runTest(self, 'endswith.asm', 'true\nfalse')
-
-
 class TypePointerTests(unittest.TestCase):
     PATH = './sample/types/Pointer'
 
@@ -3266,16 +3227,6 @@ class TypePointerTests(unittest.TestCase):
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736, 74399, 74375)
         runTest(self, 'type_of_expired.asm', 'ExpiredPointer')
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
-
-
-class RuntimeAssertionsTests(unittest.TestCase):
-    PATH = './sample/vm_runtime_assertions'
-
-    def testAssertArity(self):
-        runTest(self, 'assert_arity.asm', 'got arity 4, expected one of {1, 2, 3}')
-
-    def testAssertTypeof(self):
-        runTest(self, 'assert_typeof.asm', 'expected Integer, got String')
 
 
 class ExplicitRegisterSetsTests(unittest.TestCase):

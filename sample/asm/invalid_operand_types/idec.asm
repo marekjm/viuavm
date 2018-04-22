@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    function %1 main/1
-    idec %1
+    function %1 local main/1
+    idec %1 local
 
     izero %0 local
     return

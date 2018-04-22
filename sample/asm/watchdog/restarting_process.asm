@@ -49,80 +49,85 @@
 .function: a_detached_concurrent_process/0
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 32))]
+    frame ^[(pamv %0 (integer %1 local 32) local)]
     call std::misc::cycle/1
 
-    print (string %1 "Hello World (from detached process)!")
+    print (string %1 local "Hello World (from detached process)!") local
 
-    frame ^[(pamv %0 (integer %1 512))]
+    frame ^[(pamv %0 (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    print (string %1 "Hello World (from detached process) after a runaway exception!")
+    print (string %1 local "Hello World (from detached process) after a runaway exception!") local
 
-    frame ^[(pamv %0 (integer %1 512))]
+    frame ^[(pamv %0 (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (string %1 "a_detached_concurrent_process"))]
+    frame ^[(pamv %0 (string %1 local "a_detached_concurrent_process") local)]
     call log_exiting_detached/1
 
     return
 .end
 
 .function: formatting/2
-    arg (.name: %iota divide_what) %0
-    arg (.name: %iota divide_by) %1
+    arg (.name: %iota divide_what) local %0
+    arg (.name: %iota divide_by) local %1
 
-    string (.name: %iota format_string) "#{0} / #{1}"
-    frame ^[(param %0 %format_string) (param %1 %divide_what) (param %2 %divide_by)]
-    move %0 (msg %iota format/)
+    text %divide_what local %divide_what local
+    text %divide_by local %divide_by local
+    .name: %iota divide_op
+    text %divide_op local " / "
+
+    .name: %iota result
+    textconcat %result local %divide_what local %divide_op local
+    textconcat %result local %result local %divide_by local
 
     return
 .end
 .function: a_division_executing_process/2
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 128))]
+    frame ^[(pamv %0 (integer %1 local 128) local)]
     call std::misc::cycle/1
 
     .name: 1 divide_what
-    arg %divide_what %0
+    arg %divide_what local %0
 
     .name: 2 divide_by
-    arg %divide_by %1
+    arg %divide_by local %1
 
     .name: 3 zero
-    izero %zero
+    izero %zero local
 
-    if (eq %4 %divide_by %zero) +1 __after_throw
-    throw (string %4 "cannot divide by zero")
+    if (eq %4 local %divide_by local %zero local) local +1 __after_throw
+    throw (string %4 local "cannot divide by zero") local
     .mark: __after_throw
 
-    div %0 %divide_what %divide_by
-    echo %divide_what
-    echo (string %4 ' / ')
-    echo %divide_by
-    echo (string %4 ' = ')
-    print %0
+    div %0 local %divide_what local %divide_by local
+    echo %divide_what local
+    echo (string %4 local ' / ') local
+    echo %divide_by local
+    echo (string %4 local ' = ') local
+    print %0 local
 
     return
 .end
 
 .function: log_exiting_main/0
-    print (string %2 "process [  main  ]: 'main' exiting")
+    print (string %2 local "process [  main  ]: 'main' exiting") local
     return
 .end
 .function: log_exiting_detached/1
-    arg %1 %0
-    echo (string %2 "process [detached]: '")
-    echo %1
-    print (string %2 "' exiting")
+    arg %1 local %0
+    echo (string %2 local "process [detached]: '") local
+    echo %1 local
+    print (string %2 local "' exiting") local
     return
 .end
 .function: log_exiting_joined/0
-    arg %1 %0
-    echo (string %2 "process [ joined ]: '")
-    echo %1
-    print (string %2 "' exiting")
+    arg %1 local %0
+    echo (string %2 local "process [ joined ]: '") local
+    echo %1 local
+    print (string %2 local "' exiting") local
     return
 .end
 
@@ -134,7 +139,7 @@
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (integer %3 42)) (param %1 (integer %4 0))]
+    frame ^[(param %0 (integer %3 local 42) local) (param %1 (integer %4 local 0) local)]
     process void a_division_executing_process/2
 
     frame %0

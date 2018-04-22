@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -19,16 +19,7 @@
 
 .function: watchdog_process/0
     .mark: watchdog_start
-    throw (remove %4 (arg %1 %0) (string %3 "function"))
-
-    ;frame ^[(param 0 (ptr 2 1)) (param 1 (string 3 "function"))]
-    ;msg 4 get
-
-    ;echo (string 5 "process spawned with <")
-    ;echo 4
-    ;print (string 5 "> died")
-
-    ;jump watchdog_start
+    throw (remove %4 local (arg %1 local %0) local (string %3 local "function") local)
 
     return
 .end

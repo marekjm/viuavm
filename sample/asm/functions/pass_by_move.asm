@@ -18,15 +18,19 @@
 ;
 
 .function: foo/1
-    move %0 local (print (arg %1 local %0) local) local
+    arg %1 local %0
+    print %1 local
+    move %0 local %1 local
     return
 .end
 
 .function: main/1
-    print (new %1 local Object) local
+    integer %1 local 42
+    print %1 local
 
     frame ^[(pamv %0 %1 local)]
-    print (call %1 local foo/1) local
+    call %1 local foo/1
+    print %1 local
 
     izero %0 local
     return
