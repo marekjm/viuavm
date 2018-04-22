@@ -768,7 +768,6 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
 
         if (match(input_tokens, i, {"arg", "default"})
             or match(input_tokens, i, {"call", "default"})
-            or match(input_tokens, i, {"msg", "default"})
             or match(input_tokens, i, {"process", "default"})) {
             ++i;
             tokens.emplace_back(input_tokens.at(i).line(),

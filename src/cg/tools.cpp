@@ -995,84 +995,6 @@ static auto size_of_import(TokenVector const& tokens, TokenVector::size_type i)
 
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
-static auto size_of_class(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size =
-        bytecode_size_type{sizeof(viua::internals::types::byte)};
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null
-                                                         // terminator
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_prototype(TokenVector const& tokens,
-                              TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size =
-        bytecode_size_type{sizeof(viua::internals::types::byte)};
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-    calculated_size += size_increment;
-
-    calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null
-                                                         // terminator
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_derive(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    // for class name, +1 for null-terminator
-    calculated_size += (tokens.at(i).str().size() + 1);
-    ++i;
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_attach(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    // for real name of aliased function, +1 for null-terminator
-    calculated_size += (tokens.at(i).str().size() + 1);
-    ++i;
-
-    // for name of the alias, +1 for null-terminator
-    calculated_size += (tokens.at(i).str().size() + 1);
-    ++i;
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_register =
-    size_of_instruction_with_one_ri_operand_with_rs_type;
 
 static auto size_of_atom(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
@@ -1101,49 +1023,6 @@ static auto size_of_structremove =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_structkeys =
     size_of_instruction_with_two_ri_operands_with_rs_types;
-static auto size_of_new(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    // for class name, +1 for null-terminator
-    calculated_size += (tokens.at(i).str().size() + 1);
-    ++i;
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_msg(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    if (tokens.at(i).str().at(0) == '*' or tokens.at(i).str().at(0) == '%') {
-        tie(size_increment, i) =
-            size_of_register_index_operand_with_rs_type(tokens, i);
-        calculated_size += size_increment;
-    } else {
-        calculated_size += tokens.at(i).str().size() + 1;
-        ++i;
-    }
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
 static auto size_of_insert =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_remove =
@@ -1561,21 +1440,6 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "import") {
             ++i;
             tie(increase, i) = size_of_import(tokens, i);
-        } else if (tokens.at(i) == "class") {
-            ++i;
-            tie(increase, i) = size_of_class(tokens, i);
-        } else if (tokens.at(i) == "prototype") {
-            ++i;
-            tie(increase, i) = size_of_prototype(tokens, i);
-        } else if (tokens.at(i) == "derive") {
-            ++i;
-            tie(increase, i) = size_of_derive(tokens, i);
-        } else if (tokens.at(i) == "attach") {
-            ++i;
-            tie(increase, i) = size_of_attach(tokens, i);
-        } else if (tokens.at(i) == "register") {
-            ++i;
-            tie(increase, i) = size_of_register(tokens, i);
         } else if (tokens.at(i) == "atom") {
             ++i;
             tie(increase, i) = size_of_atom(tokens, i);
@@ -1594,12 +1458,6 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "structkeys") {
             ++i;
             tie(increase, i) = size_of_structkeys(tokens, i);
-        } else if (tokens.at(i) == "new") {
-            ++i;
-            tie(increase, i) = size_of_new(tokens, i);
-        } else if (tokens.at(i) == "msg") {
-            ++i;
-            tie(increase, i) = size_of_msg(tokens, i);
         } else if (tokens.at(i) == "insert") {
             ++i;
             tie(increase, i) = size_of_insert(tokens, i);

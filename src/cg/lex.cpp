@@ -369,7 +369,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
     const auto limit = input_tokens.size();
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         Token token = input_tokens.at(i);
-        if (token == "call" or token == "process" or token == "msg") {
+        if (token == "call" or token == "process") {
             tokens.push_back(token);
             if (is_register_index(input_tokens.at(i + 1))
                 or (input_tokens.at(i + 1) == "void")) {
@@ -1117,15 +1117,6 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "class" or token == "derive" or token == "attach"
-                   or token == "register" or token == "new") {
-            tokens.push_back(token);                 // mnemonic
-            tokens.push_back(input_tokens.at(++i));  // target register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "current");
-                tokens.back().original(input_tokens.at(i));
-            }
         } else if (token == "izero" or token == "print" or token == "argc"
                    or token == "echo" or token == "delete" or token == "draw"
                    or token == "throw" or token == "iinc" or token == "idec"
@@ -1162,7 +1153,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
          */
         tokens.push_back(token);
 
-        if (token == "call" or token == "process" or token == "msg") {
+        if (token == "call" or token == "process") {
             if (is_register_index(input_tokens.at(i + 1))
                 or (input_tokens.at(i + 1) == "void")) {
                 tokens.push_back(input_tokens.at(++i));
@@ -1879,14 +1870,6 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                                     target_register_set);
             } else {
                 tokens.push_back(input_tokens.at(++i));
-            }
-        } else if (token == "class" or token == "derive" or token == "attach"
-                   or token == "register" or token == "new") {
-            tokens.push_back(input_tokens.at(++i));  // target register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "current");
-                tokens.back().original(input_tokens.at(i));
             }
         } else if (token == "izero" or token == "print" or token == "argc"
                    or token == "echo" or token == "delete" or token == "draw"
