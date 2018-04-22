@@ -74,14 +74,9 @@ class VirtualProcessScheduler {
   public:
     viua::kernel::Kernel* kernel() const;
 
-    bool is_class(const std::string&) const;
-    bool class_accepts(const std::string&, const std::string&) const;
-    auto inheritance_chain_of(const std::string& name) const
-        -> decltype(attached_kernel->inheritance_chain_of(name));
     bool is_local_function(const std::string&) const;
     bool is_linked_function(const std::string&) const;
     bool is_native_function(const std::string&) const;
-    bool is_foreign_method(const std::string&) const;
     bool is_foreign_function(const std::string&) const;
 
     bool is_block(const std::string&) const;
@@ -90,20 +85,10 @@ class VirtualProcessScheduler {
     std::pair<viua::internals::types::byte*, viua::internals::types::byte*>
     get_entry_point_of_block(const std::string&) const;
 
-    std::string resolve_method_name(const std::string&,
-                                    const std::string&) const;
     std::pair<viua::internals::types::byte*, viua::internals::types::byte*>
     get_entry_point_of(const std::string&) const;
 
-    void register_prototype(std::unique_ptr<viua::types::Prototype>);
-
     void request_foreign_function_call(Frame*, viua::process::Process*) const;
-    void request_foreign_method_call(const std::string&,
-                                     viua::types::Value*,
-                                     Frame*,
-                                     viua::kernel::RegisterSet*,
-                                     viua::kernel::RegisterSet*,
-                                     viua::process::Process*);
 
     void load_module(std::string);
 

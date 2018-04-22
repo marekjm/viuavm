@@ -406,7 +406,6 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/object.o \
 				   build/types/pointer.o \
 				   build/types/process.o \
-				   build/types/prototype.o \
 				   build/types/reference.o \
 				   build/types/string.o \
 				   build/types/struct.o \

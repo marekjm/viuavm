@@ -85,13 +85,6 @@ bool viua::types::Pointer::boolean() const {
     return valid;
 }
 
-vector<string> viua::types::Pointer::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Pointer::inheritancechain() const {
-    return vector<string>{"Value"};
-}
-
 string viua::types::Pointer::str() const {
     return type();
 }

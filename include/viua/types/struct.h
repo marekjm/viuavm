@@ -46,9 +46,6 @@ class Struct : public Value {
     std::string str() const override;
     std::string repr() const override;
 
-    std::vector<std::string> bases() const override;
-    std::vector<std::string> inheritancechain() const override;
-
     virtual void insert(const std::string& key, std::unique_ptr<Value> value);
     virtual std::unique_ptr<Value> remove(const std::string& key);
     virtual std::vector<std::string> keys() const;

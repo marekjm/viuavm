@@ -35,7 +35,6 @@
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
 #include <viua/pid.h>
-#include <viua/types/prototype.h>
 #include <viua/types/value.h>
 
 

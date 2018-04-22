@@ -42,7 +42,6 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/include/module.h>
 #include <viua/process.h>
-#include <viua/types/prototype.h>
 
 
 namespace viua {
@@ -133,9 +132,6 @@ class Kernel {
     viua::internals::types::bytecode_size bytecode_size;
     viua::internals::types::bytecode_size executable_offset;
 
-    // Map of the typesystem currently existing inside the VM.
-    std::map<std::string, std::unique_ptr<viua::types::Prototype>> typesystem;
-
     /*  Function and block names mapped to bytecode addresses.
      */
     std::map<std::string, viua::internals::types::bytecode_size>
@@ -189,10 +185,6 @@ class Kernel {
      */
     std::map<std::string, ForeignFunction*> foreign_functions;
     std::mutex foreign_functions_mutex;
-
-    /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
-     */
-    std::map<std::string, ForeignMethod> foreign_methods;
 
     // Foreign function call requests are placed here to be executed later.
     std::vector<
@@ -248,15 +240,9 @@ class Kernel {
     Kernel& register_external_function(const std::string&, ForeignFunction*);
     Kernel& remove_external_function(std::string);
 
-    /*  Methods dealing with typesystem related tasks.
-     */
-    bool is_class(const std::string&) const;
-    bool class_accepts(const std::string&, const std::string&) const;
-    std::vector<std::string> inheritance_chain_of(const std::string&) const;
     bool is_local_function(const std::string&) const;
     bool is_linked_function(const std::string&) const;
     bool is_native_function(const std::string&) const;
-    bool is_foreign_method(const std::string&) const;
     bool is_foreign_function(const std::string&) const;
 
     bool is_block(const std::string&) const;
@@ -265,28 +251,10 @@ class Kernel {
     std::pair<viua::internals::types::byte*, viua::internals::types::byte*>
     get_entry_point_of_block(const std::string&) const;
 
-    std::string resolve_method_name(const std::string&,
-                                    const std::string&) const;
     std::pair<viua::internals::types::byte*, viua::internals::types::byte*>
     get_entry_point_of(const std::string&) const;
 
-    void register_prototype(const std::string&,
-                            std::unique_ptr<viua::types::Prototype>);
-    void register_prototype(std::unique_ptr<viua::types::Prototype>);
-
-    /// These two methods are used to inject pure-C++ classes into machine's
-    /// typesystem.
-    Kernel& register_foreign_prototype(const std::string&,
-                                       std::unique_ptr<viua::types::Prototype>);
-    Kernel& register_foreign_method(const std::string&, ForeignMethod);
-
     void request_foreign_function_call(Frame*, viua::process::Process*);
-    void request_foreign_method_call(const std::string&,
-                                     viua::types::Value*,
-                                     Frame*,
-                                     viua::kernel::RegisterSet*,
-                                     viua::kernel::RegisterSet*,
-                                     viua::process::Process*);
 
     void post_free_process(std::unique_ptr<viua::process::Process>);
 

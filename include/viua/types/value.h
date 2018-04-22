@@ -53,9 +53,6 @@ class Value {
 
     virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
 
-    virtual std::vector<std::string> bases() const;
-    virtual std::vector<std::string> inheritancechain() const;
-
     virtual std::unique_ptr<Value> copy() const = 0;
 
     Value() = default;

@@ -177,8 +177,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    viua::front::vm::load_standard_prototypes(&kernel);
-
     try {
         kernel.run();
     } catch (const viua::types::Exception* e) {

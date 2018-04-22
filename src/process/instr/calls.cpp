@@ -180,30 +180,10 @@ viua::internals::types::byte* viua::process::Process::opcall(
 
     bool is_native         = scheduler->is_native_function(call_name);
     bool is_foreign        = scheduler->is_foreign_function(call_name);
-    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
-    if (not(is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: "
                                                   + call_name);
-    }
-
-    if (is_foreign_method) {
-        if (stack->frame_new == nullptr) {
-            throw make_unique<viua::types::Exception>(
-                "cannot call foreign method without a frame");
-        }
-        if (stack->frame_new->arguments->size() == 0) {
-            throw make_unique<viua::types::Exception>(
-                "cannot call foreign method using empty frame");
-        }
-        if (stack->frame_new->arguments->at(0) == nullptr) {
-            throw make_unique<viua::types::Exception>(
-                "frame must have at least one argument when used to call a "
-                "foreign method");
-        }
-        auto obj = stack->frame_new->arguments->at(0);
-        return call_foreign_method(
-            addr, obj, call_name, return_register, call_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::call_native
@@ -257,9 +237,8 @@ viua::internals::types::byte* viua::process::Process::optailcall(
 
     bool is_native         = scheduler->is_native_function(call_name);
     bool is_foreign        = scheduler->is_foreign_function(call_name);
-    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
-    if (not(is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
             "tail call to undefined function: " + call_name);
     }
@@ -304,9 +283,8 @@ viua::internals::types::byte* viua::process::Process::opdefer(
 
     bool is_native         = scheduler->is_native_function(call_name);
     bool is_foreign        = scheduler->is_foreign_function(call_name);
-    bool is_foreign_method = scheduler->is_foreign_method(call_name);
 
-    if (not(is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
             "defer of undefined function: " + call_name);
     }
