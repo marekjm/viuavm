@@ -510,6 +510,8 @@ static auto const size_of_vlen =
 static auto const size_of_bool = size_of_instruction_with_one_ri_operand;
 static auto const size_of_not =
     size_of_instruction_with_two_ri_operands_with_rs_types;
+static auto const size_of_ptrlive =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto const size_of_and =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto const size_of_or =
@@ -1341,6 +1343,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "ptr") {
             ++i;
             tie(increase, i) = size_of_ptr(tokens, i);
+        } else if (tokens.at(i) == "ptrlive") {
+            ++i;
+            tie(increase, i) = size_of_ptrlive(tokens, i);
         } else if (tokens.at(i) == "swap") {
             ++i;
             tie(increase, i) = size_of_swap(tokens, i);
