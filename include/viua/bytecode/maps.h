@@ -145,6 +145,7 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {MOVE, "move"},
     {COPY, "copy"},
     {PTR, "ptr"},
+    {PTRLIVE, "ptrlive"},
     {SWAP, "swap"},
     {DELETE, "delete"},
     {ISNULL, "isnull"},
