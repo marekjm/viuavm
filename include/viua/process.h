@@ -403,6 +403,7 @@ class Process {
     viua::internals::types::byte* opmove(viua::internals::types::byte*);
     viua::internals::types::byte* opcopy(viua::internals::types::byte*);
     viua::internals::types::byte* opptr(viua::internals::types::byte*);
+    viua::internals::types::byte* opptrlive(viua::internals::types::byte*);
     viua::internals::types::byte* opswap(viua::internals::types::byte*);
     viua::internals::types::byte* opdelete(viua::internals::types::byte*);
     viua::internals::types::byte* opisnull(viua::internals::types::byte*);
