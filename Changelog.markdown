@@ -66,6 +66,8 @@ There are several categories of change:
   `saturatingsmul`, and `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
 - feature: `draw` instruction now supports `void` as target register
 - bic: remove `ress` instruction
+- feature: `ptrlive` instruction for checking whether a pointer is "live", i.e. valid and can be accessed
+  without errors
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
