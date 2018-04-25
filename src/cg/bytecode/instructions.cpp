@@ -767,6 +767,11 @@ auto opptr(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     return insert_two_ri_instruction(addr_ptr, PTR, a, b);
 }
 
+auto opptrlive(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
+    -> viua::internals::types::byte* {
+    return insert_two_ri_instruction(addr_ptr, PTRLIVE, a, b);
+}
+
 auto opswap(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, SWAP, a, b);
