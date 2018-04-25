@@ -97,16 +97,6 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
 }
 
 
-void viua::types::Pointer::expired(Frame* frm,
-                                   viua::kernel::RegisterSet*,
-                                   viua::kernel::RegisterSet*,
-                                   viua::process::Process*,
-                                   viua::kernel::Kernel*) {
-    frm->local_register_set->set(0,
-                                 make_unique<viua::types::Boolean>(expired()));
-}
-
-
 viua::types::Pointer::Pointer(const viua::process::Process* poi)
         : points_to(nullptr), valid(false), process_of_origin(poi) {}
 viua::types::Pointer::Pointer(viua::types::Value* t,

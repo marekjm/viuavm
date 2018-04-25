@@ -61,12 +61,6 @@ class Pointer : public Value {
     void reset(Value* t);
     Value* to(const viua::process::Process*);
 
-    virtual void expired(Frame*,
-                         viua::kernel::RegisterSet*,
-                         viua::kernel::RegisterSet*,
-                         viua::process::Process*,
-                         viua::kernel::Kernel*);
-
     std::string str() const override;
 
     std::string type() const override;
