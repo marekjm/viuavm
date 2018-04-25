@@ -371,7 +371,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr += fn_name.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if ((op == CALL) or (op == PROCESS) or (op == MSG)) {
+    } else if ((op == CALL) or (op == PROCESS)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
@@ -386,15 +386,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             ++ptr;  // for null character terminating the C-style string not
                     // included in std::string
         }
-    } else if ((op == CLASS) or (op == NEW) or (op == DERIVE)) {
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-
-        oss << ' ';
-        auto const fn_name = string{reinterpret_cast<char*>(ptr)};
-        oss << fn_name;
-        ptr += fn_name.size();
-        ++ptr;  // for null character terminating the C-style string not
-                // included in std::string
     } else if (op == TAILCALL or op == DEFER) {
         oss << ' ';
 
@@ -429,22 +420,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr += block_name.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if (op == ATTACH) {
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-
-        oss << ' ';
-        auto const fn_name = string{reinterpret_cast<char*>(ptr)};
-        oss << fn_name;
-        ptr += fn_name.size();
-        ++ptr;  // for null character terminating the C-style string not
-                // included in std::string
-
-        oss << ' ';
-        auto const md_name = string{reinterpret_cast<char*>(ptr)};
-        oss << md_name;
-        ptr += md_name.size();
-        ++ptr;  // for null character terminating the C-style string not
-                // included in std::string
     }
 
     switch (op) {
@@ -462,17 +437,12 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case FUNCTION:
     case CALL:
     case PROCESS:
-    case MSG:
-    case CLASS:
-    case NEW:
-    case DERIVE:
     case TAILCALL:
     case DEFER:
     case IMPORT:
     case ENTER:
     case WATCHDOG:
     case CATCH:
-    case ATTACH:
         // Already handled in the `if` above.
         break;
     case BITSWIDTH:
@@ -509,7 +479,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case SATURATINGSDECREMENT:
     case SATURATINGUINCREMENT:
     case SATURATINGUDECREMENT:
-    case REGISTER:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         break;
     case BOOL:
@@ -543,6 +512,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case MOVE:
     case COPY:
     case PTR:
+    case PTRLIVE:
     case SWAP:
     case VPUSH:
     case VLEN:
@@ -667,8 +637,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
 
         break;
     case STREQ:
-    case INSERT:
-    case REMOVE:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

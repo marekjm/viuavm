@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,12 +17,9 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/1
-    frame ^[(param %0 (string %1 "Hello World!")) (param %1 (string %2 "Hello"))]
-    print (msg %3 startswith/2)
-
-    frame ^[(param %0 %1) (param %1 (string %2 "Fail"))]
-    print (msg %3 startswith/2)
+.function: main/0
+    frame ^[(pamv %0 (integer %1 local 0) local)]
+    call void foo/x
 
     izero %0 local
     return

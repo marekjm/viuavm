@@ -47,13 +47,6 @@ class Ifstream : public viua::types::Value {
         return in.is_open();
     }
 
-    virtual auto bases() const -> vector<string> override {
-        return vector<string>{"viua::types::Value"};
-    }
-    virtual auto inheritancechain() const -> vector<string> override {
-        return vector<string>{"viua::types::Value"};
-    }
-
     auto getline() const -> string {
         if (in.eof()) {
             throw make_unique<viua::types::Exception>("EOF");

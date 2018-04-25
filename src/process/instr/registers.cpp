@@ -67,6 +67,21 @@ viua::internals::types::byte* viua::process::Process::opptr(
 
     return addr;
 }
+viua::internals::types::byte* viua::process::Process::opptrlive(
+    viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Pointer* source = nullptr;
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Pointer>(
+            addr, this);
+
+    *target = std::make_unique<viua::types::Boolean>(not source->expired());
+
+    return addr;
+}
 viua::internals::types::byte* viua::process::Process::opswap(
     viua::internals::types::byte* addr) {
     viua::kernel::Register *target = nullptr, *source = nullptr;

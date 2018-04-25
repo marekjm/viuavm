@@ -35,7 +35,6 @@
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
 #include <viua/pid.h>
-#include <viua/types/prototype.h>
 #include <viua/types/value.h>
 
 
@@ -404,6 +403,7 @@ class Process {
     viua::internals::types::byte* opmove(viua::internals::types::byte*);
     viua::internals::types::byte* opcopy(viua::internals::types::byte*);
     viua::internals::types::byte* opptr(viua::internals::types::byte*);
+    viua::internals::types::byte* opptrlive(viua::internals::types::byte*);
     viua::internals::types::byte* opswap(viua::internals::types::byte*);
     viua::internals::types::byte* opdelete(viua::internals::types::byte*);
     viua::internals::types::byte* opisnull(viua::internals::types::byte*);
@@ -445,11 +445,6 @@ class Process {
     viua::internals::types::byte* opthrow(viua::internals::types::byte*);
     viua::internals::types::byte* opleave(viua::internals::types::byte*);
 
-    viua::internals::types::byte* opclass(viua::internals::types::byte*);
-    viua::internals::types::byte* opderive(viua::internals::types::byte*);
-    viua::internals::types::byte* opattach(viua::internals::types::byte*);
-    viua::internals::types::byte* opregister(viua::internals::types::byte*);
-
     viua::internals::types::byte* opatom(viua::internals::types::byte*);
     viua::internals::types::byte* opatomeq(viua::internals::types::byte*);
 
@@ -457,11 +452,6 @@ class Process {
     viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
     viua::internals::types::byte* opstructremove(viua::internals::types::byte*);
     viua::internals::types::byte* opstructkeys(viua::internals::types::byte*);
-
-    viua::internals::types::byte* opnew(viua::internals::types::byte*);
-    viua::internals::types::byte* opmsg(viua::internals::types::byte*);
-    viua::internals::types::byte* opinsert(viua::internals::types::byte*);
-    viua::internals::types::byte* opremove(viua::internals::types::byte*);
 
     viua::internals::types::byte* opimport(viua::internals::types::byte*);
 

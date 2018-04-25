@@ -44,9 +44,6 @@ class Boolean : public viua::types::Value {
 
     bool& value();
 
-    virtual std::vector<std::string> bases() const override;
-    virtual std::vector<std::string> inheritancechain() const override;
-
     std::unique_ptr<Value> copy() const override;
 
     Boolean(bool v = false);

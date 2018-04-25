@@ -46,9 +46,6 @@ class Object : public Value {
 
     std::string str() const override;
 
-    std::vector<std::string> bases() const override;
-    std::vector<std::string> inheritancechain() const override;
-
     void insert(const std::string& key, std::unique_ptr<Value> value);
     std::unique_ptr<Value> remove(const std::string& key);
 

@@ -56,13 +56,6 @@ bool viua::types::Reference::boolean() const {
     return (*pointer)->boolean();
 }
 
-vector<string> viua::types::Reference::bases() const {
-    return vector<string>({});
-}
-vector<string> viua::types::Reference::inheritancechain() const {
-    return vector<string>({});
-}
-
 unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
     return make_unique<viua::types::Reference>(pointer, counter);

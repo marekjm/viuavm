@@ -186,64 +186,6 @@ viua::internals::types::byte* viua::process::Process::call_foreign(
 
     return return_address;
 }
-viua::internals::types::byte* viua::process::Process::call_foreign_method(
-    viua::internals::types::byte* return_address,
-    viua::types::Value* object,
-    const string& call_name,
-    viua::kernel::Register* return_register,
-    const string&) {
-    if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>(
-            "foreign method call without a frame");
-    }
-
-    stack->frame_new->function_name   = call_name;
-    stack->frame_new->return_address  = return_address;
-    stack->frame_new->return_register = return_register;
-
-    Frame* frame = stack->frame_new.get();
-
-    push_frame();
-
-    if (not scheduler->is_foreign_method(call_name)) {
-        throw make_unique<viua::types::Exception>(
-            "call to unregistered foreign method: " + call_name);
-    }
-
-    viua::types::Reference* rf = nullptr;
-    if ((rf = dynamic_cast<viua::types::Reference*>(object))) {
-        object = rf->points_to();
-    }
-
-    try {
-        // FIXME: supply static and global registers to foreign functions
-        scheduler->request_foreign_method_call(
-            call_name, object, frame, nullptr, nullptr, this);
-    } catch (const std::out_of_range& e) {
-        throw make_unique<viua::types::Exception>(e.what());
-    }
-
-    // FIXME: woohoo! segfault!
-    unique_ptr<viua::types::Value> returned;
-    if (return_register != nullptr) {
-        // we check in 0. register because it's reserved for return values
-        if (currently_used_register_set->at(0) == nullptr) {
-            throw make_unique<viua::types::Exception>(
-                "return value requested by frame but foreign method did not "
-                "set return register");
-        }
-        returned = currently_used_register_set->pop(0);
-    }
-
-    stack->pop();
-
-    // place return value
-    if (returned and stack->size() > 0) {
-        *return_register = std::move(returned);
-    }
-
-    return return_address;
-}
 
 auto viua::process::Process::push_deferred(string call_name) -> void {
     if (not stack->frame_new) {

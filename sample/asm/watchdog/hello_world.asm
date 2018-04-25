@@ -18,15 +18,13 @@
 ;
 
 .function: watchdog_process/1
-    arg %1 %0
+    arg %1 local %0
 
-    ;print 1
+    structremove %4 local %1 local (atom %3 local 'function') local
 
-    remove %4 %1 (string %3 "function")
-
-    echo (string %5 "process spawned with <")
-    echo %4
-    print (string %5 "> died")
+    echo (string %5 local "process spawned with <") local
+    echo %4 local
+    print (string %5 local "> died") local
 
     return
 .end
@@ -67,7 +65,7 @@
     nop
     nop
     nop
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
     return
 .end
 

@@ -387,8 +387,6 @@ VIUA_INSTR_FILES_O=build/process/instr/atom.o \
 				   build/process/instr/general.o \
 				   build/process/instr/int.o \
 				   build/process/instr/linking.o \
-				   build/process/instr/object.o \
-				   build/process/instr/prototype.o \
 				   build/process/instr/registers.o \
 				   build/process/instr/str.o \
 				   build/process/instr/struct.o \
@@ -408,7 +406,6 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/object.o \
 				   build/types/pointer.o \
 				   build/types/process.o \
-				   build/types/prototype.o \
 				   build/types/reference.o \
 				   build/types/string.o \
 				   build/types/struct.o \
@@ -472,7 +469,6 @@ build/bin/vm/vdb: build/front/wdb.o \
 
 OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_arg.o \
-	build/assembler/backend/op_assemblers/assemble_op_attach.o \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
 	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
 	build/assembler/backend/op_assemblers/assemble_op_call.o \
@@ -482,10 +478,8 @@ OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_integer.o \
 	build/assembler/backend/op_assemblers/assemble_op_join.o \
 	build/assembler/backend/op_assemblers/assemble_op_jump.o \
-	build/assembler/backend/op_assemblers/assemble_op_msg.o \
 	build/assembler/backend/op_assemblers/assemble_op_process.o \
 	build/assembler/backend/op_assemblers/assemble_op_receive.o \
-	build/assembler/backend/op_assemblers/assemble_op_remove.o \
 	build/assembler/backend/op_assemblers/assemble_op_string.o \
 	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
 	build/assembler/backend/op_assemblers/assemble_op_join.o \
@@ -555,7 +549,6 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_function.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_if.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_insert.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_isnull.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_itof.o \
@@ -563,16 +556,14 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_join.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_jump.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_move.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_msg.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_new.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_not.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_pamv.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_param.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_print.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_process.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_ptrlive.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_receive.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_remove.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_self.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_send.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \

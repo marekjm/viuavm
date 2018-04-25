@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,13 +18,10 @@
 ;
 
 .function: main/1
-    register (class %1 Foo)
-    new %1 Foo
-
-    register (class %2 Bar)
-    new %2 Bar
-    eq %3 %1 %2
-    print %3
+    text %1 local "Hello World!"
+    integer %2 local 42
+    eq %3 local %1 local %2 local
+    print %3 local
 
     izero %0 local
     return

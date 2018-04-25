@@ -47,38 +47,29 @@ class Pointer : public Value {
      *  pointer should be illegal by definition (even if the access
      *  could be made safe).
      */
-    const viua::process::Process* process_of_origin;
+    viua::process::Process const* process_of_origin;
 
     void attach();
     void detach();
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     void invalidate(Value* t);
     bool expired();
-    auto authenticate(const viua::process::Process*) -> void;
+    auto authenticate(viua::process::Process const*) -> void;
     void reset(Value* t);
-    Value* to(const viua::process::Process*);
-
-    virtual void expired(Frame*,
-                         viua::kernel::RegisterSet*,
-                         viua::kernel::RegisterSet*,
-                         viua::process::Process*,
-                         viua::kernel::Kernel*);
+    Value* to(viua::process::Process const*);
 
     std::string str() const override;
 
     std::string type() const override;
     bool boolean() const override;
 
-    std::vector<std::string> bases() const override;
-    std::vector<std::string> inheritancechain() const override;
-
     std::unique_ptr<Value> copy() const override;
 
-    Pointer(const viua::process::Process*);
-    Pointer(Value* t, const viua::process::Process*);
+    Pointer(viua::process::Process const*);
+    Pointer(Value* t, viua::process::Process const*);
     virtual ~Pointer();
 };
 }  // namespace types

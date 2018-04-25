@@ -53,15 +53,6 @@ unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
     return make_unique<viua::types::Pointer>(this, process_of_origin);
 }
 
-
-vector<string> viua::types::Value::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Value::inheritancechain() const {
-    return vector<string>{"Value"};
-}
-
-
 viua::types::Value::~Value() {
     for (auto p : pointers) {
         p->invalidate(this);

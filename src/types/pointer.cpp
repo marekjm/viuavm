@@ -85,13 +85,6 @@ bool viua::types::Pointer::boolean() const {
     return valid;
 }
 
-vector<string> viua::types::Pointer::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Pointer::inheritancechain() const {
-    return vector<string>{"Value"};
-}
-
 string viua::types::Pointer::str() const {
     return type();
 }
@@ -101,16 +94,6 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
         return make_unique<Pointer>(process_of_origin);
     }
     return make_unique<Pointer>(points_to, process_of_origin);
-}
-
-
-void viua::types::Pointer::expired(Frame* frm,
-                                   viua::kernel::RegisterSet*,
-                                   viua::kernel::RegisterSet*,
-                                   viua::process::Process*,
-                                   viua::kernel::Kernel*) {
-    frm->local_register_set->set(0,
-                                 make_unique<viua::types::Boolean>(expired()));
 }
 
 

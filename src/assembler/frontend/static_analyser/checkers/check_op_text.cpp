@@ -37,6 +37,25 @@ auto check_op_text(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *operand);
 
+    auto source = get_operand<RegisterIndex>(instruction, 1);
+    if (source) {
+        check_use_of_register(register_usage_profile, *source);
+        check_if_name_resolved(register_usage_profile, *source);
+
+        auto const converted_from_type =
+            register_usage_profile.at(Register(*source)).second.value_type;
+        if (converted_from_type == viua::internals::ValueTypes::TEXT) {
+            using viua::cg::lex::InvalidSyntax;
+            using viua::cg::lex::TracedSyntaxError;
+            throw TracedSyntaxError{}
+                .append(invalid_syntax(instruction.operands.at(1)->tokens,
+                                       "useless conversion of value"))
+                .append(InvalidSyntax{
+                    register_usage_profile.defined_where(Register(*source)), ""}
+                            .note("value defined here"));
+        }
+    }
+
     auto val         = Register{};
     val.index        = operand->index;
     val.register_set = operand->rss;

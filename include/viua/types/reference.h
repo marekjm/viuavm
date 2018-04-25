@@ -42,9 +42,6 @@ class Reference : public Value {
     std::string repr() const override;
     bool boolean() const override;
 
-    std::vector<std::string> bases() const override;
-    std::vector<std::string> inheritancechain() const override;
-
     std::unique_ptr<Value> copy() const override;
 
     virtual Value* points_to() const;

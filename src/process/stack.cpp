@@ -243,22 +243,6 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
         TryFrame* tframe   = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
-        // FIXME: mutex
-        if ((not handler_found)
-            and scheduler->is_class(handler_found_for_type)) {
-            vector<string> types_to_check =
-                scheduler->inheritance_chain_of(handler_found_for_type);
-            for (decltype(types_to_check)::size_type j = 0;
-                 j < types_to_check.size();
-                 ++j) {
-                if (tframe->catchers.count(types_to_check[j])) {
-                    handler_found          = true;
-                    handler_found_for_type = types_to_check[j];
-                    break;
-                }
-            }
-        }
-
         if (handler_found) {
             found_exception_frame = tframe;
             caught_with_type      = handler_found_for_type;

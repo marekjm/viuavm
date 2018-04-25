@@ -27,9 +27,4 @@ if [[ $COMMITS_SINCE == $SAVED_MICRO ]]; then
     exit 0
 fi
 
-HEAD_UPDATED_VERSION=`git show HEAD | grep -P '^---' | cut -d' ' -f2 | sed 's:a/::' | grep $FILE`
-
-if [[ $HEAD_UPDATED_VERSION == "" ]]; then
-    sed -i "s/COMMIT = \".*\"/COMMIT = \"`git rev-parse HEAD`\"/" $FILE
-    sed -i "s/MICRO = \".*\"/MICRO = \"$COMMITS_SINCE\"/" $FILE
-fi
+sed -i "s/MICRO\( *\)= \".*\"/MICRO\1= \"$COMMITS_SINCE\"/" $FILE

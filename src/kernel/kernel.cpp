@@ -165,24 +165,6 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_prototype(
-    const string& name,
-    unique_ptr<viua::types::Prototype> proto) {
-    /** Registers foreign prototype in viua::kernel::Kernel.
-     */
-    register_prototype(name, std::move(proto));
-    return (*this);
-}
-
-viua::kernel::Kernel& viua::kernel::Kernel::register_foreign_method(
-    const string& name,
-    ForeignMethod method) {
-    /** Registers foreign prototype in viua::kernel::Kernel.
-     */
-    foreign_methods[name] = method;
-    return (*this);
-}
-
 
 static auto is_native_module(string module) -> bool {
     auto double_colon = regex{"::"};
@@ -312,54 +294,6 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
     cxx_dynamic_lib_handles.push_back(handle);
 }
 
-
-bool viua::kernel::Kernel::is_class(const string& name) const {
-    return typesystem.count(name);
-}
-
-bool viua::kernel::Kernel::class_accepts(const string& klass,
-                                         const string& method_name) const {
-    return typesystem.at(klass)->accepts(method_name);
-}
-
-vector<string> viua::kernel::Kernel::inheritance_chain_of(
-    const string& type_name) const {
-    /** This methods returns full inheritance chain of a type.
-     */
-    if (typesystem.count(type_name) == 0) {
-        // FIXME: better exception message
-        throw make_unique<viua::types::Exception>("unregistered type: "
-                                                  + type_name);
-    }
-    vector<string> ichain = typesystem.at(type_name)->get_ancestors();
-    for (unsigned i = 0; i < ichain.size(); ++i) {
-        vector<string> sub_ichain = inheritance_chain_of(ichain[i]);
-        for (unsigned j = 0; j < sub_ichain.size(); ++j) {
-            ichain.push_back(sub_ichain[j]);
-        }
-    }
-
-    vector<string> linearised_inheritance_chain;
-    unordered_set<string> pushed;
-
-    string element;
-    for (unsigned i = 0; i < ichain.size(); ++i) {
-        element = ichain[i];
-        if (pushed.count(element)) {
-            linearised_inheritance_chain.erase(
-                remove(linearised_inheritance_chain.begin(),
-                       linearised_inheritance_chain.end(),
-                       element),
-                linearised_inheritance_chain.end());
-        } else {
-            pushed.insert(element);
-        }
-        linearised_inheritance_chain.emplace_back(element);
-    }
-
-    return ichain;
-}
-
 bool viua::kernel::Kernel::is_local_function(const string& name) const {
     return function_addresses.count(name);
 }
@@ -370,10 +304,6 @@ bool viua::kernel::Kernel::is_linked_function(const string& name) const {
 
 bool viua::kernel::Kernel::is_native_function(const string& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
-}
-
-bool viua::kernel::Kernel::is_foreign_method(const string& name) const {
-    return foreign_methods.count(name);
 }
 
 bool viua::kernel::Kernel::is_foreign_function(const string& name) const {
@@ -408,12 +338,6 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
         entry_point, module_base);
 }
 
-string viua::kernel::Kernel::resolve_method_name(
-    const string& klass,
-    const string& method_name) const {
-    return typesystem.at(klass)->resolves_to(method_name);
-}
-
 pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
     kernel::Kernel::get_entry_point_of(const std::string& name) const {
     viua::internals::types::byte* entry_point = nullptr;
@@ -430,18 +354,6 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
         entry_point, module_base);
 }
 
-void viua::kernel::Kernel::register_prototype(
-    const string& type_name,
-    unique_ptr<viua::types::Prototype> proto) {
-    typesystem.emplace(type_name, nullptr);
-    typesystem.at(type_name) = std::move(proto);
-}
-void viua::kernel::Kernel::register_prototype(
-    unique_ptr<viua::types::Prototype> proto) {
-    auto type_name = proto->get_type_name();
-    register_prototype(type_name, std::move(proto));
-}
-
 void viua::kernel::Kernel::request_foreign_function_call(
     Frame* frame,
     viua::process::Process* requesting_process) {
@@ -454,16 +366,6 @@ void viua::kernel::Kernel::request_foreign_function_call(
     // it cannot obtain the lock and fetch the call request
     lock.unlock();
     foreign_call_queue_condition.notify_one();
-}
-
-void viua::kernel::Kernel::request_foreign_method_call(
-    const string& name,
-    viua::types::Value* object,
-    Frame* frame,
-    viua::kernel::RegisterSet*,
-    viua::kernel::RegisterSet*,
-    viua::process::Process* p) {
-    foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
 void viua::kernel::Kernel::post_free_process(

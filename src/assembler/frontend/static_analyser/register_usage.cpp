@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -302,6 +302,9 @@ auto check_register_usage_for_instruction_block_impl(
             case PTR:
                 check_op_ptr(register_usage_profile, *instruction);
                 break;
+            case PTRLIVE:
+                check_op_ptrlive(register_usage_profile, *instruction);
+                break;
             case SWAP:
                 check_op_swap(register_usage_profile, *instruction);
                 break;
@@ -435,18 +438,6 @@ auto check_register_usage_for_instruction_block_impl(
             case IMPORT:
                 // do nothing
                 break;
-            case CLASS:
-                // TODO
-                break;
-            case DERIVE:
-                // TODO
-                break;
-            case ATTACH:
-                // TODO
-                break;
-            case REGISTER:
-                // TODO
-                break;
             case ATOM:
                 check_op_atom(register_usage_profile, *instruction);
                 break;
@@ -464,18 +455,6 @@ auto check_register_usage_for_instruction_block_impl(
                 break;
             case STRUCTKEYS:
                 check_op_structkeys(register_usage_profile, *instruction);
-                break;
-            case NEW:
-                check_op_new(register_usage_profile, *instruction);
-                break;
-            case MSG:
-                check_op_msg(register_usage_profile, *instruction);
-                break;
-            case INSERT:
-                check_op_insert(register_usage_profile, *instruction);
-                break;
-            case REMOVE:
-                check_op_remove(register_usage_profile, *instruction);
                 break;
             case RETURN:
                 // do nothing

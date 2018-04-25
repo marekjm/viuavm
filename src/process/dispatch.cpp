@@ -64,7 +64,7 @@ auto viua::process::Process::get_trace_line(
 
     if (static_cast<OPCODE>(*for_address) == CALL
         or static_cast<OPCODE>(*for_address) == PROCESS
-        or static_cast<OPCODE>(*for_address) == MSG) {
+        ) {
         auto working_address = for_address + 1;
         if (viua::bytecode::decoder::operands::is_void(working_address)) {
             ++working_address;
@@ -328,6 +328,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(
     case PTR:
         addr = opptr(addr + 1);
         break;
+    case PTRLIVE:
+        addr = opptrlive(addr + 1);
+        break;
     case SWAP:
         addr = opswap(addr + 1);
         break;
@@ -430,18 +433,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(
     case IMPORT:
         addr = opimport(addr + 1);
         break;
-    case CLASS:
-        addr = opclass(addr + 1);
-        break;
-    case DERIVE:
-        addr = opderive(addr + 1);
-        break;
-    case ATTACH:
-        addr = opattach(addr + 1);
-        break;
-    case REGISTER:
-        addr = opregister(addr + 1);
-        break;
     case ATOM:
         addr = opatom(addr + 1);
         break;
@@ -459,18 +450,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(
         break;
     case STRUCTKEYS:
         addr = opstructkeys(addr + 1);
-        break;
-    case NEW:
-        addr = opnew(addr + 1);
-        break;
-    case MSG:
-        addr = opmsg(addr + 1);
-        break;
-    case INSERT:
-        addr = opinsert(addr + 1);
-        break;
-    case REMOVE:
-        addr = opremove(addr + 1);
         break;
     case HALT:
         stack->state_of(Stack::STATE::HALTED);

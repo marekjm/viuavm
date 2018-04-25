@@ -27,6 +27,7 @@
 #include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
+#include <viua/types/struct.h>
 #include <viua/types/exception.h>
 #include <viua/types/function.h>
 #include <viua/types/pointer.h>
@@ -237,23 +238,6 @@ viua::kernel::Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
     return attached_kernel;
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_class(
-    const string& name) const {
-    return attached_kernel->is_class(name);
-}
-
-bool viua::scheduler::VirtualProcessScheduler::class_accepts(
-    const string& klass,
-    const string& method) const {
-    return attached_kernel->class_accepts(klass, method);
-}
-
-auto viua::scheduler::VirtualProcessScheduler::inheritance_chain_of(
-    const std::string& name) const
-    -> decltype(attached_kernel->inheritance_chain_of(name)) {
-    return attached_kernel->inheritance_chain_of(name);
-}
-
 bool viua::scheduler::VirtualProcessScheduler::is_local_function(
     const string& name) const {
     return attached_kernel->is_local_function(name);
@@ -267,11 +251,6 @@ bool viua::scheduler::VirtualProcessScheduler::is_linked_function(
 bool viua::scheduler::VirtualProcessScheduler::is_native_function(
     const string& name) const {
     return attached_kernel->is_native_function(name);
-}
-
-bool viua::scheduler::VirtualProcessScheduler::is_foreign_method(
-    const string& name) const {
-    return attached_kernel->is_foreign_method(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_foreign_function(
@@ -300,38 +279,16 @@ pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
     return attached_kernel->get_entry_point_of_block(name);
 }
 
-string viua::scheduler::VirtualProcessScheduler::resolve_method_name(
-    const string& klass,
-    const string& method) const {
-    return attached_kernel->resolve_method_name(klass, method);
-}
-
 pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
     scheduler::VirtualProcessScheduler::get_entry_point_of(
         const std::string& name) const {
     return attached_kernel->get_entry_point_of(name);
 }
 
-void viua::scheduler::VirtualProcessScheduler::register_prototype(
-    unique_ptr<viua::types::Prototype> proto) {
-    attached_kernel->register_prototype(std::move(proto));
-}
-
 void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(
     Frame* frame,
     viua::process::Process* p) const {
     attached_kernel->request_foreign_function_call(frame, p);
-}
-
-void viua::scheduler::VirtualProcessScheduler::request_foreign_method_call(
-    const string& name,
-    viua::types::Value* object,
-    Frame* frame,
-    viua::kernel::RegisterSet*,
-    viua::kernel::RegisterSet*,
-    viua::process::Process* p) {
-    attached_kernel->request_foreign_method_call(
-        name, object, frame, nullptr, nullptr, p);
 }
 
 void viua::scheduler::VirtualProcessScheduler::load_module(string module) {
@@ -580,9 +537,19 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                auto death_message = make_unique<viua::types::Object>("Object");
-                unique_ptr<viua::types::Value> exc(
-                    th->transfer_active_exception());
+                if (th->trace().at(0)->function_name == th->watchdog()) {
+#if VIUA_VM_DEBUG_LOG
+                    viua_err("[sched:vps:died:in-watchdog] pid = ",
+                             th->pid().get(),
+                             "; process reaped, death cause: ",
+                             exc->str());
+#endif
+
+                    print_stack_trace(th);
+                    dead_processes_list.emplace_back(std::move(processes.at(i)));
+                    continue;
+                }
+
                 auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args =
                     th->trace().at(0)->arguments.get();
@@ -600,11 +567,14 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                          exc->str());
 #endif
 
-                death_message->set("function",
+                auto death_message = make_unique<viua::types::Struct>();
+                death_message->insert("function",
                                    make_unique<viua::types::Function>(
                                        th->trace().at(0)->function_name));
-                death_message->set("exception", std::move(exc));
-                death_message->set("parameters", std::move(parameters));
+                auto exc =
+                    th->transfer_active_exception();
+                death_message->insert("exception", std::move(exc));
+                death_message->insert("parameters", std::move(parameters));
 
                 auto death_frame = make_unique<Frame>(nullptr, 1);
                 death_frame->arguments->set(0, std::move(death_message));

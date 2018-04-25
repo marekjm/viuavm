@@ -253,6 +253,8 @@ auto opcopy(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opptr(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
+auto opptrlive(viua::internals::types::byte*, int_op, int_op)
+    -> viua::internals::types::byte*;
 auto opswap(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opdelete(viua::internals::types::byte*, int_op)

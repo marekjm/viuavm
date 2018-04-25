@@ -20,19 +20,25 @@
 .signature: std::misc::cycle/1
 
 .function: print_hello/1
-    frame ^[(pamv %0 (integer %1 64))]
+    frame ^[(pamv %0 (integer %1 local 64) local)]
     call std::misc::cycle/1
 
-    .name: 2 format_args
-    vector %format_args (arg %1 %0) %1
+    .name: %iota hello
+    .name: %iota exclamation_mark
+    text %hello local "Hello "
+    text %exclamation_mark local "!"
 
-    .name: 1 format_string
-    string %format_string "Hello #{0}!\n"
+    .name: %iota something
+    arg %something local %0
 
-    frame ^[(param %0 %format_string) (param %1 %format_args)]
-    msg %3 format/
+    .name: %iota textified
+    text %textified local %something local
 
-    echo %3
+    .name: %iota to_print
+    textconcat %to_print local %hello local %textified local
+    textconcat %to_print local %to_print local %exclamation_mark local
+
+    print %to_print local
 
     return
 .end

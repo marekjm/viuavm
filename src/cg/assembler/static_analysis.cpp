@@ -1205,20 +1205,7 @@ static void check_block_body(const TokenVector& body_tokens,
                                   "use of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "register") {
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
-
-            check_use_of_register(body_tokens,
-                                  target,
-                                  i,
-                                  registers,
-                                  named_registers,
-                                  "registering class from empty register");
-            erase_register(
-                registers, named_registers, body_tokens.at(target), token);
-
-            i = skip_till_next_line(body_tokens, i);
-        } else if (token == "msg" or token == "call" or token == "process") {
+        } else if (token == "call" or token == "process") {
             TokenIndex target   = get_token_index_of_operand(body_tokens, i, 1);
             TokenIndex function = target + 2;
 
