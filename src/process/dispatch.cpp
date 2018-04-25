@@ -328,6 +328,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(
     case PTR:
         addr = opptr(addr + 1);
         break;
+    case PTRLIVE:
+        addr = opptrlive(addr + 1);
+        break;
     case SWAP:
         addr = opswap(addr + 1);
         break;
