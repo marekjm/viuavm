@@ -512,6 +512,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case MOVE:
     case COPY:
     case PTR:
+    case PTRLIVE:
     case SWAP:
     case VPUSH:
     case VLEN:
