@@ -438,6 +438,8 @@ viua::internals::types::bytecode_size assemble_instruction(
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);
     } else if (tokens.at(i) == "ptr") {
         assemble_double_register_op<&Program::opptr>(program, tokens, i);
+    } else if (tokens.at(i) == "ptrlive") {
+        assemble_double_register_op<&Program::opptrlive>(program, tokens, i);
     } else if (tokens.at(i) == "swap") {
         assemble_double_register_op<&Program::opswap>(program, tokens, i);
     } else if (tokens.at(i) == "delete") {
