@@ -501,6 +501,11 @@ Program& Program::opptr(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::opptrlive(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::opptrlive(addr_ptr, target, source);
+    return (*this);
+}
+
 Program& Program::opswap(int_op a, int_op b) {
     /*  Inserts swap instruction to bytecode.
      *

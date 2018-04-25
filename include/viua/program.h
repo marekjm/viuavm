@@ -165,6 +165,7 @@ class Program {
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
+    Program& opptrlive(int_op, int_op);
     Program& opswap(int_op, int_op);
     Program& opdelete(int_op);
     Program& opisnull(int_op, int_op);
