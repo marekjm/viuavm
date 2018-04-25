@@ -302,6 +302,9 @@ auto check_register_usage_for_instruction_block_impl(
             case PTR:
                 check_op_ptr(register_usage_profile, *instruction);
                 break;
+            case PTRLIVE:
+                check_op_ptrlive(register_usage_profile, *instruction);
+                break;
             case SWAP:
                 check_op_swap(register_usage_profile, *instruction);
                 break;

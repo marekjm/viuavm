@@ -374,6 +374,8 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_ptr(Register_usage_profile& register_usage_profile,
                   Instruction const& instruction) -> void;
+auto check_op_ptrlive(Register_usage_profile& register_usage_profile,
+                  Instruction const& instruction) -> void;
 auto check_op_swap(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_delete(Register_usage_profile& register_usage_profile,
