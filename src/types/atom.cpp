@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,36 +19,35 @@
 
 #include <viua/support/string.h>
 #include <viua/types/atom.h>
-using namespace std;
 
-const string viua::types::Atom::type_name = "viua::types::Atom";
+std::string const viua::types::Atom::type_name = "viua::types::Atom";
 
-string viua::types::Atom::type() const {
+auto viua::types::Atom::type() const -> std::string {
     return "viua::types::Atom";
 }
 
-bool viua::types::Atom::boolean() const {
+auto viua::types::Atom::boolean() const -> bool {
     return true;
 }
 
-string viua::types::Atom::str() const {
+auto viua::types::Atom::str() const -> std::string {
     return str::enquote(value, '\'');
 }
 
-string viua::types::Atom::repr() const {
+auto viua::types::Atom::repr() const -> std::string {
     return str();
 }
 
-viua::types::Atom::operator string() const {
+viua::types::Atom::operator std::string() const {
     return value;
 }
 
-unique_ptr<viua::types::Value> viua::types::Atom::copy() const {
-    return make_unique<Atom>(value);
+auto viua::types::Atom::copy() const -> std::unique_ptr<viua::types::Value> {
+    return std::make_unique<Atom>(value);
 }
 
-auto viua::types::Atom::operator==(const Atom& that) const -> bool {
+auto viua::types::Atom::operator==(Atom const& that) const -> bool {
     return (value == that.value);
 }
 
-viua::types::Atom::Atom(string s) : value(s) {}
+viua::types::Atom::Atom(std::string s) : value(s) {}
