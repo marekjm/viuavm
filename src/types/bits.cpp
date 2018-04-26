@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,9 +26,9 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <viua/types/bits.h>
 #include <viua/types/exception.h>
-using namespace std;
 using namespace viua::types;
 
 
@@ -36,9 +36,9 @@ using namespace viua::types;
  * Here's a cool resource for binary arithmetic:
  * https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
-static auto to_string(vector<bool> const& v, bool const with_prefix = false)
-    -> string {
-    ostringstream oss;
+static auto to_string(std::vector<bool> const& v, bool const with_prefix = false)
+    -> std::string {
+    std::ostringstream oss;
 
     if (with_prefix) {
         oss << "0b";
@@ -50,8 +50,8 @@ static auto to_string(vector<bool> const& v, bool const with_prefix = false)
 
     return oss.str();
 }
-static auto binary_expand(vector<bool> v, decltype(v)::size_type const n)
-    -> vector<bool> {
+static auto binary_expand(std::vector<bool> v, decltype(v)::size_type const n)
+    -> std::vector<bool> {
     auto expanding_value = (v.size() ? v.back() : false);
     v.reserve(n);
     while (v.size() < n) {
@@ -60,9 +60,9 @@ static auto binary_expand(vector<bool> v, decltype(v)::size_type const n)
     return v;
 }
 static auto binary_clip(
-    const vector<bool>& bits,
-    std::remove_reference_t<decltype(bits)>::size_type width) -> vector<bool> {
-    vector<bool> result;
+    const std::vector<bool>& bits,
+    std::remove_reference_t<decltype(bits)>::size_type width) -> std::vector<bool> {
+    std::vector<bool> result;
     result.reserve(width);
     std::fill_n(std::back_inserter(result), width, false);
 
@@ -71,8 +71,8 @@ static auto binary_clip(
 
     return result;
 }
-static auto binary_inversion(vector<bool> const& v) -> vector<bool> {
-    auto inverted = vector<bool>{};
+static auto binary_inversion(std::vector<bool> const& v) -> std::vector<bool> {
+    auto inverted = std::vector<bool>{};
     inverted.reserve(v.size());
 
     for (auto const each : v) {
@@ -81,7 +81,7 @@ static auto binary_inversion(vector<bool> const& v) -> vector<bool> {
 
     return inverted;
 }
-static auto binary_to_bool(vector<bool> const& v) -> bool {
+static auto binary_to_bool(std::vector<bool> const& v) -> bool {
     for (auto const each : v) {
         if (each) {
             return true;
@@ -89,18 +89,18 @@ static auto binary_to_bool(vector<bool> const& v) -> bool {
     }
     return false;
 }
-static auto binary_fill_with_zeroes(vector<bool> v) -> vector<bool> {
+static auto binary_fill_with_zeroes(std::vector<bool> v) -> std::vector<bool> {
     for (auto i = decltype(v)::size_type{0}; i < v.size(); ++i) {
         v[i] = false;
     }
     return v;
 }
-static auto binary_is_negative(vector<bool> const& v) -> bool {
+static auto binary_is_negative(std::vector<bool> const& v) -> bool {
     return v.back();
 }
-static auto binary_last_bit_set(vector<bool> const& v)
-    -> optional<remove_reference_t<decltype(v)>::size_type> {
-    auto index_of_set = optional<remove_reference_t<decltype(v)>::size_type>{};
+static auto binary_last_bit_set(std::vector<bool> const& v)
+    -> std::optional<std::remove_reference_t<decltype(v)>::size_type> {
+    auto index_of_set = std::optional<std::remove_reference_t<decltype(v)>::size_type>{};
 
     for (auto i = v.size(); i; --i) {
         if (v.at(i - 1)) {
@@ -111,9 +111,9 @@ static auto binary_last_bit_set(vector<bool> const& v)
 
     return index_of_set;
 }
-static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+static auto binary_eq(std::vector<bool> lhs, std::vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 
     for (auto i = decltype(lhs)::size_type{0}; i < lhs.size(); ++i) {
         if (lhs.at(i) != rhs.at(i)) {
@@ -126,11 +126,11 @@ static auto binary_eq(vector<bool> lhs, vector<bool> rhs) -> bool {
 }
 
 
-static auto binary_shr(vector<bool> v,
+static auto binary_shr(std::vector<bool> v,
                        decltype(v)::size_type const n,
                        bool const padding = false)
-    -> pair<vector<bool>, vector<bool>> {
-    auto shifted = vector<bool>{};
+    -> std::pair<std::vector<bool>, std::vector<bool>> {
+    auto shifted = std::vector<bool>{};
     shifted.reserve(n);
     for (auto i = decltype(n){0}; i < n; ++i) {
         shifted.push_back(false);
@@ -164,9 +164,9 @@ static auto binary_shr(vector<bool> v,
 
     return {shifted, v};
 }
-static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
-    -> pair<vector<bool>, vector<bool>> {
-    auto shifted = vector<bool>{};
+static auto binary_shl(std::vector<bool> v, decltype(v)::size_type const n)
+    -> std::pair<std::vector<bool>, std::vector<bool>> {
+    auto shifted = std::vector<bool>{};
     shifted.reserve(n);
     for (auto i = decltype(n){0}; i < n; ++i) {
         shifted.push_back(false);
@@ -204,8 +204,8 @@ static auto binary_shl(vector<bool> v, decltype(v)::size_type const n)
 
 namespace viua { namespace arithmetic {
 namespace wrapping {
-static auto binary_increment(vector<bool> const& v)
-    -> pair<bool, vector<bool>> {
+static auto binary_increment(std::vector<bool> const& v)
+    -> std::pair<bool, std::vector<bool>> {
     auto carry       = true;
     auto incremented = v;
 
@@ -221,8 +221,8 @@ static auto binary_increment(vector<bool> const& v)
 
     return {carry, incremented};
 }
-static auto binary_decrement(vector<bool> const& v)
-    -> pair<bool, vector<bool>> {
+static auto binary_decrement(std::vector<bool> const& v)
+    -> std::pair<bool, std::vector<bool>> {
     auto borrow      = false;
     auto decremented = v;
 
@@ -239,14 +239,14 @@ static auto binary_decrement(vector<bool> const& v)
 
     return {borrow, decremented};
 }
-static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
+static auto take_twos_complement(std::vector<bool> const& v) -> std::vector<bool> {
     return binary_increment(binary_inversion(v)).second;
 }
 
 
-static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+static auto binary_lte(std::vector<bool> lhs, std::vector<bool> rhs) -> bool {
+    lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 
     for (auto i = lhs.size(); i; --i) {
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
@@ -260,10 +260,10 @@ static auto binary_lte(vector<bool> lhs, vector<bool> rhs) -> bool {
     // equal to each other
     return true;
 }
-static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs)
+static auto binary_lt[[maybe_unused]](std::vector<bool> lhs, std::vector<bool> rhs)
     -> bool {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+    lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 
     for (auto i = lhs.size(); i; --i) {
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
@@ -279,9 +279,9 @@ static auto binary_lt[[maybe_unused]](vector<bool> lhs, vector<bool> rhs)
 }
 
 
-static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
-    -> vector<bool> {
-    vector<bool> result;
+static auto binary_addition(const std::vector<bool>& lhs, const std::vector<bool>& rhs)
+    -> std::vector<bool> {
+    std::vector<bool> result;
     auto size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
@@ -317,7 +317,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
          * If carry was not enabled we have 0 + 0, so we should
          * obviously leave the bit disabled in the result.
          * This means that we can just copy state of the carry flag into
-         * the result bit string on current position.
+         * the result bit std::string on current position.
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
@@ -356,17 +356,17 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
 
     return result;
 }
-static auto binary_subtraction(vector<bool> const& lhs, vector<bool> const& rhs)
-    -> vector<bool> {
+static auto binary_subtraction(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
     return binary_clip(
-        binary_addition(binary_expand(lhs, max(lhs.size(), rhs.size())),
+        binary_addition(binary_expand(lhs, std::max(lhs.size(), rhs.size())),
                         take_twos_complement(
-                            binary_expand(rhs, max(lhs.size(), rhs.size())))),
+                            binary_expand(rhs, std::max(lhs.size(), rhs.size())))),
         lhs.size());
 }
-static auto binary_multiplication(const vector<bool>& lhs,
-                                  const vector<bool>& rhs) -> vector<bool> {
-    vector<vector<bool>> intermediates;
+static auto binary_multiplication(const std::vector<bool>& lhs,
+                                  const std::vector<bool>& rhs) -> std::vector<bool> {
+    std::vector<std::vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
     /*
@@ -381,7 +381,7 @@ static auto binary_multiplication(const vector<bool>& lhs,
          ++i) {
         if (not rhs.at(i)) {
             /*
-             * Multiplication by 0 just gives a long string of zeroes.
+             * Multiplication by 0 just gives a long std::string of zeroes.
              * There is no reason to build all these zero-filled bit strings as
              * they will only slow things down the road when all the
              * intermediate bit strings are accumulated.
@@ -389,7 +389,7 @@ static auto binary_multiplication(const vector<bool>& lhs,
             continue;
         }
 
-        vector<bool> interm;
+        std::vector<bool> interm;
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -401,18 +401,18 @@ static auto binary_multiplication(const vector<bool>& lhs,
     return std::accumulate(
         intermediates.begin(),
         intermediates.end(),
-        vector<bool>{},
-        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+        std::vector<bool>{},
+        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
             return binary_addition(l, r);
         });
 }
-static auto binary_division(vector<bool> const& dividend,
-                            vector<bool> const& rhs) -> vector<bool> {
+static auto binary_division(std::vector<bool> const& dividend,
+                            std::vector<bool> const& rhs) -> std::vector<bool> {
     if (not binary_to_bool(rhs)) {
-        throw make_unique<Exception>("division by zero");
+        throw std::make_unique<Exception>("division by zero");
     }
 
-    auto quotinent = vector<bool>{};
+    auto quotinent = std::vector<bool>{};
     auto remainder = dividend;
     auto divisor   = rhs;
 
@@ -449,7 +449,7 @@ static auto binary_division(vector<bool> const& dividend,
 }
 }  // namespace wrapping
 namespace checked {
-static auto signed_increment(vector<bool> v) -> vector<bool> {
+static auto signed_increment(std::vector<bool> v) -> std::vector<bool> {
     auto carry       = true;
     auto incremented = v;
 
@@ -464,13 +464,13 @@ static auto signed_increment(vector<bool> v) -> vector<bool> {
     }
 
     if ((not binary_is_negative(v)) and binary_is_negative(incremented)) {
-        throw make_unique<Exception>(
+        throw std::make_unique<Exception>(
             "CheckedArithmeticIncrementSignedOverflow");
     }
 
     return incremented;
 }
-static auto signed_decrement(vector<bool> v) -> vector<bool> {
+static auto signed_decrement(std::vector<bool> v) -> std::vector<bool> {
     auto decremented = v;
 
     for (auto i = decltype(decremented)::size_type{0}; i < v.size(); ++i) {
@@ -483,16 +483,16 @@ static auto signed_decrement(vector<bool> v) -> vector<bool> {
     }
 
     if (binary_is_negative(v) and not binary_is_negative(decremented)) {
-        throw make_unique<Exception>(
+        throw std::make_unique<Exception>(
             "CheckedArithmeticDecrementSignedOverflow");
     }
 
     return decremented;
 }
-static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
+static auto take_twos_complement(std::vector<bool> const& v) -> std::vector<bool> {
     return signed_increment(binary_inversion(v));
 }
-static auto absolute(vector<bool> const& v) -> vector<bool> {
+static auto absolute(std::vector<bool> const& v) -> std::vector<bool> {
     if (binary_is_negative(v)) {
         return take_twos_complement(v);
     } else {
@@ -500,9 +500,9 @@ static auto absolute(vector<bool> const& v) -> vector<bool> {
     }
 }
 
-static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+static auto signed_lt(std::vector<bool> lhs, std::vector<bool> rhs) {
+    lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 
     if (binary_is_negative(lhs) and not binary_is_negative(rhs)) {
         return true;
@@ -532,9 +532,9 @@ static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
 }
 
 
-static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs)
-    -> vector<bool> {
-    vector<bool> result;
+static auto signed_add(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
+    std::vector<bool> result;
     auto size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
@@ -581,7 +581,7 @@ static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs)
          * If carry was not enabled we have 0 + 0, so we should
          * obviously leave the bit disabled in the result.
          * This means that we can just copy state of the carry flag into
-         * the result bit string on current position.
+         * the result bit std::string on current position.
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
@@ -610,16 +610,16 @@ static auto signed_add(vector<bool> const& lhs, vector<bool> const& rhs)
     }
 
     if (result_should_be_negative and not binary_is_negative(result)) {
-        throw make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
+        throw std::make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
     }
     if (not result_should_be_negative and binary_is_negative(result)) {
-        throw make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
+        throw std::make_unique<Exception>("CheckedArithmeticAdditionSignedOverflow");
     }
 
     return result;
 }
-static auto signed_sub(vector<bool> const& lhs, vector<bool> const& rhs)
-    -> vector<bool> {
+static auto signed_sub(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
     if (lhs == rhs) {
         auto result = std::vector<bool>{};
         result.reserve(lhs.size());
@@ -630,25 +630,25 @@ static auto signed_sub(vector<bool> const& lhs, vector<bool> const& rhs)
     auto rhs_used = std::vector<bool>{};
     try {
         rhs_used = take_twos_complement(
-            binary_expand(rhs, max(lhs.size(), rhs.size())));
-    } catch (unique_ptr<Exception>&) {
-        throw make_unique<Exception>(
+            binary_expand(rhs, std::max(lhs.size(), rhs.size())));
+    } catch (std::unique_ptr<Exception>&) {
+        throw std::make_unique<Exception>(
             "CheckedArithmeticSubtractionSignedOverflow");
     }
 
     try {
         return binary_clip(
-            signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())),
+            signed_add(binary_expand(lhs, std::max(lhs.size(), rhs.size())),
                        rhs_used),
             lhs.size());
-    } catch (unique_ptr<Exception>&) {
-        throw make_unique<Exception>(
+    } catch (std::unique_ptr<Exception>&) {
+        throw std::make_unique<Exception>(
             "CheckedArithmeticSubtractionSignedOverflow");
     }
 }
-static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
-    -> vector<bool> {
-    vector<vector<bool>> intermediates;
+static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
+    std::vector<std::vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
     /*
@@ -667,7 +667,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          ++i) {
         if (not rhs.at(i)) {
             /*
-             * Multiplication by 0 just gives a long string of zeroes.
+             * Multiplication by 0 just gives a long std::string of zeroes.
              * There is no reason to build all these zero-filled bit strings as
              * they will only slow things down the road when all the
              * intermediate bit strings are accumulated.
@@ -675,7 +675,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
             continue;
         }
 
-        vector<bool> interm;
+        std::vector<bool> interm;
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -688,9 +688,9 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
      * Result *MUST NOT* be empty.
      * If it would be empty checking if it is negative would result in
      * segmentation fault when binary_is_negative() would try to access last
-     * element of empty bit string.
+     * element of empty bit std::string.
      */
-    auto result = vector<bool>{};
+    auto result = std::vector<bool>{};
     result.reserve(lhs.size());
     std::fill_n(std::back_inserter(result), lhs.size(), false);
 
@@ -698,7 +698,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
         intermediates.begin(),
         intermediates.end(),
         result,
-        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
              * the result. If you used checked addition multiplication would
@@ -756,23 +756,23 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          */
         if ((not result_should_be_negative)
             and (lhs_negative or rhs_negative)) {
-            auto lhs_abs = vector<bool>{};
-            auto rhs_abs = vector<bool>{};
+            auto lhs_abs = std::vector<bool>{};
+            auto rhs_abs = std::vector<bool>{};
             try {
                 lhs_abs = absolute(lhs);
                 rhs_abs = absolute(rhs);
-            } catch (unique_ptr<Exception>&) {
+            } catch (std::unique_ptr<Exception>&) {
                 /*
                  * This is why we need separate lhs_abs and rhs_abs variables
                  * initialised under a try: because they can throw exceptions on
                  * overflow when taking two's complement of the minimal value
                  * (a.k.a. negative maximum, e.g. -128 for 8 bit integers).
                  */
-                throw make_unique<Exception>(
+                throw std::make_unique<Exception>(
                     "CheckedArithmeticMultiplicationSignedOverflow");
             }
             if (clipped != signed_mul(lhs_abs, rhs_abs)) {
-                throw make_unique<Exception>(
+                throw std::make_unique<Exception>(
                     "CheckedArithmeticMultiplicationSignedOverflow");
             }
         }
@@ -785,7 +785,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          * negative and this check fires when neither is.
          */
         if (not(lhs_negative or rhs_negative)) {
-            throw make_unique<Exception>(
+            throw std::make_unique<Exception>(
                 "CheckedArithmeticMultiplicationSignedOverflow");
         }
     }
@@ -793,19 +793,19 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
     result = std::move(clipped);
 
     if (result_should_be_negative != binary_is_negative(result)) {
-        throw make_unique<Exception>(
+        throw std::make_unique<Exception>(
             "CheckedArithmeticMultiplicationSignedOverflow");
     }
 
     return result;
 }
-static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
-    -> vector<bool> {
+static auto signed_div(std::vector<bool> const& dividend, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
     if (not binary_to_bool(rhs)) {
-        throw make_unique<Exception>("division by zero");
+        throw std::make_unique<Exception>("division by zero");
     }
 
-    auto quotinent = vector<bool>{};
+    auto quotinent = std::vector<bool>{};
     auto remainder = dividend;
     auto divisor   = rhs;
 
@@ -833,29 +833,29 @@ static auto signed_div(vector<bool> const& dividend, vector<bool> const& rhs)
         if (negative_quotinent) {
             quotinent = take_twos_complement(quotinent);
         }
-    } catch (unique_ptr<Exception>&) {
-        throw make_unique<Exception>("CheckedArithmeticDivisionSignedOverflow");
+    } catch (std::unique_ptr<Exception>&) {
+        throw std::make_unique<Exception>("CheckedArithmeticDivisionSignedOverflow");
     }
 
     return quotinent;
 }
 }  // namespace checked
 namespace saturating {
-static auto signed_make_max(size_t const n) -> vector<bool> {
-    vector<bool> v;
+static auto signed_make_max(size_t const n) -> std::vector<bool> {
+    std::vector<bool> v;
     v.reserve(n);
     v.resize(n - 1, true);
     v.push_back(false);
     return v;
 }
-static auto signed_make_min(size_t const n) -> vector<bool> {
-    vector<bool> v;
+static auto signed_make_min(size_t const n) -> std::vector<bool> {
+    std::vector<bool> v;
     v.reserve(n);
     v.resize(n - 1, false);
     v.push_back(true);
     return v;
 }
-static auto signed_is_min(vector<bool> const v) -> bool {
+static auto signed_is_min(std::vector<bool> const v) -> bool {
     /*
      * Last bit must be set in two's complement for the number to be negative.
      * If it's not then clearly the number encoded is not the minimum *signed*
@@ -875,7 +875,7 @@ static auto signed_is_min(vector<bool> const v) -> bool {
     }
     return true;
 }
-//            static auto signed_is_max(vector<bool> const v) -> bool {
+//            static auto signed_is_max(std::vector<bool> const v) -> bool {
 //                /*
 //                 * Last bit must be unset in two's complement for the number
 //                 to be positive.
@@ -898,7 +898,7 @@ static auto signed_is_min(vector<bool> const v) -> bool {
 //                }
 //                return true;
 //            }
-static auto signed_increment(vector<bool> v) -> vector<bool> {
+static auto signed_increment(std::vector<bool> v) -> std::vector<bool> {
     auto carry       = true;
     auto incremented = v;
 
@@ -918,7 +918,7 @@ static auto signed_increment(vector<bool> v) -> vector<bool> {
 
     return incremented;
 }
-static auto signed_decrement(vector<bool> v) -> vector<bool> {
+static auto signed_decrement(std::vector<bool> v) -> std::vector<bool> {
     if (signed_is_min(v)) {
         return v;
     }
@@ -937,12 +937,12 @@ static auto signed_decrement(vector<bool> v) -> vector<bool> {
     return decremented;
 }
 
-static auto take_twos_complement(vector<bool> const& v) -> vector<bool> {
+static auto take_twos_complement(std::vector<bool> const& v) -> std::vector<bool> {
     return signed_increment(binary_inversion(v));
 }
-static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
-    lhs = binary_expand(lhs, max(lhs.size(), rhs.size()));
-    rhs = binary_expand(rhs, max(lhs.size(), rhs.size()));
+static auto signed_lt(std::vector<bool> lhs, std::vector<bool> rhs) {
+    lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
+    rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 
     if (binary_is_negative(lhs) and not binary_is_negative(rhs)) {
         return true;
@@ -970,7 +970,7 @@ static auto signed_lt(vector<bool> lhs, vector<bool> rhs) {
     // equal to each other
     return true;
 }
-static auto absolute(vector<bool> const& v) -> vector<bool> {
+static auto absolute(std::vector<bool> const& v) -> std::vector<bool> {
     if (binary_is_negative(v)) {
         return take_twos_complement(v);
     } else {
@@ -978,8 +978,8 @@ static auto absolute(vector<bool> const& v) -> vector<bool> {
     }
 }
 
-static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
-    vector<bool> result;
+static auto signed_add(std::vector<bool> lhs, std::vector<bool> rhs) -> std::vector<bool> {
+    std::vector<bool> result;
     auto size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
@@ -1026,7 +1026,7 @@ static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
          * If carry was not enabled we have 0 + 0, so we should
          * obviously leave the bit disabled in the result.
          * This means that we can just copy state of the carry flag into
-         * the result bit string on current position.
+         * the result bit std::string on current position.
          */
         if (from_rhs and from_lhs) {
             result.at(i) = carry;
@@ -1063,7 +1063,7 @@ static auto signed_add(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
 
     return result;
 }
-static auto signed_sub(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
+static auto signed_sub(std::vector<bool> lhs, std::vector<bool> rhs) -> std::vector<bool> {
     if (lhs == rhs) {
         auto result = std::vector<bool>{};
         result.reserve(lhs.size());
@@ -1074,29 +1074,29 @@ static auto signed_sub(vector<bool> lhs, vector<bool> rhs) -> vector<bool> {
     auto rhs_used = std::vector<bool>{};
     try {
         rhs_used = take_twos_complement(
-            binary_expand(rhs, max(lhs.size(), rhs.size())));
-    } catch (unique_ptr<Exception>&) {
-        throw make_unique<Exception>(
+            binary_expand(rhs, std::max(lhs.size(), rhs.size())));
+    } catch (std::unique_ptr<Exception>&) {
+        throw std::make_unique<Exception>(
             "SaturatingArithmeticSubtractionSignedOverflow");
     }
 
     try {
         auto r = binary_clip(
-            signed_add(binary_expand(lhs, max(lhs.size(), rhs.size())),
+            signed_add(binary_expand(lhs, std::max(lhs.size(), rhs.size())),
                        rhs_used),
             lhs.size());
         if (signed_is_min(rhs)) {
             r = signed_increment(r);
         }
         return r;
-    } catch (unique_ptr<Exception>&) {
-        throw make_unique<Exception>(
+    } catch (std::unique_ptr<Exception>&) {
+        throw std::make_unique<Exception>(
             "SaturatingArithmeticSubtractionSignedOverflow");
     }
 }
-static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
-    -> vector<bool> {
-    vector<vector<bool>> intermediates;
+static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
+    -> std::vector<bool> {
+    std::vector<std::vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
     /*
@@ -1115,7 +1115,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          ++i) {
         if (not rhs.at(i)) {
             /*
-             * Multiplication by 0 just gives a long string of zeroes.
+             * Multiplication by 0 just gives a long std::string of zeroes.
              * There is no reason to build all these zero-filled bit strings as
              * they will only slow things down the road when all the
              * intermediate bit strings are accumulated.
@@ -1123,7 +1123,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
             continue;
         }
 
-        vector<bool> interm;
+        std::vector<bool> interm;
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -1136,9 +1136,9 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
      * Result *MUST NOT* be empty.
      * If it would be empty checking if it is negative would result in
      * segmentation fault when binary_is_negative() would try to access last
-     * element of empty bit string.
+     * element of empty bit std::string.
      */
-    auto result = vector<bool>{};
+    auto result = std::vector<bool>{};
     result.reserve(lhs.size());
     std::fill_n(std::back_inserter(result), lhs.size(), false);
 
@@ -1146,7 +1146,7 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
         intermediates.begin(),
         intermediates.end(),
         result,
-        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
              * the result. If you used checked addition multiplication would
@@ -1204,8 +1204,8 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
          */
         if ((not result_should_be_negative)
             and (lhs_negative or rhs_negative)) {
-            auto lhs_abs = vector<bool>{};
-            auto rhs_abs = vector<bool>{};
+            auto lhs_abs = std::vector<bool>{};
+            auto rhs_abs = std::vector<bool>{};
             try {
                 lhs_abs = absolute(lhs);
                 rhs_abs = absolute(rhs);
@@ -1254,13 +1254,13 @@ static auto signed_mul(vector<bool> const& lhs, vector<bool> const& rhs)
 
     return result;
 }
-static auto signed_div(vector<bool> dividend, vector<bool> divisor)
-    -> vector<bool> {
+static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
+    -> std::vector<bool> {
     if (not binary_to_bool(divisor)) {
-        throw make_unique<Exception>("division by zero");
+        throw std::make_unique<Exception>("division by zero");
     }
 
-    auto quotinent = vector<bool>{};
+    auto quotinent = std::vector<bool>{};
     auto remainder = dividend;
 
     quotinent.reserve(remainder.size());
@@ -1303,13 +1303,13 @@ static auto signed_div(vector<bool> dividend, vector<bool> divisor)
 }}  // namespace viua::arithmetic
 
 
-const string viua::types::Bits::type_name = "Bits";
+const std::string viua::types::Bits::type_name = "Bits";
 
-string viua::types::Bits::type() const {
+std::string viua::types::Bits::type() const {
     return type_name;
 }
 
-string viua::types::Bits::str() const {
+std::string viua::types::Bits::str() const {
     return to_string(underlying_array);
 }
 
@@ -1317,8 +1317,8 @@ bool viua::types::Bits::boolean() const {
     return binary_to_bool(underlying_array);
 }
 
-unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
-    return make_unique<Bits>(underlying_array);
+std::unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
+    return std::make_unique<Bits>(underlying_array);
 }
 
 auto viua::types::Bits::size() const -> size_type {
@@ -1341,31 +1341,31 @@ auto viua::types::Bits::clear() -> void {
     }
 }
 
-auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
+auto viua::types::Bits::shl(size_type n) -> std::unique_ptr<Bits> {
     auto result      = binary_shl(underlying_array, n);
     underlying_array = std::move(result.second);
-    return make_unique<Bits>(result.first);
+    return std::make_unique<Bits>(result.first);
 }
 
 auto viua::types::Bits::shr(size_type n, const bool padding)
-    -> unique_ptr<Bits> {
+    -> std::unique_ptr<Bits> {
     auto result      = binary_shr(underlying_array, n, padding);
     underlying_array = std::move(result.second);
-    return make_unique<Bits>(result.first);
+    return std::make_unique<Bits>(result.first);
 }
 
-auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> {
+auto viua::types::Bits::shr(size_type n) -> std::unique_ptr<Bits> {
     return shr(n, false);
 }
 
-auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
+auto viua::types::Bits::ashl(size_type n) -> std::unique_ptr<Bits> {
     auto sign    = at(underlying_array.size() - 1);
     auto shifted = shl(n);
     set(underlying_array.size() - 1, sign);
     return shifted;
 }
 
-auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> {
+auto viua::types::Bits::ashr(size_type n) -> std::unique_ptr<Bits> {
     return shr(n, at(size() - 1));
 }
 
@@ -1387,8 +1387,8 @@ auto viua::types::Bits::ror(size_type n) -> void {
     }
 }
 
-auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_inversion(underlying_array));
+auto viua::types::Bits::inverted() const -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(binary_inversion(underlying_array));
 }
 
 auto viua::types::Bits::increment() -> void {
@@ -1401,26 +1401,26 @@ auto viua::types::Bits::decrement() -> void {
         viua::arithmetic::wrapping::binary_decrement(underlying_array).second;
 }
 
-auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+auto viua::types::Bits::wrapadd(const Bits& that) const -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_addition(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapsub(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+auto viua::types::Bits::wrapsub(const Bits& that) const -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_subtraction(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+auto viua::types::Bits::wrapmul(const Bits& that) const -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_multiplication(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapdiv(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+auto viua::types::Bits::wrapdiv(const Bits& that) const -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_division(
                         underlying_array, that.underlying_array),
                     size()));
@@ -1436,27 +1436,27 @@ auto viua::types::Bits::checked_signed_decrement() -> void {
         viua::arithmetic::checked::signed_decrement(underlying_array);
 }
 auto viua::types::Bits::checked_signed_add(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::checked::signed_add(
                         underlying_array, that.underlying_array),
                     size()));
 }
 auto viua::types::Bits::checked_signed_sub(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::checked::signed_sub(
                         underlying_array, that.underlying_array),
                     size()));
 }
 auto viua::types::Bits::checked_signed_mul(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(viua::arithmetic::checked::signed_mul(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(viua::arithmetic::checked::signed_mul(
         underlying_array, that.underlying_array));
 }
 auto viua::types::Bits::checked_signed_div(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(viua::arithmetic::checked::signed_div(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(viua::arithmetic::checked::signed_div(
         underlying_array, that.underlying_array));
 }
 
@@ -1470,27 +1470,27 @@ auto viua::types::Bits::saturating_signed_decrement() -> void {
         viua::arithmetic::saturating::signed_decrement(underlying_array);
 }
 auto viua::types::Bits::saturating_signed_add(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::saturating::signed_add(
                         underlying_array, that.underlying_array),
                     size()));
 }
 auto viua::types::Bits::saturating_signed_sub(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::saturating::signed_sub(
                         underlying_array, that.underlying_array),
                     size()));
 }
 auto viua::types::Bits::saturating_signed_mul(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(viua::arithmetic::saturating::signed_mul(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(viua::arithmetic::saturating::signed_mul(
         underlying_array, that.underlying_array));
 }
 auto viua::types::Bits::saturating_signed_div(const Bits& that) const
-    -> unique_ptr<Bits> {
-    return make_unique<Bits>(viua::arithmetic::saturating::signed_div(
+    -> std::unique_ptr<Bits> {
+    return std::make_unique<Bits>(viua::arithmetic::saturating::signed_div(
         underlying_array, that.underlying_array));
 }
 
@@ -1502,34 +1502,34 @@ auto viua::types::Bits::operator==(const Bits& that) const -> bool {
 template<typename T>
 static auto perform_bitwise_logic(const viua::types::Bits& lhs,
                                   const viua::types::Bits& rhs)
-    -> unique_ptr<viua::types::Bits> {
-    auto result = make_unique<viua::types::Bits>(lhs.size());
+    -> std::unique_ptr<viua::types::Bits> {
+    auto result = std::make_unique<viua::types::Bits>(lhs.size());
 
     for (auto i = viua::types::Bits::size_type{0};
-         i < min(lhs.size(), rhs.size());
+         i < std::min(lhs.size(), rhs.size());
          ++i) {
         result->set(i, T()(lhs.at(i), rhs.at(i)));
     }
 
     return result;
 }
-auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
-    return perform_bitwise_logic<bit_or<bool>>(*this, that);
+auto viua::types::Bits::operator|(const Bits& that) const -> std::unique_ptr<Bits> {
+    return perform_bitwise_logic<std::bit_or<bool>>(*this, that);
 }
 
-auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
-    return perform_bitwise_logic<bit_and<bool>>(*this, that);
+auto viua::types::Bits::operator&(const Bits& that) const -> std::unique_ptr<Bits> {
+    return perform_bitwise_logic<std::bit_and<bool>>(*this, that);
 }
 
-auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
-    return perform_bitwise_logic<bit_xor<bool>>(*this, that);
+auto viua::types::Bits::operator^(const Bits& that) const -> std::unique_ptr<Bits> {
+    return perform_bitwise_logic<std::bit_xor<bool>>(*this, that);
 }
 
-viua::types::Bits::Bits(vector<bool>&& bs) {
+viua::types::Bits::Bits(std::vector<bool>&& bs) {
     underlying_array = std::move(bs);
 }
 
-viua::types::Bits::Bits(vector<bool> const& bs) {
+viua::types::Bits::Bits(std::vector<bool> const& bs) {
     underlying_array = bs;
 }
 
