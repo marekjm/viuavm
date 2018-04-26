@@ -19,18 +19,17 @@
 
 #include <sstream>
 #include <viua/support/env.h>
-using namespace std;
 
 namespace support { namespace env {
-auto get_var(string const& var) -> string {
+auto get_var(std::string const& var) -> std::string {
     auto const VAR = getenv(var.c_str());
-    return (VAR == nullptr ? string("") : string(VAR));
+    return (VAR == nullptr ? std::string("") : std::string(VAR));
 }
-auto get_paths(string const& var) -> vector<string> {
-    auto path  = get_var(var);
-    auto paths = vector<string>{};
+auto get_paths(std::string const& var) -> std::vector<std::string> {
+    auto const path  = get_var(var);
+    auto paths = std::vector<std::string>{};
 
-    auto a_path = string{};
+    auto a_path = std::string{};
     auto i      = decltype(path)::size_type{0};
     while (i < path.size()) {
         if (path[i] == ':') {
@@ -50,7 +49,7 @@ auto get_paths(string const& var) -> vector<string> {
     return paths;
 }
 
-auto is_file(string const& path) -> bool {
+auto is_file(std::string const& path) -> bool {
     struct stat sf;
 
     // not a file if stat returned error
@@ -67,13 +66,13 @@ auto is_file(string const& path) -> bool {
 }
 
 namespace viua {
-auto get_mod_path(string const& module,
-                  string const& extension,
-                  vector<string> const& paths) -> string {
-    auto path  = string{""};
+auto get_mod_path(std::string const& module,
+                  std::string const& extension,
+                  std::vector<std::string> const& paths) -> std::string {
+    auto path  = std::string{""};
     auto found = false;
 
-    auto oss = ostringstream{};
+    auto oss = std::ostringstream{};
     for (auto const& each : paths) {
         oss.str("");
         oss << each << '/' << module << '.' << extension;

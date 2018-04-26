@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 #include <viua/types/string.h>
-using namespace std;
 
 
 namespace str {
@@ -50,8 +49,8 @@ auto isnum(std::string const& s, bool negatives) -> bool {
     /*  Returns true if s contains only numerical characters.
      *  Regex equivalent: `^[0-9]+$`
      */
-    bool num                     = false;
-    std::string::size_type start = 0;
+    auto num                     = bool{false};
+    auto start = std::string::size_type{0};
     if (s[0] == '-' and negatives) {
         // must handle negative numbers
         start = 1;
@@ -82,24 +81,24 @@ auto isnum(std::string const& s, bool negatives) -> bool {
 auto ishex(std::string const& s, bool) -> bool {
     /*  Returns true if s is a valid hexadecimal number.
      */
-    static regex hexadecimal_number("^0x[0-9a-fA-F]+$");
+    static auto const hexadecimal_number = std::regex{"^0x[0-9a-fA-F]+$"};
     return regex_match(s, hexadecimal_number);
 }
 
-auto is_binary_literal(string const s) -> bool {
-    static regex binary_literal{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
+auto is_binary_literal(std::string const s) -> bool {
+    static auto const binary_literal = std::regex{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
     return regex_match(s, binary_literal);
 }
 
-auto is_boolean_literal(string const s) -> bool {
+auto is_boolean_literal(std::string const s) -> bool {
     return (s == "true" or s == "false");
 }
 
-auto is_void(string const s) -> bool {
+auto is_void(std::string const s) -> bool {
     return (s == "void");
 }
 
-auto is_atom_literal(string const s) -> bool {
+auto is_atom_literal(std::string const s) -> bool {
     /*
      * This seemingly naive check is sufficient, as this function should only
      * be called after the source code already lexed (and the lexer ensures that
@@ -109,14 +108,14 @@ auto is_atom_literal(string const s) -> bool {
     return (s.at(0) == '\'' and s.at(s.size() - 1) == '\'');
 }
 
-auto is_text_literal(string const s) -> bool {
+auto is_text_literal(std::string const s) -> bool {
     /*
      * Same as with with is_atom_literal().
      */
     return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
 }
 
-auto is_timeout_literal(string const s) -> bool {
+auto is_timeout_literal(std::string const s) -> bool {
     if (s == "infinity") {
         return true;
     }
@@ -135,7 +134,7 @@ auto is_timeout_literal(string const s) -> bool {
     return false;
 }
 
-auto is_register_set_name(string const s) -> bool {
+auto is_register_set_name(std::string const s) -> bool {
     return (s == "local" or s == "static" or s == "global" or s == "current");
 }
 
@@ -143,13 +142,13 @@ auto isfloat(std::string const& s, bool negatives) -> bool {
     /*  Returns true if s contains only numerical characters.
      *  Regex equivalent: `^[0-9]+\.[0-9]+$`
      */
-    bool is                      = false;
-    std::string::size_type start = 0;
+    auto is                      = bool{false};
+    auto start = std::string::size_type{0};
     if (s[0] == '-' and negatives) {
         // to handle negative numbers
         start = 1;
     }
-    int dot = -1;
+    auto dot = int{-1};
     for (auto i = start; i < s.size(); ++i) {
         if (s[i] == '.') {
             dot = static_cast<int>(i);
@@ -167,22 +166,23 @@ auto isfloat(std::string const& s, bool negatives) -> bool {
 auto isid(std::string const& s) -> bool {
     /*  Returns true if s is a valid identifier.
      */
-    static regex identifier("^[a-zA-Z_][:/a-zA-Z0-9_]*$");
+    static auto const identifier = std::regex{"^[a-zA-Z_][:/a-zA-Z0-9_]*$"};
     return regex_match(s, identifier);
 }
 
 
-auto sub(string const& s, std::string::size_type b, long int e) -> string {
+auto sub(std::string const& s, std::string::size_type b, long int e) -> std::string {
     /*  Returns substring of s.
      *  If only s is passed, returns copy of s.
      */
-    if (b == 0 and e == -1)
-        return string(s);
+    if (b == 0 and e == -1) {
+        return std::string(s);
+    }
 
-    ostringstream part;
+    auto part = std::ostringstream{};
     part.str("");
 
-    std::string::size_type end = 0;
+    auto end = std::string::size_type{0};
     if (e < 0) {
         end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1);
     } else {
@@ -197,27 +197,28 @@ auto sub(string const& s, std::string::size_type b, long int e) -> string {
 }
 
 
-auto chunk(string const& s, bool ignore_leading_ws) -> string {
-    /*  Returns part of the string until first whitespace from left side.
+auto chunk(std::string const& s, bool ignore_leading_ws) -> std::string {
+    /*  Returns part of the std::string until first whitespace from left side.
      */
-    ostringstream chnk;
+    auto chnk = std::ostringstream{};
 
-    string str = (ignore_leading_ws ? lstrip(s) : s);
+    auto str = std::string{ignore_leading_ws ? lstrip(s) : s};
 
-    for (std::string::size_type i = 0; i < str.size(); ++i) {
-        if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n')
+    for (auto i = std::string::size_type{0}; i < str.size(); ++i) {
+        if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n') {
             break;
+        }
         chnk << str[i];
     }
     return chnk.str();
 }
 
-auto chunks(string const& s) -> vector<string> {
-    /*  Returns chunks of string.
+auto chunks(std::string const& s) -> std::vector<std::string> {
+    /*  Returns chunks of std::string.
      */
-    vector<string> chnks;
-    string tmp(lstrip(s));
-    string chnk;
+    auto chnks = std::vector<std::string>{};
+    auto tmp = lstrip(s);
+    auto chnk = std::string{};
     while (tmp.size()) {
         chnk = chunk(tmp);
         tmp  = lstrip(sub(tmp, chnk.size()));
@@ -227,12 +228,12 @@ auto chunks(string const& s) -> vector<string> {
 }
 
 
-auto join(string const& s, vector<string> const& parts) -> string {
-    /** Join elements of vector with given string.
+auto join(std::string const& s, std::vector<std::string> const& parts) -> std::string {
+    /** Join elements of vector with given std::string.
      */
-    ostringstream oss;
-    auto limit = parts.size();
-    for (decltype(limit) i = 0; i < limit; ++i) {
+    auto oss = std::ostringstream{};
+    auto const limit = parts.size();
+    for (auto i = std::remove_reference_t<decltype(parts)>::size_type{0}; i < limit; ++i) {
         oss << parts[i];
         if (i < (limit - 1)) {
             oss << s;
@@ -242,11 +243,11 @@ auto join(string const& s, vector<string> const& parts) -> string {
 }
 
 
-auto extract(string const& s) -> string {
+auto extract(std::string const& s) -> std::string {
     /** Extracts *enquoted chunk*.
      *
-     *  It is particularly useful if you have a string encoded in another
-     * string.
+     *  It is particularly useful if you have a std::string encoded in another
+     * std::string.
      *
      *  This function will return `"Hello 'Beautiful' World!"` when fed `"Hello
      * 'Beautiful' World!" some other (42) things;`, and will return `'Hello
@@ -254,23 +255,23 @@ auto extract(string const& s) -> string {
      * things;`.
      *  Starting quote character is irrelevant.
      *
-     *  In fact, this function will treat *the first character* of the string it
-     * is fed as a delimiter for string extraction - whatever that may be (e.g.
+     *  In fact, this function will treat *the first character* of the std::string it
+     * is fed as a delimiter for std::string extraction - whatever that may be (e.g.
      * the backtick character) so you can get creative. One character that is
      * not recommended for use as a delimiter is the backslash as it is treated
      * specially (as
      *  the escape character) by this function.
      */
     if (s.size() == 0) {
-        return string("");
+        return std::string("");
     }
 
-    ostringstream chnk;
-    char quote;
+    auto chnk = std::ostringstream{};
+    auto quote = char{};
     chnk << (quote = s[0]);
 
-    std::string::size_type backs = 0;
-    for (std::string::size_type i = 1; i < s.size(); ++i) {
+    auto backs = std::string::size_type{0};
+    for (auto i = std::string::size_type{1}; i < s.size(); ++i) {
         chnk << s[i];
         if (backs and s[i] != '\\' and s[i] != quote) {
             backs = 0;
@@ -292,10 +293,10 @@ auto extract(string const& s) -> string {
 }
 
 
-auto lstrip(string const& s) -> string {
-    /*  Removes whitespace from left side of the string.
+auto lstrip(std::string const& s) -> std::string {
+    /*  Removes whitespace from left side of the std::string.
      */
-    std::string::size_type i = 0;
+    auto i = std::string::size_type{0};
     while (i < s.size()) {
         if (not(s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
             break;
@@ -306,9 +307,9 @@ auto lstrip(string const& s) -> string {
 }
 
 
-auto lshare(string const& s, string const& w) -> std::string::size_type {
-    std::string::size_type share = 0;
-    for (std::string::size_type i = 0; i < s.size() and i < w.size(); ++i) {
+auto lshare(std::string const& s, std::string const& w) -> std::string::size_type {
+    auto share = std::string::size_type{0};
+    for (auto i = std::string::size_type{0}; i < s.size() and i < w.size(); ++i) {
         if (s[i] == w[i]) {
             ++share;
         } else {
@@ -317,9 +318,9 @@ auto lshare(string const& s, string const& w) -> std::string::size_type {
     }
     return share;
 }
-auto contains(string const& s, char const c) -> bool {
-    bool it_does = false;
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
+auto contains(std::string const& s, char const c) -> bool {
+    auto it_does = bool{false};
+    for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
         if (s[i] == c) {
             it_does = true;
             break;
@@ -329,7 +330,7 @@ auto contains(string const& s, char const c) -> bool {
 }
 
 
-auto levenshtein(string const source, string const target)
+auto levenshtein(std::string const source, std::string const target)
     -> LevenshteinDistance {
     if (not source.size()) {
         return target.size();
@@ -338,7 +339,7 @@ auto levenshtein(string const source, string const target)
         return source.size();
     }
 
-    vector<vector<LevenshteinDistance>> distance_matrix;
+    auto distance_matrix = std::vector<std::vector<LevenshteinDistance>>{};
 
     distance_matrix.reserve(source.size());
     for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
@@ -367,19 +368,19 @@ auto levenshtein(string const source, string const target)
             auto substitution = distance_matrix.at(i - 1).at(j - 1) + cost;
 
             distance_matrix.at(i).at(j) =
-                min(min(deletion, insertion), substitution);
+                std::min(std::min(deletion, insertion), substitution);
         }
     }
 
     return distance_matrix.at(source.size() - 1).at(target.size() - 1);
 }
-auto levenshtein_filter(string const source,
-                        vector<string> const& candidates,
+auto levenshtein_filter(std::string const source,
+                        std::vector<std::string> const& candidates,
                         LevenshteinDistance const limit)
-    -> vector<DistancePair> {
-    vector<DistancePair> matched;
+    -> std::vector<DistancePair> {
+    auto matched = std::vector<DistancePair>{};
 
-    for (const auto each : candidates) {
+    for (auto const each : candidates) {
         if (auto distance = levenshtein(source, each); distance <= limit) {
             matched.emplace_back(distance, each);
         }
@@ -387,8 +388,8 @@ auto levenshtein_filter(string const source,
 
     return matched;
 }
-auto levenshtein_best(string const source,
-                      vector<string> const& candidates,
+auto levenshtein_best(std::string const source,
+                      std::vector<std::string> const& candidates,
                       LevenshteinDistance const limit) -> DistancePair {
     auto best = DistancePair{0, source};
 
@@ -403,13 +404,13 @@ auto levenshtein_best(string const source,
 }
 
 
-auto enquote(string const& s, char const closing) -> string {
-    /** Enquote the string.
+auto enquote(std::string const& s, char const closing) -> std::string {
+    /** Enquote the std::string.
      */
-    ostringstream encoded;
+    auto encoded = std::ostringstream{};
 
     encoded << closing;
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
+    for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
         if (s[i] == closing) {
             encoded << "\\";
         }
@@ -420,7 +421,7 @@ auto enquote(string const& s, char const closing) -> string {
     return encoded.str();
 }
 
-auto strdecode(string const& s) -> string {
+auto strdecode(std::string const& s) -> std::string {
     /** Decode escape sequences in strings.
      *
      *  This function recognizes escape sequences as listed on:
@@ -433,12 +434,12 @@ auto strdecode(string const& s) -> string {
      *
      *  If a character that does not encode an escape sequence is
      *  preceded by a backslash (\\) the function consumes the backslash and
-     *  leaves only the character preceded by it in the output string.
+     *  leaves only the character preceded by it in the output std::string.
      *
      */
-    ostringstream decoded;
-    char c;
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
+    auto decoded = std::ostringstream{};
+    auto c = char{};
+    for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
         c = s[i];
         if (c == '\\' and i < (s.size() - 1)) {
             ++i;
@@ -484,7 +485,7 @@ auto strdecode(string const& s) -> string {
     }
     return decoded.str();
 }
-auto strencode(string const& s) -> string {
+auto strencode(std::string const& s) -> std::string {
     /** Encode escape sequences in strings.
      *
      *  This function recognizes escape sequences as listed on:
@@ -496,10 +497,10 @@ auto strencode(string const& s) -> string {
      *      - long arbitrary Unicode values (escape: \Unnnnnnnn),
      *
      */
-    ostringstream encoded;
-    char c;
-    bool escape = false;
-    for (std::string::size_type i = 0; i < s.size(); ++i) {
+    auto encoded = std::ostringstream{};
+    auto c = char{};
+    auto escape = bool{false};
+    for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
         switch (s[i]) {
         case '\\':
             escape = true;
@@ -546,11 +547,11 @@ auto strencode(string const& s) -> string {
 }
 
 
-auto stringify(vector<string> const& sv) -> string {
-    ostringstream oss;
+auto stringify(std::vector<std::string> const& sv) -> std::string {
+    auto oss = std::ostringstream{};
     oss << '[';
-    auto sz = sv.size();
-    for (decltype(sz) i = 0; i < sz; ++i) {
+    auto const sz = sv.size();
+    for (std::remove_const_t<decltype(sz)> i = 0; i < sz; ++i) {
         oss << enquote(sv[i]);
         if (i < (sz - 1)) {
             oss << ", ";
