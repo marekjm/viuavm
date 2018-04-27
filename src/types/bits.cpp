@@ -38,7 +38,7 @@ using namespace viua::types;
  */
 static auto to_string(std::vector<bool> const& v, bool const with_prefix = false)
     -> std::string {
-    std::ostringstream oss;
+    auto oss = std::ostringstream{};
 
     if (with_prefix) {
         oss << "0b";
@@ -52,7 +52,7 @@ static auto to_string(std::vector<bool> const& v, bool const with_prefix = false
 }
 static auto binary_expand(std::vector<bool> v, decltype(v)::size_type const n)
     -> std::vector<bool> {
-    auto expanding_value = (v.size() ? v.back() : false);
+    auto const expanding_value = (v.size() ? v.back() : false);
     v.reserve(n);
     while (v.size() < n) {
         v.push_back(expanding_value);
@@ -60,7 +60,7 @@ static auto binary_expand(std::vector<bool> v, decltype(v)::size_type const n)
     return v;
 }
 static auto binary_clip(
-    const std::vector<bool>& bits,
+    std::vector<bool> const& bits,
     std::remove_reference_t<decltype(bits)>::size_type width) -> std::vector<bool> {
     std::vector<bool> result;
     result.reserve(width);
@@ -144,9 +144,9 @@ static auto binary_shr(std::vector<bool> v,
     }
 
     for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set            = i;
-        auto index_of_value          = i + n;
-        auto index_to_set_in_shifted = i;
+        auto const index_to_set            = i;
+        auto const index_of_value          = i + n;
+        auto const index_to_set_in_shifted = i;
 
         if (index_of_value < v.size()) {
             if (index_to_set_in_shifted < n) {
@@ -180,9 +180,9 @@ static auto binary_shl(std::vector<bool> v, decltype(v)::size_type const n)
     }
 
     for (auto i = decltype(n){0}; i < v.size(); ++i) {
-        auto index_to_set            = v.size() - i - 1;
-        auto index_of_value          = v.size() - n - i - 1;
-        auto index_to_set_in_shifted = n - i - 1;
+        auto const index_to_set            = v.size() - i - 1;
+        auto const index_of_value          = v.size() - n - i - 1;
+        auto const index_to_set_in_shifted = n - i - 1;
 
         if (index_of_value < v.size()) {
             if (index_to_set_in_shifted < n) {
@@ -281,16 +281,16 @@ static auto binary_lt[[maybe_unused]](std::vector<bool> lhs, std::vector<bool> r
 
 static auto binary_addition(const std::vector<bool>& lhs, const std::vector<bool>& rhs)
     -> std::vector<bool> {
-    std::vector<bool> result;
-    auto size_of_result = std::max(lhs.size(), rhs.size());
+    auto result = std::vector<bool>{};
+    auto const size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
 
     bool carry = false;
 
     for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-        const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
-        const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+        auto const from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+        auto const from_rhs = (i < rhs.size() ? rhs.at(i) : false);
 
         /*
          * lhs + rhs -> 0 + 0 -> 0
@@ -364,9 +364,9 @@ static auto binary_subtraction(std::vector<bool> const& lhs, std::vector<bool> c
                             binary_expand(rhs, std::max(lhs.size(), rhs.size())))),
         lhs.size());
 }
-static auto binary_multiplication(const std::vector<bool>& lhs,
-                                  const std::vector<bool>& rhs) -> std::vector<bool> {
-    std::vector<std::vector<bool>> intermediates;
+static auto binary_multiplication(std::vector<bool>const & lhs,
+                                  std::vector<bool>const & rhs) -> std::vector<bool> {
+    auto intermediates = std::vector<std::vector<bool>>{};
     intermediates.reserve(rhs.size());
 
     /*
@@ -389,7 +389,7 @@ static auto binary_multiplication(const std::vector<bool>& lhs,
             continue;
         }
 
-        std::vector<bool> interm;
+        auto interm = std::vector<bool>{};
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -402,7 +402,7 @@ static auto binary_multiplication(const std::vector<bool>& lhs,
         intermediates.begin(),
         intermediates.end(),
         std::vector<bool>{},
-        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
+        [](std::vector<bool>const & l, std::vector<bool> const& r) -> std::vector<bool> {
             return binary_addition(l, r);
         });
 }
@@ -423,8 +423,8 @@ static auto binary_division(std::vector<bool> const& dividend,
         return binary_increment(quotinent).second;
     }
 
-    auto negative_divisor   = binary_is_negative(divisor);
-    auto negative_dividend  = binary_is_negative(dividend);
+    auto const negative_divisor   = binary_is_negative(divisor);
+    auto const negative_dividend  = binary_is_negative(dividend);
     auto negative_quotinent = false;
 
     if (negative_divisor) {
@@ -534,15 +534,15 @@ static auto signed_lt(std::vector<bool> lhs, std::vector<bool> rhs) {
 
 static auto signed_add(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
     -> std::vector<bool> {
-    std::vector<bool> result;
-    auto size_of_result = std::max(lhs.size(), rhs.size());
+    auto result = std::vector<bool>{};
+    auto const size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
 
-    bool carry = false;
+    auto carry = false;
 
-    auto lhs_negative = binary_is_negative(lhs);
-    auto rhs_negative = binary_is_negative(rhs);
+    auto const lhs_negative = binary_is_negative(lhs);
+    auto const rhs_negative = binary_is_negative(rhs);
 
     auto result_should_be_negative = (lhs_negative and rhs_negative);
     if (lhs_negative and (not rhs_negative) and signed_lt(rhs, lhs)) {
@@ -553,8 +553,8 @@ static auto signed_add(std::vector<bool> const& lhs, std::vector<bool> const& rh
     }
 
     for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-        const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
-        const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+        auto const from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+        auto const from_rhs = (i < rhs.size() ? rhs.at(i) : false);
 
         /*
          * lhs + rhs -> 0 + 0 -> 0
@@ -648,7 +648,7 @@ static auto signed_sub(std::vector<bool> const& lhs, std::vector<bool> const& rh
 }
 static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
     -> std::vector<bool> {
-    std::vector<std::vector<bool>> intermediates;
+    auto intermediates = std::vector<std::vector<bool>>{};
     intermediates.reserve(rhs.size());
 
     /*
@@ -658,9 +658,9 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
      */
     intermediates.emplace_back(lhs.size() + rhs.size());
 
-    auto lhs_negative              = binary_is_negative(lhs);
-    auto rhs_negative              = binary_is_negative(rhs);
-    auto result_should_be_negative = (lhs_negative xor rhs_negative);
+    auto const lhs_negative              = binary_is_negative(lhs);
+    auto const rhs_negative              = binary_is_negative(rhs);
+    auto const result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
          i < rhs.size();
@@ -675,7 +675,7 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
             continue;
         }
 
-        std::vector<bool> interm;
+        auto interm = std::vector<bool>{};
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -698,7 +698,7 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
         intermediates.begin(),
         intermediates.end(),
         result,
-        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
+        [](std::vector<bool>const & l, std::vector<bool> const& r) -> std::vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
              * the result. If you used checked addition multiplication would
@@ -816,8 +816,8 @@ static auto signed_div(std::vector<bool> const& dividend, std::vector<bool> cons
         return wrapping::binary_increment(quotinent).second;
     }
 
-    auto negative_divisor   = binary_is_negative(divisor);
-    auto negative_dividend  = binary_is_negative(dividend);
+    auto const negative_divisor   = binary_is_negative(divisor);
+    auto const negative_dividend  = binary_is_negative(dividend);
     auto negative_quotinent = false;
 
     try {
@@ -842,14 +842,14 @@ static auto signed_div(std::vector<bool> const& dividend, std::vector<bool> cons
 }  // namespace checked
 namespace saturating {
 static auto signed_make_max(size_t const n) -> std::vector<bool> {
-    std::vector<bool> v;
+    auto v = std::vector<bool>{};
     v.reserve(n);
     v.resize(n - 1, true);
     v.push_back(false);
     return v;
 }
 static auto signed_make_min(size_t const n) -> std::vector<bool> {
-    std::vector<bool> v;
+    auto v = std::vector<bool>{};
     v.reserve(n);
     v.resize(n - 1, false);
     v.push_back(true);
@@ -979,15 +979,15 @@ static auto absolute(std::vector<bool> const& v) -> std::vector<bool> {
 }
 
 static auto signed_add(std::vector<bool> lhs, std::vector<bool> rhs) -> std::vector<bool> {
-    std::vector<bool> result;
-    auto size_of_result = std::max(lhs.size(), rhs.size());
+    auto result = std::vector<bool>{};
+    auto const size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
 
-    bool carry = false;
+    auto carry = false;
 
-    auto lhs_negative = binary_is_negative(lhs);
-    auto rhs_negative = binary_is_negative(rhs);
+    auto const lhs_negative = binary_is_negative(lhs);
+    auto const rhs_negative = binary_is_negative(rhs);
 
     auto result_should_be_negative = (lhs_negative and rhs_negative);
     if (lhs_negative and (not rhs_negative) and signed_lt(rhs, lhs)) {
@@ -998,8 +998,8 @@ static auto signed_add(std::vector<bool> lhs, std::vector<bool> rhs) -> std::vec
     }
 
     for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-        const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
-        const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
+        auto const from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+        auto const from_rhs = (i < rhs.size() ? rhs.at(i) : false);
 
         /*
          * lhs + rhs -> 0 + 0 -> 0
@@ -1096,7 +1096,7 @@ static auto signed_sub(std::vector<bool> lhs, std::vector<bool> rhs) -> std::vec
 }
 static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rhs)
     -> std::vector<bool> {
-    std::vector<std::vector<bool>> intermediates;
+    auto intermediates = std::vector<std::vector<bool>>{};
     intermediates.reserve(rhs.size());
 
     /*
@@ -1106,9 +1106,9 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
      */
     intermediates.emplace_back(lhs.size() + rhs.size());
 
-    auto lhs_negative              = binary_is_negative(lhs);
-    auto rhs_negative              = binary_is_negative(rhs);
-    auto result_should_be_negative = (lhs_negative xor rhs_negative);
+    auto const lhs_negative              = binary_is_negative(lhs);
+    auto const rhs_negative              = binary_is_negative(rhs);
+    auto const result_should_be_negative = (lhs_negative xor rhs_negative);
 
     for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0};
          i < rhs.size();
@@ -1123,7 +1123,7 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
             continue;
         }
 
-        std::vector<bool> interm;
+        auto interm = std::vector<bool>{};
         interm.reserve(i + lhs.size());
         std::fill_n(std::back_inserter(interm), i, false);
 
@@ -1146,7 +1146,7 @@ static auto signed_mul(std::vector<bool> const& lhs, std::vector<bool> const& rh
         intermediates.begin(),
         intermediates.end(),
         result,
-        [](const std::vector<bool>& l, const std::vector<bool>& r) -> std::vector<bool> {
+        [](std::vector<bool>const & l, std::vector<bool> const& r) -> std::vector<bool> {
             /*
              * Use basic (unchecked, expanding) binary addition to accumulate
              * the result. If you used checked addition multiplication would
@@ -1280,13 +1280,12 @@ static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
         return wrapping::binary_increment(quotinent).second;
     }
 
-    auto negative_divisor   = binary_is_negative(divisor);
-    auto negative_dividend  = binary_is_negative(dividend);
-    auto negative_quotinent = false;
+    auto const negative_divisor   = binary_is_negative(divisor);
+    auto const negative_dividend  = binary_is_negative(dividend);
+    auto const negative_quotinent = (negative_divisor xor negative_dividend);
 
     divisor            = absolute(divisor);
     remainder          = absolute(remainder);
-    negative_quotinent = (negative_divisor xor negative_dividend);
 
     while (wrapping::binary_lte(divisor, remainder)) {
         remainder = wrapping::binary_subtraction(remainder, divisor);
@@ -1303,7 +1302,7 @@ static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
 }}  // namespace viua::arithmetic
 
 
-const std::string viua::types::Bits::type_name = "Bits";
+std::string const viua::types::Bits::type_name = "Bits";
 
 std::string viua::types::Bits::type() const {
     return type_name;
