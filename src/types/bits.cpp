@@ -1304,19 +1304,19 @@ static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
 
 std::string const viua::types::Bits::type_name = "Bits";
 
-std::string viua::types::Bits::type() const {
+auto viua::types::Bits::type() const -> std::string {
     return type_name;
 }
 
-std::string viua::types::Bits::str() const {
+auto viua::types::Bits::str() const -> std::string {
     return to_string(underlying_array);
 }
 
-bool viua::types::Bits::boolean() const {
+auto viua::types::Bits::boolean() const -> bool {
     return binary_to_bool(underlying_array);
 }
 
-std::unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
+auto viua::types::Bits::copy() const -> std::unique_ptr<viua::types::Value> {
     return std::make_unique<Bits>(underlying_array);
 }
 
@@ -1329,7 +1329,7 @@ auto viua::types::Bits::at(size_type i) const -> bool {
 }
 
 auto viua::types::Bits::set(size_type i, const bool value) -> bool {
-    bool was               = at(i);
+    auto const was               = at(i);
     underlying_array.at(i) = value;
     return was;
 }
@@ -1341,14 +1341,14 @@ auto viua::types::Bits::clear() -> void {
 }
 
 auto viua::types::Bits::shl(size_type n) -> std::unique_ptr<Bits> {
-    auto result      = binary_shl(underlying_array, n);
+    auto const result      = binary_shl(underlying_array, n);
     underlying_array = std::move(result.second);
     return std::make_unique<Bits>(result.first);
 }
 
 auto viua::types::Bits::shr(size_type n, const bool padding)
     -> std::unique_ptr<Bits> {
-    auto result      = binary_shr(underlying_array, n, padding);
+    auto const result      = binary_shr(underlying_array, n, padding);
     underlying_array = std::move(result.second);
     return std::make_unique<Bits>(result.first);
 }
@@ -1358,7 +1358,7 @@ auto viua::types::Bits::shr(size_type n) -> std::unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::ashl(size_type n) -> std::unique_ptr<Bits> {
-    auto sign    = at(underlying_array.size() - 1);
+    auto const sign    = at(underlying_array.size() - 1);
     auto shifted = shl(n);
     set(underlying_array.size() - 1, sign);
     return shifted;
@@ -1369,7 +1369,7 @@ auto viua::types::Bits::ashr(size_type n) -> std::unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::rol(size_type n) -> void {
-    auto shifted      = shl(n);
+    auto const shifted      = shl(n);
     const auto offset = shifted->underlying_array.size();
     for (size_type i = 0; i < offset; ++i) {
         set(i, shifted->at(i));
@@ -1377,11 +1377,11 @@ auto viua::types::Bits::rol(size_type n) -> void {
 }
 
 auto viua::types::Bits::ror(size_type n) -> void {
-    auto shifted      = shr(n);
+    auto const shifted      = shr(n);
     const auto offset = shifted->underlying_array.size();
     for (size_type i = 0; i < offset; ++i) {
-        auto target_index = (underlying_array.size() - 1 - i);
-        auto source_index = (offset - 1 - i);
+        auto const target_index = (underlying_array.size() - 1 - i);
+        auto const source_index = (offset - 1 - i);
         set(target_index, shifted->at(source_index));
     }
 }
@@ -1400,25 +1400,25 @@ auto viua::types::Bits::decrement() -> void {
         viua::arithmetic::wrapping::binary_decrement(underlying_array).second;
 }
 
-auto viua::types::Bits::wrapadd(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::wrapadd(Bits const & that) const -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_addition(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapsub(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::wrapsub(Bits const & that) const -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_subtraction(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapmul(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::wrapmul(Bits const & that) const -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_multiplication(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::wrapdiv(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::wrapdiv(Bits const & that) const -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::wrapping::binary_division(
                         underlying_array, that.underlying_array),
@@ -1434,26 +1434,26 @@ auto viua::types::Bits::checked_signed_decrement() -> void {
     underlying_array =
         viua::arithmetic::checked::signed_decrement(underlying_array);
 }
-auto viua::types::Bits::checked_signed_add(const Bits& that) const
+auto viua::types::Bits::checked_signed_add(Bits const & that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::checked::signed_add(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::checked_signed_sub(const Bits& that) const
+auto viua::types::Bits::checked_signed_sub(Bits const & that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::checked::signed_sub(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::checked_signed_mul(const Bits& that) const
+auto viua::types::Bits::checked_signed_mul(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(viua::arithmetic::checked::signed_mul(
         underlying_array, that.underlying_array));
 }
-auto viua::types::Bits::checked_signed_div(const Bits& that) const
+auto viua::types::Bits::checked_signed_div(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(viua::arithmetic::checked::signed_div(
         underlying_array, that.underlying_array));
@@ -1468,39 +1468,39 @@ auto viua::types::Bits::saturating_signed_decrement() -> void {
     underlying_array =
         viua::arithmetic::saturating::signed_decrement(underlying_array);
 }
-auto viua::types::Bits::saturating_signed_add(const Bits& that) const
+auto viua::types::Bits::saturating_signed_add(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::saturating::signed_add(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::saturating_signed_sub(const Bits& that) const
+auto viua::types::Bits::saturating_signed_sub(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(
         binary_clip(viua::arithmetic::saturating::signed_sub(
                         underlying_array, that.underlying_array),
                     size()));
 }
-auto viua::types::Bits::saturating_signed_mul(const Bits& that) const
+auto viua::types::Bits::saturating_signed_mul(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(viua::arithmetic::saturating::signed_mul(
         underlying_array, that.underlying_array));
 }
-auto viua::types::Bits::saturating_signed_div(const Bits& that) const
+auto viua::types::Bits::saturating_signed_div(Bits const& that) const
     -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(viua::arithmetic::saturating::signed_div(
         underlying_array, that.underlying_array));
 }
 
-auto viua::types::Bits::operator==(const Bits& that) const -> bool {
+auto viua::types::Bits::operator==(Bits const& that) const -> bool {
     return (size() == that.size()
             and underlying_array == that.underlying_array);
 }
 
 template<typename T>
-static auto perform_bitwise_logic(const viua::types::Bits& lhs,
-                                  const viua::types::Bits& rhs)
+static auto perform_bitwise_logic(viua::types::Bits const & lhs,
+                                  viua::types::Bits const & rhs)
     -> std::unique_ptr<viua::types::Bits> {
     auto result = std::make_unique<viua::types::Bits>(lhs.size());
 
@@ -1512,15 +1512,15 @@ static auto perform_bitwise_logic(const viua::types::Bits& lhs,
 
     return result;
 }
-auto viua::types::Bits::operator|(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::operator|(Bits const& that) const -> std::unique_ptr<Bits> {
     return perform_bitwise_logic<std::bit_or<bool>>(*this, that);
 }
 
-auto viua::types::Bits::operator&(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::operator&(Bits const& that) const -> std::unique_ptr<Bits> {
     return perform_bitwise_logic<std::bit_and<bool>>(*this, that);
 }
 
-auto viua::types::Bits::operator^(const Bits& that) const -> std::unique_ptr<Bits> {
+auto viua::types::Bits::operator^(Bits const& that) const -> std::unique_ptr<Bits> {
     return perform_bitwise_logic<std::bit_xor<bool>>(*this, that);
 }
 
@@ -1539,17 +1539,17 @@ viua::types::Bits::Bits(size_type i) {
     }
 }
 
-viua::types::Bits::Bits(const size_type size, const uint8_t* source) {
+viua::types::Bits::Bits(size_type const size, uint8_t const* const source) {
     underlying_array.reserve(size * 8);
     for (auto i = size * 8; i; --i) {
         underlying_array.push_back(false);
     }
-    const uint8_t one = 1;
+    uint8_t const one = 1;
     for (size_type byte_index = 0; byte_index < size; ++byte_index) {
-        viua::internals::types::byte a_byte = *(source + byte_index);
+        auto const a_byte = *(source + byte_index);
 
         for (auto i = 0u; i < 8; ++i) {
-            auto mask = static_cast<decltype(one)>(one << i);
+            auto const mask = static_cast<decltype(one)>(one << i);
             underlying_array.at((size * 8) - 1
                                 - ((byte_index * 8) + (7u - i))) =
                 (a_byte & mask);
