@@ -38,15 +38,15 @@ class Boolean : public viua::types::Value {
   public:
     static const std::string type_name;
 
-    std::string type() const override;
-    std::string str() const override;
-    bool boolean() const override;
+    auto type() const -> std::string override;
+    auto str() const -> std::string override;
+    auto boolean() const -> bool override;
 
-    bool& value();
+    auto value() -> bool&;
 
-    std::unique_ptr<Value> copy() const override;
+    auto copy() const -> std::unique_ptr<Value> override;
 
-    Boolean(bool v = false);
+    Boolean(bool const v = false);
 };
 }}  // namespace viua::types
 
