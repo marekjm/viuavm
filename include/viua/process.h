@@ -175,6 +175,9 @@ class Stack {
 };
 
 class Process {
+    public:
+        using Op_address_type = viua::internals::types::byte const*;
+    private:
 #ifdef AS_DEBUG_HEADER
   public:
 #endif
@@ -185,8 +188,8 @@ class Process {
      * regarding executed code.
      */
     const bool tracing_enabled;
-    auto get_trace_line(viua::internals::types::byte*) const -> std::string;
-    auto emit_trace_line(viua::internals::types::byte*) const -> void;
+    auto get_trace_line(viua::internals::types::byte const*) const -> std::string;
+    auto emit_trace_line(viua::internals::types::byte const*) const -> void;
 
     /*
      * Pointer to scheduler the process is currently bound to.
@@ -286,177 +289,157 @@ class Process {
 
     /*  Methods implementing individual instructions.
      */
-    viua::internals::types::byte* opizero(viua::internals::types::byte*);
-    viua::internals::types::byte* opinteger(viua::internals::types::byte*);
-    viua::internals::types::byte* opiinc(viua::internals::types::byte*);
-    viua::internals::types::byte* opidec(viua::internals::types::byte*);
+    auto opizero(Op_address_type) -> Op_address_type;
+    auto opinteger(Op_address_type) -> Op_address_type;
+    auto opiinc(Op_address_type) -> Op_address_type;
+    auto opidec(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opfloat(viua::internals::types::byte*);
+    auto opfloat(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opitof(viua::internals::types::byte*);
-    viua::internals::types::byte* opftoi(viua::internals::types::byte*);
-    viua::internals::types::byte* opstoi(viua::internals::types::byte*);
-    viua::internals::types::byte* opstof(viua::internals::types::byte*);
+    auto opitof(Op_address_type) -> Op_address_type;
+    auto opftoi(Op_address_type) -> Op_address_type;
+    auto opstoi(Op_address_type) -> Op_address_type;
+    auto opstof(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opadd(viua::internals::types::byte*);
-    viua::internals::types::byte* opsub(viua::internals::types::byte*);
-    viua::internals::types::byte* opmul(viua::internals::types::byte*);
-    viua::internals::types::byte* opdiv(viua::internals::types::byte*);
-    viua::internals::types::byte* oplt(viua::internals::types::byte*);
-    viua::internals::types::byte* oplte(viua::internals::types::byte*);
-    viua::internals::types::byte* opgt(viua::internals::types::byte*);
-    viua::internals::types::byte* opgte(viua::internals::types::byte*);
-    viua::internals::types::byte* opeq(viua::internals::types::byte*);
+    auto opadd(Op_address_type) -> Op_address_type;
+    auto opsub(Op_address_type) -> Op_address_type;
+    auto opmul(Op_address_type) -> Op_address_type;
+    auto opdiv(Op_address_type) -> Op_address_type;
+    auto oplt(Op_address_type) -> Op_address_type;
+    auto oplte(Op_address_type) -> Op_address_type;
+    auto opgt(Op_address_type) -> Op_address_type;
+    auto opgte(Op_address_type) -> Op_address_type;
+    auto opeq(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opstring(viua::internals::types::byte*);
+    auto opstring(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* optext(viua::internals::types::byte*);
-    viua::internals::types::byte* optexteq(viua::internals::types::byte*);
-    viua::internals::types::byte* optextat(viua::internals::types::byte*);
-    viua::internals::types::byte* optextsub(viua::internals::types::byte*);
-    viua::internals::types::byte* optextlength(viua::internals::types::byte*);
-    viua::internals::types::byte* optextcommonprefix(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* optextcommonsuffix(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* optextconcat(viua::internals::types::byte*);
+    auto optext(Op_address_type) -> Op_address_type;
+    auto optexteq(Op_address_type) -> Op_address_type;
+    auto optextat(Op_address_type) -> Op_address_type;
+    auto optextsub(Op_address_type) -> Op_address_type;
+    auto optextlength(Op_address_type) -> Op_address_type;
+    auto optextcommonprefix(Op_address_type) -> Op_address_type;
+    auto optextcommonsuffix(Op_address_type) -> Op_address_type;
+    auto optextconcat(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opvector(viua::internals::types::byte*);
-    viua::internals::types::byte* opvinsert(viua::internals::types::byte*);
-    viua::internals::types::byte* opvpush(viua::internals::types::byte*);
-    viua::internals::types::byte* opvpop(viua::internals::types::byte*);
-    viua::internals::types::byte* opvat(viua::internals::types::byte*);
-    viua::internals::types::byte* opvlen(viua::internals::types::byte*);
+    auto opvector(Op_address_type) -> Op_address_type;
+    auto opvinsert(Op_address_type) -> Op_address_type;
+    auto opvpush(Op_address_type) -> Op_address_type;
+    auto opvpop(Op_address_type) -> Op_address_type;
+    auto opvat(Op_address_type) -> Op_address_type;
+    auto opvlen(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* boolean(viua::internals::types::byte*);
-    viua::internals::types::byte* opnot(viua::internals::types::byte*);
-    viua::internals::types::byte* opand(viua::internals::types::byte*);
-    viua::internals::types::byte* opor(viua::internals::types::byte*);
+    auto opboolean(Op_address_type) -> Op_address_type;
+    auto opnot(Op_address_type) -> Op_address_type;
+    auto opand(Op_address_type) -> Op_address_type;
+    auto opor(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opbits(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitand(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitor(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitnot(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitxor(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitat(viua::internals::types::byte*);
-    viua::internals::types::byte* opbitset(viua::internals::types::byte*);
-    viua::internals::types::byte* opshl(viua::internals::types::byte*);
-    viua::internals::types::byte* opshr(viua::internals::types::byte*);
-    viua::internals::types::byte* opashl(viua::internals::types::byte*);
-    viua::internals::types::byte* opashr(viua::internals::types::byte*);
-    viua::internals::types::byte* oprol(viua::internals::types::byte*);
-    viua::internals::types::byte* opror(viua::internals::types::byte*);
+    auto opbits(Op_address_type) -> Op_address_type;
+    auto opbitand(Op_address_type) -> Op_address_type;
+    auto opbitor(Op_address_type) -> Op_address_type;
+    auto opbitnot(Op_address_type) -> Op_address_type;
+    auto opbitxor(Op_address_type) -> Op_address_type;
+    auto opbitat(Op_address_type) -> Op_address_type;
+    auto opbitset(Op_address_type) -> Op_address_type;
+    auto opshl(Op_address_type) -> Op_address_type;
+    auto opshr(Op_address_type) -> Op_address_type;
+    auto opashl(Op_address_type) -> Op_address_type;
+    auto opashr(Op_address_type) -> Op_address_type;
+    auto oprol(Op_address_type) -> Op_address_type;
+    auto opror(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opwrapincrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opwrapdecrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opwrapadd(viua::internals::types::byte*);
-    viua::internals::types::byte* opwrapsub(viua::internals::types::byte*);
-    viua::internals::types::byte* opwrapmul(viua::internals::types::byte*);
-    viua::internals::types::byte* opwrapdiv(viua::internals::types::byte*);
+    auto opwrapincrement(Op_address_type) -> Op_address_type;
+    auto opwrapdecrement(Op_address_type) -> Op_address_type;
+    auto opwrapadd(Op_address_type) -> Op_address_type;
+    auto opwrapsub(Op_address_type) -> Op_address_type;
+    auto opwrapmul(Op_address_type) -> Op_address_type;
+    auto opwrapdiv(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opcheckedsincrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedsdecrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedsadd(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedssub(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedsdiv(viua::internals::types::byte*);
+    auto opcheckedsincrement(Op_address_type) -> Op_address_type;
+    auto opcheckedsdecrement(Op_address_type) -> Op_address_type;
+    auto opcheckedsadd(Op_address_type) -> Op_address_type;
+    auto opcheckedssub(Op_address_type) -> Op_address_type;
+    auto opcheckedsmul(Op_address_type) -> Op_address_type;
+    auto opcheckedsdiv(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opcheckeduincrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedudecrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedusub(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedumul(viua::internals::types::byte*);
-    viua::internals::types::byte* opcheckedudiv(viua::internals::types::byte*);
+    auto opcheckeduincrement(Op_address_type) -> Op_address_type;
+    auto opcheckedudecrement(Op_address_type) -> Op_address_type;
+    auto opcheckeduadd(Op_address_type) -> Op_address_type;
+    auto opcheckedusub(Op_address_type) -> Op_address_type;
+    auto opcheckedumul(Op_address_type) -> Op_address_type;
+    auto opcheckedudiv(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opsaturatingsincrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingsdecrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingsadd(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingssub(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingsmul(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingsdiv(
-        viua::internals::types::byte*);
+    auto opsaturatingsincrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingsdecrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingsadd(Op_address_type) -> Op_address_type;
+    auto opsaturatingssub(Op_address_type) -> Op_address_type;
+    auto opsaturatingsmul(Op_address_type) -> Op_address_type;
+    auto opsaturatingsdiv(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opsaturatinguincrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingudecrement(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatinguadd(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingusub(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingumul(
-        viua::internals::types::byte*);
-    viua::internals::types::byte* opsaturatingudiv(
-        viua::internals::types::byte*);
+    auto opsaturatinguincrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingudecrement(Op_address_type) -> Op_address_type;
+    auto opsaturatinguadd(Op_address_type) -> Op_address_type;
+    auto opsaturatingusub(Op_address_type) -> Op_address_type;
+    auto opsaturatingumul(Op_address_type) -> Op_address_type;
+    auto opsaturatingudiv(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opmove(viua::internals::types::byte*);
-    viua::internals::types::byte* opcopy(viua::internals::types::byte*);
-    viua::internals::types::byte* opptr(viua::internals::types::byte*);
-    viua::internals::types::byte* opptrlive(viua::internals::types::byte*);
-    viua::internals::types::byte* opswap(viua::internals::types::byte*);
-    viua::internals::types::byte* opdelete(viua::internals::types::byte*);
-    viua::internals::types::byte* opisnull(viua::internals::types::byte*);
+    auto opmove(Op_address_type) -> Op_address_type;
+    auto opcopy(Op_address_type) -> Op_address_type;
+    auto opptr(Op_address_type) -> Op_address_type;
+    auto opptrlive(Op_address_type) -> Op_address_type;
+    auto opswap(Op_address_type) -> Op_address_type;
+    auto opdelete(Op_address_type) -> Op_address_type;
+    auto opisnull(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opprint(viua::internals::types::byte*);
-    viua::internals::types::byte* opecho(viua::internals::types::byte*);
+    auto opprint(Op_address_type) -> Op_address_type;
+    auto opecho(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opcapture(viua::internals::types::byte*);
-    viua::internals::types::byte* opcapturecopy(viua::internals::types::byte*);
-    viua::internals::types::byte* opcapturemove(viua::internals::types::byte*);
-    viua::internals::types::byte* opclosure(viua::internals::types::byte*);
+    auto opcapture(Op_address_type) -> Op_address_type;
+    auto opcapturecopy(Op_address_type) -> Op_address_type;
+    auto opcapturemove(Op_address_type) -> Op_address_type;
+    auto opclosure(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opfunction(viua::internals::types::byte*);
+    auto opfunction(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opframe(viua::internals::types::byte*);
-    viua::internals::types::byte* opparam(viua::internals::types::byte*);
-    viua::internals::types::byte* oppamv(viua::internals::types::byte*);
-    viua::internals::types::byte* oparg(viua::internals::types::byte*);
-    viua::internals::types::byte* opargc(viua::internals::types::byte*);
+    auto opframe(Op_address_type) -> Op_address_type;
+    auto opparam(Op_address_type) -> Op_address_type;
+    auto oppamv(Op_address_type) -> Op_address_type;
+    auto oparg(Op_address_type) -> Op_address_type;
+    auto opargc(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opcall(viua::internals::types::byte*);
-    viua::internals::types::byte* optailcall(viua::internals::types::byte*);
-    viua::internals::types::byte* opdefer(viua::internals::types::byte*);
-    viua::internals::types::byte* opprocess(viua::internals::types::byte*);
-    viua::internals::types::byte* opself(viua::internals::types::byte*);
-    viua::internals::types::byte* opjoin(viua::internals::types::byte*);
-    viua::internals::types::byte* opsend(viua::internals::types::byte*);
-    viua::internals::types::byte* opreceive(viua::internals::types::byte*);
-    viua::internals::types::byte* opwatchdog(viua::internals::types::byte*);
-    viua::internals::types::byte* opreturn(viua::internals::types::byte*);
+    auto opcall(Op_address_type) -> Op_address_type;
+    auto optailcall(Op_address_type) -> Op_address_type;
+    auto opdefer(Op_address_type) -> Op_address_type;
+    auto opprocess(Op_address_type) -> Op_address_type;
+    auto opself(Op_address_type) -> Op_address_type;
+    auto opjoin(Op_address_type) -> Op_address_type;
+    auto opsend(Op_address_type) -> Op_address_type;
+    auto opreceive(Op_address_type) -> Op_address_type;
+    auto opwatchdog(Op_address_type) -> Op_address_type;
+    auto opreturn(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opjump(viua::internals::types::byte*);
-    viua::internals::types::byte* opif(viua::internals::types::byte*);
+    auto opjump(Op_address_type) -> Op_address_type;
+    auto opif(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* optry(viua::internals::types::byte*);
-    viua::internals::types::byte* opcatch(viua::internals::types::byte*);
-    viua::internals::types::byte* opdraw(viua::internals::types::byte*);
-    viua::internals::types::byte* openter(viua::internals::types::byte*);
-    viua::internals::types::byte* opthrow(viua::internals::types::byte*);
-    viua::internals::types::byte* opleave(viua::internals::types::byte*);
+    auto optry(Op_address_type) -> Op_address_type;
+    auto opcatch(Op_address_type) -> Op_address_type;
+    auto opdraw(Op_address_type) -> Op_address_type;
+    auto openter(Op_address_type) -> Op_address_type;
+    auto opthrow(Op_address_type) -> Op_address_type;
+    auto opleave(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opatom(viua::internals::types::byte*);
-    viua::internals::types::byte* opatomeq(viua::internals::types::byte*);
+    auto opatom(Op_address_type) -> Op_address_type;
+    auto opatomeq(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opstruct(viua::internals::types::byte*);
-    viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
-    viua::internals::types::byte* opstructremove(viua::internals::types::byte*);
-    viua::internals::types::byte* opstructkeys(viua::internals::types::byte*);
+    auto opstruct(Op_address_type) -> Op_address_type;
+    auto opstructinsert(Op_address_type) -> Op_address_type;
+    auto opstructremove(Op_address_type) -> Op_address_type;
+    auto opstructkeys(Op_address_type) -> Op_address_type;
 
-    viua::internals::types::byte* opimport(viua::internals::types::byte*);
+    auto opimport(Op_address_type) -> Op_address_type;
 
   public:
-    viua::internals::types::byte* dispatch(viua::internals::types::byte*);
+    auto dispatch(viua::internals::types::byte const*) -> viua::internals::types::byte const*;
     viua::internals::types::byte* tick();
 
     viua::types::Value* obtain(viua::internals::types::register_index) const;

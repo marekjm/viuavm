@@ -31,7 +31,7 @@
 
 class Frame {
   public:
-    viua::internals::types::byte const* const return_address;
+    viua::internals::types::byte const* return_address;
     std::unique_ptr<viua::kernel::RegisterSet> arguments;
     viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet>
         local_register_set;
@@ -42,7 +42,7 @@ class Frame {
 
     std::string function_name;
 
-    inline auto ret_address() const -> viua::internals::types::byte const* const {
+    inline auto ret_address() const -> viua::internals::types::byte const* {
         return return_address;
     }
 

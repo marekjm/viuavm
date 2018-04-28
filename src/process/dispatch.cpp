@@ -28,29 +28,29 @@ using namespace std;
 
 
 auto viua::process::Process::get_trace_line(
-    viua::internals::types::byte* for_address) const -> string {
-    ostringstream trace_line;
+    viua::internals::types::byte const* for_address) const -> std::string {
+    auto trace_line = std::ostringstream{};
 
     trace_line << "[";
-    trace_line << " scheduler = " << hex << scheduler << dec;
-    trace_line << ", process = " << hex << this << dec;
-    trace_line << ", stack = " << hex << stack << dec;
-    trace_line << ", frame = 0x" << hex
-               << reinterpret_cast<unsigned long>(stack->back().get()) << dec;
-    trace_line << ", jump_base = 0x" << hex
-               << reinterpret_cast<unsigned long>(stack->jump_base) << dec;
-    trace_line << ", address = 0x" << hex
-               << reinterpret_cast<unsigned long>(for_address) << dec;
+    trace_line << " scheduler = " << std::hex << scheduler << std::dec;
+    trace_line << ", process = " << std::hex << this << std::dec;
+    trace_line << ", stack = " << std::hex << stack << std::dec;
+    trace_line << ", frame = 0x" << std::hex
+               << reinterpret_cast<unsigned long>(stack->back().get()) << std::dec;
+    trace_line << ", jump_base = 0x" << std::hex
+               << reinterpret_cast<unsigned long>(stack->jump_base) << std::dec;
+    trace_line << ", address = 0x" << std::hex
+               << reinterpret_cast<unsigned long>(for_address) << std::dec;
     trace_line << ", depth = " << stack->size();
     if (stack->thrown) {
-        trace_line << ", thrown = 0x" << hex
+        trace_line << ", thrown = 0x" << std::hex
                    << reinterpret_cast<unsigned long>(stack->thrown.get())
-                   << dec;
+                   << std::dec;
     }
     if (stack->caught) {
-        trace_line << ", caught = 0x" << hex
+        trace_line << ", caught = 0x" << std::hex
                    << reinterpret_cast<unsigned long>(stack->caught.get())
-                   << dec;
+                   << std::dec;
     }
     trace_line << " ] ";
 
@@ -75,12 +75,12 @@ auto viua::process::Process::get_trace_line(
             working_address +=
                 sizeof(viua::internals::types::registerset_type_marker);
         }
-        trace_line << ' ' << string(reinterpret_cast<char*>(working_address));
+        trace_line << ' ' << std::string{ reinterpret_cast<char const* const>(working_address) };
     }
     if (static_cast<OPCODE>(*for_address) == TAILCALL
         or static_cast<OPCODE>(*for_address) == DEFER) {
         trace_line << ' ';
-        trace_line << string(reinterpret_cast<char*>(for_address + 1));
+        trace_line << std::string{ reinterpret_cast<char const* const>(for_address + 1) };
     }
     if (static_cast<OPCODE>(*for_address) == RETURN) {
         trace_line << " from " + stack->back()->function_name;
@@ -98,20 +98,20 @@ auto viua::process::Process::get_trace_line(
     return trace_line.str();
 }
 auto viua::process::Process::emit_trace_line(
-    viua::internals::types::byte* for_address) const -> void {
+    viua::internals::types::byte const* for_address) const -> void {
     // FIXME conditionally enable duplicate trace lines
-    static string previous_trace_line;
-    string line = get_trace_line(for_address);
+    static std::string previous_trace_line;
+    auto const line = get_trace_line(for_address);
 
     if (line != previous_trace_line) {
-        cerr << (line + "\n");
+        std::cerr << (line + "\n");
         previous_trace_line = line;
     }
 }
 
 
-viua::internals::types::byte* viua::process::Process::dispatch(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::dispatch(
+    viua::internals::types::byte const* addr) -> viua::internals::types::byte const* {
     /** Dispatches instruction at a pointer to its handler.
      */
     if (tracing_enabled) {

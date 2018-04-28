@@ -294,8 +294,8 @@ viua::internals::types::byte* viua::process::Process::opdefer(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opreturn(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opreturn(
+    Op_address_type addr) -> Op_address_type {
     if (stack->size() == 0) {
         throw make_unique<viua::types::Exception>(
             "no frame on stack: no call to return from");
