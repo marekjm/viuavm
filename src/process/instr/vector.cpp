@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -30,8 +30,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opvector(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     viua::internals::RegisterSets target_rs =
         viua::internals::RegisterSets::CURRENT;
     viua::internals::types::register_index target_ri = 0;
@@ -78,8 +77,7 @@ viua::internals::types::byte* viua::process::Process::opvector(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opvinsert(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvinsert(Op_address_type addr) -> Op_address_type {
     viua::types::Vector* vector_operand = nullptr;
     tie(addr, vector_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
@@ -116,8 +114,7 @@ viua::internals::types::byte* viua::process::Process::opvinsert(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opvpush(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvpush(Op_address_type addr) -> Op_address_type {
     viua::types::Vector* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
@@ -142,8 +139,7 @@ viua::internals::types::byte* viua::process::Process::opvpush(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opvpop(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type {
     bool void_target = viua::bytecode::decoder::operands::is_void(addr);
     viua::kernel::Register* target = nullptr;
 
@@ -180,8 +176,7 @@ viua::internals::types::byte* viua::process::Process::opvpop(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opvat(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvat(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -201,8 +196,7 @@ viua::internals::types::byte* viua::process::Process::opvat(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opvlen(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opvlen(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     viua::types::Vector* source    = nullptr;
 

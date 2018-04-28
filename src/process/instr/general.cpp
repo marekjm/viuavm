@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,8 +27,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opecho(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type {
     viua::types::Value* source{nullptr};
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
@@ -36,8 +35,7 @@ viua::internals::types::byte* viua::process::Process::opecho(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opprint(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type {
     viua::types::Value* source{nullptr};
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
@@ -46,12 +44,11 @@ viua::internals::types::byte* viua::process::Process::opprint(
 }
 
 
-viua::internals::types::byte* viua::process::Process::opjump(
-    viua::internals::types::byte* addr) {
-    viua::internals::types::byte* target =
-        (stack->jump_base
-         + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
-                                                                       this));
+auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type {
+    auto target =
+        Op_address_type{ stack->jump_base
+            + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
+                    this) };
     if (target == addr) {
         throw make_unique<viua::types::Exception>(
             "aborting: JUMP instruction pointing to itself");
@@ -59,8 +56,7 @@ viua::internals::types::byte* viua::process::Process::opjump(
     return target;
 }
 
-viua::internals::types::byte* viua::process::Process::opif(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type {
     viua::types::Value* source = nullptr;
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);

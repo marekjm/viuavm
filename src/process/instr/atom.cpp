@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,8 +26,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opatom(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -42,8 +41,7 @@ viua::internals::types::byte* viua::process::Process::opatom(
 }
 
 
-viua::internals::types::byte* viua::process::Process::opatomeq(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opatomeq(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

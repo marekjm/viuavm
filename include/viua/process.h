@@ -51,6 +51,8 @@ class VirtualProcessScheduler;
 namespace viua { namespace process {
 class Process;
 
+using viua::internals::types::Op_address_type;
+
 class Stack {
   public:
     enum class STATE {
@@ -92,11 +94,11 @@ class Stack {
     STATE current_state = STATE::UNINITIALISED;
 
   public:
-    const std::string entry_function;
+    std::string const entry_function;
     Process* parent_process;
 
-    viua::internals::types::byte* jump_base;
-    viua::internals::types::byte* instruction_pointer;
+    Op_address_type jump_base;
+    Op_address_type instruction_pointer;
 
     std::unique_ptr<Frame> frame_new;
     using size_type = decltype(frames)::size_type;
@@ -175,9 +177,6 @@ class Stack {
 };
 
 class Process {
-    public:
-        using Op_address_type = viua::internals::types::byte const*;
-    private:
 #ifdef AS_DEBUG_HEADER
   public:
 #endif
@@ -249,25 +248,17 @@ class Process {
         const std::string&);
     viua::internals::types::byte* adjust_jump_base_for(const std::string&);
     // call native (i.e. written in Viua) function
-    viua::internals::types::byte* call_native(viua::internals::types::byte*,
-                                              const std::string&,
-                                              viua::kernel::Register*,
-                                              const std::string&);
+    auto call_native(Op_address_type,
+                                              std::string const&,
+                                              viua::kernel::Register* const,
+                                              std::string const&) -> Op_address_type;
     // call foreign (i.e. from a C++ extension) function
-    viua::internals::types::byte* call_foreign(viua::internals::types::byte*,
-                                               const std::string&,
-                                               viua::kernel::Register*,
-                                               const std::string&);
-    // call foreign method (i.e. method of a pure-C++ class loaded into
-    // machine's typesystem)
-    viua::internals::types::byte* call_foreign_method(
-        viua::internals::types::byte*,
-        viua::types::Value*,
-        const std::string&,
-        viua::kernel::Register*,
-        const std::string&);
+    auto call_foreign(Op_address_type,
+                                               std::string const&,
+                                               viua::kernel::Register* const,
+                                               std::string const&) -> Op_address_type;
 
-    auto push_deferred(std::string) -> void;
+    auto push_deferred(std::string const) -> void;
 
     std::atomic_bool finished;
     std::atomic_bool is_joinable;
@@ -439,8 +430,8 @@ class Process {
     auto opimport(Op_address_type) -> Op_address_type;
 
   public:
-    auto dispatch(viua::internals::types::byte const*) -> viua::internals::types::byte const*;
-    viua::internals::types::byte* tick();
+    auto dispatch(Op_address_type) -> Op_address_type;
+    auto tick() -> Op_address_type;
 
     viua::types::Value* obtain(viua::internals::types::register_index) const;
     void put(viua::internals::types::register_index,
@@ -480,10 +471,10 @@ class Process {
 
     bool watchdogged() const;
     std::string watchdog() const;
-    viua::internals::types::byte* become(const std::string&,
-                                         std::unique_ptr<Frame>);
+    auto become(const std::string&,
+                                         std::unique_ptr<Frame>) -> Op_address_type;
 
-    viua::internals::types::byte* begin();
+    auto begin() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);
 
     std::vector<Frame*> trace() const;

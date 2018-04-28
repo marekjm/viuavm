@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -143,11 +143,11 @@ viua::internals::types::byte* viua::process::Process::adjust_jump_base_for(
     const string& call_name) {
     return stack->adjust_jump_base_for(call_name);
 }
-viua::internals::types::byte* viua::process::Process::call_native(
-    viua::internals::types::byte* return_address,
-    const string& call_name,
+auto viua::process::Process::call_native(
+    Op_address_type return_address,
+    std::string const& call_name,
     viua::kernel::Register* return_register,
-    const string&) {
+    std::string const&) -> Op_address_type {
     viua::internals::types::byte* call_address =
         adjust_jump_base_for(call_name);
 
@@ -166,11 +166,11 @@ viua::internals::types::byte* viua::process::Process::call_native(
 
     return call_address;
 }
-viua::internals::types::byte* viua::process::Process::call_foreign(
-    viua::internals::types::byte* return_address,
-    const string& call_name,
+auto viua::process::Process::call_foreign(
+    Op_address_type return_address,
+    std::string const& call_name,
     viua::kernel::Register* return_register,
-    const string&) {
+    std::string const&) -> Op_address_type {
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
             "external function call without a frame: use `frame 0' in source "
@@ -187,7 +187,7 @@ viua::internals::types::byte* viua::process::Process::call_foreign(
     return return_address;
 }
 
-auto viua::process::Process::push_deferred(string call_name) -> void {
+auto viua::process::Process::push_deferred(std::string const call_name) -> void {
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
             "function call without a frame: use `frame 0' in source code if "
@@ -205,8 +205,8 @@ auto viua::process::Process::push_deferred(string call_name) -> void {
 void viua::process::Process::handle_active_exception() {
     stack->unwind();
 }
-viua::internals::types::byte* viua::process::Process::tick() {
-    viua::internals::types::byte* previous_instruction_pointer =
+auto viua::process::Process::tick() -> Op_address_type {
+    Op_address_type previous_instruction_pointer =
         stack->instruction_pointer;
 
     try {
@@ -399,9 +399,9 @@ bool viua::process::Process::watchdogged() const {
 string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
-viua::internals::types::byte* viua::process::Process::become(
-    const string& function_name,
-    std::unique_ptr<Frame> frame_to_use) {
+auto viua::process::Process::become(
+    std::string const& function_name,
+    std::unique_ptr<Frame> frame_to_use) -> Op_address_type {
     if (not scheduler->is_native_function(function_name)) {
         throw make_unique<viua::types::Exception>(
             "process from undefined function: " + function_name);
@@ -420,7 +420,7 @@ viua::internals::types::byte* viua::process::Process::become(
     return (stack->instruction_pointer = adjust_jump_base_for(function_name));
 }
 
-viua::internals::types::byte* viua::process::Process::begin() {
+auto viua::process::Process::begin() -> Op_address_type {
     if (not scheduler->is_native_function(stack->at(0)->function_name)) {
         throw make_unique<viua::types::Exception>(
             "process from undefined function: " + stack->at(0)->function_name);

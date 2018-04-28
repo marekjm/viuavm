@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,8 +26,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::optry(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
     /** Create new special frame for try blocks.
      */
     if (stack->try_frame_new) {
@@ -37,8 +36,7 @@ viua::internals::types::byte* viua::process::Process::optry(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opcatch(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
     /** Run catch instruction.
      */
     string type_name, catcher_block_name;
@@ -59,8 +57,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opdraw(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
     /** Run draw instruction.
      */
     if (viua::bytecode::decoder::operands::is_void(addr)) {
@@ -84,8 +81,7 @@ viua::internals::types::byte* viua::process::Process::opdraw(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::openter(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     /*  Run enter instruction.
      */
     string block_name;
@@ -109,8 +105,7 @@ viua::internals::types::byte* viua::process::Process::openter(
     return block_address;
 }
 
-viua::internals::types::byte* viua::process::Process::opthrow(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type {
     /** Run throw instruction.
      */
     viua::kernel::Register* source = nullptr;
@@ -127,8 +122,7 @@ viua::internals::types::byte* viua::process::Process::opthrow(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opleave(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type {
     /*  Run leave instruction.
      */
     if (stack->tryframes.size() == 0) {

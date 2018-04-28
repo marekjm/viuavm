@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -37,20 +37,23 @@ using viua::types::numeric::Number;
 using ArithmeticOp = unique_ptr<Number> (Number::*)(const Number&) const;
 using LogicOp =
     unique_ptr<viua::types::Boolean> (Number::*)(const Number&) const;
+using viua::internals::types::Op_address_type;
+
+template<typename T> using dumb_ptr = T*;   // FIXME; use std::experimental::observer_ptr
 
 template<typename OpType, OpType action>
-static auto alu_impl(viua::internals::types::byte* addr,
+static auto alu_impl(Op_address_type addr,
                      viua::process::Process* process)
-    -> viua::internals::types::byte* {
-    viua::kernel::Register* target = nullptr;
+    -> Op_address_type {
+    auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
 
-    Number* lhs    = nullptr;
+    auto lhs    = dumb_ptr<Number>{nullptr};
     tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
-    Number* rhs    = nullptr;
+    auto rhs    = dumb_ptr<Number>{nullptr};
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
@@ -59,47 +62,38 @@ static auto alu_impl(viua::internals::types::byte* addr,
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opadd(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opadd(Op_address_type addr) -> Op_address_type {
     return alu_impl<ArithmeticOp, (&Number::operator+)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opsub(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opsub(Op_address_type addr) -> Op_address_type {
     return alu_impl<ArithmeticOp, (&Number::operator-)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opmul(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opmul(Op_address_type addr) -> Op_address_type {
     return alu_impl<ArithmeticOp, (&Number::operator*)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opdiv(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opdiv(Op_address_type addr) -> Op_address_type {
     return alu_impl<ArithmeticOp, (&Number::operator/)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::oplt(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::oplt(Op_address_type addr) -> Op_address_type {
     return alu_impl<LogicOp, (&Number::operator<)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::oplte(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::oplte(Op_address_type addr) -> Op_address_type {
     return alu_impl<LogicOp, (&Number::operator<=)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opgt(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opgt(Op_address_type addr) -> Op_address_type {
     return alu_impl<LogicOp, ((&Number::operator>))>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opgte(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opgte(Op_address_type addr) -> Op_address_type {
     return alu_impl<LogicOp, (&Number::operator>=)>(addr, this);
 }
 
-viua::internals::types::byte* viua::process::Process::opeq(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opeq(Op_address_type addr) -> Op_address_type {
     return alu_impl<LogicOp, (&Number::operator==)>(addr, this);
 }

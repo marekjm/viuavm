@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -32,8 +32,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opcapture(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -72,8 +71,7 @@ viua::internals::types::byte* viua::process::Process::opcapture(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opcapturecopy(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opcapturecopy(Op_address_type addr) -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -97,8 +95,7 @@ viua::internals::types::byte* viua::process::Process::opcapturecopy(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opcapturemove(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opcapturemove(Op_address_type addr) -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -122,8 +119,7 @@ viua::internals::types::byte* viua::process::Process::opcapturemove(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opclosure(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type {
     /** Create a closure from a function.
      */
     viua::kernel::Register* target = nullptr;
@@ -144,8 +140,7 @@ viua::internals::types::byte* viua::process::Process::opclosure(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opfunction(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opfunction(Op_address_type addr) -> Op_address_type {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and

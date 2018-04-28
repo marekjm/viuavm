@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,6 +27,7 @@
 namespace viua { namespace internals {
 namespace types {
 typedef uint8_t byte;
+using Op_address_type = byte const*;
 
 typedef uint64_t bytecode_size;
 typedef uint32_t register_index;

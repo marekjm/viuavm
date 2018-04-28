@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -30,8 +30,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opitof(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -46,8 +45,7 @@ viua::internals::types::byte* viua::process::Process::opitof(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opftoi(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -62,8 +60,7 @@ viua::internals::types::byte* viua::process::Process::opftoi(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opstoi(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -89,8 +86,7 @@ viua::internals::types::byte* viua::process::Process::opstoi(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opstof(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

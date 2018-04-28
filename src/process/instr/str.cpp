@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,8 +28,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opstring(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

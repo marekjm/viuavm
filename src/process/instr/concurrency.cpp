@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -31,8 +31,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opprocess(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
@@ -79,14 +78,13 @@ viua::internals::types::byte* viua::process::Process::opprocess(
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opjoin(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
     /** Join a process.
      *
      *  This opcode blocks execution of current process until
      *  the process being joined finishes execution.
      */
-    viua::internals::types::byte* return_addr = (addr - 1);
+    auto return_addr = Op_address_type{ addr - 1 };
 
     viua::kernel::Register* target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -140,8 +138,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(
 
     return return_addr;
 }
-viua::internals::types::byte* viua::process::Process::opsend(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     /** Send a message to a process.
      */
     viua::kernel::Register *target = nullptr, *source = nullptr;
@@ -159,14 +156,13 @@ viua::internals::types::byte* viua::process::Process::opsend(
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opreceive(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type {
     /** Receive a message.
      *
      *  This opcode blocks execution of current process
      *  until a message arrives.
      */
-    viua::internals::types::byte* return_addr = (addr - 1);
+    auto return_addr = Op_address_type{addr - 1};
 
     viua::kernel::Register* target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -219,8 +215,7 @@ viua::internals::types::byte* viua::process::Process::opreceive(
 
     return return_addr;
 }
-viua::internals::types::byte* viua::process::Process::opwatchdog(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type {
     string call_name;
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -246,8 +241,7 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opself(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opself(Op_address_type addr) -> Op_address_type {
     /*  Run process instruction.
      */
     viua::kernel::Register* target = nullptr;

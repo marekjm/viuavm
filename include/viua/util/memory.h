@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,6 +28,8 @@
 
 
 namespace viua { namespace util { namespace memory {
+template<typename T> using dumb_ptr = T*;   // FIXME; use std::experimental::observer_ptr
+
 template<class T> class maybe_unique_ptr {
     bool owns_pointer;
     T* pointer;

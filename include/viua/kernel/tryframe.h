@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,8 +20,6 @@
 #ifndef VIUA_CPU_TRYFRAME_H
 #define VIUA_CPU_TRYFRAME_H
 
-#pragma once
-
 #include <map>
 #include <memory>
 #include <string>
@@ -31,14 +29,14 @@
 
 class TryFrame {
   public:
-    viua::internals::types::byte* return_address;
+    viua::internals::types::Op_address_type return_address;
     Frame* associated_frame;
 
     std::string block_name;
 
     std::map<std::string, std::unique_ptr<Catcher>> catchers;
 
-    inline viua::internals::types::byte* ret_address() {
+    inline auto ret_address() const -> decltype(return_address) {
         return return_address;
     }
 

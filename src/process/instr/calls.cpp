@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,8 +29,7 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opframe(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
     /** Create new frame for function calls.
      */
     viua::internals::types::register_index arguments = 0, local_registers = 0;
@@ -44,8 +43,7 @@ viua::internals::types::byte* viua::process::Process::opframe(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opparam(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
     /** Run param instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0;
@@ -69,8 +67,7 @@ viua::internals::types::byte* viua::process::Process::opparam(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::oppamv(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
     /** Run pamv instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0,
@@ -94,8 +91,7 @@ viua::internals::types::byte* viua::process::Process::oppamv(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::oparg(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
     /** Run arg instruction.
      */
     viua::kernel::Register* target = nullptr;
@@ -136,8 +132,7 @@ viua::internals::types::byte* viua::process::Process::oparg(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opargc(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -148,8 +143,7 @@ viua::internals::types::byte* viua::process::Process::opargc(
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opcall(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
     viua::kernel::Register* return_register = nullptr;
 
@@ -191,8 +185,7 @@ viua::internals::types::byte* viua::process::Process::opcall(
     return (this->*caller)(addr, call_name, return_register, "");
 }
 
-viua::internals::types::byte* viua::process::Process::optailcall(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type {
     if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
         stack->register_deferred_calls();
         stack->state_of(
@@ -259,8 +252,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(
     return adjust_jump_base_for(call_name);
 }
 
-viua::internals::types::byte* viua::process::Process::opdefer(
-    viua::internals::types::byte* addr) {
+auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
     string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
