@@ -26,19 +26,19 @@ auto Frame::set_local_register_set(viua::kernel::RegisterSet* const rs,
     local_register_set.reset(rs, receives_ownership);
 }
 
-Frame::Frame(viua::internals::types::byte* ra,
+Frame::Frame(viua::internals::types::byte const* const ra,
              viua::internals::types::register_index const argsize,
              viua::internals::types::register_index const regsize)
-        : return_address(ra)
-        , arguments(nullptr)
-        , local_register_set(nullptr)
-        , return_register(nullptr) {
+        : return_address{ ra }
+        , arguments{ nullptr }
+        , local_register_set{ nullptr }
+        , return_register{ nullptr } {
     arguments          = std::make_unique<viua::kernel::RegisterSet>(argsize);
     local_register_set = std::make_unique<viua::kernel::RegisterSet>(regsize);
 }
-Frame::Frame(Frame const& that) {
-    return_address = that.return_address;
-
+Frame::Frame(Frame const& that):
+    return_address{that.return_address}
+{
     // FIXME: copy the registers maybe?
     // FIXME: oh, and the arguments too, while you're at it!
 }
