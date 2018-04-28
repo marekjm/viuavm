@@ -42,17 +42,17 @@ class Frame {
 
     std::string function_name;
 
-    inline viua::internals::types::byte* ret_address() {
+    inline auto ret_address() const -> viua::internals::types::byte* {
         return return_address;
     }
 
-    void set_local_register_set(viua::kernel::RegisterSet*,
-                                bool receives_ownership = true);
+    auto set_local_register_set(viua::kernel::RegisterSet* const,
+                                bool const receives_ownership = true) -> void;
 
     Frame(viua::internals::types::byte*,
-          viua::internals::types::register_index,
-          viua::internals::types::register_index = 16);
-    Frame(const Frame&);
+          viua::internals::types::register_index const,
+          viua::internals::types::register_index const = 16);
+    Frame(Frame const&);
 };
 
 
