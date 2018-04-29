@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t bytes = loader.get_bytecode_size();
-    unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
+    std::unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
 
     map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();

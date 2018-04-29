@@ -34,7 +34,7 @@ void viua::types::Reference::rebind(viua::types::Value* ptr) {
     (*pointer) = ptr;
 }
 
-void viua::types::Reference::rebind(unique_ptr<viua::types::Value> ptr) {
+void viua::types::Reference::rebind(std::unique_ptr<viua::types::Value> ptr) {
     if (*pointer) {
         delete (*pointer);
     }
@@ -56,7 +56,7 @@ bool viua::types::Reference::boolean() const {
     return (*pointer)->boolean();
 }
 
-unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
     return make_unique<viua::types::Reference>(pointer, counter);
 }

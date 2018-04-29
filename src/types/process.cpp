@@ -49,7 +49,7 @@ bool viua::types::Process::boolean() const {
     return false;
 }
 
-unique_ptr<viua::types::Value> viua::types::Process::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Process::copy() const {
     return make_unique<Process>(thrd);
 }
 

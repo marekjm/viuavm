@@ -28,7 +28,7 @@ using namespace std;
 
 
 void viua::scheduler::ffi::ff_call_processor(
-    vector<unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>*
+    vector<std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>*
         requests,
     map<std::string, ForeignFunction*>* foreign_functions,
     mutex* ff_map_mtx,
@@ -44,7 +44,7 @@ void viua::scheduler::ffi::ff_call_processor(
         }))
             ;
 
-        unique_ptr<ForeignFunctionCallRequest> request(
+        std::unique_ptr<ForeignFunctionCallRequest> request(
             std::move(requests->front()));
         requests->erase(requests->begin());
 

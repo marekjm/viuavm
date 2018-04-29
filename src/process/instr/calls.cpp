@@ -115,7 +115,7 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
         throw make_unique<viua::types::Exception>(oss.str());
     }
 
-    unique_ptr<viua::types::Value> argument;
+    std::unique_ptr<viua::types::Value> argument;
 
     if (stack->back()->arguments->isflagged(parameter_no_operand_index,
                                             MOVED)) {
@@ -316,7 +316,7 @@ auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
 
     addr = stack->back()->ret_address();
 
-    unique_ptr<viua::types::Value> returned;
+    std::unique_ptr<viua::types::Value> returned;
     viua::kernel::Register* return_register = stack->back()->return_register;
     if (return_register != nullptr) {
         returned = std::move(stack->return_value);

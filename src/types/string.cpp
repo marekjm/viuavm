@@ -52,7 +52,7 @@ bool String::boolean() const {
     return svalue.size() != 0;
 }
 
-unique_ptr<Value> String::copy() const {
+std::unique_ptr<Value> String::copy() const {
     return make_unique<String>(svalue);
 }
 
@@ -244,7 +244,7 @@ void String::substr(Frame* frame,
         }
     }
     frame->local_register_set->set(
-        0, unique_ptr<viua::types::Value>{sub(begin, end)});
+        0, std::unique_ptr<viua::types::Value>{sub(begin, end)});
 }
 
 void String::concatenate(Frame* frame,

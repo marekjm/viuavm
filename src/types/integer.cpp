@@ -49,7 +49,7 @@ int64_t Integer::decrement() {
     return (--number);
 }
 
-unique_ptr<Value> Integer::copy() const {
+std::unique_ptr<Value> Integer::copy() const {
     return make_unique<Integer>(number);
 }
 
@@ -69,39 +69,39 @@ auto Integer::as_float() const -> viua::float64 {
 }
 
 auto Integer::operator+(const numeric::Number& that) const
-    -> unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number> {
     return make_unique<Integer>(number + that.as_integer());
 }
 auto Integer::operator-(const numeric::Number& that) const
-    -> unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number> {
     return make_unique<Integer>(number - that.as_integer());
 }
 auto Integer::operator*(const numeric::Number& that) const
-    -> unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number> {
     return make_unique<Integer>(number * that.as_integer());
 }
 auto Integer::operator/(const numeric::Number& that) const
-    -> unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number> {
     return make_unique<Integer>(number / that.as_integer());
 }
 
 auto Integer::operator<(const numeric::Number& that) const
-    -> unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number < that.as_integer());
 }
 auto Integer::operator<=(const numeric::Number& that) const
-    -> unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number <= that.as_integer());
 }
 auto Integer::operator>(const numeric::Number& that) const
-    -> unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number > that.as_integer());
 }
 auto Integer::operator>=(const numeric::Number& that) const
-    -> unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number >= that.as_integer());
 }
 auto Integer::operator==(const numeric::Number& that) const
-    -> unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number == that.as_integer());
 }

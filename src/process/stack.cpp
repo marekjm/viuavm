@@ -120,8 +120,8 @@ auto viua::process::Stack::register_deferred_calls(const bool push_this_stack)
     register_deferred_calls_from(back().get());
 }
 
-auto viua::process::Stack::pop() -> unique_ptr<Frame> {
-    unique_ptr<Frame> frame{std::move(frames.back())};
+auto viua::process::Stack::pop() -> std::unique_ptr<Frame> {
+    std::unique_ptr<Frame> frame{std::move(frames.back())};
     frames.pop_back();
 
     for (viua::internals::types::register_index i = 0;
@@ -155,7 +155,7 @@ auto viua::process::Stack::clear() -> void {
     frames.clear();
 }
 
-auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame)
+auto viua::process::Stack::emplace_back(std::unique_ptr<Frame> frame)
     -> decltype(frames.emplace_back(frame)) {
     return frames.emplace_back(std::move(frame));
 }

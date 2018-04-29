@@ -32,7 +32,7 @@ using viua::util::exceptions::make_unique_exception;
 const std::string viua::types::Vector::type_name = "Vector";
 
 void viua::types::Vector::insert(long int index,
-                                 unique_ptr<viua::types::Value> object) {
+                                 std::unique_ptr<viua::types::Value> object) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -59,11 +59,11 @@ void viua::types::Vector::insert(long int index,
     internal_object.insert(it, std::move(object));
 }
 
-void viua::types::Vector::push(unique_ptr<viua::types::Value> object) {
+void viua::types::Vector::push(std::unique_ptr<viua::types::Value> object) {
     internal_object.emplace_back(std::move(object));
 }
 
-unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
+std::unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -89,7 +89,7 @@ unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
     }
 
     auto it                               = (internal_object.begin() + offset);
-    unique_ptr<viua::types::Value> object = std::move(*it);
+    std::unique_ptr<viua::types::Value> object = std::move(*it);
     internal_object.erase(it);
     return object;
 }
@@ -150,7 +150,7 @@ bool viua::types::Vector::boolean() const {
     return internal_object.size() != 0;
 }
 
-unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
     auto v = make_unique<Vector>();
     for (unsigned i = 0; i < internal_object.size(); ++i) {
         v->push(internal_object[i]->copy());
@@ -158,7 +158,7 @@ unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
     return std::move(v);
 }
 
-vector<unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
+vector<std::unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
     return internal_object;
 }
 

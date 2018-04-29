@@ -50,7 +50,7 @@ bool viua::types::Function::boolean() const {
     return true;
 }
 
-unique_ptr<viua::types::Value> viua::types::Function::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Function::copy() const {
     return make_unique<viua::types::Function>(function_name);
 }
 

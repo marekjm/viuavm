@@ -87,7 +87,7 @@ auto viua::process::Process::opstructremove(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
             addr, this);
 
-    unique_ptr<viua::types::Value> result{struct_operand->remove(*key)};
+    std::unique_ptr<viua::types::Value> result{struct_operand->remove(*key)};
     if (not void_target) {
         *target = std::move(result);
     }

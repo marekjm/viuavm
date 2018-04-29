@@ -53,7 +53,7 @@ std::string viua::types::Object::str() const {
     return oss.str();
 }
 
-unique_ptr<viua::types::Value> viua::types::Object::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
     auto cp = make_unique<viua::types::Object>(object_type_name);
     for (const auto& each : attributes) {
         cp->set(each.first, each.second->copy());
@@ -62,15 +62,15 @@ unique_ptr<viua::types::Value> viua::types::Object::copy() const {
 }
 
 void viua::types::Object::set(const std::string& name,
-                              unique_ptr<viua::types::Value> object) {
+                              std::unique_ptr<viua::types::Value> object) {
     attributes[name] = std::move(object);
 }
 
 void viua::types::Object::insert(const std::string& key,
-                                 unique_ptr<viua::types::Value> value) {
+                                 std::unique_ptr<viua::types::Value> value) {
     set(key, std::move(value));
 }
-unique_ptr<viua::types::Value> viua::types::Object::remove(
+std::unique_ptr<viua::types::Value> viua::types::Object::remove(
     const std::string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;

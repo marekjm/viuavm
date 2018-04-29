@@ -89,7 +89,7 @@ std::string viua::types::Pointer::str() const {
     return type();
 }
 
-unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
         return make_unique<Pointer>(process_of_origin);
     }

@@ -55,13 +55,13 @@ std::string viua::types::Struct::repr() const {
 }
 
 void viua::types::Struct::insert(const std::string& key,
-                                 unique_ptr<viua::types::Value> value) {
+                                 std::unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::remove(
+std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     const std::string& key) {
-    unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
+    std::unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;
 }
@@ -74,7 +74,7 @@ vector<std::string> viua::types::Struct::keys() const {
     return ks;
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
     auto copied = make_unique<Struct>();
     for (const auto& each : attributes) {
         copied->insert(each.first, each.second->copy());

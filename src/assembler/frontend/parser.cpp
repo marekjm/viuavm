@@ -114,7 +114,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
 
 auto viua::assembler::frontend::parser::parse_operand(
     const vector_view<Token> tokens,
-    unique_ptr<Operand>& operand,
+    std::unique_ptr<Operand>& operand,
     const bool integer_literal_means_offset) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
@@ -308,7 +308,7 @@ static auto get_directives() -> vector<std::string> {
 }
 auto viua::assembler::frontend::parser::parse_instruction(
     const vector_view<Token> tokens,
-    unique_ptr<Instruction>& instruction) -> decltype(tokens)::size_type {
+    std::unique_ptr<Instruction>& instruction) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i).str().at(0) == '.') {
@@ -331,7 +331,7 @@ auto viua::assembler::frontend::parser::parse_instruction(
 
     try {
         while (tokens.at(i) != "\n") {
-            unique_ptr<Operand> operand;
+            std::unique_ptr<Operand> operand;
             i += parse_operand(vector_view<Token>(tokens, i),
                                operand,
                                integer_literal_means_offset);
@@ -346,7 +346,7 @@ auto viua::assembler::frontend::parser::parse_instruction(
 }
 auto viua::assembler::frontend::parser::parse_directive(
     const vector_view<Token> tokens,
-    unique_ptr<Directive>& directive) -> decltype(tokens)::size_type {
+    std::unique_ptr<Directive>& directive) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
@@ -395,7 +395,7 @@ auto viua::assembler::frontend::parser::parse_directive(
 }
 auto viua::assembler::frontend::parser::parse_line(
     const vector_view<Token> tokens,
-    unique_ptr<Line>& line) -> decltype(tokens)::size_type {
+    std::unique_ptr<Line>& line) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
     if (tokens.at(0).str().at(0) == '.') {
         auto directive = make_unique<Directive>();

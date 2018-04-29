@@ -29,7 +29,7 @@ using namespace std;
 
 static auto printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
-    unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
+    std::unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
     // concatenate before printing to avoid mangled output
     cout << ("Hello " + arg->str() + "!\n");
 }

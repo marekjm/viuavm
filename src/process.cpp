@@ -77,12 +77,12 @@ viua::kernel::Register* viua::process::Process::register_at(
     }
 }
 
-unique_ptr<viua::types::Value> viua::process::Process::pop(
+std::unique_ptr<viua::types::Value> viua::process::Process::pop(
     viua::internals::types::register_index index) {
     return currently_used_register_set->pop(index);
 }
 void viua::process::Process::place(viua::internals::types::register_index index,
-                                   unique_ptr<viua::types::Value> obj) {
+                                   std::unique_ptr<viua::types::Value> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the
@@ -93,7 +93,7 @@ void viua::process::Process::place(viua::internals::types::register_index index,
     currently_used_register_set->set(index, std::move(obj));
 }
 void viua::process::Process::put(viua::internals::types::register_index index,
-                                 unique_ptr<viua::types::Value> o) {
+                                 std::unique_ptr<viua::types::Value> o) {
     place(index, std::move(o));
 }
 void viua::process::Process::ensure_static_registers(
@@ -238,7 +238,7 @@ auto viua::process::Process::tick() -> Op_address_type {
         default:
             break;
         }
-    } catch (unique_ptr<viua::types::Exception>& e) {
+    } catch (std::unique_ptr<viua::types::Exception>& e) {
         /*
          * All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -249,7 +249,7 @@ auto viua::process::Process::tick() -> Op_address_type {
          * block) they will terminate execution later.
          */
         stack->thrown = std::move(e);
-    } catch (unique_ptr<viua::types::Value>& e) {
+    } catch (std::unique_ptr<viua::types::Value>& e) {
         /*
          * All values can be thrown as exceptions, so Values must also be
          * caught.
@@ -369,7 +369,7 @@ bool viua::process::Process::terminated() const {
     return static_cast<bool>(stack->thrown);
 }
 
-void viua::process::Process::pass(unique_ptr<viua::types::Value> message) {
+void viua::process::Process::pass(std::unique_ptr<viua::types::Value> message) {
     message_queue.push(std::move(message));
     wakeup();
 }
@@ -379,17 +379,17 @@ viua::types::Value* viua::process::Process::get_active_exception() {
     return stack->thrown.get();
 }
 
-unique_ptr<viua::types::Value> viua::process::Process::
+std::unique_ptr<viua::types::Value> viua::process::Process::
     transfer_active_exception() {
     return std::move(stack->thrown);
 }
 
-void viua::process::Process::raise(unique_ptr<viua::types::Value> exception) {
+void viua::process::Process::raise(std::unique_ptr<viua::types::Value> exception) {
     stack->thrown = std::move(exception);
 }
 
 
-unique_ptr<viua::types::Value> viua::process::Process::get_return_value() {
+std::unique_ptr<viua::types::Value> viua::process::Process::get_return_value() {
     return std::move(stack->return_value);
 }
 
@@ -461,7 +461,7 @@ void viua::process::Process::migrate_to(
     scheduler = sch;
 }
 
-viua::process::Process::Process(unique_ptr<Frame> frm,
+viua::process::Process::Process(std::unique_ptr<Frame> frm,
                                 viua::scheduler::VirtualProcessScheduler* sch,
                                 viua::process::Process* pt,
                                 const bool enable_tracing)

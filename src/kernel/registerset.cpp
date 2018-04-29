@@ -29,7 +29,7 @@
 using namespace std;
 
 
-void viua::kernel::Register::reset(unique_ptr<viua::types::Value> o) {
+void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o) {
     if (dynamic_cast<viua::types::Reference*>(value.get())) {
         static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
     } else {
@@ -119,7 +119,7 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register& {
 
 void viua::kernel::RegisterSet::put(
     viua::internals::types::register_index index,
-    unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object) {
     if (index >= registerset_size) {
         throw make_unique<viua::types::Exception>(
             "register access out of bounds: write");
@@ -127,11 +127,11 @@ void viua::kernel::RegisterSet::put(
     registers.at(index).reset(std::move(object));
 }
 
-unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(
+std::unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(
     viua::internals::types::register_index index) {
     /** Pop an object from the register.
      */
-    unique_ptr<viua::types::Value> object{at(index)};
+    std::unique_ptr<viua::types::Value> object{at(index)};
     if (not object) {
         // FIXME: throw an exception on read from empty register
     }
@@ -141,7 +141,7 @@ unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(
 
 void viua::kernel::RegisterSet::set(
     viua::internals::types::register_index index,
-    unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -403,7 +403,7 @@ void viua::kernel::RegisterSet::drop() {
 }
 
 
-unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
+std::unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     auto rscopy = make_unique<viua::kernel::RegisterSet>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
         if (at(i) == nullptr) {

@@ -48,7 +48,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
     }
     cerr << "\n";
 
-    unique_ptr<viua::types::Value> thrown_object(
+    std::unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
     auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     std::string ex_type = thrown_object->type();
@@ -142,7 +142,7 @@ static auto print_stack_trace_json(viua::process::Process* process) -> void {
     }
     oss << "],";
 
-    unique_ptr<viua::types::Value> thrown_object(
+    std::unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
     oss << "\"uncaught\":{";
     oss << "\"type\":" << str::enquote(thrown_object->type()) << ',';
@@ -318,7 +318,7 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
 }
 
 viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
-    unique_ptr<Frame> frame,
+    std::unique_ptr<Frame> frame,
     viua::process::Process* parent,
     bool disown) {
     auto p = make_unique<viua::process::Process>(
@@ -382,7 +382,7 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
 
 void viua::scheduler::VirtualProcessScheduler::send(
     const viua::process::PID pid,
-    unique_ptr<viua::types::Value> message) {
+    std::unique_ptr<viua::types::Value> message) {
 #if VIUA_VM_DEBUG_LOG
     viua_err("[sched:vps:send] pid = ", pid.get());
 #endif
@@ -391,7 +391,7 @@ void viua::scheduler::VirtualProcessScheduler::send(
 
 void viua::scheduler::VirtualProcessScheduler::receive(
     const viua::process::PID pid,
-    queue<unique_ptr<viua::types::Value>>& message_queue) {
+    queue<std::unique_ptr<viua::types::Value>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
     viua_err("[sched:vps:receive] pid = ", pid.get());
 #endif
@@ -411,11 +411,11 @@ auto viua::scheduler::VirtualProcessScheduler::is_terminated(
     return attached_kernel->is_process_terminated(pid);
 }
 auto viua::scheduler::VirtualProcessScheduler::transfer_exception_of(
-    const viua::process::PID pid) const -> unique_ptr<viua::types::Value> {
+    const viua::process::PID pid) const -> std::unique_ptr<viua::types::Value> {
     return attached_kernel->transfer_exception_of(pid);
 }
 auto viua::scheduler::VirtualProcessScheduler::transfer_result_of(
-    const viua::process::PID pid) const -> unique_ptr<viua::types::Value> {
+    const viua::process::PID pid) const -> std::unique_ptr<viua::types::Value> {
     return attached_kernel->transfer_result_of(pid);
 }
 
@@ -428,7 +428,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     bool ticked     = false;
     bool any_active = false;
 
-    vector<unique_ptr<viua::process::Process>> running_processes_list;
+    vector<std::unique_ptr<viua::process::Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0;
@@ -747,7 +747,7 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     viua::kernel::Kernel* akernel,
-    vector<unique_ptr<viua::process::Process>>* fp,
+    vector<std::unique_ptr<viua::process::Process>>* fp,
     mutex* fp_mtx,
     condition_variable* fp_cv,
     const bool enable_tracing)

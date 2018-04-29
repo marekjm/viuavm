@@ -804,11 +804,11 @@ void generate(vector<Token> const& tokens,
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
     map<std::string,
         tuple<viua::internals::types::bytecode_size,
-              unique_ptr<viua::internals::types::byte[]>>>
+              std::unique_ptr<viua::internals::types::byte[]>>>
         functions_bytecode;
     map<std::string,
         tuple<viua::internals::types::bytecode_size,
-              unique_ptr<viua::internals::types::byte[]>>>
+              std::unique_ptr<viua::internals::types::byte[]>>>
         block_bodies_bytecode;
     viua::internals::types::bytecode_size functions_section_size    = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;

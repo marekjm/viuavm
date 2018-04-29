@@ -53,7 +53,7 @@ bool viua::types::Exception::boolean() const {
     return true;
 }
 
-unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
     return make_unique<Exception>(cause);
 }
 

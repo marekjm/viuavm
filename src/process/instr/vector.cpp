@@ -84,7 +84,7 @@ auto viua::process::Process::opvinsert(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
-    unique_ptr<viua::types::Value> object;
+    std::unique_ptr<viua::types::Value> object;
     if (viua::bytecode::decoder::operands::get_operand_type(addr)
         == OT_POINTER) {
         viua::types::Value* source = nullptr;
@@ -121,7 +121,7 @@ auto viua::process::Process::opvpush(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
-    unique_ptr<viua::types::Value> object;
+    std::unique_ptr<viua::types::Value> object;
     if (viua::bytecode::decoder::operands::get_operand_type(addr)
         == OT_POINTER) {
         viua::types::Value* source = nullptr;
@@ -168,7 +168,7 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    unique_ptr<viua::types::Value> ptr =
+    std::unique_ptr<viua::types::Value> ptr =
         vector_operand->pop(position_operand_index);
     if (not void_target) {
         *target = std::move(ptr);

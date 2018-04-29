@@ -57,7 +57,7 @@ class Ifstream : public viua::types::Value {
         return line;
     }
 
-    auto copy() const -> unique_ptr<viua::types::Value> override {
+    auto copy() const -> std::unique_ptr<viua::types::Value> override {
         throw make_unique<viua::types::Exception>("Ifstream is not copyable");
     }
 

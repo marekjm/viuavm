@@ -40,7 +40,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(
     try {
         (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
-        unique_ptr<viua::types::Value> returned;
+        std::unique_ptr<viua::types::Value> returned;
         viua::kernel::Register* return_register = frame->return_register;
         if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
@@ -65,7 +65,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(
     }
 }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::raise(
-    unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object) {
     caller_process->raise(std::move(object));
 }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() {

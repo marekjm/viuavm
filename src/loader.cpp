@@ -263,7 +263,7 @@ Loader& Loader::executable() {
 uint64_t Loader::get_bytecode_size() {
     return size;
 }
-unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
+std::unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
     auto copy = make_unique<viua::internals::types::byte[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
