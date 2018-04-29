@@ -21,7 +21,8 @@
 using namespace std;
 
 
-auto assembler::operands::normalise_binary_literal(std::string const s) -> string {
+auto assembler::operands::normalise_binary_literal(std::string const s)
+    -> string {
     auto oss = ostringstream{};
 
     if (s.size() == 0) {
@@ -53,7 +54,8 @@ static auto strip_leading_zeroes(std::string const s) -> string {
     }
     return (leading_zeroes < s.size() ? s.substr(leading_zeroes) : "0");
 }
-auto assembler::operands::octal_to_binary_literal(std::string const s) -> string {
+auto assembler::operands::octal_to_binary_literal(std::string const s)
+    -> string {
     ostringstream oss;
     static map<const char, const std::string> const lookup = {
         {

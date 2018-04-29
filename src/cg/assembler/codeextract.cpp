@@ -34,7 +34,8 @@ using Token = viua::cg::lex::Token;
 
 
 auto assembler::ce::getmarks(vector<viua::cg::lex::Token> const& tokens)
-    -> map<std::string, std::remove_reference<decltype(tokens)>::type::size_type> {
+    -> map<std::string,
+           std::remove_reference<decltype(tokens)>::type::size_type> {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.

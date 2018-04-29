@@ -64,15 +64,15 @@ auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opptrlive(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Pointer* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Pointer>(
-            addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Pointer>(addr, this);
 
     *target = std::make_unique<viua::types::Boolean>(not source->expired());
 

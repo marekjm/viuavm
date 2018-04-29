@@ -163,17 +163,17 @@ auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame)
 auto viua::process::Stack::adjust_jump_base_for_block(
     std::string const& call_name) -> Op_address_type {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
-    auto ep     = scheduler->get_entry_point_of_block(call_name);
-    entry_point = ep.first;
-    jump_base   = ep.second;
+    auto ep          = scheduler->get_entry_point_of_block(call_name);
+    entry_point      = ep.first;
+    jump_base        = ep.second;
     return entry_point;
 }
-auto viua::process::Stack::adjust_jump_base_for(
-    std::string const& call_name) -> Op_address_type {
+auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
+    -> Op_address_type {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
-    auto ep     = scheduler->get_entry_point_of(call_name);
-    entry_point = ep.first;
-    jump_base   = ep.second;
+    auto ep          = scheduler->get_entry_point_of(call_name);
+    entry_point      = ep.first;
+    jump_base        = ep.second;
     return entry_point;
 }
 
@@ -235,7 +235,7 @@ auto viua::process::Stack::unwind_to(const TryFrame* tframe,
 
 auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
     TryFrame* found_exception_frame = nullptr;
-    std::string caught_with_type         = "";
+    std::string caught_with_type    = "";
     std::string handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
@@ -250,11 +250,12 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
         }
     }
 
-    return tuple<TryFrame*, std::string>(found_exception_frame, caught_with_type);
+    return tuple<TryFrame*, std::string>(found_exception_frame,
+                                         caught_with_type);
 }
 
 auto viua::process::Stack::unwind() -> void {
-    TryFrame* tframe              = nullptr;
+    TryFrame* tframe                   = nullptr;
     std::string handler_found_for_type = "";
 
     // Find catch frame for current thrown exception.

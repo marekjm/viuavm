@@ -77,7 +77,8 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opvinsert(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opvinsert(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Vector* vector_operand = nullptr;
     tie(addr, vector_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(

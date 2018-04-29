@@ -21,22 +21,24 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_text(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
+auto assemble_op_text(Program& program,
+                      std::vector<Token> const& tokens,
+                      Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index source = target + 2;
 
-        auto target_operand = ::assembler::operands::getint_with_rs_type(
-            ::assembler::operands::resolve_register(tokens.at(target)),
-            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-        if (tokens.at(source).str().at(0) == '*'
-            or tokens.at(source).str().at(0) == '%') {
-            program.optext(target_operand,
-                           ::assembler::operands::getint_with_rs_type(
-                               ::assembler::operands::resolve_register(tokens.at(source)),
-                               ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
-        } else {
-            program.optext(target_operand, tokens.at(source));
-        }
+    auto target_operand = ::assembler::operands::getint_with_rs_type(
+        ::assembler::operands::resolve_register(tokens.at(target)),
+        ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
+    if (tokens.at(source).str().at(0) == '*'
+        or tokens.at(source).str().at(0) == '%') {
+        program.optext(
+            target_operand,
+            ::assembler::operands::getint_with_rs_type(
+                ::assembler::operands::resolve_register(tokens.at(source)),
+                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+    } else {
+        program.optext(target_operand, tokens.at(source));
+    }
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

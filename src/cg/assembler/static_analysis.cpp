@@ -95,8 +95,8 @@ static auto skip_till_next_line(const TokenVector& tokens,
     } while (i < tokens.size() and tokens.at(i) != "\n");
     return i;
 }
-static auto is_named(const map<std::string, std::string>& named_registers, std::string name)
-    -> bool {
+static auto is_named(const map<std::string, std::string>& named_registers,
+                     std::string name) -> bool {
     return (std::find_if(named_registers.begin(),
                          named_registers.end(),
                          [name](std::remove_reference<decltype(
@@ -120,10 +120,11 @@ static auto get_name(const map<std::string, std::string>& named_registers,
     }
     return it->first;
 }
-static std::string resolve_register_name(const map<string, std::string>& named_registers,
-                                    Token token,
-                                    std::string name,
-                                    const bool allow_direct_access = false) {
+static std::string resolve_register_name(
+    const map<string, std::string>& named_registers,
+    Token token,
+    std::string name,
+    const bool allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::InvalidSyntax(token,
                                            "expected operand, found newline");
@@ -166,8 +167,9 @@ static std::string resolve_register_name(const map<string, std::string>& named_r
     }
     return named_registers.at(name);
 }
-static std::string resolve_register_name(const map<std::string, std::string>& named_registers,
-                                    Token token) {
+static std::string resolve_register_name(
+    const map<std::string, std::string>& named_registers,
+    Token token) {
     return resolve_register_name(named_registers, token, token.str());
 }
 
@@ -248,11 +250,12 @@ static void check_use_of_register(
                                 message_prefix,
                                 allow_direct_access_to_target);
 }
-static void check_use_of_register(const TokenVector& tokens,
-                                  long unsigned i,
-                                  long unsigned by,
-                                  Registers& registers,
-                                  map<std::string, std::string>& named_registers) {
+static void check_use_of_register(
+    const TokenVector& tokens,
+    long unsigned i,
+    long unsigned by,
+    Registers& registers,
+    map<std::string, std::string>& named_registers) {
     check_use_of_register_index(tokens,
                                 i,
                                 by,
@@ -867,7 +870,8 @@ static void check_block_body(const TokenVector& body_tokens,
                 i,
                 registers,
                 named_registers,
-                ("parameter " + std::string{token.str() == "pamv" ? "move" : "pass"}
+                ("parameter "
+                 + std::string{token.str() == "pamv" ? "move" : "pass"}
                  + " from empty register"));
             if (token == "pamv") {
                 erase_register(
@@ -1256,8 +1260,8 @@ static void check_block_body(const TokenVector& body_tokens,
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
             std::string reg_original = body_tokens.at(target),
-                   reg          = resolve_register_name(named_registers,
-                                               body_tokens.at(target));
+                        reg          = resolve_register_name(named_registers,
+                                                    body_tokens.at(target));
             registers.insert(reg, body_tokens.at(target));
             if (debug) {
                 cout << "  " << str::enquote(token) << " defined register "

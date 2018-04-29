@@ -21,22 +21,23 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_process(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index fn     = target + 2;
+auto assemble_op_process(Program& program,
+                         std::vector<Token> const& tokens,
+                         Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index fn     = target + 2;
 
-        int_op ret;
-        if (tokens.at(target) == "void") {
-            --fn;
-            ret =
-                ::assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
-        } else {
-            ret = ::assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(target)),
-                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-        }
+    int_op ret;
+    if (tokens.at(target) == "void") {
+        --fn;
+        ret = ::assembler::operands::getint(
+            ::assembler::operands::resolve_register(tokens.at(target)));
+    } else {
+        ret = ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
+    }
 
-        program.opprocess(ret, tokens.at(fn));
+    program.opprocess(ret, tokens.at(fn));
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

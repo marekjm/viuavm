@@ -22,10 +22,11 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_jump(Program& program, std::vector<Token> const& tokens,
-        Token_index const i,
-        viua::internals::types::bytecode_size const& instruction,
-        std::map<std::string, Token_index> const& marks) -> void {
+auto assemble_op_jump(Program& program,
+                      std::vector<Token> const& tokens,
+                      Token_index const i,
+                      viua::internals::types::bytecode_size const& instruction,
+                      std::map<std::string, Token_index> const& marks) -> void {
     /*  Jump instruction can be written in two forms:
      *
      *      * `jump <index>`
@@ -42,8 +43,8 @@ auto assemble_op_jump(Program& program, std::vector<Token> const& tokens,
      */
     viua::internals::types::bytecode_size jump_target;
     enum JUMPTYPE jump_type;
-    std::tie(jump_target, jump_type) =
-        ::assembler::operands::resolve_jump(tokens.at(i + 1), marks, instruction);
+    std::tie(jump_target, jump_type) = ::assembler::operands::resolve_jump(
+        tokens.at(i + 1), marks, instruction);
 
     program.opjump(jump_target, jump_type);
 }

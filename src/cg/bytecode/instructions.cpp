@@ -171,7 +171,8 @@ static auto insert_size_and_type_prefixed_bitstring(
     return ptr;
 }
 
-static auto insert_string(viua::internals::types::byte* ptr, const std::string& s)
+static auto insert_string(viua::internals::types::byte* ptr,
+                          const std::string& s)
     -> viua::internals::types::byte* {
     for (auto const each : s) {
         *(ptr++) = static_cast<viua::internals::types::byte>(each);
@@ -885,8 +886,8 @@ auto opcall(viua::internals::types::byte* addr_ptr, int_op reg, int_op fn)
     return insert_two_ri_instruction(addr_ptr, CALL, reg, fn);
 }
 
-auto optailcall(viua::internals::types::byte* addr_ptr, const std::string& fn_name)
-    -> viua::internals::types::byte* {
+auto optailcall(viua::internals::types::byte* addr_ptr,
+                const std::string& fn_name) -> viua::internals::types::byte* {
     *(addr_ptr++) = TAILCALL;
     return insert_string(addr_ptr, fn_name);
 }
@@ -971,8 +972,8 @@ auto opreceive(viua::internals::types::byte* addr_ptr,
     return addr_ptr;
 }
 
-auto opwatchdog(viua::internals::types::byte* addr_ptr, const std::string& fn_name)
-    -> viua::internals::types::byte* {
+auto opwatchdog(viua::internals::types::byte* addr_ptr,
+                const std::string& fn_name) -> viua::internals::types::byte* {
     *(addr_ptr++) = WATCHDOG;
     return insert_string(addr_ptr, fn_name);
 }
@@ -1040,8 +1041,8 @@ auto opdraw(viua::internals::types::byte* addr_ptr, int_op regno)
     return insert_ri_operand(addr_ptr, regno);
 }
 
-auto openter(viua::internals::types::byte* addr_ptr, const std::string& block_name)
-    -> viua::internals::types::byte* {
+auto openter(viua::internals::types::byte* addr_ptr,
+             const std::string& block_name) -> viua::internals::types::byte* {
     *(addr_ptr++) = ENTER;
     return insert_string(addr_ptr, block_name);
 }
@@ -1058,8 +1059,8 @@ auto opleave(viua::internals::types::byte* addr_ptr)
     return addr_ptr;
 }
 
-auto opimport(viua::internals::types::byte* addr_ptr, const std::string& module_name)
-    -> viua::internals::types::byte* {
+auto opimport(viua::internals::types::byte* addr_ptr,
+              const std::string& module_name) -> viua::internals::types::byte* {
     *(addr_ptr++) = IMPORT;
     return insert_string(addr_ptr,
                          module_name.substr(1, module_name.size() - 2));

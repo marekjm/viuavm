@@ -19,7 +19,6 @@
 
 #include <functional>
 #include <viua/assert.h>
-#include <viua/util/memory.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/kernel/kernel.h>
@@ -27,11 +26,12 @@
 #include <viua/types/float.h>
 #include <viua/types/integer.h>
 #include <viua/types/value.h>
+#include <viua/util/memory.h>
 
 
 auto viua::process::Process::opfloat(Op_address_type addr) -> Op_address_type {
     auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    auto value                    = float{0.0};
+    auto value  = float{0.0};
 
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

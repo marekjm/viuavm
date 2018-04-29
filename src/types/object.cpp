@@ -70,7 +70,8 @@ void viua::types::Object::insert(const std::string& key,
                                  unique_ptr<viua::types::Value> value) {
     set(key, std::move(value));
 }
-unique_ptr<viua::types::Value> viua::types::Object::remove(const std::string& key) {
+unique_ptr<viua::types::Value> viua::types::Object::remove(
+    const std::string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;

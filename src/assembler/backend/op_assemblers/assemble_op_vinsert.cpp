@@ -21,8 +21,9 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_vinsert(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
+auto assemble_op_vinsert(Program& program,
+                         std::vector<Token> const& tokens,
+                         Token_index const i) -> void {
     Token_index target   = i + 1;
     Token_index source   = target + 2;
     Token_index position = source + 2;
@@ -37,12 +38,13 @@ auto assemble_op_vinsert(Program& program, std::vector<Token> const& tokens,
             ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));
     }
 
-    program.opvinsert(::assembler::operands::getint_with_rs_type(
-                          ::assembler::operands::resolve_register(tokens.at(target)),
-                          ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                      ::assembler::operands::getint_with_rs_type(
-                          ::assembler::operands::resolve_register(tokens.at(source)),
-                          ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
-                      position_op);
+    program.opvinsert(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(source)),
+            ::assembler::operands::resolve_rs_type(tokens.at(source + 1))),
+        position_op);
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

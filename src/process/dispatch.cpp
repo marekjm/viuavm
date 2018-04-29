@@ -36,7 +36,8 @@ auto viua::process::Process::get_trace_line(
     trace_line << ", process = " << std::hex << this << std::dec;
     trace_line << ", stack = " << std::hex << stack << std::dec;
     trace_line << ", frame = 0x" << std::hex
-               << reinterpret_cast<unsigned long>(stack->back().get()) << std::dec;
+               << reinterpret_cast<unsigned long>(stack->back().get())
+               << std::dec;
     trace_line << ", jump_base = 0x" << std::hex
                << reinterpret_cast<unsigned long>(stack->jump_base) << std::dec;
     trace_line << ", address = 0x" << std::hex
@@ -63,8 +64,7 @@ auto viua::process::Process::get_trace_line(
     }
 
     if (static_cast<OPCODE>(*for_address) == CALL
-        or static_cast<OPCODE>(*for_address) == PROCESS
-        ) {
+        or static_cast<OPCODE>(*for_address) == PROCESS) {
         auto working_address = for_address + 1;
         if (viua::bytecode::decoder::operands::is_void(working_address)) {
             ++working_address;
@@ -75,12 +75,15 @@ auto viua::process::Process::get_trace_line(
             working_address +=
                 sizeof(viua::internals::types::registerset_type_marker);
         }
-        trace_line << ' ' << std::string{ reinterpret_cast<char const* const>(working_address) };
+        trace_line << ' '
+                   << std::string{
+                          reinterpret_cast<char const* const>(working_address)};
     }
     if (static_cast<OPCODE>(*for_address) == TAILCALL
         or static_cast<OPCODE>(*for_address) == DEFER) {
         trace_line << ' ';
-        trace_line << std::string{ reinterpret_cast<char const* const>(for_address + 1) };
+        trace_line << std::string{
+            reinterpret_cast<char const* const>(for_address + 1)};
     }
     if (static_cast<OPCODE>(*for_address) == RETURN) {
         trace_line << " from " + stack->back()->function_name;
@@ -110,8 +113,8 @@ auto viua::process::Process::emit_trace_line(
 }
 
 
-auto viua::process::Process::dispatch(
-    viua::internals::types::byte const* addr) -> viua::internals::types::byte const* {
+auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
+    -> viua::internals::types::byte const* {
     /** Dispatches instruction at a pointer to its handler.
      */
     if (tracing_enabled) {

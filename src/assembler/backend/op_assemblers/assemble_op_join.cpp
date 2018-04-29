@@ -21,30 +21,33 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_join(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target        = i + 1;
-        Token_index process       = target + 2;
-        Token_index timeout_index = process + 2;
+auto assemble_op_join(Program& program,
+                      std::vector<Token> const& tokens,
+                      Token_index const i) -> void {
+    Token_index target        = i + 1;
+    Token_index process       = target + 2;
+    Token_index timeout_index = process + 2;
 
-        int_op target_operand;
-        if (tokens.at(target) == "void") {
-            --process;
-            --timeout_index;
-            target_operand =
-                ::assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
-        } else {
-            target_operand = ::assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(target)),
-                ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
-        }
+    int_op target_operand;
+    if (tokens.at(target) == "void") {
+        --process;
+        --timeout_index;
+        target_operand = ::assembler::operands::getint(
+            ::assembler::operands::resolve_register(tokens.at(target)));
+    } else {
+        target_operand = ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
+    }
 
-        timeout_op timeout =
-            ::assembler::operands::convert_token_to_timeout_operand(tokens.at(timeout_index));
-        program.opjoin(target_operand,
-                       ::assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(process)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(process + 1))),
-                       timeout);
+    timeout_op timeout =
+        ::assembler::operands::convert_token_to_timeout_operand(
+            tokens.at(timeout_index));
+    program.opjoin(
+        target_operand,
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(process)),
+            ::assembler::operands::resolve_rs_type(tokens.at(process + 1))),
+        timeout);
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

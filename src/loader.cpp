@@ -59,7 +59,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump,
 }
 void Loader::calculate_function_sizes() {
     for (unsigned i = 0; i < functions.size(); ++i) {
-        std::string name      = functions[i];
+        std::string name = functions[i];
         uint64_t el_size = 0;
 
         if (i < (functions.size() - 1)) {
@@ -83,7 +83,8 @@ void Loader::load_magic_number(ifstream& in) {
         throw "invalid magic number";
     }
     if (std::string(magic_number) != string(VIUA_MAGIC_NUMBER)) {
-        throw(std::string("invalid magic number: ") + std::string(magic_number));
+        throw(std::string("invalid magic number: ")
+              + std::string(magic_number));
     }
 }
 

@@ -112,7 +112,8 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::optextsub(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextsub(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -140,7 +141,8 @@ auto viua::process::Process::optextsub(Op_address_type addr) -> Op_address_type 
 }
 
 
-auto viua::process::Process::optextlength(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextlength(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -156,7 +158,8 @@ auto viua::process::Process::optextlength(Op_address_type addr) -> Op_address_ty
 }
 
 
-auto viua::process::Process::optextcommonprefix(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextcommonprefix(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -178,7 +181,8 @@ auto viua::process::Process::optextcommonprefix(Op_address_type addr) -> Op_addr
 }
 
 
-auto viua::process::Process::optextcommonsuffix(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextcommonsuffix(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -200,7 +204,8 @@ auto viua::process::Process::optextcommonsuffix(Op_address_type addr) -> Op_addr
 }
 
 
-auto viua::process::Process::optextconcat(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextconcat(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

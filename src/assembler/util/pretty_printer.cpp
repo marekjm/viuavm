@@ -26,8 +26,8 @@
 using namespace std;
 
 
-auto viua::assembler::util::pretty_printer::send_control_seq(const std::string& mode)
-    -> std::string {
+auto viua::assembler::util::pretty_printer::send_control_seq(
+    const std::string& mode) -> std::string {
     static auto is_terminal = isatty(1);
     static std::string env_color_flag{
         getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};

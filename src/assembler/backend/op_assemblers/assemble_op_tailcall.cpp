@@ -21,15 +21,16 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_tailcall(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        if (tokens.at(i + 1).str().at(0) == '*'
-            or tokens.at(i + 1).str().at(0) == '%') {
-            program.optailcall(assembler::operands::getint_with_rs_type(
-                ::assembler::operands::resolve_register(tokens.at(i + 1)),
-                ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
-        } else {
-            program.optailcall(tokens.at(i + 1));
-        }
+auto assemble_op_tailcall(Program& program,
+                          std::vector<Token> const& tokens,
+                          Token_index const i) -> void {
+    if (tokens.at(i + 1).str().at(0) == '*'
+        or tokens.at(i + 1).str().at(0) == '%') {
+        program.optailcall(assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(i + 1)),
+            ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
+    } else {
+        program.optailcall(tokens.at(i + 1));
+    }
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

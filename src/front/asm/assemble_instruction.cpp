@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <viua/assembler/backend/op_assemblers.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
@@ -30,7 +31,6 @@
 #include <viua/front/asm.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
-#include <viua/assembler/backend/op_assemblers.h>
 #include <viua/program.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
@@ -46,72 +46,76 @@ using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
-using Token      = viua::cg::lex::Token;
+using Token = viua::cg::lex::Token;
 using viua::assembler::backend::op_assemblers::Token_index;
 
 
 auto ::assembler::operands::resolve_jump(
     Token token,
     std::map<std::string, std::vector<Token>::size_type> const& marks,
-    viua::internals::types::bytecode_size instruction_index) -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> {
-    /*  This function is used to resolve jumps in `jump` and `branch`
-     * instructions.
-     */
-    std::string jmp                                 = token.str();
-    viua::internals::types::bytecode_size addr = 0;
-    enum JUMPTYPE jump_type                    = JMP_RELATIVE;
-    if (str::isnum(jmp, false)) {
-        addr = stoul(jmp);
-    } else if (jmp.substr(0, 2) == "0x") {
-        stringstream ss;
-        ss << hex << jmp;
-        ss >> addr;
-        jump_type = JMP_TO_BYTE;
-    } else if (jmp[0] == '-') {
-        int jump_value = stoi(jmp);
-        if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
-            // FIXME: move jump verification to assembler::verify namespace
-            // function
-            ostringstream oss;
-            oss << "use of relative jump results in a jump to negative index: ";
-            oss << "jump_value = " << jump_value << ", ";
-            oss << "instruction_index = " << instruction_index;
-            throw viua::cg::lex::InvalidSyntax(token, oss.str());
-        }
-        addr = (instruction_index
-                - static_cast<viua::internals::types::bytecode_size>(
-                      -1 * jump_value));
-    } else if (jmp[0] == '+') {
-        addr = (instruction_index + stoul(jmp.substr(1)));
-    } else {
-        try {
-            // FIXME: markers map should use
-            // viua::internals::types::bytecode_size to avoid the need for
-            // casting
-            addr = static_cast<viua::internals::types::bytecode_size>(
-                marks.at(jmp));
-        } catch (const std::out_of_range& e) {
-            throw viua::cg::lex::InvalidSyntax(
-                token,
-                ("cannot resolve jump to unrecognised marker: "
-                 + str::enquote(str::strencode(jmp))));
-        }
+    viua::internals::types::bytecode_size instruction_index)
+    -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> {
+        /*  This function is used to resolve jumps in `jump` and `branch`
+         * instructions.
+         */
+        std::string jmp                            = token.str();
+        viua::internals::types::bytecode_size addr = 0;
+        enum JUMPTYPE jump_type                    = JMP_RELATIVE;
+        if (str::isnum(jmp, false)){addr = stoul(jmp);}
+else if (jmp.substr(0, 2) == "0x") {
+    stringstream ss;
+    ss << hex << jmp;
+    ss >> addr;
+    jump_type = JMP_TO_BYTE;
+}
+else if (jmp[0] == '-') {
+    int jump_value = stoi(jmp);
+    if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
+        // FIXME: move jump verification to assembler::verify namespace
+        // function
+        ostringstream oss;
+        oss << "use of relative jump results in a jump to negative index: ";
+        oss << "jump_value = " << jump_value << ", ";
+        oss << "instruction_index = " << instruction_index;
+        throw viua::cg::lex::InvalidSyntax(token, oss.str());
     }
+    addr =
+        (instruction_index
+         - static_cast<viua::internals::types::bytecode_size>(-1 * jump_value));
+}
+else if (jmp[0] == '+') {
+    addr = (instruction_index + stoul(jmp.substr(1)));
+}
+else {
+    try {
+        // FIXME: markers map should use
+        // viua::internals::types::bytecode_size to avoid the need for
+        // casting
+        addr =
+            static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
+    } catch (const std::out_of_range& e) {
+        throw viua::cg::lex::InvalidSyntax(
+            token,
+            ("cannot resolve jump to unrecognised marker: "
+             + str::enquote(str::strencode(jmp))));
+    }
+}
 
-    // FIXME: check if the jump is within the size of bytecode
-    return tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(
-        addr, jump_type);
+// FIXME: check if the jump is within the size of bytecode
+return tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr,
+                                                                   jump_type);
 }
 
 auto ::assembler::operands::resolve_register(Token const token,
-                              bool const allow_bare_integers) -> std::string {
+                                             bool const allow_bare_integers)
+    -> std::string {
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
      *  This function MUST return string as teh result is further passed to
      * assembler::operands::getint() function which *expects* string.
      */
-    auto out = ostringstream{};
+    auto out       = ostringstream{};
     auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
@@ -156,7 +160,8 @@ auto ::assembler::operands::resolve_register(Token const token,
     return out.str();
 }
 
-auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internals::RegisterSets {
+auto ::assembler::operands::resolve_rs_type(Token const token)
+    -> viua::internals::RegisterSets {
     if (token == "current") {
         return viua::internals::RegisterSets::CURRENT;
     } else if (token == "local") {
@@ -166,12 +171,13 @@ auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internal
     } else if (token == "global") {
         return viua::internals::RegisterSets::GLOBAL;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token,
-                                           "invalid register set type name: " + token.str());
+        throw viua::cg::lex::InvalidSyntax(
+            token, "invalid register set type name: " + token.str());
     }
 }
 
-static auto timeout_to_int(std::string const& timeout) -> viua::internals::types::timeout {
+static auto timeout_to_int(std::string const& timeout)
+    -> viua::internals::types::timeout {
     const auto timeout_str_size = timeout.size();
     if (timeout[timeout_str_size - 2] == 'm') {
         return static_cast<viua::internals::types::timeout>(
@@ -182,8 +188,8 @@ static auto timeout_to_int(std::string const& timeout) -> viua::internals::types
     }
 }
 
-auto ::assembler::operands::convert_token_to_timeout_operand(viua::cg::lex::Token const token)
-    -> timeout_op {
+auto ::assembler::operands::convert_token_to_timeout_operand(
+    viua::cg::lex::Token const token) -> timeout_op {
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
         timeout_milliseconds = timeout_to_int(token);
@@ -204,37 +210,37 @@ static auto log_location_being_assembled(const Token& token) -> void {
     }
 }
 
-using viua::assembler::backend::op_assemblers::assemble_single_register_op;
-using viua::assembler::backend::op_assemblers::assemble_double_register_op;
-using viua::assembler::backend::op_assemblers::assemble_three_register_op;
-using viua::assembler::backend::op_assemblers::assemble_four_register_op;
-using viua::assembler::backend::op_assemblers::assemble_capture_op;
-using viua::assembler::backend::op_assemblers::assemble_fn_ctor_op;
-using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
-using viua::assembler::backend::op_assemblers::assemble_increment_instruction;
 using viua::assembler::backend::op_assemblers::assemble_arithmetic_instruction;
+using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
+using viua::assembler::backend::op_assemblers::assemble_capture_op;
+using viua::assembler::backend::op_assemblers::assemble_double_register_op;
+using viua::assembler::backend::op_assemblers::assemble_fn_ctor_op;
+using viua::assembler::backend::op_assemblers::assemble_four_register_op;
+using viua::assembler::backend::op_assemblers::assemble_increment_instruction;
+using viua::assembler::backend::op_assemblers::assemble_single_register_op;
+using viua::assembler::backend::op_assemblers::assemble_three_register_op;
 
-using viua::assembler::backend::op_assemblers::assemble_op_integer;
-using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
-using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 using viua::assembler::backend::op_assemblers::assemble_op_bits;
 using viua::assembler::backend::op_assemblers::assemble_op_bitset;
 using viua::assembler::backend::op_assemblers::assemble_op_call;
-using viua::assembler::backend::op_assemblers::assemble_op_if;
-using viua::assembler::backend::op_assemblers::assemble_op_jump;
-using viua::assembler::backend::op_assemblers::assemble_op_structremove;
-using viua::assembler::backend::op_assemblers::assemble_op_msg;
-using viua::assembler::backend::op_assemblers::assemble_op_remove;
 using viua::assembler::backend::op_assemblers::assemble_op_float;
 using viua::assembler::backend::op_assemblers::assemble_op_frame;
+using viua::assembler::backend::op_assemblers::assemble_op_if;
+using viua::assembler::backend::op_assemblers::assemble_op_integer;
+using viua::assembler::backend::op_assemblers::assemble_op_jump;
+using viua::assembler::backend::op_assemblers::assemble_op_msg;
+using viua::assembler::backend::op_assemblers::assemble_op_remove;
+using viua::assembler::backend::op_assemblers::assemble_op_structremove;
+using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
+using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
     vector<Token> const& tokens,
-    std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>&
-        marks) {
+    std::map<std::string,
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -281,9 +287,11 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "eq") {
         assemble_three_register_op<&Program::opeq>(program, tokens, i);
     } else if (tokens.at(i) == "string") {
-        viua::assembler::backend::op_assemblers::assemble_op_string(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_string(
+            program, tokens, i);
     } else if (tokens.at(i) == "text") {
-        viua::assembler::backend::op_assemblers::assemble_op_text(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_text(
+            program, tokens, i);
     } else if (tokens.at(i) == "texteq") {
         assemble_three_register_op<&Program::optexteq>(program, tokens, i);
     } else if (tokens.at(i) == "textat") {
@@ -293,13 +301,16 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "textlength") {
         assemble_double_register_op<&Program::optextlength>(program, tokens, i);
     } else if (tokens.at(i) == "textcommonprefix") {
-        assemble_three_register_op<&Program::optextcommonprefix>(program, tokens, i);
+        assemble_three_register_op<&Program::optextcommonprefix>(
+            program, tokens, i);
     } else if (tokens.at(i) == "textcommonsuffix") {
-        assemble_three_register_op<&Program::optextcommonsuffix>(program, tokens, i);
+        assemble_three_register_op<&Program::optextcommonsuffix>(
+            program, tokens, i);
     } else if (tokens.at(i) == "textconcat") {
         assemble_three_register_op<&Program::optextconcat>(program, tokens, i);
     } else if (tokens.at(i) == "vector") {
-        viua::assembler::backend::op_assemblers::assemble_op_vector(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_vector(
+            program, tokens, i);
     } else if (tokens.at(i) == "vinsert") {
         assemble_op_vinsert(program, tokens, i);
     } else if (tokens.at(i) == "vpush") {
@@ -463,29 +474,39 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "frame") {
         assemble_op_frame(program, tokens, i);
     } else if (tokens.at(i) == "param") {
-        viua::assembler::backend::op_assemblers::assemble_parameter_op<&Program::opparam>(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_parameter_op<
+            &Program::opparam>(program, tokens, i);
     } else if (tokens.at(i) == "pamv") {
-        viua::assembler::backend::op_assemblers::assemble_parameter_op<&Program::oppamv>(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_parameter_op<
+            &Program::oppamv>(program, tokens, i);
     } else if (tokens.at(i) == "arg") {
-        viua::assembler::backend::op_assemblers::assemble_op_arg(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_arg(
+            program, tokens, i);
     } else if (tokens.at(i) == "argc") {
         assemble_single_register_op<&Program::opargc>(program, tokens, i);
     } else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {
-        viua::assembler::backend::op_assemblers::assemble_no_result_call_op<&Program::optailcall, &Program::optailcall>(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_no_result_call_op<
+            &Program::optailcall,
+            &Program::optailcall>(program, tokens, i);
     } else if (tokens.at(i) == "defer") {
-        viua::assembler::backend::op_assemblers::assemble_no_result_call_op<&Program::opdefer, &Program::opdefer>(program, tokens, i);
+        viua::assembler::backend::op_assemblers::
+            assemble_no_result_call_op<&Program::opdefer, &Program::opdefer>(
+                program, tokens, i);
     } else if (tokens.at(i) == "process") {
-        viua::assembler::backend::op_assemblers::assemble_op_process(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_process(
+            program, tokens, i);
     } else if (tokens.at(i) == "self") {
         assemble_single_register_op<&Program::opself>(program, tokens, i);
     } else if (tokens.at(i) == "join") {
-        viua::assembler::backend::op_assemblers::assemble_op_join(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_join(
+            program, tokens, i);
     } else if (tokens.at(i) == "send") {
         assemble_double_register_op<&Program::opsend>(program, tokens, i);
     } else if (tokens.at(i) == "receive") {
-        viua::assembler::backend::op_assemblers::assemble_op_receive(program, tokens, i);
+        viua::assembler::backend::op_assemblers::assemble_op_receive(
+            program, tokens, i);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i + 1));
     } else if (tokens.at(i) == "if") {
@@ -513,7 +534,8 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i) == "struct") {
         assemble_single_register_op<&Program::opstruct>(program, tokens, i);
     } else if (tokens.at(i) == "structinsert") {
-        assemble_three_register_op<&Program::opstructinsert>(program, tokens, i);
+        assemble_three_register_op<&Program::opstructinsert>(
+            program, tokens, i);
     } else if (tokens.at(i) == "structremove") {
         assemble_op_structremove(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {

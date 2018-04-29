@@ -188,7 +188,8 @@ class Process {
      * regarding executed code.
      */
     const bool tracing_enabled;
-    auto get_trace_line(viua::internals::types::byte const*) const -> std::string;
+    auto get_trace_line(viua::internals::types::byte const*) const
+        -> std::string;
     auto emit_trace_line(viua::internals::types::byte const*) const -> void;
 
     /*
@@ -245,19 +246,20 @@ class Process {
         viua::internals::types::register_index registers_size = 0);
     TryFrame* request_new_try_frame();
     void push_frame();
-    auto adjust_jump_base_for_block(
-        std::string const&) -> viua::internals::types::Op_address_type;
-    auto adjust_jump_base_for(std::string const&) -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for_block(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(std::string const&)
+        -> viua::internals::types::Op_address_type;
     // call native (i.e. written in Viua) function
     auto call_native(Op_address_type,
-                                              std::string const&,
-                                              viua::kernel::Register* const,
-                                              std::string const&) -> Op_address_type;
+                     std::string const&,
+                     viua::kernel::Register* const,
+                     std::string const&) -> Op_address_type;
     // call foreign (i.e. from a C++ extension) function
     auto call_foreign(Op_address_type,
-                                               std::string const&,
-                                               viua::kernel::Register* const,
-                                               std::string const&) -> Op_address_type;
+                      std::string const&,
+                      viua::kernel::Register* const,
+                      std::string const&) -> Op_address_type;
 
     auto push_deferred(std::string const) -> void;
 
@@ -472,8 +474,7 @@ class Process {
 
     bool watchdogged() const;
     std::string watchdog() const;
-    auto become(const std::string&,
-                                         std::unique_ptr<Frame>) -> Op_address_type;
+    auto become(const std::string&, std::unique_ptr<Frame>) -> Op_address_type;
 
     auto begin() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);

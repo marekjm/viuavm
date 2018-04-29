@@ -37,7 +37,8 @@ auto viua::process::Process::opstruct(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opstructinsert(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstructinsert(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Struct* struct_operand = nullptr;
     tie(addr, struct_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
@@ -64,7 +65,8 @@ auto viua::process::Process::opstructinsert(Op_address_type addr) -> Op_address_
     return addr;
 }
 
-auto viua::process::Process::opstructremove(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstructremove(Op_address_type addr)
+    -> Op_address_type {
     bool void_target = viua::bytecode::decoder::operands::is_void(addr);
     viua::kernel::Register* target = nullptr;
 
@@ -93,7 +95,8 @@ auto viua::process::Process::opstructremove(Op_address_type addr) -> Op_address_
     return addr;
 }
 
-auto viua::process::Process::opstructkeys(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstructkeys(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

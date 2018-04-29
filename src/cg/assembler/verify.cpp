@@ -75,7 +75,7 @@ void assembler::verify::function_calls_are_defined(
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
                         (std::string{token == "tailcall" ? "tail call to"
-                                                    : "deferred"}
+                                                         : "deferred"}
                          + " undefined function " + function_name.str()));
                 }
             }
@@ -98,7 +98,8 @@ void assembler::verify::function_calls_are_defined(
                         function_name, function_names, function_signatures)) {
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
-                        (std::string{token == "call" ? "call to" : "process from"}
+                        (std::string{token == "call" ? "call to"
+                                                     : "process from"}
                          + " undefined function " + function_name.str()));
                 }
             }

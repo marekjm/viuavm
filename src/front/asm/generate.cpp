@@ -84,13 +84,14 @@ static void strwrite(ofstream& out, const std::string& s) {
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op,
                                                          int_op,
                                                          int_op);
-const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
-    {"and", &Program::opand},
-    {"or", &Program::opor},
+const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
+    {
+        {"and", &Program::opand},
+        {"or", &Program::opor},
 
-    {"capture", &Program::opcapture},
-    {"capturecopy", &Program::opcapturecopy},
-    {"capturemove", &Program::opcapturemove},
+        {"capture", &Program::opcapture},
+        {"capturecopy", &Program::opcapturecopy},
+        {"capturemove", &Program::opcapturemove},
 };
 
 
@@ -259,7 +260,8 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
     return block_bodies_size_so_far;
 }
 
-static std::string get_main_function(const vector<std::string>& available_functions) {
+static std::string get_main_function(
+    const vector<std::string>& available_functions) {
     std::string main_function = "";
     for (auto f : available_functions) {
         if (f == "main/0" or f == "main/1" or f == "main/2") {
@@ -1204,7 +1206,7 @@ void generate(vector<Token> const& tokens,
     // WRITE STATICALLY LINKED LIBRARIES
     viua::internals::types::bytecode_size bytes_offset = current_link_offset;
     for (auto& lnk : linked_libs_bytecode) {
-        std::string lib_name                                   = get<0>(lnk);
+        std::string lib_name                              = get<0>(lnk);
         viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 

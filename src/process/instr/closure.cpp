@@ -32,7 +32,8 @@
 using namespace std;
 
 
-auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcapture(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -71,7 +72,8 @@ auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type 
     return addr;
 }
 
-auto viua::process::Process::opcapturecopy(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcapturecopy(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -95,7 +97,8 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr) -> Op_address_t
     return addr;
 }
 
-auto viua::process::Process::opcapturemove(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcapturemove(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Closure* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Closure>(addr, this);
@@ -119,7 +122,8 @@ auto viua::process::Process::opcapturemove(Op_address_type addr) -> Op_address_t
     return addr;
 }
 
-auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opclosure(Op_address_type addr)
+    -> Op_address_type {
     /** Create a closure from a function.
      */
     viua::kernel::Register* target = nullptr;
@@ -140,7 +144,8 @@ auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type 
     return addr;
 }
 
-auto viua::process::Process::opfunction(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opfunction(Op_address_type addr)
+    -> Op_address_type {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and

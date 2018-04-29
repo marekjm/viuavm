@@ -28,7 +28,8 @@
 
 
 namespace viua { namespace util { namespace memory {
-template<typename T> using dumb_ptr = T*;   // FIXME; use std::experimental::observer_ptr
+template<typename T>
+using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr
 
 template<class T> class maybe_unique_ptr {
     bool owns_pointer;

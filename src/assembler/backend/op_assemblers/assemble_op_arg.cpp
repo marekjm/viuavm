@@ -21,23 +21,26 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_arg(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target = i + 1;
-        Token_index source = target + 2;
+auto assemble_op_arg(Program& program,
+                     std::vector<Token> const& tokens,
+                     Token_index const i) -> void {
+    Token_index target = i + 1;
+    Token_index source = target + 2;
 
-        if (tokens.at(target) == "void") {
-            --source;
-            program.oparg(
-                ::assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target))),
-                ::assembler::operands::getint(
-                    ::assembler::operands::resolve_register(tokens.at(source))));
-        } else {
-            program.oparg(::assembler::operands::getint_with_rs_type(
-                              ::assembler::operands::resolve_register(tokens.at(target)),
-                              ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                          ::assembler::operands::getint(
-                              ::assembler::operands::resolve_register(tokens.at(source))));
-        }
+    if (tokens.at(target) == "void") {
+        --source;
+        program.oparg(
+            ::assembler::operands::getint(
+                ::assembler::operands::resolve_register(tokens.at(target))),
+            ::assembler::operands::getint(
+                ::assembler::operands::resolve_register(tokens.at(source))));
+    } else {
+        program.oparg(
+            ::assembler::operands::getint_with_rs_type(
+                ::assembler::operands::resolve_register(tokens.at(target)),
+                ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+            ::assembler::operands::getint(
+                ::assembler::operands::resolve_register(tokens.at(source))));
+    }
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

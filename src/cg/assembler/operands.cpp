@@ -29,7 +29,8 @@ using namespace std;
 
 
 static auto resolveregister(viua::cg::lex::Token const token,
-                            bool const allow_bare_integers = false) -> std::string {
+                            bool const allow_bare_integers = false)
+    -> std::string {
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *

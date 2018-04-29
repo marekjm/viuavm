@@ -55,7 +55,8 @@ static auto enumerate(const vector<T>& v)
     return enumerated_vector;
 }
 
-static void encode_json(const std::string& filename, const vector<Token>& tokens) {
+static void encode_json(const std::string& filename,
+                        const vector<Token>& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";

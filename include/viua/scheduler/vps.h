@@ -82,11 +82,13 @@ class VirtualProcessScheduler {
     bool is_block(const std::string&) const;
     bool is_local_block(const std::string&) const;
     bool is_linked_block(const std::string&) const;
-   auto
-    get_entry_point_of_block(std::string const&) const -> std::pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>;
+    auto get_entry_point_of_block(std::string const&) const
+        -> std::pair<viua::internals::types::Op_address_type,
+                     viua::internals::types::Op_address_type>;
 
-   auto
-    get_entry_point_of(std::string const&) const -> std::pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>;
+    auto get_entry_point_of(std::string const&) const
+        -> std::pair<viua::internals::types::Op_address_type,
+                     viua::internals::types::Op_address_type>;
 
     void request_foreign_function_call(Frame*, viua::process::Process*) const;
 

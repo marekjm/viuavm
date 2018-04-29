@@ -20,11 +20,11 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
-#include <viua/util/memory.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
+#include <viua/util/memory.h>
 
 
 auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type {
@@ -45,10 +45,10 @@ auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type {
 
 
 auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type {
-    auto target =
-        Op_address_type{ stack->jump_base
-            + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
-                    this) };
+    auto target = Op_address_type{
+        stack->jump_base
+        + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
+                                                                      this)};
     if (target == addr) {
         throw std::make_unique<viua::types::Exception>(
             "aborting: JUMP instruction pointing to itself");
@@ -61,7 +61,7 @@ auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type {
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    auto addr_true = viua::internals::types::bytecode_size{0};
+    auto addr_true  = viua::internals::types::bytecode_size{0};
     auto addr_false = viua::internals::types::bytecode_size{0};
     std::tie(addr, addr_true) =
         viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);

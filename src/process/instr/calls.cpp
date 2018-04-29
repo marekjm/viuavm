@@ -172,8 +172,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native         = scheduler->is_native_function(call_name);
-    bool is_foreign        = scheduler->is_foreign_function(call_name);
+    bool is_native  = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: "
@@ -185,7 +185,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     return (this->*caller)(addr, call_name, return_register, "");
 }
 
-auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optailcall(Op_address_type addr)
+    -> Op_address_type {
     if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
         stack->register_deferred_calls();
         stack->state_of(
@@ -228,8 +229,8 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native         = scheduler->is_native_function(call_name);
-    bool is_foreign        = scheduler->is_foreign_function(call_name);
+    bool is_native  = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
@@ -273,8 +274,8 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native         = scheduler->is_native_function(call_name);
-    bool is_foreign        = scheduler->is_foreign_function(call_name);
+    bool is_native  = scheduler->is_native_function(call_name);
+    bool is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
@@ -286,8 +287,7 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opreturn(
-    Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
     if (stack->size() == 0) {
         throw make_unique<viua::types::Exception>(
             "no frame on stack: no call to return from");

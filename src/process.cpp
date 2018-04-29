@@ -96,7 +96,8 @@ void viua::process::Process::put(viua::internals::types::register_index index,
                                  unique_ptr<viua::types::Value> o) {
     place(index, std::move(o));
 }
-void viua::process::Process::ensure_static_registers(std::string function_name) {
+void viua::process::Process::ensure_static_registers(
+    std::string function_name) {
     /** Makes sure that static register set for requested function is
      * initialized.
      */
@@ -135,8 +136,8 @@ void viua::process::Process::push_frame() {
     stack->emplace_back(std::move(stack->frame_new));
 }
 
-auto viua::process::Process::adjust_jump_base_for_block(std::string const& call_name)
-    -> viua::internals::types::Op_address_type {
+auto viua::process::Process::adjust_jump_base_for_block(
+    std::string const& call_name) -> viua::internals::types::Op_address_type {
     return stack->adjust_jump_base_for_block(call_name);
 }
 auto viua::process::Process::adjust_jump_base_for(std::string const& call_name)
@@ -148,8 +149,7 @@ auto viua::process::Process::call_native(
     std::string const& call_name,
     viua::kernel::Register* return_register,
     std::string const&) -> Op_address_type {
-    auto call_address =
-        adjust_jump_base_for(call_name);
+    auto call_address = adjust_jump_base_for(call_name);
 
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
@@ -187,7 +187,8 @@ auto viua::process::Process::call_foreign(
     return return_address;
 }
 
-auto viua::process::Process::push_deferred(std::string const call_name) -> void {
+auto viua::process::Process::push_deferred(std::string const call_name)
+    -> void {
     if (not stack->frame_new) {
         throw make_unique<viua::types::Exception>(
             "function call without a frame: use `frame 0' in source code if "
@@ -206,8 +207,7 @@ void viua::process::Process::handle_active_exception() {
     stack->unwind();
 }
 auto viua::process::Process::tick() -> Op_address_type {
-    Op_address_type previous_instruction_pointer =
-        stack->instruction_pointer;
+    Op_address_type previous_instruction_pointer = stack->instruction_pointer;
 
     try {
         // It is necessary to use a "saved stack" because the stack variable may
@@ -399,9 +399,9 @@ bool viua::process::Process::watchdogged() const {
 std::string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
-auto viua::process::Process::become(
-    std::string const& function_name,
-    std::unique_ptr<Frame> frame_to_use) -> Op_address_type {
+auto viua::process::Process::become(std::string const& function_name,
+                                    std::unique_ptr<Frame> frame_to_use)
+    -> Op_address_type {
     if (not scheduler->is_native_function(function_name)) {
         throw make_unique<viua::types::Exception>(
             "process from undefined function: " + function_name);

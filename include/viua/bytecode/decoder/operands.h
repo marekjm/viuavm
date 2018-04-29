@@ -58,36 +58,26 @@ auto is_void(Op_address_type const) -> bool;
 auto fetch_void(Op_address_type) -> Op_address_type;
 auto fetch_operand_type(Op_address_type)
     -> std::tuple<Op_address_type, OperandType>;
-auto fetch_register_index(Op_address_type,
-                          viua::process::Process*)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::register_index>;
+auto fetch_register_index(Op_address_type, viua::process::Process*)
+    -> std::tuple<Op_address_type, viua::internals::types::register_index>;
 auto fetch_register(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, viua::kernel::Register*>;
-auto fetch_register_type_and_index(Op_address_type,
-                                   viua::process::Process*)
+auto fetch_register_type_and_index(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type,
                   viua::internals::RegisterSets,
                   viua::internals::types::register_index>;
 auto fetch_timeout(Op_address_type, viua::process::Process*)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::timeout>;
-auto fetch_registerset_type(Op_address_type,
-                            viua::process::Process*)
+    -> std::tuple<Op_address_type, viua::internals::types::timeout>;
+auto fetch_registerset_type(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type,
                   viua::internals::types::registerset_type_marker>;
-auto fetch_primitive_uint(Op_address_type,
-                          viua::process::Process*)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::register_index>;
-auto fetch_primitive_uint64(Op_address_type,
-                            viua::process::Process*)
+auto fetch_primitive_uint(Op_address_type, viua::process::Process*)
+    -> std::tuple<Op_address_type, viua::internals::types::register_index>;
+auto fetch_primitive_uint64(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, uint64_t>;
 auto fetch_primitive_int(Op_address_type, viua::process::Process*)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::plain_int>;
-auto fetch_primitive_string(Op_address_type,
-                            viua::process::Process*)
+    -> std::tuple<Op_address_type, viua::internals::types::plain_int>;
+auto fetch_primitive_string(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, std::string>;
 auto fetch_atom(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, std::string>;
@@ -95,11 +85,10 @@ auto fetch_object(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, viua::types::Value*>;
 
 template<typename RequestedType>
-auto fetch_object_of(Op_address_type ip,
-                     viua::process::Process* p)
+auto fetch_object_of(Op_address_type ip, viua::process::Process* p)
     -> std::tuple<Op_address_type, RequestedType*> {
-    Op_address_type addr = nullptr;
-    viua::types::Value* fetched        = nullptr;
+    Op_address_type addr        = nullptr;
+    viua::types::Value* fetched = nullptr;
 
     std::tie(addr, fetched) = fetch_object(ip, p);
 
@@ -119,11 +108,9 @@ auto fetch_object_of(Op_address_type ip,
  *  immediates.
  */
 auto fetch_raw_int(Op_address_type ip, viua::process::Process* p)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::plain_int>;
+    -> std::tuple<Op_address_type, viua::internals::types::plain_int>;
 auto fetch_raw_float(Op_address_type, viua::process::Process*)
-    -> std::tuple<Op_address_type,
-                  viua::internals::types::plain_float>;
+    -> std::tuple<Op_address_type, viua::internals::types::plain_float>;
 
 /*
  *  Extract data decoding it from bytecode without advancing the bytecode
@@ -131,8 +118,8 @@ auto fetch_raw_float(Op_address_type, viua::process::Process*)
  *  These functions are used by instructions whose operands are always
  *  immediates.
  */
-auto extract_primitive_uint64(Op_address_type,
-                              viua::process::Process*) -> uint64_t;
+auto extract_primitive_uint64(Op_address_type, viua::process::Process*)
+    -> uint64_t;
 }}}}  // namespace viua::bytecode::decoder::operands
 
 

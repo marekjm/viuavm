@@ -59,7 +59,8 @@ void viua::types::Struct::insert(const std::string& key,
     attributes[key] = std::move(value);
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::remove(const std::string& key) {
+unique_ptr<viua::types::Value> viua::types::Struct::remove(
+    const std::string& key) {
     unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;

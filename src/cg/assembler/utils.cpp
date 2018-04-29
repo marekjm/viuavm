@@ -31,7 +31,8 @@ regex assembler::utils::get_function_name_regex() {
         "(?:::)?[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z_][a-zA-Z0-9_]*)*/([0-9]+)?"};
 }
 
-bool assembler::utils::is_valid_function_name(const std::string& function_name) {
+bool assembler::utils::is_valid_function_name(
+    const std::string& function_name) {
     return regex_match(function_name, get_function_name_regex());
 }
 
@@ -97,15 +98,17 @@ bool assembler::utils::lines::is_directive(const std::string& line) {
             or is_closure(line) or line == ".unused:" or false);
 }
 
-std::string assembler::utils::lines::make_function_signature(const std::string& name) {
+std::string assembler::utils::lines::make_function_signature(
+    const std::string& name) {
     return (".signature: " + name);
 }
 
-std::string assembler::utils::lines::make_block_signature(const std::string& name) {
+std::string assembler::utils::lines::make_block_signature(
+    const std::string& name) {
     return (".bsignature: " + name);
 }
 
 std::string assembler::utils::lines::make_info(const std::string& key,
-                                          const std::string& value) {
+                                               const std::string& value) {
     return (".info: " + key + ' ' + str::enquote(str::strencode(value)));
 }

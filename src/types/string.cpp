@@ -95,7 +95,7 @@ String* String::add(String* s) {
 String* String::join(Vector* v) {
     /** Use this string to join objects in vector.
      */
-    std::string s       = "";
+    std::string s  = "";
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
         s += v->at(i)->str();
@@ -135,7 +135,7 @@ void String::startswith(Frame* frame,
                         viua::kernel::RegisterSet*,
                         viua::process::Process*,
                         viua::kernel::Kernel*) {
-    std::string s         = static_cast<String*>(frame->arguments->at(1))->value();
+    std::string s    = static_cast<String*>(frame->arguments->at(1))->value();
     bool starts_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -157,7 +157,7 @@ void String::endswith(Frame* frame,
                       viua::kernel::RegisterSet*,
                       viua::process::Process*,
                       viua::kernel::Kernel*) {
-    std::string s       = static_cast<String*>(frame->arguments->at(1))->value();
+    std::string s  = static_cast<String*>(frame->arguments->at(1))->value();
     bool ends_with = false;
 
     if (s.size() <= svalue.size()) {

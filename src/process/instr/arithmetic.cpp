@@ -39,21 +39,21 @@ using LogicOp =
     unique_ptr<viua::types::Boolean> (Number::*)(const Number&) const;
 using viua::internals::types::Op_address_type;
 
-template<typename T> using dumb_ptr = T*;   // FIXME; use std::experimental::observer_ptr
+template<typename T>
+using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr
 
 template<typename OpType, OpType action>
-static auto alu_impl(Op_address_type addr,
-                     viua::process::Process* process)
+static auto alu_impl(Op_address_type addr, viua::process::Process* process)
     -> Op_address_type {
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
 
-    auto lhs    = dumb_ptr<Number>{nullptr};
+    auto lhs       = dumb_ptr<Number>{nullptr};
     tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
-    auto rhs    = dumb_ptr<Number>{nullptr};
+    auto rhs       = dumb_ptr<Number>{nullptr};
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 

@@ -53,9 +53,9 @@ bool SHOW_VERSION = false;
 bool VERBOSE      = false;
 bool DEBUG        = false;
 
-bool DISASSEMBLE_ENTRY   = false;
-bool INCLUDE_INFO        = false;
-bool LINE_BY_LINE        = false;
+bool DISASSEMBLE_ENTRY        = false;
+bool INCLUDE_INFO             = false;
+bool LINE_BY_LINE             = false;
 std::string SELECTED_FUNCTION = "";
 
 
@@ -193,8 +193,9 @@ int main(int argc, char* argv[]) {
     vector<std::string> functions             = loader.get_functions();
     map<std::string, uint64_t> function_sizes = loader.get_function_sizes();
 
-    map<std::string, uint64_t> block_address_mapping = loader.get_block_addresses();
-    vector<std::string> blocks                       = loader.get_blocks();
+    map<std::string, uint64_t> block_address_mapping =
+        loader.get_block_addresses();
+    vector<std::string> blocks = loader.get_blocks();
     map<std::string, uint64_t> block_sizes;
 
     map<std::string, uint64_t> element_address_mapping;
@@ -229,7 +230,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        const std::string name             = functions[i];
+        const std::string name        = functions[i];
         element_sizes[name]           = function_sizes[name];
         element_types[name]           = "function";
         element_address_mapping[name] = function_address_mapping[name];
@@ -291,8 +292,8 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        const std::string name  = elements[i];
-        const auto el_size = element_sizes[name];
+        const std::string name = elements[i];
+        const auto el_size     = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {
             continue;

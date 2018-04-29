@@ -30,8 +30,8 @@ using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
 
-static auto invalid_syntax(const vector<Token>& tokens, const std::string message)
-    -> InvalidSyntax {
+static auto invalid_syntax(const vector<Token>& tokens,
+                           const std::string message) -> InvalidSyntax {
     auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
          i < tokens.size();
@@ -77,8 +77,8 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
 }
 
 
-static auto is_defined_block_name(const ParsedSource& source, const std::string name)
-    -> bool {
+static auto is_defined_block_name(const ParsedSource& source,
+                                  const std::string name) -> bool {
     auto is_undefined =
         (source.blocks.end()
          == find_if(source.blocks.begin(),
@@ -344,8 +344,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 }
 
                 auto opcode = instruction->opcode;
-                if (not(opcode == CALL or opcode == PROCESS
-                        or opcode == DEFER or opcode == FRAME or opcode == PARAM
+                if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
+                        or opcode == FRAME or opcode == PARAM
                         or opcode == PAMV)) {
                     continue;
                 }
@@ -440,11 +440,12 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
 using InstructionIndex = decltype(
     viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
-static auto validate_jump(const Token token,
-                          const std::string& extracted_jump,
-                          const InstructionIndex instruction_counter,
-                          const InstructionIndex current_instruction_counter,
-                          const map<std::string, InstructionIndex>& jump_targets)
+static auto validate_jump(
+    const Token token,
+    const std::string& extracted_jump,
+    const InstructionIndex instruction_counter,
+    const InstructionIndex current_instruction_counter,
+    const map<std::string, InstructionIndex>& jump_targets)
     -> InstructionIndex {
     auto target = InstructionIndex{0};
     if (str::isnum(extracted_jump, false)) {

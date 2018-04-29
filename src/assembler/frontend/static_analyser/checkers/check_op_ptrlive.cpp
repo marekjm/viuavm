@@ -25,7 +25,7 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_ptrlive(Register_usage_profile& register_usage_profile,
-                  Instruction const& instruction) -> void {
+                      Instruction const& instruction) -> void {
     auto result = get_operand<RegisterIndex>(instruction, 0);
     if (not result) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
@@ -43,7 +43,8 @@ auto check_op_ptrlive(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *operand, "pointer from");
-    assert_type_of_register<ValueTypes::POINTER>(register_usage_profile, *operand);
+    assert_type_of_register<ValueTypes::POINTER>(register_usage_profile,
+                                                 *operand);
 
     auto val       = Register(*result);
     val.value_type = viua::internals::ValueTypes::BOOLEAN;

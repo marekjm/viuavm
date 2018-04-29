@@ -159,7 +159,8 @@ InvalidSyntax::InvalidSyntax(Token t, std::string m)
 UnusedValue::UnusedValue(Token token)
         : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
-UnusedValue::UnusedValue(Token token, std::string s) : InvalidSyntax(token, s) {}
+UnusedValue::UnusedValue(Token token, std::string s)
+        : InvalidSyntax(token, s) {}
 
 auto TracedSyntaxError::what() const -> const char* {
     return errors.front().what();

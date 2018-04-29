@@ -119,7 +119,8 @@ auto remove_comments(vector<Token> input_tokens) -> vector<Token> {
 }
 
 auto reduce_token_sequence(vector<Token> input_tokens,
-                           vector<std::string> const sequence) -> vector<Token> {
+                           vector<std::string> const sequence)
+    -> vector<Token> {
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -872,7 +873,7 @@ auto replace_named_registers(std::vector<Token> input_tokens)
         }
 
         if (token == ".name:") {
-            Token name   = input_tokens.at(i + 2);
+            Token name        = input_tokens.at(i + 2);
             std::string index = input_tokens.at(i + 1).str();
 
             assert_is_not_reserved_keyword(name, "register name");

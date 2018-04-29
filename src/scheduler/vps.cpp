@@ -27,11 +27,11 @@
 #include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
-#include <viua/types/struct.h>
 #include <viua/types/exception.h>
 #include <viua/types/function.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
+#include <viua/types/struct.h>
 #include <viua/types/vector.h>
 using namespace std;
 
@@ -50,7 +50,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
 
     unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
-    auto ex        = dynamic_cast<viua::types::Exception*>(thrown_object.get());
+    auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     std::string ex_type = thrown_object->type();
 
     // cerr << "failed instruction: " <<
@@ -273,18 +273,17 @@ bool viua::scheduler::VirtualProcessScheduler::is_linked_block(
     return attached_kernel->is_linked_block(name);
 }
 
-auto
-viua::scheduler::VirtualProcessScheduler::get_entry_point_of_block(
-        const std::string& name) const
-->
-pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>
-{
+auto viua::scheduler::VirtualProcessScheduler::get_entry_point_of_block(
+    const std::string& name) const
+    -> pair<viua::internals::types::Op_address_type,
+            viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of_block(name);
 }
 
-auto
-viua::scheduler::VirtualProcessScheduler::get_entry_point_of(
-        std::string const& name) const -> pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type> {
+auto viua::scheduler::VirtualProcessScheduler::get_entry_point_of(
+    std::string const& name) const
+    -> pair<viua::internals::types::Op_address_type,
+            viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of(name);
 }
 
@@ -549,7 +548,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
 
                     print_stack_trace(th);
-                    dead_processes_list.emplace_back(std::move(processes.at(i)));
+                    dead_processes_list.emplace_back(
+                        std::move(processes.at(i)));
                     continue;
                 }
 
@@ -572,10 +572,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
                 auto death_message = make_unique<viua::types::Struct>();
                 death_message->insert("function",
-                                   make_unique<viua::types::Function>(
-                                       th->trace().at(0)->function_name));
-                auto exc =
-                    th->transfer_active_exception();
+                                      make_unique<viua::types::Function>(
+                                          th->trace().at(0)->function_name));
+                auto exc = th->transfer_active_exception();
                 death_message->insert("exception", std::move(exc));
                 death_message->insert("parameters", std::move(parameters));
 

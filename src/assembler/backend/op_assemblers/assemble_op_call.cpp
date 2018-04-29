@@ -21,8 +21,9 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
+auto assemble_op_call(Program& program,
+                      std::vector<Token> const& tokens,
+                      Token_index const i) -> void {
     /** Full form of call instruction has two operands: function name and
      *  return value register index.
      *  If call is given only one operand it means it is the function name
@@ -55,20 +56,20 @@ auto assemble_op_call(Program& program, std::vector<Token> const& tokens,
     int_op ret;
     if (tokens.at(target) == "void") {
         --fn;
-        ret =
-            ::assembler::operands::getint(::assembler::operands::resolve_register(tokens.at(target)));
+        ret = ::assembler::operands::getint(
+            ::assembler::operands::resolve_register(tokens.at(target)));
     } else {
         ret = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
     }
 
-    if (tokens.at(fn).str().at(0) == '*'
-        or tokens.at(fn).str().at(0) == '%') {
-        program.opcall(ret,
-                       ::assembler::operands::getint_with_rs_type(
-                           ::assembler::operands::resolve_register(tokens.at(fn)),
-                           ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
+    if (tokens.at(fn).str().at(0) == '*' or tokens.at(fn).str().at(0) == '%') {
+        program.opcall(
+            ret,
+            ::assembler::operands::getint_with_rs_type(
+                ::assembler::operands::resolve_register(tokens.at(fn)),
+                ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
     } else {
         program.opcall(ret, tokens.at(fn));
     }

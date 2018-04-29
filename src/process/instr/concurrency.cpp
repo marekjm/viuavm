@@ -19,7 +19,6 @@
 
 #include <chrono>
 #include <memory>
-#include <viua/util/memory.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -29,12 +28,15 @@
 #include <viua/types/function.h>
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
+#include <viua/util/memory.h>
 using namespace std;
 
 
-auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type {
-auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+auto viua::process::Process::opprocess(Op_address_type addr)
+    -> Op_address_type {
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void =
+        viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -46,7 +48,7 @@ auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     std::string call_name;
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
+        auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
         tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Function>(addr, this);
 
@@ -85,10 +87,11 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
      *  This opcode blocks execution of current process until
      *  the process being joined finishes execution.
      */
-    auto return_addr = Op_address_type{ addr - 1 };
+    auto return_addr = Op_address_type{addr - 1};
 
-auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void =
+        viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -97,7 +100,7 @@ auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-auto thrd = viua::util::memory::dumb_ptr<viua::types::Process>{nullptr};
+    auto thrd = viua::util::memory::dumb_ptr<viua::types::Process>{nullptr};
     tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Process>(addr, this);
 
@@ -142,8 +145,8 @@ auto thrd = viua::util::memory::dumb_ptr<viua::types::Process>{nullptr};
 auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     /** Send a message to a process.
      */
-auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, source) =
@@ -158,7 +161,8 @@ auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
 
     return addr;
 }
-auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opreceive(Op_address_type addr)
+    -> Op_address_type {
     /** Receive a message.
      *
      *  This opcode blocks execution of current process
@@ -166,8 +170,9 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type 
      */
     auto return_addr = Op_address_type{addr - 1};
 
-auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void =
+        viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -217,7 +222,8 @@ auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
 
     return return_addr;
 }
-auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opwatchdog(Op_address_type addr)
+    -> Op_address_type {
     std::string call_name;
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -246,7 +252,7 @@ auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::opself(Op_address_type addr) -> Op_address_type {
     /*  Run process instruction.
      */
-auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 

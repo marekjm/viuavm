@@ -26,8 +26,8 @@ auto get_var(std::string const& var) -> std::string {
     return (VAR == nullptr ? std::string("") : std::string(VAR));
 }
 auto get_paths(std::string const& var) -> std::vector<std::string> {
-    auto const path  = get_var(var);
-    auto paths = std::vector<std::string>{};
+    auto const path = get_var(var);
+    auto paths      = std::vector<std::string>{};
 
     auto a_path = std::string{};
     auto i      = decltype(path)::size_type{0};

@@ -39,7 +39,8 @@ auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opinteger(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opinteger(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

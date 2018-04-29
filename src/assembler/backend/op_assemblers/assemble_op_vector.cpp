@@ -21,19 +21,23 @@
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_vector(Program& program, std::vector<Token> const& tokens,
-        Token_index const i) -> void {
-        Token_index target           = i + 1;
-        Token_index pack_range_start = target + 2;
-        Token_index pack_range_count = pack_range_start + 2;
+auto assemble_op_vector(Program& program,
+                        std::vector<Token> const& tokens,
+                        Token_index const i) -> void {
+    Token_index target           = i + 1;
+    Token_index pack_range_start = target + 2;
+    Token_index pack_range_count = pack_range_start + 2;
 
-        program.opvector(::assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(target)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                         ::assembler::operands::getint_with_rs_type(
-                             ::assembler::operands::resolve_register(tokens.at(pack_range_start)),
-                             ::assembler::operands::resolve_rs_type(tokens.at(pack_range_start + 1))),
-                         ::assembler::operands::getint(
-                             ::assembler::operands::resolve_register(tokens.at(pack_range_count))));
+    program.opvector(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(
+                tokens.at(pack_range_start)),
+            ::assembler::operands::resolve_rs_type(
+                tokens.at(pack_range_start + 1))),
+        ::assembler::operands::getint(::assembler::operands::resolve_register(
+            tokens.at(pack_range_count))));
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

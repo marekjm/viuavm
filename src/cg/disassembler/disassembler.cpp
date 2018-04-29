@@ -721,5 +721,5 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
 
     return tuple<std::string, viua::internals::types::bytecode_size>(oss.str(),
-                                                                increase);
+                                                                     increase);
 }

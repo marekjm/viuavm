@@ -67,7 +67,8 @@ auto viua::types::Closure::release() -> viua::kernel::RegisterSet* {
     return local_register_set.release();
 }
 
-auto viua::types::Closure::give() -> std::unique_ptr<viua::kernel::RegisterSet> {
+auto viua::types::Closure::give()
+    -> std::unique_ptr<viua::kernel::RegisterSet> {
     return std::move(local_register_set);
 }
 
@@ -75,7 +76,8 @@ auto viua::types::Closure::empty() const -> bool {
     return (local_register_set == nullptr);
 }
 
-void viua::types::Closure::set(viua::internals::types::register_index const index,
-                               std::unique_ptr<viua::types::Value> object) {
+void viua::types::Closure::set(
+    viua::internals::types::register_index const index,
+    std::unique_ptr<viua::types::Value> object) {
     local_register_set->set(index, std::move(object));
 }

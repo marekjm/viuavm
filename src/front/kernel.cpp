@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string filename = "";
-    filename        = args[0];
+    filename             = args[0];
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;

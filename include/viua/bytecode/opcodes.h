@@ -313,13 +313,13 @@ enum OPCODE : viua::internals::types::byte {
     SATURATINGUDIV,
 
     // register manipulation
-    MOVE,    // move an object from one register to another
-    COPY,    // copy an object from one register to another
-    PTR,     // create a pointer to an object
-    PTRLIVE, // check if pointer is live
-    SWAP,    // swap two objects between registers
-    DELETE,  // delete an object from a register, freeing the memory
-    ISNULL,  // checks if register is null (empty)
+    MOVE,     // move an object from one register to another
+    COPY,     // copy an object from one register to another
+    PTR,      // create a pointer to an object
+    PTRLIVE,  // check if pointer is live
+    SWAP,     // swap two objects between registers
+    DELETE,   // delete an object from a register, freeing the memory
+    ISNULL,   // checks if register is null (empty)
 
     PRINT,
     ECHO,
