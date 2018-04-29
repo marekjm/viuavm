@@ -160,17 +160,17 @@ auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame)
     return frames.emplace_back(std::move(frame));
 }
 
-viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for_block(
-    const string& call_name) {
-    viua::internals::types::byte* entry_point = nullptr;
+auto viua::process::Stack::adjust_jump_base_for_block(
+    std::string const& call_name) -> Op_address_type {
+    auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto ep     = scheduler->get_entry_point_of_block(call_name);
     entry_point = ep.first;
     jump_base   = ep.second;
     return entry_point;
 }
-viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(
-    const string& call_name) {
-    viua::internals::types::byte* entry_point = nullptr;
+auto viua::process::Stack::adjust_jump_base_for(
+    std::string const& call_name) -> Op_address_type {
+    auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto ep     = scheduler->get_entry_point_of(call_name);
     entry_point = ep.first;
     jump_base   = ep.second;

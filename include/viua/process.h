@@ -162,9 +162,9 @@ class Stack {
                        viua::internals::types::register_index) -> Frame*;
     auto push_prepared_frame() -> void;
 
-    viua::internals::types::byte* adjust_jump_base_for_block(
-        const std::string&);
-    viua::internals::types::byte* adjust_jump_base_for(const std::string&);
+    auto adjust_jump_base_for_block(
+        std::string const&) -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(const std::string&) -> viua::internals::types::Op_address_type;
     auto unwind() -> void;
 
     Stack(std::string,
