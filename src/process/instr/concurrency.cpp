@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <memory>
+#include <viua/util/memory.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -32,8 +33,8 @@ using namespace std;
 
 
 auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type {
-    viua::kernel::Register* target = nullptr;
-    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -43,9 +44,9 @@ auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type 
     }
 
     string call_name;
-    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto const ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        viua::types::Function* fn = nullptr;
+auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
         tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Function>(addr, this);
 
@@ -60,8 +61,8 @@ auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type 
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    bool is_native  = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = scheduler->is_native_function(call_name);
+    auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: "
@@ -86,8 +87,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
      */
     auto return_addr = Op_address_type{ addr - 1 };
 
-    viua::kernel::Register* target = nullptr;
-    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -96,7 +97,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    viua::types::Process* thrd = nullptr;
+auto thrd = viua::util::memory::dumb_ptr<viua::types::Process>{nullptr};
     tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Process>(addr, this);
 
@@ -141,13 +142,14 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     /** Send a message to a process.
      */
-    viua::kernel::Register *target = nullptr, *source = nullptr;
+auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (auto thrd = dynamic_cast<viua::types::Process*>(target->get())) {
+    if (auto const thrd = dynamic_cast<viua::types::Process*>(target->get())) {
         scheduler->send(thrd->pid(), source->give());
     } else {
         throw make_unique<viua::types::Exception>(
@@ -164,8 +166,8 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type 
      */
     auto return_addr = Op_address_type{addr - 1};
 
-    viua::kernel::Register* target = nullptr;
-    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
+auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto const target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
         tie(addr, target) =
@@ -220,8 +222,8 @@ auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    bool is_native  = scheduler->is_native_function(call_name);
-    bool is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = scheduler->is_native_function(call_name);
+    auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
@@ -244,7 +246,7 @@ auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::opself(Op_address_type addr) -> Op_address_type {
     /*  Run process instruction.
      */
-    viua::kernel::Register* target = nullptr;
+auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
