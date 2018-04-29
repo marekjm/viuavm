@@ -56,7 +56,7 @@ bool DEBUG        = false;
 bool DISASSEMBLE_ENTRY        = false;
 bool INCLUDE_INFO             = false;
 bool LINE_BY_LINE             = false;
-std::string SELECTED_FUNCTION = "";
+auto SELECTED_FUNCTION = std::string{};
 
 
 static bool usage(const char* program,
@@ -102,13 +102,13 @@ static bool usage(const char* program,
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<std::string> args;
-    std::string option;
+    auto option = std::string{};
 
     // for getline()
-    std::string dummy;
+    auto dummy = std::string{};
 
-    std::string filename   = "";
-    std::string disasmname = "";
+    auto filename = std::string{""};
+    auto disasmname = std::string{};
     for (int i = 1; i < argc; ++i) {
         option = std::string(argv[i]);
         if (option == "--help" or option == "-h") {
@@ -308,10 +308,10 @@ int main(int argc, char* argv[]) {
             getline(cin, dummy);
         }
 
-        std::string opname;
+        auto opname = std::string{};
         bool disasm_terminated = false;
         for (unsigned j = 0; j < el_size;) {
-            std::string instruction;
+            auto instruction = std::string{};
             try {
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction(

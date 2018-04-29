@@ -28,16 +28,16 @@ namespace viua {
     namespace assembler {
         namespace util {
             namespace pretty_printer {
-const std::string COLOR_FG_RED          = "\x1b[38;5;1m";
-const std::string COLOR_FG_YELLOW       = "\x1b[38;5;3m";
-const std::string COLOR_FG_CYAN         = "\x1b[38;5;6m";
-const std::string COLOR_FG_LIGHT_GREEN  = "\x1b[38;5;10m";
-const std::string COLOR_FG_LIGHT_YELLOW = "\x1b[38;5;11m";
-const std::string COLOR_FG_WHITE        = "\x1b[38;5;15m";
-const std::string COLOR_FG_GREEN_1      = "\x1b[38;5;46m";
-const std::string COLOR_FG_RED_1        = "\x1b[38;5;196m";
-const std::string COLOR_FG_ORANGE_RED_1 = "\x1b[38;5;202m";
-const std::string ATTR_RESET            = "\x1b[0m";
+const auto COLOR_FG_RED = std::string{"\x1b[38;5;1m"};
+const auto COLOR_FG_YELLOW = std::string{"\x1b[38;5;3m"};
+const auto COLOR_FG_CYAN = std::string{"\x1b[38;5;6m"};
+const auto COLOR_FG_LIGHT_GREEN = std::string{"\x1b[38;5;10m"};
+const auto COLOR_FG_LIGHT_YELLOW = std::string{"\x1b[38;5;11m"};
+const auto COLOR_FG_WHITE = std::string{"\x1b[38;5;15m"};
+const auto COLOR_FG_GREEN_1 = std::string{"\x1b[38;5;46m"};
+const auto COLOR_FG_RED_1 = std::string{"\x1b[38;5;196m"};
+const auto COLOR_FG_ORANGE_RED_1 = std::string{"\x1b[38;5;202m"};
+const auto ATTR_RESET = std::string{"\x1b[0m"};
 
 auto send_control_seq(const std::string&) -> std::string;
 

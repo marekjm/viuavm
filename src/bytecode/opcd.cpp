@@ -37,7 +37,7 @@ int main() {
 
     max_mnemonic_length += 1;
 
-    const std::string initial_column = "MNEMONIC            ";
+    const auto initial_column = std::string{"MNEMONIC            "};
     cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
 
     max_mnemonic_length = (max_mnemonic_length < initial_column.size()

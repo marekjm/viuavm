@@ -469,7 +469,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             std::string target_register_index = tokens.back();
-            std::string target_register_set   = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -518,7 +518,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (tokens.back().str() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
@@ -556,7 +556,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(
                     tokens.back().line(), tokens.back().character(), "current");
@@ -585,7 +585,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -752,7 +752,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             std::string target_register_index = tokens.back();
-            std::string target_register_set   = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1053,7 +1053,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1095,7 +1095,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1243,7 +1243,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             std::string target_register_index = tokens.back();
-            std::string target_register_set   = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1290,7 +1290,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vpop") {
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (tokens.back().str() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
@@ -1326,7 +1326,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vat") {
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(
                     tokens.back().line(), tokens.back().character(), "current");
@@ -1353,7 +1353,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vlen") {
             tokens.push_back(input_tokens.at(++i));
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1508,7 +1508,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                    or token == "wrapadd" or token == "wrapmul") {
             tokens.push_back(input_tokens.at(++i));  // target register
             std::string target_register_index = tokens.back();
-            std::string target_register_set   = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1792,7 +1792,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             continue;
         } else if (token == "not") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1831,7 +1831,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1851,7 +1851,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "bits") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            std::string target_register_set = "current";
+            auto target_register_set = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),

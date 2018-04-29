@@ -31,7 +31,7 @@ auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type {
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    std::string s;
+    auto s = std::string{};
     tie(addr, s) =
         viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 

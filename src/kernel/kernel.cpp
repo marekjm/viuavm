@@ -527,7 +527,7 @@ auto viua::kernel::Kernel::no_of_ffi_schedulers()
                             default_ffi_schedulers_limit);
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
-    std::string viua_enable_tracing;
+    auto viua_enable_tracing = std::string{};
     char* env_text = getenv("VIUA_ENABLE_TRACING");
     if (env_text) {
         viua_enable_tracing = std::string(env_text);

@@ -235,7 +235,7 @@ auto viua::process::Stack::unwind_to(const TryFrame* tframe,
 
 auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
     TryFrame* found_exception_frame = nullptr;
-    std::string caught_with_type    = "";
+    auto caught_with_type = std::string{""};
     std::string handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
@@ -256,7 +256,7 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
 
 auto viua::process::Stack::unwind() -> void {
     TryFrame* tframe                   = nullptr;
-    std::string handler_found_for_type = "";
+    auto handler_found_for_type = std::string{};
 
     // Find catch frame for current thrown exception.
     // May return nullptr, because the catcher may not always be found.

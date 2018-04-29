@@ -282,7 +282,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                     continue;
                 }
 
-                std::string function_name;
+                auto function_name = std::string{};
                 using viua::assembler::frontend::parser::AtomLiteral;
                 using viua::assembler::frontend::parser::FunctionNameLiteral;
                 if (auto name_from_atom = dynamic_cast<AtomLiteral*>(operand);

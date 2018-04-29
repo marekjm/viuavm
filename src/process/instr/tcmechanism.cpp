@@ -84,7 +84,7 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     /*  Run enter instruction.
      */
-    std::string block_name;
+    auto block_name = std::string{};
     tie(addr, block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

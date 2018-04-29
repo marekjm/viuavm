@@ -88,7 +88,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
 
     while (i < tokens.size() and tokens.at(i) != "]]") {
         const std::string key = tokens.at(i++);
-        std::string value;
+        auto value = std::string{};
 
         if (tokens.at(i) == ",") {
             ++i;

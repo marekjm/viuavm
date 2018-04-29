@@ -151,7 +151,7 @@ static std::string read_file(const std::string& path) {
     ifstream in(path, ios::in | ios::binary);
 
     ostringstream source_in;
-    std::string line;
+    auto line = std::string{};
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -162,7 +162,7 @@ static std::string read_file(const std::string& path) {
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<std::string> args;
-    std::string option;
+    auto option = std::string{};
 
     std::string filename(""), compilename("");
 

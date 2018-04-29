@@ -58,7 +58,7 @@ void assembler::verify::function_calls_are_defined(
     const vector<std::string>& function_names,
     const vector<std::string>& function_signatures) {
     ostringstream report("");
-    std::string line;
+    auto line = std::string{};
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
         if (not(token == "call" or token == "process" or token == "watchdog"

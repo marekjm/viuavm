@@ -406,7 +406,7 @@ auto reduce_floats(vector<Token> input_tokens) -> vector<Token> {
 auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
     decltype(input_tokens) tokens;
     decltype(tokens) block_tokens, nested_block_tokens;
-    std::string opened_inside;
+    auto opened_inside = std::string{};
 
     bool block_opened        = false;
     bool nested_block_opened = false;

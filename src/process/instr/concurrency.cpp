@@ -45,7 +45,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    std::string call_name;
+    auto call_name = std::string{};
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
@@ -224,7 +224,7 @@ auto viua::process::Process::opreceive(Op_address_type addr)
 }
 auto viua::process::Process::opwatchdog(Op_address_type addr)
     -> Op_address_type {
-    std::string call_name;
+    auto call_name = std::string{};
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

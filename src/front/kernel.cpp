@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string filename = "";
+    auto filename = std::string{};
     filename             = args[0];
 
     if (!filename.size()) {

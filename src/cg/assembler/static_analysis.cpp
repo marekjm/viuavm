@@ -196,7 +196,7 @@ static void check_use_of_register_index(
     map<std::string, std::string>& named_registers,
     const std::string& message_prefix,
     const bool allow_direct_access_to_target = true) {
-    std::string resolved_register_name;
+    auto resolved_register_name = std::string{};
     try {
         resolved_register_name =
             resolve_register_name(named_registers,
@@ -749,7 +749,7 @@ static void check_block_body(const TokenVector& body_tokens,
                                   named_registers,
                                   "branch depends on empty register");
 
-            std::string register_with_unused_value;
+            auto register_with_unused_value = std::string{};
 
             try {
                 auto copied_registers       = registers;
@@ -1297,7 +1297,7 @@ void assembler::verify::manipulation_of_defined_registers(
     const TokenVector& tokens,
     const map<std::string, TokenVector>& block_bodies,
     const bool debug) {
-    std::string opened_function;
+    auto opened_function = std::string{};
     set<std::string> attributes;
 
     TokenVector body;

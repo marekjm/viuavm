@@ -118,7 +118,7 @@ static bool usage(const char* program,
 
 static std::string read_file(ifstream& in) {
     ostringstream source_in;
-    std::string line;
+    auto line = std::string{};
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -152,7 +152,7 @@ static void display_results(const std::string& filename,
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<std::string> args;
-    std::string option;
+    auto option = std::string{};
 
     std::string filename(""), compilename("");
 

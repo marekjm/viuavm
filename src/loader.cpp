@@ -43,7 +43,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump,
     char* lib_function_ids_map = bytedump;
 
     long unsigned i = 0;
-    std::string lib_fn_name;
+    auto lib_fn_name = std::string{};
     uint64_t lib_fn_address;
     while (i < bytedump_size) {
         lib_fn_name = std::string(lib_function_ids_map);
@@ -141,7 +141,7 @@ static vector<std::string> load_string_list(ifstream& in) {
 
     uint64_t i   = 0;
     char* buffer = signatures_section_buffer.get();
-    std::string sig;
+    auto sig = std::string{};
     vector<std::string> strings_list;
     while (i < signatures_section_size) {
         sig = std::string(buffer + i);

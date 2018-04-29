@@ -262,7 +262,7 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
 
 static std::string get_main_function(
     const vector<std::string>& available_functions) {
-    std::string main_function = "";
+    auto main_function = std::string{};
     for (auto f : available_functions) {
         if (f == "main/0" or f == "main/1" or f == "main/2") {
             main_function = f;

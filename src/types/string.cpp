@@ -95,7 +95,7 @@ String* String::add(String* s) {
 String* String::join(Vector* v) {
     /** Use this string to join objects in vector.
      */
-    std::string s  = "";
+    auto s = std::string{""};
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
         s += v->at(i)->str();
@@ -196,7 +196,7 @@ void String::format(Frame* frame,
 
         for (auto i : matches) {
             std::string m = i.substr(2, (i.size() - 3));
-            std::string replacement;
+            auto replacement = std::string{};
             bool is_number = true;
             int index      = -1;
             try {
