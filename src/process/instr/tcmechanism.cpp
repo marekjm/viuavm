@@ -93,7 +93,7 @@ auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
             "cannot enter undefined block: " + block_name);
     }
 
-    viua::internals::types::byte* block_address =
+    auto block_address =
         adjust_jump_base_for_block(block_name);
 
     stack->try_frame_new->return_address   = addr;

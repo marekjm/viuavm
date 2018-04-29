@@ -135,12 +135,12 @@ void viua::process::Process::push_frame() {
     stack->emplace_back(std::move(stack->frame_new));
 }
 
-viua::internals::types::byte* viua::process::Process::
-    adjust_jump_base_for_block(const std::string& call_name) {
+auto viua::process::Process::adjust_jump_base_for_block(std::string const& call_name)
+    -> viua::internals::types::Op_address_type {
     return stack->adjust_jump_base_for_block(call_name);
 }
-viua::internals::types::byte* viua::process::Process::adjust_jump_base_for(
-    const std::string& call_name) {
+auto viua::process::Process::adjust_jump_base_for(std::string const& call_name)
+    -> viua::internals::types::Op_address_type {
     return stack->adjust_jump_base_for(call_name);
 }
 auto viua::process::Process::call_native(
@@ -148,7 +148,7 @@ auto viua::process::Process::call_native(
     std::string const& call_name,
     viua::kernel::Register* return_register,
     std::string const&) -> Op_address_type {
-    viua::internals::types::byte* call_address =
+    auto call_address =
         adjust_jump_base_for(call_name);
 
     if (not stack->frame_new) {

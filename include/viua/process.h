@@ -162,9 +162,10 @@ class Stack {
                        viua::internals::types::register_index) -> Frame*;
     auto push_prepared_frame() -> void;
 
-    auto adjust_jump_base_for_block(
-        std::string const&) -> viua::internals::types::Op_address_type;
-    auto adjust_jump_base_for(const std::string&) -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for_block(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(std::string const&)
+        -> viua::internals::types::Op_address_type;
     auto unwind() -> void;
 
     Stack(std::string,
@@ -244,9 +245,9 @@ class Process {
         viua::internals::types::register_index registers_size = 0);
     TryFrame* request_new_try_frame();
     void push_frame();
-    viua::internals::types::byte* adjust_jump_base_for_block(
-        const std::string&);
-    viua::internals::types::byte* adjust_jump_base_for(const std::string&);
+    auto adjust_jump_base_for_block(
+        std::string const&) -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(std::string const&) -> viua::internals::types::Op_address_type;
     // call native (i.e. written in Viua) function
     auto call_native(Op_address_type,
                                               std::string const&,

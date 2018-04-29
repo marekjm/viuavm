@@ -273,15 +273,18 @@ bool viua::scheduler::VirtualProcessScheduler::is_linked_block(
     return attached_kernel->is_linked_block(name);
 }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
-    scheduler::VirtualProcessScheduler::get_entry_point_of_block(
-        const std::string& name) const {
+auto
+viua::scheduler::VirtualProcessScheduler::get_entry_point_of_block(
+        const std::string& name) const
+->
+pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>
+{
     return attached_kernel->get_entry_point_of_block(name);
 }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
-    scheduler::VirtualProcessScheduler::get_entry_point_of(
-        const std::string& name) const {
+auto
+viua::scheduler::VirtualProcessScheduler::get_entry_point_of(
+        std::string const& name) const -> pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of(name);
 }
 
