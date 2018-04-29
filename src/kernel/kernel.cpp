@@ -322,35 +322,33 @@ bool viua::kernel::Kernel::is_linked_block(const string& name) const {
     return linked_blocks.count(name);
 }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
-    kernel::Kernel::get_entry_point_of_block(const std::string& name) const {
-    viua::internals::types::byte* entry_point = nullptr;
-    viua::internals::types::byte* module_base = nullptr;
+auto viua::kernel::Kernel::get_entry_point_of_block(std::string const& name) const -> pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type> {
+    auto entry_point = viua::internals::types::Op_address_type{nullptr};
+    auto module_base = viua::internals::types::Op_address_type{nullptr};
     if (block_addresses.count(name)) {
         entry_point = (bytecode.get() + block_addresses.at(name));
         module_base = bytecode.get();
     } else {
-        auto lf     = linked_blocks.at(name);
+        auto const lf     = linked_blocks.at(name);
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(
+    return pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>(
         entry_point, module_base);
 }
 
-pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::
-    kernel::Kernel::get_entry_point_of(const std::string& name) const {
-    viua::internals::types::byte* entry_point = nullptr;
-    viua::internals::types::byte* module_base = nullptr;
+auto viua::kernel::Kernel::get_entry_point_of(const std::string& name) const -> pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type> {
+    auto entry_point = viua::internals::types::Op_address_type{nullptr};
+    auto module_base = viua::internals::types::Op_address_type{nullptr};
     if (function_addresses.count(name)) {
         entry_point = (bytecode.get() + function_addresses.at(name));
         module_base = bytecode.get();
     } else {
-        auto lf     = linked_functions.at(name);
+        auto const lf     = linked_functions.at(name);
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(
+    return pair<viua::internals::types::Op_address_type, viua::internals::types::Op_address_type>(
         entry_point, module_base);
 }
 
