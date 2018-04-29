@@ -70,7 +70,7 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     int result_integer     = 0;
-    string supplied_string = static_cast<viua::types::String*>(source)->value();
+    std::string supplied_string = static_cast<viua::types::String*>(source)->value();
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
@@ -95,7 +95,7 @@ auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type {
     tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    string supplied_string = static_cast<viua::types::String*>(source)->value();
+    std::string supplied_string = static_cast<viua::types::String*>(source)->value();
     double convert_from    = std::stod(supplied_string);
     *target                = make_unique<viua::types::Float>(convert_from);
 

@@ -51,7 +51,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
     unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
     auto ex        = dynamic_cast<viua::types::Exception*>(thrown_object.get());
-    string ex_type = thrown_object->type();
+    std::string ex_type = thrown_object->type();
 
     // cerr << "failed instruction: " <<
     // get<0>(disassembler::instruction(process->execution_at())) << endl;
@@ -239,37 +239,37 @@ viua::kernel::Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_local_function(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_local_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_linked_function(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_linked_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_native_function(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_native_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_foreign_function(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_foreign_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_block(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_block(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_local_block(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_local_block(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_linked_block(
-    const string& name) const {
+    const std::string& name) const {
     return attached_kernel->is_linked_block(name);
 }
 
@@ -291,7 +291,7 @@ void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(
     attached_kernel->request_foreign_function_call(frame, p);
 }
 
-void viua::scheduler::VirtualProcessScheduler::load_module(string module) {
+void viua::scheduler::VirtualProcessScheduler::load_module(std::string module) {
     attached_kernel->load_module(module);
 }
 
@@ -711,7 +711,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(
-    const vector<string>& commandline_arguments) {
+    const vector<std::string>& commandline_arguments) {
     auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 

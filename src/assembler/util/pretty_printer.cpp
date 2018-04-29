@@ -26,10 +26,10 @@
 using namespace std;
 
 
-auto viua::assembler::util::pretty_printer::send_control_seq(const string& mode)
-    -> string {
+auto viua::assembler::util::pretty_printer::send_control_seq(const std::string& mode)
+    -> std::string {
     static auto is_terminal = isatty(1);
-    static string env_color_flag{
+    static std::string env_color_flag{
         getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
 
     bool colorise = is_terminal;
@@ -212,7 +212,7 @@ auto viua::assembler::util::pretty_printer::display_context_line(
 }
 auto viua::assembler::util::pretty_printer::display_error_header(
     const viua::cg::lex::InvalidSyntax& error,
-    const string& filename) -> void {
+    const std::string& filename) -> void {
     if (error.str().size()) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
              << error.line() + 1 << ':' << error.character() + 1 << ':'
@@ -261,7 +261,7 @@ auto viua::assembler::util::pretty_printer::display_error_location(
 auto viua::assembler::util::pretty_printer::display_error_in_context(
     const vector<viua::cg::lex::Token>& tokens,
     const viua::cg::lex::InvalidSyntax error,
-    const string& filename) -> void {
+    const std::string& filename) -> void {
     display_error_header(error, filename);
     cout << "\n";
     display_error_location(tokens, error);
@@ -269,7 +269,7 @@ auto viua::assembler::util::pretty_printer::display_error_in_context(
 auto viua::assembler::util::pretty_printer::display_error_in_context(
     const vector<viua::cg::lex::Token>& tokens,
     const viua::cg::lex::TracedSyntaxError error,
-    const string& filename) -> void {
+    const std::string& filename) -> void {
     for (auto const& e : error.errors) {
         display_error_in_context(tokens, e, filename);
         cout << "\n";

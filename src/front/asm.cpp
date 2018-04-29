@@ -147,11 +147,11 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static string read_file(const string& path) {
+static std::string read_file(const std::string& path) {
     ifstream in(path, ios::in | ios::binary);
 
     ostringstream source_in;
-    string line;
+    std::string line;
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -161,13 +161,13 @@ static string read_file(const string& path) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    vector<std::string> args;
+    std::string option;
 
-    string filename(""), compilename("");
+    std::string filename(""), compilename("");
 
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
 
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc - 1) {
-                compilename = string(argv[++i]);
+                compilename = std::string(argv[++i]);
             } else {
                 cout << send_control_seq(COLOR_FG_RED) << "error"
                      << send_control_seq(ATTR_RESET);
@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
 
     //////////////////////////////////////////
     // GATHER LINKS OBTAINED FROM COMMAND LINE
-    vector<string> commandline_given_links;
+    vector<std::string> commandline_given_links;
     for (unsigned i = 1; i < args.size(); ++i) {
         commandline_given_links.emplace_back(args[i]);
     }
@@ -393,7 +393,7 @@ int main(int argc, char* argv[]) {
                  compilename,
                  commandline_given_links,
                  flags);
-    } catch (const string& e) {
+    } catch (const std::string& e) {
         ret_code = 1;
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET) << ": ";

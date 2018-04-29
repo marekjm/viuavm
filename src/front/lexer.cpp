@@ -55,7 +55,7 @@ static auto enumerate(const vector<T>& v)
     return enumerated_vector;
 }
 
-static void encode_json(const string& filename, const vector<Token>& tokens) {
+static void encode_json(const std::string& filename, const vector<Token>& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";
@@ -115,9 +115,9 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static string read_file(ifstream& in) {
+static std::string read_file(ifstream& in) {
     ostringstream source_in;
-    string line;
+    std::string line;
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -131,7 +131,7 @@ static bool MANUAL_REDUCING   = false;
 static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
-static void display_results(const string& filename,
+static void display_results(const std::string& filename,
                             const vector<Token>& tokens) {
     if (DISPLAY_SIZE) {
         try {
@@ -150,13 +150,13 @@ static void display_results(const string& filename,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    vector<std::string> args;
+    std::string option;
 
-    string filename(""), compilename("");
+    std::string filename(""), compilename("");
 
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
 
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string source = read_file(in);
+    std::string source = read_file(in);
 
     vector<Token> tokens;
     try {
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
             }
         }
     } catch (const InvalidSyntax& e) {
-        string message = e.what();
+        std::string message = e.what();
         cerr << filename << ':' << e.line_number + 1 << ':'
              << e.character_in_line + 1
              << ": error: " << (message.size() ? message : "invalid syntax")

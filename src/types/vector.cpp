@@ -29,7 +29,7 @@ using namespace std;
 
 using viua::util::exceptions::make_unique_exception;
 
-const string viua::types::Vector::type_name = "Vector";
+const std::string viua::types::Vector::type_name = "Vector";
 
 void viua::types::Vector::insert(long int index,
                                  unique_ptr<viua::types::Value> object) {
@@ -130,11 +130,11 @@ int viua::types::Vector::len() {
     return static_cast<int>(internal_object.size());
 }
 
-string viua::types::Vector::type() const {
+std::string viua::types::Vector::type() const {
     return "Vector";
 }
 
-string viua::types::Vector::str() const {
+std::string viua::types::Vector::str() const {
     ostringstream oss;
     oss << "[";
     for (decltype(internal_object)::size_type i = 0; i < internal_object.size();

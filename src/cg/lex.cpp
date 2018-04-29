@@ -36,14 +36,14 @@ auto Token::character() const -> decltype(character_in_line) {
 auto Token::str() const -> decltype(content) {
     return content;
 }
-auto Token::str(string s) -> void {
+auto Token::str(std::string s) -> void {
     content = s;
 }
 
 auto Token::original() const -> decltype(original_content) {
     return original_content;
 }
-auto Token::original(string s) -> void {
+auto Token::original(std::string s) -> void {
     original_content = s;
 }
 
@@ -52,20 +52,20 @@ auto Token::ends(bool const as_original) const -> decltype(character_in_line) {
             + (as_original ? original_content : content).size());
 }
 
-auto Token::operator==(string const& s) const -> bool {
+auto Token::operator==(std::string const& s) const -> bool {
     return (content == s);
 }
-auto Token::operator!=(string const& s) const -> bool {
+auto Token::operator!=(std::string const& s) const -> bool {
     return (content != s);
 }
 
-Token::operator string() const {
+Token::operator std::string() const {
     return str();
 }
 
 Token::Token(decltype(line_number) line_,
              decltype(character_in_line) character_,
-             string content_)
+             std::string content_)
         : content(content_)
         , original_content(content)
         , line_number(line_)
@@ -75,7 +75,7 @@ Token::Token() : Token(0, 0, "") {}
 auto InvalidSyntax::what() const -> const char* {
     return message.c_str();
 }
-auto InvalidSyntax::str() const -> string {
+auto InvalidSyntax::str() const -> std::string {
     return message;
 }
 
@@ -108,7 +108,7 @@ auto InvalidSyntax::add(Token token) -> InvalidSyntax& {
     return *this;
 }
 
-auto InvalidSyntax::note(string n) -> InvalidSyntax& {
+auto InvalidSyntax::note(std::string n) -> InvalidSyntax& {
     attached_notes.push_back(n);
     return *this;
 }
@@ -116,16 +116,16 @@ auto InvalidSyntax::notes() const -> const decltype(attached_notes)& {
     return attached_notes;
 }
 
-auto InvalidSyntax::aside(string a) -> InvalidSyntax& {
+auto InvalidSyntax::aside(std::string a) -> InvalidSyntax& {
     aside_note = a;
     return *this;
 }
-auto InvalidSyntax::aside(Token t, string a) -> InvalidSyntax& {
+auto InvalidSyntax::aside(Token t, std::string a) -> InvalidSyntax& {
     aside_note  = a;
     aside_token = t;
     return *this;
 }
-auto InvalidSyntax::aside() const -> string {
+auto InvalidSyntax::aside() const -> std::string {
     return aside_note;
 }
 
@@ -146,9 +146,9 @@ auto InvalidSyntax::match_aside(Token token) const -> bool {
 
 InvalidSyntax::InvalidSyntax(decltype(line_number) ln,
                              decltype(character_in_line) ch,
-                             string ct)
+                             std::string ct)
         : line_number(ln), character_in_line(ch), content(ct) {}
-InvalidSyntax::InvalidSyntax(Token t, string m)
+InvalidSyntax::InvalidSyntax(Token t, std::string m)
         : line_number(t.line())
         , character_in_line(t.character())
         , content(t.original())
@@ -159,7 +159,7 @@ InvalidSyntax::InvalidSyntax(Token t, string m)
 UnusedValue::UnusedValue(Token token)
         : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
-UnusedValue::UnusedValue(Token token, string s) : InvalidSyntax(token, s) {}
+UnusedValue::UnusedValue(Token token, std::string s) : InvalidSyntax(token, s) {}
 
 auto TracedSyntaxError::what() const -> const char* {
     return errors.front().what();
@@ -179,7 +179,7 @@ auto TracedSyntaxError::append(InvalidSyntax const& e) -> TracedSyntaxError& {
 }
 
 
-auto is_mnemonic(string const& s) -> bool {
+auto is_mnemonic(std::string const& s) -> bool {
     auto is_it = false;
     for (const auto& each : OP_NAMES) {
         if (each.second == s) {
@@ -189,8 +189,8 @@ auto is_mnemonic(string const& s) -> bool {
     }
     return is_it;
 }
-auto is_reserved_keyword(string const& s) -> bool {
-    static set<string> const reserved_keywords{
+auto is_reserved_keyword(std::string const& s) -> bool {
+    static set<std::string> const reserved_keywords{
         /*
          * Used for timeouts in 'join' and 'receive' instructions
          */
@@ -245,7 +245,7 @@ auto is_reserved_keyword(string const& s) -> bool {
     };
     return (reserved_keywords.count(s) or is_mnemonic(s));
 }
-auto assert_is_not_reserved_keyword(Token token, string const& message)
+auto assert_is_not_reserved_keyword(Token token, std::string const& message)
     -> void {
     auto const s = token.original();
     if (is_reserved_keyword(s)) {
@@ -255,7 +255,7 @@ auto assert_is_not_reserved_keyword(Token token, string const& message)
     }
 }
 
-auto tokenise(string const& source) -> vector<Token> {
+auto tokenise(std::string const& source) -> vector<Token> {
     vector<Token> tokens;
 
     ostringstream candidate_token;
@@ -332,7 +332,7 @@ auto tokenise(string const& source) -> vector<Token> {
             }
             if ((current_char == '\'' or current_char == '"')
                 and not active_comment) {
-                string s = str::extract(source.substr(i));
+                std::string s = str::extract(source.substr(i));
 
                 tokens.emplace_back(line_number, character_in_line, s);
                 character_in_line += (s.size() - 1);
@@ -356,10 +356,10 @@ auto tokenise(string const& source) -> vector<Token> {
     return tokens;
 }
 
-static auto is_register_set_name(string const s) -> bool {
+static auto is_register_set_name(std::string const s) -> bool {
     return (s == "current" or s == "local" or s == "static" or s == "global");
 }
-static auto is_register_index(string const s) -> bool {
+static auto is_register_index(std::string const s) -> bool {
     auto const p = s.at(0);
     return (p == '%' or p == '*' or p == '@');
 }
@@ -467,8 +467,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
             tokens.push_back(input_tokens.at(++i));
 
-            string target_register_index = tokens.back();
-            string target_register_set   = "current";
+            std::string target_register_index = tokens.back();
+            std::string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -517,7 +517,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (tokens.back().str() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
@@ -555,7 +555,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(
                     tokens.back().line(), tokens.back().character(), "current");
@@ -584,7 +584,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);
 
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -750,8 +750,8 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_index = tokens.back();
-            string target_register_set   = "current";
+            std::string target_register_index = tokens.back();
+            std::string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1052,7 +1052,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1094,7 +1094,7 @@ auto standardise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1241,8 +1241,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
         } else if (token == "vector") {
             tokens.push_back(input_tokens.at(++i));
 
-            string target_register_index = tokens.back();
-            string target_register_set   = "current";
+            std::string target_register_index = tokens.back();
+            std::string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1289,7 +1289,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vpop") {
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (tokens.back().str() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
                     tokens.emplace_back(tokens.back().line(),
@@ -1325,7 +1325,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vat") {
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(
                     tokens.back().line(), tokens.back().character(), "current");
@@ -1352,7 +1352,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "vlen") {
             tokens.push_back(input_tokens.at(++i));
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1506,8 +1506,8 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
                    or token == "gt" or token == "gte" or token == "eq"
                    or token == "wrapadd" or token == "wrapmul") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_index = tokens.back();
-            string target_register_set   = "current";
+            std::string target_register_index = tokens.back();
+            std::string target_register_set   = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1791,7 +1791,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             continue;
         } else if (token == "not") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1830,7 +1830,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1850,7 +1850,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
             }
         } else if (token == "bits") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            string target_register_set = "current";
+            std::string target_register_set = "current";
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1905,7 +1905,7 @@ auto normalise(vector<Token> input_tokens) -> vector<Token> {
 
 auto join_tokens(vector<Token> const tokens,
                  decltype(tokens)::size_type const from,
-                 decltype(from) const to) -> string {
+                 decltype(from) const to) -> std::string {
     ostringstream joined;
 
     for (auto i = from; i < tokens.size() and i < to; ++i) {

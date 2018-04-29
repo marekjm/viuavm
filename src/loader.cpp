@@ -37,16 +37,16 @@ using viua::util::memory::aligned_read;
 
 IdToAddressMapping Loader::loadmap(char* bytedump,
                                    const uint64_t& bytedump_size) {
-    vector<string> order;
-    map<string, uint64_t> mapping;
+    vector<std::string> order;
+    map<std::string, uint64_t> mapping;
 
     char* lib_function_ids_map = bytedump;
 
     long unsigned i = 0;
-    string lib_fn_name;
+    std::string lib_fn_name;
     uint64_t lib_fn_address;
     while (i < bytedump_size) {
-        lib_fn_name = string(lib_function_ids_map);
+        lib_fn_name = std::string(lib_function_ids_map);
         i += lib_fn_name.size() + 1;  // one for null character
         aligned_read(lib_fn_address) = (bytedump + i);
         i += sizeof(decltype(lib_fn_address));
@@ -59,7 +59,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump,
 }
 void Loader::calculate_function_sizes() {
     for (unsigned i = 0; i < functions.size(); ++i) {
-        string name      = functions[i];
+        std::string name      = functions[i];
         uint64_t el_size = 0;
 
         if (i < (functions.size() - 1)) {
@@ -82,8 +82,8 @@ void Loader::load_magic_number(ifstream& in) {
     if (magic_number[4] != '\0') {
         throw "invalid magic number";
     }
-    if (string(magic_number) != string(VIUA_MAGIC_NUMBER)) {
-        throw(string("invalid magic number: ") + string(magic_number));
+    if (std::string(magic_number) != string(VIUA_MAGIC_NUMBER)) {
+        throw(std::string("invalid magic number: ") + std::string(magic_number));
     }
 }
 
@@ -101,7 +101,7 @@ void Loader::assume_binary_type(ifstream& in,
     }
 }
 
-static map<string, string> load_meta_information_map(ifstream& in) {
+static map<std::string, std::string> load_meta_information_map(ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
@@ -110,15 +110,15 @@ static map<string, string> load_meta_information_map(ifstream& in) {
     in.read(meta_information_map_buffer.get(),
             static_cast<std::streamsize>(meta_information_map_size));
 
-    map<string, string> meta_information_map;
+    map<std::string, std::string> meta_information_map;
 
     char* buffer = meta_information_map_buffer.get();
     uint64_t i   = 0;
-    string key, value;
+    std::string key, value;
     while (i < meta_information_map_size) {
-        key = string(buffer + i);
+        key = std::string(buffer + i);
         i += (key.size() + 1);
-        value = string(buffer + i);
+        value = std::string(buffer + i);
         i += (value.size() + 1);
         meta_information_map[key] = value;
     }
@@ -129,7 +129,7 @@ void Loader::load_meta_information(ifstream& in) {
     meta_information = load_meta_information_map(in);
 }
 
-static vector<string> load_string_list(ifstream& in) {
+static vector<std::string> load_string_list(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
@@ -140,10 +140,10 @@ static vector<string> load_string_list(ifstream& in) {
 
     uint64_t i   = 0;
     char* buffer = signatures_section_buffer.get();
-    string sig;
-    vector<string> strings_list;
+    std::string sig;
+    vector<std::string> strings_list;
     while (i < signatures_section_size) {
-        sig = string(buffer + i);
+        sig = std::string(buffer + i);
         i += (sig.size() + 1);
         strings_list.emplace_back(sig);
     }
@@ -177,13 +177,13 @@ void Loader::load_functions_map(ifstream& in) {
     in.read(lib_buffer_function_ids.get(),
             static_cast<std::streamsize>(lib_function_ids_section_size));
 
-    vector<string> order;
-    map<string, uint64_t> mapping;
+    vector<std::string> order;
+    map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
         loadmap(lib_buffer_function_ids.get(), lib_function_ids_section_size);
 
-    for (string p : order) {
+    for (std::string p : order) {
         functions.emplace_back(p);
         function_addresses[p] = mapping[p];
     }
@@ -196,13 +196,13 @@ void Loader::load_blocks_map(ifstream& in) {
     in.read(lib_buffer_block_ids.get(),
             static_cast<std::streamsize>(lib_block_ids_section_size));
 
-    vector<string> order;
-    map<string, uint64_t> mapping;
+    vector<std::string> order;
+    map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
         loadmap(lib_buffer_block_ids.get(), lib_block_ids_section_size);
 
-    for (string p : order) {
+    for (std::string p : order) {
         blocks.emplace_back(p);
         block_addresses[p] = mapping[p];
     }
@@ -274,31 +274,31 @@ vector<uint64_t> Loader::get_jumps() {
     return jumps;
 }
 
-map<string, string> Loader::get_meta_information() {
+map<std::string, std::string> Loader::get_meta_information() {
     return meta_information;
 }
 
-vector<string> Loader::get_external_signatures() {
+vector<std::string> Loader::get_external_signatures() {
     return external_signatures;
 }
 
-vector<string> Loader::get_external_block_signatures() {
+vector<std::string> Loader::get_external_block_signatures() {
     return external_signatures_block;
 }
 
-map<string, uint64_t> Loader::get_function_addresses() {
+map<std::string, uint64_t> Loader::get_function_addresses() {
     return function_addresses;
 }
-map<string, uint64_t> Loader::get_function_sizes() {
+map<std::string, uint64_t> Loader::get_function_sizes() {
     return function_sizes;
 }
-vector<string> Loader::get_functions() {
+vector<std::string> Loader::get_functions() {
     return functions;
 }
 
-map<string, uint64_t> Loader::get_block_addresses() {
+map<std::string, uint64_t> Loader::get_block_addresses() {
     return block_addresses;
 }
-vector<string> Loader::get_blocks() {
+vector<std::string> Loader::get_blocks() {
     return blocks;
 }

@@ -58,7 +58,7 @@ using Token = viua::cg::lex::Token;
 template<class T> void bwrite(ofstream& out, const T& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
-static void strwrite(ofstream& out, const string& s) {
+static void strwrite(ofstream& out, const std::string& s) {
     out.write(s.c_str(), static_cast<std::streamsize>(s.size()));
     out.put('\0');
 }
@@ -84,7 +84,7 @@ static void strwrite(ofstream& out, const string& s) {
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op,
                                                          int_op,
                                                          int_op);
-const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
+const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     {"and", &Program::opand},
     {"or", &Program::opor},
 
@@ -97,7 +97,7 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
 static Program& compile(
     Program& program,
     const vector<Token>& tokens,
-    map<string, std::remove_reference<decltype(tokens)>::type::size_type>&
+    map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>&
         marks) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
@@ -153,12 +153,12 @@ static void assemble(Program& program, const vector<Token>& tokens) {
 }
 
 
-static map<string, viua::internals::types::bytecode_size>
+static map<std::string, viua::internals::types::bytecode_size>
 map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction,
     const invocables_t& blocks) {
-    map<string, viua::internals::types::bytecode_size> addresses;
-    for (string name : blocks.names) {
+    map<std::string, viua::internals::types::bytecode_size> addresses;
+    for (std::string name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
             starting_instruction += viua::cg::tools::calculate_bytecode_size2(
@@ -173,11 +173,11 @@ map_invocable_addresses(
 static viua::internals::types::bytecode_size write_code_blocks_section(
     ofstream& out,
     const invocables_t& blocks,
-    const vector<string>& linked_block_names,
+    const vector<std::string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
 
-    for (string name : blocks.names) {
+    for (std::string name : blocks.names) {
         /*
          * Increase size of the block IDs section by
          * size of the block's name.
@@ -206,7 +206,7 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
      */
     bwrite(out, block_ids_section_size);
 
-    for (string name : blocks.names) {
+    for (std::string name : blocks.names) {
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
                  << send_control_seq(ATTR_RESET);
@@ -259,8 +259,8 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
     return block_bodies_size_so_far;
 }
 
-static string get_main_function(const vector<string>& available_functions) {
-    string main_function = "";
+static std::string get_main_function(const vector<std::string>& available_functions) {
+    std::string main_function = "";
     for (auto f : available_functions) {
         if (f == "main/0" or f == "main/1" or f == "main/2") {
             main_function = f;
@@ -270,7 +270,7 @@ static string get_main_function(const vector<string>& available_functions) {
     return main_function;
 }
 
-static void check_main_function(const string& main_function,
+static void check_main_function(const std::string& main_function,
                                 const vector<Token>& main_function_tokens) {
     // Why three newlines?
     //
@@ -345,9 +345,9 @@ static void check_main_function(const string& main_function,
 
 static viua::internals::types::bytecode_size generate_entry_function(
     viua::internals::types::bytecode_size bytes,
-    map<string, viua::internals::types::bytecode_size> function_addresses,
+    map<std::string, viua::internals::types::bytecode_size> function_addresses,
     invocables_t& functions,
-    const string& main_function,
+    const std::string& main_function,
     viua::internals::types::bytecode_size starting_instruction) {
     if (DEBUG) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
@@ -488,9 +488,9 @@ static viua::internals::types::bytecode_size generate_entry_function(
 void generate(vector<Token> const& tokens,
               invocables_t& functions,
               invocables_t& blocks,
-              const string& filename,
-              string& compilename,
-              const vector<string>& commandline_given_links,
+              const std::string& filename,
+              std::string& compilename,
+              const vector<std::string>& commandline_given_links,
               const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -499,7 +499,7 @@ void generate(vector<Token> const& tokens,
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
-    string main_function = get_main_function(functions.names);
+    std::string main_function = get_main_function(functions.names);
     if (((VERBOSE and main_function != "main/1" and main_function != "")
          or DEBUG)
         and not flags.as_lib) {
@@ -550,37 +550,37 @@ void generate(vector<Token> const& tokens,
     viua::internals::types::bytecode_size starting_instruction =
         0;  // the bytecode offset to first
             // executable instruction
-    map<string, viua::internals::types::bytecode_size> function_addresses;
-    map<string, viua::internals::types::bytecode_size> block_addresses;
+    map<std::string, viua::internals::types::bytecode_size> function_addresses;
+    map<std::string, viua::internals::types::bytecode_size> block_addresses;
     try {
         block_addresses = map_invocable_addresses(starting_instruction, blocks);
         function_addresses =
             map_invocable_addresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
-    } catch (const string& e) {
+    } catch (const std::string& e) {
         throw("bytecode size calculation failed: " + e);
     }
 
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    vector<string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<string,
+    vector<std::string> links = assembler::ce::getlinks(tokens);
+    vector<tuple<std::string,
                  viua::internals::types::bytecode_size,
                  std::unique_ptr<viua::internals::types::byte[]>>>
         linked_libs_bytecode;
-    vector<string> linked_function_names;
-    vector<string> linked_block_names;
-    map<string, vector<viua::internals::types::bytecode_size>>
+    vector<std::string> linked_function_names;
+    vector<std::string> linked_block_names;
+    map<std::string, vector<viua::internals::types::bytecode_size>>
         linked_libs_jumptables;
 
     // map of symbol names to name of the module the symbol came from
-    map<string, string> symbol_sources;
+    map<std::string, std::string> symbol_sources;
     for (auto f : functions.names) {
         symbol_sources[f] = filename;
     }
 
-    for (string lnk : commandline_given_links) {
+    for (std::string lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
         } else {
@@ -589,12 +589,12 @@ void generate(vector<Token> const& tokens,
     }
 
     // gather all linked function names
-    for (string lnk : links) {
+    for (std::string lnk : links) {
         Loader loader(lnk);
         loader.load();
 
-        vector<string> fn_names = loader.get_functions();
-        for (string fn : fn_names) {
+        vector<std::string> fn_names = loader.get_functions();
+        for (std::string fn : fn_names) {
             if (function_addresses.count(fn)) {
                 throw("duplicate symbol '" + fn + "' found when linking '" + lnk
                       + "' (previously found in '" + symbol_sources.at(fn)
@@ -602,9 +602,9 @@ void generate(vector<Token> const& tokens,
             }
         }
 
-        map<string, viua::internals::types::bytecode_size> fn_addresses =
+        map<std::string, viua::internals::types::bytecode_size> fn_addresses =
             loader.get_function_addresses();
-        for (string fn : fn_names) {
+        for (std::string fn : fn_names) {
             function_addresses[fn] = 0;  // for now we just build a list of all
                                          // available functions
             symbol_sources[fn] = lnk;
@@ -631,7 +631,7 @@ void generate(vector<Token> const& tokens,
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     auto local_function_names = functions.names;
-    for (string name : linked_function_names) {
+    for (std::string name : linked_function_names) {
         functions.names.emplace_back(name);
     }
 
@@ -639,7 +639,7 @@ void generate(vector<Token> const& tokens,
     if (not flags.as_lib) {
         // check if our initial guess for main function is correct and
         // detect some main-function-related errors
-        vector<string> main_function_found;
+        vector<std::string> main_function_found;
         for (auto f : functions.names) {
             if (f == "main/0" or f == "main/1" or f == "main/2") {
                 main_function_found.emplace_back(f);
@@ -680,7 +680,7 @@ void generate(vector<Token> const& tokens,
 
 
     viua::internals::types::bytecode_size current_link_offset = bytes;
-    for (string lnk : links) {
+    for (std::string lnk : links) {
         if (DEBUG or VERBOSE) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
@@ -697,7 +697,7 @@ void generate(vector<Token> const& tokens,
         Loader loader(lnk);
         loader.load();
 
-        vector<string> fn_names = loader.get_functions();
+        vector<std::string> fn_names = loader.get_functions();
 
         vector<viua::internals::types::bytecode_size> lib_jumps =
             loader.get_jumps();
@@ -718,9 +718,9 @@ void generate(vector<Token> const& tokens,
 
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        map<string, viua::internals::types::bytecode_size> fn_addresses =
+        map<std::string, viua::internals::types::bytecode_size> fn_addresses =
             loader.get_function_addresses();
-        for (string fn : fn_names) {
+        for (std::string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             if (DEBUG) {
                 cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -800,11 +800,11 @@ void generate(vector<Token> const& tokens,
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-    map<string,
+    map<std::string,
         tuple<viua::internals::types::bytecode_size,
               unique_ptr<viua::internals::types::byte[]>>>
         functions_bytecode;
-    map<string,
+    map<std::string,
         tuple<viua::internals::types::bytecode_size,
               unique_ptr<viua::internals::types::byte[]>>>
         block_bodies_bytecode;
@@ -815,7 +815,7 @@ void generate(vector<Token> const& tokens,
                  viua::internals::types::bytecode_size>>
         jump_positions;
 
-    for (string name : blocks.names) {
+    for (std::string name : blocks.names) {
         // do not generate bytecode for blocks that were linked
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
@@ -842,7 +842,7 @@ void generate(vector<Token> const& tokens,
                 cout << " (" << fun_bytes << " bytes at byte "
                      << block_bodies_section_size << ')' << endl;
             }
-        } catch (const string& e) {
+        } catch (const std::string& e) {
             throw("failed block size count (during pre-assembling): " + e);
         } catch (const std::out_of_range& e) {
             throw("in block '" + name + "': " + e.what());
@@ -864,7 +864,7 @@ void generate(vector<Token> const& tokens,
                 cout << "'\n";
             }
             assemble(func, strip_attributes(blocks.tokens.at(name)));
-        } catch (const string& e) {
+        } catch (const std::string& e) {
             throw("in block '" + name + "': " + e);
         } catch (const char*& e) {
             throw("in block '" + name + "': " + e);
@@ -912,7 +912,7 @@ void generate(vector<Token> const& tokens,
     // functions section size, must be offset by the size of block section
     functions_section_size = block_bodies_section_size;
 
-    for (string name : functions.names) {
+    for (std::string name : functions.names) {
         // do not generate bytecode for functions that were linked
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),
@@ -941,7 +941,7 @@ void generate(vector<Token> const& tokens,
                 cout << " (" << fun_bytes << " bytes at byte "
                      << functions_section_size << ')' << endl;
             }
-        } catch (const string& e) {
+        } catch (const std::string& e) {
             throw("failed function size count (during pre-assembling): " + e);
         } catch (const std::out_of_range& e) {
             throw e.what();
@@ -963,18 +963,18 @@ void generate(vector<Token> const& tokens,
                 cout << "'\n";
             }
             assemble(func, strip_attributes(functions.tokens.at(name)));
-        } catch (const string& e) {
-            string msg =
+        } catch (const std::string& e) {
+            std::string msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const char*& e) {
-            string msg =
+            std::string msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const std::out_of_range& e) {
-            string msg =
+            std::string msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e.what());
             throw msg;
@@ -1117,7 +1117,7 @@ void generate(vector<Token> const& tokens,
         write_code_blocks_section(out, blocks, linked_block_names);
     write_code_blocks_section(
         out, functions, linked_function_names, functions_size_so_far);
-    for (string name : linked_function_names) {
+    for (std::string name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
         viua::internals::types::bytecode_size address =
@@ -1135,7 +1135,7 @@ void generate(vector<Token> const& tokens,
 
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
-    for (string name : blocks.names) {
+    for (std::string name : blocks.names) {
         // linked blocks are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
@@ -1168,7 +1168,7 @@ void generate(vector<Token> const& tokens,
 
     ///////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
-    for (string name : functions.names) {
+    for (std::string name : functions.names) {
         // linked functions are to be inserted later
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),
@@ -1204,7 +1204,7 @@ void generate(vector<Token> const& tokens,
     // WRITE STATICALLY LINKED LIBRARIES
     viua::internals::types::bytecode_size bytes_offset = current_link_offset;
     for (auto& lnk : linked_libs_bytecode) {
-        string lib_name                                   = get<0>(lnk);
+        std::string lib_name                                   = get<0>(lnk);
         viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 

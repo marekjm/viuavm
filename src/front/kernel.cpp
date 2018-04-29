@@ -45,7 +45,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
-static bool usage(const string program, const vector<string>& args) {
+static bool usage(const std::string program, const vector<std::string>& args) {
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;
@@ -131,7 +131,7 @@ static bool usage(const string program, const vector<string>& args) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
+    vector<std::string> args;
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string filename = "";
+    std::string filename = "";
     filename        = args[0];
 
     if (!filename.size()) {
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
     } catch (const char* e) {
         cout << "error: " << e << endl;
         return 1;
-    } catch (const string& e) {
+    } catch (const std::string& e) {
         cout << "error: " << e << endl;
         return 1;
     }

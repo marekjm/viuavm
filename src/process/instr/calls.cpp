@@ -154,7 +154,7 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    string call_name;
+    std::string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         viua::types::Function* fn = nullptr;
@@ -208,7 +208,7 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
 
     stack->state_of(viua::process::Stack::STATE::RUNNING);
 
-    string call_name;
+    std::string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         viua::types::Function* fn = nullptr;
@@ -253,7 +253,7 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
 }
 
 auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
-    string call_name;
+    std::string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         viua::types::Function* fn = nullptr;

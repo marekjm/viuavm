@@ -31,28 +31,28 @@ using namespace std;
 
 class Ifstream : public viua::types::Value {
     mutable ifstream in;
-    string const filename;
+    std::string const filename;
 
   public:
-    auto type() const -> string override {
+    auto type() const -> std::string override {
         return "Ifstream";
     }
-    auto str() const -> string override {
+    auto str() const -> std::string override {
         return type();
     }
-    auto repr() const -> string override {
+    auto repr() const -> std::string override {
         return str();
     }
     auto boolean() const -> bool override {
         return in.is_open();
     }
 
-    auto getline() const -> string {
+    auto getline() const -> std::string {
         if (in.eof()) {
             throw make_unique<viua::types::Exception>("EOF");
         }
 
-        auto line = string{};
+        auto line = std::string{};
         ::std::getline(in, line);
         return line;
     }
@@ -61,7 +61,7 @@ class Ifstream : public viua::types::Value {
         throw make_unique<viua::types::Exception>("Ifstream is not copyable");
     }
 
-    Ifstream(string const& path) : filename(path) {
+    Ifstream(std::string const& path) : filename(path) {
         in.open(filename);
     }
     virtual ~Ifstream() {
@@ -77,7 +77,7 @@ static auto io_stdin_getline(Frame* frame,
                              viua::kernel::RegisterSet*,
                              viua::process::Process*,
                              viua::kernel::Kernel*) -> void {
-    auto line = string{};
+    auto line = std::string{};
     getline(cin, line);
     frame->local_register_set->set(0, make_unique<viua::types::String>(line));
 }
@@ -108,7 +108,7 @@ static auto io_file_read(Frame* frame,
     auto in         = ifstream{path};
 
     auto oss  = ostringstream{};
-    auto line = string{};
+    auto line = std::string{};
     while (getline(in, line)) {
         oss << line << '\n';
     }

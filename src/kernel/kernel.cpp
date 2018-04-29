@@ -138,7 +138,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
-    const string& name,
+    const std::string& name,
     viua::internals::types::bytecode_size address) {
     /** Maps function name to bytecode address.
      */
@@ -147,7 +147,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
-    const string& name,
+    const std::string& name,
     viua::internals::types::bytecode_size address) {
     /** Maps block name to bytecode address.
      */
@@ -156,7 +156,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
-    const string& name,
+    const std::string& name,
     ForeignFunction* function_ptr) {
     /** Registers external function in viua::kernel::Kernel.
      */
@@ -166,7 +166,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
 }
 
 
-static auto is_native_module(string module) -> bool {
+static auto is_native_module(std::string module) -> bool {
     auto double_colon = regex{"::"};
     auto oss          = ostringstream{};
     oss << regex_replace(module, double_colon, "/");
@@ -183,7 +183,7 @@ static auto is_native_module(string module) -> bool {
     }
     return (path.size() > 0);
 }
-static auto is_foreign_module(string module) -> bool {
+static auto is_foreign_module(std::string module) -> bool {
     auto path = support::env::viua::get_mod_path(
         module, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
@@ -195,7 +195,7 @@ static auto is_foreign_module(string module) -> bool {
     }
     return (path.size() > 0);
 }
-void viua::kernel::Kernel::load_module(string module) {
+void viua::kernel::Kernel::load_module(std::string module) {
     if (is_native_module(module)) {
         load_native_library(module);
     } else if (is_foreign_module(module)) {
@@ -205,11 +205,11 @@ void viua::kernel::Kernel::load_module(string module) {
             "LinkException", ("failed to link library: " + module));
     }
 }
-void viua::kernel::Kernel::load_native_library(const string& module) {
+void viua::kernel::Kernel::load_native_library(const std::string& module) {
     regex double_colon("::");
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
-    string try_path = oss.str();
+    std::string try_path = oss.str();
     auto path       = support::env::viua::get_mod_path(
         try_path, "vlib", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
@@ -231,7 +231,7 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
         auto const fn_addrs = loader.get_function_addresses();
         for (const auto& fn_linkname : fn_names) {
             linked_functions[fn_linkname] =
-                pair<string, viua::internals::types::byte*>(
+                pair<std::string, viua::internals::types::byte*>(
                     module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
         }
 
@@ -239,7 +239,7 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
         auto const bl_addrs = loader.get_block_addresses();
         for (auto const& bl_linkname : bl_names) {
             linked_blocks[bl_linkname] =
-                pair<string, viua::internals::types::byte*>(
+                pair<std::string, viua::internals::types::byte*>(
                     module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
         }
 
@@ -251,7 +251,7 @@ void viua::kernel::Kernel::load_native_library(const string& module) {
         throw make_unique<viua::types::Exception>("failed to link: " + module);
     }
 }
-void viua::kernel::Kernel::load_foreign_library(const string& module) {
+void viua::kernel::Kernel::load_foreign_library(const std::string& module) {
     auto path = support::env::viua::get_mod_path(
         module, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
@@ -294,31 +294,31 @@ void viua::kernel::Kernel::load_foreign_library(const string& module) {
     cxx_dynamic_lib_handles.push_back(handle);
 }
 
-bool viua::kernel::Kernel::is_local_function(const string& name) const {
+bool viua::kernel::Kernel::is_local_function(const std::string& name) const {
     return function_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::is_linked_function(const string& name) const {
+bool viua::kernel::Kernel::is_linked_function(const std::string& name) const {
     return linked_functions.count(name);
 }
 
-bool viua::kernel::Kernel::is_native_function(const string& name) const {
+bool viua::kernel::Kernel::is_native_function(const std::string& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
 }
 
-bool viua::kernel::Kernel::is_foreign_function(const string& name) const {
+bool viua::kernel::Kernel::is_foreign_function(const std::string& name) const {
     return foreign_functions.count(name);
 }
 
-bool viua::kernel::Kernel::is_block(const string& name) const {
+bool viua::kernel::Kernel::is_block(const std::string& name) const {
     return (block_addresses.count(name) or linked_blocks.count(name));
 }
 
-bool viua::kernel::Kernel::is_local_block(const string& name) const {
+bool viua::kernel::Kernel::is_local_block(const std::string& name) const {
     return block_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::is_linked_block(const string& name) const {
+bool viua::kernel::Kernel::is_linked_block(const std::string& name) const {
     return linked_blocks.count(name);
 }
 
@@ -521,10 +521,10 @@ auto viua::kernel::Kernel::no_of_ffi_schedulers()
                             default_ffi_schedulers_limit);
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
-    string viua_enable_tracing;
+    std::string viua_enable_tracing;
     char* env_text = getenv("VIUA_ENABLE_TRACING");
     if (env_text) {
-        viua_enable_tracing = string(env_text);
+        viua_enable_tracing = std::string(env_text);
     }
     return (viua_enable_tracing == "yes" or viua_enable_tracing == "true"
             or viua_enable_tracing == "1");

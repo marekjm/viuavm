@@ -29,7 +29,7 @@ using namespace std;
 
 
 static auto resolveregister(viua::cg::lex::Token const token,
-                            bool const allow_bare_integers = false) -> string {
+                            bool const allow_bare_integers = false) -> std::string {
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
@@ -80,7 +80,7 @@ static auto resolveregister(viua::cg::lex::Token const token,
 }
 
 
-auto assembler::operands::getint(string const& s,
+auto assembler::operands::getint(std::string const& s,
                                  bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
@@ -104,7 +104,7 @@ auto assembler::operands::getint(string const& s,
 }
 
 auto assembler::operands::getint_with_rs_type(
-    string const& s,
+    std::string const& s,
     viua::internals::RegisterSets const rs_type,
     bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
@@ -159,27 +159,27 @@ auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens,
     return iop;
 }
 
-auto assembler::operands::getbyte(string const& s) -> byte_op {
+auto assembler::operands::getbyte(std::string const& s) -> byte_op {
     auto const ref = (s[0] == '@');
     return tuple<bool, char>(ref,
                              static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
-auto assembler::operands::getfloat(string const& s) -> float_op {
+auto assembler::operands::getfloat(std::string const& s) -> float_op {
     auto const ref = (s[0] == '@');
     return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
 }
 
-auto assembler::operands::get2(string const s) -> tuple<string, string> {
+auto assembler::operands::get2(std::string const s) -> tuple<string, string> {
     /** Returns tuple of two strings - two operands chunked from the `s` string.
      */
     auto const op_a = str::chunk(s);
     auto const op_b = str::chunk(str::sub(s, op_a.size()));
-    return tuple<string, string>(op_a, op_b);
+    return tuple<std::string, std::string>(op_a, op_b);
 }
 
-auto assembler::operands::get3(string const s, bool const fill_third)
-    -> tuple<string, string, string> {
+auto assembler::operands::get3(std::string const s, bool const fill_third)
+    -> tuple<std::string, std::string, std::string> {
     auto const op_a      = str::chunk(s);
     auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
@@ -188,19 +188,19 @@ auto assembler::operands::get3(string const s, bool const fill_third)
 
     /* If s is empty and fill_third is true, use first operand as a filler.
      * In any other case, use the chunk of s.
-     * The chunk of empty string will give us empty string and
+     * The chunk of empty std::string will give us empty string and
      * it is a valid (and sometimes wanted) value to return.
      */
     auto const op_c =
         (s.size() == 0 and fill_third ? op_a : str::chunk(s_after_b));
 
-    return tuple<string, string, string>(op_a, op_b, op_c);
+    return tuple<std::string, string, string>(op_a, op_b, op_c);
 }
 
 auto assembler::operands::convert_token_to_bitstring_operand(
     viua::cg::lex::Token const token) -> vector<uint8_t> {
     auto const s            = token.str();
-    auto normalised_version = string{};
+    auto normalised_version = std::string{};
     if (s.at(1) == 'b') {
         normalised_version = normalise_binary_literal(s.substr(2));
     } else if (s.at(1) == 'o') {

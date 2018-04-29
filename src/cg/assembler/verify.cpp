@@ -34,13 +34,13 @@
 using namespace std;
 
 
-using ErrorReport = pair<unsigned, string>;
+using ErrorReport = pair<unsigned, std::string>;
 using Token       = viua::cg::lex::Token;
 
 
-static bool is_defined(string function_name,
-                       const vector<string>& function_names,
-                       const vector<string>& function_signatures) {
+static bool is_defined(std::string function_name,
+                       const vector<std::string>& function_names,
+                       const vector<std::string>& function_signatures) {
     bool is_undefined =
         (find(function_names.begin(), function_names.end(), function_name)
          == function_names.end());
@@ -55,10 +55,10 @@ static bool is_defined(string function_name,
 }
 void assembler::verify::function_calls_are_defined(
     const vector<Token>& tokens,
-    const vector<string>& function_names,
-    const vector<string>& function_signatures) {
+    const vector<std::string>& function_names,
+    const vector<std::string>& function_signatures) {
     ostringstream report("");
-    string line;
+    std::string line;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
         if (not(token == "call" or token == "process" or token == "watchdog"
@@ -74,8 +74,8 @@ void assembler::verify::function_calls_are_defined(
                         function_name, function_names, function_signatures)) {
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
-                        (string(token == "tailcall" ? "tail call to"
-                                                    : "deferred")
+                        (std::string{token == "tailcall" ? "tail call to"
+                                                    : "deferred"}
                          + " undefined function " + function_name.str()));
                 }
             }
@@ -98,7 +98,7 @@ void assembler::verify::function_calls_are_defined(
                         function_name, function_names, function_signatures)) {
                     throw viua::cg::lex::InvalidSyntax(
                         function_name,
-                        (string(token == "call" ? "call to" : "process from")
+                        (std::string{token == "call" ? "call to" : "process from"}
                          + " undefined function " + function_name.str()));
                 }
             }
@@ -108,8 +108,8 @@ void assembler::verify::function_calls_are_defined(
 
 void assembler::verify::callable_creations(
     const vector<Token>& tokens,
-    const vector<string>& function_names,
-    const vector<string>& function_signatures) {
+    const vector<std::string>& function_names,
+    const vector<std::string>& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
          i < tokens.size();
          ++i) {
@@ -122,7 +122,7 @@ void assembler::verify::callable_creations(
             continue;
         }
 
-        string function = tokens.at(i + 3);
+        std::string function = tokens.at(i + 3);
 
         if (not assembler::utils::is_valid_function_name(function)) {
             // we don't have a valid function name here, let's defer to SA to

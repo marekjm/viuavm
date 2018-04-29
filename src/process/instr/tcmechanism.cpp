@@ -39,7 +39,7 @@ auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
     /** Run catch instruction.
      */
-    string type_name, catcher_block_name;
+    std::string type_name, catcher_block_name;
     tie(addr, type_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
     tie(addr, catcher_block_name) =
@@ -84,7 +84,7 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     /*  Run enter instruction.
      */
-    string block_name;
+    std::string block_name;
     tie(addr, block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

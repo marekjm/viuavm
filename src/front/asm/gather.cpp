@@ -50,9 +50,9 @@ invocables_t gather_blocks(const vector<viua::cg::lex::Token>& tokens) {
     return invocables;
 }
 
-map<string, string> gather_meta_information(
+map<std::string, std::string> gather_meta_information(
     const vector<viua::cg::lex::Token>& tokens) {
-    map<string, string> meta_information;
+    map<std::string, std::string> meta_information;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
          i < tokens.size();

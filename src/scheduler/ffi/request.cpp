@@ -26,7 +26,7 @@
 using namespace std;
 
 
-string viua::scheduler::ffi::ForeignFunctionCallRequest::function_name() const {
+std::string viua::scheduler::ffi::ForeignFunctionCallRequest::function_name() const {
     return frame->function_name;
 }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::call(

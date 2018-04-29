@@ -30,7 +30,7 @@ using namespace std;
 void viua::scheduler::ffi::ff_call_processor(
     vector<unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>*
         requests,
-    map<string, ForeignFunction*>* foreign_functions,
+    map<std::string, ForeignFunction*>* foreign_functions,
     mutex* ff_map_mtx,
     mutex* mtx,
     condition_variable* cv) {
@@ -56,7 +56,7 @@ void viua::scheduler::ffi::ff_call_processor(
             break;
         }
 
-        string call_name = request->function_name();
+        std::string call_name = request->function_name();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
             request->raise(make_unique<viua::types::Exception>(

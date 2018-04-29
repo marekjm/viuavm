@@ -24,13 +24,13 @@
 using namespace std;
 using namespace viua::types;
 
-const string viua::types::Float::type_name = "Float";
+const std::string viua::types::Float::type_name = "Float";
 
 
-string Float::type() const {
+std::string Float::type() const {
     return "Float";
 }
-string Float::str() const {
+std::string Float::str() const {
     return to_string(number);
 }
 bool Float::boolean() const {

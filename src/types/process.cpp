@@ -27,19 +27,19 @@
 #include <viua/types/process.h>
 using namespace std;
 
-const string viua::types::Process::type_name = "Process";
+const std::string viua::types::Process::type_name = "Process";
 
-string viua::types::Process::type() const {
+std::string viua::types::Process::type() const {
     return "Process";
 }
 
-string viua::types::Process::str() const {
+std::string viua::types::Process::str() const {
     ostringstream oss;
     oss << "Process: " << hex << pid().str() << dec;
     return oss.str();
 }
 
-string viua::types::Process::repr() const {
+std::string viua::types::Process::repr() const {
     return str();
 }
 

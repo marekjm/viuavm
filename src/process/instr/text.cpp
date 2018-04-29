@@ -33,7 +33,7 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type {
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    string s;
+    std::string s;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         viua::types::Value* o = nullptr;

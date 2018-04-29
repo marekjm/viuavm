@@ -25,7 +25,7 @@
 using namespace std;
 
 
-viua::process::Stack::Stack(string fn,
+viua::process::Stack::Stack(std::string fn,
                             Process* pp,
                             viua::kernel::RegisterSet** curs,
                             viua::kernel::RegisterSet* gs,
@@ -179,7 +179,7 @@ auto viua::process::Stack::adjust_jump_base_for(
 
 auto viua::process::Stack::adjust_instruction_pointer(
     const TryFrame* tframe,
-    const string handler_found_for_type) -> void {
+    const std::string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(
         tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
@@ -226,17 +226,17 @@ auto viua::process::Stack::unwind_try_stack_to(const TryFrame* tframe) -> void {
 }
 
 auto viua::process::Stack::unwind_to(const TryFrame* tframe,
-                                     const string handler_found_for_type)
+                                     const std::string handler_found_for_type)
     -> void {
     adjust_instruction_pointer(tframe, handler_found_for_type);
     unwind_call_stack_to(tframe->associated_frame);
     unwind_try_stack_to(tframe);
 }
 
-auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
+auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
     TryFrame* found_exception_frame = nullptr;
-    string caught_with_type         = "";
-    string handler_found_for_type =
+    std::string caught_with_type         = "";
+    std::string handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
@@ -250,12 +250,12 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
         }
     }
 
-    return tuple<TryFrame*, string>(found_exception_frame, caught_with_type);
+    return tuple<TryFrame*, std::string>(found_exception_frame, caught_with_type);
 }
 
 auto viua::process::Stack::unwind() -> void {
     TryFrame* tframe              = nullptr;
-    string handler_found_for_type = "";
+    std::string handler_found_for_type = "";
 
     // Find catch frame for current thrown exception.
     // May return nullptr, because the catcher may not always be found.

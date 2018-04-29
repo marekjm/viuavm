@@ -43,7 +43,7 @@ auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    string call_name;
+    std::string call_name;
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
 auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
@@ -218,7 +218,7 @@ auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     return return_addr;
 }
 auto viua::process::Process::opwatchdog(Op_address_type addr) -> Op_address_type {
-    string call_name;
+    std::string call_name;
     tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

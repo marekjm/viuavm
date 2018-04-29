@@ -103,7 +103,7 @@ static auto extract_register_index(Op_address_type ip,
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
             "OT_REGISTER_REFERENCE"
-            + (pointers_allowed ? string(", OT_POINTER") : string("")));
+            + (pointers_allowed ? std::string(", OT_POINTER") : std::string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i =
@@ -140,7 +140,7 @@ static auto extract_register_type_and_index(Op_address_type ip,
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
             "OT_REGISTER_REFERENCE"
-            + (pointers_allowed ? string(", OT_POINTER") : string("")));
+            + (pointers_allowed ? std::string(", OT_POINTER") : std::string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto const i =
@@ -304,18 +304,18 @@ auto viua::bytecode::decoder::operands::extract_primitive_uint64(
 
 auto viua::bytecode::decoder::operands::fetch_primitive_string(
     Op_address_type ip,
-    viua::process::Process*) -> tuple<Op_address_type, string> {
-    auto const s = string{extract_ptr<char const>(ip)};
+    viua::process::Process*) -> tuple<Op_address_type, std::string> {
+    auto const s = std::string{extract_ptr<char const>(ip)};
     ip += (s.size() + 1);
-    return tuple<Op_address_type, string>(ip, s);
+    return tuple<Op_address_type, std::string>(ip, s);
 }
 
 auto viua::bytecode::decoder::operands::fetch_atom(
     Op_address_type ip,
-    viua::process::Process*) -> tuple<Op_address_type, string> {
-    auto const s = string{extract_ptr<char const>(ip)};
+    viua::process::Process*) -> tuple<Op_address_type, std::string> {
+    auto const s = std::string{extract_ptr<char const>(ip)};
     ip += (s.size() + 1);
-    return tuple<Op_address_type, string>(ip, s);
+    return tuple<Op_address_type, std::string>(ip, s);
 }
 
 auto viua::bytecode::decoder::operands::fetch_object(

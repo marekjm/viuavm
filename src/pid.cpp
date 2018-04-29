@@ -61,7 +61,7 @@ auto viua::process::PID::get() const -> decltype(associated_process) {
     return associated_process;
 }
 
-auto viua::process::PID::str() const -> string {
+auto viua::process::PID::str() const -> std::string {
     ostringstream oss;
     oss << hex << associated_process;
     return oss.str();

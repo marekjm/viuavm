@@ -56,7 +56,7 @@ bool DEBUG        = false;
 bool DISASSEMBLE_ENTRY   = false;
 bool INCLUDE_INFO        = false;
 bool LINE_BY_LINE        = false;
-string SELECTED_FUNCTION = "";
+std::string SELECTED_FUNCTION = "";
 
 
 static bool usage(const char* program,
@@ -101,16 +101,16 @@ static bool usage(const char* program,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    vector<std::string> args;
+    std::string option;
 
     // for getline()
-    string dummy;
+    std::string dummy;
 
-    string filename   = "";
-    string disasmname = "";
+    std::string filename   = "";
+    std::string disasmname = "";
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
         } else if (option == "--version" or option == "-V") {
@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
             LINE_BY_LINE = true;
         } else if (option == "--function" or option == "-F") {
             if (i < argc - 1) {
-                SELECTED_FUNCTION = string(argv[++i]);
+                SELECTED_FUNCTION = std::string(argv[++i]);
             } else {
                 cout << "error: option '" << argv[i]
                      << "' requires an argument: function name" << endl;
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc - 1) {
-                disasmname = string(argv[++i]);
+                disasmname = std::string(argv[++i]);
             } else {
                 cout << "error: option '" << argv[i]
                      << "' requires an argument: filename" << endl;
@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
 
     try {
         loader.executable();
-    } catch (const string& e) {
+    } catch (const std::string& e) {
         cout << e << endl;
         return 1;
     }
@@ -188,26 +188,26 @@ int main(int argc, char* argv[]) {
     uint64_t bytes = loader.get_bytecode_size();
     unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
 
-    map<string, uint64_t> function_address_mapping =
+    map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
-    vector<string> functions             = loader.get_functions();
-    map<string, uint64_t> function_sizes = loader.get_function_sizes();
+    vector<std::string> functions             = loader.get_functions();
+    map<std::string, uint64_t> function_sizes = loader.get_function_sizes();
 
-    map<string, uint64_t> block_address_mapping = loader.get_block_addresses();
-    vector<string> blocks                       = loader.get_blocks();
-    map<string, uint64_t> block_sizes;
+    map<std::string, uint64_t> block_address_mapping = loader.get_block_addresses();
+    vector<std::string> blocks                       = loader.get_blocks();
+    map<std::string, uint64_t> block_sizes;
 
-    map<string, uint64_t> element_address_mapping;
-    vector<string> elements;
-    map<string, uint64_t> element_sizes;
-    map<string, string> element_types;
+    map<std::string, uint64_t> element_address_mapping;
+    vector<std::string> elements;
+    map<std::string, uint64_t> element_sizes;
+    map<std::string, string> element_types;
 
-    vector<string> disassembled_lines;
+    vector<std::string> disassembled_lines;
     ostringstream oss;
 
 
     for (unsigned i = 0; i < blocks.size(); ++i) {
-        const string name = blocks[i];
+        const std::string name = blocks[i];
 
         uint64_t el_size = 0;
         if (i < (blocks.size() - 1)) {
@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        const string name             = functions[i];
+        const std::string name             = functions[i];
         element_sizes[name]           = function_sizes[name];
         element_types[name]           = "function";
         element_address_mapping[name] = function_address_mapping[name];
@@ -291,7 +291,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        const string name  = elements[i];
+        const std::string name  = elements[i];
         const auto el_size = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {
@@ -307,10 +307,10 @@ int main(int argc, char* argv[]) {
             getline(cin, dummy);
         }
 
-        string opname;
+        std::string opname;
         bool disasm_terminated = false;
         for (unsigned j = 0; j < el_size;) {
-            string instruction;
+            std::string instruction;
             try {
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction(
@@ -333,7 +333,7 @@ int main(int argc, char* argv[]) {
                 (DEBUG ? cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
-            } catch (const string& e) {
+            } catch (const std::string& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? cout : oss) << "disassembly terminated after throwing "
                                         "an instance of std::out_of_range\n";

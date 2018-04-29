@@ -26,16 +26,16 @@
 #include <viua/types/object.h>
 using namespace std;
 
-const string viua::types::Object::type_name = "Object";
+const std::string viua::types::Object::type_name = "Object";
 
-string viua::types::Object::type() const {
+std::string viua::types::Object::type() const {
     return object_type_name;
 }
 bool viua::types::Object::boolean() const {
     return true;
 }
 
-string viua::types::Object::str() const {
+std::string viua::types::Object::str() const {
     ostringstream oss;
 
     oss << object_type_name << '#';
@@ -61,16 +61,16 @@ unique_ptr<viua::types::Value> viua::types::Object::copy() const {
     return std::move(cp);
 }
 
-void viua::types::Object::set(const string& name,
+void viua::types::Object::set(const std::string& name,
                               unique_ptr<viua::types::Value> object) {
     attributes[name] = std::move(object);
 }
 
-void viua::types::Object::insert(const string& key,
+void viua::types::Object::insert(const std::string& key,
                                  unique_ptr<viua::types::Value> value) {
     set(key, std::move(value));
 }
-unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
+unique_ptr<viua::types::Value> viua::types::Object::remove(const std::string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;

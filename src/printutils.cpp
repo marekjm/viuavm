@@ -23,7 +23,7 @@
 #include <viua/types/value.h>
 using namespace std;
 
-string stringify_function_invocation(const Frame* frame) {
+std::string stringify_function_invocation(const Frame* frame) {
     ostringstream oss;
     oss << frame->function_name << '/' << frame->arguments->size();
     oss << '(';

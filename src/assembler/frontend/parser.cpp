@@ -38,7 +38,7 @@ const auto max_distance_for_misspelled_ids = str::LevenshteinDistance{4};
 
 
 auto viua::assembler::frontend::parser::ParsedSource::block(
-    string const name) const -> InstructionsBlock const& {
+    std::string const name) const -> InstructionsBlock const& {
     for (auto const& each : blocks) {
         if (each.name == name) {
             return each;
@@ -58,7 +58,7 @@ auto viua::assembler::frontend::parser::Line::add(Token t) -> void {
 
 auto viua::assembler::frontend::parser::parse_attribute_value(
     const vector_view<Token> tokens,
-    string& value) -> decltype(tokens)::size_type {
+    std::string& value) -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{1};
 
     if (tokens.at(i) == "}") {
@@ -87,8 +87,8 @@ auto viua::assembler::frontend::parser::parse_attributes(
     ++i;  // skip '[['
 
     while (i < tokens.size() and tokens.at(i) != "]]") {
-        const string key = tokens.at(i++);
-        string value;
+        const std::string key = tokens.at(i++);
+        std::string value;
 
         if (tokens.at(i) == ",") {
             ++i;
@@ -277,7 +277,7 @@ auto viua::assembler::frontend::parser::parse_operand(
 }
 
 auto viua::assembler::frontend::parser::mnemonic_to_opcode(
-    const string mnemonic) -> OPCODE {
+    const std::string mnemonic) -> OPCODE {
     OPCODE opcode = NOP;
     for (const auto each : OP_NAMES) {
         if (each.second == mnemonic) {
@@ -287,14 +287,14 @@ auto viua::assembler::frontend::parser::mnemonic_to_opcode(
     }
     return opcode;
 }
-static auto get_mnemonics() -> vector<string> {
-    vector<string> mnemonics;
+static auto get_mnemonics() -> vector<std::string> {
+    vector<std::string> mnemonics;
     for (const auto each : OP_NAMES) {
         mnemonics.push_back(std::move(each.second));
     }
     return mnemonics;
 }
-static auto get_directives() -> vector<string> {
+static auto get_directives() -> vector<std::string> {
     return {
         ".end",
         ".function:",

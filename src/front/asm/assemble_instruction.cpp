@@ -57,7 +57,7 @@ auto ::assembler::operands::resolve_jump(
     /*  This function is used to resolve jumps in `jump` and `branch`
      * instructions.
      */
-    string jmp                                 = token.str();
+    std::string jmp                                 = token.str();
     viua::internals::types::bytecode_size addr = 0;
     enum JUMPTYPE jump_type                    = JMP_RELATIVE;
     if (str::isnum(jmp, false)) {
@@ -171,7 +171,7 @@ auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internal
     }
 }
 
-static auto timeout_to_int(string const& timeout) -> viua::internals::types::timeout {
+static auto timeout_to_int(std::string const& timeout) -> viua::internals::types::timeout {
     const auto timeout_str_size = timeout.size();
     if (timeout[timeout_str_size - 2] == 'm') {
         return static_cast<viua::internals::types::timeout>(

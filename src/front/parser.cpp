@@ -95,9 +95,9 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static string read_file(ifstream& in) {
+static std::string read_file(ifstream& in) {
     ostringstream source_in;
-    string line;
+    std::string line;
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -107,13 +107,13 @@ static string read_file(ifstream& in) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    vector<std::string> args;
+    std::string option;
 
-    string filename(""), compilename("");
+    std::string filename(""), compilename("");
 
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
 
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string source = read_file(in);
+    std::string source = read_file(in);
 
     auto raw_tokens = viua::cg::lex::tokenise(source);
     vector<Token> tokens;

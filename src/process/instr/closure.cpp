@@ -126,7 +126,7 @@ auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type 
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    string function_name;
+    std::string function_name;
     tie(addr, function_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
@@ -151,7 +151,7 @@ auto viua::process::Process::opfunction(Op_address_type addr) -> Op_address_type
     tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    string function_name;
+    std::string function_name;
     tie(addr, function_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 

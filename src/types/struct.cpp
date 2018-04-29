@@ -22,9 +22,9 @@
 #include <viua/types/struct.h>
 using namespace std;
 
-const string viua::types::Struct::type_name = "Struct";
+const std::string viua::types::Struct::type_name = "Struct";
 
-string viua::types::Struct::type() const {
+std::string viua::types::Struct::type() const {
     return "Struct";
 }
 
@@ -32,7 +32,7 @@ bool viua::types::Struct::boolean() const {
     return (not attributes.empty());
 }
 
-string viua::types::Struct::str() const {
+std::string viua::types::Struct::str() const {
     ostringstream oss;
 
     oss << '{';
@@ -50,23 +50,23 @@ string viua::types::Struct::str() const {
     return oss.str();
 }
 
-string viua::types::Struct::repr() const {
+std::string viua::types::Struct::repr() const {
     return str();
 }
 
-void viua::types::Struct::insert(const string& key,
+void viua::types::Struct::insert(const std::string& key,
                                  unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::remove(const string& key) {
+unique_ptr<viua::types::Value> viua::types::Struct::remove(const std::string& key) {
     unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;
 }
 
-vector<string> viua::types::Struct::keys() const {
-    vector<string> ks;
+vector<std::string> viua::types::Struct::keys() const {
+    vector<std::string> ks;
     for (const auto& each : attributes) {
         ks.push_back(each.first);
     }

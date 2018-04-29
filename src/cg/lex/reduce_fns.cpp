@@ -26,12 +26,12 @@
 using namespace std;
 
 namespace viua { namespace cg { namespace lex {
-static auto is_valid_register_id(string s) -> bool {
+static auto is_valid_register_id(std::string s) -> bool {
     return (str::isnum(s) or str::isid(s));
 }
 static auto match(vector<Token> const& tokens,
                   std::remove_reference<decltype(tokens)>::type::size_type i,
-                  vector<string> const& sequence) -> bool {
+                  vector<std::string> const& sequence) -> bool {
     if (i + sequence.size() >= tokens.size()) {
         return false;
     }
@@ -76,7 +76,7 @@ static auto match_adjacent(
 auto remove_spaces(vector<Token> input_tokens) -> vector<Token> {
     vector<Token> tokens;
 
-    string space(" ");
+    std::string space(" ");
     for (auto t : input_tokens) {
         if (t.str() != space) {
             tokens.push_back(t);
@@ -119,7 +119,7 @@ auto remove_comments(vector<Token> input_tokens) -> vector<Token> {
 }
 
 auto reduce_token_sequence(vector<Token> input_tokens,
-                           vector<string> const sequence) -> vector<Token> {
+                           vector<std::string> const sequence) -> vector<Token> {
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -139,7 +139,7 @@ auto reduce_token_sequence(vector<Token> input_tokens,
     return tokens;
 }
 
-auto reduce_directive(vector<Token> input_tokens, string const directive)
+auto reduce_directive(vector<Token> input_tokens, std::string const directive)
     -> vector<Token> {
     return reduce_token_sequence(input_tokens, {".", directive, ":"});
 }
@@ -405,7 +405,7 @@ auto reduce_floats(vector<Token> input_tokens) -> vector<Token> {
 auto move_inline_blocks_out(vector<Token> input_tokens) -> vector<Token> {
     decltype(input_tokens) tokens;
     decltype(tokens) block_tokens, nested_block_tokens;
-    string opened_inside;
+    std::string opened_inside;
 
     bool block_opened        = false;
     bool nested_block_opened = false;
@@ -532,8 +532,8 @@ static auto get_subtokens(
     const vector<Token>& input_tokens,
     std::remove_reference<decltype(input_tokens)>::type::size_type i)
     -> std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned> {
-    string paren_type         = input_tokens.at(i);
-    string closing_paren_type = ((paren_type == "(") ? ")" : "]");
+    std::string paren_type         = input_tokens.at(i);
+    std::string closing_paren_type = ((paren_type == "(") ? ")" : "]");
     ++i;
 
     vector<Token> subtokens;
@@ -851,7 +851,7 @@ auto replace_defaults(vector<Token> input_tokens) -> vector<Token> {
 auto replace_named_registers(std::vector<Token> input_tokens)
     -> std::vector<Token> {
     vector<Token> tokens;
-    map<string, string> names;
+    map<std::string, std::string> names;
     unsigned open_blocks = 0;
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
@@ -873,7 +873,7 @@ auto replace_named_registers(std::vector<Token> input_tokens)
 
         if (token == ".name:") {
             Token name   = input_tokens.at(i + 2);
-            string index = input_tokens.at(i + 1).str();
+            std::string index = input_tokens.at(i + 1).str();
 
             assert_is_not_reserved_keyword(name, "register name");
 

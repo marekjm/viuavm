@@ -29,7 +29,7 @@ using namespace std;
 
 int main() {
     std::string::size_type max_mnemonic_length = 0;
-    for (pair<const OPCODE, string> i : OP_NAMES) {
+    for (pair<const OPCODE, std::string> i : OP_NAMES) {
         max_mnemonic_length = ((max_mnemonic_length >= i.second.size())
                                    ? max_mnemonic_length
                                    : i.second.size());
@@ -37,7 +37,7 @@ int main() {
 
     max_mnemonic_length += 1;
 
-    const string initial_column = "MNEMONIC            ";
+    const std::string initial_column = "MNEMONIC            ";
     cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
 
     max_mnemonic_length = (max_mnemonic_length < initial_column.size()
@@ -48,7 +48,7 @@ int main() {
          i < static_cast<viua::internals::types::byte>(0xff);
          ++i) {
         auto opcode   = static_cast<OPCODE>(i);
-        auto mnemonic = string{"??"};
+        auto mnemonic = std::string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
         } else {

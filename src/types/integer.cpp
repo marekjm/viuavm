@@ -26,12 +26,12 @@
 using namespace std;
 using namespace viua::types;
 
-const string viua::types::Integer::type_name = "Integer";
+const std::string viua::types::Integer::type_name = "Integer";
 
-string Integer::type() const {
+std::string Integer::type() const {
     return "Integer";
 }
-string Integer::str() const {
+std::string Integer::str() const {
     return to_string(number);
 }
 bool Integer::boolean() const {

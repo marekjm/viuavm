@@ -28,7 +28,7 @@
 #include <viua/types/value.h>
 using namespace std;
 
-const string viua::types::Pointer::type_name = "Pointer";
+const std::string viua::types::Pointer::type_name = "Pointer";
 
 void viua::types::Pointer::attach() {
     points_to->pointers.push_back(this);
@@ -77,7 +77,7 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     return points_to;
 }
 
-string viua::types::Pointer::type() const {
+std::string viua::types::Pointer::type() const {
     return ((valid ? points_to->type() : "Expired") + "Pointer");
 }
 
@@ -85,7 +85,7 @@ bool viua::types::Pointer::boolean() const {
     return valid;
 }
 
-string viua::types::Pointer::str() const {
+std::string viua::types::Pointer::str() const {
     return type();
 }
 

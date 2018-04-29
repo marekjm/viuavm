@@ -96,7 +96,7 @@ void viua::process::Process::put(viua::internals::types::register_index index,
                                  unique_ptr<viua::types::Value> o) {
     place(index, std::move(o));
 }
-void viua::process::Process::ensure_static_registers(string function_name) {
+void viua::process::Process::ensure_static_registers(std::string function_name) {
     /** Makes sure that static register set for requested function is
      * initialized.
      */
@@ -136,11 +136,11 @@ void viua::process::Process::push_frame() {
 }
 
 viua::internals::types::byte* viua::process::Process::
-    adjust_jump_base_for_block(const string& call_name) {
+    adjust_jump_base_for_block(const std::string& call_name) {
     return stack->adjust_jump_base_for_block(call_name);
 }
 viua::internals::types::byte* viua::process::Process::adjust_jump_base_for(
-    const string& call_name) {
+    const std::string& call_name) {
     return stack->adjust_jump_base_for(call_name);
 }
 auto viua::process::Process::call_native(
@@ -350,7 +350,7 @@ viua::process::Process* viua::process::Process::parent() const {
     return parent_process;
 }
 
-string viua::process::Process::starting_function() const {
+std::string viua::process::Process::starting_function() const {
     return stack->entry_function;
 }
 
@@ -396,7 +396,7 @@ unique_ptr<viua::types::Value> viua::process::Process::get_return_value() {
 bool viua::process::Process::watchdogged() const {
     return (not watchdog_function.empty());
 }
-string viua::process::Process::watchdog() const {
+std::string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
 auto viua::process::Process::become(

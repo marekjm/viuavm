@@ -23,7 +23,7 @@
 #include <viua/types/text.h>
 using namespace std;
 
-const string viua::types::Text::type_name = "Text";
+const std::string viua::types::Text::type_name = "Text";
 
 namespace {
 const uint8_t UTF8_1ST_ROW = 0b00000000;
@@ -45,7 +45,7 @@ static auto is_continuation_byte(uint8_t b) -> bool {
 static auto is_continuation_byte(char b) -> bool {
     return is_continuation_byte(static_cast<uint8_t>(b));
 }
-auto viua::types::Text::parse(string s) -> decltype(text) {
+auto viua::types::Text::parse(std::string s) -> decltype(text) {
     vector<Character> parsed_text;
 
     char ss[5];
@@ -98,15 +98,15 @@ auto viua::types::Text::parse(string s) -> decltype(text) {
     return parsed_text;
 }
 
-viua::types::Text::Text(string s) : text(parse(s)) {}
+viua::types::Text::Text(std::string s) : text(parse(s)) {}
 viua::types::Text::Text(vector<Character> s) : text(std::move(s)) {}
 viua::types::Text::Text(Text&& s) : text(std::move(s.text)) {}
 
-string viua::types::Text::type() const {
+std::string viua::types::Text::type() const {
     return "Text";
 }
 
-string viua::types::Text::str() const {
+std::string viua::types::Text::str() const {
     ostringstream oss;
     for (const auto& each : text) {
         oss << each;
@@ -114,7 +114,7 @@ string viua::types::Text::str() const {
     return oss.str();
 }
 
-string viua::types::Text::repr() const {
+std::string viua::types::Text::repr() const {
     return str::enquote(str());
 }
 

@@ -30,7 +30,7 @@ using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
 
-static auto invalid_syntax(const vector<Token>& tokens, const string message)
+static auto invalid_syntax(const vector<Token>& tokens, const std::string message)
     -> InvalidSyntax {
     auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
@@ -77,7 +77,7 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
 }
 
 
-static auto is_defined_block_name(const ParsedSource& source, const string name)
+static auto is_defined_block_name(const ParsedSource& source, const std::string name)
     -> bool {
     auto is_undefined =
         (source.blocks.end()
@@ -282,7 +282,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                     continue;
                 }
 
-                string function_name;
+                std::string function_name;
                 using viua::assembler::frontend::parser::AtomLiteral;
                 using viua::assembler::frontend::parser::FunctionNameLiteral;
                 if (auto name_from_atom = dynamic_cast<AtomLiteral*>(operand);
@@ -441,10 +441,10 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 using InstructionIndex = decltype(
     viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
 static auto validate_jump(const Token token,
-                          const string& extracted_jump,
+                          const std::string& extracted_jump,
                           const InstructionIndex instruction_counter,
                           const InstructionIndex current_instruction_counter,
-                          const map<string, InstructionIndex>& jump_targets)
+                          const map<std::string, InstructionIndex>& jump_targets)
     -> InstructionIndex {
     auto target = InstructionIndex{0};
     if (str::isnum(extracted_jump, false)) {
@@ -501,7 +501,7 @@ static auto validate_jump_pair(
     const Token& when_false,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
-    const map<string, InstructionIndex>& jump_targets) -> void {
+    const map<std::string, InstructionIndex>& jump_targets) -> void {
     if (when_true.str() == when_false.str()) {
         throw viua::cg::lex::InvalidSyntax(
             branch_token,
@@ -535,7 +535,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
             auto current_instruction_counter =
                 static_cast<InstructionIndex>(-1);
 
-            map<string, decltype(instruction_counter)> jump_targets;
+            map<std::string, decltype(instruction_counter)> jump_targets;
 
             for (const auto& line : ib.body) {
                 auto mnemonic = line->tokens.at(0);

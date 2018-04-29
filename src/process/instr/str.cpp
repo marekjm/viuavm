@@ -35,7 +35,7 @@ auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type {
 
     ++addr;  // for operand type
 
-    string s;
+    std::string s;
     tie(addr, s) =
         viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 

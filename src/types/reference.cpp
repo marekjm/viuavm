@@ -21,7 +21,7 @@
 #include <viua/types/reference.h>
 using namespace std;
 
-const string viua::types::Reference::type_name = "Reference";
+const std::string viua::types::Reference::type_name = "Reference";
 
 viua::types::Value* viua::types::Reference::points_to() const {
     return *pointer;
@@ -42,14 +42,14 @@ void viua::types::Reference::rebind(unique_ptr<viua::types::Value> ptr) {
 }
 
 
-string viua::types::Reference::type() const {
+std::string viua::types::Reference::type() const {
     return (*pointer)->type();
 }
 
-string viua::types::Reference::str() const {
+std::string viua::types::Reference::str() const {
     return (*pointer)->str();
 }
-string viua::types::Reference::repr() const {
+std::string viua::types::Reference::repr() const {
     return (*pointer)->repr();
 }
 bool viua::types::Reference::boolean() const {

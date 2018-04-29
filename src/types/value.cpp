@@ -27,15 +27,15 @@
 using namespace std;
 
 
-string viua::types::Value::type() const {
+std::string viua::types::Value::type() const {
     return "Value";
 }
-string viua::types::Value::str() const {
+std::string viua::types::Value::str() const {
     ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-string viua::types::Value::repr() const {
+std::string viua::types::Value::repr() const {
     return str();
 }
 bool viua::types::Value::boolean() const {

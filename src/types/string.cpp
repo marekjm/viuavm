@@ -37,15 +37,15 @@ using namespace std;
 using namespace viua::assertions;
 using namespace viua::types;
 
-const string viua::types::String::type_name = "String";
+const std::string viua::types::String::type_name = "String";
 
-string String::type() const {
+std::string String::type() const {
     return "String";
 }
-string String::str() const {
+std::string String::str() const {
     return svalue;
 }
-string String::repr() const {
+std::string String::repr() const {
     return str::enquote(svalue);
 }
 bool String::boolean() const {
@@ -56,7 +56,7 @@ unique_ptr<Value> String::copy() const {
     return make_unique<String>(svalue);
 }
 
-string& String::value() {
+std::string& String::value() {
     return svalue;
 }
 
@@ -69,7 +69,7 @@ Integer* String::size() {
 String* String::sub(int64_t b, int64_t e) {
     /** Return substring extracted from this object.
      */
-    string::size_type cut_from, cut_to;
+    std::string::size_type cut_from, cut_to;
     // these casts are ugly as hell, but without them Clang warns about implicit
     // sign-changing
     if (b < 0) {
@@ -95,7 +95,7 @@ String* String::add(String* s) {
 String* String::join(Vector* v) {
     /** Use this string to join objects in vector.
      */
-    string s       = "";
+    std::string s       = "";
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
         s += v->at(i)->str();
@@ -135,7 +135,7 @@ void String::startswith(Frame* frame,
                         viua::kernel::RegisterSet*,
                         viua::process::Process*,
                         viua::kernel::Kernel*) {
-    string s         = static_cast<String*>(frame->arguments->at(1))->value();
+    std::string s         = static_cast<String*>(frame->arguments->at(1))->value();
     bool starts_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -157,7 +157,7 @@ void String::endswith(Frame* frame,
                       viua::kernel::RegisterSet*,
                       viua::process::Process*,
                       viua::kernel::Kernel*) {
-    string s       = static_cast<String*>(frame->arguments->at(1))->value();
+    std::string s       = static_cast<String*>(frame->arguments->at(1))->value();
     bool ends_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -183,10 +183,10 @@ void String::format(Frame* frame,
                     viua::kernel::Kernel*) {
     regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
-    string result = svalue;
+    std::string result = svalue;
 
     if (regex_search(result, key_regex)) {
-        vector<string> matches;
+        vector<std::string> matches;
         for (sregex_iterator match =
                  sregex_iterator(result.begin(), result.end(), key_regex);
              match != sregex_iterator();
@@ -195,8 +195,8 @@ void String::format(Frame* frame,
         }
 
         for (auto i : matches) {
-            string m = i.substr(2, (i.size() - 3));
-            string replacement;
+            std::string m = i.substr(2, (i.size() - 3));
+            std::string replacement;
             bool is_number = true;
             int index      = -1;
             try {
@@ -212,7 +212,7 @@ void String::format(Frame* frame,
                 replacement =
                     static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
             }
-            string pat("#\\{" + m + "\\}");
+            std::string pat("#\\{" + m + "\\}");
             regex subst(pat);
             result = regex_replace(result, subst, replacement);
         }
@@ -276,4 +276,4 @@ void String::size(Frame* frame,
         0, make_unique<Integer>(static_cast<int>(svalue.size())));
 }
 
-String::String(string s) : svalue(s) {}
+String::String(std::string s) : svalue(s) {}

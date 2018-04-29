@@ -22,9 +22,9 @@
 using namespace std;
 
 
-const string viua::types::numeric::Number::type_name = "Number";
+const std::string viua::types::numeric::Number::type_name = "Number";
 
-string viua::types::numeric::Number::type() const {
+std::string viua::types::numeric::Number::type() const {
     return "Number";
 }
 

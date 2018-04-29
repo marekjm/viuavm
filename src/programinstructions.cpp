@@ -148,14 +148,14 @@ Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opstring(int_op reg, string s) {
+Program& Program::opstring(int_op reg, std::string s) {
     /*  Inserts string instruction.
      */
     addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
 
-Program& Program::optext(int_op reg, string s) {
+Program& Program::optext(int_op reg, std::string s) {
     addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
     return (*this);
 }
@@ -649,7 +649,7 @@ Program& Program::opargc(int_op a) {
     return (*this);
 }
 
-Program& Program::opcall(int_op reg, const string& fn_name) {
+Program& Program::opcall(int_op reg, const std::string& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
@@ -688,7 +688,7 @@ Program& Program::opdefer(int_op fn) {
     return (*this);
 }
 
-Program& Program::opprocess(int_op ref, const string& fn_name) {
+Program& Program::opprocess(int_op ref, const std::string& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);
 }
@@ -720,7 +720,7 @@ Program& Program::opreceive(int_op ref, timeout_op timeout) {
     return (*this);
 }
 
-Program& Program::opwatchdog(const string& fn_name) {
+Program& Program::opwatchdog(const std::string& fn_name) {
     addr_ptr = cg::bytecode::opwatchdog(addr_ptr, fn_name);
     return (*this);
 }
@@ -780,7 +780,7 @@ Program& Program::optry() {
     return (*this);
 }
 
-Program& Program::opcatch(string type_name, string block_name) {
+Program& Program::opcatch(std::string type_name, std::string block_name) {
     /*  Inserts catch instruction.
      */
     addr_ptr = cg::bytecode::opcatch(addr_ptr, type_name, block_name);
@@ -794,7 +794,7 @@ Program& Program::opdraw(int_op regno) {
     return (*this);
 }
 
-Program& Program::openter(string block_name) {
+Program& Program::openter(std::string block_name) {
     /*  Inserts enter instruction.
      *  Byte offset is calculated automatically.
      */
@@ -816,14 +816,14 @@ Program& Program::opleave() {
     return (*this);
 }
 
-Program& Program::opimport(string module_name) {
+Program& Program::opimport(std::string module_name) {
     /*  Inserts import instruction.
      */
     addr_ptr = cg::bytecode::opimport(addr_ptr, module_name);
     return (*this);
 }
 
-Program& Program::opatom(int_op reg, string const& s) {
+Program& Program::opatom(int_op reg, std::string const& s) {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
 }
