@@ -78,3 +78,5 @@ but it works (as of 2018-02-05) and there are no plans to change it.
 
 %% INSTRUCTION SET ARCHITECTURE
 \section{end}
+
+%% vim:set ft=tex:
