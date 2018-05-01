@@ -30,11 +30,11 @@ auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
     ParsedSource const& ps,
     std::map<Register, Closure> const& created_closures) -> void {
-    for (const auto& each : created_closures) {
+    for (auto const& each : created_closures) {
         Register_usage_profile closure_register_usage_profile;
-        const auto& fn = *std::find_if(ps.functions.begin(),
+        auto const& fn = *std::find_if(ps.functions.begin(),
                                        ps.functions.end(),
-                                       [&each](const InstructionsBlock& b) {
+                                       [&each](InstructionsBlock const& b) {
                                            return b.name == each.second.name;
                                        });
         for (auto& captured_value : each.second.defined_registers) {

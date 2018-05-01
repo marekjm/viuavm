@@ -34,9 +34,9 @@
 using namespace std;
 
 using viua::types::numeric::Number;
-using ArithmeticOp = std::unique_ptr<Number> (Number::*)(const Number&) const;
+using ArithmeticOp = std::unique_ptr<Number> (Number::*)(Number const&) const;
 using LogicOp =
-    std::unique_ptr<viua::types::Boolean> (Number::*)(const Number&) const;
+    std::unique_ptr<viua::types::Boolean> (Number::*)(Number const&) const;
 using viua::internals::types::Op_address_type;
 
 template<typename T>

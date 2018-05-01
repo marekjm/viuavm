@@ -21,7 +21,7 @@
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
-auto Register::operator<(const Register& that) const -> bool {
+auto Register::operator<(Register const& that) const -> bool {
     if (register_set < that.register_set) {
         return true;
     }
@@ -30,7 +30,7 @@ auto Register::operator<(const Register& that) const -> bool {
     }
     return false;
 }
-auto Register::operator==(const Register& that) const -> bool {
+auto Register::operator==(Register const& that) const -> bool {
     return (register_set == that.register_set) and (index == that.index);
 }
 

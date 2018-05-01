@@ -55,10 +55,10 @@ extern bool SCREAM;
 using Token = viua::cg::lex::Token;
 
 
-template<class T> void bwrite(ofstream& out, const T& object) {
+template<class T> void bwrite(ofstream& out, T const& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
-static void strwrite(ofstream& out, const std::string& s) {
+static void strwrite(ofstream& out, std::string const& s) {
     out.write(s.c_str(), static_cast<std::streamsize>(s.size()));
     out.put('\0');
 }
@@ -157,14 +157,14 @@ static void assemble(Program& program, const std::vector<Token>& tokens) {
 static map<std::string, viua::internals::types::bytecode_size>
 map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction,
-    const invocables_t& blocks) {
+    invocables_t const& blocks) {
     map<std::string, viua::internals::types::bytecode_size> addresses;
     for (std::string name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
             starting_instruction += viua::cg::tools::calculate_bytecode_size2(
                 blocks.tokens.at(name));
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw("could not find block '" + name + "'");
         }
     }
@@ -173,7 +173,7 @@ map_invocable_addresses(
 
 static viua::internals::types::bytecode_size write_code_blocks_section(
     ofstream& out,
-    const invocables_t& blocks,
+    invocables_t const& blocks,
     const std::vector<std::string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
@@ -251,7 +251,7 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
             block_bodies_size_so_far +=
                 viua::cg::tools::calculate_bytecode_size2(
                     blocks.tokens.at(name));
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw("could not find block '" + name
                   + "' during address table write");
         }
@@ -272,7 +272,7 @@ static std::string get_main_function(
     return main_function;
 }
 
-static void check_main_function(const std::string& main_function,
+static void check_main_function(std::string const& main_function,
                                 const std::vector<Token>& main_function_tokens) {
     // Why three newlines?
     //
@@ -349,7 +349,7 @@ static viua::internals::types::bytecode_size generate_entry_function(
     viua::internals::types::bytecode_size bytes,
     map<std::string, viua::internals::types::bytecode_size> function_addresses,
     invocables_t& functions,
-    const std::string& main_function,
+    std::string const& main_function,
     viua::internals::types::bytecode_size starting_instruction) {
     if (DEBUG) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
@@ -490,10 +490,10 @@ static viua::internals::types::bytecode_size generate_entry_function(
 void generate(std::vector<Token> const& tokens,
               invocables_t& functions,
               invocables_t& blocks,
-              const std::string& filename,
+              std::string const& filename,
               std::string& compilename,
               const std::vector<std::string>& commandline_given_links,
-              const compilationflags_t& flags) {
+              compilationflags_t const& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     viua::internals::types::bytecode_size bytes = 0;
@@ -559,7 +559,7 @@ void generate(std::vector<Token> const& tokens,
         function_addresses =
             map_invocable_addresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
-    } catch (const std::string& e) {
+    } catch (std::string const& e) {
         throw("bytecode size calculation failed: " + e);
     }
 
@@ -844,9 +844,9 @@ void generate(std::vector<Token> const& tokens,
                 cout << " (" << fun_bytes << " bytes at byte "
                      << block_bodies_section_size << ')' << endl;
             }
-        } catch (const std::string& e) {
+        } catch (std::string const& e) {
             throw("failed block size count (during pre-assembling): " + e);
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw("in block '" + name + "': " + e.what());
         }
 
@@ -866,11 +866,11 @@ void generate(std::vector<Token> const& tokens,
                 cout << "'\n";
             }
             assemble(func, strip_attributes(blocks.tokens.at(name)));
-        } catch (const std::string& e) {
+        } catch (std::string const& e) {
             throw("in block '" + name + "': " + e);
         } catch (const char*& e) {
             throw("in block '" + name + "': " + e);
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw("in block '" + name + "': " + e.what());
         }
 
@@ -943,9 +943,9 @@ void generate(std::vector<Token> const& tokens,
                 cout << " (" << fun_bytes << " bytes at byte "
                      << functions_section_size << ')' << endl;
             }
-        } catch (const std::string& e) {
+        } catch (std::string const& e) {
             throw("failed function size count (during pre-assembling): " + e);
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw e.what();
         }
 
@@ -965,7 +965,7 @@ void generate(std::vector<Token> const& tokens,
                 cout << "'\n";
             }
             assemble(func, strip_attributes(functions.tokens.at(name)));
-        } catch (const std::string& e) {
+        } catch (std::string const& e) {
             std::string msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
@@ -975,7 +975,7 @@ void generate(std::vector<Token> const& tokens,
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             std::string msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e.what());
@@ -1228,7 +1228,7 @@ void generate(std::vector<Token> const& tokens,
         auto linked_jumptable = std::vector<viua::internals::types::bytecode_size>{};
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
-        } catch (const std::out_of_range& e) {
+        } catch (std::out_of_range const& e) {
             throw("[linker] could not find jumptable for '" + lib_name
                   + "' (maybe not loaded?)");
         }

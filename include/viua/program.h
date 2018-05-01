@@ -186,19 +186,19 @@ class Program {
     Program& oparg(int_op, int_op);
     Program& opargc(int_op);
 
-    Program& opcall(int_op, const std::string&);
+    Program& opcall(int_op, std::string const&);
     Program& opcall(int_op, int_op);
     Program& optailcall(std::string const&);
     Program& optailcall(int_op);
     Program& opdefer(std::string const&);
     Program& opdefer(int_op);
-    Program& opprocess(int_op, const std::string&);
+    Program& opprocess(int_op, std::string const&);
     Program& opprocess(int_op, int_op);
     Program& opself(int_op);
     Program& opjoin(int_op, int_op, timeout_op);
     Program& opsend(int_op, int_op);
     Program& opreceive(int_op, timeout_op);
-    Program& opwatchdog(const std::string&);
+    Program& opwatchdog(std::string const&);
     Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
     Program& opif(int_op,
                   viua::internals::types::bytecode_size,
@@ -246,8 +246,8 @@ class Program {
     viua::internals::types::bytecode_size size();
 
     Program(viua::internals::types::bytecode_size bts = 2);
-    Program(const Program& that);
-    Program& operator=(const Program& that);
+    Program(Program const& that);
+    Program& operator=(Program const& that);
 };
 
 

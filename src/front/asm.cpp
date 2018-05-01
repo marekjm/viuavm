@@ -147,7 +147,7 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static std::string read_file(const std::string& path) {
+static std::string read_file(std::string const& path) {
     ifstream in(path, ios::in | ios::binary);
 
     ostringstream source_in;
@@ -297,11 +297,11 @@ int main(int argc, char* argv[]) {
             viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
         normalised_tokens =
             viua::cg::lex::normalise(viua::cg::lex::cook(raw_tokens));
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -310,11 +310,11 @@ int main(int argc, char* argv[]) {
     invocables_t functions;
     try {
         functions = gather_functions(cooked_tokens);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -323,11 +323,11 @@ int main(int argc, char* argv[]) {
     invocables_t blocks;
     try {
         blocks = gather_blocks(cooked_tokens);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -349,11 +349,11 @@ int main(int argc, char* argv[]) {
                     cooked_tokens_without_names_replaced, blocks.tokens, DEBUG);
             }
         }
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -393,7 +393,7 @@ int main(int argc, char* argv[]) {
                  compilename,
                  commandline_given_links,
                  flags);
-    } catch (const std::string& e) {
+    } catch (std::string const& e) {
         ret_code = 1;
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET) << ": ";
@@ -407,11 +407,11 @@ int main(int argc, char* argv[]) {
         cout << send_control_seq(COLOR_FG_RED) << "error"
              << send_control_seq(ATTR_RESET);
         cout << ": " << e << endl;
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;

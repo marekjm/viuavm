@@ -32,10 +32,10 @@ class PID {
     const viua::process::Process* associated_process;
 
   public:
-    bool operator==(const viua::process::PID&) const;
+    bool operator==(viua::process::PID const&) const;
     bool operator==(const viua::process::Process*) const;
-    bool operator<(const viua::process::PID&) const;
-    bool operator>(const viua::process::PID&) const;
+    bool operator<(viua::process::PID const&) const;
+    bool operator>(viua::process::PID const&) const;
 
     auto get() const -> decltype(associated_process);
     auto str() const -> std::string;

@@ -649,7 +649,7 @@ Program& Program::opargc(int_op a) {
     return (*this);
 }
 
-Program& Program::opcall(int_op reg, const std::string& fn_name) {
+Program& Program::opcall(int_op reg, std::string const& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
@@ -688,7 +688,7 @@ Program& Program::opdefer(int_op fn) {
     return (*this);
 }
 
-Program& Program::opprocess(int_op ref, const std::string& fn_name) {
+Program& Program::opprocess(int_op ref, std::string const& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);
 }
@@ -720,7 +720,7 @@ Program& Program::opreceive(int_op ref, timeout_op timeout) {
     return (*this);
 }
 
-Program& Program::opwatchdog(const std::string& fn_name) {
+Program& Program::opwatchdog(std::string const& fn_name) {
     addr_ptr = cg::bytecode::opwatchdog(addr_ptr, fn_name);
     return (*this);
 }

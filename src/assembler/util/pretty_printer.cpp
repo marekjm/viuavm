@@ -27,7 +27,7 @@ using namespace std;
 
 
 auto viua::assembler::util::pretty_printer::send_control_seq(
-    const std::string& mode) -> std::string {
+    std::string const& mode) -> std::string {
     static auto is_terminal = isatty(1);
     static std::string env_color_flag{
         getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
@@ -54,7 +54,7 @@ auto viua::assembler::util::pretty_printer::send_control_seq(
 auto viua::assembler::util::pretty_printer::underline_error_token(
     const std::vector<viua::cg::lex::Token>& tokens,
     decltype(tokens.size()) i,
-    const viua::cg::lex::InvalidSyntax& error) -> void {
+    viua::cg::lex::InvalidSyntax const& error) -> void {
     /*
      * Indent is needed to align an aside note correctly.
      * The aside note is a additional piece of text that is attached to the
@@ -89,7 +89,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
     bool has_matched           = false;
     bool has_matched_for_aside = false;
     while (i < tokens.size()) {
-        const auto& each = tokens.at(i++);
+        auto const& each = tokens.at(i++);
         bool match       = error.match(each);
 
         if (each == "\n") {
@@ -156,9 +156,9 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
 }
 auto viua::assembler::util::pretty_printer::display_error_line(
     const std::vector<viua::cg::lex::Token>& tokens,
-    const viua::cg::lex::InvalidSyntax& error,
+    viua::cg::lex::InvalidSyntax const& error,
     decltype(tokens.size()) i,
-    const size_t line_no_width) -> decltype(i) {
+    size_t const line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << send_control_seq(COLOR_FG_RED);
@@ -193,9 +193,9 @@ auto viua::assembler::util::pretty_printer::display_error_line(
 }
 auto viua::assembler::util::pretty_printer::display_context_line(
     const std::vector<viua::cg::lex::Token>& tokens,
-    const viua::cg::lex::InvalidSyntax&,
+    viua::cg::lex::InvalidSyntax const&,
     decltype(tokens.size()) i,
-    const size_t line_no_width) -> decltype(i) {
+    size_t const line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << "    ";  // message indent, ">>>>" on error line
@@ -211,8 +211,8 @@ auto viua::assembler::util::pretty_printer::display_context_line(
     return i;
 }
 auto viua::assembler::util::pretty_printer::display_error_header(
-    const viua::cg::lex::InvalidSyntax& error,
-    const std::string& filename) -> void {
+    viua::cg::lex::InvalidSyntax const& error,
+    std::string const& filename) -> void {
     if (error.str().size()) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
              << error.line() + 1 << ':' << error.character() + 1 << ':'
@@ -221,7 +221,7 @@ auto viua::assembler::util::pretty_printer::display_error_header(
              << send_control_seq(ATTR_RESET) << ": " << error.what() << endl;
     }
     if (error.notes().size()) {
-        for (const auto& note : error.notes()) {
+        for (auto const& note : error.notes()) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
                  << error.line() + 1 << ':' << error.character() + 1 << ':'
                  << send_control_seq(ATTR_RESET) << ' ';
@@ -261,7 +261,7 @@ auto viua::assembler::util::pretty_printer::display_error_location(
 auto viua::assembler::util::pretty_printer::display_error_in_context(
     const std::vector<viua::cg::lex::Token>& tokens,
     const viua::cg::lex::InvalidSyntax error,
-    const std::string& filename) -> void {
+    std::string const& filename) -> void {
     display_error_header(error, filename);
     cout << "\n";
     display_error_location(tokens, error);
@@ -269,7 +269,7 @@ auto viua::assembler::util::pretty_printer::display_error_in_context(
 auto viua::assembler::util::pretty_printer::display_error_in_context(
     const std::vector<viua::cg::lex::Token>& tokens,
     const viua::cg::lex::TracedSyntaxError error,
-    const std::string& filename) -> void {
+    std::string const& filename) -> void {
     for (auto const& e : error.errors) {
         display_error_in_context(tokens, e, filename);
         cout << "\n";

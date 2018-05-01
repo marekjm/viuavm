@@ -37,11 +37,11 @@ using viua::assembler::frontend::static_analyser::Register;
 using viua::assembler::frontend::static_analyser::Register_usage_profile;
 
 
-using Verifier = auto (*)(const ParsedSource&, const InstructionsBlock&)
+using Verifier = auto (*)(ParsedSource const&, InstructionsBlock const&)
                      -> void;
-static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
+static auto verify_wrapper(ParsedSource const& source, Verifier verifier)
     -> void {
-    for (const auto& fn : source.functions) {
+    for (auto const& fn : source.functions) {
         if (fn.attributes.count("no_sa")) {
             continue;
         }
@@ -62,7 +62,7 @@ namespace static_analyser { namespace checkers {
 auto map_names_to_register_indexes(
     Register_usage_profile& register_usage_profile,
     InstructionsBlock const& ib) -> void {
-    for (const auto& line : ib.body) {
+    for (auto const& line : ib.body) {
         auto directive =
             dynamic_cast<viua::assembler::frontend::parser::Directive*>(
                 line.get());
@@ -491,8 +491,8 @@ auto check_register_usage_for_instruction_block_impl(
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
 
 static auto check_register_usage_for_instruction_block(
-    const ParsedSource& ps,
-    const InstructionsBlock& ib) -> void {
+    ParsedSource const& ps,
+    InstructionsBlock const& ib) -> void {
     if (ib.closure) {
         return;
     }
@@ -509,6 +509,6 @@ static auto check_register_usage_for_instruction_block(
             static_cast<InstructionIndex>(-1));
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(src, check_register_usage_for_instruction_block);
 }

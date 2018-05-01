@@ -422,7 +422,7 @@ static auto populate_marker_map(InstructionsBlock& instructions_block) -> void {
     // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
-    for (const auto& line : instructions_block.body) {
+    for (auto const& line : instructions_block.body) {
         if (const auto directive = dynamic_cast<Directive*>(line.get());
             directive) {
             if (directive->directive == ".mark:") {

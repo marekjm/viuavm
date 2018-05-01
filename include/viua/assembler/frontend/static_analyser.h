@@ -28,15 +28,15 @@
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
-auto verify_block_tries(const parser::ParsedSource&) -> void;
-auto verify_block_catches(const parser::ParsedSource&) -> void;
-auto verify_block_endings(const parser::ParsedSource& src) -> void;
-auto verify_frame_balance(const parser::ParsedSource& src) -> void;
-auto verify_function_call_arities(const parser::ParsedSource& src) -> void;
-auto verify_frames_have_no_gaps(const parser::ParsedSource& src) -> void;
-auto verify_jumps_are_in_range(const parser::ParsedSource&) -> void;
+auto verify_block_tries(parser::ParsedSource const&) -> void;
+auto verify_block_catches(parser::ParsedSource const&) -> void;
+auto verify_block_endings(parser::ParsedSource const& src) -> void;
+auto verify_frame_balance(parser::ParsedSource const& src) -> void;
+auto verify_function_call_arities(parser::ParsedSource const& src) -> void;
+auto verify_frames_have_no_gaps(parser::ParsedSource const& src) -> void;
+auto verify_jumps_are_in_range(parser::ParsedSource const&) -> void;
 
-auto verify(const parser::ParsedSource&) -> void;
+auto verify(parser::ParsedSource const&) -> void;
 
 struct Register {
     viua::internals::types::register_index index{0};
@@ -46,8 +46,8 @@ struct Register {
         viua::internals::ValueTypes::UNDEFINED;
     std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
 
-    auto operator<(const Register& that) const -> bool;
-    auto operator==(const Register& that) const -> bool;
+    auto operator<(Register const& that) const -> bool;
+    auto operator==(Register const& that) const -> bool;
 
     Register() = default;
     Register(viua::assembler::frontend::parser::RegisterIndex const&);

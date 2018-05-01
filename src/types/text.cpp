@@ -108,7 +108,7 @@ std::string viua::types::Text::type() const {
 
 std::string viua::types::Text::str() const {
     ostringstream oss;
-    for (const auto& each : text) {
+    for (auto const& each : text) {
         oss << each;
     }
     return oss.str();
@@ -126,12 +126,12 @@ std::unique_ptr<viua::types::Value> viua::types::Text::copy() const {
     return std::make_unique<Text>(text);
 }
 
-auto viua::types::Text::operator==(const viua::types::Text& other) const
+auto viua::types::Text::operator==(viua::types::Text const& other) const
     -> bool {
     return (text == other.text);
 }
 
-auto viua::types::Text::operator+(const viua::types::Text& other) const
+auto viua::types::Text::operator+(viua::types::Text const& other) const
     -> Text {
     decltype(text) copied;
     for (size_type i = 0; i < size(); ++i) {
@@ -169,7 +169,7 @@ auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
 }
 
 
-auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
+auto viua::types::Text::common_prefix(Text const& other) const -> size_type {
     size_type length_of_common_prefix = 0;
     auto limit                        = max(size(), other.size());
 
@@ -181,7 +181,7 @@ auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
 
     return length_of_common_prefix;
 }
-auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
+auto viua::types::Text::common_suffix(Text const& other) const -> size_type {
     size_type length_of_common_suffix = 0;
 
     size_type this_index  = size() - 1;

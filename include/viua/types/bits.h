@@ -56,10 +56,10 @@ class Bits : public viua::types::Value {
     auto increment() -> void;
     auto decrement() -> void;
 
-    auto wrapadd(const Bits&) const -> std::unique_ptr<Bits>;
-    auto wrapsub(const Bits&) const -> std::unique_ptr<Bits>;
-    auto wrapmul(const Bits&) const -> std::unique_ptr<Bits>;
-    auto wrapdiv(const Bits&) const -> std::unique_ptr<Bits>;
+    auto wrapadd(Bits const&) const -> std::unique_ptr<Bits>;
+    auto wrapsub(Bits const&) const -> std::unique_ptr<Bits>;
+    auto wrapmul(Bits const&) const -> std::unique_ptr<Bits>;
+    auto wrapdiv(Bits const&) const -> std::unique_ptr<Bits>;
 
     auto checked_signed_increment() -> void;
     auto checked_signed_decrement() -> void;
@@ -75,15 +75,15 @@ class Bits : public viua::types::Value {
     auto saturating_signed_mul(Bits const&) const -> std::unique_ptr<Bits>;
     auto saturating_signed_div(Bits const&) const -> std::unique_ptr<Bits>;
 
-    auto operator==(const Bits&) const -> bool;
-    auto operator<(const Bits&) const -> bool;
-    auto operator<=(const Bits&) const -> bool;
-    auto operator>(const Bits&) const -> bool;
-    auto operator>=(const Bits&) const -> bool;
+    auto operator==(Bits const&) const -> bool;
+    auto operator<(Bits const&) const -> bool;
+    auto operator<=(Bits const&) const -> bool;
+    auto operator>(Bits const&) const -> bool;
+    auto operator>=(Bits const&) const -> bool;
 
-    auto operator&(const Bits&)const -> std::unique_ptr<Bits>;
-    auto operator|(const Bits&) const -> std::unique_ptr<Bits>;
-    auto operator^(const Bits&) const -> std::unique_ptr<Bits>;
+    auto operator&(Bits const&)const -> std::unique_ptr<Bits>;
+    auto operator|(Bits const&) const -> std::unique_ptr<Bits>;
+    auto operator^(Bits const&) const -> std::unique_ptr<Bits>;
 
     static const std::string type_name;
 

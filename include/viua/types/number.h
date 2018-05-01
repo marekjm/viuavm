@@ -53,18 +53,18 @@ class Number : public Value {
     virtual auto as_integer() const -> int64_t = 0;
     virtual auto as_float() const -> float64   = 0;
 
-    virtual auto operator+(const Number&) const -> std::unique_ptr<Number> = 0;
-    virtual auto operator-(const Number&) const -> std::unique_ptr<Number> = 0;
-    virtual auto operator*(const Number&)const -> std::unique_ptr<Number>  = 0;
-    virtual auto operator/(const Number&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator+(Number const&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator-(Number const&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator*(Number const&)const -> std::unique_ptr<Number>  = 0;
+    virtual auto operator/(Number const&) const -> std::unique_ptr<Number> = 0;
 
-    virtual auto operator<(const Number&) const -> std::unique_ptr<Boolean> = 0;
-    virtual auto operator<=(const Number&) const
+    virtual auto operator<(Number const&) const -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator<=(Number const&) const
         -> std::unique_ptr<Boolean>                                         = 0;
-    virtual auto operator>(const Number&) const -> std::unique_ptr<Boolean> = 0;
-    virtual auto operator>=(const Number&) const
+    virtual auto operator>(Number const&) const -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator>=(Number const&) const
         -> std::unique_ptr<Boolean> = 0;
-    virtual auto operator==(const Number&) const
+    virtual auto operator==(Number const&) const
         -> std::unique_ptr<Boolean> = 0;
 
     Number();

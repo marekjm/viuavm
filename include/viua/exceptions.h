@@ -34,7 +34,7 @@ class OutOfRangeException : public viua::types::Exception {
     std::string type() const {
         return "OutOfRangeException";
     }
-    OutOfRangeException(const std::string& s) : viua::types::Exception(s) {}
+    OutOfRangeException(std::string const& s) : viua::types::Exception(s) {}
 };
 
 class ArityException : public viua::types::Exception {

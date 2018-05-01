@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
     } catch (const char* e) {
         cout << "error: " << e << endl;
         return 1;
-    } catch (const std::string& e) {
+    } catch (std::string const& e) {
         cout << "error: " << e << endl;
         return 1;
     }
@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
         cout << "VM error: an irrecoverable VM exception occured: " << e->what()
              << endl;
         return 1;
-    } catch (const std::exception& e) {
+    } catch (std::exception const& e) {
         cout << "VM error: an irrecoverable host exception occured: "
              << e.what() << endl;
         return 1;

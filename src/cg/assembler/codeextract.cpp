@@ -144,7 +144,7 @@ auto assembler::ce::get_function_names(std::vector<Token> const& tokens)
     auto names = get_instruction_block_names(tokens, "function", [](Token t) {
         assert_is_not_reserved_keyword(t, "function name");
     });
-    for (const auto& each : get_instruction_block_names(tokens, "closure")) {
+    for (auto const& each : get_instruction_block_names(tokens, "closure")) {
         names.push_back(each);
     }
     return names;
@@ -211,7 +211,7 @@ static auto get_raw_block_bodies(std::string const& type,
 
     return invokables;
 }
-auto assembler::ce::get_invokables_token_bodies(const std::string& type,
+auto assembler::ce::get_invokables_token_bodies(std::string const& type,
                                                 const std::vector<Token>& tokens)
     -> map<std::string, std::vector<Token>> {
     return get_raw_block_bodies(type, tokens);

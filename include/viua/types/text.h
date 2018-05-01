@@ -64,8 +64,8 @@ class Text : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    auto operator==(const Text&) const -> bool;
-    auto operator+(const Text&) const -> Text;
+    auto operator==(Text const&) const -> bool;
+    auto operator+(Text const&) const -> Text;
 
     using size_type = decltype(text)::size_type;
     auto at(const size_type) const -> Character;
@@ -73,8 +73,8 @@ class Text : public Value {
     auto size() const -> size_type;
     auto sub(size_type, size_type) const -> decltype(text);
     auto sub(size_type) const -> decltype(text);
-    auto common_prefix(const Text&) const -> size_type;
-    auto common_suffix(const Text&) const -> size_type;
+    auto common_prefix(Text const&) const -> size_type;
+    auto common_suffix(Text const&) const -> size_type;
 
     Text(std::vector<Character>);
     Text(std::string);

@@ -199,7 +199,7 @@ void String::format(Frame* frame,
             int index      = -1;
             try {
                 index = stoi(m);
-            } catch (const std::invalid_argument&) {
+            } catch (std::invalid_argument const&) {
                 is_number = false;
             }
             if (is_number) {

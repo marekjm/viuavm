@@ -56,16 +56,16 @@ class Integer : public viua::types::numeric::Number {
     auto as_integer() const -> int64_t override;
     auto as_float() const -> viua::float64 override;
 
-    auto operator+(const Number&) const -> std::unique_ptr<Number> override;
-    auto operator-(const Number&) const -> std::unique_ptr<Number> override;
-    auto operator*(const Number&)const -> std::unique_ptr<Number> override;
-    auto operator/(const Number&) const -> std::unique_ptr<Number> override;
+    auto operator+(Number const&) const -> std::unique_ptr<Number> override;
+    auto operator-(Number const&) const -> std::unique_ptr<Number> override;
+    auto operator*(Number const&)const -> std::unique_ptr<Number> override;
+    auto operator/(Number const&) const -> std::unique_ptr<Number> override;
 
-    auto operator<(const Number&) const -> std::unique_ptr<Boolean> override;
-    auto operator<=(const Number&) const -> std::unique_ptr<Boolean> override;
-    auto operator>(const Number&) const -> std::unique_ptr<Boolean> override;
-    auto operator>=(const Number&) const -> std::unique_ptr<Boolean> override;
-    auto operator==(const Number&) const -> std::unique_ptr<Boolean> override;
+    auto operator<(Number const&) const -> std::unique_ptr<Boolean> override;
+    auto operator<=(Number const&) const -> std::unique_ptr<Boolean> override;
+    auto operator>(Number const&) const -> std::unique_ptr<Boolean> override;
+    auto operator>=(Number const&) const -> std::unique_ptr<Boolean> override;
+    auto operator==(Number const&) const -> std::unique_ptr<Boolean> override;
 
     Integer(decltype(number) n = 0) : number(n) {}
 };

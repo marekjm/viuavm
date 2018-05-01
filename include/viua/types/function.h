@@ -46,7 +46,7 @@ class Function : public Value {
     virtual std::string name() const;
 
     // FIXME: implement real dtor
-    Function(const std::string& = "");
+    Function(std::string const& = "");
     virtual ~Function();
 };
 }}  // namespace viua::types

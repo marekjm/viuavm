@@ -103,7 +103,7 @@ void viua::process::Process::ensure_static_registers(
      */
     try {
         static_registers.at(function_name);
-    } catch (const std::out_of_range& e) {
+    } catch (std::out_of_range const& e) {
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] =

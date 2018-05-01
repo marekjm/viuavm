@@ -26,8 +26,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_for_unused_registers(
-    const Register_usage_profile& register_usage_profile) -> void {
-    for (const auto& each : register_usage_profile) {
+    Register_usage_profile const& register_usage_profile) -> void {
+    for (auto const& each : register_usage_profile) {
         if (not each.first.index) {
             /*
              * Registers with index 0 do not take part in the "unused" analysis,

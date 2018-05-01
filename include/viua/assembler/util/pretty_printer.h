@@ -39,29 +39,29 @@ const auto COLOR_FG_RED_1 = std::string{"\x1b[38;5;196m"};
 const auto COLOR_FG_ORANGE_RED_1 = std::string{"\x1b[38;5;202m"};
 const auto ATTR_RESET = std::string{"\x1b[0m"};
 
-auto send_control_seq(const std::string&) -> std::string;
+auto send_control_seq(std::string const&) -> std::string;
 
 auto underline_error_token(const std::vector<viua::cg::lex::Token>& tokens,
                            decltype(tokens.size()) i,
-                           const viua::cg::lex::InvalidSyntax& error) -> void;
+                           viua::cg::lex::InvalidSyntax const& error) -> void;
 auto display_error_line(const std::vector<viua::cg::lex::Token>& tokens,
-                        const viua::cg::lex::InvalidSyntax& error,
+                        viua::cg::lex::InvalidSyntax const& error,
                         decltype(tokens.size()) i,
-                        const size_t) -> decltype(i);
+                        size_t const) -> decltype(i);
 auto display_context_line(const std::vector<viua::cg::lex::Token>& tokens,
-                          const viua::cg::lex::InvalidSyntax&,
+                          viua::cg::lex::InvalidSyntax const&,
                           decltype(tokens.size()) i,
-                          const size_t) -> decltype(i);
-auto display_error_header(const viua::cg::lex::InvalidSyntax& error,
-                          const std::string& filename) -> void;
+                          size_t const) -> decltype(i);
+auto display_error_header(viua::cg::lex::InvalidSyntax const& error,
+                          std::string const& filename) -> void;
 auto display_error_location(const std::vector<viua::cg::lex::Token>& tokens,
                             const viua::cg::lex::InvalidSyntax error) -> void;
 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
                               const viua::cg::lex::InvalidSyntax error,
-                              const std::string& filename) -> void;
+                              std::string const& filename) -> void;
 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
                               const viua::cg::lex::TracedSyntaxError error,
-                              const std::string& filename) -> void;
+                              std::string const& filename) -> void;
 }}}}  // namespace viua::assembler::util::pretty_printer
 
 #endif

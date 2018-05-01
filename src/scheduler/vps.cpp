@@ -239,42 +239,42 @@ viua::kernel::Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_local_function(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_local_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_linked_function(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_linked_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_native_function(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_native_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_foreign_function(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_foreign_function(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_block(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_block(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_local_block(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_local_block(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::is_linked_block(
-    const std::string& name) const {
+    std::string const& name) const {
     return attached_kernel->is_linked_block(name);
 }
 
 auto viua::scheduler::VirtualProcessScheduler::get_entry_point_of_block(
-    const std::string& name) const
+    std::string const& name) const
     -> pair<viua::internals::types::Op_address_type,
             viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of_block(name);

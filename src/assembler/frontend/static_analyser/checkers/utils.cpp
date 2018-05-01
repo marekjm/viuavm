@@ -102,7 +102,7 @@ template<typename K, typename V>
 static auto keys_of(std::map<K, V> const& m) -> std::vector<K> {
     auto keys = std::vector<K>{};
 
-    for (const auto& each : m) {
+    for (auto const& each : m) {
         keys.push_back(each.first);
     }
 

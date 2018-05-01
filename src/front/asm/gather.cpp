@@ -31,7 +31,7 @@ invocables_t gather_functions(const std::vector<viua::cg::lex::Token>& tokens) {
     invocables.signatures = assembler::ce::get_signatures(tokens);
     invocables.tokens =
         assembler::ce::get_invokables_token_bodies("function", tokens);
-    for (const auto& each :
+    for (auto const& each :
          assembler::ce::get_invokables_token_bodies("closure", tokens)) {
         invocables.tokens[each.first] = each.second;
     }

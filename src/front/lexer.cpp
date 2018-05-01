@@ -47,7 +47,7 @@ static auto enumerate(const std::vector<T>& v)
     std::vector<pair<typename std::vector<T>::size_type, T>> enumerated_vector;
 
     typename std::vector<T>::size_type i = 0;
-    for (const auto& each : v) {
+    for (auto const& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
     }
@@ -55,14 +55,14 @@ static auto enumerate(const std::vector<T>& v)
     return enumerated_vector;
 }
 
-static void encode_json(const std::string& filename,
+static void encode_json(std::string const& filename,
                         const std::vector<Token>& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";
 
     const auto limit = tokens.size();
-    for (const auto& t : enumerate(tokens)) {
+    for (auto const& t : enumerate(tokens)) {
         cout << "{";
         cout << str::enquote("line") << ": " << t.second.line() << ", ";
         cout << str::enquote("character") << ": " << t.second.character()
@@ -132,12 +132,12 @@ static bool MANUAL_REDUCING   = false;
 static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
-static void display_results(const std::string& filename,
+static void display_results(std::string const& filename,
                             const std::vector<Token>& tokens) {
     if (DISPLAY_SIZE) {
         try {
             cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
-        } catch (const InvalidSyntax& e) {
+        } catch (InvalidSyntax const& e) {
             cerr << filename << ':' << e.line_number << ':'
                  << e.character_in_line;
             cerr << ": error: invalid syntax: " << str::strencode(e.content)
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_mark_directive(tokens);
             }
         }
-    } catch (const InvalidSyntax& e) {
+    } catch (InvalidSyntax const& e) {
         std::string message = e.what();
         cerr << filename << ':' << e.line_number + 1 << ':'
              << e.character_in_line + 1

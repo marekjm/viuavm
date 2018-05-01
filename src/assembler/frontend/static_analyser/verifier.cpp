@@ -42,11 +42,11 @@ static auto invalid_syntax(const std::vector<Token>& tokens,
 }
 
 
-using Verifier = auto (*)(const ParsedSource&, const InstructionsBlock&)
+using Verifier = auto (*)(ParsedSource const&, InstructionsBlock const&)
                      -> void;
-static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
+static auto verify_wrapper(ParsedSource const& source, Verifier verifier)
     -> void {
-    for (const auto& fn : source.functions) {
+    for (auto const& fn : source.functions) {
         if (fn.attributes.count("no_sa")) {
             continue;
         }
@@ -60,7 +60,7 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
                 InvalidSyntax(fn.name, ("in function " + fn.name.str())));
         }
     }
-    for (const auto& bl : source.blocks) {
+    for (auto const& bl : source.blocks) {
         if (bl.attributes.count("no_sa")) {
             continue;
         }
@@ -77,31 +77,31 @@ static auto verify_wrapper(const ParsedSource& source, Verifier verifier)
 }
 
 
-static auto is_defined_block_name(const ParsedSource& source,
+static auto is_defined_block_name(ParsedSource const& source,
                                   const std::string name) -> bool {
     auto is_undefined =
         (source.blocks.end()
          == find_if(source.blocks.begin(),
                     source.blocks.end(),
-                    [name](const InstructionsBlock& ib) -> bool {
+                    [name](InstructionsBlock const& ib) -> bool {
                         return (ib.name == name);
                     }));
     if (is_undefined) {
         is_undefined = (source.block_signatures.end()
                         == find_if(source.block_signatures.begin(),
                                    source.block_signatures.end(),
-                                   [name](const Token& block_name) -> bool {
+                                   [name](Token const& block_name) -> bool {
                                        return (block_name.str() == name);
                                    }));
     }
     return (not is_undefined);
 }
 auto viua::assembler::frontend::static_analyser::verify_block_tries(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
         src,
-        [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
-            for (const auto& line : ib.body) {
+        [](ParsedSource const& source, InstructionsBlock const& ib) -> void {
+            for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
                     viua::assembler::frontend::parser::Instruction*>(
                     line.get());
@@ -122,11 +122,11 @@ auto viua::assembler::frontend::static_analyser::verify_block_tries(
         });
 }
 auto viua::assembler::frontend::static_analyser::verify_block_catches(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
         src,
-        [](const ParsedSource& source, const InstructionsBlock& ib) -> void {
-            for (const auto& line : ib.body) {
+        [](ParsedSource const& source, InstructionsBlock const& ib) -> void {
+            for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
                     viua::assembler::frontend::parser::Instruction*>(
                     line.get());
@@ -148,9 +148,9 @@ auto viua::assembler::frontend::static_analyser::verify_block_catches(
         });
 }
 auto viua::assembler::frontend::static_analyser::verify_block_endings(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
-        src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        src, [](ParsedSource const&, InstructionsBlock const& ib) -> void {
             auto last_instruction =
                 dynamic_cast<viua::assembler::frontend::parser::Instruction*>(
                     ib.body.back().get());
@@ -170,13 +170,13 @@ auto viua::assembler::frontend::static_analyser::verify_block_endings(
         });
 }
 auto viua::assembler::frontend::static_analyser::verify_frame_balance(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
-        src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        src, [](ParsedSource const&, InstructionsBlock const& ib) -> void {
             int balance = 0;
             Token previous_frame_spawned;
 
-            for (const auto& line : ib.body) {
+            for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
                     viua::assembler::frontend::parser::Instruction*>(
                     line.get());
@@ -230,12 +230,12 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
         });
 }
 auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
-        src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        src, [](ParsedSource const&, InstructionsBlock const& ib) -> void {
             int frame_parameters_count = 0;
             Token frame_spawned_here;
-            for (const auto& line : ib.body) {
+            for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
                     viua::assembler::frontend::parser::Instruction*>(
                     line.get());
@@ -322,9 +322,9 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
         });
 }
 auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
-        src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        src, [](ParsedSource const&, InstructionsBlock const& ib) -> void {
             unsigned long frame_parameters_count  = 0;
             auto detected_frame_parameters_count  = false;
             auto slot_index_detection_is_reliable = true;
@@ -334,7 +334,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
             auto filled_slots = std::vector<bool>{};
             auto pass_lines = std::vector<Token>{};
 
-            for (const auto& line : ib.body) {
+            for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
                     viua::assembler::frontend::parser::Instruction*>(
                     line.get());
@@ -442,7 +442,7 @@ using InstructionIndex = decltype(
     viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
 static auto validate_jump(
     const Token token,
-    const std::string& extracted_jump,
+    std::string const& extracted_jump,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
     const map<std::string, InstructionIndex>& jump_targets)
@@ -497,9 +497,9 @@ static auto validate_jump(
     return target;
 }
 static auto validate_jump_pair(
-    const Token& branch_token,
-    const Token& when_true,
-    const Token& when_false,
+    Token const& branch_token,
+    Token const& when_true,
+    Token const& when_false,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
     const map<std::string, InstructionIndex>& jump_targets) -> void {
@@ -527,9 +527,9 @@ static auto validate_jump_pair(
     }
 }
 auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
-    const ParsedSource& src) -> void {
+    ParsedSource const& src) -> void {
     verify_wrapper(
-        src, [](const ParsedSource&, const InstructionsBlock& ib) -> void {
+        src, [](ParsedSource const&, InstructionsBlock const& ib) -> void {
             // XXX HACK start from maximum value, and wrap to zero when
             // incremented for first instruction; this is a hack
             auto instruction_counter = static_cast<InstructionIndex>(-1);
@@ -538,7 +538,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
 
             map<std::string, decltype(instruction_counter)> jump_targets;
 
-            for (const auto& line : ib.body) {
+            for (auto const& line : ib.body) {
                 auto mnemonic = line->tokens.at(0);
 
                 using viua::assembler::frontend::parser::Directive;
@@ -554,7 +554,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
                 }
             }
 
-            for (const auto& line : ib.body) {
+            for (auto const& line : ib.body) {
                 auto mnemonic = line->tokens.at(0);
                 if (mnemonic.str().at(0) != '.') {
                     ++current_instruction_counter;
@@ -585,7 +585,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
 
 
 auto viua::assembler::frontend::static_analyser::verify(
-    const ParsedSource& source) -> void {
+    ParsedSource const& source) -> void {
     verify_block_tries(source);
     verify_block_catches(source);
     verify_block_endings(source);

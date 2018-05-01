@@ -46,17 +46,17 @@ class Object : public Value {
 
     std::string str() const override;
 
-    void insert(const std::string& key, std::unique_ptr<Value> value);
-    std::unique_ptr<Value> remove(const std::string& key);
+    void insert(std::string const& key, std::unique_ptr<Value> value);
+    std::unique_ptr<Value> remove(std::string const& key);
 
-    void set(const std::string&, std::unique_ptr<Value>);
-    inline Value* at(const std::string& s) {
+    void set(std::string const&, std::unique_ptr<Value>);
+    inline Value* at(std::string const& s) {
         return attributes.at(s).get();
     }
 
     virtual std::unique_ptr<Value> copy() const override;
 
-    Object(const std::string& tn);
+    Object(std::string const& tn);
     virtual ~Object();
 };
 }}  // namespace viua::types

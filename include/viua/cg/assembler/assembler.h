@@ -45,14 +45,14 @@ auto resolve_jump(
     -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>;
 auto convert_token_to_timeout_operand(viua::cg::lex::Token const) -> timeout_op;
 
-auto getint(const std::string& s, const bool = false) -> int_op;
-auto getint_with_rs_type(const std::string&,
+auto getint(std::string const& s, const bool = false) -> int_op;
+auto getint_with_rs_type(std::string const&,
                          const viua::internals::RegisterSets,
                          const bool = false) -> int_op;
 auto getint(const std::vector<viua::cg::lex::Token>& tokens,
             decltype(tokens.size())) -> int_op;
-auto getbyte(const std::string& s) -> byte_op;
-auto getfloat(const std::string& s) -> float_op;
+auto getbyte(std::string const& s) -> byte_op;
+auto getfloat(std::string const& s) -> float_op;
 
 auto normalise_binary_literal(const std::string s) -> std::string;
 auto octal_to_binary_literal(const std::string s) -> std::string;
@@ -80,10 +80,10 @@ auto get_block_names(const std::vector<viua::cg::lex::Token>&)
     -> std::vector<std::string>;
 auto get_block_signatures(const std::vector<viua::cg::lex::Token>&)
     -> std::vector<std::string>;
-auto get_invokables(const std::string& type,
+auto get_invokables(std::string const& type,
                     const std::vector<viua::cg::lex::Token>&)
     -> std::map<std::string, std::vector<std::string>>;
-auto get_invokables_token_bodies(const std::string&,
+auto get_invokables_token_bodies(std::string const&,
                                  const std::vector<viua::cg::lex::Token>&)
     -> std::map<std::string, std::vector<viua::cg::lex::Token>>;
 }  // namespace ce
@@ -103,27 +103,27 @@ auto manipulation_of_defined_registers(
 
 namespace utils {
 auto get_function_name_regex() -> std::regex;
-auto is_valid_function_name(const std::string&) -> bool;
-auto match_function_name(const std::string&) -> std::smatch;
-auto get_function_arity(const std::string&) -> int;
+auto is_valid_function_name(std::string const&) -> bool;
+auto match_function_name(std::string const&) -> std::smatch;
+auto get_function_arity(std::string const&) -> int;
 
 namespace lines {
-auto is_directive(const std::string&) -> bool;
+auto is_directive(std::string const&) -> bool;
 
-auto is_function(const std::string&) -> bool;
-auto is_closure(const std::string&) -> bool;
-auto is_block(const std::string&) -> bool;
-auto is_function_signature(const std::string&) -> bool;
-auto is_block_signature(const std::string&) -> bool;
-auto is_name(const std::string&) -> bool;
-auto is_mark(const std::string&) -> bool;
-auto is_info(const std::string&) -> bool;
-auto is_end(const std::string&) -> bool;
-auto is_import(const std::string&) -> bool;
+auto is_function(std::string const&) -> bool;
+auto is_closure(std::string const&) -> bool;
+auto is_block(std::string const&) -> bool;
+auto is_function_signature(std::string const&) -> bool;
+auto is_block_signature(std::string const&) -> bool;
+auto is_name(std::string const&) -> bool;
+auto is_mark(std::string const&) -> bool;
+auto is_info(std::string const&) -> bool;
+auto is_end(std::string const&) -> bool;
+auto is_import(std::string const&) -> bool;
 
-auto make_function_signature(const std::string&) -> std::string;
-auto make_block_signature(const std::string&) -> std::string;
-auto make_info(const std::string&, const std::string&) -> std::string;
+auto make_function_signature(std::string const&) -> std::string;
+auto make_block_signature(std::string const&) -> std::string;
+auto make_info(std::string const&, std::string const&) -> std::string;
 }  // namespace lines
 }  // namespace utils
 }  // namespace assembler

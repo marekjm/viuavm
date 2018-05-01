@@ -74,14 +74,14 @@ class VirtualProcessScheduler {
   public:
     viua::kernel::Kernel* kernel() const;
 
-    bool is_local_function(const std::string&) const;
-    bool is_linked_function(const std::string&) const;
-    bool is_native_function(const std::string&) const;
-    bool is_foreign_function(const std::string&) const;
+    bool is_local_function(std::string const&) const;
+    bool is_linked_function(std::string const&) const;
+    bool is_native_function(std::string const&) const;
+    bool is_foreign_function(std::string const&) const;
 
-    bool is_block(const std::string&) const;
-    bool is_local_block(const std::string&) const;
-    bool is_linked_block(const std::string&) const;
+    bool is_block(std::string const&) const;
+    bool is_local_block(std::string const&) const;
+    bool is_linked_block(std::string const&) const;
     auto get_entry_point_of_block(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;

@@ -63,7 +63,7 @@ class Loader {
     std::vector<std::string> blocks;
 
     IdToAddressMapping loadmap(char*,
-                               const viua::internals::types::bytecode_size&);
+                               viua::internals::types::bytecode_size const&);
     void calculate_function_sizes();
 
     void load_magic_number(std::ifstream&);

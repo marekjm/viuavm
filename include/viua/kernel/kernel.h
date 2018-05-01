@@ -215,8 +215,8 @@ class Kernel {
     /*  Methods dealing with dynamic library loading.
      */
     void load_module(std::string);
-    void load_native_library(const std::string&);
-    void load_foreign_library(const std::string&);
+    void load_native_library(std::string const&);
+    void load_foreign_library(std::string const&);
 
     // debug and error reporting flags
     bool debug, errors;
@@ -233,26 +233,26 @@ class Kernel {
     Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
     Kernel& bytes(viua::internals::types::bytecode_size);
 
-    Kernel& mapfunction(const std::string&,
+    Kernel& mapfunction(std::string const&,
                         viua::internals::types::bytecode_size);
-    Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
+    Kernel& mapblock(std::string const&, viua::internals::types::bytecode_size);
 
-    Kernel& register_external_function(const std::string&, ForeignFunction*);
+    Kernel& register_external_function(std::string const&, ForeignFunction*);
     Kernel& remove_external_function(std::string);
 
-    bool is_local_function(const std::string&) const;
-    bool is_linked_function(const std::string&) const;
-    bool is_native_function(const std::string&) const;
-    bool is_foreign_function(const std::string&) const;
+    bool is_local_function(std::string const&) const;
+    bool is_linked_function(std::string const&) const;
+    bool is_native_function(std::string const&) const;
+    bool is_foreign_function(std::string const&) const;
 
-    bool is_block(const std::string&) const;
-    bool is_local_block(const std::string&) const;
-    bool is_linked_block(const std::string&) const;
-    auto get_entry_point_of_block(const std::string&) const
+    bool is_block(std::string const&) const;
+    bool is_local_block(std::string const&) const;
+    bool is_linked_block(std::string const&) const;
+    auto get_entry_point_of_block(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
 
-    auto get_entry_point_of(const std::string&) const
+    auto get_entry_point_of(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
 

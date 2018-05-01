@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
 
     try {
         loader.executable();
-    } catch (const std::string& e) {
+    } catch (std::string const& e) {
         cout << e << endl;
         return 1;
     }
@@ -327,14 +327,14 @@ int main(int argc, char* argv[]) {
                 }
                 (DEBUG ? cout : oss) << "    " << instruction << '\n';
                 j += size;
-            } catch (const out_of_range& e) {
+            } catch (out_of_range const& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? cout : oss) << "disassembly terminated after throwing "
                                         "an instance of std::out_of_range\n";
                 (DEBUG ? cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
-            } catch (const std::string& e) {
+            } catch (std::string const& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? cout : oss) << "disassembly terminated after throwing "
                                         "an instance of std::out_of_range\n";

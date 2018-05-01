@@ -44,7 +44,7 @@ class Registers {
     set<std::string> maybe_unused_registers;
 
   public:
-    bool defined(const std::string& r) {
+    bool defined(std::string const& r) {
         return (defined_registers.count(r) == 1);
     }
     Token defined_where(std::string r) {
@@ -55,14 +55,14 @@ class Registers {
             defined_registers.emplace(r, where);
         }
     }
-    void erase(const std::string& r, const Token& token) {
+    void erase(std::string const& r, Token const& token) {
         erased_registers.emplace(r, token);
         defined_registers.erase(defined_registers.find(r));
     }
-    bool erased(const std::string& r) {
+    bool erased(std::string const& r) {
         return (erased_registers.count(r) == 1);
     }
-    Token erased_by(const std::string& r) {
+    Token erased_by(std::string const& r) {
         return erased_registers.at(r);
     }
     void use(std::string r, Token where) {
@@ -88,7 +88,7 @@ class Registers {
 };
 
 
-static auto skip_till_next_line(const TokenVector& tokens,
+static auto skip_till_next_line(TokenVector const& tokens,
                                 TokenVector::size_type i) -> decltype(i) {
     do {
         ++i;
@@ -188,13 +188,13 @@ static auto strip_access_mode_sigil(std::string s) -> string {
                                                                  : s);
 }
 static void check_use_of_register_index(
-    const TokenVector& tokens,
+    TokenVector const& tokens,
     long unsigned i,
     long unsigned by,
     std::string register_index,
     Registers& registers,
     map<std::string, std::string>& named_registers,
-    const std::string& message_prefix,
+    std::string const& message_prefix,
     const bool allow_direct_access_to_target = true) {
     auto resolved_register_name = std::string{};
     try {
@@ -234,12 +234,12 @@ static void check_use_of_register_index(
     registers.use(resolved_register_name, tokens.at(i));
 }
 static void check_use_of_register(
-    const TokenVector& tokens,
+    TokenVector const& tokens,
     long unsigned i,
     long unsigned by,
     Registers& registers,
     map<std::string, std::string>& named_registers,
-    const std::string& message_prefix,
+    std::string const& message_prefix,
     const bool allow_direct_access_to_target = true) {
     check_use_of_register_index(tokens,
                                 i,
@@ -251,7 +251,7 @@ static void check_use_of_register(
                                 allow_direct_access_to_target);
 }
 static void check_use_of_register(
-    const TokenVector& tokens,
+    TokenVector const& tokens,
     long unsigned i,
     long unsigned by,
     Registers& registers,
@@ -267,7 +267,7 @@ static void check_use_of_register(
 
 static void check_defined_but_unused(Registers& registers) {
     for (auto it = registers.begin(); it != registers.end(); ++it) {
-        const auto& each = *it;
+        auto const& each = *it;
         if (each.first == "0") {
             continue;
         }
@@ -279,12 +279,12 @@ static void check_defined_but_unused(Registers& registers) {
     }
 }
 
-static auto in_block_offset(const TokenVector& body_tokens,
+static auto in_block_offset(TokenVector const& body_tokens,
                             TokenVector::size_type i,
                             Registers& registers,
                             map<std::string, std::string>& named_registers)
     -> decltype(i) {
-    const auto& checked_token = body_tokens.at(i);
+    auto const& checked_token = body_tokens.at(i);
 
     if (checked_token.str().at(0) == '+') {
         auto n = stoul(checked_token.str().substr(1));
@@ -363,20 +363,20 @@ static auto in_block_offset(const TokenVector& body_tokens,
     return i;
 }
 
-static void check_block_body(const TokenVector& body_tokens,
+static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type,
                              Registers&,
                              const map<std::string, TokenVector>&,
                              const bool);
-static void check_block_body(const TokenVector&,
+static void check_block_body(TokenVector const&,
                              Registers&,
                              const map<std::string, TokenVector>&,
                              const bool);
 
 static void erase_register(Registers& registers,
                            map<std::string, std::string>& named_registers,
-                           const Token& name,
-                           const Token& context) {
+                           Token const& name,
+                           Token const& context) {
     /*
      * Even if normally an instruction would erase a register, when it is a
      * pointer dereference that is given as the opernad the "move an object"
@@ -388,7 +388,7 @@ static void erase_register(Registers& registers,
 }
 
 // FIXME this function is duplicated
-static auto get_token_index_of_operand(const TokenVector& tokens,
+static auto get_token_index_of_operand(TokenVector const& tokens,
                                        TokenVector::size_type i,
                                        int wanted_operand_index)
     -> decltype(i) {
@@ -419,7 +419,7 @@ static auto get_token_index_of_operand(const TokenVector& tokens,
     return i;
 }
 
-static void check_block_body(const TokenVector& body_tokens,
+static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type i,
                              Registers& registers,
                              map<std::string, std::string> named_registers,
@@ -767,7 +767,7 @@ static void check_block_body(const TokenVector& body_tokens,
                 // do not fail yet, because the value may be used by false
                 // branch save the error for later
                 register_with_unused_value = e.what();
-            } catch (const viua::cg::lex::InvalidSyntax& e) {
+            } catch (viua::cg::lex::InvalidSyntax const& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(
                     viua::cg::lex::InvalidSyntax(body_tokens.at(i + 1),
                                                  "after taking true branch:"));
@@ -794,7 +794,7 @@ static void check_block_body(const TokenVector& body_tokens,
                             body_tokens.at(i - 1),
                             "after taking either branch at:"));
                 }
-            } catch (const viua::cg::lex::InvalidSyntax& e) {
+            } catch (viua::cg::lex::InvalidSyntax const& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(
                     viua::cg::lex::InvalidSyntax(body_tokens.at(i + 2),
                                                  "after taking false branch:"));
@@ -1277,7 +1277,7 @@ static void check_block_body(const TokenVector& body_tokens,
     }
     check_defined_but_unused(registers);
 }
-static void check_block_body(const TokenVector& body_tokens,
+static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type i,
                              Registers& registers,
                              const map<std::string, TokenVector>& block_bodies,
@@ -1286,7 +1286,7 @@ static void check_block_body(const TokenVector& body_tokens,
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);
 }
-static void check_block_body(const TokenVector& body_tokens,
+static void check_block_body(TokenVector const& body_tokens,
                              Registers& registers,
                              const map<std::string, TokenVector>& block_bodies,
                              const bool debug) {
@@ -1294,7 +1294,7 @@ static void check_block_body(const TokenVector& body_tokens,
 }
 
 void assembler::verify::manipulation_of_defined_registers(
-    const TokenVector& tokens,
+    TokenVector const& tokens,
     const map<std::string, TokenVector>& block_bodies,
     const bool debug) {
     auto opened_function = std::string{};
@@ -1332,7 +1332,7 @@ void assembler::verify::manipulation_of_defined_registers(
                 if (not attributes.count("no_sa")) {
                     check_block_body(body, registers, block_bodies, debug);
                 }
-            } catch (const viua::cg::lex::InvalidSyntax& e) {
+            } catch (viua::cg::lex::InvalidSyntax const& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(
                     viua::cg::lex::InvalidSyntax(
                         tokens.at(i - body.size() - 2),

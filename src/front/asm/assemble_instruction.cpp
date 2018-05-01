@@ -93,7 +93,7 @@ else {
         // casting
         addr =
             static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
-    } catch (const std::out_of_range& e) {
+    } catch (std::out_of_range const& e) {
         throw viua::cg::lex::InvalidSyntax(
             token,
             ("cannot resolve jump to unrecognised marker: "
@@ -197,7 +197,7 @@ auto ::assembler::operands::convert_token_to_timeout_operand(
     }
     return timeout_op{timeout_milliseconds};
 }
-static auto log_location_being_assembled(const Token& token) -> void {
+static auto log_location_being_assembled(Token const& token) -> void {
     if (DEBUG and SCREAM) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "debug"
              << send_control_seq(ATTR_RESET);

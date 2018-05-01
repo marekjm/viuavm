@@ -58,7 +58,7 @@ static auto enumerate(const std::vector<T>& v)
     std::vector<pair<typename std::vector<T>::size_type, T>> enumerated_vector;
 
     typename std::vector<T>::size_type i = 0;
-    for (const auto& each : v) {
+    for (auto const& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
     }
@@ -172,11 +172,11 @@ int main(int argc, char* argv[]) {
     try {
         tokens            = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -187,11 +187,11 @@ int main(int argc, char* argv[]) {
             viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::InvalidSyntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+    } catch (viua::cg::lex::TracedSyntaxError const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;

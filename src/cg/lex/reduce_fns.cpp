@@ -413,7 +413,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Toke
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
-        const auto& token = input_tokens.at(i);
+        auto const& token = input_tokens.at(i);
 
         if (token == ".block:" or token == ".function:"
             or token == ".closure:") {
@@ -453,7 +453,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Toke
 
         if (token == ".end") {
             if (nested_block_opened) {
-                for (const auto& ntoken : nested_block_tokens) {
+                for (auto const& ntoken : nested_block_tokens) {
                     tokens.push_back(ntoken);
                 }
                 tokens.emplace_back(nested_block_tokens.front().line(),
@@ -470,7 +470,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Toke
             }
 
             if (block_opened) {
-                for (const auto& btoken : block_tokens) {
+                for (auto const& btoken : block_tokens) {
                     tokens.push_back(btoken);
                 }
                 block_opened = false;
@@ -485,7 +485,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Toke
 
 static void push_unwrapped_lines(
     const bool invert,
-    const Token& inner_target_token,
+    Token const& inner_target_token,
     std::vector<Token>& final_tokens,
     const std::vector<Token>& unwrapped_tokens,
     const std::vector<Token>& input_tokens,
@@ -523,7 +523,7 @@ static void push_unwrapped_lines(
 }
 static void unwrap_subtokens(std::vector<Token>& unwrapped_tokens,
                              const std::vector<Token>& subtokens,
-                             const Token& token) {
+                             Token const& token) {
     for (auto subt : unwrap_lines(subtokens)) {
         unwrapped_tokens.push_back(subt);
     }
@@ -573,7 +573,7 @@ static auto get_subtokens(
         toplevel_subexpressions};
 }
 static auto get_innermost_target_token(const std::vector<Token>& subtokens,
-                                       const Token& t) -> Token {
+                                       Token const& t) -> Token {
     Token inner_target_token;
     try {
         unsigned long check = 1;
@@ -599,7 +599,7 @@ static auto get_innermost_target_token(const std::vector<Token>& subtokens,
             inner_target_token = subtokens.at(check);
             check += 2;
         } while (inner_target_token.str() == "(");
-    } catch (const std::out_of_range& e) {
+    } catch (std::out_of_range const& e) {
         throw InvalidSyntax(t.line(), t.character(), t.str());
     }
     return inner_target_token;
@@ -707,7 +707,7 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
-        const auto& token = input_tokens.at(i);
+        auto const& token = input_tokens.at(i);
 
         if (token == ".iota:") {
             if (iotas.empty()) {
@@ -764,7 +764,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
-        const auto& token = input_tokens.at(i);
+        auto const& token = input_tokens.at(i);
         tokens.push_back(token);
 
         if (match(input_tokens, i, {"arg", "default"})
@@ -857,7 +857,7 @@ auto replace_named_registers(std::vector<Token> input_tokens)
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
-        const auto& token = input_tokens.at(i);
+        auto const& token = input_tokens.at(i);
 
         if (str::isnum(token)) {
             tokens.push_back(token);

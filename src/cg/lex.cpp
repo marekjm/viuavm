@@ -87,7 +87,7 @@ auto InvalidSyntax::character() const -> decltype(character_in_line) {
 }
 
 auto InvalidSyntax::match(Token const token) const -> bool {
-    for (const auto& each : tokens) {
+    for (auto const& each : tokens) {
         if (token.line() == each.line()
             and token.character() == each.character()) {
             return true;
@@ -182,7 +182,7 @@ auto TracedSyntaxError::append(InvalidSyntax const& e) -> TracedSyntaxError& {
 
 auto is_mnemonic(std::string const& s) -> bool {
     auto is_it = false;
-    for (const auto& each : OP_NAMES) {
+    for (auto const& each : OP_NAMES) {
         if (each.second == s) {
             is_it = true;
             break;

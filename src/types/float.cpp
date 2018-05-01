@@ -53,40 +53,40 @@ auto Float::as_float() const -> viua::float64 {
     return number;
 }
 
-auto Float::operator+(const numeric::Number& that) const
+auto Float::operator+(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
     return make_unique<Float>(number + that.as_float());
 }
-auto Float::operator-(const numeric::Number& that) const
+auto Float::operator-(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
     return make_unique<Float>(number - that.as_float());
 }
-auto Float::operator*(const numeric::Number& that) const
+auto Float::operator*(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
     return make_unique<Float>(number * that.as_float());
 }
-auto Float::operator/(const numeric::Number& that) const
+auto Float::operator/(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
     return make_unique<Float>(number / that.as_float());
 }
 
-auto Float::operator<(const numeric::Number& that) const
+auto Float::operator<(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number < that.as_float());
 }
-auto Float::operator<=(const numeric::Number& that) const
+auto Float::operator<=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number <= that.as_float());
 }
-auto Float::operator>(const numeric::Number& that) const
+auto Float::operator>(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number > that.as_float());
 }
-auto Float::operator>=(const numeric::Number& that) const
+auto Float::operator>=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number >= that.as_float());
 }
-auto Float::operator==(const numeric::Number& that) const
+auto Float::operator==(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
     return make_unique<Boolean>(number == that.as_float());
 }

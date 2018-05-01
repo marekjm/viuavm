@@ -273,9 +273,9 @@ auto opcapturecopy(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opcapturemove(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
-auto opclosure(viua::internals::types::byte*, int_op, const std::string&)
+auto opclosure(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
-auto opfunction(viua::internals::types::byte*, int_op, const std::string&)
+auto opfunction(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 
 auto opframe(viua::internals::types::byte*, int_op, int_op)
@@ -288,19 +288,19 @@ auto oparg(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opargc(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
-auto opcall(viua::internals::types::byte*, int_op, const std::string&)
+auto opcall(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 auto opcall(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
-auto optailcall(viua::internals::types::byte*, const std::string&)
+auto optailcall(viua::internals::types::byte*, std::string const&)
     -> viua::internals::types::byte*;
 auto optailcall(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
-auto opdefer(viua::internals::types::byte*, const std::string&)
+auto opdefer(viua::internals::types::byte*, std::string const&)
     -> viua::internals::types::byte*;
 auto opdefer(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
-auto opprocess(viua::internals::types::byte*, int_op, const std::string&)
+auto opprocess(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 auto opprocess(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
@@ -312,7 +312,7 @@ auto opsend(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opreceive(viua::internals::types::byte*, int_op, timeout_op)
     -> viua::internals::types::byte*;
-auto opwatchdog(viua::internals::types::byte*, const std::string&)
+auto opwatchdog(viua::internals::types::byte*, std::string const&)
     -> viua::internals::types::byte*;
 
 auto opjump(viua::internals::types::byte*,
@@ -326,27 +326,27 @@ auto opif(viua::internals::types::byte*,
 
 auto optry(viua::internals::types::byte*) -> viua::internals::types::byte*;
 auto opcatch(viua::internals::types::byte*,
-             const std::string&,
-             const std::string&) -> viua::internals::types::byte*;
+             std::string const&,
+             std::string const&) -> viua::internals::types::byte*;
 auto opdraw(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
-auto openter(viua::internals::types::byte*, const std::string&)
+auto openter(viua::internals::types::byte*, std::string const&)
     -> viua::internals::types::byte*;
 auto opthrow(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
 auto opleave(viua::internals::types::byte*) -> viua::internals::types::byte*;
 
-auto opimport(viua::internals::types::byte*, const std::string&)
+auto opimport(viua::internals::types::byte*, std::string const&)
     -> viua::internals::types::byte*;
 
-auto opclass(viua::internals::types::byte*, int_op, const std::string&)
+auto opclass(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
-auto opderive(viua::internals::types::byte*, int_op, const std::string&)
+auto opderive(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 auto opattach(viua::internals::types::byte*,
               int_op,
-              const std::string&,
-              const std::string&) -> viua::internals::types::byte*;
+              std::string const&,
+              std::string const&) -> viua::internals::types::byte*;
 auto opregister(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
 
@@ -364,9 +364,9 @@ auto opstructremove(viua::internals::types::byte*, int_op, int_op, int_op)
 auto opstructkeys(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 
-auto opnew(viua::internals::types::byte*, int_op, const std::string&)
+auto opnew(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
-auto opmsg(viua::internals::types::byte*, int_op, const std::string&)
+auto opmsg(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 auto opmsg(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;

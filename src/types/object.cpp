@@ -42,7 +42,7 @@ std::string viua::types::Object::str() const {
     oss << '{';
     const auto limit                           = attributes.size();
     std::remove_const<decltype(limit)>::type i = 0;
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         oss << each.first << ": " << each.second->repr();
         if (++i < limit) {
             oss << ", ";
@@ -55,23 +55,23 @@ std::string viua::types::Object::str() const {
 
 std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
     auto cp = make_unique<viua::types::Object>(object_type_name);
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
     return std::move(cp);
 }
 
-void viua::types::Object::set(const std::string& name,
+void viua::types::Object::set(std::string const& name,
                               std::unique_ptr<viua::types::Value> object) {
     attributes[name] = std::move(object);
 }
 
-void viua::types::Object::insert(const std::string& key,
+void viua::types::Object::insert(std::string const& key,
                                  std::unique_ptr<viua::types::Value> value) {
     set(key, std::move(value));
 }
 std::unique_ptr<viua::types::Value> viua::types::Object::remove(
-    const std::string& key) {
+    std::string const& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;
@@ -82,5 +82,5 @@ std::unique_ptr<viua::types::Value> viua::types::Object::remove(
     return o;
 }
 
-viua::types::Object::Object(const std::string& tn) : object_type_name(tn) {}
+viua::types::Object::Object(std::string const& tn) : object_type_name(tn) {}
 viua::types::Object::~Object() {}

@@ -138,7 +138,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
-    const std::string& name,
+    std::string const& name,
     viua::internals::types::bytecode_size address) {
     /** Maps function name to bytecode address.
      */
@@ -147,7 +147,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
-    const std::string& name,
+    std::string const& name,
     viua::internals::types::bytecode_size address) {
     /** Maps block name to bytecode address.
      */
@@ -156,7 +156,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
-    const std::string& name,
+    std::string const& name,
     ForeignFunction* function_ptr) {
     /** Registers external function in viua::kernel::Kernel.
      */
@@ -205,7 +205,7 @@ void viua::kernel::Kernel::load_module(std::string module) {
             "LinkException", ("failed to link library: " + module));
     }
 }
-void viua::kernel::Kernel::load_native_library(const std::string& module) {
+void viua::kernel::Kernel::load_native_library(std::string const& module) {
     regex double_colon("::");
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
@@ -229,7 +229,7 @@ void viua::kernel::Kernel::load_native_library(const std::string& module) {
 
         auto const fn_names = loader.get_functions();
         auto const fn_addrs = loader.get_function_addresses();
-        for (const auto& fn_linkname : fn_names) {
+        for (auto const& fn_linkname : fn_names) {
             linked_functions[fn_linkname] =
                 pair<std::string, viua::internals::types::byte*>(
                     module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
@@ -251,7 +251,7 @@ void viua::kernel::Kernel::load_native_library(const std::string& module) {
         throw make_unique<viua::types::Exception>("failed to link: " + module);
     }
 }
-void viua::kernel::Kernel::load_foreign_library(const std::string& module) {
+void viua::kernel::Kernel::load_foreign_library(std::string const& module) {
     auto path = support::env::viua::get_mod_path(
         module, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
@@ -294,31 +294,31 @@ void viua::kernel::Kernel::load_foreign_library(const std::string& module) {
     cxx_dynamic_lib_handles.push_back(handle);
 }
 
-bool viua::kernel::Kernel::is_local_function(const std::string& name) const {
+bool viua::kernel::Kernel::is_local_function(std::string const& name) const {
     return function_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::is_linked_function(const std::string& name) const {
+bool viua::kernel::Kernel::is_linked_function(std::string const& name) const {
     return linked_functions.count(name);
 }
 
-bool viua::kernel::Kernel::is_native_function(const std::string& name) const {
+bool viua::kernel::Kernel::is_native_function(std::string const& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
 }
 
-bool viua::kernel::Kernel::is_foreign_function(const std::string& name) const {
+bool viua::kernel::Kernel::is_foreign_function(std::string const& name) const {
     return foreign_functions.count(name);
 }
 
-bool viua::kernel::Kernel::is_block(const std::string& name) const {
+bool viua::kernel::Kernel::is_block(std::string const& name) const {
     return (block_addresses.count(name) or linked_blocks.count(name));
 }
 
-bool viua::kernel::Kernel::is_local_block(const std::string& name) const {
+bool viua::kernel::Kernel::is_local_block(std::string const& name) const {
     return block_addresses.count(name);
 }
 
-bool viua::kernel::Kernel::is_linked_block(const std::string& name) const {
+bool viua::kernel::Kernel::is_linked_block(std::string const& name) const {
     return linked_blocks.count(name);
 }
 
@@ -340,7 +340,7 @@ auto viua::kernel::Kernel::get_entry_point_of_block(std::string const& name)
                                                          module_base);
 }
 
-auto viua::kernel::Kernel::get_entry_point_of(const std::string& name) const
+auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
     -> pair<viua::internals::types::Op_address_type,
             viua::internals::types::Op_address_type> {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};

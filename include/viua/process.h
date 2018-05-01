@@ -474,7 +474,7 @@ class Process {
 
     bool watchdogged() const;
     std::string watchdog() const;
-    auto become(const std::string&, std::unique_ptr<Frame>) -> Op_address_type;
+    auto become(std::string const&, std::unique_ptr<Frame>) -> Op_address_type;
 
     auto begin() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);

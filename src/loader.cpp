@@ -36,7 +36,7 @@ using viua::util::memory::aligned_read;
 
 
 IdToAddressMapping Loader::loadmap(char* bytedump,
-                                   const uint64_t& bytedump_size) {
+                                   uint64_t const& bytedump_size) {
     auto order = std::vector<std::string>{};
     map<std::string, uint64_t> mapping;
 

@@ -39,7 +39,7 @@ class Atom : public Value {
     virtual std::string repr() const override;
 
     operator std::string() const;
-    auto operator==(const Atom&) const -> bool;
+    auto operator==(Atom const&) const -> bool;
 
     virtual std::unique_ptr<Value> copy() const override;
 
