@@ -130,7 +130,7 @@ auto assembler::operands::getint_with_rs_type(
     }
 }
 
-auto assembler::operands::getint(vector<viua::cg::lex::Token> const& tokens,
+auto assembler::operands::getint(std::vector<viua::cg::lex::Token> const& tokens,
                                  decltype(tokens.size()) const i) -> int_op {
     auto const s = resolveregister(tokens.at(i));
 
@@ -199,7 +199,7 @@ auto assembler::operands::get3(std::string const s, bool const fill_third)
 }
 
 auto assembler::operands::convert_token_to_bitstring_operand(
-    viua::cg::lex::Token const token) -> vector<uint8_t> {
+    viua::cg::lex::Token const token) -> std::vector<uint8_t> {
     auto const s            = token.str();
     auto normalised_version = std::string{};
     if (s.at(1) == 'b') {
@@ -217,7 +217,7 @@ auto assembler::operands::convert_token_to_bitstring_operand(
     reverse(normalised_version.begin(), normalised_version.end());
     auto const workable_version = normalised_version;
 
-    auto converted = vector<uint8_t>{};
+    auto converted = std::vector<uint8_t>{};
     auto part      = uint8_t{0};
     for (auto i = decltype(workable_version)::size_type{0};
          i < workable_version.size();

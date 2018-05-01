@@ -434,8 +434,8 @@ auto viua::process::Process::execution_at() const
 }
 
 
-vector<Frame*> viua::process::Process::trace() const {
-    vector<Frame*> tr;
+std::vector<Frame*> viua::process::Process::trace() const {
+    std::vector<Frame*> tr;
     for (auto& each : *stack) {
         tr.push_back(each.get());
     }

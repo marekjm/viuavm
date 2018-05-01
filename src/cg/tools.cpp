@@ -28,7 +28,7 @@ using namespace std;
 
 
 using viua::cg::lex::Token;
-using TokenVector        = vector<Token>;
+using TokenVector        = std::vector<Token>;
 using bytecode_size_type = viua::internals::types::bytecode_size;
 
 

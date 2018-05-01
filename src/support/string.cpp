@@ -233,8 +233,6 @@ auto chunks(std::string const& s) -> std::vector<std::string> {
 
 auto join(std::string const& s, std::vector<std::string> const& parts)
     -> std::string {
-    /** Join elements of vector with given std::string.
-     */
     auto oss         = std::ostringstream{};
     auto const limit = parts.size();
     for (auto i = std::remove_reference_t<decltype(parts)>::size_type{0};

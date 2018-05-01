@@ -428,7 +428,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     bool ticked     = false;
     bool any_active = false;
 
-    vector<std::unique_ptr<viua::process::Process>> running_processes_list;
+    std::vector<std::unique_ptr<viua::process::Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0;
@@ -713,7 +713,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(
-    const vector<std::string>& commandline_arguments) {
+    const std::vector<std::string>& commandline_arguments) {
     auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
@@ -747,7 +747,7 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     viua::kernel::Kernel* akernel,
-    vector<std::unique_ptr<viua::process::Process>>* fp,
+    std::vector<std::unique_ptr<viua::process::Process>>* fp,
     mutex* fp_mtx,
     condition_variable* fp_cv,
     const bool enable_tracing)

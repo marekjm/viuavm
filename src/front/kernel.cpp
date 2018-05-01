@@ -45,7 +45,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
-static bool usage(const std::string program, const vector<std::string>& args) {
+static bool usage(const std::string program, const std::vector<std::string>& args) {
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;
@@ -130,8 +130,8 @@ static bool usage(const std::string program, const vector<std::string>& args) {
 }
 
 int main(int argc, char* argv[]) {
-    // setup command line arguments vector
-    vector<std::string> args;
+    // setup command line arguments std::vector
+    std::vector<std::string> args;
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }

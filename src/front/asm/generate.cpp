@@ -97,7 +97,7 @@ const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
 
 static Program& compile(
     Program& program,
-    const vector<Token>& tokens,
+    const std::vector<Token>& tokens,
     map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>&
         marks) {
     /** Compile instructions into bytecode using bytecode generation API.
@@ -112,8 +112,8 @@ static Program& compile(
 }
 
 
-static auto strip_attributes(vector<viua::cg::lex::Token> const& tokens)
-    -> vector<viua::cg::lex::Token> {
+static auto strip_attributes(std::vector<viua::cg::lex::Token> const& tokens)
+    -> std::vector<viua::cg::lex::Token> {
     /*
      * After the codegen is ported to the new parser-driven way, the
      * strip-attributes code will not be needed.
@@ -138,7 +138,7 @@ static auto strip_attributes(vector<viua::cg::lex::Token> const& tokens)
     return stripped;
 }
 
-static void assemble(Program& program, const vector<Token>& tokens) {
+static void assemble(Program& program, const std::vector<Token>& tokens) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named
      * registers and functions. Then, it passes all gathered data into
@@ -174,7 +174,7 @@ map_invocable_addresses(
 static viua::internals::types::bytecode_size write_code_blocks_section(
     ofstream& out,
     const invocables_t& blocks,
-    const vector<std::string>& linked_block_names,
+    const std::vector<std::string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
 
@@ -261,7 +261,7 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
 }
 
 static std::string get_main_function(
-    const vector<std::string>& available_functions) {
+    const std::vector<std::string>& available_functions) {
     auto main_function = std::string{};
     for (auto f : available_functions) {
         if (f == "main/0" or f == "main/1" or f == "main/2") {
@@ -273,7 +273,7 @@ static std::string get_main_function(
 }
 
 static void check_main_function(const std::string& main_function,
-                                const vector<Token>& main_function_tokens) {
+                                const std::vector<Token>& main_function_tokens) {
     // Why three newlines?
     //
     // Here's why:
@@ -361,7 +361,7 @@ static viua::internals::types::bytecode_size generate_entry_function(
         cout << " function" << endl;
     }
 
-    vector<Token> entry_function_tokens;
+    std::vector<Token> entry_function_tokens;
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
 
@@ -487,12 +487,12 @@ static viua::internals::types::bytecode_size generate_entry_function(
     return bytes;
 }
 
-void generate(vector<Token> const& tokens,
+void generate(std::vector<Token> const& tokens,
               invocables_t& functions,
               invocables_t& blocks,
               const std::string& filename,
               std::string& compilename,
-              const vector<std::string>& commandline_given_links,
+              const std::vector<std::string>& commandline_given_links,
               const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -566,14 +566,14 @@ void generate(vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    vector<std::string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<std::string,
+    std::vector<std::string> links = assembler::ce::getlinks(tokens);
+    std::vector<tuple<std::string,
                  viua::internals::types::bytecode_size,
                  std::unique_ptr<viua::internals::types::byte[]>>>
         linked_libs_bytecode;
-    vector<std::string> linked_function_names;
-    vector<std::string> linked_block_names;
-    map<std::string, vector<viua::internals::types::bytecode_size>>
+    std::vector<std::string> linked_function_names;
+    std::vector<std::string> linked_block_names;
+    map<std::string, std::vector<viua::internals::types::bytecode_size>>
         linked_libs_jumptables;
 
     // map of symbol names to name of the module the symbol came from
@@ -595,7 +595,7 @@ void generate(vector<Token> const& tokens,
         Loader loader(lnk);
         loader.load();
 
-        vector<std::string> fn_names = loader.get_functions();
+        std::vector<std::string> fn_names = loader.get_functions();
         for (std::string fn : fn_names) {
             if (function_addresses.count(fn)) {
                 throw("duplicate symbol '" + fn + "' found when linking '" + lnk
@@ -641,7 +641,7 @@ void generate(vector<Token> const& tokens,
     if (not flags.as_lib) {
         // check if our initial guess for main function is correct and
         // detect some main-function-related errors
-        vector<std::string> main_function_found;
+        std::vector<std::string> main_function_found;
         for (auto f : functions.names) {
             if (f == "main/0" or f == "main/1" or f == "main/2") {
                 main_function_found.emplace_back(f);
@@ -699,9 +699,9 @@ void generate(vector<Token> const& tokens,
         Loader loader(lnk);
         loader.load();
 
-        vector<std::string> fn_names = loader.get_functions();
+        std::vector<std::string> fn_names = loader.get_functions();
 
-        vector<viua::internals::types::bytecode_size> lib_jumps =
+        std::vector<viua::internals::types::bytecode_size> lib_jumps =
             loader.get_jumps();
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -794,7 +794,7 @@ void generate(vector<Token> const& tokens,
 
     ////////////////////
     // CREATE JUMP TABLE
-    vector<viua::internals::types::bytecode_size> jump_table;
+    std::vector<viua::internals::types::bytecode_size> jump_table;
 
 
     /////////////////////////////////////////////////////////
@@ -813,7 +813,7 @@ void generate(vector<Token> const& tokens,
     viua::internals::types::bytecode_size functions_section_size    = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
 
-    vector<tuple<viua::internals::types::bytecode_size,
+    std::vector<tuple<viua::internals::types::bytecode_size,
                  viua::internals::types::bytecode_size>>
         jump_positions;
 
@@ -874,9 +874,9 @@ void generate(vector<Token> const& tokens,
             throw("in block '" + name + "': " + e.what());
         }
 
-        vector<viua::internals::types::bytecode_size> jumps = func.jumps();
+        std::vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
-        vector<tuple<viua::internals::types::bytecode_size,
+        std::vector<tuple<viua::internals::types::bytecode_size,
                      viua::internals::types::bytecode_size>>
             local_jumps;
         for (auto jmp : jumps) {
@@ -982,9 +982,9 @@ void generate(vector<Token> const& tokens,
             throw msg;
         }
 
-        vector<viua::internals::types::bytecode_size> jumps = func.jumps();
+        std::vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
-        vector<tuple<viua::internals::types::bytecode_size,
+        std::vector<tuple<viua::internals::types::bytecode_size,
                      viua::internals::types::bytecode_size>>
             local_jumps;
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
@@ -1225,7 +1225,7 @@ void generate(vector<Token> const& tokens,
             cout << "\" written at offset " << bytes_offset << endl;
         }
 
-        vector<viua::internals::types::bytecode_size> linked_jumptable;
+        std::vector<viua::internals::types::bytecode_size> linked_jumptable;
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {

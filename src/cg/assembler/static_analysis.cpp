@@ -35,7 +35,7 @@ using namespace std;
 
 
 using Token       = viua::cg::lex::Token;
-using TokenVector = vector<Token>;
+using TokenVector = std::vector<Token>;
 
 class Registers {
     map<std::string, Token> defined_registers;

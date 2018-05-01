@@ -82,8 +82,8 @@ uint64_t Program::size() {
 
 using Token = viua::cg::lex::Token;
 Program& Program::calculate_jumps(
-    vector<tuple<uint64_t, uint64_t>> jump_positions,
-    vector<Token>& tokens) {
+    std::vector<tuple<uint64_t, uint64_t>> jump_positions,
+    std::vector<Token>& tokens) {
     /** Calculate jump targets in given bytecode.
      */
     uint64_t* ptr = nullptr;
@@ -116,10 +116,8 @@ Program& Program::calculate_jumps(
     return (*this);
 }
 
-vector<uint64_t> Program::jumps() {
-    /** Returns vector if bytecode points which contain jumps.
-     */
-    vector<uint64_t> jmps;
+std::vector<uint64_t> Program::jumps() {
+    std::vector<uint64_t> jmps;
     for (viua::internals::types::byte* jmp : branches) {
         jmps.push_back(static_cast<uint64_t>(jmp - program.get()));
     }

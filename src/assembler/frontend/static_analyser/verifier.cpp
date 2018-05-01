@@ -30,7 +30,7 @@ using viua::cg::lex::Token;
 using viua::cg::lex::TracedSyntaxError;
 
 
-static auto invalid_syntax(const vector<Token>& tokens,
+static auto invalid_syntax(const std::vector<Token>& tokens,
                            const std::string message) -> InvalidSyntax {
     auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
@@ -331,8 +331,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
             viua::assembler::frontend::parser::Instruction* last_frame =
                 nullptr;
 
-            vector<bool> filled_slots;
-            vector<Token> pass_lines;
+            std::vector<bool> filled_slots;
+            std::vector<Token> pass_lines;
 
             for (const auto& line : ib.body) {
                 auto instruction = dynamic_cast<

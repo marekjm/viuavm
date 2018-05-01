@@ -287,14 +287,14 @@ auto viua::assembler::frontend::parser::mnemonic_to_opcode(
     }
     return opcode;
 }
-static auto get_mnemonics() -> vector<std::string> {
-    vector<std::string> mnemonics;
+static auto get_mnemonics() -> std::vector<std::string> {
+    std::vector<std::string> mnemonics;
     for (const auto each : OP_NAMES) {
         mnemonics.push_back(std::move(each.second));
     }
     return mnemonics;
 }
-static auto get_directives() -> vector<std::string> {
+static auto get_directives() -> std::vector<std::string> {
     return {
         ".end",
         ".function:",
@@ -562,7 +562,7 @@ auto viua::assembler::frontend::parser::parse_block(
     return i;
 }
 
-auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens)
+auto viua::assembler::frontend::parser::parse(const std::vector<Token>& tokens)
     -> ParsedSource {
     ParsedSource parsed;
 

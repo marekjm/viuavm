@@ -37,7 +37,7 @@ using viua::util::memory::aligned_read;
 
 IdToAddressMapping Loader::loadmap(char* bytedump,
                                    const uint64_t& bytedump_size) {
-    vector<std::string> order;
+    std::vector<std::string> order;
     map<std::string, uint64_t> mapping;
 
     char* lib_function_ids_map = bytedump;
@@ -130,7 +130,7 @@ void Loader::load_meta_information(ifstream& in) {
     meta_information = load_meta_information_map(in);
 }
 
-static vector<std::string> load_string_list(ifstream& in) {
+static std::vector<std::string> load_string_list(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
@@ -142,7 +142,7 @@ static vector<std::string> load_string_list(ifstream& in) {
     uint64_t i   = 0;
     char* buffer = signatures_section_buffer.get();
     auto sig = std::string{};
-    vector<std::string> strings_list;
+    std::vector<std::string> strings_list;
     while (i < signatures_section_size) {
         sig = std::string(buffer + i);
         i += (sig.size() + 1);
@@ -178,7 +178,7 @@ void Loader::load_functions_map(ifstream& in) {
     in.read(lib_buffer_function_ids.get(),
             static_cast<std::streamsize>(lib_function_ids_section_size));
 
-    vector<std::string> order;
+    std::vector<std::string> order;
     map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
@@ -197,7 +197,7 @@ void Loader::load_blocks_map(ifstream& in) {
     in.read(lib_buffer_block_ids.get(),
             static_cast<std::streamsize>(lib_block_ids_section_size));
 
-    vector<std::string> order;
+    std::vector<std::string> order;
     map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
@@ -271,7 +271,7 @@ std::unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
     return copy;
 }
 
-vector<uint64_t> Loader::get_jumps() {
+std::vector<uint64_t> Loader::get_jumps() {
     return jumps;
 }
 
@@ -279,11 +279,11 @@ map<std::string, std::string> Loader::get_meta_information() {
     return meta_information;
 }
 
-vector<std::string> Loader::get_external_signatures() {
+std::vector<std::string> Loader::get_external_signatures() {
     return external_signatures;
 }
 
-vector<std::string> Loader::get_external_block_signatures() {
+std::vector<std::string> Loader::get_external_block_signatures() {
     return external_signatures_block;
 }
 
@@ -293,13 +293,13 @@ map<std::string, uint64_t> Loader::get_function_addresses() {
 map<std::string, uint64_t> Loader::get_function_sizes() {
     return function_sizes;
 }
-vector<std::string> Loader::get_functions() {
+std::vector<std::string> Loader::get_functions() {
     return functions;
 }
 
 map<std::string, uint64_t> Loader::get_block_addresses() {
     return block_addresses;
 }
-vector<std::string> Loader::get_blocks() {
+std::vector<std::string> Loader::get_blocks() {
     return blocks;
 }

@@ -42,11 +42,11 @@ using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
 
 template<class T>
-static auto enumerate(const vector<T>& v)
-    -> vector<pair<typename vector<T>::size_type, T>> {
-    vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
+static auto enumerate(const std::vector<T>& v)
+    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    std::vector<pair<typename std::vector<T>::size_type, T>> enumerated_vector;
 
-    typename vector<T>::size_type i = 0;
+    typename std::vector<T>::size_type i = 0;
     for (const auto& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
@@ -56,7 +56,7 @@ static auto enumerate(const vector<T>& v)
 }
 
 static void encode_json(const std::string& filename,
-                        const vector<Token>& tokens) {
+                        const std::vector<Token>& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";
@@ -133,7 +133,7 @@ static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
 static void display_results(const std::string& filename,
-                            const vector<Token>& tokens) {
+                            const std::vector<Token>& tokens) {
     if (DISPLAY_SIZE) {
         try {
             cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
@@ -151,7 +151,7 @@ static void display_results(const std::string& filename,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<std::string> args;
+    std::vector<std::string> args;
     auto option = std::string{};
 
     std::string filename(""), compilename("");
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
 
     std::string source = read_file(in);
 
-    vector<Token> tokens;
+    std::vector<Token> tokens;
     try {
         tokens = viua::cg::lex::tokenise(source);
         if (not MANUAL_REDUCING) {

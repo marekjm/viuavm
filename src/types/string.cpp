@@ -93,8 +93,6 @@ String* String::add(String* s) {
 }
 
 String* String::join(Vector* v) {
-    /** Use this string to join objects in vector.
-     */
     auto s = std::string{""};
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
@@ -186,7 +184,7 @@ void String::format(Frame* frame,
     std::string result = svalue;
 
     if (regex_search(result, key_regex)) {
-        vector<std::string> matches;
+        std::vector<std::string> matches;
         for (sregex_iterator match =
                  sregex_iterator(result.begin(), result.end(), key_regex);
              match != sregex_iterator();

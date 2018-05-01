@@ -152,7 +152,7 @@ static auto insert_type_prefixed_string(viua::internals::types::byte* ptr,
 
 static auto insert_size_and_type_prefixed_bitstring(
     viua::internals::types::byte* ptr,
-    const vector<uint8_t> bit_string) -> viua::internals::types::byte* {
+    const std::vector<uint8_t> bit_string) -> viua::internals::types::byte* {
     *(reinterpret_cast<OperandType*>(ptr)) = OT_BITS;
     pointer::inc<OperandType, viua::internals::types::byte>(ptr);
     aligned_write(ptr) = bit_string.size();
@@ -452,7 +452,7 @@ auto opbits(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs)
 
 auto opbits(viua::internals::types::byte* addr_ptr,
             int_op target,
-            vector<uint8_t> bit_string) -> viua::internals::types::byte* {
+            std::vector<uint8_t> bit_string) -> viua::internals::types::byte* {
     *(addr_ptr++) = BITS;
     addr_ptr      = insert_ri_operand(addr_ptr, target);
     return insert_size_and_type_prefixed_bitstring(addr_ptr, bit_string);

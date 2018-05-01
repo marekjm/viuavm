@@ -158,7 +158,7 @@ std::unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
     return std::move(v);
 }
 
-vector<std::unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
+std::vector<std::unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
     return internal_object;
 }
 

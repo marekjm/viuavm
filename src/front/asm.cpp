@@ -160,8 +160,8 @@ static std::string read_file(const std::string& path) {
 }
 
 int main(int argc, char* argv[]) {
-    // setup command line arguments vector
-    vector<std::string> args;
+    // setup command line arguments std::vector
+    std::vector<std::string> args;
     auto option = std::string{};
 
     std::string filename(""), compilename("");
@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
 
     //////////////////////////////////////////
     // GATHER LINKS OBTAINED FROM COMMAND LINE
-    vector<std::string> commandline_given_links;
+    std::vector<std::string> commandline_given_links;
     for (unsigned i = 1; i < args.size(); ++i) {
         commandline_given_links.emplace_back(args[i]);
     }

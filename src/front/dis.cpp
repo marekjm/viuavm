@@ -101,7 +101,7 @@ static bool usage(const char* program,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<std::string> args;
+    std::vector<std::string> args;
     auto option = std::string{};
 
     // for getline()
@@ -190,20 +190,20 @@ int main(int argc, char* argv[]) {
 
     map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
-    vector<std::string> functions             = loader.get_functions();
+    std::vector<std::string> functions             = loader.get_functions();
     map<std::string, uint64_t> function_sizes = loader.get_function_sizes();
 
     map<std::string, uint64_t> block_address_mapping =
         loader.get_block_addresses();
-    vector<std::string> blocks = loader.get_blocks();
+    std::vector<std::string> blocks = loader.get_blocks();
     map<std::string, uint64_t> block_sizes;
 
     map<std::string, uint64_t> element_address_mapping;
-    vector<std::string> elements;
+    std::vector<std::string> elements;
     map<std::string, uint64_t> element_sizes;
     map<std::string, string> element_types;
 
-    vector<std::string> disassembled_lines;
+    std::vector<std::string> disassembled_lines;
     ostringstream oss;
 
 

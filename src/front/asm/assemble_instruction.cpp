@@ -238,7 +238,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
-    vector<Token> const& tokens,
+    std::vector<Token> const& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /*  This is main assembly loop.

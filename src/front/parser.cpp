@@ -53,11 +53,11 @@ using viua::cg::lex::TracedSyntaxError;
 
 
 template<class T>
-static auto enumerate(const vector<T>& v)
-    -> vector<pair<typename vector<T>::size_type, T>> {
-    vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
+static auto enumerate(const std::vector<T>& v)
+    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    std::vector<pair<typename std::vector<T>::size_type, T>> enumerated_vector;
 
-    typename vector<T>::size_type i = 0;
+    typename std::vector<T>::size_type i = 0;
     for (const auto& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
@@ -107,7 +107,7 @@ static std::string read_file(ifstream& in) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<std::string> args;
+    std::vector<std::string> args;
     auto option = std::string{};
 
     std::string filename(""), compilename("");
@@ -166,8 +166,8 @@ int main(int argc, char* argv[]) {
     std::string source = read_file(in);
 
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    vector<Token> tokens;
-    vector<Token> normalised_tokens;
+    std::vector<Token> tokens;
+    std::vector<Token> normalised_tokens;
 
     try {
         tokens            = viua::cg::lex::cook(raw_tokens);

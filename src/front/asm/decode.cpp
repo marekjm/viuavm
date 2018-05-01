@@ -24,10 +24,10 @@
 using namespace std;
 
 
-auto decode_line_tokens(vector<std::string> const& tokens)
-    -> vector<vector<std::string>> {
-    auto decoded_lines = vector<vector<std::string>>{};
-    auto main_line     = vector<std::string>{};
+auto decode_line_tokens(std::vector<std::string> const& tokens)
+    -> std::vector<std::vector<std::string>> {
+    auto decoded_lines = std::vector<std::vector<std::string>>{};
+    auto main_line     = std::vector<std::string>{};
 
     auto i      = std::remove_reference_t<decltype(tokens)>::size_type{0};
     auto invert = false;
@@ -38,7 +38,7 @@ auto decode_line_tokens(vector<std::string> const& tokens)
             continue;
         }
         if (tokens.at(i) == "(") {
-            vector<std::string> subtokens;
+            std::vector<std::string> subtokens;
             ++i;
             auto balance = unsigned{1};
             while (i < tokens.size()) {
@@ -63,7 +63,7 @@ auto decode_line_tokens(vector<std::string> const& tokens)
             continue;
         }
         if (tokens.at(i) == "[") {
-            auto subtokens = vector<std::string>{};
+            auto subtokens = std::vector<std::string>{};
             ++i;
             auto balance                  = unsigned{1};
             auto toplevel_subexpr_balance = unsigned{0};
@@ -110,6 +110,6 @@ auto decode_line_tokens(vector<std::string> const& tokens)
 
     return decoded_lines;
 }
-auto decode_line(std::string const& s) -> vector<vector<std::string>> {
+auto decode_line(std::string const& s) -> std::vector<std::vector<std::string>> {
     return decode_line_tokens(viua::cg::tokenizer::tokenize(s));
 }

@@ -24,7 +24,7 @@ using namespace std;
 
 void viua::front::vm::initialise(viua::kernel::Kernel* kernel,
                                  const std::string& program,
-                                 vector<std::string> args) {
+                                 std::vector<std::string> args) {
     auto loader = Loader{program};
     loader.executable();
 
