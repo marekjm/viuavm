@@ -1,6 +1,6 @@
 \section{begin}
 
-Viua is a CISC machine, and its instructions vary in complexity from very simple (e.g. adding two
+Instructions in Viua vary in complexity from very simple (e.g. adding two
 integers) to complex and expensive ones (e.g. performing signed saturating multiplication).
 
 \heading{INSTRUCTION CATEGORIES}
