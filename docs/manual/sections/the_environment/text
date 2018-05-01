@@ -106,6 +106,44 @@ Using the \instruction{process} instruction described in section \ref{opcode:pro
 %% EXECUTION
 \section{end}
 
+\heading{INTERRUPTION}{ref=environment:processes:interruption}
+\section{begin}
+
+A process may be interrupted by another process.
+To interrupt a process you must have access to its PID.
+
+Interrupts are delievered asynchronously: the process that interrupts another one does not
+block until the interrupt is delievered.
+This is consistent with how messages are delievered.
+
+An interrupt is handled by the receiving process as soon as it is delievered.
+This is in contrast with how messages are handled; when a message arrives it is put on a
+queue and the receiving process decides when to handle it, but when an interrupt arrives
+it must be handled immediately.
+
+When an interrupt arrives two things can happen:
+\list{begin}
+\item
+if the process has registered a handler for the type of interrupt that arrived, a new
+stack is created for the handler, and the process switches execution to it (the interrupt
+is "serviced")
+\item
+if the process has not registered a handler for the type of interrupt that arrives, the
+process is cancelled (cancellation is described in section
+\ref{environment:processes:cancellation})
+\list{end}
+
+After the interrupt is serviced the process resumes executing the stack it was executing
+when the interrupt was delievered.
+
+\heading{CANCELLATION}{ref=environment:processes:cancellation}
+\section{begin}
+%% CANCELLATION
+\section{end}
+
+%% INTERRUPTION
+\section{end}
+
 \heading{SHUT DOWN}{ref=environment:processes:shut_down}
 \section{begin}
 %% SHUT DOWN
@@ -529,5 +567,3 @@ systems.
 
 %% THE ENVIRONMENT
 \section{end}
-
-%% vim:set ft=tex:
