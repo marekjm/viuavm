@@ -67,7 +67,7 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
 }
 
 std::vector<std::string> viua::types::Struct::keys() const {
-    std::vector<std::string> ks;
+    auto ks = std::vector<std::string>{};
     for (const auto& each : attributes) {
         ks.push_back(each.first);
     }

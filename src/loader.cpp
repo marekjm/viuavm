@@ -37,7 +37,7 @@ using viua::util::memory::aligned_read;
 
 IdToAddressMapping Loader::loadmap(char* bytedump,
                                    const uint64_t& bytedump_size) {
-    std::vector<std::string> order;
+    auto order = std::vector<std::string>{};
     map<std::string, uint64_t> mapping;
 
     char* lib_function_ids_map = bytedump;
@@ -142,7 +142,7 @@ static std::vector<std::string> load_string_list(ifstream& in) {
     uint64_t i   = 0;
     char* buffer = signatures_section_buffer.get();
     auto sig = std::string{};
-    std::vector<std::string> strings_list;
+    auto strings_list = std::vector<std::string>{};
     while (i < signatures_section_size) {
         sig = std::string(buffer + i);
         i += (sig.size() + 1);
@@ -178,7 +178,7 @@ void Loader::load_functions_map(ifstream& in) {
     in.read(lib_buffer_function_ids.get(),
             static_cast<std::streamsize>(lib_function_ids_section_size));
 
-    std::vector<std::string> order;
+    auto order = std::vector<std::string>{};
     map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
@@ -197,7 +197,7 @@ void Loader::load_blocks_map(ifstream& in) {
     in.read(lib_buffer_block_ids.get(),
             static_cast<std::streamsize>(lib_block_ids_section_size));
 
-    std::vector<std::string> order;
+    auto order = std::vector<std::string>{};
     map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =

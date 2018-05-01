@@ -257,7 +257,7 @@ auto assert_is_not_reserved_keyword(Token token, std::string const& message)
 }
 
 auto tokenise(std::string const& source) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     ostringstream candidate_token;
     candidate_token.str("");
@@ -365,7 +365,7 @@ static auto is_register_index(std::string const s) -> bool {
     return (p == '%' or p == '*' or p == '@');
 }
 auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     const auto limit = input_tokens.size();
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
@@ -1139,7 +1139,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
     return tokens;
 }
 auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     const auto limit = input_tokens.size();
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {

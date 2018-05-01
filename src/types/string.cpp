@@ -184,7 +184,7 @@ void String::format(Frame* frame,
     std::string result = svalue;
 
     if (regex_search(result, key_regex)) {
-        std::vector<std::string> matches;
+        auto matches = std::vector<std::string>{};
         for (sregex_iterator match =
                  sregex_iterator(result.begin(), result.end(), key_regex);
              match != sregex_iterator();

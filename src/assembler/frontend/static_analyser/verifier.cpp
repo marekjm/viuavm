@@ -331,8 +331,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
             viua::assembler::frontend::parser::Instruction* last_frame =
                 nullptr;
 
-            std::vector<bool> filled_slots;
-            std::vector<Token> pass_lines;
+            auto filled_slots = std::vector<bool>{};
+            auto pass_lines = std::vector<Token>{};
 
             for (const auto& line : ib.body) {
                 auto instruction = dynamic_cast<

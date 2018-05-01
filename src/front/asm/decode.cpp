@@ -38,7 +38,7 @@ auto decode_line_tokens(std::vector<std::string> const& tokens)
             continue;
         }
         if (tokens.at(i) == "(") {
-            std::vector<std::string> subtokens;
+            auto subtokens = std::vector<std::string>{};
             ++i;
             auto balance = unsigned{1};
             while (i < tokens.size()) {

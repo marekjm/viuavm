@@ -151,7 +151,7 @@ static void display_results(const std::string& filename,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    std::vector<std::string> args;
+    auto args = std::vector<std::string>{};
     auto option = std::string{};
 
     std::string filename(""), compilename("");
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
 
     std::string source = read_file(in);
 
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
     try {
         tokens = viua::cg::lex::tokenise(source);
         if (not MANUAL_REDUCING) {

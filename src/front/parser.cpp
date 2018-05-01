@@ -107,7 +107,7 @@ static std::string read_file(ifstream& in) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    std::vector<std::string> args;
+    auto args = std::vector<std::string>{};
     auto option = std::string{};
 
     std::string filename(""), compilename("");
@@ -166,8 +166,8 @@ int main(int argc, char* argv[]) {
     std::string source = read_file(in);
 
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    std::vector<Token> tokens;
-    std::vector<Token> normalised_tokens;
+    auto tokens = std::vector<Token>{};
+    auto normalised_tokens = std::vector<Token>{};
 
     try {
         tokens            = viua::cg::lex::cook(raw_tokens);

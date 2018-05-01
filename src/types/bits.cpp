@@ -63,7 +63,7 @@ static auto binary_clip(
     std::vector<bool> const& bits,
     std::remove_reference_t<decltype(bits)>::size_type width)
     -> std::vector<bool> {
-    std::vector<bool> result;
+    auto result = std::vector<bool>{};
     result.reserve(width);
     std::fill_n(std::back_inserter(result), width, false);
 

@@ -46,7 +46,7 @@ static auto is_continuation_byte(char b) -> bool {
     return is_continuation_byte(static_cast<uint8_t>(b));
 }
 auto viua::types::Text::parse(std::string s) -> decltype(text) {
-    std::vector<Character> parsed_text;
+    auto parsed_text = std::vector<Character>{};
 
     char ss[5];
     ss[4] = '\0';

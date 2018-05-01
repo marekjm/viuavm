@@ -101,7 +101,7 @@ static bool usage(const char* program,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    std::vector<std::string> args;
+    auto args = std::vector<std::string>{};
     auto option = std::string{};
 
     // for getline()
@@ -199,11 +199,11 @@ int main(int argc, char* argv[]) {
     map<std::string, uint64_t> block_sizes;
 
     map<std::string, uint64_t> element_address_mapping;
-    std::vector<std::string> elements;
+    auto elements = std::vector<std::string>{};
     map<std::string, uint64_t> element_sizes;
     map<std::string, string> element_types;
 
-    std::vector<std::string> disassembled_lines;
+    auto disassembled_lines = std::vector<std::string>{};
     ostringstream oss;
 
 

@@ -74,7 +74,7 @@ static auto match_adjacent(
 }
 
 auto remove_spaces(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     std::string space(" ");
     for (auto t : input_tokens) {
@@ -87,7 +87,7 @@ auto remove_spaces(std::vector<Token> input_tokens) -> std::vector<Token> {
 }
 
 auto remove_comments(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     const auto limit = input_tokens.size();
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
@@ -146,7 +146,7 @@ auto reduce_directive(std::vector<Token> input_tokens, std::string const directi
 }
 
 auto reduce_newlines(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     const auto limit                    = input_tokens.size();
     decltype(input_tokens)::size_type i = 0;
@@ -505,7 +505,7 @@ static void push_unwrapped_lines(
             final_tokens.push_back(to);
         }
     } else {
-        std::vector<Token> last_line;
+        auto last_line = std::vector<Token>{};
         while (final_tokens.size()
                and final_tokens.at(final_tokens.size() - 1) != "\n") {
             last_line.insert(last_line.begin(), final_tokens.back());
@@ -537,7 +537,7 @@ static auto get_subtokens(
     std::string closing_paren_type = ((paren_type == "(") ? ")" : "]");
     ++i;
 
-    std::vector<Token> subtokens;
+    auto subtokens = std::vector<Token>{};
     const auto limit = input_tokens.size();
 
     unsigned balance                         = 1;
@@ -626,7 +626,7 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
             continue;
         }
         if (t == "(" or t == "[") {
-            std::vector<Token> subtokens;
+            auto subtokens = std::vector<Token>{};
             unsigned balance                         = 1;
             unsigned toplevel_subexpressions_balance = 0;
             unsigned toplevel_subexpressions         = 0;
@@ -702,7 +702,7 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
 }
 
 auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
     std::vector<unsigned long> iotas;
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
@@ -760,7 +760,7 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
 }
 
 auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
@@ -851,7 +851,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
 
 auto replace_named_registers(std::vector<Token> input_tokens)
     -> std::vector<Token> {
-    std::vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
     map<std::string, std::string> names;
     unsigned open_blocks = 0;
 

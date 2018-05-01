@@ -361,7 +361,7 @@ static viua::internals::types::bytecode_size generate_entry_function(
         cout << " function" << endl;
     }
 
-    std::vector<Token> entry_function_tokens;
+    auto entry_function_tokens = std::vector<Token>{};
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
 
@@ -571,8 +571,8 @@ void generate(std::vector<Token> const& tokens,
                  viua::internals::types::bytecode_size,
                  std::unique_ptr<viua::internals::types::byte[]>>>
         linked_libs_bytecode;
-    std::vector<std::string> linked_function_names;
-    std::vector<std::string> linked_block_names;
+    auto linked_function_names = std::vector<std::string>{};
+    auto linked_block_names = std::vector<std::string>{};
     map<std::string, std::vector<viua::internals::types::bytecode_size>>
         linked_libs_jumptables;
 
@@ -641,7 +641,7 @@ void generate(std::vector<Token> const& tokens,
     if (not flags.as_lib) {
         // check if our initial guess for main function is correct and
         // detect some main-function-related errors
-        std::vector<std::string> main_function_found;
+        auto main_function_found = std::vector<std::string>{};
         for (auto f : functions.names) {
             if (f == "main/0" or f == "main/1" or f == "main/2") {
                 main_function_found.emplace_back(f);
@@ -794,7 +794,7 @@ void generate(std::vector<Token> const& tokens,
 
     ////////////////////
     // CREATE JUMP TABLE
-    std::vector<viua::internals::types::bytecode_size> jump_table;
+    auto jump_table = std::vector<viua::internals::types::bytecode_size>{};
 
 
     /////////////////////////////////////////////////////////
@@ -1225,7 +1225,7 @@ void generate(std::vector<Token> const& tokens,
             cout << "\" written at offset " << bytes_offset << endl;
         }
 
-        std::vector<viua::internals::types::bytecode_size> linked_jumptable;
+        auto linked_jumptable = std::vector<viua::internals::types::bytecode_size>{};
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {

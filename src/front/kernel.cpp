@@ -131,7 +131,7 @@ static bool usage(const std::string program, const std::vector<std::string>& arg
 
 int main(int argc, char* argv[]) {
     // setup command line arguments std::vector
-    std::vector<std::string> args;
+    auto args = std::vector<std::string>{};
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }

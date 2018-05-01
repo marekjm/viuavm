@@ -546,7 +546,7 @@ int viua::kernel::Kernel::run() {
     vp_schedulers_limit = no_of_vp_schedulers();
     bool enable_tracing = is_tracing_enabled();
 
-    std::vector<viua::scheduler::VirtualProcessScheduler> vp_schedulers;
+    auto vp_schedulers = std::vector<viua::scheduler::VirtualProcessScheduler>{};
 
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);

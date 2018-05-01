@@ -288,7 +288,7 @@ auto viua::assembler::frontend::parser::mnemonic_to_opcode(
     return opcode;
 }
 static auto get_mnemonics() -> std::vector<std::string> {
-    std::vector<std::string> mnemonics;
+    auto mnemonics = std::vector<std::string>{};
     for (const auto each : OP_NAMES) {
         mnemonics.push_back(std::move(each.second));
     }
