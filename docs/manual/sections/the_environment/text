@@ -136,15 +136,39 @@ process is cancelled (cancellation is described in section
 After the interrupt is serviced the process resumes executing the stack it was executing
 when the interrupt was delievered.
 
+\heading{INTERRUPT DELIVERY POINTS}{ref=environment:processes:interrupts:delivery_points}
+\section{begin}
+
+Interrupts are delievered at well-defined points during program execution.
+
+When a process is normally executing they are delievered between instructions.
+
+%% INTERRUPT DELIVERY POINTS
+\section{end}
+
+\heading{ERRORS IN INTERRUPT HANDLERS}{ref=environment:processes:interrupts:errored}
+\section{begin}
+
+If an exception escapes the stack of the interrupt handler the shutdown of the process is
+triggered.
+Shutdowns are described in section \ref{environment:processes:shutdown}.
+
+%% ERRORS IN INTERRUPT HANDLERS
+\section{end}
+
 \heading{CANCELLATION}{ref=environment:processes:cancellation}
 \section{begin}
+
+Cancellation causes an immediate shutdown of a process.
+Shutdowns are described in section \ref{environment:processes:shutdown}.
+
 %% CANCELLATION
 \section{end}
 
 %% INTERRUPTION
 \section{end}
 
-\heading{SHUT DOWN}{ref=environment:processes:shut_down}
+\heading{SHUTDOWN}{ref=environment:processes:shutdown}
 \section{begin}
 %% SHUT DOWN
 \section{end}

@@ -13,5 +13,5 @@ If the `ImportException' is not caught by the process it will cause the call sta
 unwound (stack unwinding is described in section
 \ref{environment:processes:error_handling:exceptions:stack_unwinding}), and
 the process will be shut down using the normal procedure (described in section
-\ref{environment:processes:shut_down}).
+\ref{environment:processes:shutdown}).
 \list{end}
