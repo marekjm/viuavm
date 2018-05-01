@@ -118,7 +118,7 @@ Program& Program::calculate_jumps(
 
 std::vector<uint64_t> Program::jumps() {
     auto jmps = std::vector<uint64_t>{};
-    for (viua::internals::types::byte* jmp : branches) {
+    for (auto const jmp : branches) {
         jmps.push_back(static_cast<uint64_t>(jmp - program.get()));
     }
     return jmps;
