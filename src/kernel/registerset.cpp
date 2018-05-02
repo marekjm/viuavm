@@ -117,7 +117,7 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register& {
 }
 
 
-void viua::kernel::RegisterSet::put(
+void viua::kernel::Register_set::put(
     viua::internals::types::register_index index,
     std::unique_ptr<viua::types::Value> object) {
     if (index >= registerset_size) {
@@ -127,7 +127,7 @@ void viua::kernel::RegisterSet::put(
     registers.at(index).reset(std::move(object));
 }
 
-std::unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(
+std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
     viua::internals::types::register_index index) {
     /** Pop an object from the register.
      */
@@ -139,7 +139,7 @@ std::unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(
     return object;
 }
 
-void viua::kernel::RegisterSet::set(
+void viua::kernel::Register_set::set(
     viua::internals::types::register_index index,
     std::unique_ptr<viua::types::Value> object) {
     /** Put object inside register specified by given index.
@@ -159,7 +159,7 @@ void viua::kernel::RegisterSet::set(
     }
 }
 
-viua::types::Value* viua::kernel::RegisterSet::get(
+viua::types::Value* viua::kernel::Register_set::get(
     viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
@@ -180,7 +180,7 @@ viua::types::Value* viua::kernel::RegisterSet::get(
     return optr;
 }
 
-viua::types::Value* viua::kernel::RegisterSet::at(
+viua::types::Value* viua::kernel::Register_set::at(
     viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
@@ -195,7 +195,7 @@ viua::types::Value* viua::kernel::RegisterSet::at(
     return registers.at(index).get();
 }
 
-viua::kernel::Register* viua::kernel::RegisterSet::register_at(
+viua::kernel::Register* viua::kernel::Register_set::register_at(
     viua::internals::types::register_index index) {
     if (index >= registerset_size) {
         ostringstream emsg;
@@ -206,7 +206,7 @@ viua::kernel::Register* viua::kernel::RegisterSet::register_at(
 }
 
 
-void viua::kernel::RegisterSet::move(
+void viua::kernel::Register_set::move(
     viua::internals::types::register_index src,
     viua::internals::types::register_index dst) {
     /** Move an object from src register to dst register.
@@ -225,7 +225,7 @@ void viua::kernel::RegisterSet::move(
     set(dst, pop(src));
 }
 
-void viua::kernel::RegisterSet::swap(
+void viua::kernel::Register_set::swap(
     viua::internals::types::register_index src,
     viua::internals::types::register_index dst) {
     /** Swap objects in src and dst registers.
@@ -244,7 +244,7 @@ void viua::kernel::RegisterSet::swap(
     registers[src].swap(registers[dst]);
 }
 
-void viua::kernel::RegisterSet::empty(
+void viua::kernel::Register_set::empty(
     viua::internals::types::register_index here) {
     /** Empty a register.
      *
@@ -258,7 +258,7 @@ void viua::kernel::RegisterSet::empty(
     registers.at(here).release();
 }
 
-void viua::kernel::RegisterSet::free(
+void viua::kernel::Register_set::free(
     viua::internals::types::register_index here) {
     /** Free an object inside a register.
      *
@@ -277,7 +277,7 @@ void viua::kernel::RegisterSet::free(
 }
 
 
-void viua::kernel::RegisterSet::flag(
+void viua::kernel::Register_set::flag(
     viua::internals::types::register_index index,
     mask_type filter) {
     /** Enable masks specified by filter for register at given index.
@@ -297,7 +297,7 @@ void viua::kernel::RegisterSet::flag(
     registers.at(index).flag(filter);
 }
 
-void viua::kernel::RegisterSet::unflag(
+void viua::kernel::Register_set::unflag(
     viua::internals::types::register_index index,
     mask_type filter) {
     /** Disable masks specified by filter for register at given index.
@@ -317,7 +317,7 @@ void viua::kernel::RegisterSet::unflag(
     registers.at(index).unflag(filter);
 }
 
-void viua::kernel::RegisterSet::clear(
+void viua::kernel::Register_set::clear(
     viua::internals::types::register_index index) {
     /** Clear masks for given register.
      *
@@ -330,7 +330,7 @@ void viua::kernel::RegisterSet::clear(
     registers.at(index).set_mask(0);
 }
 
-bool viua::kernel::RegisterSet::isflagged(
+bool viua::kernel::Register_set::isflagged(
     viua::internals::types::register_index index,
     mask_type filter) {
     /** Returns true if given filter is enabled for register specified by given
@@ -350,7 +350,7 @@ bool viua::kernel::RegisterSet::isflagged(
     }
 }
 
-void viua::kernel::RegisterSet::setmask(
+void viua::kernel::Register_set::setmask(
     viua::internals::types::register_index index,
     mask_type mask) {
     /** Set mask for a register.
@@ -370,7 +370,7 @@ void viua::kernel::RegisterSet::setmask(
     registers.at(index).set_mask(mask);
 }
 
-mask_type viua::kernel::RegisterSet::getmask(
+mask_type viua::kernel::Register_set::getmask(
     viua::internals::types::register_index index) {
     /** Get mask of a register.
      *
@@ -390,7 +390,7 @@ mask_type viua::kernel::RegisterSet::getmask(
 }
 
 
-void viua::kernel::RegisterSet::drop() {
+void viua::kernel::Register_set::drop() {
     /** Drop register set contents.
      *
      *  This function makes the register set drop all objects it holds by
@@ -403,8 +403,8 @@ void viua::kernel::RegisterSet::drop() {
 }
 
 
-std::unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
-    auto rscopy = make_unique<viua::kernel::RegisterSet>(size());
+std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy() {
+    auto rscopy = make_unique<viua::kernel::Register_set>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
         if (at(i) == nullptr) {
             continue;
@@ -415,7 +415,7 @@ std::unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     return rscopy;
 }
 
-viua::kernel::RegisterSet::RegisterSet(
+viua::kernel::Register_set::Register_set(
     viua::internals::types::register_index sz)
         : registerset_size(sz) {
     /** Create register set with specified size.
@@ -426,4 +426,4 @@ viua::kernel::RegisterSet::RegisterSet(
         registers.emplace_back(nullptr);
     }
 }
-viua::kernel::RegisterSet::~RegisterSet() {}
+viua::kernel::Register_set::~Register_set() {}

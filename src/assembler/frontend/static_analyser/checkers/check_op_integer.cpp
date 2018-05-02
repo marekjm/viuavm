@@ -28,8 +28,8 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_integer(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::RegisterIndex;
-    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    using viua::assembler::frontend::parser::Register_index;
+    auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -41,7 +41,7 @@ auto check_op_integer(Register_usage_profile& register_usage_profile,
     auto val         = Register{};
     val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type   = viua::internals::ValueTypes::INTEGER;
+    val.value_type   = viua::internals::Value_types::INTEGER;
     register_usage_profile.define(val, operand->tokens.at(0));
 
     if (operand->attributes.count("maybe_unused")) {

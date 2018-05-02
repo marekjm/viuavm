@@ -72,7 +72,7 @@ void assembler::verify::function_calls_are_defined(
                 and function_name.str().at(0) != '%') {
                 if (not is_defined(
                         function_name, function_names, function_signatures)) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         function_name,
                         (std::string{token == "tailcall" ? "tail call to"
                                                          : "deferred"}
@@ -83,7 +83,7 @@ void assembler::verify::function_calls_are_defined(
             auto function_name = tokens.at(i + 1);
             if (not is_defined(
                     function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     function_name,
                     "watchdog from undefined function " + function_name.str());
             }
@@ -96,7 +96,7 @@ void assembler::verify::function_calls_are_defined(
                 and function_name.str().at(0) != '%') {
                 if (not is_defined(
                         function_name, function_names, function_signatures)) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         function_name,
                         (std::string{token == "call" ? "call to"
                                                      : "process from"}
@@ -143,7 +143,7 @@ void assembler::verify::callable_creations(
         }
 
         if (is_undefined) {
-            viua::cg::lex::InvalidSyntax e(
+            viua::cg::lex::Invalid_syntax e(
                 tokens.at(i),
                 (tokens.at(i).str() + " from undefined function: " + function));
             e.add(tokens.at(i + 2));

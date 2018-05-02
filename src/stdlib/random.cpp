@@ -49,8 +49,8 @@ static auto getrandom() -> long double {
 }
 
 static auto random_drandom(Frame* frame,
-                           viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*,
+                           viua::kernel::Register_set*,
+                           viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
     /** Return random integer.
@@ -69,8 +69,8 @@ static auto random_drandom(Frame* frame,
 }
 
 static auto random_durandom(Frame* frame,
-                            viua::kernel::RegisterSet*,
-                            viua::kernel::RegisterSet*,
+                            viua::kernel::Register_set*,
+                            viua::kernel::Register_set*,
                             viua::process::Process*,
                             viua::kernel::Kernel*) -> void {
     /** Return random integer.
@@ -91,8 +91,8 @@ static auto random_durandom(Frame* frame,
 }
 
 static auto random_random(Frame* frame,
-                          viua::kernel::RegisterSet*,
-                          viua::kernel::RegisterSet*,
+                          viua::kernel::Register_set*,
+                          viua::kernel::Register_set*,
                           viua::process::Process*,
                           viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
@@ -102,8 +102,8 @@ static auto random_random(Frame* frame,
 }
 
 static auto random_randint(Frame* frame,
-                           viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*,
+                           viua::kernel::Register_set*,
+                           viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
     /** Return random integer from selected range.
@@ -120,7 +120,7 @@ static auto random_randint(Frame* frame,
         0, make_unique<viua::types::Integer>(lower_bound + modifer));
 }
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"std::random::device::random/0", &random_drandom},
     {"std::random::device::urandom/0", &random_durandom},
     {"std::random::random/0", &random_random},
@@ -128,6 +128,6 @@ const ForeignFunctionSpec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
+extern "C" const Foreign_function_spec* exports() {
     return functions;
 }

@@ -32,7 +32,7 @@ auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
     if (stack->try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    stack->try_frame_new = make_unique<TryFrame>();
+    stack->try_frame_new = make_unique<Try_frame>();
     return addr;
 }
 

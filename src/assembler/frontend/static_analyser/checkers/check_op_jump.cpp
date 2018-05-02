@@ -26,14 +26,14 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_jump(Register_usage_profile& register_usage_profile,
-                   ParsedSource const& ps,
+                   Parsed_source const& ps,
                    Instruction const& instruction,
-                   InstructionsBlock const& ib,
+                   Instructions_block const& ib,
                    InstructionIndex i,
                    InstructionIndex const mnemonic_counter) -> void {
     using viua::assembler::frontend::parser::Label;
     using viua::assembler::frontend::parser::Offset;
-    using viua::cg::lex::InvalidSyntax;
+    using viua::cg::lex::Invalid_syntax;
 
     auto target = instruction.operands.at(0).get();
 
@@ -57,7 +57,7 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
         // jump instructions. Do not check them now, but this should be fixed in
         // the future.
     } else {
-        throw InvalidSyntax(target->tokens.at(0),
+        throw Invalid_syntax(target->tokens.at(0),
                             "invalid operand for jump instruction");
     }
 }

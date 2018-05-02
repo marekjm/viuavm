@@ -62,14 +62,14 @@ enum OperandType : uint8_t {
 };
 
 namespace viua { namespace internals {
-enum class AccessSpecifier {
+enum class Access_specifier {
     DIRECT,
     REGISTER_INDIRECT,
     POINTER_DEREFERENCE,
 };
 
 using ValueTypesType = uint32_t;
-enum class ValueTypes : ValueTypesType {
+enum class Value_types : ValueTypesType {
     /*
      * This is the type that is used when it is not known what type a value
      * actually has. When the type can be inferred UNDEFINED may be swapped for

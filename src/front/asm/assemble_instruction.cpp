@@ -77,7 +77,7 @@ else if (jmp[0] == '-') {
         oss << "use of relative jump results in a jump to negative index: ";
         oss << "jump_value = " << jump_value << ", ";
         oss << "instruction_index = " << instruction_index;
-        throw viua::cg::lex::InvalidSyntax(token, oss.str());
+        throw viua::cg::lex::Invalid_syntax(token, oss.str());
     }
     addr =
         (instruction_index
@@ -94,7 +94,7 @@ else {
         addr =
             static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
     } catch (std::out_of_range const& e) {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token,
             ("cannot resolve jump to unrecognised marker: "
              + str::enquote(str::strencode(jmp))));
@@ -152,7 +152,7 @@ auto ::assembler::operands::resolve_register(Token const token,
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token,
             ("cannot resolve register operand: "
              + str::enquote(str::strencode(token.str()))));
@@ -161,17 +161,17 @@ auto ::assembler::operands::resolve_register(Token const token,
 }
 
 auto ::assembler::operands::resolve_rs_type(Token const token)
-    -> viua::internals::RegisterSets {
+    -> viua::internals::Register_sets {
     if (token == "current") {
-        return viua::internals::RegisterSets::CURRENT;
+        return viua::internals::Register_sets::CURRENT;
     } else if (token == "local") {
-        return viua::internals::RegisterSets::LOCAL;
+        return viua::internals::Register_sets::LOCAL;
     } else if (token == "static") {
-        return viua::internals::RegisterSets::STATIC;
+        return viua::internals::Register_sets::STATIC;
     } else if (token == "global") {
-        return viua::internals::RegisterSets::GLOBAL;
+        return viua::internals::Register_sets::GLOBAL;
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token, "invalid register set type name: " + token.str());
     }
 }
@@ -547,7 +547,7 @@ viua::internals::types::bytecode_size assemble_instruction(
     } else if (tokens.at(i).str().substr(0, 1) == ".") {
         // do nothing, it's an assembler directive
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             tokens.at(i),
             ("unimplemented instruction: "
              + str::enquote(str::strencode(tokens.at(i)))));

@@ -27,25 +27,25 @@ using viua::util::memory::aligned_write;
 
 
 int_op::int_op()
-        : type(IntegerOperandType::PLAIN)
-        , rs_type(viua::internals::RegisterSets::CURRENT)
+        : type(Integer_operand_type::PLAIN)
+        , rs_type(viua::internals::Register_sets::CURRENT)
         , value(0) {}
-int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n)
-        : type(t), rs_type(viua::internals::RegisterSets::CURRENT), value(n) {}
-int_op::int_op(IntegerOperandType t,
-               viua::internals::RegisterSets rst,
+int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
+        : type(t), rs_type(viua::internals::Register_sets::CURRENT), value(n) {}
+int_op::int_op(Integer_operand_type t,
+               viua::internals::Register_sets rst,
                viua::internals::types::plain_int n)
         : type(t), rs_type(rst), value(n) {}
 int_op::int_op(viua::internals::types::plain_int n)
-        : type(IntegerOperandType::PLAIN)
-        , rs_type(viua::internals::RegisterSets::CURRENT)
+        : type(Integer_operand_type::PLAIN)
+        , rs_type(viua::internals::Register_sets::CURRENT)
         , value(n) {}
 
-timeout_op::timeout_op() : type(IntegerOperandType::PLAIN), value(0) {}
-timeout_op::timeout_op(IntegerOperandType t, viua::internals::types::timeout n)
+timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
+timeout_op::timeout_op(Integer_operand_type t, viua::internals::types::timeout n)
         : type(t), value(n) {}
 timeout_op::timeout_op(viua::internals::types::timeout n)
-        : type(IntegerOperandType::PLAIN), value(n) {}
+        : type(Integer_operand_type::PLAIN), value(n) {}
 
 
 static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
@@ -59,7 +59,7 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
      *  will look into a register the integer points to, fetch an integer from
      * this register and use the fetched register as the operand.
      */
-    if (op.type == IntegerOperandType::VOID) {
+    if (op.type == Integer_operand_type::VOID) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_VOID;
         pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
         return addr_ptr;
@@ -69,9 +69,9 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
      * Since we store everything in a big array of bytes we have to cast
      * incompatible pointers to actually put *valid* data inside it.
      */
-    if (op.type == IntegerOperandType::POINTER_DEREFERENCE) {
+    if (op.type == Integer_operand_type::POINTER_DEREFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_POINTER;
-    } else if (op.type == IntegerOperandType::REGISTER_REFERENCE) {
+    } else if (op.type == Integer_operand_type::REGISTER_REFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
     } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
@@ -82,8 +82,8 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
     pointer::inc<viua::internals::types::register_index,
                  viua::internals::types::byte>(addr_ptr);
 
-    *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = op.rs_type;
-    pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(
+    *(reinterpret_cast<viua::internals::Register_sets*>(addr_ptr)) = op.rs_type;
+    pointer::inc<viua::internals::Register_sets, viua::internals::types::byte>(
         addr_ptr);
 
     return addr_ptr;

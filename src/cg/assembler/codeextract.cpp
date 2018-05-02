@@ -78,7 +78,7 @@ auto assembler::ce::getlinks(std::vector<viua::cg::lex::Token> const& tokens)
         if (tokens.at(i) == ".import:") {
             ++i;  // skip '.import:' token
             if (tokens.at(i) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     tokens.at(i), "missing module name in import directive");
             }
             links.emplace_back(tokens.at(i));
@@ -118,11 +118,11 @@ static auto get_instruction_block_names(std::vector<Token> const& tokens,
             }
 
             if (defined_where.count(tokens.at(i)) > 0) {
-                throw viua::cg::lex::TracedSyntaxError()
-                    .append(viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Traced_syntax_error()
+                    .append(viua::cg::lex::Invalid_syntax(
                         tokens.at(i),
                         ("duplicated name: " + tokens.at(i).str())))
-                    .append(viua::cg::lex::InvalidSyntax(
+                    .append(viua::cg::lex::Invalid_syntax(
                         defined_where.at(tokens.at(i)),
                         "already defined here:"));
             }
@@ -193,7 +193,7 @@ static auto get_raw_block_bodies(std::string const& type,
             ++i;  // skip '\n' token
             while (i < tokens.size() and tokens[i].str() != ".end") {
                 if (tokens[i] == looking_for) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         tokens[i],
                         ("another " + type
                          + " opened before assembler reached .end after '"

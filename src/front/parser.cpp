@@ -47,9 +47,9 @@ bool AS_LIB = false;
 
 
 using namespace viua::assembler::frontend::parser;
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
+using viua::cg::lex::Traced_syntax_error;
 
 
 template<class T>
@@ -172,11 +172,11 @@ int main(int argc, char* argv[]) {
     try {
         tokens            = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
-    } catch (viua::cg::lex::InvalidSyntax const& e) {
+    } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::TracedSyntaxError const& e) {
+    } catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -187,11 +187,11 @@ int main(int argc, char* argv[]) {
             viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
-    } catch (viua::cg::lex::InvalidSyntax const& e) {
+    } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::TracedSyntaxError const& e) {
+    } catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;

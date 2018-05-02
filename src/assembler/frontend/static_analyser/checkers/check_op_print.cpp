@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_print(Register_usage_profile& register_usage_profile,
                     Instruction const& instruction) -> void {
-    auto operand = get_input_operand<RegisterIndex>(instruction, 0);
+    auto operand = get_input_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -39,7 +39,7 @@ auto check_op_print(Register_usage_profile& register_usage_profile,
     // a pointer, and even if we can't be sure if it's a pointer to text or
     // integer, the fact that a register holds a *pointer* is valuable on its
     // own.
-    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+    assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *operand);
 
     register_usage_profile.use(Register(*operand), operand->tokens.at(0));

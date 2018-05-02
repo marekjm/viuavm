@@ -31,15 +31,15 @@ using namespace std;
 
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
-    viua::internals::RegisterSets target_rs =
-        viua::internals::RegisterSets::CURRENT;
+    viua::internals::Register_sets target_rs =
+        viua::internals::Register_sets::CURRENT;
     viua::internals::types::register_index target_ri = 0;
     tie(addr, target_rs, target_ri) =
         viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
                                                                          this);
 
-    viua::internals::RegisterSets pack_start_rs =
-        viua::internals::RegisterSets::CURRENT;
+    viua::internals::Register_sets pack_start_rs =
+        viua::internals::Register_sets::CURRENT;
     viua::internals::types::register_index pack_start_ri = 0;
     tie(addr, pack_start_rs, pack_start_ri) =
         viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,

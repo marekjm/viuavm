@@ -29,8 +29,8 @@ using namespace std;
 
 
 static void os_system(Frame* frame,
-                      viua::kernel::RegisterSet*,
-                      viua::kernel::RegisterSet*,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
                       viua::process::Process*,
                       viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
@@ -43,11 +43,11 @@ static void os_system(Frame* frame,
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"std::os::system/1", &os_system},
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
+extern "C" const Foreign_function_spec* exports() {
     return functions;
 }

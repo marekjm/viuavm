@@ -52,7 +52,7 @@ class Token {
     Token();
 };
 
-struct InvalidSyntax {
+struct Invalid_syntax {
     std::vector<Token>::size_type line_number, character_in_line;
     std::string content;
     std::string message;
@@ -69,36 +69,36 @@ struct InvalidSyntax {
     auto character() const -> decltype(character_in_line);
     auto match(Token const) const -> bool;
 
-    auto add(Token) -> InvalidSyntax&;
+    auto add(Token) -> Invalid_syntax&;
 
-    auto note(std::string) -> InvalidSyntax&;
+    auto note(std::string) -> Invalid_syntax&;
     auto notes() const -> const decltype(attached_notes)&;
 
-    auto aside(std::string) -> InvalidSyntax&;
-    auto aside(Token, std::string) -> InvalidSyntax&;
+    auto aside(std::string) -> Invalid_syntax&;
+    auto aside(Token, std::string) -> Invalid_syntax&;
     auto aside() const -> std::string;
     auto match_aside(Token) const -> bool;
 
-    InvalidSyntax(decltype(line_number),
+    Invalid_syntax(decltype(line_number),
                   decltype(character_in_line),
                   std::string);
-    InvalidSyntax(Token, std::string = "");
+    Invalid_syntax(Token, std::string = "");
 };
 
-struct UnusedValue : public InvalidSyntax {
-    UnusedValue(Token);
-    UnusedValue(Token, std::string);
+struct Unused_value : public Invalid_syntax {
+    Unused_value(Token);
+    Unused_value(Token, std::string);
 };
 
-struct TracedSyntaxError {
-    std::vector<InvalidSyntax> errors;
+struct Traced_syntax_error {
+    std::vector<Invalid_syntax> errors;
 
     auto what() const -> const char*;
 
     auto line() const -> decltype(errors.front().line());
     auto character() const -> decltype(errors.front().character());
 
-    auto append(InvalidSyntax const&) -> TracedSyntaxError&;
+    auto append(Invalid_syntax const&) -> Traced_syntax_error&;
 };
 
 auto is_reserved_keyword(std::string const&) -> bool;

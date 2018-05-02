@@ -32,7 +32,7 @@ auto check_op_arg(Register_usage_profile& register_usage_profile,
         return;
     }
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")

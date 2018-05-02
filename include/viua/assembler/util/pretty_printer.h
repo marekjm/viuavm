@@ -43,24 +43,24 @@ auto send_control_seq(std::string const&) -> std::string;
 
 auto underline_error_token(const std::vector<viua::cg::lex::Token>& tokens,
                            decltype(tokens.size()) i,
-                           viua::cg::lex::InvalidSyntax const& error) -> void;
+                           viua::cg::lex::Invalid_syntax const& error) -> void;
 auto display_error_line(const std::vector<viua::cg::lex::Token>& tokens,
-                        viua::cg::lex::InvalidSyntax const& error,
+                        viua::cg::lex::Invalid_syntax const& error,
                         decltype(tokens.size()) i,
                         size_t const) -> decltype(i);
 auto display_context_line(const std::vector<viua::cg::lex::Token>& tokens,
-                          viua::cg::lex::InvalidSyntax const&,
+                          viua::cg::lex::Invalid_syntax const&,
                           decltype(tokens.size()) i,
                           size_t const) -> decltype(i);
-auto display_error_header(viua::cg::lex::InvalidSyntax const& error,
+auto display_error_header(viua::cg::lex::Invalid_syntax const& error,
                           std::string const& filename) -> void;
 auto display_error_location(const std::vector<viua::cg::lex::Token>& tokens,
-                            const viua::cg::lex::InvalidSyntax error) -> void;
+                            const viua::cg::lex::Invalid_syntax error) -> void;
 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
-                              const viua::cg::lex::InvalidSyntax error,
+                              const viua::cg::lex::Invalid_syntax error,
                               std::string const& filename) -> void;
 auto display_error_in_context(const std::vector<viua::cg::lex::Token>& tokens,
-                              const viua::cg::lex::TracedSyntaxError error,
+                              const viua::cg::lex::Traced_syntax_error error,
                               std::string const& filename) -> void;
 }}}}  // namespace viua::assembler::util::pretty_printer
 

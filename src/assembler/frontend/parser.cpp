@@ -26,19 +26,19 @@
 using namespace std;
 
 
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
-using viua::internals::AccessSpecifier;
-using viua::internals::RegisterSets;
+using viua::cg::lex::Traced_syntax_error;
+using viua::internals::Access_specifier;
+using viua::internals::Register_sets;
 
 
 // This value is completely arbitrary.
 const auto max_distance_for_misspelled_ids = str::LevenshteinDistance{4};
 
 
-auto viua::assembler::frontend::parser::ParsedSource::block(
-    std::string const name) const -> InstructionsBlock const& {
+auto viua::assembler::frontend::parser::Parsed_source::block(
+    std::string const name) const -> Instructions_block const& {
     for (auto const& each : blocks) {
         if (each.name == name) {
             return each;
@@ -69,7 +69,7 @@ auto viua::assembler::frontend::parser::parse_attribute_value(
     }
 
     if (tokens.at(i) != "}") {
-        throw InvalidSyntax(tokens.at(i), "expected '}'");
+        throw Invalid_syntax(tokens.at(i), "expected '}'");
     }
     ++i;
 
@@ -77,12 +77,12 @@ auto viua::assembler::frontend::parser::parse_attribute_value(
 }
 auto viua::assembler::frontend::parser::parse_attributes(
     const vector_view<Token> tokens,
-    decltype(InstructionsBlock::attributes)& attributes)
+    decltype(Instructions_block::attributes)& attributes)
     -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i) != "[[") {
-        throw InvalidSyntax(tokens.at(i), "expected '[['");
+        throw Invalid_syntax(tokens.at(i), "expected '[['");
     }
     ++i;  // skip '[['
 
@@ -97,7 +97,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
         } else if (tokens.at(i) == "]]") {
             // do nothing
         } else {
-            throw InvalidSyntax(tokens.at(i), "expected ',' or '{' or ']]'");
+            throw Invalid_syntax(tokens.at(i), "expected ',' or '{' or ']]'");
         }
 
         attributes[key] = value;
@@ -105,7 +105,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
     ++i;  // skip ']]'
 
     if (i == tokens.size()) {
-        throw InvalidSyntax(tokens.at(i - 1),
+        throw Invalid_syntax(tokens.at(i - 1),
                             "unexpected end-of-file: expected function name");
     }
 
@@ -121,14 +121,14 @@ auto viua::assembler::frontend::parser::parse_operand(
     auto tok = tokens.at(i).str();
 
     if (tok.at(0) == '%' or tok.at(0) == '*' or tok.at(0) == '@') {
-        auto ri = make_unique<RegisterIndex>();
+        auto ri = make_unique<Register_index>();
 
         if (tok.at(0) == '%') {
-            ri->as = AccessSpecifier::DIRECT;
+            ri->as = Access_specifier::DIRECT;
         } else if (tok.at(0) == '*') {
-            ri->as = AccessSpecifier::POINTER_DEREFERENCE;
+            ri->as = Access_specifier::POINTER_DEREFERENCE;
         } else if (tok.at(0) == '@') {
-            ri->as = AccessSpecifier::REGISTER_INDIRECT;
+            ri->as = Access_specifier::REGISTER_INDIRECT;
         }
         ri->add(tokens.at(i));  // add index token
 
@@ -136,14 +136,14 @@ auto viua::assembler::frontend::parser::parse_operand(
             ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
             ri->resolved = true;
         } else if (str::isnum(tok.substr(1), true)) {
-            throw InvalidSyntax(tokens.at(0),
+            throw Invalid_syntax(tokens.at(0),
                                 "register indexes cannot be negative: "
                                     + tok.substr(1));
         } else {
             // FIXME Throw this error during register usage analysis, when we
             // have a full map of names built so "did you mean...?" note can be
             // provided. Mark the register index as unresolved to prevent it
-            // from being accidentally used. throw InvalidSyntax(tokens.at(0),
+            // from being accidentally used. throw Invalid_syntax(tokens.at(0),
             // "undeclared register name: " + tok.substr(1));
             ri->resolved = false;
         }
@@ -152,13 +152,13 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         auto has_rss = true;
         if (tokens.at(i) == "current") {
-            ri->rss = RegisterSets::CURRENT;
+            ri->rss = Register_sets::CURRENT;
         } else if (tokens.at(i) == "local") {
-            ri->rss = RegisterSets::LOCAL;
+            ri->rss = Register_sets::LOCAL;
         } else if (tokens.at(i) == "static") {
-            ri->rss = RegisterSets::STATIC;
+            ri->rss = Register_sets::STATIC;
         } else if (tokens.at(i) == "global") {
-            ri->rss = RegisterSets::GLOBAL;
+            ri->rss = Register_sets::GLOBAL;
         } else {
             /*
              * This is just for 'arg' instruction's special-case, where
@@ -265,7 +265,7 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(offset);
     } else {
-        throw InvalidSyntax(tokens.at(i), "invalid operand");
+        throw Invalid_syntax(tokens.at(i), "invalid operand");
     }
 
     if (tokens.at(i) == "[[") {
@@ -312,10 +312,10 @@ auto viua::assembler::frontend::parser::parse_instruction(
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i).str().at(0) == '.') {
-        throw InvalidSyntax(tokens.at(i), "expected mnemonic");
+        throw Invalid_syntax(tokens.at(i), "expected mnemonic");
     }
     if (not viua::cg::lex::is_mnemonic(tokens.at(i).str())) {
-        auto error = InvalidSyntax(tokens.at(i), "unknown instruction");
+        auto error = Invalid_syntax(tokens.at(i), "unknown instruction");
         if (auto suggestion = str::levenshtein_best(
                 tokens.at(i), get_mnemonics(), max_distance_for_misspelled_ids);
             suggestion.first) {
@@ -338,7 +338,7 @@ auto viua::assembler::frontend::parser::parse_instruction(
             instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
-    } catch (InvalidSyntax& e) {
+    } catch (Invalid_syntax& e) {
         throw e.add(tokens.at(0));
     }
 
@@ -350,7 +350,7 @@ auto viua::assembler::frontend::parser::parse_directive(
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
-        auto error = InvalidSyntax(tokens.at(0), "unknown directive");
+        auto error = Invalid_syntax(tokens.at(0), "unknown directive");
         if (auto suggestion =
                 str::levenshtein_best(tokens.at(i),
                                       get_directives(),
@@ -363,19 +363,19 @@ auto viua::assembler::frontend::parser::parse_directive(
 
     if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:"
         or tokens.at(0) == ".closure:") {
-        throw InvalidSyntax(tokens.at(0), "no '.end' between definitions");
+        throw Invalid_syntax(tokens.at(0), "no '.end' between definitions");
     }
 
     directive->directive = tokens.at(i++);
 
     if (tokens.at(0) == ".iota:") {
         if (not str::isnum(tokens.at(i), false)) {
-            throw InvalidSyntax(tokens.at(i), "expected a positive integer");
+            throw Invalid_syntax(tokens.at(i), "expected a positive integer");
         }
         directive->operands.push_back(tokens.at(i++));
     } else if (tokens.at(0) == ".mark:") {
         if (not str::isid(tokens.at(i))) {
-            throw InvalidSyntax(tokens.at(i), "invalid marker");
+            throw Invalid_syntax(tokens.at(i), "invalid marker");
         }
         directive->operands.push_back(tokens.at(i++));
     } else if (tokens.at(0) == ".unused:") {
@@ -386,7 +386,7 @@ auto viua::assembler::frontend::parser::parse_directive(
     }
 
     if (tokens.at(i) != "\n") {
-        throw InvalidSyntax(tokens.at(i), "extra parameters to a directive")
+        throw Invalid_syntax(tokens.at(i), "extra parameters to a directive")
             .add(tokens.at(0));
     }
     ++i;  // skip newline
@@ -415,10 +415,10 @@ auto viua::assembler::frontend::parser::parse_line(
 }
 
 using viua::assembler::frontend::parser::Directive;
-using viua::assembler::frontend::parser::InstructionsBlock;
+using viua::assembler::frontend::parser::Instructions_block;
 using InstructionIndex = decltype(
-    viua::assembler::frontend::parser::InstructionsBlock::body)::size_type;
-static auto populate_marker_map(InstructionsBlock& instructions_block) -> void {
+    viua::assembler::frontend::parser::Instructions_block::body)::size_type;
+static auto populate_marker_map(Instructions_block& instructions_block) -> void {
     // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
@@ -436,7 +436,7 @@ static auto populate_marker_map(InstructionsBlock& instructions_block) -> void {
 }
 auto viua::assembler::frontend::parser::parse_block_body(
     const vector_view<Token> tokens,
-    InstructionsBlock& instructions_block) -> decltype(tokens)::size_type {
+    Instructions_block& instructions_block) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
@@ -445,7 +445,7 @@ auto viua::assembler::frontend::parser::parse_block_body(
         instructions_block.body.push_back(std::move(line));
     }
     if (tokens.at(i) != ".end") {
-        throw InvalidSyntax(tokens.at(i), "no '.end' at the end of a block");
+        throw Invalid_syntax(tokens.at(i), "no '.end' at the end of a block");
     }
     instructions_block.ending_token = tokens.at(i);
 
@@ -456,7 +456,7 @@ auto viua::assembler::frontend::parser::parse_block_body(
 
 auto viua::assembler::frontend::parser::parse_function(
     const vector_view<Token> tokens,
-    InstructionsBlock& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -464,27 +464,27 @@ auto viua::assembler::frontend::parser::parse_function(
     ib.name = tokens.at(i);
 
     if (not::assembler::utils::is_valid_function_name(ib.name)) {
-        throw InvalidSyntax(ib.name,
+        throw Invalid_syntax(ib.name,
                             ("invalid function name: " + ib.name.str()));
     }
 
     ++i;  // skip name
 
     if (tokens.at(i) != "\n") {
-        throw InvalidSyntax(tokens.at(i),
+        throw Invalid_syntax(tokens.at(i),
                             "unexpected token after function name");
     }
     ++i;  // skip newline
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (InvalidSyntax& e) {
-        throw TracedSyntaxError().append(e).append(
-            InvalidSyntax(ib.name, ("in function " + ib.name.str())));
+    } catch (Invalid_syntax& e) {
+        throw Traced_syntax_error().append(e).append(
+            Invalid_syntax(ib.name, ("in function " + ib.name.str())));
     }
 
     if (not ib.body.size()) {
-        throw InvalidSyntax(ib.name,
+        throw Invalid_syntax(ib.name,
                             ("function with empty body: " + ib.name.str()));
     }
 
@@ -492,7 +492,7 @@ auto viua::assembler::frontend::parser::parse_function(
 }
 auto viua::assembler::frontend::parser::parse_closure(
     const vector_view<Token> tokens,
-    InstructionsBlock& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -501,31 +501,31 @@ auto viua::assembler::frontend::parser::parse_closure(
     ib.name    = tokens.at(i);
 
     if (not::assembler::utils::is_valid_function_name(ib.name)) {
-        throw InvalidSyntax(ib.name,
+        throw Invalid_syntax(ib.name,
                             ("invalid function name: " + ib.name.str()));
     }
     if (::assembler::utils::get_function_arity(ib.name) == -1) {
-        throw InvalidSyntax(
+        throw Invalid_syntax(
             ib.name, ("function with undefined arity: " + ib.name.str()));
     }
 
     ++i;  // skip name
 
     if (tokens.at(i) != "\n") {
-        throw InvalidSyntax(tokens.at(i),
+        throw Invalid_syntax(tokens.at(i),
                             "unexpected token after function name");
     }
     ++i;  // skip newline
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (InvalidSyntax& e) {
-        throw TracedSyntaxError().append(e).append(
-            InvalidSyntax(ib.name, ("in function " + ib.name.str())));
+    } catch (Invalid_syntax& e) {
+        throw Traced_syntax_error().append(e).append(
+            Invalid_syntax(ib.name, ("in function " + ib.name.str())));
     }
 
     if (not ib.body.size()) {
-        throw InvalidSyntax(ib.name,
+        throw Invalid_syntax(ib.name,
                             ("function with empty body: " + ib.name.str()));
     }
 
@@ -533,7 +533,7 @@ auto viua::assembler::frontend::parser::parse_closure(
 }
 auto viua::assembler::frontend::parser::parse_block(
     const vector_view<Token> tokens,
-    InstructionsBlock& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -543,19 +543,19 @@ auto viua::assembler::frontend::parser::parse_block(
     ++i;  // skip name
 
     if (tokens.at(i) != "\n") {
-        throw InvalidSyntax(tokens.at(i), "unexpected token after block name");
+        throw Invalid_syntax(tokens.at(i), "unexpected token after block name");
     }
     ++i;  // skip newline
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (InvalidSyntax& e) {
-        throw TracedSyntaxError().append(e).append(
-            InvalidSyntax(ib.name, ("in block " + ib.name.str())));
+    } catch (Invalid_syntax& e) {
+        throw Traced_syntax_error().append(e).append(
+            Invalid_syntax(ib.name, ("in block " + ib.name.str())));
     }
 
     if (not ib.body.size()) {
-        throw InvalidSyntax(ib.name,
+        throw Invalid_syntax(ib.name,
                             ("block with empty body: " + ib.name.str()));
     }
 
@@ -563,8 +563,8 @@ auto viua::assembler::frontend::parser::parse_block(
 }
 
 auto viua::assembler::frontend::parser::parse(const std::vector<Token>& tokens)
-    -> ParsedSource {
-    ParsedSource parsed;
+    -> Parsed_source {
+    Parsed_source parsed;
 
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
          i < tokens.size();
@@ -573,43 +573,43 @@ auto viua::assembler::frontend::parser::parse(const std::vector<Token>& tokens)
             continue;
         }
         if (tokens.at(i) == ".function:") {
-            InstructionsBlock ib;
+            Instructions_block ib;
             i += parse_function(vector_view<Token>(tokens, i), ib);
             parsed.functions.push_back(std::move(ib));
         } else if (tokens.at(i) == ".block:") {
-            InstructionsBlock ib;
+            Instructions_block ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
             parsed.blocks.push_back(std::move(ib));
         } else if (tokens.at(i) == ".closure:") {
-            InstructionsBlock ib;
+            Instructions_block ib;
             i += parse_closure(vector_view<Token>(tokens, i), ib);
             parsed.functions.push_back(std::move(ib));
         } else if (tokens.at(i) == ".signature:") {
             ++i;
             if (tokens.at(i) == "\n") {
-                throw InvalidSyntax(tokens.at(i - 1), "missing function name");
+                throw Invalid_syntax(tokens.at(i - 1), "missing function name");
             }
             if (not::assembler::utils::is_valid_function_name(tokens.at(i))) {
-                throw InvalidSyntax(tokens.at(i), "not a valid function name");
+                throw Invalid_syntax(tokens.at(i), "not a valid function name");
             }
             parsed.function_signatures.push_back(tokens.at(i++));
         } else if (tokens.at(i) == ".bsignature:") {
             ++i;
             if (tokens.at(i) == "\n") {
-                throw InvalidSyntax(tokens.at(i - 1), "missing block name");
+                throw Invalid_syntax(tokens.at(i - 1), "missing block name");
             }
             parsed.block_signatures.push_back(tokens.at(i++));
         } else if (tokens.at(i) == ".end") {
-            throw InvalidSyntax(tokens.at(i), "stray .end marker");
+            throw Invalid_syntax(tokens.at(i), "stray .end marker");
         } else if (tokens.at(i) == ".info:") {
             // FIXME add meta information to parsed source
             // for now just skip key and value
             i += 2;
         } else if (tokens.at(i).str().at(0) == '.') {
-            throw InvalidSyntax(tokens.at(i), "illegal directive")
+            throw Invalid_syntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
         } else {
-            throw InvalidSyntax(tokens.at(i),
+            throw Invalid_syntax(tokens.at(i),
                                 "expected a function or a block definition (or "
                                 "signature), or a newline");
         }

@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_draw(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")

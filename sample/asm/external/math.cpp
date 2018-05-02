@@ -29,7 +29,7 @@
 using namespace std;
 
 
-static auto math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+static auto math_sqrt(Frame* frame, viua::kernel::Register_set*, viua::kernel::Register_set*,
                       viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
         throw make_unique<viua::types::Exception>("expected float as first argument");
@@ -43,8 +43,8 @@ static auto math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"math::sqrt/1", &math_sqrt}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports() { return functions; }

@@ -27,9 +27,9 @@ namespace static_analyser { namespace checkers {
 auto check_op_capture(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction,
                       std::map<Register, Closure>& created_closures) -> void {
-    using viua::internals::RegisterSets;
+    using viua::internals::Register_sets;
 
-    auto closure = get_operand<RegisterIndex>(instruction, 0);
+    auto closure = get_operand<Register_index>(instruction, 0);
     if (not closure) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -37,19 +37,19 @@ auto check_op_capture(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *closure);
-    assert_type_of_register<viua::internals::ValueTypes::CLOSURE>(
+    assert_type_of_register<viua::internals::Value_types::CLOSURE>(
         register_usage_profile, *closure);
 
     // this index is not verified because it is used as *the* index to use when
     // putting a value inside the closure
-    auto index = get_operand<RegisterIndex>(instruction, 1);
+    auto index = get_operand<Register_index>(instruction, 1);
     if (not index) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    auto source = get_operand<RegisterIndex>(instruction, 2);
+    auto source = get_operand<Register_index>(instruction, 2);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(2)->tokens,
                              "invalid operand")
@@ -57,12 +57,12 @@ auto check_op_capture(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *source);
-    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+    assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 
     auto val         = Register{};
     val.index        = index->index;
-    val.register_set = RegisterSets::LOCAL;
+    val.register_set = Register_sets::LOCAL;
     val.value_type   = register_usage_profile.at(*source).second.value_type;
     created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }

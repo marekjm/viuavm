@@ -115,7 +115,7 @@ static auto get_name(const map<std::string, std::string>& named_registers,
             std::remove_reference<decltype(named_registers)>::type::value_type
                 t) { return (t.second == name); });
     if (it == named_registers.end()) {
-        throw viua::cg::lex::InvalidSyntax(context,
+        throw viua::cg::lex::Invalid_syntax(context,
                                            ("register is not named: " + name));
     }
     return it->first;
@@ -126,7 +126,7 @@ static std::string resolve_register_name(
     std::string name,
     const bool allow_direct_access = false) {
     if (name == "\n") {
-        throw viua::cg::lex::InvalidSyntax(token,
+        throw viua::cg::lex::Invalid_syntax(token,
                                            "expected operand, found newline");
     }
     if (name == "void" or name == "true" or name == "false") {
@@ -135,7 +135,7 @@ static std::string resolve_register_name(
     if (name.at(0) == '@' or name.at(0) == '*' or name.at(0) == '%') {
         name = name.substr(1);
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token,
             ("not a valid register accessor: "
              + str::enquote(str::strencode(name))));
@@ -148,7 +148,7 @@ static std::string resolve_register_name(
                          or token.original().at(0) == '*')
                         and token.original().substr(1) == "iota")
                     or token.original() == "\n")) {
-            throw viua::cg::lex::InvalidSyntax(
+            throw viua::cg::lex::Invalid_syntax(
                 token,
                 ("accessing named register using direct index: "
                  + str::enquote(get_name(named_registers, name, token))
@@ -157,11 +157,11 @@ static std::string resolve_register_name(
         return name;
     }
     if (str::isnum(name, true)) {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token, ("register indexes cannot be negative: " + name));
     }
     if (named_registers.count(name) == 0) {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token,
             ("not a named register: " + str::enquote(str::strencode(name))));
     }
@@ -175,11 +175,11 @@ static std::string resolve_register_name(
 
 static void check_timeout_operand(Token token) {
     if (token == "\n") {
-        throw viua::cg::lex::InvalidSyntax(token, "missing timeout operand");
+        throw viua::cg::lex::Invalid_syntax(token, "missing timeout operand");
     }
     static const regex timeout_regex{"^(?:0|[1-9]\\d*)m?s$"};
     if (token != "infinity" and not regex_match(token.str(), timeout_regex)) {
-        throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
+        throw viua::cg::lex::Invalid_syntax(token, "invalid timeout operand");
     }
 }
 
@@ -203,12 +203,12 @@ static void check_use_of_register_index(
                                   tokens.at(i),
                                   register_index,
                                   allow_direct_access_to_target);
-    } catch (viua::cg::lex::InvalidSyntax& e) {
+    } catch (viua::cg::lex::Invalid_syntax& e) {
         e.add(tokens.at(by));
         throw e;
     }
     if (resolved_register_name == "void") {
-        auto base_error = viua::cg::lex::InvalidSyntax(
+        auto base_error = viua::cg::lex::Invalid_syntax(
             tokens.at(i), "use of void as input register:");
         base_error.add(tokens.at(by));
         throw base_error;
@@ -220,14 +220,14 @@ static void check_use_of_register_index(
         if (resolved_register_name != strip_access_mode_sigil(register_index)) {
             message += (" := " + resolved_register_name);
         }
-        auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), message);
+        auto base_error = viua::cg::lex::Invalid_syntax(tokens.at(i), message);
         base_error.add(tokens.at(by));
         if (not registers.erased(resolved_register_name)) {
             throw base_error;
         }
-        viua::cg::lex::TracedSyntaxError traced_error;
+        viua::cg::lex::Traced_syntax_error traced_error;
         traced_error.append(base_error);
-        traced_error.append(viua::cg::lex::InvalidSyntax(
+        traced_error.append(viua::cg::lex::Invalid_syntax(
             registers.erased_by(resolved_register_name), "erased by:"));
         throw traced_error;
     }
@@ -274,7 +274,7 @@ static void check_defined_but_unused(Registers& registers) {
         if ((not registers.used(each.first))
             and (not registers.erased(each.first))
             and (not registers.maybe_unused(each.first))) {
-            throw viua::cg::lex::UnusedValue(each.second);
+            throw viua::cg::lex::Unused_value(each.second);
         }
     }
 }
@@ -296,13 +296,13 @@ static auto in_block_offset(TokenVector const& body_tokens,
             }
             if (body_tokens.at(i) == ".name:") {
                 if (named_registers.count(body_tokens.at(i + 2))) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         body_tokens.at(i + 2),
                         ("register name already taken: "
                          + str::strencode(body_tokens.at(i + 2))));
                 }
                 if (registers.defined(body_tokens.at(i + 1))) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         body_tokens.at(i + 1),
                         ("register defined before being named: "
                          + str::strencode(body_tokens.at(i + 1)) + " = "
@@ -336,13 +336,13 @@ static auto in_block_offset(TokenVector const& body_tokens,
             ++i;
             if (i < body_tokens.size() - 1 and body_tokens.at(i) == ".name:") {
                 if (named_registers.count(body_tokens.at(i + 2))) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         body_tokens.at(i + 2),
                         ("register name already taken: "
                          + str::strencode(body_tokens.at(i + 2))));
                 }
                 if (registers.defined(body_tokens.at(i + 1))) {
-                    throw viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Invalid_syntax(
                         body_tokens.at(i + 1),
                         ("register defined before being named: "
                          + str::strencode(body_tokens.at(i + 1)) + " = "
@@ -412,7 +412,7 @@ static auto get_token_index_of_operand(TokenVector const& tokens,
             ++i;
             --wanted_operand_index;
         } else {
-            throw viua::cg::lex::InvalidSyntax(
+            throw viua::cg::lex::Invalid_syntax(
                 tokens.at(i), "invalid token where operand index was expected");
         }
     }
@@ -434,13 +434,13 @@ static void check_block_body(TokenVector const& body_tokens,
         }
         if (token == ".name:") {
             if (named_registers.count(body_tokens.at(i + 2))) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 2),
                     ("register name already taken: "
                      + str::strencode(body_tokens.at(i + 2))));
             }
             if (registers.defined(body_tokens.at(i + 1))) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 1),
                     ("register defined before being named: "
                      + str::strencode(body_tokens.at(i + 1)) + " = "
@@ -486,16 +486,16 @@ static void check_block_body(TokenVector const& body_tokens,
                                  registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::InvalidSyntax& e) {
-                viua::cg::lex::InvalidSyntax base_error{
+            } catch (viua::cg::lex::Invalid_syntax& e) {
+                viua::cg::lex::Invalid_syntax base_error{
                     token,
                     ("after entering block "
                      + str::enquote(body_tokens.at(i + 1).original()))};
                 base_error.add(body_tokens.at(i + 1));
-                throw viua::cg::lex::TracedSyntaxError().append(e).append(
+                throw viua::cg::lex::Traced_syntax_error().append(e).append(
                     base_error);
-            } catch (viua::cg::lex::TracedSyntaxError& e) {
-                viua::cg::lex::InvalidSyntax base_error{
+            } catch (viua::cg::lex::Traced_syntax_error& e) {
+                viua::cg::lex::Invalid_syntax base_error{
                     token,
                     ("after entering block "
                      + str::enquote(body_tokens.at(i + 1).original()))};
@@ -725,7 +725,7 @@ static void check_block_body(TokenVector const& body_tokens,
 
             if (registers.defined(resolve_register_name(
                     named_registers, body_tokens.at(source)))) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     body_tokens.at(target),
                     ("useless check, register will always be defined: "
                      + str::strencode(
@@ -763,16 +763,16 @@ static void check_block_body(TokenVector const& body_tokens,
                                  copied_named_registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::UnusedValue& e) {
+            } catch (viua::cg::lex::Unused_value& e) {
                 // do not fail yet, because the value may be used by false
                 // branch save the error for later
                 register_with_unused_value = e.what();
-            } catch (viua::cg::lex::InvalidSyntax const& e) {
-                throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                    viua::cg::lex::InvalidSyntax(body_tokens.at(i + 1),
+            } catch (viua::cg::lex::Invalid_syntax const& e) {
+                throw viua::cg::lex::Traced_syntax_error().append(e).append(
+                    viua::cg::lex::Invalid_syntax(body_tokens.at(i + 1),
                                                  "after taking true branch:"));
-            } catch (viua::cg::lex::TracedSyntaxError& e) {
-                throw e.append(viua::cg::lex::InvalidSyntax(
+            } catch (viua::cg::lex::Traced_syntax_error& e) {
+                throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 1), "after taking true branch:"));
             }
             try {
@@ -787,19 +787,19 @@ static void check_block_body(TokenVector const& body_tokens,
                                  copied_named_registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::UnusedValue& e) {
+            } catch (viua::cg::lex::Unused_value& e) {
                 if (register_with_unused_value == e.what()) {
-                    throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                        viua::cg::lex::InvalidSyntax(
+                    throw viua::cg::lex::Traced_syntax_error().append(e).append(
+                        viua::cg::lex::Invalid_syntax(
                             body_tokens.at(i - 1),
                             "after taking either branch at:"));
                 }
-            } catch (viua::cg::lex::InvalidSyntax const& e) {
-                throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                    viua::cg::lex::InvalidSyntax(body_tokens.at(i + 2),
+            } catch (viua::cg::lex::Invalid_syntax const& e) {
+                throw viua::cg::lex::Traced_syntax_error().append(e).append(
+                    viua::cg::lex::Invalid_syntax(body_tokens.at(i + 2),
                                                  "after taking false branch:"));
-            } catch (viua::cg::lex::TracedSyntaxError& e) {
-                throw e.append(viua::cg::lex::InvalidSyntax(
+            } catch (viua::cg::lex::Traced_syntax_error& e) {
+                throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 2), "after taking false branch:"));
             }
             // early return because we already checked both true, and false
@@ -1012,7 +1012,7 @@ static void check_block_body(TokenVector const& body_tokens,
                 named_registers, body_tokens.at(pack_range_start)));
 
             if (body_tokens.at(pack_range_count).str().at(0) != '%') {
-                auto error = viua::cg::lex::InvalidSyntax(
+                auto error = viua::cg::lex::Invalid_syntax(
                     body_tokens.at(pack_range_count),
                     "expected register index operand");
                 error.add(body_tokens.at(i - 1));
@@ -1332,13 +1332,13 @@ void assembler::verify::manipulation_of_defined_registers(
                 if (not attributes.count("no_sa")) {
                     check_block_body(body, registers, block_bodies, debug);
                 }
-            } catch (viua::cg::lex::InvalidSyntax const& e) {
-                throw viua::cg::lex::TracedSyntaxError().append(e).append(
-                    viua::cg::lex::InvalidSyntax(
+            } catch (viua::cg::lex::Invalid_syntax const& e) {
+                throw viua::cg::lex::Traced_syntax_error().append(e).append(
+                    viua::cg::lex::Invalid_syntax(
                         tokens.at(i - body.size() - 2),
                         ("in function " + opened_function)));
-            } catch (viua::cg::lex::TracedSyntaxError& e) {
-                throw e.append(viua::cg::lex::InvalidSyntax(
+            } catch (viua::cg::lex::Traced_syntax_error& e) {
+                throw e.append(viua::cg::lex::Invalid_syntax(
                     tokens.at(i - body.size() - 2),
                     ("in function " + opened_function)));
             }

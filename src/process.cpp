@@ -60,16 +60,16 @@ viua::kernel::Register* viua::process::Process::register_at(
 
 viua::kernel::Register* viua::process::Process::register_at(
     viua::internals::types::register_index i,
-    viua::internals::RegisterSets rs) {
-    if (rs == viua::internals::RegisterSets::CURRENT) {
+    viua::internals::Register_sets rs) {
+    if (rs == viua::internals::Register_sets::CURRENT) {
         return currently_used_register_set->register_at(i);
-    } else if (rs == viua::internals::RegisterSets::LOCAL) {
+    } else if (rs == viua::internals::Register_sets::LOCAL) {
         return stack->back()->local_register_set->register_at(i);
-    } else if (rs == viua::internals::RegisterSets::STATIC) {
+    } else if (rs == viua::internals::Register_sets::STATIC) {
         ensure_static_registers(stack->back()->function_name);
         return static_registers.at(stack->back()->function_name)
             ->register_at(i);
-    } else if (rs == viua::internals::RegisterSets::GLOBAL) {
+    } else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
     } else {
         throw make_unique<viua::types::Exception>(
@@ -107,7 +107,7 @@ void viua::process::Process::ensure_static_registers(
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] =
-            make_unique<viua::kernel::RegisterSet>(16);
+            make_unique<viua::kernel::Register_set>(16);
     }
 }
 
@@ -457,12 +457,12 @@ bool viua::process::Process::empty() const {
 }
 
 void viua::process::Process::migrate_to(
-    viua::scheduler::VirtualProcessScheduler* sch) {
+    viua::scheduler::Virtual_process_scheduler* sch) {
     scheduler = sch;
 }
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
-                                viua::scheduler::VirtualProcessScheduler* sch,
+                                viua::scheduler::Virtual_process_scheduler* sch,
                                 viua::process::Process* pt,
                                 const bool enable_tracing)
         : tracing_enabled(enable_tracing)
@@ -478,7 +478,7 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , process_id(this)
         , is_hidden(false) {
     global_register_set =
-        make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
+        make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
     currently_used_register_set = frm->local_register_set.get();
     auto s                      = make_unique<Stack>(frm->function_name,
                                 this,

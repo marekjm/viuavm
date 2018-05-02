@@ -28,29 +28,29 @@
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
-auto verify_block_tries(parser::ParsedSource const&) -> void;
-auto verify_block_catches(parser::ParsedSource const&) -> void;
-auto verify_block_endings(parser::ParsedSource const& src) -> void;
-auto verify_frame_balance(parser::ParsedSource const& src) -> void;
-auto verify_function_call_arities(parser::ParsedSource const& src) -> void;
-auto verify_frames_have_no_gaps(parser::ParsedSource const& src) -> void;
-auto verify_jumps_are_in_range(parser::ParsedSource const&) -> void;
+auto verify_block_tries(parser::Parsed_source const&) -> void;
+auto verify_block_catches(parser::Parsed_source const&) -> void;
+auto verify_block_endings(parser::Parsed_source const& src) -> void;
+auto verify_frame_balance(parser::Parsed_source const& src) -> void;
+auto verify_function_call_arities(parser::Parsed_source const& src) -> void;
+auto verify_frames_have_no_gaps(parser::Parsed_source const& src) -> void;
+auto verify_jumps_are_in_range(parser::Parsed_source const&) -> void;
 
-auto verify(parser::ParsedSource const&) -> void;
+auto verify(parser::Parsed_source const&) -> void;
 
 struct Register {
     viua::internals::types::register_index index{0};
-    viua::internals::RegisterSets register_set =
-        viua::internals::RegisterSets::LOCAL;
-    viua::internals::ValueTypes value_type =
-        viua::internals::ValueTypes::UNDEFINED;
+    viua::internals::Register_sets register_set =
+        viua::internals::Register_sets::LOCAL;
+    viua::internals::Value_types value_type =
+        viua::internals::Value_types::UNDEFINED;
     std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
 
     auto operator<(Register const& that) const -> bool;
     auto operator==(Register const& that) const -> bool;
 
     Register() = default;
-    Register(viua::assembler::frontend::parser::RegisterIndex const&);
+    Register(viua::assembler::frontend::parser::Register_index const&);
 };
 
 struct Closure {
@@ -126,7 +126,7 @@ class Register_usage_profile {
     auto defined_where(Register const r) const -> viua::cg::lex::Token;
 
     auto infer(Register const r,
-               viua::internals::ValueTypes const value_type_id,
+               viua::internals::Value_types const value_type_id,
                viua::cg::lex::Token const& t) -> void;
 
     auto at(Register const r) const -> const
@@ -147,20 +147,20 @@ class Register_usage_profile {
 
 namespace checkers {
 using viua::assembler::frontend::parser::Instruction;
-using viua::assembler::frontend::parser::InstructionsBlock;
-using viua::assembler::frontend::parser::ParsedSource;
-using InstructionIndex = InstructionsBlock::size_type;
+using viua::assembler::frontend::parser::Instructions_block;
+using viua::assembler::frontend::parser::Parsed_source;
+using InstructionIndex = Instructions_block::size_type;
 
-auto to_string(viua::internals::RegisterSets const) -> std::string;
-auto to_string(viua::internals::ValueTypes const) -> std::string;
+auto to_string(viua::internals::Register_sets const) -> std::string;
+auto to_string(viua::internals::Value_types const) -> std::string;
 
 template<typename T>
 auto get_operand(
     viua::assembler::frontend::parser::Instruction const& instruction,
     size_t operand_index) -> T* {
     if (operand_index >= instruction.operands.size()) {
-        using viua::cg::lex::InvalidSyntax;
-        throw InvalidSyntax{instruction.tokens.at(0), "not enough operands"}
+        using viua::cg::lex::Invalid_syntax;
+        throw Invalid_syntax{instruction.tokens.at(0), "not enough operands"}
             .note("when extracting operand " + std::to_string(operand_index));
     }
     T* operand = dynamic_cast<T*>(instruction.operands.at(operand_index).get());
@@ -168,33 +168,33 @@ auto get_operand(
 }
 
 auto invalid_syntax(std::vector<viua::cg::lex::Token> const&, std::string const)
-    -> viua::cg::lex::InvalidSyntax;
-using viua::assembler::frontend::parser::RegisterIndex;
+    -> viua::cg::lex::Invalid_syntax;
+using viua::assembler::frontend::parser::Register_index;
 auto check_if_name_resolved(Register_usage_profile const& rup,
-                            RegisterIndex const r) -> void;
+                            Register_index const r) -> void;
 auto check_use_of_register(Register_usage_profile&,
-                           viua::assembler::frontend::parser::RegisterIndex,
+                           viua::assembler::frontend::parser::Register_index,
                            std::string const = "use of") -> void;
 
 
-using viua::internals::ValueTypes;
-auto operator|(ValueTypes const, ValueTypes const) -> ValueTypes;
-auto operator&(ValueTypes const, ValueTypes const) -> ValueTypes;
-auto operator^(ValueTypes const, ValueTypes const) -> ValueTypes;
-auto operator!(ValueTypes const) -> bool;
+using viua::internals::Value_types;
+auto operator|(Value_types const, Value_types const) -> Value_types;
+auto operator&(Value_types const, Value_types const) -> Value_types;
+auto operator^(Value_types const, Value_types const) -> Value_types;
+auto operator!(Value_types const) -> bool;
 
-auto depointerise_type_if_needed(viua::internals::ValueTypes const, bool const)
-    -> viua::internals::ValueTypes;
+auto depointerise_type_if_needed(viua::internals::Value_types const, bool const)
+    -> viua::internals::Value_types;
 
-template<viua::internals::ValueTypes expected_type>
+template<viua::internals::Value_types expected_type>
 auto assert_type_of_register(Register_usage_profile& register_usage_profile,
-                             RegisterIndex const& register_index)
-    -> viua::internals::ValueTypes {
-    using viua::cg::lex::InvalidSyntax;
-    using viua::cg::lex::TracedSyntaxError;
-    using viua::internals::ValueTypes;
+                             Register_index const& register_index)
+    -> viua::internals::Value_types {
+    using viua::cg::lex::Invalid_syntax;
+    using viua::cg::lex::Traced_syntax_error;
+    using viua::internals::Value_types;
 
-    if (register_index.rss == viua::internals::RegisterSets::GLOBAL) {
+    if (register_index.rss == viua::internals::Register_sets::GLOBAL) {
         return expected_type;
     }
 
@@ -203,24 +203,24 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
 
     auto access_via_pointer_dereference =
         (register_index.as
-         == viua::internals::AccessSpecifier::POINTER_DEREFERENCE);
+         == viua::internals::Access_specifier::POINTER_DEREFERENCE);
     if (access_via_pointer_dereference) {
         /*
          * Throw only if the type is not UNDEFINED.
          * If the type is UNDEFINED let the inferencer do its job.
          */
-        if ((actual_type != ValueTypes::UNDEFINED)
-            and not(actual_type & ValueTypes::POINTER)) {
+        if ((actual_type != Value_types::UNDEFINED)
+            and not(actual_type & Value_types::POINTER)) {
             auto error =
-                viua::cg::lex::TracedSyntaxError{}
-                    .append(InvalidSyntax(
+                viua::cg::lex::Traced_syntax_error{}
+                    .append(Invalid_syntax(
                                 register_index.tokens.at(0),
                                 "invalid type of value contained in register "
                                 "for this access type")
                                 .note("need pointer to "
                                       + to_string(expected_type) + ", got "
                                       + to_string(actual_type)))
-                    .append(InvalidSyntax(register_usage_profile.defined_where(
+                    .append(Invalid_syntax(register_usage_profile.defined_where(
                                               Register(register_index)),
                                           "")
                                 .note("register defined here"));
@@ -231,16 +231,16 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
          * Modify types only if they are defined.
          * Tinkering with UNDEFINEDs will prevent inferencer from kicking in.
          */
-        if (actual_type != ValueTypes::UNDEFINED) {
-            actual_type = (actual_type ^ ValueTypes::POINTER);
+        if (actual_type != Value_types::UNDEFINED) {
+            actual_type = (actual_type ^ Value_types::POINTER);
         }
     }
 
-    if (actual_type == ValueTypes::UNDEFINED) {
+    if (actual_type == Value_types::UNDEFINED) {
         auto inferred_type =
             (expected_type
-             | (access_via_pointer_dereference ? ValueTypes::POINTER
-                                               : ValueTypes::UNDEFINED));
+             | (access_via_pointer_dereference ? Value_types::POINTER
+                                               : Value_types::UNDEFINED));
         register_usage_profile.infer(Register(register_index),
                                      inferred_type,
                                      register_index.tokens.at(0));
@@ -248,25 +248,25 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                                            access_via_pointer_dereference);
     }
 
-    if (expected_type == ValueTypes::UNDEFINED) {
+    if (expected_type == Value_types::UNDEFINED) {
         return depointerise_type_if_needed(actual_type,
                                            access_via_pointer_dereference);
     }
     if (not(actual_type & expected_type)) {
         auto error =
-            TracedSyntaxError{}
+            Traced_syntax_error{}
                 .append(
-                    InvalidSyntax(register_index.tokens.at(0),
+                    Invalid_syntax(register_index.tokens.at(0),
                                   "invalid type of value contained in register")
                         .note("expected " + to_string(expected_type) + ", got "
                               + to_string(actual_type)))
-                .append(InvalidSyntax(register_usage_profile.defined_where(
+                .append(Invalid_syntax(register_usage_profile.defined_where(
                                           Register(register_index)),
                                       "")
                             .note("register defined here"));
         if (auto r = register_usage_profile.at(Register(register_index)).second;
             r.inferred.first) {
-            error.append(InvalidSyntax(r.inferred.second, "")
+            error.append(Invalid_syntax(r.inferred.second, "")
                              .note("type inferred here")
                              .aside(r.inferred.second,
                                     "deduced type is '"
@@ -287,7 +287,7 @@ auto get_input_operand(
     if ((not operand)
         and dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(
                 instruction.operands.at(operand_index).get())) {
-        throw viua::cg::lex::InvalidSyntax{
+        throw viua::cg::lex::Invalid_syntax{
             instruction.operands.at(operand_index)->tokens.at(0),
             "use of void as input register:"};
     }
@@ -428,24 +428,24 @@ auto check_op_receive(Register_usage_profile& register_usage_profile,
 auto check_op_watchdog(Register_usage_profile&, Instruction const& instruction)
     -> void;
 auto check_op_throw(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps,
+                    Parsed_source const& ps,
                     std::map<Register, Closure>&,
                     Instruction const&) -> void;
 auto check_op_draw(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_enter(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps,
+                    Parsed_source const& ps,
                     Instruction const& instruction) -> void;
 auto check_op_jump(Register_usage_profile& register_usage_profile,
-                   ParsedSource const& ps,
+                   Parsed_source const& ps,
                    Instruction const& instruction,
-                   InstructionsBlock const& ib,
+                   Instructions_block const& ib,
                    InstructionIndex i,
                    InstructionIndex const mnemonic_counter) -> void;
 auto check_op_if(Register_usage_profile& register_usage_profile,
-                 ParsedSource const& ps,
+                 Parsed_source const& ps,
                  Instruction const& instruction,
-                 InstructionsBlock const& ib,
+                 Instructions_block const& ib,
                  InstructionIndex i,
                  InstructionIndex const mnemonic_counter) -> void;
 auto check_op_atom(Register_usage_profile& register_usage_profile,
@@ -465,27 +465,27 @@ auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void;
 auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
-    ParsedSource const& ps,
+    Parsed_source const& ps,
     std::map<Register, Closure> const& created_closures) -> void;
 
 auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
-                                                     ParsedSource const&,
-                                                     InstructionsBlock const&,
+                                                     Parsed_source const&,
+                                                     Instructions_block const&,
                                                      InstructionIndex,
                                                      InstructionIndex) -> void;
 
 auto map_names_to_register_indexes(Register_usage_profile&,
-                                   InstructionsBlock const&) -> void;
+                                   Instructions_block const&) -> void;
 auto erase_if_direct_access(
     Register_usage_profile&,
-    RegisterIndex* const,
+    Register_index* const,
     viua::assembler::frontend::parser::Instruction const&) -> void;
 auto get_line_index_of_instruction(InstructionIndex const,
-                                   InstructionsBlock const&)
+                                   Instructions_block const&)
     -> InstructionIndex;
 }  // namespace checkers
 
-auto check_register_usage(parser::ParsedSource const&) -> void;
+auto check_register_usage(parser::Parsed_source const&) -> void;
 }}}}  // namespace viua::assembler::frontend::static_analyser
 
 #endif

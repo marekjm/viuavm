@@ -29,7 +29,7 @@ auto check_op_closure(Register_usage_profile& register_usage_profile,
                       std::map<Register, Closure>& created_closures) -> void {
     using viua::assembler::frontend::parser::FunctionNameLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -53,7 +53,7 @@ auto check_op_closure(Register_usage_profile& register_usage_profile,
      */
 
     auto val       = Register{*target};
-    val.value_type = ValueTypes::CLOSURE;
+    val.value_type = Value_types::CLOSURE;
     register_usage_profile.define(val, target->tokens.at(0));
 
     created_closures[val] = Closure{fn->content};

@@ -72,40 +72,40 @@ auto viua::kernel::Mailbox::size() const -> decltype(messages)::size_type {
 }
 
 
-viua::kernel::ProcessResult::ProcessResult(ProcessResult&& that) {
+viua::kernel::Process_result::Process_result(Process_result&& that) {
     value_returned   = std::move(that.value_returned);
     exception_thrown = std::move(that.exception_thrown);
     done.store(that.done.load(std::memory_order_acquire),
                std::memory_order_release);
 }
-auto viua::kernel::ProcessResult::resolve(std::unique_ptr<viua::types::Value> result)
+auto viua::kernel::Process_result::resolve(std::unique_ptr<viua::types::Value> result)
     -> void {
     unique_lock<mutex> lck{result_mutex};
     value_returned = std::move(result);
     done.store(true, std::memory_order_release);
 }
-auto viua::kernel::ProcessResult::raise(std::unique_ptr<viua::types::Value> failure)
+auto viua::kernel::Process_result::raise(std::unique_ptr<viua::types::Value> failure)
     -> void {
     unique_lock<mutex> lck{result_mutex};
     exception_thrown = std::move(failure);
     done.store(true, std::memory_order_release);
 }
-auto viua::kernel::ProcessResult::stopped() const -> bool {
+auto viua::kernel::Process_result::stopped() const -> bool {
     return done.load(std::memory_order_acquire);
 }
-auto viua::kernel::ProcessResult::terminated() const -> bool {
+auto viua::kernel::Process_result::terminated() const -> bool {
     if (done.load(std::memory_order_acquire)) {
         unique_lock<mutex> lck{result_mutex};
         return static_cast<bool>(exception_thrown);
     }
     return false;
 }
-auto viua::kernel::ProcessResult::transfer_exception()
+auto viua::kernel::Process_result::transfer_exception()
     -> std::unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck{result_mutex};
     return std::move(exception_thrown);
 }
-auto viua::kernel::ProcessResult::transfer_result()
+auto viua::kernel::Process_result::transfer_result()
     -> std::unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck{result_mutex};
     return std::move(value_returned);
@@ -275,7 +275,7 @@ void viua::kernel::Kernel::load_foreign_library(std::string const& module) {
             ("failed to open handle: " + module + ": " + dlerror()));
     }
 
-    using ExporterFunction   = const ForeignFunctionSpec* (*)();
+    using ExporterFunction   = const Foreign_function_spec* (*)();
     ExporterFunction exports = nullptr;
     if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports")))
         == nullptr) {
@@ -283,7 +283,7 @@ void viua::kernel::Kernel::load_foreign_library(std::string const& module) {
             "failed to extract interface from module: " + module);
     }
 
-    const ForeignFunctionSpec* exported = (*exports)();
+    const Foreign_function_spec* exported = (*exports)();
 
     size_t i = 0;
     while (exported[i].name != nullptr) {
@@ -363,7 +363,7 @@ void viua::kernel::Kernel::request_foreign_function_call(
     viua::process::Process* requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(
-        make_unique<viua::scheduler::ffi::ForeignFunctionCallRequest>(
+        make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
             frame, requesting_process, this));
 
     // unlock before calling notify_one() to avoid waking the worker thread when
@@ -402,7 +402,7 @@ auto viua::kernel::Kernel::delete_mailbox(const viua::process::PID pid)
 auto viua::kernel::Kernel::create_result_slot_for(viua::process::PID pid)
     -> void {
     unique_lock<mutex> lck{process_results_mutex};
-    process_results.emplace(pid, ProcessResult{});
+    process_results.emplace(pid, Process_result{});
 }
 auto viua::kernel::Kernel::detach_process(const viua::process::PID pid)
     -> void {
@@ -546,7 +546,7 @@ int viua::kernel::Kernel::run() {
     vp_schedulers_limit = no_of_vp_schedulers();
     bool enable_tracing = is_tracing_enabled();
 
-    auto vp_schedulers = std::vector<viua::scheduler::VirtualProcessScheduler>{};
+    auto vp_schedulers = std::vector<viua::scheduler::Virtual_process_scheduler>{};
 
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);

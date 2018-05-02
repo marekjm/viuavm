@@ -74,7 +74,7 @@ static auto resolveregister(viua::cg::lex::Token const token,
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token,
+        throw viua::cg::lex::Invalid_syntax(token,
                                            ("illegal operand: " + token.str()));
     }
     return out.str();
@@ -88,12 +88,12 @@ auto assembler::operands::getint(std::string const& s,
     }
 
     if (s == "void") {
-        return int_op(IntegerOperandType::VOID);
+        return int_op(Integer_operand_type::VOID);
     } else if (s.at(0) == '@') {
-        return int_op(IntegerOperandType::REGISTER_REFERENCE,
+        return int_op(Integer_operand_type::REGISTER_REFERENCE,
                       stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        return int_op(IntegerOperandType::POINTER_DEREFERENCE,
+        return int_op(Integer_operand_type::POINTER_DEREFERENCE,
                       stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         return int_op(stoi(s.substr(1)));
@@ -106,23 +106,23 @@ auto assembler::operands::getint(std::string const& s,
 
 auto assembler::operands::getint_with_rs_type(
     std::string const& s,
-    viua::internals::RegisterSets const rs_type,
+    viua::internals::Register_sets const rs_type,
     bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
 
     if (s == "void") {
-        return int_op(IntegerOperandType::VOID);
+        return int_op(Integer_operand_type::VOID);
     } else if (s.at(0) == '@') {
         return int_op(
-            IntegerOperandType::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
+            Integer_operand_type::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
-        return int_op(IntegerOperandType::POINTER_DEREFERENCE,
+        return int_op(Integer_operand_type::POINTER_DEREFERENCE,
                       rs_type,
                       stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
-        return int_op(IntegerOperandType::INDEX, rs_type, stoi(s.substr(1)));
+        return int_op(Integer_operand_type::INDEX, rs_type, stoi(s.substr(1)));
     } else if (allow_bare_integers and str::isnum(s)) {
         return int_op(stoi(s));
     } else {
@@ -139,19 +139,19 @@ auto assembler::operands::getint(std::vector<viua::cg::lex::Token> const& tokens
     }
 
     if (s == "void") {
-        return int_op(IntegerOperandType::VOID);
+        return int_op(Integer_operand_type::VOID);
     }
 
     auto iop = int_op{};
     if (s.at(0) == '@') {
-        iop = int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
+        iop = int_op(Integer_operand_type::REGISTER_REFERENCE, stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
         iop =
-            int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
+            int_op(Integer_operand_type::POINTER_DEREFERENCE, stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         iop = int_op(stoi(s.substr(1)));
     } else {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+        throw viua::cg::lex::Invalid_syntax(tokens.at(i),
                                            "cannot convert to register index");
     }
 
@@ -211,7 +211,7 @@ auto assembler::operands::convert_token_to_bitstring_operand(
         normalised_version =
             normalise_binary_literal(hexadecimal_to_binary_literal(s));
     } else {
-        throw viua::cg::lex::InvalidSyntax(token);
+        throw viua::cg::lex::Invalid_syntax(token);
     }
 
     reverse(normalised_version.begin(), normalised_version.end());

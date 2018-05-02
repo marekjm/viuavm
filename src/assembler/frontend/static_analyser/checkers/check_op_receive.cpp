@@ -28,7 +28,7 @@ auto check_op_receive(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::VoidLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         if (not get_operand<VoidLiteral>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,

@@ -37,7 +37,7 @@ namespace operands {
 auto resolve_register(viua::cg::lex::Token const,
                       bool const allow_bare_integers = false) -> std::string;
 auto resolve_rs_type(viua::cg::lex::Token const)
-    -> viua::internals::RegisterSets;
+    -> viua::internals::Register_sets;
 auto resolve_jump(
     viua::cg::lex::Token const,
     std::map<std::string, std::vector<viua::cg::lex::Token>::size_type> const&,
@@ -47,7 +47,7 @@ auto convert_token_to_timeout_operand(viua::cg::lex::Token const) -> timeout_op;
 
 auto getint(std::string const& s, const bool = false) -> int_op;
 auto getint_with_rs_type(std::string const&,
-                         const viua::internals::RegisterSets,
+                         const viua::internals::Register_sets,
                          const bool = false) -> int_op;
 auto getint(const std::vector<viua::cg::lex::Token>& tokens,
             decltype(tokens.size())) -> int_op;

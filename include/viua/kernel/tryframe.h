@@ -27,7 +27,7 @@
 #include <viua/kernel/catcher.h>
 #include <viua/kernel/frame.h>
 
-class TryFrame {
+class Try_frame {
   public:
     viua::internals::types::Op_address_type return_address;
     Frame* associated_frame;
@@ -40,7 +40,7 @@ class TryFrame {
         return return_address;
     }
 
-    TryFrame() : return_address(nullptr), associated_frame(nullptr) {}
+    Try_frame() : return_address(nullptr), associated_frame(nullptr) {}
 };
 
 

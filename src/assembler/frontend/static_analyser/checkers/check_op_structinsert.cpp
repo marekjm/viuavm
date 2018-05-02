@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_structinsert(Register_usage_profile& register_usage_profile,
                            Instruction const& instruction) -> void {
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -34,10 +34,10 @@ auto check_op_structinsert(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *target);
-    assert_type_of_register<viua::internals::ValueTypes::STRUCT>(
+    assert_type_of_register<viua::internals::Value_types::STRUCT>(
         register_usage_profile, *target);
 
-    auto key = get_operand<RegisterIndex>(instruction, 1);
+    auto key = get_operand<Register_index>(instruction, 1);
     if (not key) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
@@ -45,10 +45,10 @@ auto check_op_structinsert(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *key);
-    assert_type_of_register<viua::internals::ValueTypes::ATOM>(
+    assert_type_of_register<viua::internals::Value_types::ATOM>(
         register_usage_profile, *key);
 
-    auto source = get_operand<RegisterIndex>(instruction, 2);
+    auto source = get_operand<Register_index>(instruction, 2);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(2)->tokens,
                              "invalid operand")

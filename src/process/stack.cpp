@@ -27,9 +27,9 @@ using namespace std;
 
 viua::process::Stack::Stack(std::string fn,
                             Process* pp,
-                            viua::kernel::RegisterSet** curs,
-                            viua::kernel::RegisterSet* gs,
-                            viua::scheduler::VirtualProcessScheduler* sch)
+                            viua::kernel::Register_set** curs,
+                            viua::kernel::Register_set* gs,
+                            viua::scheduler::Virtual_process_scheduler* sch)
         : current_state(STATE::RUNNING)
         , entry_function(fn)
         , parent_process(pp)
@@ -67,8 +67,8 @@ auto viua::process::Stack::state_of(const STATE s) -> STATE {
     return previous_state;
 }
 
-auto viua::process::Stack::bind(viua::kernel::RegisterSet** curs,
-                                viua::kernel::RegisterSet* gs) -> void {
+auto viua::process::Stack::bind(viua::kernel::Register_set** curs,
+                                viua::kernel::Register_set* gs) -> void {
     currently_used_register_set = curs;
     global_register_set         = gs;
 }
@@ -178,7 +178,7 @@ auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
 }
 
 auto viua::process::Stack::adjust_instruction_pointer(
-    const TryFrame* tframe,
+    const Try_frame* tframe,
     const std::string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(
         tframe->catchers.at(handler_found_for_type)->catcher_name);
@@ -219,13 +219,13 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
         pop();
     }
 }
-auto viua::process::Stack::unwind_try_stack_to(const TryFrame* tframe) -> void {
+auto viua::process::Stack::unwind_try_stack_to(const Try_frame* tframe) -> void {
     while (tryframes.back().get() != tframe) {
         tryframes.pop_back();
     }
 }
 
-auto viua::process::Stack::unwind_to(const TryFrame* tframe,
+auto viua::process::Stack::unwind_to(const Try_frame* tframe,
                                      const std::string handler_found_for_type)
     -> void {
     adjust_instruction_pointer(tframe, handler_found_for_type);
@@ -233,14 +233,14 @@ auto viua::process::Stack::unwind_to(const TryFrame* tframe,
     unwind_try_stack_to(tframe);
 }
 
-auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
-    TryFrame* found_exception_frame = nullptr;
+auto viua::process::Stack::find_catch_frame() -> tuple<Try_frame*, std::string> {
+    Try_frame* found_exception_frame = nullptr;
     auto caught_with_type = std::string{""};
     std::string handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        TryFrame* tframe   = tryframes[(i - 1)].get();
+        Try_frame* tframe   = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         if (handler_found) {
@@ -250,12 +250,12 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, std::string> {
         }
     }
 
-    return tuple<TryFrame*, std::string>(found_exception_frame,
+    return tuple<Try_frame*, std::string>(found_exception_frame,
                                          caught_with_type);
 }
 
 auto viua::process::Stack::unwind() -> void {
-    TryFrame* tframe                   = nullptr;
+    Try_frame* tframe                   = nullptr;
     auto handler_found_for_type = std::string{};
 
     // Find catch frame for current thrown exception.

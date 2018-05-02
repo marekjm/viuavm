@@ -28,7 +28,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_textcommonsuffix(Register_usage_profile& register_usage_profile,
                                Instruction const& instruction) -> void {
-    auto result = get_operand<RegisterIndex>(instruction, 0);
+    auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -37,14 +37,14 @@ auto check_op_textcommonsuffix(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *result);
 
-    auto lhs = get_operand<RegisterIndex>(instruction, 1);
+    auto lhs = get_operand<Register_index>(instruction, 1);
     if (not lhs) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid left-hand side operand")
             .note("expected register index");
     }
 
-    auto rhs = get_operand<RegisterIndex>(instruction, 2);
+    auto rhs = get_operand<Register_index>(instruction, 2);
     if (not rhs) {
         throw invalid_syntax(instruction.operands.at(2)->tokens,
                              "invalid right-hand side operand")
@@ -54,13 +54,13 @@ auto check_op_textcommonsuffix(Register_usage_profile& register_usage_profile,
     check_use_of_register(register_usage_profile, *lhs);
     check_use_of_register(register_usage_profile, *rhs);
 
-    assert_type_of_register<viua::internals::ValueTypes::TEXT>(
+    assert_type_of_register<viua::internals::Value_types::TEXT>(
         register_usage_profile, *lhs);
-    assert_type_of_register<viua::internals::ValueTypes::TEXT>(
+    assert_type_of_register<viua::internals::Value_types::TEXT>(
         register_usage_profile, *rhs);
 
     auto val       = Register(*result);
-    val.value_type = viua::internals::ValueTypes::INTEGER;
+    val.value_type = viua::internals::Value_types::INTEGER;
     register_usage_profile.define(val, result->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

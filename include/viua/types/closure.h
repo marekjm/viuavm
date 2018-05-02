@@ -31,7 +31,7 @@
 
 namespace viua { namespace types {
 class Closure : public Function {
-    std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
+    std::unique_ptr<viua::kernel::Register_set> local_register_set;
     std::string function_name;
 
   public:
@@ -46,14 +46,14 @@ class Closure : public Function {
     auto copy() const -> std::unique_ptr<Value> override;
 
     auto name() const -> std::string override;
-    auto rs() const -> viua::kernel::RegisterSet*;
-    auto release() -> viua::kernel::RegisterSet*;
-    auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
+    auto rs() const -> viua::kernel::Register_set*;
+    auto release() -> viua::kernel::Register_set*;
+    auto give() -> std::unique_ptr<viua::kernel::Register_set>;
     auto empty() const -> bool;
     auto set(viua::internals::types::register_index const,
              std::unique_ptr<viua::types::Value>) -> void;
 
-    Closure(std::string const&, std::unique_ptr<viua::kernel::RegisterSet>);
+    Closure(std::string const&, std::unique_ptr<viua::kernel::Register_set>);
     virtual ~Closure();
 };
 }}  // namespace viua::types

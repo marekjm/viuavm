@@ -26,42 +26,42 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_isnull(Register_usage_profile& register_usage_profile,
                      Instruction const& instruction) -> void {
-    using viua::cg::lex::InvalidSyntax;
-    using viua::cg::lex::TracedSyntaxError;
+    using viua::cg::lex::Invalid_syntax;
+    using viua::cg::lex::Traced_syntax_error;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    if (source->as == viua::internals::AccessSpecifier::POINTER_DEREFERENCE) {
-        throw InvalidSyntax(source->tokens.at(0), "invalid access mode")
+    if (source->as == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+        throw Invalid_syntax(source->tokens.at(0), "invalid access mode")
             .note("can only check using direct access mode")
             .aside("did you mean '%" + source->tokens.at(0).str().substr(1)
                    + "'?");
     }
 
     if (register_usage_profile.defined(Register{*source})) {
-        throw TracedSyntaxError{}
+        throw Traced_syntax_error{}
             .append(
-                InvalidSyntax{source->tokens.at(0),
+                Invalid_syntax{source->tokens.at(0),
                               "useless check, register will always be defined"})
-            .append(InvalidSyntax{
+            .append(Invalid_syntax{
                 register_usage_profile.defined_where(Register{*source})}
                         .note("register is defined here"));
     }
 
     auto val       = Register(*target);
-    val.value_type = ValueTypes::BOOLEAN;
+    val.value_type = Value_types::BOOLEAN;
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

@@ -28,7 +28,7 @@ auto check_op_bits(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::BitsLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -37,7 +37,7 @@ auto check_op_bits(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *target);
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         if (not get_operand<BitsLiteral>(instruction, 1)) {
             throw invalid_syntax(instruction.operands.at(1)->tokens,
@@ -48,14 +48,14 @@ auto check_op_bits(Register_usage_profile& register_usage_profile,
 
     if (source) {
         check_use_of_register(register_usage_profile, *source);
-        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        assert_type_of_register<viua::internals::Value_types::INTEGER>(
             register_usage_profile, *source);
     }
 
     auto val         = Register{};
     val.index        = target->index;
     val.register_set = target->rss;
-    val.value_type   = viua::internals::ValueTypes::BITS;
+    val.value_type   = viua::internals::Value_types::BITS;
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

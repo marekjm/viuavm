@@ -21,9 +21,9 @@
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
+using viua::cg::lex::Traced_syntax_error;
 
 auto Register_usage_profile::fresh(Register const r) const -> bool {
     return fresh_registers.count(r);
@@ -37,10 +37,10 @@ auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void {
     if (defined(r) and fresh(r) and not allow_overwrites) {
-        throw TracedSyntaxError{}
-            .append(viua::cg::lex::UnusedValue{t, "overwrite of unused value:"})
+        throw Traced_syntax_error{}
+            .append(viua::cg::lex::Unused_value{t, "overwrite of unused value:"})
             .append(
-                InvalidSyntax{at(r).first}.note("unused value defined here:"));
+                Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }
     defined_registers.insert_or_assign(r, std::pair<Token, Register>(t, r));
     fresh_registers.insert(r);
@@ -54,7 +54,7 @@ auto Register_usage_profile::defined_where(Register const r) const -> Token {
 
 auto Register_usage_profile::infer(
     Register const r,
-    const viua::internals::ValueTypes value_type_id,
+    const viua::internals::Value_types value_type_id,
     Token const& t) -> void {
     auto reg              = at(r);
     reg.second.value_type = value_type_id;

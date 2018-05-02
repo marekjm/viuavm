@@ -1328,7 +1328,7 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
     def testInsertingOutOfRangeWithPositiveIndex(self):
-        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range: index = 5, size = 4',))
+        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('Out_of_range_exception', 'positive vector index out of range: index = 5, size = 4',))
 
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
@@ -2794,10 +2794,10 @@ class MiscExceptionTests(unittest.TestCase):
         runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
 
     def testVectorOutOfRangeRead(self):
-        runTestThrowsException(self, 'vector_out_of_range_read.asm', ('OutOfRangeException', 'positive vector index out of range',))
+        runTestThrowsException(self, 'vector_out_of_range_read.asm', ('Out_of_range_exception', 'positive vector index out of range',))
 
     def testVectorOutOfRangeReadFromEmpty(self):
-        runTestThrowsException(self, 'vector_out_of_range_read_from_empty.asm', ('OutOfRangeException', 'empty vector index out of range',))
+        runTestThrowsException(self, 'vector_out_of_range_read_from_empty.asm', ('Out_of_range_exception', 'empty vector index out of range',))
 
     def testDeleteOfEmptyRegister(self):
         runTestThrowsException(self, 'delete_of_empty_register.asm', ('Exception', 'delete of null register',), assembly_opts=('--no-sa',))

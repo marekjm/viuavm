@@ -38,14 +38,14 @@
 #include <viua/types/value.h>
 
 
-class HaltException : public std::runtime_error {
+class Halt_exception : public std::runtime_error {
   public:
-    HaltException() : std::runtime_error("execution halted") {}
+    Halt_exception() : std::runtime_error("execution halted") {}
 };
 
 
 namespace viua { namespace scheduler {
-class VirtualProcessScheduler;
+class Virtual_process_scheduler;
 }}  // namespace viua::scheduler
 
 namespace viua { namespace process {
@@ -103,8 +103,8 @@ class Stack {
     std::unique_ptr<Frame> frame_new;
     using size_type = decltype(frames)::size_type;
 
-    std::vector<std::unique_ptr<TryFrame>> tryframes;
-    std::unique_ptr<TryFrame> try_frame_new;
+    std::vector<std::unique_ptr<Try_frame>> tryframes;
+    std::unique_ptr<Try_frame> try_frame_new;
 
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set either by user code, or the VM.
@@ -116,8 +116,8 @@ class Stack {
      *  Currently used register, and
      *  global register set of parent process.
      */
-    viua::kernel::RegisterSet** currently_used_register_set;
-    viua::kernel::RegisterSet* global_register_set;
+    viua::kernel::Register_set** currently_used_register_set;
+    viua::kernel::Register_set* global_register_set;
 
     /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -126,11 +126,11 @@ class Stack {
                                                        // top-most frame on the
                                                        // stack
 
-    void adjust_instruction_pointer(const TryFrame*, const std::string);
+    void adjust_instruction_pointer(const Try_frame*, const std::string);
     auto unwind_call_stack_to(const Frame*) -> void;
-    auto unwind_try_stack_to(const TryFrame*) -> void;
-    auto unwind_to(const TryFrame*, const std::string) -> void;
-    auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
+    auto unwind_try_stack_to(const Try_frame*) -> void;
+    auto unwind_to(const Try_frame*, const std::string) -> void;
+    auto find_catch_frame() -> std::tuple<Try_frame*, std::string>;
 
   public:
     auto set_return_value() -> void;
@@ -138,9 +138,9 @@ class Stack {
     auto state_of() const -> STATE;
     auto state_of(const STATE) -> STATE;
 
-    viua::scheduler::VirtualProcessScheduler* scheduler;
+    viua::scheduler::Virtual_process_scheduler* scheduler;
 
-    auto bind(viua::kernel::RegisterSet**, viua::kernel::RegisterSet*) -> void;
+    auto bind(viua::kernel::Register_set**, viua::kernel::Register_set*) -> void;
 
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
@@ -170,9 +170,9 @@ class Stack {
 
     Stack(std::string,
           Process*,
-          viua::kernel::RegisterSet**,
-          viua::kernel::RegisterSet*,
-          viua::scheduler::VirtualProcessScheduler*);
+          viua::kernel::Register_set**,
+          viua::kernel::Register_set*,
+          viua::scheduler::Virtual_process_scheduler*);
 
     static uint16_t const MAX_STACK_SIZE = 8192;
 };
@@ -197,7 +197,7 @@ class Process {
      * This is not constant because processes may migrate between
      * schedulers during load balancing.
      */
-    viua::scheduler::VirtualProcessScheduler* scheduler;
+    viua::scheduler::Virtual_process_scheduler* scheduler;
 
     /*
      * Parent process of this process.
@@ -208,7 +208,7 @@ class Process {
     std::string watchdog_function{""};
     bool watchdog_failed{false};
 
-    std::unique_ptr<viua::kernel::RegisterSet> global_register_set;
+    std::unique_ptr<viua::kernel::Register_set> global_register_set;
 
     /*
      * This pointer points different register sets during the process's
@@ -217,10 +217,10 @@ class Process {
      * FIXME Remove this. It is not needed after "ress" was removed. The
      * "current" pseudo-register set must also be removed for this to be viable.
      */
-    viua::kernel::RegisterSet* currently_used_register_set;
+    viua::kernel::Register_set* currently_used_register_set;
 
     // Static registers
-    std::map<std::string, std::unique_ptr<viua::kernel::RegisterSet>>
+    std::map<std::string, std::unique_ptr<viua::kernel::Register_set>>
         static_registers;
 
 
@@ -244,7 +244,7 @@ class Process {
     Frame* request_new_frame(
         viua::internals::types::register_index arguments_size = 0,
         viua::internals::types::register_index registers_size = 0);
-    TryFrame* request_new_try_frame();
+    Try_frame* request_new_try_frame();
     void push_frame();
     auto adjust_jump_base_for_block(std::string const&)
         -> viua::internals::types::Op_address_type;
@@ -442,7 +442,7 @@ class Process {
 
     viua::kernel::Register* register_at(viua::internals::types::register_index);
     viua::kernel::Register* register_at(viua::internals::types::register_index,
-                                        viua::internals::RegisterSets);
+                                        viua::internals::Register_sets);
 
     bool joinable() const;
     void join();
@@ -468,7 +468,7 @@ class Process {
     void raise(std::unique_ptr<viua::types::Value>);
     void handle_active_exception();
 
-    void migrate_to(viua::scheduler::VirtualProcessScheduler*);
+    void migrate_to(viua::scheduler::Virtual_process_scheduler*);
 
     std::unique_ptr<viua::types::Value> get_return_value();
 
@@ -488,7 +488,7 @@ class Process {
     bool empty() const;
 
     Process(std::unique_ptr<Frame>,
-            viua::scheduler::VirtualProcessScheduler*,
+            viua::scheduler::Virtual_process_scheduler*,
             viua::process::Process*,
             const bool = false);
     ~Process();

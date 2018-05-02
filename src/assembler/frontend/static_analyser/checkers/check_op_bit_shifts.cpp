@@ -28,7 +28,7 @@ auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::VoidLiteral;
 
-    auto result = get_operand<RegisterIndex>(instruction, 0);
+    auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {
         if (not get_operand<VoidLiteral>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
@@ -37,7 +37,7 @@ auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
         }
     }
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
@@ -45,10 +45,10 @@ auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *source);
-    assert_type_of_register<viua::internals::ValueTypes::BITS>(
+    assert_type_of_register<viua::internals::Value_types::BITS>(
         register_usage_profile, *source);
 
-    auto offset = get_operand<RegisterIndex>(instruction, 2);
+    auto offset = get_operand<Register_index>(instruction, 2);
     if (not offset) {
         throw invalid_syntax(instruction.operands.at(2)->tokens,
                              "invalid operand")
@@ -56,12 +56,12 @@ auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *offset);
-    assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+    assert_type_of_register<viua::internals::Value_types::INTEGER>(
         register_usage_profile, *offset);
 
     if (result) {
         auto val       = Register(*result);
-        val.value_type = ValueTypes::BITS;
+        val.value_type = Value_types::BITS;
         register_usage_profile.define(val, result->tokens.at(0));
     }
 }

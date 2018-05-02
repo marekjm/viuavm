@@ -26,21 +26,21 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_pamv(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
-    if (target->as == viua::internals::AccessSpecifier::REGISTER_INDIRECT) {
+    if (target->as == viua::internals::Access_specifier::REGISTER_INDIRECT) {
         auto r = *target;
-        r.rss  = viua::internals::RegisterSets::LOCAL;
+        r.rss  = viua::internals::Register_sets::LOCAL;
         check_use_of_register(register_usage_profile, r);
-        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        assert_type_of_register<viua::internals::Value_types::INTEGER>(
             register_usage_profile, r);
     }
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
@@ -48,7 +48,7 @@ auto check_op_pamv(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *source);
-    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+    assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 
     erase_if_direct_access(register_usage_profile, source, instruction);

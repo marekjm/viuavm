@@ -69,51 +69,51 @@ class String : public Value {
     String* join(Vector*);
 
     virtual void stringify(Frame*,
-                           viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*,
+                           viua::kernel::Register_set*,
+                           viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*);
     virtual void represent(Frame*,
-                           viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*,
+                           viua::kernel::Register_set*,
+                           viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*);
 
     virtual void startswith(Frame*,
-                            viua::kernel::RegisterSet*,
-                            viua::kernel::RegisterSet*,
+                            viua::kernel::Register_set*,
+                            viua::kernel::Register_set*,
                             viua::process::Process*,
                             viua::kernel::Kernel*);
     virtual void endswith(Frame*,
-                          viua::kernel::RegisterSet*,
-                          viua::kernel::RegisterSet*,
+                          viua::kernel::Register_set*,
+                          viua::kernel::Register_set*,
                           viua::process::Process*,
                           viua::kernel::Kernel*);
 
     virtual void format(Frame*,
-                        viua::kernel::RegisterSet*,
-                        viua::kernel::RegisterSet*,
+                        viua::kernel::Register_set*,
+                        viua::kernel::Register_set*,
                         viua::process::Process*,
                         viua::kernel::Kernel*);
     virtual void substr(Frame*,
-                        viua::kernel::RegisterSet*,
-                        viua::kernel::RegisterSet*,
+                        viua::kernel::Register_set*,
+                        viua::kernel::Register_set*,
                         viua::process::Process*,
                         viua::kernel::Kernel*);
     virtual void concatenate(Frame*,
-                             viua::kernel::RegisterSet*,
-                             viua::kernel::RegisterSet*,
+                             viua::kernel::Register_set*,
+                             viua::kernel::Register_set*,
                              viua::process::Process*,
                              viua::kernel::Kernel*);
     virtual void join(Frame*,
-                      viua::kernel::RegisterSet*,
-                      viua::kernel::RegisterSet*,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
                       viua::process::Process*,
                       viua::kernel::Kernel*);
 
     virtual void size(Frame*,
-                      viua::kernel::RegisterSet*,
-                      viua::kernel::RegisterSet*,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
                       viua::process::Process*,
                       viua::kernel::Kernel*);
 

@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_struct(Register_usage_profile& register_usage_profile,
                      Instruction const& instruction) -> void {
-    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -36,7 +36,7 @@ auto check_op_struct(Register_usage_profile& register_usage_profile,
     check_if_name_resolved(register_usage_profile, *operand);
 
     auto val       = Register{*operand};
-    val.value_type = ValueTypes::STRUCT;
+    val.value_type = Value_types::STRUCT;
     register_usage_profile.define(val, operand->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

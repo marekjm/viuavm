@@ -49,10 +49,10 @@ namespace process {
 class Process;
 }
 namespace scheduler {
-class VirtualProcessScheduler;
+class Virtual_process_scheduler;
 
 namespace ffi {
-class ForeignFunctionCallRequest;
+class Foreign_function_call_request;
 }
 }  // namespace scheduler
 }  // namespace viua
@@ -72,7 +72,7 @@ class Mailbox {
     Mailbox(Mailbox&&);
 };
 
-class ProcessResult {
+class Process_result {
     mutable std::mutex result_mutex;
 
     /*
@@ -117,8 +117,8 @@ class ProcessResult {
     auto transfer_exception() -> std::unique_ptr<viua::types::Value>;
     auto transfer_result() -> std::unique_ptr<viua::types::Value>;
 
-    ProcessResult() = default;
-    ProcessResult(ProcessResult&&);
+    Process_result() = default;
+    Process_result(Process_result&&);
 };
 
 class Kernel {
@@ -168,10 +168,10 @@ class Kernel {
     std::condition_variable free_virtual_processes_cv;
     // list of running VP schedulers, pairs of {scheduler-pointer, thread}
     std::vector<
-        std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>>
+        std::pair<viua::scheduler::Virtual_process_scheduler*, std::thread>>
         virtual_process_schedulers;
     // list of idle VP schedulers
-    std::vector<viua::scheduler::VirtualProcessScheduler*>
+    std::vector<viua::scheduler::Virtual_process_scheduler*>
         idle_virtual_process_schedulers;
 
     std::atomic<viua::internals::types::processes_count> running_processes{0};
@@ -188,7 +188,7 @@ class Kernel {
 
     // Foreign function call requests are placed here to be executed later.
     std::vector<
-        std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>
+        std::unique_ptr<viua::scheduler::ffi::Foreign_function_call_request>>
         foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
@@ -208,7 +208,7 @@ class Kernel {
      * It must also be deleted when no process would be able to fetch it to
      * prevent return value leaks.
      */
-    std::map<viua::process::PID, ProcessResult> process_results;
+    std::map<viua::process::PID, Process_result> process_results;
     mutable std::mutex process_results_mutex;
 
   public:

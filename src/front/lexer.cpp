@@ -38,7 +38,7 @@ bool VERBOSE      = false;
 
 
 using Token         = viua::cg::lex::Token;
-using InvalidSyntax = viua::cg::lex::InvalidSyntax;
+using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 
 template<class T>
@@ -137,7 +137,7 @@ static void display_results(std::string const& filename,
     if (DISPLAY_SIZE) {
         try {
             cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
-        } catch (InvalidSyntax const& e) {
+        } catch (Invalid_syntax const& e) {
             cerr << filename << ':' << e.line_number << ':'
                  << e.character_in_line;
             cerr << ": error: invalid syntax: " << str::strencode(e.content)
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_mark_directive(tokens);
             }
         }
-    } catch (InvalidSyntax const& e) {
+    } catch (Invalid_syntax const& e) {
         std::string message = e.what();
         cerr << filename << ':' << e.line_number + 1 << ':'
              << e.character_in_line + 1

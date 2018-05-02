@@ -757,7 +757,7 @@ Program& Program::opif(int_op regc,
     jump_position_in_bytecode +=
         sizeof(viua::internals::types::byte);  // for operand-type marker
     jump_position_in_bytecode +=
-        sizeof(viua::internals::RegisterSets);  // for rs-type marker
+        sizeof(viua::internals::Register_sets);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {

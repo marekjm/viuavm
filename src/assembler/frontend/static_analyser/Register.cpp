@@ -34,6 +34,6 @@ auto Register::operator==(Register const& that) const -> bool {
     return (register_set == that.register_set) and (index == that.index);
 }
 
-Register::Register(viua::assembler::frontend::parser::RegisterIndex const& ri)
+Register::Register(viua::assembler::frontend::parser::Register_index const& ri)
         : index(ri.index), register_set(ri.rss) {}
 }}}}  // namespace viua::assembler::frontend::static_analyser

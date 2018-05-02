@@ -28,7 +28,7 @@ auto check_op_vinsert(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::VoidLiteral;
 
-    auto result = get_operand<RegisterIndex>(instruction, 0);
+    auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -36,17 +36,17 @@ auto check_op_vinsert(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *result);
-    assert_type_of_register<viua::internals::ValueTypes::VECTOR>(
+    assert_type_of_register<viua::internals::Value_types::VECTOR>(
         register_usage_profile, *result);
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    auto key = get_operand<RegisterIndex>(instruction, 2);
+    auto key = get_operand<Register_index>(instruction, 2);
     if (not key) {
         if (not get_operand<VoidLiteral>(instruction, 2)) {
             throw invalid_syntax(instruction.operands.at(2)->tokens,
@@ -59,7 +59,7 @@ auto check_op_vinsert(Register_usage_profile& register_usage_profile,
 
     if (key) {
         check_use_of_register(register_usage_profile, *key);
-        assert_type_of_register<viua::internals::ValueTypes::INTEGER>(
+        assert_type_of_register<viua::internals::Value_types::INTEGER>(
             register_usage_profile, *key);
     }
 

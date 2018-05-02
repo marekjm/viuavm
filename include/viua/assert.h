@@ -48,7 +48,7 @@ void assert_arity(const Frame* frame, A const&... valid_arities) {
     Arity arity = frame->arguments->size();
     if (not any_equal(arity, valid_arities...)) {
         auto ex = std::unique_ptr<viua::types::Exception>{};
-        ex.reset(new ArityException(arity, {valid_arities...}));
+        ex.reset(new Arity_exception(arity, {valid_arities...}));
         throw ex;
     }
 }

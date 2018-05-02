@@ -30,7 +30,7 @@ auto check_op_call(Register_usage_profile& register_usage_profile,
     using viua::assembler::frontend::parser::FunctionNameLiteral;
     using viua::assembler::frontend::parser::VoidLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         if (not get_operand<VoidLiteral>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
@@ -46,14 +46,14 @@ auto check_op_call(Register_usage_profile& register_usage_profile,
     auto fn = instruction.operands.at(1).get();
     if ((not dynamic_cast<AtomLiteral*>(fn))
         and (not dynamic_cast<FunctionNameLiteral*>(fn))
-        and (not dynamic_cast<RegisterIndex*>(fn))) {
+        and (not dynamic_cast<Register_index*>(fn))) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected function name, atom literal, or register index");
     }
-    if (auto r = dynamic_cast<RegisterIndex*>(fn); r) {
+    if (auto r = dynamic_cast<Register_index*>(fn); r) {
         check_use_of_register(register_usage_profile, *r, "call from");
-        assert_type_of_register<viua::internals::ValueTypes::INVOCABLE>(
+        assert_type_of_register<viua::internals::Value_types::INVOCABLE>(
             register_usage_profile, *r);
     }
 

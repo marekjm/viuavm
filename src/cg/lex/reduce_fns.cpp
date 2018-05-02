@@ -448,7 +448,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Toke
         }
 
         if (i > 0 and token == "end" and input_tokens.at(i - 1) == "\n") {
-            throw InvalidSyntax(token, "missing '.' character before 'end'");
+            throw Invalid_syntax(token, "missing '.' character before 'end'");
         }
 
         if (token == ".end") {
@@ -600,7 +600,7 @@ static auto get_innermost_target_token(const std::vector<Token>& subtokens,
             check += 2;
         } while (inner_target_token.str() == "(");
     } catch (std::out_of_range const& e) {
-        throw InvalidSyntax(t.line(), t.character(), t.str());
+        throw Invalid_syntax(t.line(), t.character(), t.str());
     }
     return inner_target_token;
 }
@@ -639,11 +639,11 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
 
             if (t == "(") {
                 if (i >= limit and balance != 0) {
-                    throw InvalidSyntax(
+                    throw Invalid_syntax(
                         t, "unbalanced parenthesis in wrapped instruction");
                 }
                 if (subtokens.size() < 2) {
-                    throw InvalidSyntax(t,
+                    throw Invalid_syntax(t,
                                         "at least two tokens are required "
                                         "in a wrapped instruction");
                 }
@@ -711,11 +711,11 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
 
         if (token == ".iota:") {
             if (iotas.empty()) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     token, "'.iota:' directive used outside of iota scope");
             }
             if (not str::isnum(input_tokens.at(i + 1))) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     input_tokens.at(i + 1),
                     ("invalid argument to '.iota:' directive: "
                      + str::strencode(input_tokens.at(i + 1))));
@@ -884,7 +884,7 @@ auto replace_named_registers(std::vector<Token> input_tokens)
             }
 
             if (not str::isnum(index)) {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     input_tokens.at(i + 1),
                     ("invalid register index: " + str::strencode(name)
                      + " := " + str::enquote(str::strencode(index))));

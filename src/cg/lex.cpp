@@ -72,21 +72,21 @@ Token::Token(decltype(line_number) line_,
         , character_in_line(character_) {}
 Token::Token() : Token(0, 0, "") {}
 
-auto InvalidSyntax::what() const -> const char* {
+auto Invalid_syntax::what() const -> const char* {
     return message.c_str();
 }
-auto InvalidSyntax::str() const -> std::string {
+auto Invalid_syntax::str() const -> std::string {
     return message;
 }
 
-auto InvalidSyntax::line() const -> decltype(line_number) {
+auto Invalid_syntax::line() const -> decltype(line_number) {
     return line_number;
 }
-auto InvalidSyntax::character() const -> decltype(character_in_line) {
+auto Invalid_syntax::character() const -> decltype(character_in_line) {
     return character_in_line;
 }
 
-auto InvalidSyntax::match(Token const token) const -> bool {
+auto Invalid_syntax::match(Token const token) const -> bool {
     for (auto const& each : tokens) {
         if (token.line() == each.line()
             and token.character() == each.character()) {
@@ -103,33 +103,33 @@ auto InvalidSyntax::match(Token const token) const -> bool {
     return false;
 }
 
-auto InvalidSyntax::add(Token token) -> InvalidSyntax& {
+auto Invalid_syntax::add(Token token) -> Invalid_syntax& {
     tokens.push_back(std::move(token));
     return *this;
 }
 
-auto InvalidSyntax::note(std::string n) -> InvalidSyntax& {
+auto Invalid_syntax::note(std::string n) -> Invalid_syntax& {
     attached_notes.push_back(n);
     return *this;
 }
-auto InvalidSyntax::notes() const -> const decltype(attached_notes)& {
+auto Invalid_syntax::notes() const -> const decltype(attached_notes)& {
     return attached_notes;
 }
 
-auto InvalidSyntax::aside(std::string a) -> InvalidSyntax& {
+auto Invalid_syntax::aside(std::string a) -> Invalid_syntax& {
     aside_note = a;
     return *this;
 }
-auto InvalidSyntax::aside(Token t, std::string a) -> InvalidSyntax& {
+auto Invalid_syntax::aside(Token t, std::string a) -> Invalid_syntax& {
     aside_note  = a;
     aside_token = t;
     return *this;
 }
-auto InvalidSyntax::aside() const -> std::string {
+auto Invalid_syntax::aside() const -> std::string {
     return aside_note;
 }
 
-auto InvalidSyntax::match_aside(Token token) const -> bool {
+auto Invalid_syntax::match_aside(Token token) const -> bool {
     if (token.line() == aside_token.line()
         and token.character() == aside_token.character()) {
         return true;
@@ -144,11 +144,11 @@ auto InvalidSyntax::match_aside(Token token) const -> bool {
     return false;
 }
 
-InvalidSyntax::InvalidSyntax(decltype(line_number) ln,
+Invalid_syntax::Invalid_syntax(decltype(line_number) ln,
                              decltype(character_in_line) ch,
                              std::string ct)
         : line_number(ln), character_in_line(ch), content(ct) {}
-InvalidSyntax::InvalidSyntax(Token t, std::string m)
+Invalid_syntax::Invalid_syntax(Token t, std::string m)
         : line_number(t.line())
         , character_in_line(t.character())
         , content(t.original())
@@ -156,25 +156,25 @@ InvalidSyntax::InvalidSyntax(Token t, std::string m)
     add(t);
 }
 
-UnusedValue::UnusedValue(Token token)
-        : InvalidSyntax(token, ("unused value in register " + token.str())) {}
+Unused_value::Unused_value(Token token)
+        : Invalid_syntax(token, ("unused value in register " + token.str())) {}
 
-UnusedValue::UnusedValue(Token token, std::string s)
-        : InvalidSyntax(token, s) {}
+Unused_value::Unused_value(Token token, std::string s)
+        : Invalid_syntax(token, s) {}
 
-auto TracedSyntaxError::what() const -> const char* {
+auto Traced_syntax_error::what() const -> const char* {
     return errors.front().what();
 }
 
-auto TracedSyntaxError::line() const -> decltype(errors.front().line()) {
+auto Traced_syntax_error::line() const -> decltype(errors.front().line()) {
     return errors.front().line();
 }
-auto TracedSyntaxError::character() const
+auto Traced_syntax_error::character() const
     -> decltype(errors.front().character()) {
     return errors.front().character();
 }
 
-auto TracedSyntaxError::append(InvalidSyntax const& e) -> TracedSyntaxError& {
+auto Traced_syntax_error::append(Invalid_syntax const& e) -> Traced_syntax_error& {
     errors.push_back(e);
     return (*this);
 }
@@ -250,7 +250,7 @@ auto assert_is_not_reserved_keyword(Token token, std::string const& message)
     -> void {
     auto const s = token.original();
     if (is_reserved_keyword(s)) {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             token,
             ("invalid " + message + ": '" + s + "' is a registered keyword"));
     }
@@ -1025,7 +1025,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
         } else if (token == "if") {
             tokens.push_back(token);  // mnemonic
             if (input_tokens.at(i + 1) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(token,
+                throw viua::cg::lex::Invalid_syntax(token,
                                                    "branch without operands");
             }
 
@@ -1038,7 +1038,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(token,
+                throw viua::cg::lex::Invalid_syntax(token,
                                                    "branch without a target");
             }
 
@@ -1106,7 +1106,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                throw InvalidSyntax{input_tokens.at(i + 1),
+                throw Invalid_syntax{input_tokens.at(i + 1),
                                     "missing second operand"}
                     .add(token);
             }
@@ -1766,7 +1766,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             continue;
         } else if (token == "if") {
             if (input_tokens.at(i + 1) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(token,
+                throw viua::cg::lex::Invalid_syntax(token,
                                                    "branch without operands");
             }
 
@@ -1779,7 +1779,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
 
             if (input_tokens.at(i + 1) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(token,
+                throw viua::cg::lex::Invalid_syntax(token,
                                                    "branch without a target");
             }
 

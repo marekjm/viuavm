@@ -50,7 +50,7 @@ auto check_for_unused_registers(
                     << ')';
             }
 
-            throw viua::cg::lex::UnusedValue{each.second.first, msg.str()};
+            throw viua::cg::lex::Unused_value{each.second.first, msg.str()};
         }
     }
 }

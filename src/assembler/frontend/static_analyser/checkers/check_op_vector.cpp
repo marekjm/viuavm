@@ -26,23 +26,23 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_vector(Register_usage_profile& register_usage_profile,
                      Instruction const& instruction) -> void {
-    using viua::cg::lex::InvalidSyntax;
+    using viua::cg::lex::Invalid_syntax;
 
-    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    auto const pack_range_start = get_operand<RegisterIndex>(instruction, 1);
+    auto const pack_range_start = get_operand<Register_index>(instruction, 1);
     if (not pack_range_start) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
-    auto const pack_range_count = get_operand<RegisterIndex>(instruction, 2);
+    auto const pack_range_count = get_operand<Register_index>(instruction, 2);
     if (not pack_range_count) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -57,7 +57,7 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
         checker.index        = j;
         checker.register_set = pack_range_start->rss;
         if (not register_usage_profile.defined(checker)) {
-            throw InvalidSyntax{pack_range_start->tokens.at(0),
+            throw Invalid_syntax{pack_range_start->tokens.at(0),
                                 "pack of empty register: " + std::to_string(j)};
         }
         register_usage_profile.erase(checker, instruction.tokens.at(0));
@@ -66,7 +66,7 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
     auto val         = Register{};
     val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type   = viua::internals::ValueTypes::VECTOR;
+    val.value_type   = viua::internals::Value_types::VECTOR;
     register_usage_profile.define(val, operand->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

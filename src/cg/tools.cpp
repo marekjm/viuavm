@@ -45,7 +45,7 @@ static auto size_of_register_index_operand_with_rs_type(
     } else if (tokens.at(i).str().at(0) == '%'
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
@@ -55,7 +55,7 @@ static auto size_of_register_index_operand_with_rs_type(
         }
     } else if (tokens.at(i).str().at(0) == '@') {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
@@ -65,7 +65,7 @@ static auto size_of_register_index_operand_with_rs_type(
         }
     } else if (tokens.at(i).str().at(0) == '*') {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
@@ -74,7 +74,7 @@ static auto size_of_register_index_operand_with_rs_type(
             ++i;
         }
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
     }
 
@@ -97,21 +97,21 @@ static auto size_of_register_index_operand(TokenVector const& tokens,
     } else if (tokens.at(i).str().at(0) == '%'
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
     } else if (tokens.at(i).str().at(0) == '@') {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
     } else if (tokens.at(i).str().at(0) == '*') {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::RegisterSets);
+        calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
     }
 
@@ -888,7 +888,7 @@ static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
         calculated_size += sizeof(viua::internals::types::timeout);
         ++i;
     } else {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+        throw viua::cg::lex::Invalid_syntax(tokens.at(i),
                                            "invalid timeout token in 'join'");
     }
 
@@ -907,7 +907,7 @@ static auto size_of_receive(TokenVector const& tokens, TokenVector::size_type i)
         calculated_size += sizeof(viua::internals::types::timeout);
         ++i;
     } else {
-        throw viua::cg::lex::InvalidSyntax(
+        throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), "invalid timeout token in 'receive'");
     }
 
@@ -1476,7 +1476,7 @@ auto calculate_bytecode_size_of_first_n_instructions2(
             ++i;
             tie(increase, i) = size_of_halt(tokens, i);
         } else {
-            throw viua::cg::lex::InvalidSyntax(
+            throw viua::cg::lex::Invalid_syntax(
                 tokens.at(i),
                 ("failed to calculate size of: " + tokens.at(i).str()));
         }

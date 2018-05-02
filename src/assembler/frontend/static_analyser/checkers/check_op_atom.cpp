@@ -28,7 +28,7 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::AtomLiteral;
 
-    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -47,7 +47,7 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
     auto val         = Register{};
     val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type   = ValueTypes::ATOM;
+    val.value_type   = Value_types::ATOM;
 
     register_usage_profile.define(val, operand->tokens.at(0));
 }

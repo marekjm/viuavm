@@ -59,8 +59,8 @@ class Kernel;
 typedef void(ForeignFunction)(
     Frame*,  // call frame; contains parameters, local registers, name of the
              // function etc.
-    viua::kernel::RegisterSet*,  // static register set (may be nullptr)
-    viua::kernel::RegisterSet*,  // global register set (may be nullptr)
+    viua::kernel::Register_set*,  // static register set (may be nullptr)
+    viua::kernel::Register_set*,  // global register set (may be nullptr)
     viua::process::Process*,     // calling process
     viua::kernel::Kernel*  // VM viua::kernel::Kernel the calling process is
                            // running on
@@ -77,14 +77,14 @@ typedef void(ForeignFunction)(
  */
 typedef void (viua::types::Value::*ForeignMethodMemberPointer)(
     Frame*,
-    viua::kernel::RegisterSet*,
-    viua::kernel::RegisterSet*,
+    viua::kernel::Register_set*,
+    viua::kernel::Register_set*,
     viua::process::Process*,
     viua::kernel::Kernel*);
 typedef std::function<void(viua::types::Value*,
                            Frame*,
-                           viua::kernel::RegisterSet*,
-                           viua::kernel::RegisterSet*,
+                           viua::kernel::Register_set*,
+                           viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*)>
     ForeignMethod;
@@ -96,12 +96,12 @@ typedef std::function<void(viua::types::Value*,
  *
  *  The "exports()" function returns an array of below structures.
  */
-struct ForeignFunctionSpec {
+struct Foreign_function_spec {
     const char* name;
     ForeignFunction* fpointer;
 };
 
-extern "C" const ForeignFunctionSpec* exports();
+extern "C" const Foreign_function_spec* exports();
 
 
 #endif

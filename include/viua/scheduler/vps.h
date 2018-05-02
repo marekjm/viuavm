@@ -43,7 +43,7 @@ class Kernel;
 
 
 namespace viua { namespace scheduler {
-class VirtualProcessScheduler {
+class Virtual_process_scheduler {
     /** Scheduler of Viua VM virtual processes.
      */
     viua::kernel::Kernel* attached_kernel;
@@ -127,14 +127,14 @@ class VirtualProcessScheduler {
     void join();
     int exit() const;
 
-    VirtualProcessScheduler(
+    Virtual_process_scheduler(
         viua::kernel::Kernel*,
         std::vector<std::unique_ptr<viua::process::Process>>*,
         std::mutex*,
         std::condition_variable*,
         const bool = false);
-    VirtualProcessScheduler(VirtualProcessScheduler&&);
-    ~VirtualProcessScheduler();
+    Virtual_process_scheduler(Virtual_process_scheduler&&);
+    ~Virtual_process_scheduler();
 };
 }}  // namespace viua::scheduler
 

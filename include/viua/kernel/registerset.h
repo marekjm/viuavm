@@ -66,7 +66,7 @@ class Register {
     auto operator=(decltype(value)&&) -> Register&;
 };
 
-class RegisterSet {
+class Register_set {
     viua::internals::types::register_index registerset_size;
     std::vector<Register> registers;
 
@@ -104,10 +104,10 @@ class RegisterSet {
         return registerset_size;
     }
 
-    std::unique_ptr<RegisterSet> copy();
+    std::unique_ptr<Register_set> copy();
 
-    RegisterSet(viua::internals::types::register_index sz);
-    ~RegisterSet();
+    Register_set(viua::internals::types::register_index sz);
+    ~Register_set();
 };
 }}  // namespace viua::kernel
 

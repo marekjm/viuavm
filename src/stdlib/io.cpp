@@ -73,8 +73,8 @@ class Ifstream : public viua::types::Value {
 
 
 static auto io_stdin_getline(Frame* frame,
-                             viua::kernel::RegisterSet*,
-                             viua::kernel::RegisterSet*,
+                             viua::kernel::Register_set*,
+                             viua::kernel::Register_set*,
                              viua::process::Process*,
                              viua::kernel::Kernel*) -> void {
     auto line = std::string{};
@@ -83,16 +83,16 @@ static auto io_stdin_getline(Frame* frame,
 }
 
 static auto io_stdout_write(Frame* frame,
-                            viua::kernel::RegisterSet*,
-                            viua::kernel::RegisterSet*,
+                            viua::kernel::Register_set*,
+                            viua::kernel::Register_set*,
                             viua::process::Process*,
                             viua::kernel::Kernel*) -> void {
     cout << frame->arguments->at(0)->str();
 }
 
 static auto io_stderr_write(Frame* frame,
-                            viua::kernel::RegisterSet*,
-                            viua::kernel::RegisterSet*,
+                            viua::kernel::Register_set*,
+                            viua::kernel::Register_set*,
                             viua::process::Process*,
                             viua::kernel::Kernel*) -> void {
     cerr << frame->arguments->at(0)->str();
@@ -100,8 +100,8 @@ static auto io_stderr_write(Frame* frame,
 
 
 static auto io_file_read(Frame* frame,
-                         viua::kernel::RegisterSet*,
-                         viua::kernel::RegisterSet*,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
                          viua::process::Process*,
                          viua::kernel::Kernel*) -> void {
     auto const path = frame->arguments->get(0)->str();
@@ -118,8 +118,8 @@ static auto io_file_read(Frame* frame,
 }
 
 static auto io_file_write(Frame* frame,
-                          viua::kernel::RegisterSet*,
-                          viua::kernel::RegisterSet*,
+                          viua::kernel::Register_set*,
+                          viua::kernel::Register_set*,
                           viua::process::Process*,
                           viua::kernel::Kernel*) -> void {
     auto out = ofstream{frame->arguments->get(0)->str()};
@@ -128,8 +128,8 @@ static auto io_file_write(Frame* frame,
 }
 
 static auto io_ifstream_open(Frame* frame,
-                             viua::kernel::RegisterSet*,
-                             viua::kernel::RegisterSet*,
+                             viua::kernel::Register_set*,
+                             viua::kernel::Register_set*,
                              viua::process::Process*,
                              viua::kernel::Kernel*) -> void {
     frame->local_register_set->set(
@@ -137,8 +137,8 @@ static auto io_ifstream_open(Frame* frame,
 }
 
 static auto io_ifstream_getline(Frame* frame,
-                                viua::kernel::RegisterSet*,
-                                viua::kernel::RegisterSet*,
+                                viua::kernel::Register_set*,
+                                viua::kernel::Register_set*,
                                 viua::process::Process* p,
                                 viua::kernel::Kernel*) -> void {
     auto const in = dynamic_cast<Ifstream*>(
@@ -147,7 +147,7 @@ static auto io_ifstream_getline(Frame* frame,
         0, make_unique<viua::types::String>(in->getline()));
 }
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"std::io::stdin::getline/0", &io_stdin_getline},
     {"std::io::stdout::write/1", &io_stdout_write},
     {"std::io::stderr::write/1", &io_stderr_write},
@@ -158,6 +158,6 @@ const ForeignFunctionSpec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
+extern "C" const Foreign_function_spec* exports() {
     return functions;
 }

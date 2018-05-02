@@ -26,7 +26,7 @@ const std::string viua::types::Closure::type_name = "Closure";
 
 
 viua::types::Closure::Closure(std::string const& name,
-                              std::unique_ptr<viua::kernel::RegisterSet> rs)
+                              std::unique_ptr<viua::kernel::Register_set> rs)
         : local_register_set(std::move(rs)), function_name(name) {}
 
 viua::types::Closure::~Closure() {}
@@ -59,16 +59,16 @@ auto viua::types::Closure::name() const -> std::string {
     return function_name;
 }
 
-auto viua::types::Closure::rs() const -> viua::kernel::RegisterSet* {
+auto viua::types::Closure::rs() const -> viua::kernel::Register_set* {
     return local_register_set.get();
 }
 
-auto viua::types::Closure::release() -> viua::kernel::RegisterSet* {
+auto viua::types::Closure::release() -> viua::kernel::Register_set* {
     return local_register_set.release();
 }
 
 auto viua::types::Closure::give()
-    -> std::unique_ptr<viua::kernel::RegisterSet> {
+    -> std::unique_ptr<viua::kernel::Register_set> {
     return std::move(local_register_set);
 }
 

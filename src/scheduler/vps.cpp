@@ -199,7 +199,7 @@ template<class... Ts> static void viua_err(Ts&&... arguments) {
 }
 
 
-bool viua::scheduler::VirtualProcessScheduler::execute_quant(
+bool viua::scheduler::Virtual_process_scheduler::execute_quant(
     viua::process::Process* th,
     viua::internals::types::process_time_slice_type priority) {
     if (th->stopped() and th->joinable()) {
@@ -234,90 +234,90 @@ bool viua::scheduler::VirtualProcessScheduler::execute_quant(
     return true;
 }
 
-viua::kernel::Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
+viua::kernel::Kernel* viua::scheduler::Virtual_process_scheduler::kernel() const {
     return attached_kernel;
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_local_function(
+bool viua::scheduler::Virtual_process_scheduler::is_local_function(
     std::string const& name) const {
     return attached_kernel->is_local_function(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_linked_function(
+bool viua::scheduler::Virtual_process_scheduler::is_linked_function(
     std::string const& name) const {
     return attached_kernel->is_linked_function(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_native_function(
+bool viua::scheduler::Virtual_process_scheduler::is_native_function(
     std::string const& name) const {
     return attached_kernel->is_native_function(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_foreign_function(
+bool viua::scheduler::Virtual_process_scheduler::is_foreign_function(
     std::string const& name) const {
     return attached_kernel->is_foreign_function(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_block(
+bool viua::scheduler::Virtual_process_scheduler::is_block(
     std::string const& name) const {
     return attached_kernel->is_block(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_local_block(
+bool viua::scheduler::Virtual_process_scheduler::is_local_block(
     std::string const& name) const {
     return attached_kernel->is_local_block(name);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::is_linked_block(
+bool viua::scheduler::Virtual_process_scheduler::is_linked_block(
     std::string const& name) const {
     return attached_kernel->is_linked_block(name);
 }
 
-auto viua::scheduler::VirtualProcessScheduler::get_entry_point_of_block(
+auto viua::scheduler::Virtual_process_scheduler::get_entry_point_of_block(
     std::string const& name) const
     -> pair<viua::internals::types::Op_address_type,
             viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of_block(name);
 }
 
-auto viua::scheduler::VirtualProcessScheduler::get_entry_point_of(
+auto viua::scheduler::Virtual_process_scheduler::get_entry_point_of(
     std::string const& name) const
     -> pair<viua::internals::types::Op_address_type,
             viua::internals::types::Op_address_type> {
     return attached_kernel->get_entry_point_of(name);
 }
 
-void viua::scheduler::VirtualProcessScheduler::request_foreign_function_call(
+void viua::scheduler::Virtual_process_scheduler::request_foreign_function_call(
     Frame* frame,
     viua::process::Process* p) const {
     attached_kernel->request_foreign_function_call(frame, p);
 }
 
-void viua::scheduler::VirtualProcessScheduler::load_module(std::string module) {
+void viua::scheduler::Virtual_process_scheduler::load_module(std::string module) {
     attached_kernel->load_module(module);
 }
 
-auto viua::scheduler::VirtualProcessScheduler::cpi() const
+auto viua::scheduler::Virtual_process_scheduler::cpi() const
     -> decltype(processes)::size_type {
     return current_process_index;
 }
 
 
-auto viua::scheduler::VirtualProcessScheduler::size() const
+auto viua::scheduler::Virtual_process_scheduler::size() const
     -> decltype(processes)::size_type {
     return processes.size();
 }
 
-viua::process::Process* viua::scheduler::VirtualProcessScheduler::process(
+viua::process::Process* viua::scheduler::Virtual_process_scheduler::process(
     decltype(processes)::size_type index) {
     return processes.at(index).get();
 }
 
-viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
+viua::process::Process* viua::scheduler::Virtual_process_scheduler::process() {
     return process(current_process_index);
 }
 
-viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
+viua::process::Process* viua::scheduler::Virtual_process_scheduler::spawn(
     std::unique_ptr<Frame> frame,
     viua::process::Process* parent,
     bool disown) {
@@ -380,7 +380,7 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(
     return process_ptr;
 }
 
-void viua::scheduler::VirtualProcessScheduler::send(
+void viua::scheduler::Virtual_process_scheduler::send(
     const viua::process::PID pid,
     std::unique_ptr<viua::types::Value> message) {
 #if VIUA_VM_DEBUG_LOG
@@ -389,7 +389,7 @@ void viua::scheduler::VirtualProcessScheduler::send(
     attached_kernel->send(pid, std::move(message));
 }
 
-void viua::scheduler::VirtualProcessScheduler::receive(
+void viua::scheduler::Virtual_process_scheduler::receive(
     const viua::process::PID pid,
     queue<std::unique_ptr<viua::types::Value>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
@@ -398,28 +398,28 @@ void viua::scheduler::VirtualProcessScheduler::receive(
     attached_kernel->receive(pid, message_queue);
 }
 
-auto viua::scheduler::VirtualProcessScheduler::is_joinable(
+auto viua::scheduler::Virtual_process_scheduler::is_joinable(
     const viua::process::PID pid) const -> bool {
     return attached_kernel->is_process_joinable(pid);
 }
-auto viua::scheduler::VirtualProcessScheduler::is_stopped(
+auto viua::scheduler::Virtual_process_scheduler::is_stopped(
     const viua::process::PID pid) const -> bool {
     return attached_kernel->is_process_stopped(pid);
 }
-auto viua::scheduler::VirtualProcessScheduler::is_terminated(
+auto viua::scheduler::Virtual_process_scheduler::is_terminated(
     const viua::process::PID pid) const -> bool {
     return attached_kernel->is_process_terminated(pid);
 }
-auto viua::scheduler::VirtualProcessScheduler::transfer_exception_of(
+auto viua::scheduler::Virtual_process_scheduler::transfer_exception_of(
     const viua::process::PID pid) const -> std::unique_ptr<viua::types::Value> {
     return attached_kernel->transfer_exception_of(pid);
 }
-auto viua::scheduler::VirtualProcessScheduler::transfer_result_of(
+auto viua::scheduler::Virtual_process_scheduler::transfer_result_of(
     const viua::process::PID pid) const -> std::unique_ptr<viua::types::Value> {
     return attached_kernel->transfer_result_of(pid);
 }
 
-bool viua::scheduler::VirtualProcessScheduler::burst() {
+bool viua::scheduler::Virtual_process_scheduler::burst() {
     if (not processes.size()) {
         // make kernel stop if there are no processes_list to run
         return false;
@@ -554,7 +554,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 }
 
                 auto parameters = make_unique<viua::types::Vector>();
-                viua::kernel::RegisterSet* top_args =
+                viua::kernel::Register_set* top_args =
                     th->trace().at(0)->arguments.get();
                 for (decltype(top_args->size()) j = 0; j < top_args->size();
                      ++j) {
@@ -620,7 +620,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     return ticked;
 }
-void viua::scheduler::VirtualProcessScheduler::operator()() {
+void viua::scheduler::Virtual_process_scheduler::operator()() {
     while (true) {
         // FIXME perform a single burst at a time - if scheduler keeps bursting
         // for a long time some free processes may wait "forever" before being
@@ -712,7 +712,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 #endif
 }
 
-void viua::scheduler::VirtualProcessScheduler::bootstrap(
+void viua::scheduler::Virtual_process_scheduler::bootstrap(
     const std::vector<std::string>& commandline_arguments) {
     auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
@@ -729,23 +729,23 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(
     main_process->priority(16);
 }
 
-void viua::scheduler::VirtualProcessScheduler::launch() {
+void viua::scheduler::Virtual_process_scheduler::launch() {
     scheduler_thread = thread([this] { (*this)(); });
 }
 
-void viua::scheduler::VirtualProcessScheduler::shutdown() {
+void viua::scheduler::Virtual_process_scheduler::shutdown() {
     shut_down.store(true, std::memory_order_release);
 }
 
-void viua::scheduler::VirtualProcessScheduler::join() {
+void viua::scheduler::Virtual_process_scheduler::join() {
     scheduler_thread.join();
 }
 
-int viua::scheduler::VirtualProcessScheduler::exit() const {
+int viua::scheduler::Virtual_process_scheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
+viua::scheduler::Virtual_process_scheduler::Virtual_process_scheduler(
     viua::kernel::Kernel* akernel,
     std::vector<std::unique_ptr<viua::process::Process>>* fp,
     mutex* fp_mtx,
@@ -762,8 +762,8 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
         , current_load(0)
         , shut_down(false) {}
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
-    VirtualProcessScheduler&& that)
+viua::scheduler::Virtual_process_scheduler::Virtual_process_scheduler(
+    Virtual_process_scheduler&& that)
         : tracing_enabled(that.tracing_enabled) {
     attached_kernel = that.attached_kernel;
 
@@ -783,4 +783,4 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
     scheduler_thread = std::move(that.scheduler_thread);
 }
 
-viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {}
+viua::scheduler::Virtual_process_scheduler::~Virtual_process_scheduler() {}

@@ -30,7 +30,7 @@ void viua::assertions::assert_typeof(viua::types::Value* object,
      *  Example: checking if an object is an Integer.
      */
     if (object->type() != expected) {
-        throw viua::util::exceptions::make_unique_exception<TypeException>(
+        throw viua::util::exceptions::make_unique_exception<Type_exception>(
             expected, object->type());
     }
 }

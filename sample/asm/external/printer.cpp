@@ -27,7 +27,7 @@
 using namespace std;
 
 
-static auto printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+static auto printer_print(Frame* frame, viua::kernel::Register_set*, viua::kernel::Register_set*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     std::unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
     // concatenate before printing to avoid mangled output
@@ -35,8 +35,8 @@ static auto printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"printer::print/1", &printer_print}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports() { return functions; }

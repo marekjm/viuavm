@@ -96,7 +96,7 @@ static auto extract_register_index(Op_address_type ip,
         ip += sizeof(viua::internals::types::register_index);
 
         // FIXME extract RS type
-        ip += sizeof(viua::internals::RegisterSets);
+        ip += sizeof(viua::internals::Register_sets);
     } else {
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
@@ -121,20 +121,20 @@ static auto extract_register_type_and_index(Op_address_type ip,
                                             viua::process::Process* process,
                                             bool const pointers_allowed = false)
     -> tuple<Op_address_type,
-             viua::internals::RegisterSets,
+             viua::internals::Register_sets,
              viua::internals::types::register_index> {
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
-    auto register_type  = viua::internals::RegisterSets::LOCAL;
+    auto register_type  = viua::internals::Register_sets::LOCAL;
     auto register_index = viua::internals::types::register_index{0};
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE
         or (pointers_allowed and ot == OT_POINTER)) {
         register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
 
-        register_type = extract<viua::internals::RegisterSets>(ip);
-        ip += sizeof(viua::internals::RegisterSets);
+        register_type = extract<viua::internals::Register_sets>(ip);
+        ip += sizeof(viua::internals::Register_sets);
     } else {
         throw make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
@@ -153,7 +153,7 @@ static auto extract_register_type_and_index(Op_address_type ip,
         register_index = integer_to_register_index(i->as_integer());
     }
     return tuple<Op_address_type,
-                 viua::internals::RegisterSets,
+                 viua::internals::Register_sets,
                  viua::internals::types::register_index>(
         ip, register_type, register_index);
 }
@@ -168,7 +168,7 @@ auto viua::bytecode::decoder::operands::fetch_register(
     Op_address_type ip,
     viua::process::Process* process)
     -> tuple<Op_address_type, viua::kernel::Register*> {
-    auto register_type = viua::internals::RegisterSets::LOCAL;
+    auto register_type = viua::internals::Register_sets::LOCAL;
     auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, process);
@@ -180,14 +180,14 @@ auto viua::bytecode::decoder::operands::fetch_register_type_and_index(
     Op_address_type ip,
     viua::process::Process* process)
     -> tuple<Op_address_type,
-             viua::internals::RegisterSets,
+             viua::internals::Register_sets,
              viua::internals::types::register_index> {
-    auto register_type = viua::internals::RegisterSets::LOCAL;
+    auto register_type = viua::internals::Register_sets::LOCAL;
     auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, process);
     return tuple<Op_address_type,
-                 viua::internals::RegisterSets,
+                 viua::internals::Register_sets,
                  viua::internals::types::register_index>(
         ip, register_type, target);
 }
@@ -249,7 +249,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(
         ip += sizeof(viua::internals::types::register_index);
 
         // FIXME decode rs type
-        ip += sizeof(viua::internals::RegisterSets);
+        ip += sizeof(viua::internals::Register_sets);
 
         // FIXME once dynamic operand types are implemented the need for this
         // cast will go away because the operand *will* be encoded as a real
@@ -313,7 +313,7 @@ auto viua::bytecode::decoder::operands::fetch_object(Op_address_type ip,
     -> tuple<Op_address_type, viua::types::Value*> {
     auto const is_pointer_dereference = (get_operand_type(ip) == OT_POINTER);
 
-    auto register_type = viua::internals::RegisterSets::LOCAL;
+    auto register_type = viua::internals::Register_sets::LOCAL;
     auto target        = viua::internals::types::register_index{0};
     tie(ip, register_type, target) =
         extract_register_type_and_index(ip, p, true);

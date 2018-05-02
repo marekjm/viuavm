@@ -40,13 +40,13 @@ struct Operand {
     virtual ~Operand() = default;
 };
 
-struct RegisterIndex : public Operand {
-    viua::internals::AccessSpecifier as;
+struct Register_index : public Operand {
+    viua::internals::Access_specifier as;
     viua::internals::types::register_index index;
-    viua::internals::RegisterSets rss;
+    viua::internals::Register_sets rss;
     bool resolved = false;
 };
-struct InstructionBlockName : public Operand {};
+struct Instruction_block_name : public Operand {};
 struct BitsLiteral : public Operand {
     std::string content;
 };
@@ -97,7 +97,7 @@ struct Instruction : public Line {
     std::vector<std::unique_ptr<Operand>> operands;
 };
 
-struct InstructionsBlock {
+struct Instructions_block {
     viua::cg::lex::Token name;
     viua::cg::lex::Token ending_token;
     std::map<std::string, std::string> attributes;
@@ -109,16 +109,16 @@ struct InstructionsBlock {
     std::map<std::string, size_type> marker_map;
 };
 
-struct ParsedSource {
-    std::vector<InstructionsBlock> functions;
+struct Parsed_source {
+    std::vector<Instructions_block> functions;
     std::vector<viua::cg::lex::Token> function_signatures;
 
-    std::vector<InstructionsBlock> blocks;
+    std::vector<Instructions_block> blocks;
     std::vector<viua::cg::lex::Token> block_signatures;
 
     bool as_library = false;
 
-    auto block(std::string const) const -> InstructionsBlock const&;
+    auto block(std::string const) const -> Instructions_block const&;
 };
 
 
@@ -161,14 +161,14 @@ auto parse_directive(const vector_view<viua::cg::lex::Token> tokens,
 auto parse_line(const vector_view<viua::cg::lex::Token> tokens,
                 std::unique_ptr<Line>&) -> decltype(tokens)::size_type;
 auto parse_block_body(const vector_view<viua::cg::lex::Token> tokens,
-                      InstructionsBlock&) -> decltype(tokens)::size_type;
+                      Instructions_block&) -> decltype(tokens)::size_type;
 auto parse_function(const vector_view<viua::cg::lex::Token> tokens,
-                    InstructionsBlock&) -> decltype(tokens)::size_type;
+                    Instructions_block&) -> decltype(tokens)::size_type;
 auto parse_closure(const vector_view<viua::cg::lex::Token> tokens,
-                   InstructionsBlock&) -> decltype(tokens)::size_type;
+                   Instructions_block&) -> decltype(tokens)::size_type;
 auto parse_block(const vector_view<viua::cg::lex::Token> tokens,
-                 InstructionsBlock&) -> decltype(tokens)::size_type;
-auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;
+                 Instructions_block&) -> decltype(tokens)::size_type;
+auto parse(const std::vector<viua::cg::lex::Token>&) -> Parsed_source;
 }}}}  // namespace viua::assembler::frontend::parser
 
 

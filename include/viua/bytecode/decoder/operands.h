@@ -64,7 +64,7 @@ auto fetch_register(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, viua::kernel::Register*>;
 auto fetch_register_type_and_index(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type,
-                  viua::internals::RegisterSets,
+                  viua::internals::Register_sets,
                   viua::internals::types::register_index>;
 auto fetch_timeout(Op_address_type, viua::process::Process*)
     -> std::tuple<Op_address_type, viua::internals::types::timeout>;

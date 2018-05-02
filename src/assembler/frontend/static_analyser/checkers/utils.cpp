@@ -32,39 +32,39 @@ using viua::assembler::frontend::parser::BooleanLiteral;
 using viua::assembler::frontend::parser::FunctionNameLiteral;
 using viua::assembler::frontend::parser::Label;
 using viua::assembler::frontend::parser::Offset;
-using viua::assembler::frontend::parser::RegisterIndex;
+using viua::assembler::frontend::parser::Register_index;
 using viua::assembler::frontend::parser::VoidLiteral;
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
+using viua::cg::lex::Traced_syntax_error;
 
-using viua::internals::RegisterSets;
-auto register_set_names = std::map<RegisterSets, std::string>{
+using viua::internals::Register_sets;
+auto register_set_names = std::map<Register_sets, std::string>{
     {
         // FIXME 'current' as a register set name should be deprecated.
-        RegisterSets::CURRENT,
+        Register_sets::CURRENT,
         "current",
     },
     {
-        RegisterSets::GLOBAL,
+        Register_sets::GLOBAL,
         "global",
     },
     {
-        RegisterSets::STATIC,
+        Register_sets::STATIC,
         "static",
     },
     {
-        RegisterSets::LOCAL,
+        Register_sets::LOCAL,
         "local",
     },
 };
-auto to_string(RegisterSets const register_set_id) -> std::string {
+auto to_string(Register_sets const register_set_id) -> std::string {
     return register_set_names.at(register_set_id);
 }
 
 auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
-    -> InvalidSyntax {
-    auto invalid_syntax_error = InvalidSyntax(tokens.at(0), message);
+    -> Invalid_syntax {
+    auto invalid_syntax_error = Invalid_syntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
          i < tokens.size();
          ++i) {
@@ -74,7 +74,7 @@ auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
 }
 
 auto get_line_index_of_instruction(InstructionIndex const n,
-                                   InstructionsBlock const& ib)
+                                   Instructions_block const& ib)
     -> InstructionIndex {
     auto left = n;
     auto i    = InstructionIndex{0};
@@ -91,9 +91,9 @@ auto get_line_index_of_instruction(InstructionIndex const n,
 
 auto erase_if_direct_access(
     Register_usage_profile& register_usage_profile,
-    RegisterIndex* const r,
+    Register_index* const r,
     viua::assembler::frontend::parser::Instruction const& instruction) -> void {
-    if (r->as == viua::internals::AccessSpecifier::DIRECT) {
+    if (r->as == viua::internals::Access_specifier::DIRECT) {
         register_usage_profile.erase(Register(*r), instruction.tokens.at(0));
     }
 }
@@ -109,9 +109,9 @@ static auto keys_of(std::map<K, V> const& m) -> std::vector<K> {
     return keys;
 }
 auto check_if_name_resolved(Register_usage_profile const& rup,
-                            RegisterIndex const r) -> void {
+                            Register_index const r) -> void {
     if (not r.resolved) {
-        auto error = InvalidSyntax(r.tokens.at(0), "unresolved name");
+        auto error = Invalid_syntax(r.tokens.at(0), "unresolved name");
         if (auto suggestion = str::levenshtein_best(
                 r.tokens.at(0).str().substr(1), keys_of(rup.name_to_index), 4);
             suggestion.first) {
@@ -126,9 +126,9 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
 }
 static auto maybe_mistyped_register_set_helper(
     Register_usage_profile& rup,
-    viua::assembler::frontend::parser::RegisterIndex r,
-    TracedSyntaxError& error,
-    RegisterSets rs_id) -> bool {
+    viua::assembler::frontend::parser::Register_index r,
+    Traced_syntax_error& error,
+    Register_sets rs_id) -> bool {
     if (r.rss != rs_id) {
         auto val         = Register{};
         val.index        = r.index;
@@ -138,7 +138,7 @@ static auto maybe_mistyped_register_set_helper(
                                       "did you mean " + to_string(rs_id)
                                           + " register "
                                           + std::to_string(r.index) + "?");
-            error.append(InvalidSyntax(rup.defined_where(val), "")
+            error.append(Invalid_syntax(rup.defined_where(val), "")
                              .note(to_string(rs_id) + " register "
                                    + std::to_string(r.index)
                                    + " was defined here"));
@@ -149,22 +149,22 @@ static auto maybe_mistyped_register_set_helper(
 }
 static auto maybe_mistyped_register_set(
     Register_usage_profile& rup,
-    viua::assembler::frontend::parser::RegisterIndex r,
-    TracedSyntaxError& error) -> void {
+    viua::assembler::frontend::parser::Register_index r,
+    Traced_syntax_error& error) -> void {
     if (maybe_mistyped_register_set_helper(
-            rup, r, error, RegisterSets::LOCAL)) {
+            rup, r, error, Register_sets::LOCAL)) {
         return;
     }
     if (maybe_mistyped_register_set_helper(
-            rup, r, error, RegisterSets::STATIC)) {
+            rup, r, error, Register_sets::STATIC)) {
         return;
     }
 }
 auto check_use_of_register(Register_usage_profile& rup,
-                           viua::assembler::frontend::parser::RegisterIndex r,
+                           viua::assembler::frontend::parser::Register_index r,
                            std::string const error_core_msg) -> void {
     check_if_name_resolved(rup, r);
-    if (r.rss == RegisterSets::GLOBAL) {
+    if (r.rss == Register_sets::GLOBAL) {
         /*
          * Do not check global register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -184,11 +184,11 @@ auto check_use_of_register(Register_usage_profile& rup,
             msg << " (named " << str::enquote(rup.index_to_name.at(r.index))
                 << ')';
         }
-        auto error = TracedSyntaxError{}.append(
-            InvalidSyntax(r.tokens.at(0), msg.str()));
+        auto error = Traced_syntax_error{}.append(
+            Invalid_syntax(r.tokens.at(0), msg.str()));
 
         if (rup.erased(Register(r))) {
-            error.append(InvalidSyntax(rup.erased_where(Register(r)), "")
+            error.append(Invalid_syntax(rup.erased_where(Register(r)), "")
                              .note("erased here:"));
         }
 
@@ -199,9 +199,9 @@ auto check_use_of_register(Register_usage_profile& rup,
     rup.use(Register(r), r.tokens.at(0));
 }
 
-using ValueTypes            = viua::internals::ValueTypes;
+using Value_types            = viua::internals::Value_types;
 using ValueTypesType        = viua::internals::ValueTypesType;
-auto const value_type_names = std::map<ValueTypes, std::string>{
+auto const value_type_names = std::map<Value_types, std::string>{
     {
         /*
          * Making this "value" instead of "undefined" lets us build error
@@ -210,101 +210,101 @@ auto const value_type_names = std::map<ValueTypes, std::string>{
          * for the value we will not print a "unused undefined" (what would that
          * even mean?) message, but "unused value".
          */
-        ValueTypes::UNDEFINED,
+        Value_types::UNDEFINED,
         "value",
     },
     {
-        ValueTypes::VOID,
+        Value_types::VOID,
         "void",
     },
     {
-        ValueTypes::INTEGER,
+        Value_types::INTEGER,
         "integer",
     },
     {
-        ValueTypes::FLOAT,
+        Value_types::FLOAT,
         "float",
     },
     {
-        ValueTypes::NUMBER,
+        Value_types::NUMBER,
         "number",
     },
     {
-        ValueTypes::BOOLEAN,
+        Value_types::BOOLEAN,
         "boolean",
     },
     {
-        ValueTypes::TEXT,
+        Value_types::TEXT,
         "text",
     },
     {
-        ValueTypes::STRING,
+        Value_types::STRING,
         "string",
     },
     {
-        ValueTypes::VECTOR,
+        Value_types::VECTOR,
         "vector",
     },
     {
-        ValueTypes::BITS,
+        Value_types::BITS,
         "bits",
     },
     {
-        ValueTypes::CLOSURE,
+        Value_types::CLOSURE,
         "closure",
     },
     {
-        ValueTypes::FUNCTION,
+        Value_types::FUNCTION,
         "function",
     },
     {
-        ValueTypes::INVOCABLE,
+        Value_types::INVOCABLE,
         "invocable",
     },
     {
-        ValueTypes::ATOM,
+        Value_types::ATOM,
         "atom",
     },
     {
-        ValueTypes::PID,
+        Value_types::PID,
         "pid",
     },
     {
-        ValueTypes::STRUCT,
+        Value_types::STRUCT,
         "struct",
     },
     {
-        ValueTypes::OBJECT,
+        Value_types::OBJECT,
         "object",
     },
 };
-auto operator|(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+auto operator|(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+    return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                    | static_cast<ValueTypesType>(rhs));
 }
-auto operator&(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+auto operator&(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+    return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                    & static_cast<ValueTypesType>(rhs));
 }
-auto operator^(const ValueTypes lhs, const ValueTypes rhs) -> ValueTypes {
+auto operator^(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
-    return static_cast<ValueTypes>(static_cast<ValueTypesType>(lhs)
+    return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                    ^ static_cast<ValueTypesType>(rhs));
 }
-auto operator!(const ValueTypes v) -> bool {
+auto operator!(const Value_types v) -> bool {
     return not static_cast<ValueTypesType>(v);
 }
-auto to_string(ValueTypes const value_type_id) -> std::string {
-    auto const has_pointer = not not(value_type_id & ValueTypes::POINTER);
+auto to_string(Value_types const value_type_id) -> std::string {
+    auto const has_pointer = not not(value_type_id & Value_types::POINTER);
     auto const type_name   = value_type_names.at(
-        has_pointer ? (value_type_id ^ ValueTypes::POINTER) : value_type_id);
+        has_pointer ? (value_type_id ^ Value_types::POINTER) : value_type_id);
     return (has_pointer ? "pointer to " : "") + type_name;
 }
-auto depointerise_type_if_needed(ValueTypes const t,
+auto depointerise_type_if_needed(Value_types const t,
                                  bool const access_via_pointer_dereference)
-    -> ValueTypes {
-    return (access_via_pointer_dereference ? (t ^ ValueTypes::POINTER) : t);
+    -> Value_types {
+    return (access_via_pointer_dereference ? (t ^ Value_types::POINTER) : t);
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

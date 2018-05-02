@@ -28,7 +28,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_text(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    auto operand = get_operand<RegisterIndex>(instruction, 0);
+    auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -37,20 +37,20 @@ auto check_op_text(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *operand);
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (source) {
         check_use_of_register(register_usage_profile, *source);
         check_if_name_resolved(register_usage_profile, *source);
 
         auto const converted_from_type =
             register_usage_profile.at(Register(*source)).second.value_type;
-        if (converted_from_type == viua::internals::ValueTypes::TEXT) {
-            using viua::cg::lex::InvalidSyntax;
-            using viua::cg::lex::TracedSyntaxError;
-            throw TracedSyntaxError{}
+        if (converted_from_type == viua::internals::Value_types::TEXT) {
+            using viua::cg::lex::Invalid_syntax;
+            using viua::cg::lex::Traced_syntax_error;
+            throw Traced_syntax_error{}
                 .append(invalid_syntax(instruction.operands.at(1)->tokens,
                                        "useless conversion of value"))
-                .append(InvalidSyntax{
+                .append(Invalid_syntax{
                     register_usage_profile.defined_where(Register(*source)), ""}
                             .note("value defined here"));
         }
@@ -59,7 +59,7 @@ auto check_op_text(Register_usage_profile& register_usage_profile,
     auto val         = Register{};
     val.index        = operand->index;
     val.register_set = operand->rss;
-    val.value_type   = viua::internals::ValueTypes::TEXT;
+    val.value_type   = viua::internals::Value_types::TEXT;
 
     register_usage_profile.define(val, operand->tokens.at(0));
 }

@@ -25,11 +25,11 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_enter(Register_usage_profile& register_usage_profile,
-                    ParsedSource const& ps,
+                    Parsed_source const& ps,
                     Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::Label;
-    using viua::cg::lex::InvalidSyntax;
-    using viua::cg::lex::TracedSyntaxError;
+    using viua::cg::lex::Invalid_syntax;
+    using viua::cg::lex::Traced_syntax_error;
 
     auto const label = get_operand<Label>(instruction, 0);
     if (not label) {
@@ -43,11 +43,11 @@ auto check_op_enter(Register_usage_profile& register_usage_profile,
     try {
         check_register_usage_for_instruction_block_impl(
             register_usage_profile, ps, ps.block(block_name), 0, 0);
-    } catch (InvalidSyntax& e) {
-        throw TracedSyntaxError{}.append(e).append(InvalidSyntax{
+    } catch (Invalid_syntax& e) {
+        throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
             label->tokens.at(0), "after entering block " + block_name});
-    } catch (TracedSyntaxError& e) {
-        throw e.append(InvalidSyntax{label->tokens.at(0),
+    } catch (Traced_syntax_error& e) {
+        throw e.append(Invalid_syntax{label->tokens.at(0),
                                      "after entering block " + block_name});
     }
 }

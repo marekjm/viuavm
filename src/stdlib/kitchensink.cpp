@@ -31,8 +31,8 @@ using namespace std;
 
 
 static void kitchensink_sleep(Frame* frame,
-                              viua::kernel::RegisterSet*,
-                              viua::kernel::RegisterSet*,
+                              viua::kernel::Register_set*,
+                              viua::kernel::Register_set*,
                               viua::process::Process*,
                               viua::kernel::Kernel*) {
     sleep(static_cast<unsigned int>(
@@ -40,11 +40,11 @@ static void kitchensink_sleep(Frame* frame,
             ->as_integer()));
 }
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"std::kitchensink::sleep/1", &kitchensink_sleep},
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
+extern "C" const Foreign_function_spec* exports() {
     return functions;
 }

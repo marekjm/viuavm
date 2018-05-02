@@ -28,7 +28,7 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::FunctionNameLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
@@ -44,7 +44,7 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
     }
 
     auto val       = Register{*target};
-    val.value_type = ValueTypes::FUNCTION;
+    val.value_type = Value_types::FUNCTION;
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

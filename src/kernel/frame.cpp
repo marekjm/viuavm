@@ -21,7 +21,7 @@
 #include <viua/kernel/frame.h>
 
 
-auto Frame::set_local_register_set(viua::kernel::RegisterSet* const rs,
+auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
                                    bool const receives_ownership) -> void {
     local_register_set.reset(rs, receives_ownership);
 }
@@ -33,8 +33,8 @@ Frame::Frame(viua::internals::types::byte const* const ra,
         , arguments{nullptr}
         , local_register_set{nullptr}
         , return_register{nullptr} {
-    arguments          = std::make_unique<viua::kernel::RegisterSet>(argsize);
-    local_register_set = std::make_unique<viua::kernel::RegisterSet>(regsize);
+    arguments          = std::make_unique<viua::kernel::Register_set>(argsize);
+    local_register_set = std::make_unique<viua::kernel::Register_set>(regsize);
 }
 Frame::Frame(Frame const& that) : return_address{that.return_address} {
     // FIXME: copy the registers maybe?

@@ -29,7 +29,7 @@
 #include <viua/support/pointer.h>
 
 
-enum class IntegerOperandType {
+enum class Integer_operand_type {
     PLAIN = 0,
     INDEX,
     REGISTER_REFERENCE,
@@ -38,23 +38,23 @@ enum class IntegerOperandType {
 };
 
 struct int_op {
-    IntegerOperandType type;
-    viua::internals::RegisterSets rs_type;
+    Integer_operand_type type;
+    viua::internals::Register_sets rs_type;
     viua::internals::types::plain_int value;
 
     int_op();
-    int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
-    int_op(IntegerOperandType,
-           viua::internals::RegisterSets,
+    int_op(Integer_operand_type, viua::internals::types::plain_int = 0);
+    int_op(Integer_operand_type,
+           viua::internals::Register_sets,
            viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };
 struct timeout_op {
-    IntegerOperandType type;
+    Integer_operand_type type;
     viua::internals::types::timeout value;
 
     timeout_op();
-    timeout_op(IntegerOperandType, viua::internals::types::timeout = 0);
+    timeout_op(Integer_operand_type, viua::internals::types::timeout = 0);
     timeout_op(viua::internals::types::timeout);
 };
 

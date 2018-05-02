@@ -26,24 +26,24 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_if(Register_usage_profile& register_usage_profile,
-                 ParsedSource const& ps,
+                 Parsed_source const& ps,
                  Instruction const& instruction,
-                 InstructionsBlock const& ib,
+                 Instructions_block const& ib,
                  InstructionIndex i,
                  InstructionIndex const mnemonic_counter) -> void {
     using viua::assembler::frontend::parser::Label;
     using viua::assembler::frontend::parser::Offset;
-    using viua::cg::lex::InvalidSyntax;
-    using viua::cg::lex::TracedSyntaxError;
+    using viua::cg::lex::Invalid_syntax;
+    using viua::cg::lex::Traced_syntax_error;
 
-    auto source = get_operand<RegisterIndex>(instruction, 0);
+    auto source = get_operand<Register_index>(instruction, 0);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
     check_use_of_register(register_usage_profile, *source, "branch depends on");
-    assert_type_of_register<viua::internals::ValueTypes::UNDEFINED>(
+    assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 
     auto jump_target_if_true = InstructionIndex{0};
@@ -73,7 +73,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // throwing *many* false positives.
         return;
     } else {
-        throw InvalidSyntax(instruction.operands.at(1)->tokens.at(0),
+        throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
                             "invalid operand for if instruction");
     }
 
@@ -104,7 +104,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // throwing *many* false positives.
         return;
     } else {
-        throw InvalidSyntax(instruction.operands.at(2)->tokens.at(0),
+        throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
                             "invalid operand for if instruction");
     }
 
@@ -120,17 +120,17 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             ib,
             jump_target_if_true,
             mnemonic_counter);
-    } catch (viua::cg::lex::UnusedValue& e) {
+    } catch (viua::cg::lex::Unused_value& e) {
         // Do not fail yet, because the value may be used by false branch.
         // Save the error for later rethrowing.
         register_with_unused_value = e.what();
-    } catch (InvalidSyntax& e) {
-        throw TracedSyntaxError{}.append(e).append(
-            InvalidSyntax{instruction.tokens.at(0),
+    } catch (Invalid_syntax& e) {
+        throw Traced_syntax_error{}.append(e).append(
+            Invalid_syntax{instruction.tokens.at(0),
                           "after taking true branch here:"}
                 .add(instruction.operands.at(1)->tokens.at(0)));
-    } catch (TracedSyntaxError& e) {
-        throw e.append(InvalidSyntax{instruction.tokens.at(0),
+    } catch (Traced_syntax_error& e) {
+        throw e.append(Invalid_syntax{instruction.tokens.at(0),
                                      "after taking true branch here:"}
                            .add(instruction.operands.at(1)->tokens.at(0)));
     }
@@ -145,9 +145,9 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             ib,
             jump_target_if_false,
             mnemonic_counter);
-    } catch (viua::cg::lex::UnusedValue& e) {
+    } catch (viua::cg::lex::Unused_value& e) {
         if (register_with_unused_value == e.what()) {
-            throw TracedSyntaxError{}.append(e).append(InvalidSyntax{
+            throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
                 instruction.tokens.at(0), "after taking either branch:"});
         } else {
             /*
@@ -157,7 +157,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
              * was used in the true one (so no error either).
              */
         }
-    } catch (InvalidSyntax& e) {
+    } catch (Invalid_syntax& e) {
         if (register_with_unused_value != e.what()
             and std::string{e.what()}.substr(0, 6) == "unused") {
             /*
@@ -167,12 +167,12 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
              * was used in the true one (so no error either).
              */
         } else {
-            throw TracedSyntaxError{}.append(e).append(
-                InvalidSyntax{instruction.tokens.at(0),
+            throw Traced_syntax_error{}.append(e).append(
+                Invalid_syntax{instruction.tokens.at(0),
                               "after taking false branch here:"}
                     .add(instruction.operands.at(2)->tokens.at(0)));
         }
-    } catch (TracedSyntaxError& e) {
+    } catch (Traced_syntax_error& e) {
         if (register_with_unused_value != e.errors.front().what()
             and std::string{e.errors.front().what()}.substr(0, 6) == "unused") {
             /*
@@ -182,7 +182,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
              * was used in the true one (so no error either).
              */
         } else {
-            throw e.append(InvalidSyntax{instruction.tokens.at(0),
+            throw e.append(Invalid_syntax{instruction.tokens.at(0),
                                          "after taking false branch here:"}
                                .add(instruction.operands.at(2)->tokens.at(0)));
         }

@@ -27,9 +27,9 @@ namespace static_analyser { namespace checkers {
 auto check_op_join(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::VoidLiteral;
-    using viua::cg::lex::InvalidSyntax;
+    using viua::cg::lex::Invalid_syntax;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         if (not get_operand<VoidLiteral>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
@@ -40,15 +40,15 @@ auto check_op_join(Register_usage_profile& register_usage_profile,
 
     if (target) {
         check_if_name_resolved(register_usage_profile, *target);
-        if (target->as != viua::internals::AccessSpecifier::DIRECT) {
-            throw InvalidSyntax(target->tokens.at(0), "invalid access mode")
+        if (target->as != viua::internals::Access_specifier::DIRECT) {
+            throw Invalid_syntax(target->tokens.at(0), "invalid access mode")
                 .note("can only join using direct access mode")
                 .aside("did you mean '%" + target->tokens.at(0).str().substr(1)
                        + "'?");
         }
     }
 
-    auto source = get_operand<RegisterIndex>(instruction, 1);
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
@@ -56,7 +56,7 @@ auto check_op_join(Register_usage_profile& register_usage_profile,
     }
 
     check_use_of_register(register_usage_profile, *source);
-    assert_type_of_register<viua::internals::ValueTypes::PID>(
+    assert_type_of_register<viua::internals::Value_types::PID>(
         register_usage_profile, *source);
 
     if (target) {

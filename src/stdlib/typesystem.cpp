@@ -30,8 +30,8 @@ using namespace std;
 
 
 static auto typeof(Frame* frame,
-                   viua::kernel::RegisterSet*,
-                   viua::kernel::RegisterSet*,
+                   viua::kernel::Register_set*,
+                   viua::kernel::Register_set*,
                    viua::process::Process* process,
                    viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
@@ -49,11 +49,11 @@ static auto typeof(Frame* frame,
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"std::typesystem::typeof/1", &typeof},
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
+extern "C" const Foreign_function_spec* exports() {
     return functions;
 }

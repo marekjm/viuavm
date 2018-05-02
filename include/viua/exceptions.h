@@ -29,21 +29,21 @@
 #include <viua/util/exceptions.h>
 
 
-class OutOfRangeException : public viua::types::Exception {
+class Out_of_range_exception : public viua::types::Exception {
   public:
     std::string type() const {
-        return "OutOfRangeException";
+        return "Out_of_range_exception";
     }
-    OutOfRangeException(std::string const& s) : viua::types::Exception(s) {}
+    Out_of_range_exception(std::string const& s) : viua::types::Exception(s) {}
 };
 
-class ArityException : public viua::types::Exception {
+class Arity_exception : public viua::types::Exception {
     viua::internals::types::register_index got_arity;
     std::vector<decltype(got_arity)> valid_arities;
 
   public:
     std::string type() const override {
-        return "ArityException";
+        return "Arity_exception";
     }
 
     std::string str() const override {
@@ -61,7 +61,7 @@ class ArityException : public viua::types::Exception {
     }
 
     std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<ArityException>(
+        return viua::util::exceptions::make_unique_exception<Arity_exception>(
             got_arity, valid_arities);
     }
 
@@ -69,18 +69,18 @@ class ArityException : public viua::types::Exception {
         return str();
     }
 
-    ArityException(decltype(got_arity) a, decltype(valid_arities) v)
+    Arity_exception(decltype(got_arity) a, decltype(valid_arities) v)
             : got_arity(a), valid_arities(v) {}
-    ~ArityException() {}
+    ~Arity_exception() {}
 };
 
-class TypeException : public viua::types::Exception {
+class Type_exception : public viua::types::Exception {
     std::string expected;
     std::string got;
 
   public:
     std::string type() const override {
-        return "TypeException";
+        return "Type_exception";
     }
 
     std::string str() const override {
@@ -90,7 +90,7 @@ class TypeException : public viua::types::Exception {
     }
 
     std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<TypeException>(
+        return viua::util::exceptions::make_unique_exception<Type_exception>(
             expected, got);
     }
 
@@ -98,17 +98,17 @@ class TypeException : public viua::types::Exception {
         return str();
     }
 
-    TypeException(decltype(expected) e, decltype(got) g)
+    Type_exception(decltype(expected) e, decltype(got) g)
             : expected(e), got(g) {}
-    ~TypeException() {}
+    ~Type_exception() {}
 };
 
-class UnresolvedAtomException : public viua::types::Exception {
+class Unresolved_atom_exception : public viua::types::Exception {
     std::string atom;
 
   public:
     std::string type() const override {
-        return "UnresolvedAtomException";
+        return "Unresolved_atom_exception";
     }
 
     std::string str() const override {
@@ -117,21 +117,21 @@ class UnresolvedAtomException : public viua::types::Exception {
 
     std::unique_ptr<Value> copy() const override {
         return viua::util::exceptions::make_unique_exception<
-            UnresolvedAtomException>(atom);
+            Unresolved_atom_exception>(atom);
     }
 
     std::string what() const override {
         return str();
     }
 
-    UnresolvedAtomException(decltype(atom) a) : atom(a) {}
-    ~UnresolvedAtomException() {}
+    Unresolved_atom_exception(decltype(atom) a) : atom(a) {}
+    ~Unresolved_atom_exception() {}
 };
 
-class OperandTypeException : public viua::types::Exception {
+class Operand_type_exception : public viua::types::Exception {
   public:
     std::string type() const override {
-        return "OperandTypeException";
+        return "Operand_type_exception";
     }
 
     std::string str() const override {
@@ -140,7 +140,7 @@ class OperandTypeException : public viua::types::Exception {
 
     std::unique_ptr<Value> copy() const override {
         return viua::util::exceptions::make_unique_exception<
-            OperandTypeException>();
+            Operand_type_exception>();
     }
 
     std::string what() const override {

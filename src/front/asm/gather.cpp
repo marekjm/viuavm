@@ -61,11 +61,11 @@ map<std::string, std::string> gather_meta_information(
             viua::cg::lex::Token key   = tokens.at(i + 1),
                                  value = tokens.at(i + 2);
             if (key == "\n") {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     tokens.at(i), "missing key and value in .info: directive");
             }
             if (value == "\n") {
-                throw viua::cg::lex::InvalidSyntax(
+                throw viua::cg::lex::Invalid_syntax(
                     tokens.at(i), "missing value in .info: directive");
             }
             meta_information.emplace(

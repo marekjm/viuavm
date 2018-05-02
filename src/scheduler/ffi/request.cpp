@@ -26,11 +26,11 @@
 using namespace std;
 
 
-std::string viua::scheduler::ffi::ForeignFunctionCallRequest::function_name()
+std::string viua::scheduler::ffi::Foreign_function_call_request::function_name()
     const {
     return frame->function_name;
 }
-void viua::scheduler::ffi::ForeignFunctionCallRequest::call(
+void viua::scheduler::ffi::Foreign_function_call_request::call(
     ForeignFunction* callback) {
     /* FIXME: second parameter should be a pointer to static registers or
      *        nullptr if function does not have static registers registered
@@ -64,10 +64,10 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(
         caller_process->handle_active_exception();
     }
 }
-void viua::scheduler::ffi::ForeignFunctionCallRequest::raise(
+void viua::scheduler::ffi::Foreign_function_call_request::raise(
     std::unique_ptr<viua::types::Value> object) {
     caller_process->raise(std::move(object));
 }
-void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() {
+void viua::scheduler::ffi::Foreign_function_call_request::wakeup() {
     caller_process->wakeup();
 }

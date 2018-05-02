@@ -28,7 +28,7 @@ auto check_op_self(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::VoidLiteral;
 
-    auto target = get_operand<RegisterIndex>(instruction, 0);
+    auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         if (not get_operand<VoidLiteral>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
@@ -40,7 +40,7 @@ auto check_op_self(Register_usage_profile& register_usage_profile,
     check_if_name_resolved(register_usage_profile, *target);
 
     auto val       = Register{*target};
-    val.value_type = ValueTypes::PID;
+    val.value_type = Value_types::PID;
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

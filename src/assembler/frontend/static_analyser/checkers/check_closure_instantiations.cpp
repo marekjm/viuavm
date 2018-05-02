@@ -20,21 +20,21 @@
 #include <algorithm>
 #include <viua/assembler/frontend/static_analyser.h>
 
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
+using viua::cg::lex::Traced_syntax_error;
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
-    ParsedSource const& ps,
+    Parsed_source const& ps,
     std::map<Register, Closure> const& created_closures) -> void {
     for (auto const& each : created_closures) {
         Register_usage_profile closure_register_usage_profile;
         auto const& fn = *std::find_if(ps.functions.begin(),
                                        ps.functions.end(),
-                                       [&each](InstructionsBlock const& b) {
+                                       [&each](Instructions_block const& b) {
                                            return b.name == each.second.name;
                                        });
         for (auto& captured_value : each.second.defined_registers) {
@@ -50,16 +50,16 @@ auto check_closure_instantiations(
                 fn,
                 0,
                 static_cast<InstructionIndex>(-1));
-        } catch (InvalidSyntax& e) {
-            throw TracedSyntaxError{}
+        } catch (Invalid_syntax& e) {
+            throw Traced_syntax_error{}
                 .append(e)
-                .append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                .append(InvalidSyntax{
+                .append(Invalid_syntax{fn.name, "in a closure defined here:"})
+                .append(Invalid_syntax{
                     register_usage_profile.defined_where(each.first),
                     "when instantiated here:"});
-        } catch (TracedSyntaxError& e) {
-            throw e.append(InvalidSyntax{fn.name, "in a closure defined here:"})
-                .append(InvalidSyntax{
+        } catch (Traced_syntax_error& e) {
+            throw e.append(Invalid_syntax{fn.name, "in a closure defined here:"})
+                .append(Invalid_syntax{
                     register_usage_profile.defined_where(each.first),
                     "when instantiated here:"});
         }
