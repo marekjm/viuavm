@@ -703,7 +703,7 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
 
 auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
-    std::vector<unsigned long> iotas;
+    auto iotas = std::vector<unsigned long>{};
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {

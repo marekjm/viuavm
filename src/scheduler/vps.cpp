@@ -428,7 +428,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     bool ticked     = false;
     bool any_active = false;
 
-    std::vector<std::unique_ptr<viua::process::Process>> running_processes_list;
+    auto running_processes_list = std::vector<std::unique_ptr<viua::process::Process>>{};
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0;
