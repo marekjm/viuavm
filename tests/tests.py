@@ -93,7 +93,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
-        with open('/tmp/viua_test_suite_last_assembler_failure', 'w') as ofstream:
+        with open('./tests/compiled/viua_test_suite_last_assembler_failure', 'w') as ofstream:
             output_option = ('--out', '-o',)
             def undesirable(x):
                 i, each = x
