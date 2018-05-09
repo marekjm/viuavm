@@ -406,6 +406,44 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
+def render_multiline_heading(heading_text, index, indent, noise, extra, ref):
+    colorise_with = None
+    if section_tracker.depth() < 2:
+        colorise_with = COLOR_SECTION_MAJOR
+    if section_tracker.depth() == 2:
+        colorise_with = COLOR_SECTION_MINOR
+    if section_tracker.depth() > 2:
+        colorise_with = COLOR_SECTION_SUBSECTION
+
+    format_line_title = '{prefix}[{index}] {text}'
+    format_line_ref = '{prefix}{index_prefix}{ref}'
+    ref_name = ''
+    if ref is not None:
+        ref_name = ' {{{}}}'.format(ref)
+    top_marker = ''
+    top_marker_spacing = ''
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        format_line_title = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
+        format_line_ref = '{prefix}{index_prefix}{ref}'
+        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
+            len(TOP_MARKER)))
+        top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
+
+    print(format_line_title.format(
+        prefix = (' ' * indent),
+        index = index,
+        slug = section_tracker.slug(index),
+        text = colorise(heading_text, colorise_with),
+        top_marker = top_marker,
+        top_marker_spacing = top_marker_spacing,
+    ))
+    index_prefix = len(index) + 2   # +2 for '[' and ']'
+    print(format_line_ref.format(
+        prefix = (' ' * indent),
+        index_prefix = (' ' * index_prefix),
+        ref = ref_name,
+    ))
+
 def render_heading(heading_text, indent, noise = False, extra = None, ref = None):
     colorise_with = None
     if section_tracker.depth() < 2:
@@ -428,7 +466,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
             len(TOP_MARKER)))
         top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
 
-    print(format_line.format(
+    rendered_line = format_line.format(
         prefix = (' ' * indent),
         index = index,
         slug = section_tracker.slug(index),
@@ -436,7 +474,13 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
         ref = ref_name,
         top_marker = top_marker,
         top_marker_spacing = top_marker_spacing,
-    ))
+    )
+
+    visible_width = indent + len(index) + 2 + 1 + len(section_tracker.slug(index)) + len(ref_name)
+    if visible_width >= (LINE_WIDTH - len(TOP_MARKER)):
+        return render_multiline_heading(heading_text, index, indent, noise, extra, ref)
+
+    print(rendered_line)
 
 class Types:
     @staticmethod
