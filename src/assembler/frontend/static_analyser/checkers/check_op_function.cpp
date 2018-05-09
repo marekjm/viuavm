@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_function(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::FunctionNameLiteral;
+    using viua::assembler::frontend::parser::Function_name_literal;
 
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
@@ -37,7 +37,7 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *target);
 
-    if (not get_operand<FunctionNameLiteral>(instruction, 1)) {
+    if (not get_operand<Function_name_literal>(instruction, 1)) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected function name literal");

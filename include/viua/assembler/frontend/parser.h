@@ -47,31 +47,31 @@ struct Register_index : public Operand {
     bool resolved = false;
 };
 struct Instruction_block_name : public Operand {};
-struct BitsLiteral : public Operand {
+struct Bits_literal : public Operand {
     std::string content;
 };
-struct IntegerLiteral : public Operand {
+struct Integer_literal : public Operand {
     std::string content;
 };
-struct FloatLiteral : public Operand {
+struct Float_literal : public Operand {
     std::string content;
 };
-struct BooleanLiteral : public Operand {
+struct Boolean_literal : public Operand {
     std::string content;
 };
-struct VoidLiteral : public Operand {
+struct Void_literal : public Operand {
     const std::string content = "void";
 };
-struct FunctionNameLiteral : public Operand {
+struct Function_name_literal : public Operand {
     std::string content;
 };
-struct AtomLiteral : public Operand {
+struct Atom_literal : public Operand {
     std::string content;
 };
-struct TextLiteral : public Operand {
+struct Text_literal : public Operand {
     std::string content;
 };
-struct DurationLiteral : public Operand {
+struct Duration_literal : public Operand {
     std::string content;
 };
 struct Label : public Operand {

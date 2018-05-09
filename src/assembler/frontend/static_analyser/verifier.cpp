@@ -283,13 +283,13 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                 }
 
                 auto function_name = std::string{};
-                using viua::assembler::frontend::parser::AtomLiteral;
-                using viua::assembler::frontend::parser::FunctionNameLiteral;
-                if (auto name_from_atom = dynamic_cast<AtomLiteral*>(operand);
+                using viua::assembler::frontend::parser::Atom_literal;
+                using viua::assembler::frontend::parser::Function_name_literal;
+                if (auto name_from_atom = dynamic_cast<Atom_literal*>(operand);
                     name_from_atom) {
                     function_name = name_from_atom->content;
                 } else if (auto name_from_fn =
-                               dynamic_cast<FunctionNameLiteral*>(operand);
+                               dynamic_cast<Function_name_literal*>(operand);
                            name_from_fn) {
                     function_name = name_from_fn->content;
                 } else if (auto label = dynamic_cast<Label*>(operand); label) {

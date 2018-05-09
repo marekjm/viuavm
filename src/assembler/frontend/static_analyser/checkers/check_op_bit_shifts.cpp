@@ -26,11 +26,11 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_bit_shifts(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::VoidLiteral;
+    using viua::assembler::frontend::parser::Void_literal;
 
     auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {
-        if (not get_operand<VoidLiteral>(instruction, 0)) {
+        if (not get_operand<Void_literal>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
                                  "invalid operand")
                 .note("expected register index or void");

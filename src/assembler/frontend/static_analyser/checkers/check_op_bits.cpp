@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_bits(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::BitsLiteral;
+    using viua::assembler::frontend::parser::Bits_literal;
 
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
@@ -39,7 +39,7 @@ auto check_op_bits(Register_usage_profile& register_usage_profile,
 
     auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
-        if (not get_operand<BitsLiteral>(instruction, 1)) {
+        if (not get_operand<Bits_literal>(instruction, 1)) {
             throw invalid_syntax(instruction.operands.at(1)->tokens,
                                  "invalid operand")
                 .note("expected register index or bits literal");

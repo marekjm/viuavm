@@ -178,35 +178,35 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(ri);
     } else if (str::is_binary_literal(tok)) {
-        auto bits_literal     = make_unique<BitsLiteral>();
+        auto bits_literal     = make_unique<Bits_literal>();
         bits_literal->content = tokens.at(i);
         bits_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(bits_literal);
     } else if (str::isnum(tok, true) and not integer_literal_means_offset) {
-        auto integer_literal     = make_unique<IntegerLiteral>();
+        auto integer_literal     = make_unique<Integer_literal>();
         integer_literal->content = tokens.at(i);
         integer_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(integer_literal);
     } else if (str::isfloat(tok, true)) {
-        auto float_literal     = make_unique<FloatLiteral>();
+        auto float_literal     = make_unique<Float_literal>();
         float_literal->content = tokens.at(i);
         float_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(float_literal);
     } else if (str::is_boolean_literal(tok)) {
-        auto boolean_literal     = make_unique<BooleanLiteral>();
+        auto boolean_literal     = make_unique<Boolean_literal>();
         boolean_literal->content = tokens.at(i);
         boolean_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(boolean_literal);
     } else if (str::is_void(tok)) {
-        auto void_literal = make_unique<VoidLiteral>();
+        auto void_literal = make_unique<Void_literal>();
         void_literal->add(tokens.at(i));
         ++i;
 
@@ -222,7 +222,7 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(label);
     } else if (::assembler::utils::is_valid_function_name(tok)) {
-        auto fn_name_literal     = make_unique<FunctionNameLiteral>();
+        auto fn_name_literal     = make_unique<Function_name_literal>();
         fn_name_literal->content = tokens.at(i);
         fn_name_literal->add(tokens.at(i));
         ++i;
@@ -236,21 +236,21 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         operand = std::move(label);
     } else if (str::is_atom_literal(tok)) {
-        auto atom_literal     = make_unique<AtomLiteral>();
+        auto atom_literal     = make_unique<Atom_literal>();
         atom_literal->content = tokens.at(i);
         atom_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(atom_literal);
     } else if (str::is_text_literal(tok)) {
-        auto text_literal     = make_unique<TextLiteral>();
+        auto text_literal     = make_unique<Text_literal>();
         text_literal->content = tokens.at(i);
         text_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(text_literal);
     } else if (str::is_timeout_literal(tok)) {
-        auto duration_literal     = make_unique<DurationLiteral>();
+        auto duration_literal     = make_unique<Duration_literal>();
         duration_literal->content = tokens.at(i);
         duration_literal->add(tokens.at(i));
         ++i;

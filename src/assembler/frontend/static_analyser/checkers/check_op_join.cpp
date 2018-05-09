@@ -26,12 +26,12 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_join(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::VoidLiteral;
+    using viua::assembler::frontend::parser::Void_literal;
     using viua::cg::lex::Invalid_syntax;
 
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
-        if (not get_operand<VoidLiteral>(instruction, 0)) {
+        if (not get_operand<Void_literal>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
                                  "invalid operand")
                 .note("expected register index or void");

@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_vinsert(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::VoidLiteral;
+    using viua::assembler::frontend::parser::Void_literal;
 
     auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {
@@ -48,7 +48,7 @@ auto check_op_vinsert(Register_usage_profile& register_usage_profile,
 
     auto key = get_operand<Register_index>(instruction, 2);
     if (not key) {
-        if (not get_operand<VoidLiteral>(instruction, 2)) {
+        if (not get_operand<Void_literal>(instruction, 2)) {
             throw invalid_syntax(instruction.operands.at(2)->tokens,
                                  "invalid operand")
                 .note("expected register index or void");

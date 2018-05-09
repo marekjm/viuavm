@@ -26,7 +26,7 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_atom(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::AtomLiteral;
+    using viua::assembler::frontend::parser::Atom_literal;
 
     auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
@@ -37,7 +37,7 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
 
     check_if_name_resolved(register_usage_profile, *operand);
 
-    auto source = get_operand<AtomLiteral>(instruction, 1);
+    auto source = get_operand<Atom_literal>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")

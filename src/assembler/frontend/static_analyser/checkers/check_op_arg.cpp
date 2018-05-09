@@ -26,9 +26,9 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_arg(Register_usage_profile& register_usage_profile,
                   Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::VoidLiteral;
+    using viua::assembler::frontend::parser::Void_literal;
 
-    if (get_operand<VoidLiteral>(instruction, 0)) {
+    if (get_operand<Void_literal>(instruction, 0)) {
         return;
     }
 

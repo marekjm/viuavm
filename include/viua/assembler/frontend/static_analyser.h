@@ -285,7 +285,7 @@ auto get_input_operand(
     size_t operand_index) -> T* {
     auto operand = get_operand<T>(instruction, operand_index);
     if ((not operand)
-        and dynamic_cast<viua::assembler::frontend::parser::VoidLiteral*>(
+        and dynamic_cast<viua::assembler::frontend::parser::Void_literal*>(
                 instruction.operands.at(operand_index).get())) {
         throw viua::cg::lex::Invalid_syntax{
             instruction.operands.at(operand_index)->tokens.at(0),

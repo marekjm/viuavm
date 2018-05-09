@@ -26,14 +26,14 @@ using viua::assembler::frontend::parser::Instruction;
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
-using viua::assembler::frontend::parser::AtomLiteral;
-using viua::assembler::frontend::parser::BitsLiteral;
-using viua::assembler::frontend::parser::BooleanLiteral;
-using viua::assembler::frontend::parser::FunctionNameLiteral;
+using viua::assembler::frontend::parser::Atom_literal;
+using viua::assembler::frontend::parser::Bits_literal;
+using viua::assembler::frontend::parser::Boolean_literal;
+using viua::assembler::frontend::parser::Function_name_literal;
 using viua::assembler::frontend::parser::Label;
 using viua::assembler::frontend::parser::Offset;
 using viua::assembler::frontend::parser::Register_index;
-using viua::assembler::frontend::parser::VoidLiteral;
+using viua::assembler::frontend::parser::Void_literal;
 using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;

@@ -26,13 +26,13 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_call(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
-    using viua::assembler::frontend::parser::AtomLiteral;
-    using viua::assembler::frontend::parser::FunctionNameLiteral;
-    using viua::assembler::frontend::parser::VoidLiteral;
+    using viua::assembler::frontend::parser::Atom_literal;
+    using viua::assembler::frontend::parser::Function_name_literal;
+    using viua::assembler::frontend::parser::Void_literal;
 
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
-        if (not get_operand<VoidLiteral>(instruction, 0)) {
+        if (not get_operand<Void_literal>(instruction, 0)) {
             throw invalid_syntax(instruction.operands.at(0)->tokens,
                                  "invalid operand")
                 .note("expected register index or void");
@@ -44,8 +44,8 @@ auto check_op_call(Register_usage_profile& register_usage_profile,
     }
 
     auto fn = instruction.operands.at(1).get();
-    if ((not dynamic_cast<AtomLiteral*>(fn))
-        and (not dynamic_cast<FunctionNameLiteral*>(fn))
+    if ((not dynamic_cast<Atom_literal*>(fn))
+        and (not dynamic_cast<Function_name_literal*>(fn))
         and (not dynamic_cast<Register_index*>(fn))) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
