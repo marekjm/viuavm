@@ -28,7 +28,7 @@ fi
 # The command below will compile the code with as many threads as your CPU has cores.
 # Behold the great power of pipes and subshells!
 if [[ $JOBS == '' ]]; then
-    JOBS=$(dc -e "$(cat /proc/cpuinfo | grep 'processor' | tail -n 1 | grep -Po '[0-9]+') 1 + p")
+    JOBS=$(dc -e "$(cat /proc/cpuinfo | grep 'processor' | tail -n 1 | grep -Po '[0-9]+') 2 + p")
 fi
 
 echo "$0: using $JOBS jobs"
