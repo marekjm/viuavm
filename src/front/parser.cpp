@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
         cout << "fatal: no file to tokenize" << endl;
         return 1;
     }
-    if (!support::env::is_file(filename)) {
+    if (!viua::support::env::is_file(filename)) {
         cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }

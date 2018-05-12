@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
         cout << ": no file to assemble" << endl;
         return 1;
     }
-    if (!support::env::is_file(filename)) {
+    if (!viua::support::env::is_file(filename)) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET) << ": ";
         cout << send_control_seq(COLOR_FG_RED) << "error"

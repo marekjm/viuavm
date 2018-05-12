@@ -40,7 +40,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
     auto trace = process->trace();
     cerr << "stack trace: from entry point, most recent call last...\n";
     decltype(trace)::size_type i = 0;
-    if (support::env::get_var("VIUA_STACK_TRACES") != "full") {
+    if (viua::support::env::get_var("VIUA_STACK_TRACES") != "full") {
         i = (trace.size() and trace[0]->function_name == "__entry");
     }
     for (; i < trace.size(); ++i) {
@@ -131,7 +131,7 @@ static auto print_stack_trace_json(viua::process::Process* process) -> void {
     oss << "\"trace\":[";
     auto trace                   = process->trace();
     decltype(trace)::size_type i = 0;
-    if (support::env::get_var("VIUA_STACK_TRACES") != "full") {
+    if (viua::support::env::get_var("VIUA_STACK_TRACES") != "full") {
         i = (trace.size() and trace[0]->function_name == "__entry");
     }
     for (; i < trace.size(); ++i) {
@@ -154,7 +154,7 @@ static auto print_stack_trace_json(viua::process::Process* process) -> void {
 
     oss << '}';
 
-    auto to = support::env::get_var("VIUA_STACKTRACE_PRINT_TO");
+    auto to = viua::support::env::get_var("VIUA_STACKTRACE_PRINT_TO");
     if (to == "") {
         to = "stdout";
     }
@@ -168,7 +168,7 @@ static auto print_stack_trace_json(viua::process::Process* process) -> void {
 }
 static void print_stack_trace(viua::process::Process* process) {
     auto stack_trace_print_type =
-        support::env::get_var("VIUA_STACKTRACE_SERIALISATION");
+        viua::support::env::get_var("VIUA_STACKTRACE_SERIALISATION");
     if (stack_trace_print_type == "") {
         stack_trace_print_type = "default";
     }
