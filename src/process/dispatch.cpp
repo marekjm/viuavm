@@ -104,7 +104,7 @@ auto viua::process::Process::emit_trace_line(
     viua::internals::types::byte const* for_address) const -> void {
     // FIXME conditionally enable duplicate trace lines
     static auto previous_trace_line = std::string{};
-    auto const line = get_trace_line(for_address);
+    auto const line                 = get_trace_line(for_address);
 
     if (line != previous_trace_line) {
         std::cerr << (line + "\n");

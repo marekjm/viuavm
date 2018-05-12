@@ -88,7 +88,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
 
     while (i < tokens.size() and tokens.at(i) != "]]") {
         const std::string key = tokens.at(i++);
-        auto value = std::string{};
+        auto value            = std::string{};
 
         if (tokens.at(i) == ",") {
             ++i;
@@ -106,7 +106,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
 
     if (i == tokens.size()) {
         throw Invalid_syntax(tokens.at(i - 1),
-                            "unexpected end-of-file: expected function name");
+                             "unexpected end-of-file: expected function name");
     }
 
     return i;
@@ -137,8 +137,8 @@ auto viua::assembler::frontend::parser::parse_operand(
             ri->resolved = true;
         } else if (str::isnum(tok.substr(1), true)) {
             throw Invalid_syntax(tokens.at(0),
-                                "register indexes cannot be negative: "
-                                    + tok.substr(1));
+                                 "register indexes cannot be negative: "
+                                     + tok.substr(1));
         } else {
             // FIXME Throw this error during register usage analysis, when we
             // have a full map of names built so "did you mean...?" note can be
@@ -418,7 +418,8 @@ using viua::assembler::frontend::parser::Directive;
 using viua::assembler::frontend::parser::Instructions_block;
 using InstructionIndex = decltype(
     viua::assembler::frontend::parser::Instructions_block::body)::size_type;
-static auto populate_marker_map(Instructions_block& instructions_block) -> void {
+static auto populate_marker_map(Instructions_block& instructions_block)
+    -> void {
     // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
@@ -465,14 +466,14 @@ auto viua::assembler::frontend::parser::parse_function(
 
     if (not::assembler::utils::is_valid_function_name(ib.name)) {
         throw Invalid_syntax(ib.name,
-                            ("invalid function name: " + ib.name.str()));
+                             ("invalid function name: " + ib.name.str()));
     }
 
     ++i;  // skip name
 
     if (tokens.at(i) != "\n") {
         throw Invalid_syntax(tokens.at(i),
-                            "unexpected token after function name");
+                             "unexpected token after function name");
     }
     ++i;  // skip newline
 
@@ -485,7 +486,7 @@ auto viua::assembler::frontend::parser::parse_function(
 
     if (not ib.body.size()) {
         throw Invalid_syntax(ib.name,
-                            ("function with empty body: " + ib.name.str()));
+                             ("function with empty body: " + ib.name.str()));
     }
 
     return i;
@@ -502,7 +503,7 @@ auto viua::assembler::frontend::parser::parse_closure(
 
     if (not::assembler::utils::is_valid_function_name(ib.name)) {
         throw Invalid_syntax(ib.name,
-                            ("invalid function name: " + ib.name.str()));
+                             ("invalid function name: " + ib.name.str()));
     }
     if (::assembler::utils::get_function_arity(ib.name) == -1) {
         throw Invalid_syntax(
@@ -513,7 +514,7 @@ auto viua::assembler::frontend::parser::parse_closure(
 
     if (tokens.at(i) != "\n") {
         throw Invalid_syntax(tokens.at(i),
-                            "unexpected token after function name");
+                             "unexpected token after function name");
     }
     ++i;  // skip newline
 
@@ -526,7 +527,7 @@ auto viua::assembler::frontend::parser::parse_closure(
 
     if (not ib.body.size()) {
         throw Invalid_syntax(ib.name,
-                            ("function with empty body: " + ib.name.str()));
+                             ("function with empty body: " + ib.name.str()));
     }
 
     return i;
@@ -556,7 +557,7 @@ auto viua::assembler::frontend::parser::parse_block(
 
     if (not ib.body.size()) {
         throw Invalid_syntax(ib.name,
-                            ("block with empty body: " + ib.name.str()));
+                             ("block with empty body: " + ib.name.str()));
     }
 
     return i;
@@ -609,9 +610,10 @@ auto viua::assembler::frontend::parser::parse(const std::vector<Token>& tokens)
             throw Invalid_syntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
         } else {
-            throw Invalid_syntax(tokens.at(i),
-                                "expected a function or a block definition (or "
-                                "signature), or a newline");
+            throw Invalid_syntax(
+                tokens.at(i),
+                "expected a function or a block definition (or "
+                "signature), or a newline");
         }
     }
 

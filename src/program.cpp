@@ -33,7 +33,8 @@ using viua::util::memory::aligned_write;
 using viua::util::memory::load_aligned;
 
 
-auto Program::bytecode() const -> std::unique_ptr<viua::internals::types::byte[]> {
+auto Program::bytecode() const
+    -> std::unique_ptr<viua::internals::types::byte[]> {
     /*  Returns pointer to a copy of the bytecode.
      *  Each call produces new copy.
      *

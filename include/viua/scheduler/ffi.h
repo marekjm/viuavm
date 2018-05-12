@@ -49,8 +49,8 @@ class Foreign_function_call_request {
     void wakeup();
 
     Foreign_function_call_request(Frame* fr,
-                               viua::process::Process* cp,
-                               viua::kernel::Kernel* c)
+                                  viua::process::Process* cp,
+                                  viua::kernel::Kernel* c)
             : frame(fr), caller_process(cp), kernel(c) {}
     ~Foreign_function_call_request() {}
 };

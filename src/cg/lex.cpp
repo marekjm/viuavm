@@ -145,8 +145,8 @@ auto Invalid_syntax::match_aside(Token token) const -> bool {
 }
 
 Invalid_syntax::Invalid_syntax(decltype(line_number) ln,
-                             decltype(character_in_line) ch,
-                             std::string ct)
+                               decltype(character_in_line) ch,
+                               std::string ct)
         : line_number(ln), character_in_line(ch), content(ct) {}
 Invalid_syntax::Invalid_syntax(Token t, std::string m)
         : line_number(t.line())
@@ -174,7 +174,8 @@ auto Traced_syntax_error::character() const
     return errors.front().character();
 }
 
-auto Traced_syntax_error::append(Invalid_syntax const& e) -> Traced_syntax_error& {
+auto Traced_syntax_error::append(Invalid_syntax const& e)
+    -> Traced_syntax_error& {
     errors.push_back(e);
     return (*this);
 }
@@ -469,7 +470,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             std::string target_register_index = tokens.back();
-            auto target_register_set = std::string{"current"};
+            auto target_register_set          = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -752,7 +753,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
 
             tokens.push_back(input_tokens.at(++i));  // target register
             std::string target_register_index = tokens.back();
-            auto target_register_set = std::string{"current"};
+            auto target_register_set          = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1026,7 +1027,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.push_back(token);  // mnemonic
             if (input_tokens.at(i + 1) == "\n") {
                 throw viua::cg::lex::Invalid_syntax(token,
-                                                   "branch without operands");
+                                                    "branch without operands");
             }
 
             tokens.push_back(input_tokens.at(++i));  // checked register
@@ -1039,7 +1040,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
 
             if (input_tokens.at(i + 1) == "\n") {
                 throw viua::cg::lex::Invalid_syntax(token,
-                                                   "branch without a target");
+                                                    "branch without a target");
             }
 
             tokens.push_back(input_tokens.at(++i));  // target if true branch
@@ -1107,7 +1108,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
 
             if (input_tokens.at(i + 1) == "\n") {
                 throw Invalid_syntax{input_tokens.at(i + 1),
-                                    "missing second operand"}
+                                     "missing second operand"}
                     .add(token);
             }
             tokens.push_back(input_tokens.at(++i));
@@ -1243,7 +1244,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.push_back(input_tokens.at(++i));
 
             std::string target_register_index = tokens.back();
-            auto target_register_set = std::string{"current"};
+            auto target_register_set          = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1508,7 +1509,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
                    or token == "wrapadd" or token == "wrapmul") {
             tokens.push_back(input_tokens.at(++i));  // target register
             std::string target_register_index = tokens.back();
-            auto target_register_set = std::string{"current"};
+            auto target_register_set          = std::string{"current"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
                                     tokens.back().character(),
@@ -1767,7 +1768,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
         } else if (token == "if") {
             if (input_tokens.at(i + 1) == "\n") {
                 throw viua::cg::lex::Invalid_syntax(token,
-                                                   "branch without operands");
+                                                    "branch without operands");
             }
 
             tokens.push_back(input_tokens.at(++i));  // checked register
@@ -1780,7 +1781,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
 
             if (input_tokens.at(i + 1) == "\n") {
                 throw viua::cg::lex::Invalid_syntax(token,
-                                                   "branch without a target");
+                                                    "branch without a target");
             }
 
             tokens.push_back(input_tokens.at(++i));  // target if true branch

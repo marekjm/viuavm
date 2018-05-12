@@ -221,8 +221,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                                       + to_string(expected_type) + ", got "
                                       + to_string(actual_type)))
                     .append(Invalid_syntax(register_usage_profile.defined_where(
-                                              Register(register_index)),
-                                          "")
+                                               Register(register_index)),
+                                           "")
                                 .note("register defined here"));
             throw error;
         }
@@ -255,14 +255,14 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
     if (not(actual_type & expected_type)) {
         auto error =
             Traced_syntax_error{}
-                .append(
-                    Invalid_syntax(register_index.tokens.at(0),
-                                  "invalid type of value contained in register")
-                        .note("expected " + to_string(expected_type) + ", got "
-                              + to_string(actual_type)))
+                .append(Invalid_syntax(
+                            register_index.tokens.at(0),
+                            "invalid type of value contained in register")
+                            .note("expected " + to_string(expected_type)
+                                  + ", got " + to_string(actual_type)))
                 .append(Invalid_syntax(register_usage_profile.defined_where(
-                                          Register(register_index)),
-                                      "")
+                                           Register(register_index)),
+                                       "")
                             .note("register defined here"));
         if (auto r = register_usage_profile.at(Register(register_index)).second;
             r.inferred.first) {

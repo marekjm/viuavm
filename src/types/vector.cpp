@@ -88,7 +88,7 @@ std::unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
         offset = index;
     }
 
-    auto it                               = (internal_object.begin() + offset);
+    auto it = (internal_object.begin() + offset);
     std::unique_ptr<viua::types::Value> object = std::move(*it);
     internal_object.erase(it);
     return object;

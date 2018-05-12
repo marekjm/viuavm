@@ -85,7 +85,7 @@ auto map_names_to_register_indexes(
 
         if (register_usage_profile.name_to_index.count(name)) {
             throw Invalid_syntax{directive->tokens.at(2),
-                                "register name already taken: " + name}
+                                 "register name already taken: " + name}
                 .add(directive->tokens.at(0));
         }
 

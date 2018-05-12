@@ -57,8 +57,8 @@ auto viua::kernel::Mailbox::send(std::unique_ptr<viua::types::Value> message)
     messages.push_back(std::move(message));
 }
 
-auto viua::kernel::Mailbox::receive(queue<std::unique_ptr<viua::types::Value>>& mq)
-    -> void {
+auto viua::kernel::Mailbox::receive(
+    queue<std::unique_ptr<viua::types::Value>>& mq) -> void {
     unique_lock<mutex> lck{mailbox_mutex};
     for (auto& message : messages) {
         mq.push(std::move(message));
@@ -78,14 +78,14 @@ viua::kernel::Process_result::Process_result(Process_result&& that) {
     done.store(that.done.load(std::memory_order_acquire),
                std::memory_order_release);
 }
-auto viua::kernel::Process_result::resolve(std::unique_ptr<viua::types::Value> result)
-    -> void {
+auto viua::kernel::Process_result::resolve(
+    std::unique_ptr<viua::types::Value> result) -> void {
     unique_lock<mutex> lck{result_mutex};
     value_returned = std::move(result);
     done.store(true, std::memory_order_release);
 }
-auto viua::kernel::Process_result::raise(std::unique_ptr<viua::types::Value> failure)
-    -> void {
+auto viua::kernel::Process_result::raise(
+    std::unique_ptr<viua::types::Value> failure) -> void {
     unique_lock<mutex> lck{result_mutex};
     exception_thrown = std::move(failure);
     done.store(true, std::memory_order_release);
@@ -175,7 +175,8 @@ static auto is_native_module(std::string module) -> bool {
     auto path           = viua::support::env::viua::get_mod_path(
         try_path, "vlib", viua::support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
+        path =
+            viua::support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
     }
     if (path.size() == 0) {
         path = viua::support::env::viua::get_mod_path(
@@ -213,7 +214,8 @@ void viua::kernel::Kernel::load_native_library(std::string const& module) {
     auto path            = viua::support::env::viua::get_mod_path(
         try_path, "vlib", viua::support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
+        path =
+            viua::support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
     }
     if (path.size() == 0) {
         path = viua::support::env::viua::get_mod_path(
@@ -528,7 +530,7 @@ auto viua::kernel::Kernel::no_of_ffi_schedulers()
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
     auto viua_enable_tracing = std::string{};
-    char* env_text = getenv("VIUA_ENABLE_TRACING");
+    char* env_text           = getenv("VIUA_ENABLE_TRACING");
     if (env_text) {
         viua_enable_tracing = std::string(env_text);
     }
@@ -546,7 +548,8 @@ int viua::kernel::Kernel::run() {
     vp_schedulers_limit = no_of_vp_schedulers();
     bool enable_tracing = is_tracing_enabled();
 
-    auto vp_schedulers = std::vector<viua::scheduler::Virtual_process_scheduler>{};
+    auto vp_schedulers =
+        std::vector<viua::scheduler::Virtual_process_scheduler>{};
 
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);

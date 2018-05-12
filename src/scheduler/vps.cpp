@@ -234,7 +234,8 @@ bool viua::scheduler::Virtual_process_scheduler::execute_quant(
     return true;
 }
 
-viua::kernel::Kernel* viua::scheduler::Virtual_process_scheduler::kernel() const {
+viua::kernel::Kernel* viua::scheduler::Virtual_process_scheduler::kernel()
+    const {
     return attached_kernel;
 }
 
@@ -293,7 +294,8 @@ void viua::scheduler::Virtual_process_scheduler::request_foreign_function_call(
     attached_kernel->request_foreign_function_call(frame, p);
 }
 
-void viua::scheduler::Virtual_process_scheduler::load_module(std::string module) {
+void viua::scheduler::Virtual_process_scheduler::load_module(
+    std::string module) {
     attached_kernel->load_module(module);
 }
 
@@ -428,7 +430,8 @@ bool viua::scheduler::Virtual_process_scheduler::burst() {
     bool ticked     = false;
     bool any_active = false;
 
-    auto running_processes_list = std::vector<std::unique_ptr<viua::process::Process>>{};
+    auto running_processes_list =
+        std::vector<std::unique_ptr<viua::process::Process>>{};
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0;

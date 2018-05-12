@@ -44,7 +44,7 @@ auto check_op_ptrlive(Register_usage_profile& register_usage_profile,
 
     check_use_of_register(register_usage_profile, *operand, "pointer from");
     assert_type_of_register<Value_types::POINTER>(register_usage_profile,
-                                                 *operand);
+                                                  *operand);
 
     auto val       = Register(*result);
     val.value_type = viua::internals::Value_types::BOOLEAN;

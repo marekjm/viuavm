@@ -116,7 +116,7 @@ static auto get_name(const map<std::string, std::string>& named_registers,
                 t) { return (t.second == name); });
     if (it == named_registers.end()) {
         throw viua::cg::lex::Invalid_syntax(context,
-                                           ("register is not named: " + name));
+                                            ("register is not named: " + name));
     }
     return it->first;
 }
@@ -127,7 +127,7 @@ static std::string resolve_register_name(
     const bool allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::Invalid_syntax(token,
-                                           "expected operand, found newline");
+                                            "expected operand, found newline");
     }
     if (name == "void" or name == "true" or name == "false") {
         return name;
@@ -770,7 +770,7 @@ static void check_block_body(TokenVector const& body_tokens,
             } catch (viua::cg::lex::Invalid_syntax const& e) {
                 throw viua::cg::lex::Traced_syntax_error().append(e).append(
                     viua::cg::lex::Invalid_syntax(body_tokens.at(i + 1),
-                                                 "after taking true branch:"));
+                                                  "after taking true branch:"));
             } catch (viua::cg::lex::Traced_syntax_error& e) {
                 throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 1), "after taking true branch:"));
@@ -796,8 +796,8 @@ static void check_block_body(TokenVector const& body_tokens,
                 }
             } catch (viua::cg::lex::Invalid_syntax const& e) {
                 throw viua::cg::lex::Traced_syntax_error().append(e).append(
-                    viua::cg::lex::Invalid_syntax(body_tokens.at(i + 2),
-                                                 "after taking false branch:"));
+                    viua::cg::lex::Invalid_syntax(
+                        body_tokens.at(i + 2), "after taking false branch:"));
             } catch (viua::cg::lex::Traced_syntax_error& e) {
                 throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 2), "after taking false branch:"));

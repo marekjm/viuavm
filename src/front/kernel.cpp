@@ -45,7 +45,8 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
-static bool usage(const std::string program, const std::vector<std::string>& args) {
+static bool usage(const std::string program,
+                  const std::vector<std::string>& args) {
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;
@@ -146,7 +147,7 @@ int main(int argc, char* argv[]) {
     }
 
     auto filename = std::string{};
-    filename             = args[0];
+    filename      = args[0];
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;

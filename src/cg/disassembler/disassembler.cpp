@@ -44,25 +44,25 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
     } else if (type == OT_REGISTER_INDEX) {
         oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_REGISTER_REFERENCE) {
         oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_POINTER) {
         oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_INT) {
         oss << load_aligned<viua::internals::types::plain_int>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else {
         // FIXME Throw a real exception.
         throw "invalid operand type detected";
@@ -82,7 +82,7 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
     } else if (type == OT_REGISTER_INDEX) {
         oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         oss << ' ';
         switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
         case viua::internals::Register_sets::CURRENT:
@@ -106,11 +106,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             }
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_REGISTER_REFERENCE) {
         oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         oss << ' ';
         switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
         case viua::internals::Register_sets::CURRENT:
@@ -129,11 +129,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             throw "invalid register set detected";
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_POINTER) {
         oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         oss << ' ';
         switch (*reinterpret_cast<viua::internals::Register_sets*>(ptr)) {
         case viua::internals::Register_sets::CURRENT:
@@ -152,11 +152,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             throw "invalid register set detected";
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else if (type == OT_INT) {
         oss << load_aligned<viua::internals::types::plain_int>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
     } else {
         throw "invalid operand type detected";
     }
@@ -266,19 +266,22 @@ static auto disassemble_ri_operand(ostream& oss,
     case OT_REGISTER_INDEX:
     case OT_REGISTER_REFERENCE:
     case OT_POINTER:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         break;
     case OT_VOID:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         break;
     case OT_INT:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         break;
     default:
         throw "invalid operand type detected";
@@ -294,19 +297,22 @@ static auto disassemble_ri_operand_with_rs_type(
     case OT_REGISTER_INDEX:
     case OT_REGISTER_REFERENCE:
     case OT_POINTER:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         break;
     case OT_VOID:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         break;
     case OT_INT:
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         break;
     default:
         throw "invalid operand type detected";
@@ -532,7 +538,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             ++ptr;  // for operand type
             auto bsz = load_aligned<viua::internals::types::bits_size>(ptr);
             viua::support::pointer::inc<viua::internals::types::bits_size,
-                         viua::internals::types::byte>(ptr);
+                                        viua::internals::types::byte>(ptr);
             oss << ' ';
             oss << disassemble_bit_string(ptr, bsz);
             ptr += bsz;
@@ -646,7 +652,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << " 0x";
         oss << hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
-        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
+            ptr);
 
         oss << dec;
 
@@ -657,12 +664,14 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << " 0x";
         oss << hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
-        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
+            ptr);
 
         oss << " 0x";
         oss << hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
-        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
+        viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
+            ptr);
 
         oss << dec;
 
@@ -673,14 +682,14 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << ' ';
         oss << load_aligned<viua::internals::types::plain_float>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_float,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         break;
     case JOIN:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         viua::support::pointer::inc<viua::internals::types::byte,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         oss << ' ';
         if (decode_timeout(ptr)) {
             oss << decode_timeout(ptr) - 1 << "ms";
@@ -688,14 +697,14 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             oss << "infinity";
         }
         viua::support::pointer::inc<viua::internals::types::timeout,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
 
         break;
     case RECEIVE:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         viua::support::pointer::inc<viua::internals::types::byte,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
         oss << ' ';
         if (decode_timeout(ptr)) {
             oss << decode_timeout(ptr) - 1 << "ms";
@@ -703,7 +712,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             oss << "infinity";
         }
         viua::support::pointer::inc<viua::internals::types::timeout,
-                     viua::internals::types::byte>(ptr);
+                                    viua::internals::types::byte>(ptr);
 
         break;
     default:

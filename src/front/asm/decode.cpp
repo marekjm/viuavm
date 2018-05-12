@@ -110,6 +110,7 @@ auto decode_line_tokens(std::vector<std::string> const& tokens)
 
     return decoded_lines;
 }
-auto decode_line(std::string const& s) -> std::vector<std::vector<std::string>> {
+auto decode_line(std::string const& s)
+    -> std::vector<std::vector<std::string>> {
     return decode_line_tokens(viua::cg::tokenizer::tokenize(s));
 }

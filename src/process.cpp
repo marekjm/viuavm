@@ -384,7 +384,8 @@ std::unique_ptr<viua::types::Value> viua::process::Process::
     return std::move(stack->thrown);
 }
 
-void viua::process::Process::raise(std::unique_ptr<viua::types::Value> exception) {
+void viua::process::Process::raise(
+    std::unique_ptr<viua::types::Value> exception) {
     stack->thrown = std::move(exception);
 }
 

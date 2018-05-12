@@ -42,7 +42,8 @@ int_op::int_op(viua::internals::types::plain_int n)
         , value(n) {}
 
 timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
-timeout_op::timeout_op(Integer_operand_type t, viua::internals::types::timeout n)
+timeout_op::timeout_op(Integer_operand_type t,
+                       viua::internals::types::timeout n)
         : type(t), value(n) {}
 timeout_op::timeout_op(viua::internals::types::timeout n)
         : type(Integer_operand_type::PLAIN), value(n) {}
@@ -61,7 +62,8 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
      */
     if (op.type == Integer_operand_type::VOID) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_VOID;
-        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+        viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+            addr_ptr);
         return addr_ptr;
     }
 
@@ -76,15 +78,16 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
     } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
-    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+        addr_ptr);
 
     aligned_write(addr_ptr) = op.value;
     viua::support::pointer::inc<viua::internals::types::register_index,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
 
     *(reinterpret_cast<viua::internals::Register_sets*>(addr_ptr)) = op.rs_type;
-    viua::support::pointer::inc<viua::internals::Register_sets, viua::internals::types::byte>(
-        addr_ptr);
+    viua::support::pointer::inc<viua::internals::Register_sets,
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -96,7 +99,8 @@ static auto insert_bool_operand(viua::internals::types::byte* addr_ptr, bool op)
     } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_FALSE;
     }
-    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+        addr_ptr);
 
     return addr_ptr;
 }
@@ -157,7 +161,7 @@ static auto insert_size_and_type_prefixed_bitstring(
     viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
     aligned_write(ptr) = bit_string.size();
     viua::support::pointer::inc<viua::internals::types::bits_size,
-                 viua::internals::types::byte>(ptr);
+                                viua::internals::types::byte>(ptr);
 
     /*
      * Binaries (and other multibyte values) are stored in the Big Endian
@@ -200,10 +204,11 @@ auto opinteger(viua::internals::types::byte* addr_ptr, int_op regno, int_op i)
     addr_ptr      = insert_ri_operand(addr_ptr, regno);
 
     *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
-    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+        addr_ptr);
     aligned_write(addr_ptr) = i.value;
     viua::support::pointer::inc<viua::internals::types::plain_int,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -228,7 +233,7 @@ auto opfloat(viua::internals::types::byte* addr_ptr,
     addr_ptr                = insert_ri_operand(addr_ptr, regno);
     aligned_write(addr_ptr) = f;
     viua::support::pointer::inc<viua::internals::types::plain_float,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -939,10 +944,11 @@ auto opjoin(viua::internals::types::byte* addr_ptr,
 
     // FIXME change to OT_TIMEOUT?
     *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
-    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-    aligned_write(addr_ptr) = timeout.value;
-    viua::support::pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
         addr_ptr);
+    aligned_write(addr_ptr) = timeout.value;
+    viua::support::pointer::inc<viua::internals::types::timeout,
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -963,11 +969,12 @@ auto opreceive(viua::internals::types::byte* addr_ptr,
 
     // FIXME change to OT_TIMEOUT?
     *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
-    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+        addr_ptr);
 
     aligned_write(addr_ptr) = timeout.value;
-    viua::support::pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(
-        addr_ptr);
+    viua::support::pointer::inc<viua::internals::types::timeout,
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -988,7 +995,7 @@ auto opjump(viua::internals::types::byte* addr_ptr,
     // is justified
     aligned_write(addr_ptr) = addr;
     viua::support::pointer::inc<viua::internals::types::bytecode_size,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }
@@ -1006,10 +1013,10 @@ auto opif(viua::internals::types::byte* addr_ptr,
     // reinterpret_cast<> is justified
     aligned_write(addr_ptr) = addr_truth;
     viua::support::pointer::inc<viua::internals::types::bytecode_size,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
     aligned_write(addr_ptr) = addr_false;
     viua::support::pointer::inc<viua::internals::types::bytecode_size,
-                 viua::internals::types::byte>(addr_ptr);
+                                viua::internals::types::byte>(addr_ptr);
 
     return addr_ptr;
 }

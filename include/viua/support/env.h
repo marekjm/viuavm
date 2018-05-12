@@ -26,8 +26,7 @@
 #include <sys/stat.h>
 #include <vector>
 
-namespace viua {
-namespace support { namespace env {
+namespace viua { namespace support { namespace env {
 auto get_paths(std::string const&) -> std::vector<std::string>;
 auto get_var(std::string const&) -> std::string;
 
@@ -38,7 +37,6 @@ auto get_mod_path(std::string const&,
                   std::string const&,
                   std::vector<std::string> const&) -> std::string;
 }
-}}  // namespace support::env
-}
+}}}  // namespace viua::support::env
 
 #endif

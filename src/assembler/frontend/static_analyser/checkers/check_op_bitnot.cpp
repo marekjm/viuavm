@@ -44,7 +44,8 @@ auto check_op_bitnot(Register_usage_profile& register_usage_profile,
 
     check_use_of_register(register_usage_profile, *operand);
 
-    assert_type_of_register<Value_types::BITS>(register_usage_profile, *operand);
+    assert_type_of_register<Value_types::BITS>(register_usage_profile,
+                                               *operand);
 
     auto val       = Register(*result);
     val.value_type = Value_types::BITS;

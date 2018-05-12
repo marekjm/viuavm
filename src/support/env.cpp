@@ -20,8 +20,7 @@
 #include <sstream>
 #include <viua/support/env.h>
 
-namespace viua {
-namespace support { namespace env {
+namespace viua { namespace support { namespace env {
 auto get_var(std::string const& var) -> std::string {
     auto const VAR = getenv(var.c_str());
     return (VAR == nullptr ? std::string("") : std::string(VAR));
@@ -91,6 +90,5 @@ auto get_mod_path(std::string const& module,
 
     return (found ? path : "");
 }
-}
 }  // namespace viua
-}}  // namespace support::env
+}}}  // namespace viua::support::env

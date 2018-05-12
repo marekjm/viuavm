@@ -140,7 +140,8 @@ class Stack {
 
     viua::scheduler::Virtual_process_scheduler* scheduler;
 
-    auto bind(viua::kernel::Register_set**, viua::kernel::Register_set*) -> void;
+    auto bind(viua::kernel::Register_set**, viua::kernel::Register_set*)
+        -> void;
 
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());

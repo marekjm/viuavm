@@ -889,7 +889,7 @@ static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
         ++i;
     } else {
         throw viua::cg::lex::Invalid_syntax(tokens.at(i),
-                                           "invalid timeout token in 'join'");
+                                            "invalid timeout token in 'join'");
     }
 
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);

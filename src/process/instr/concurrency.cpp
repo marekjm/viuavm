@@ -46,7 +46,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     }
 
     auto call_name = std::string{};
-    auto const ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto const ot  = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
         tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<

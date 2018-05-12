@@ -93,7 +93,7 @@ String* String::add(String* s) {
 }
 
 String* String::join(Vector* v) {
-    auto s = std::string{""};
+    auto s         = std::string{""};
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
         s += v->at(i)->str();
@@ -193,10 +193,10 @@ void String::format(Frame* frame,
         }
 
         for (auto i : matches) {
-            std::string m = i.substr(2, (i.size() - 3));
+            std::string m    = i.substr(2, (i.size() - 3));
             auto replacement = std::string{};
-            bool is_number = true;
-            int index      = -1;
+            bool is_number   = true;
+            int index        = -1;
             try {
                 index = stoi(m);
             } catch (std::invalid_argument const&) {

@@ -74,8 +74,8 @@ static auto resolveregister(viua::cg::lex::Token const token,
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::Invalid_syntax(token,
-                                           ("illegal operand: " + token.str()));
+        throw viua::cg::lex::Invalid_syntax(
+            token, ("illegal operand: " + token.str()));
     }
     return out.str();
 }
@@ -115,8 +115,9 @@ auto assembler::operands::getint_with_rs_type(
     if (s == "void") {
         return int_op(Integer_operand_type::VOID);
     } else if (s.at(0) == '@') {
-        return int_op(
-            Integer_operand_type::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
+        return int_op(Integer_operand_type::REGISTER_REFERENCE,
+                      rs_type,
+                      stoi(s.substr(1)));
     } else if (s.at(0) == '*') {
         return int_op(Integer_operand_type::POINTER_DEREFERENCE,
                       rs_type,
@@ -130,8 +131,9 @@ auto assembler::operands::getint_with_rs_type(
     }
 }
 
-auto assembler::operands::getint(std::vector<viua::cg::lex::Token> const& tokens,
-                                 decltype(tokens.size()) const i) -> int_op {
+auto assembler::operands::getint(
+    std::vector<viua::cg::lex::Token> const& tokens,
+    decltype(tokens.size()) const i) -> int_op {
     auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {
@@ -144,15 +146,16 @@ auto assembler::operands::getint(std::vector<viua::cg::lex::Token> const& tokens
 
     auto iop = int_op{};
     if (s.at(0) == '@') {
-        iop = int_op(Integer_operand_type::REGISTER_REFERENCE, stoi(s.substr(1)));
-    } else if (s.at(0) == '*') {
         iop =
-            int_op(Integer_operand_type::POINTER_DEREFERENCE, stoi(s.substr(1)));
+            int_op(Integer_operand_type::REGISTER_REFERENCE, stoi(s.substr(1)));
+    } else if (s.at(0) == '*') {
+        iop = int_op(Integer_operand_type::POINTER_DEREFERENCE,
+                     stoi(s.substr(1)));
     } else if (s.at(0) == '%') {
         iop = int_op(stoi(s.substr(1)));
     } else {
         throw viua::cg::lex::Invalid_syntax(tokens.at(i),
-                                           "cannot convert to register index");
+                                            "cannot convert to register index");
     }
 
     // FIXME set iop.rs_type according to rs specifier for given operand

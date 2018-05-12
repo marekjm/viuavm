@@ -38,7 +38,8 @@ auto Register_usage_profile::define(Register const r,
                                     bool const allow_overwrites) -> void {
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
-            .append(viua::cg::lex::Unused_value{t, "overwrite of unused value:"})
+            .append(
+                viua::cg::lex::Unused_value{t, "overwrite of unused value:"})
             .append(
                 Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }

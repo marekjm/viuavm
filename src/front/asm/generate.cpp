@@ -272,8 +272,9 @@ static std::string get_main_function(
     return main_function;
 }
 
-static void check_main_function(std::string const& main_function,
-                                const std::vector<Token>& main_function_tokens) {
+static void check_main_function(
+    std::string const& main_function,
+    const std::vector<Token>& main_function_tokens) {
     // Why three newlines?
     //
     // Here's why:
@@ -568,11 +569,11 @@ void generate(std::vector<Token> const& tokens,
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     std::vector<std::string> links = assembler::ce::getlinks(tokens);
     std::vector<tuple<std::string,
-                 viua::internals::types::bytecode_size,
-                 std::unique_ptr<viua::internals::types::byte[]>>>
+                      viua::internals::types::bytecode_size,
+                      std::unique_ptr<viua::internals::types::byte[]>>>
         linked_libs_bytecode;
     auto linked_function_names = std::vector<std::string>{};
-    auto linked_block_names = std::vector<std::string>{};
+    auto linked_block_names    = std::vector<std::string>{};
     map<std::string, std::vector<viua::internals::types::bytecode_size>>
         linked_libs_jumptables;
 
@@ -814,7 +815,7 @@ void generate(std::vector<Token> const& tokens,
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
 
     std::vector<tuple<viua::internals::types::bytecode_size,
-                 viua::internals::types::bytecode_size>>
+                      viua::internals::types::bytecode_size>>
         jump_positions;
 
     for (std::string name : blocks.names) {
@@ -877,7 +878,7 @@ void generate(std::vector<Token> const& tokens,
         std::vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
         std::vector<tuple<viua::internals::types::bytecode_size,
-                     viua::internals::types::bytecode_size>>
+                          viua::internals::types::bytecode_size>>
             local_jumps;
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
@@ -985,7 +986,7 @@ void generate(std::vector<Token> const& tokens,
         std::vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
         std::vector<tuple<viua::internals::types::bytecode_size,
-                     viua::internals::types::bytecode_size>>
+                          viua::internals::types::bytecode_size>>
             local_jumps;
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
@@ -1225,7 +1226,8 @@ void generate(std::vector<Token> const& tokens,
             cout << "\" written at offset " << bytes_offset << endl;
         }
 
-        auto linked_jumptable = std::vector<viua::internals::types::bytecode_size>{};
+        auto linked_jumptable =
+            std::vector<viua::internals::types::bytecode_size>{};
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (std::out_of_range const& e) {

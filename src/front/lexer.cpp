@@ -37,14 +37,15 @@ bool SHOW_VERSION = false;
 bool VERBOSE      = false;
 
 
-using Token         = viua::cg::lex::Token;
+using Token          = viua::cg::lex::Token;
 using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 
 template<class T>
 static auto enumerate(const std::vector<T>& v)
     -> std::vector<pair<typename std::vector<T>::size_type, T>> {
-    auto enumerated_vector = std::vector<pair<typename std::vector<T>::size_type, T>>{};
+    auto enumerated_vector =
+        std::vector<pair<typename std::vector<T>::size_type, T>>{};
 
     typename std::vector<T>::size_type i = 0;
     for (auto const& each : v) {
@@ -151,7 +152,7 @@ static void display_results(std::string const& filename,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    auto args = std::vector<std::string>{};
+    auto args   = std::vector<std::string>{};
     auto option = std::string{};
 
     std::string filename(""), compilename("");

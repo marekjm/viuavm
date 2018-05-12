@@ -52,9 +52,9 @@ auto check_op_isnull(Register_usage_profile& register_usage_profile,
 
     if (register_usage_profile.defined(Register{*source})) {
         throw Traced_syntax_error{}
-            .append(
-                Invalid_syntax{source->tokens.at(0),
-                              "useless check, register will always be defined"})
+            .append(Invalid_syntax{
+                source->tokens.at(0),
+                "useless check, register will always be defined"})
             .append(Invalid_syntax{
                 register_usage_profile.defined_where(Register{*source})}
                         .note("register is defined here"));

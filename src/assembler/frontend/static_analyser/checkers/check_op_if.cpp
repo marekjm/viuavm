@@ -74,7 +74,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         return;
     } else {
         throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
-                            "invalid operand for if instruction");
+                             "invalid operand for if instruction");
     }
 
     auto jump_target_if_false = InstructionIndex{0};
@@ -105,7 +105,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         return;
     } else {
         throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
-                            "invalid operand for if instruction");
+                             "invalid operand for if instruction");
     }
 
     auto register_with_unused_value = std::string{};
@@ -127,11 +127,11 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
     } catch (Invalid_syntax& e) {
         throw Traced_syntax_error{}.append(e).append(
             Invalid_syntax{instruction.tokens.at(0),
-                          "after taking true branch here:"}
+                           "after taking true branch here:"}
                 .add(instruction.operands.at(1)->tokens.at(0)));
     } catch (Traced_syntax_error& e) {
         throw e.append(Invalid_syntax{instruction.tokens.at(0),
-                                     "after taking true branch here:"}
+                                      "after taking true branch here:"}
                            .add(instruction.operands.at(1)->tokens.at(0)));
     }
 
@@ -169,7 +169,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         } else {
             throw Traced_syntax_error{}.append(e).append(
                 Invalid_syntax{instruction.tokens.at(0),
-                              "after taking false branch here:"}
+                               "after taking false branch here:"}
                     .add(instruction.operands.at(2)->tokens.at(0)));
         }
     } catch (Traced_syntax_error& e) {
@@ -183,7 +183,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
              */
         } else {
             throw e.append(Invalid_syntax{instruction.tokens.at(0),
-                                         "after taking false branch here:"}
+                                          "after taking false branch here:"}
                                .add(instruction.operands.at(2)->tokens.at(0)));
         }
     }

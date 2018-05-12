@@ -140,8 +140,8 @@ auto viua::assembler::frontend::static_analyser::verify_block_catches(
 
                 if (not is_defined_block_name(source, block_name)) {
                     throw Invalid_syntax(block_name,
-                                        ("cannot catch using undefined block: "
-                                         + block_name.str()))
+                                         ("cannot catch using undefined block: "
+                                          + block_name.str()))
                         .add(instruction->tokens.at(0));
                 }
             }
@@ -201,15 +201,15 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
 
                 if (balance < 0) {
                     throw Invalid_syntax(instruction->tokens.at(0),
-                                        ("call with '"
-                                         + instruction->tokens.at(0).str()
-                                         + "' without a frame"));
+                                         ("call with '"
+                                          + instruction->tokens.at(0).str()
+                                          + "' without a frame"));
                 }
 
                 if (balance > 1) {
                     throw viua::cg::lex::Traced_syntax_error()
                         .append(Invalid_syntax(instruction->tokens.at(0),
-                                              "excess frame spawned"))
+                                               "excess frame spawned"))
                         .append(Invalid_syntax(previous_frame_spawned, "")
                                     .note("unused frame:"));
                 }
@@ -218,7 +218,7 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
                     and balance > 0) {
                     throw viua::cg::lex::Traced_syntax_error()
                         .append(Invalid_syntax(instruction->tokens.at(0),
-                                              "lost frame at:"))
+                                               "lost frame at:"))
                         .append(Invalid_syntax(previous_frame_spawned, "")
                                     .note("spawned here:"));
                 }
@@ -294,12 +294,12 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                     function_name = name_from_fn->content;
                 } else if (auto label = dynamic_cast<Label*>(operand); label) {
                     throw Invalid_syntax(operand->tokens.at(0),
-                                        "not a valid function name")
+                                         "not a valid function name")
                         .add(instruction->tokens.at(0));
                 } else {
                     throw Invalid_syntax(operand->tokens.at(0),
-                                        "invalid operand: expected function "
-                                        "name, atom, or register index");
+                                         "invalid operand: expected function "
+                                         "name, atom, or register index");
                 }
 
                 auto arity =
@@ -313,10 +313,10 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                         << frame_parameters_count;
                     throw viua::cg::lex::Traced_syntax_error()
                         .append(Invalid_syntax(instruction->tokens.at(0),
-                                              report.str())
+                                               report.str())
                                     .add(operand->tokens.at(0)))
                         .append(Invalid_syntax(frame_spawned_here,
-                                              "from frame spawned here"));
+                                               "from frame spawned here"));
                 }
             }
         });
@@ -332,7 +332,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 nullptr;
 
             auto filled_slots = std::vector<bool>{};
-            auto pass_lines = std::vector<Token>{};
+            auto pass_lines   = std::vector<Token>{};
 
             for (auto const& line : ib.body) {
                 auto instruction = dynamic_cast<
@@ -427,10 +427,11 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                         if (not filled_slots[j]) {
                             throw Traced_syntax_error()
                                 .append(Invalid_syntax(last_frame->tokens.at(0),
-                                                      "gap in frame"))
-                                .append(Invalid_syntax(instruction->tokens.at(0),
-                                                      ("slot " + to_string(j)
-                                                       + " left empty at")));
+                                                       "gap in frame"))
+                                .append(
+                                    Invalid_syntax(instruction->tokens.at(0),
+                                                   ("slot " + to_string(j)
+                                                    + " left empty at")));
                         }
                     }
                 }
@@ -479,7 +480,7 @@ static auto validate_jump(
         target = jump_targets.at(extracted_jump);
         if (target > instruction_counter) {
             throw viua::cg::lex::Invalid_syntax(token,
-                                               "marker out-of-range jump");
+                                                "marker out-of-range jump");
         }
     } else {
         throw viua::cg::lex::Invalid_syntax(

@@ -161,7 +161,7 @@ static std::string read_file(std::string const& path) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments std::vector
-    auto args = std::vector<std::string>{};
+    auto args   = std::vector<std::string>{};
     auto option = std::string{};
 
     std::string filename(""), compilename("");

@@ -61,7 +61,7 @@ typedef void(ForeignFunction)(
              // function etc.
     viua::kernel::Register_set*,  // static register set (may be nullptr)
     viua::kernel::Register_set*,  // global register set (may be nullptr)
-    viua::process::Process*,     // calling process
+    viua::process::Process*,      // calling process
     viua::kernel::Kernel*  // VM viua::kernel::Kernel the calling process is
                            // running on
 );

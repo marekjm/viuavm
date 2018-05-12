@@ -58,7 +58,8 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
         checker.register_set = pack_range_start->rss;
         if (not register_usage_profile.defined(checker)) {
             throw Invalid_syntax{pack_range_start->tokens.at(0),
-                                "pack of empty register: " + std::to_string(j)};
+                                 "pack of empty register: "
+                                     + std::to_string(j)};
         }
         register_usage_profile.erase(checker, instruction.tokens.at(0));
     }

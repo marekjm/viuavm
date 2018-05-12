@@ -211,8 +211,8 @@ static auto get_raw_block_bodies(std::string const& type,
 
     return invokables;
 }
-auto assembler::ce::get_invokables_token_bodies(std::string const& type,
-                                                const std::vector<Token>& tokens)
-    -> map<std::string, std::vector<Token>> {
+auto assembler::ce::get_invokables_token_bodies(
+    std::string const& type,
+    const std::vector<Token>& tokens) -> map<std::string, std::vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }

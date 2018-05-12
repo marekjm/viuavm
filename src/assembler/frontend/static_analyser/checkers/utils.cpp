@@ -199,7 +199,7 @@ auto check_use_of_register(Register_usage_profile& rup,
     rup.use(Register(r), r.tokens.at(0));
 }
 
-using Value_types            = viua::internals::Value_types;
+using Value_types           = viua::internals::Value_types;
 using ValueTypesType        = viua::internals::ValueTypesType;
 auto const value_type_names = std::map<Value_types, std::string>{
     {
@@ -281,17 +281,17 @@ auto const value_type_names = std::map<Value_types, std::string>{
 auto operator|(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
-                                   | static_cast<ValueTypesType>(rhs));
+                                    | static_cast<ValueTypesType>(rhs));
 }
 auto operator&(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
-                                   & static_cast<ValueTypesType>(rhs));
+                                    & static_cast<ValueTypesType>(rhs));
 }
 auto operator^(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
-                                   ^ static_cast<ValueTypesType>(rhs));
+                                    ^ static_cast<ValueTypesType>(rhs));
 }
 auto operator!(const Value_types v) -> bool {
     return not static_cast<ValueTypesType>(v);

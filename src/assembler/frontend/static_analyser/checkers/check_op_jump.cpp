@@ -58,7 +58,7 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
         // the future.
     } else {
         throw Invalid_syntax(target->tokens.at(0),
-                            "invalid operand for jump instruction");
+                             "invalid operand for jump instruction");
     }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

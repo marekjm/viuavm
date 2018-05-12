@@ -58,7 +58,8 @@ auto check_closure_instantiations(
                     register_usage_profile.defined_where(each.first),
                     "when instantiated here:"});
         } catch (Traced_syntax_error& e) {
-            throw e.append(Invalid_syntax{fn.name, "in a closure defined here:"})
+            throw e
+                .append(Invalid_syntax{fn.name, "in a closure defined here:"})
                 .append(Invalid_syntax{
                     register_usage_profile.defined_where(each.first),
                     "when instantiated here:"});

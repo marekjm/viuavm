@@ -48,7 +48,7 @@ auto check_op_enter(Register_usage_profile& register_usage_profile,
             label->tokens.at(0), "after entering block " + block_name});
     } catch (Traced_syntax_error& e) {
         throw e.append(Invalid_syntax{label->tokens.at(0),
-                                     "after entering block " + block_name});
+                                      "after entering block " + block_name});
     }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

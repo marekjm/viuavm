@@ -53,9 +53,9 @@ bool SHOW_VERSION = false;
 bool VERBOSE      = false;
 bool DEBUG        = false;
 
-bool DISASSEMBLE_ENTRY        = false;
-bool INCLUDE_INFO             = false;
-bool LINE_BY_LINE             = false;
+bool DISASSEMBLE_ENTRY = false;
+bool INCLUDE_INFO      = false;
+bool LINE_BY_LINE      = false;
 auto SELECTED_FUNCTION = std::string{};
 
 
@@ -101,13 +101,13 @@ static bool usage(const char* program,
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    auto args = std::vector<std::string>{};
+    auto args   = std::vector<std::string>{};
     auto option = std::string{};
 
     // for getline()
     auto dummy = std::string{};
 
-    auto filename = std::string{""};
+    auto filename   = std::string{""};
     auto disasmname = std::string{};
     for (int i = 1; i < argc; ++i) {
         option = std::string(argv[i]);
@@ -186,11 +186,12 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t bytes = loader.get_bytecode_size();
-    std::unique_ptr<viua::internals::types::byte[]> bytecode = loader.get_bytecode();
+    std::unique_ptr<viua::internals::types::byte[]> bytecode =
+        loader.get_bytecode();
 
     map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
-    std::vector<std::string> functions             = loader.get_functions();
+    std::vector<std::string> functions        = loader.get_functions();
     map<std::string, uint64_t> function_sizes = loader.get_function_sizes();
 
     map<std::string, uint64_t> block_address_mapping =
@@ -308,7 +309,7 @@ int main(int argc, char* argv[]) {
             getline(cin, dummy);
         }
 
-        auto opname = std::string{};
+        auto opname            = std::string{};
         bool disasm_terminated = false;
         for (unsigned j = 0; j < el_size;) {
             auto instruction = std::string{};

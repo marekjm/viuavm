@@ -140,8 +140,8 @@ auto reduce_token_sequence(std::vector<Token> input_tokens,
     return tokens;
 }
 
-auto reduce_directive(std::vector<Token> input_tokens, std::string const directive)
-    -> std::vector<Token> {
+auto reduce_directive(std::vector<Token> input_tokens,
+                      std::string const directive) -> std::vector<Token> {
     return reduce_token_sequence(input_tokens, {".", directive, ":"});
 }
 
@@ -169,51 +169,63 @@ auto reduce_newlines(std::vector<Token> input_tokens) -> std::vector<Token> {
     return tokens;
 }
 
-auto reduce_mark_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_mark_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "mark");
 }
 
-auto reduce_name_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_name_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "name");
 }
 
-auto reduce_info_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_info_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "info");
 }
 
-auto reduce_import_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_import_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "import");
 }
 
-auto reduce_function_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_function_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "function");
 }
 
-auto reduce_closure_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_closure_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "closure");
 }
 
-auto reduce_end_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_end_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_token_sequence(input_tokens, {".", "end"});
 }
 
-auto reduce_signature_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_signature_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "signature");
 }
 
-auto reduce_bsignature_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_bsignature_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "bsignature");
 }
 
-auto reduce_iota_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_iota_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "iota");
 }
 
-auto reduce_block_directive(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_block_directive(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_directive(input_tokens, "block");
 }
 
-auto reduce_double_colon(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_double_colon(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     return reduce_token_sequence(input_tokens, {":", ":"});
 }
 
@@ -227,7 +239,8 @@ auto reduce_right_attribute_bracket(std::vector<Token> input_tokens)
     return reduce_token_sequence(input_tokens, {"]", "]"});
 }
 
-auto reduce_function_signatures(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_function_signatures(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -319,7 +332,8 @@ auto reduce_names(std::vector<Token> input_tokens) -> std::vector<Token> {
     return tokens;
 }
 
-auto reduce_offset_jumps(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_offset_jumps(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -342,7 +356,8 @@ auto reduce_offset_jumps(std::vector<Token> input_tokens) -> std::vector<Token> 
     return tokens;
 }
 
-auto reduce_at_prefixed_registers(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto reduce_at_prefixed_registers(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -403,7 +418,8 @@ auto reduce_floats(std::vector<Token> input_tokens) -> std::vector<Token> {
     return tokens;
 }
 
-auto move_inline_blocks_out(std::vector<Token> input_tokens) -> std::vector<Token> {
+auto move_inline_blocks_out(std::vector<Token> input_tokens)
+    -> std::vector<Token> {
     decltype(input_tokens) tokens;
     decltype(tokens) block_tokens, nested_block_tokens;
     auto opened_inside = std::string{};
@@ -531,13 +547,13 @@ static void unwrap_subtokens(std::vector<Token>& unwrapped_tokens,
 }
 static auto get_subtokens(
     const std::vector<Token>& input_tokens,
-    std::remove_reference<decltype(input_tokens)>::type::size_type i)
-    -> std::tuple<decltype(i), std::vector<Token>, unsigned, unsigned, unsigned> {
+    std::remove_reference<decltype(input_tokens)>::type::size_type i) -> std::
+    tuple<decltype(i), std::vector<Token>, unsigned, unsigned, unsigned> {
     std::string paren_type         = input_tokens.at(i);
     std::string closing_paren_type = ((paren_type == "(") ? ")" : "]");
     ++i;
 
-    auto subtokens = std::vector<Token>{};
+    auto subtokens   = std::vector<Token>{};
     const auto limit = input_tokens.size();
 
     unsigned balance                         = 1;
@@ -565,12 +581,13 @@ static auto get_subtokens(
         ++i;
     }
 
-    return std::tuple<decltype(i), std::vector<Token>, unsigned, unsigned, unsigned>{
-        i,
-        std::move(subtokens),
-        balance,
-        toplevel_subexpressions_balance,
-        toplevel_subexpressions};
+    return std::
+        tuple<decltype(i), std::vector<Token>, unsigned, unsigned, unsigned>{
+            i,
+            std::move(subtokens),
+            balance,
+            toplevel_subexpressions_balance,
+            toplevel_subexpressions};
 }
 static auto get_innermost_target_token(const std::vector<Token>& subtokens,
                                        Token const& t) -> Token {
@@ -610,7 +627,8 @@ static auto get_counter_token(const std::vector<Token>& subtokens,
                  subtokens.at(0).character(),
                  ('%' + str::stringify(toplevel_subexpressions, false))};
 }
-auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Token> {
+auto unwrap_lines(std::vector<Token> input_tokens, bool full)
+    -> std::vector<Token> {
     decltype(input_tokens) unwrapped_tokens;
     decltype(input_tokens) tokens;
     decltype(input_tokens) final_tokens;
@@ -626,7 +644,7 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
             continue;
         }
         if (t == "(" or t == "[") {
-            auto subtokens = std::vector<Token>{};
+            auto subtokens                           = std::vector<Token>{};
             unsigned balance                         = 1;
             unsigned toplevel_subexpressions_balance = 0;
             unsigned toplevel_subexpressions         = 0;
@@ -644,8 +662,8 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
                 }
                 if (subtokens.size() < 2) {
                     throw Invalid_syntax(t,
-                                        "at least two tokens are required "
-                                        "in a wrapped instruction");
+                                         "at least two tokens are required "
+                                         "in a wrapped instruction");
                 }
 
                 Token inner_target_token =
@@ -703,7 +721,7 @@ auto unwrap_lines(std::vector<Token> input_tokens, bool full) -> std::vector<Tok
 
 auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
-    auto iotas = std::vector<unsigned long>{};
+    auto iotas  = std::vector<unsigned long>{};
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {
