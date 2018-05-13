@@ -67,8 +67,15 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wpedantic \
 				 -g \
 				 -I./include
-# -Weverything					-- in theory enables *everything*
-# -Wdeprecated-implementations	-- makes sense for C++?
+# -Weverything						-- in theory enables *everything*
+# -Wdeprecated-implementations		-- makes sense for C++?
+# -Wpadded							-- breaks existing code
+# -Wexit-time-destructors 			-- breaks existing code
+# -Wglobal-constructors				-- breaks existing code
+# -Wmissing-variable-declarations	-- breaks existing code
+# -Wcovered-switch-default 			-- breaks existing code
+# -Wunused-template					-- breaks existing code
+# -Wfloat-equal 					-- breaks existing code
 CLANG_CXXFLAGS=-Wall \
 			   -Wextra \
 			   -Wabsolute-value \
@@ -85,7 +92,6 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wconditional-uninitialized \
 			   -Wconversion \
 			   -Wconsumed \
-			   -Wcovered-switch-default \
 			   -Wdate-time \
 			   -Wdelete-non-virtual-dtor \
 			   -Wdeprecated \
@@ -96,15 +102,12 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wduplicate-enum \
 			   -Wduplicate-method-arg \
 			   -Wduplicate-method-match \
-			   -Wexit-time-destructors \
 			   -Wfloat-conversion \
-			   -Wfloat-equal \
 			   -Wint-to-void-pointer-cast \
 			   -Wfor-loop-analysis \
 			   -Wformat-nonliteral \
 			   -Wformat-pedantic \
 			   -Wfour-char-constants \
-			   -Wglobal-constructors \
 			   -Wheader-hygiene \
 			   -Widiomatic-parentheses \
 			   -Winfinite-recursion \
@@ -115,8 +118,6 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wmissing-include-dirs \
 			   -Wmissing-prototypes \
 			   -Wmissing-noreturn \
-			   -Wmissing-variable-declaraions \
-			   -Wno-eof \
 			   -Wnon-virtual-dtor \
 			   -Wnull-pointer-arithmetic \
 			   -Wold-style-cast \
@@ -125,7 +126,6 @@ CLANG_CXXFLAGS=-Wall \
 			   -Woverloaded-virtual \
 			   -Woverriding-method-mismatch \
 			   -Wpacked \
-			   -Wpadded \
 			   -Wpessimizing-move \
 			   -Wpointer-arith \
 			   -Wrange-loop-analysis \
@@ -166,7 +166,6 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wunused-member-function \
 			   -Wunused-parameter \
 			   -Wunused-private-field \
-			   -Wunused-template \
 			   -Wunused-variable \
 			   -Wused-but-marked-unused \
 			   -Wuser-defined-literals \
@@ -176,8 +175,9 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wweak-vtables \
 			   -Wzero-as-null-pointer-constant \
 			   -Wzero-length-array \
-			   -Wc++21-compat \
+			   -Wc++2a-compat \
 			   -Werror \
+			   -Wno-weak-vtables \
 			   -Wfatal-errors \
 			   -pedantic \
 			   -g \
