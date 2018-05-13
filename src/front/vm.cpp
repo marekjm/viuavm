@@ -32,10 +32,10 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel,
     auto bytecode    = loader.get_bytecode();
 
     auto const function_address_mapping = loader.get_function_addresses();
-    for (auto const p : function_address_mapping) {
+    for (auto const& p : function_address_mapping) {
         kernel->mapfunction(p.first, p.second);
     }
-    for (auto const p : loader.get_block_addresses()) {
+    for (auto const& p : loader.get_block_addresses()) {
         kernel->mapblock(p.first, p.second);
     }
 

@@ -1088,12 +1088,12 @@ void generate(vector<Token> const& tokens,
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL FUNCTION SIGNATURES
     viua::internals::types::bytecode_size signatures_section_size = 0;
-    for (const auto each : functions.signatures) {
+    for (auto const& each : functions.signatures) {
         signatures_section_size += (each.size() + 1);  // +1 for null byte after
                                                        // each signature
     }
     bwrite(out, signatures_section_size);
-    for (const auto each : functions.signatures) {
+    for (auto const& each : functions.signatures) {
         strwrite(out, each);
     }
 
@@ -1101,12 +1101,12 @@ void generate(vector<Token> const& tokens,
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL BLOCK SIGNATURES
     signatures_section_size = 0;
-    for (const auto each : blocks.signatures) {
+    for (auto const& each : blocks.signatures) {
         signatures_section_size += (each.size() + 1);  // +1 for null byte after
                                                        // each signature
     }
     bwrite(out, signatures_section_size);
-    for (const auto each : blocks.signatures) {
+    for (auto const& each : blocks.signatures) {
         strwrite(out, each);
     }
 
@@ -1117,7 +1117,7 @@ void generate(vector<Token> const& tokens,
         write_code_blocks_section(out, blocks, linked_block_names);
     write_code_blocks_section(
         out, functions, linked_function_names, functions_size_so_far);
-    for (string name : linked_function_names) {
+    for (auto const& name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
         viua::internals::types::bytecode_size address =

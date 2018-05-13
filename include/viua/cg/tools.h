@@ -28,17 +28,6 @@
 
 
 namespace viua { namespace cg { namespace tools {
-template<class T> static auto any(T item, T other) -> bool {
-    return (item == other);
-}
-template<class T, class... R>
-static auto any(T item, T first, R... rest) -> bool {
-    if (item == first) {
-        return true;
-    }
-    return any(item, rest...);
-}
-
 auto calculate_bytecode_size_of_first_n_instructions2(
     std::vector<viua::cg::lex::Token> const& tokens,
     std::remove_reference<decltype(tokens)>::type::size_type const limit)

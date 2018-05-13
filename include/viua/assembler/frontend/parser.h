@@ -37,6 +37,8 @@ struct Operand {
 
     auto add(viua::cg::lex::Token) -> void;
 
+    Operand() = default;
+    Operand(Operand const&) = default;
     virtual ~Operand() = default;
 };
 

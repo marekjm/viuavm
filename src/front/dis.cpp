@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
     if (meta_information.size()) {
         disassembled_lines.emplace_back("; meta information\n");
     }
-    for (const auto each : meta_information) {
+    for (auto const& each : meta_information) {
         disassembled_lines.emplace_back(
             assembler::utils::lines::make_info(each.first, each.second) + "\n");
     }
@@ -270,7 +270,7 @@ int main(int argc, char* argv[]) {
     if (signatures.size()) {
         disassembled_lines.emplace_back("; external function signatures\n");
     }
-    for (const auto each : signatures) {
+    for (auto const& each : signatures) {
         disassembled_lines.emplace_back(
             assembler::utils::lines::make_function_signature(each) + "\n");
     }
@@ -282,7 +282,7 @@ int main(int argc, char* argv[]) {
     if (block_signatures.size()) {
         disassembled_lines.emplace_back("; external block signatures\n");
     }
-    for (const auto each : block_signatures) {
+    for (auto const& each : block_signatures) {
         disassembled_lines.emplace_back(
             assembler::utils::lines::make_block_signature(each) + "\n");
     }
