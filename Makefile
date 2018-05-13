@@ -67,15 +67,116 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wpedantic \
 				 -g \
 				 -I./include
+# -Weverything					-- in theory enables *everything*
+# -Wdeprecated-implementations	-- makes sense for C++?
 CLANG_CXXFLAGS=-Wall \
 			   -Wextra \
-			   -Wint-to-void-pointer-cast \
-			   -Wconversion \
-			   -Wshadow \
-			   -Wswitch-default \
-			   -Wmissing-include-dirs \
+			   -Wabsolute-value \
+			   -Wabstract-vbase-init \
+			   -Waligned-allocation-unavailable \
+			   -Warray-bounds-pointer-arithmetic \
+			   -Wassign-enum \
+			   -Wbad-function-cast \
+			   -Wbitfield-enum-conversion \
 			   -Wcast-align \
+			   -Wcast-qual \
+			   -Wchar-subscripts \
+			   -Wcomma \
+			   -Wconditional-uninitialized \
+			   -Wconversion \
+			   -Wconsumed \
+			   -Wcovered-switch-default \
+			   -Wdate-time \
+			   -Wdelete-non-virtual-dtor \
+			   -Wdeprecated \
+			   -Wdeprecated-implementations \
+			   -Wdirect-ivar-access \
+			   -Wdiv-by-zero \
+			   -Wdouble-promotion \
+			   -Wduplicate-enum \
+			   -Wduplicate-method-arg \
+			   -Wduplicate-method-match \
+			   -Wexit-time-destructors \
+			   -Wfloat-conversion \
+			   -Wfloat-equal \
+			   -Wint-to-void-pointer-cast \
+			   -Wfor-loop-analysis \
+			   -Wformat-nonliteral \
+			   -Wformat-pedantic \
+			   -Wfour-char-constants \
+			   -Wglobal-constructors \
+			   -Wheader-hygiene \
+			   -Widiomatic-parentheses \
+			   -Winfinite-recursion \
+			   -Wkeyword-macro \
+			   -Wmain \
+			   -Wmissing-braces \
+			   -Wmissing-field-initializers \
+			   -Wmissing-include-dirs \
+			   -Wmissing-prototypes \
+			   -Wmissing-noreturn \
+			   -Wmissing-variable-declaraions \
+			   -Wno-eof \
+			   -Wnon-virtual-dtor \
+			   -Wnull-pointer-arithmetic \
 			   -Wold-style-cast \
+			   -Wover-aligned \
+			   -Woverlength-strings \
+			   -Woverloaded-virtual \
+			   -Woverriding-method-mismatch \
+			   -Wpacked \
+			   -Wpadded \
+			   -Wpessimizing-move \
+			   -Wpointer-arith \
+			   -Wrange-loop-analysis \
+			   -Wredundant-move \
+			   -Wredundant-parens \
+			   -Wreorder \
+			   -Wretained-language-linkage \
+			   -Wself-assign \
+			   -Wself-move \
+			   -Wsemicolon-before-method-body \
+			   -Wshadow-all \
+			   -Wshift-sign-overflow \
+			   -Wshorten-64-to-32 \
+			   -Wsign-compare \
+			   -Wsign-conversion \
+			   -Wsometimes-uninitialized \
+			   -Wstatic-in-inline \
+			   -Wstrict-prototypes \
+			   -Wstring-conversion \
+			   -Wsuper-class-method-mismatch \
+			   -Wswitch-enum \
+			   -Wtautological-overlap-compare \
+			   -Wthread-safety \
+			   -Wundef \
+			   -Wundefined-func-template \
+			   -Wundefined-internal-type \
+			   -Wundefined-reinterpret-cast \
+			   -Wuninitialized \
+			   -Wunneeded-internal-declaration \
+			   -Wunneeded-member-function \
+			   -Wunreachable-code-aggressive \
+			   -Wunused-const-variable \
+			   -Wunused-function \
+			   -Wunused-label \
+			   -Wunused-lambda-capture \
+			   -Wunused-local-typedef \
+			   -Wunused-macros \
+			   -Wunused-member-function \
+			   -Wunused-parameter \
+			   -Wunused-private-field \
+			   -Wunused-template \
+			   -Wunused-variable \
+			   -Wused-but-marked-unused \
+			   -Wuser-defined-literals \
+			   -Wvector-conversion \
+			   -Wvla \
+			   -Wweak-template-vtables \
+			   -Wweak-vtables \
+			   -Wzero-as-null-pointer-constant \
+			   -Wzero-length-array \
+			   -Wc++21-compat \
 			   -Werror \
 			   -Wfatal-errors \
 			   -pedantic \
