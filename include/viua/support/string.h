@@ -56,11 +56,12 @@ auto chunks(std::string const& s) -> std::vector<std::string>;
 
 auto join(std::string const& s, std::vector<std::string> const& v)
     -> std::string;
+
 template<typename T>
 auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
     auto const sz = seq.size();
-    std::ostringstream oss;
-    for (std::remove_const_t<decltype(sz)> i = 0; i < sz; ++i) {
+    auto oss = std::ostringstream{};
+    for (auto i = std::remove_const_t<decltype(sz)>{0}; i < sz; ++i) {
         oss << seq[i];
         if (i < (sz - 1)) {
             oss << delim;
@@ -71,8 +72,8 @@ auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
 
 template<typename T>
 auto strmul(T const& s, size_t const times) -> std::string {
-    std::ostringstream oss;
-    for (std::remove_const_t<decltype(times)> i = 0; i < times; ++i) {
+    auto oss = std::ostringstream{};
+    for (auto i = std::remove_const_t<decltype(times)>{0}; i < times; ++i) {
         oss << s;
     }
     return oss.str();
@@ -80,7 +81,7 @@ auto strmul(T const& s, size_t const times) -> std::string {
 
 auto lstrip(std::string const& s) -> std::string;
 
-std::string::size_type lshare(std::string const& s, std::string const& w);
+auto lshare(std::string const& s, std::string const& w) -> std::string::size_type;
 auto contains(std::string const& s, char const c) -> bool;
 
 using LevenshteinDistance = std::string::size_type;
@@ -100,7 +101,7 @@ auto strencode(std::string const&) -> std::string;
 auto stringify(std::vector<std::string> const&) -> std::string;
 template<class T>
 auto stringify(T const o, bool const nl = true) -> std::string {
-    std::ostringstream oss;
+    auto oss = std::ostringstream{};
     oss << o;
     if (nl) {
         oss << "\n";

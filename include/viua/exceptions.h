@@ -47,7 +47,7 @@ class Arity_exception : public viua::types::Exception {
     }
 
     std::string str() const override {
-        std::ostringstream oss;
+        auto oss = std::ostringstream{};
         oss << "got arity " << got_arity << ", expected one of {";
         for (decltype(valid_arities)::size_type i = 0; i < valid_arities.size();
              ++i) {
@@ -84,7 +84,7 @@ class Type_exception : public viua::types::Exception {
     }
 
     std::string str() const override {
-        std::ostringstream oss;
+        auto oss = std::ostringstream{};
         oss << "expected " << expected << ", got " << got;
         return oss.str();
     }
