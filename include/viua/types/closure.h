@@ -32,7 +32,6 @@
 namespace viua { namespace types {
 class Closure : public Function {
     std::unique_ptr<viua::kernel::Register_set> local_register_set;
-    std::string function_name;
 
   public:
     static const std::string type_name;

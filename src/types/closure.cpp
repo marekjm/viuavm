@@ -27,7 +27,7 @@ const std::string viua::types::Closure::type_name = "Closure";
 
 viua::types::Closure::Closure(std::string const& name,
                               std::unique_ptr<viua::kernel::Register_set> rs)
-        : local_register_set(std::move(rs)), function_name(name) {}
+        : viua::types::Function::Function{name}, local_register_set{std::move(rs)} {}
 
 viua::types::Closure::~Closure() {}
 

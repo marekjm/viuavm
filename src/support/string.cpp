@@ -386,7 +386,7 @@ auto levenshtein_filter(std::string const source,
     -> std::vector<DistancePair> {
     auto matched = std::vector<DistancePair>{};
 
-    for (auto const each : candidates) {
+    for (auto const& each : candidates) {
         if (auto distance = levenshtein(source, each); distance <= limit) {
             matched.emplace_back(distance, each);
         }
@@ -399,7 +399,7 @@ auto levenshtein_best(std::string const source,
                       LevenshteinDistance const limit) -> DistancePair {
     auto best = DistancePair{0, source};
 
-    for (const auto each : levenshtein_filter(source, candidates, limit)) {
+    for (auto const& each : levenshtein_filter(source, candidates, limit)) {
         if ((not best.first) or each.first < best.first) {
             best = each;
             continue;
