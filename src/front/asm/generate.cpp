@@ -97,7 +97,7 @@ const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
 
 static Program& compile(
     Program& program,
-    const std::vector<Token>& tokens,
+    std::vector<Token> const& tokens,
     map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>&
         marks) {
     /** Compile instructions into bytecode using bytecode generation API.
@@ -138,7 +138,7 @@ static auto strip_attributes(std::vector<viua::cg::lex::Token> const& tokens)
     return stripped;
 }
 
-static void assemble(Program& program, const std::vector<Token>& tokens) {
+static void assemble(Program& program, std::vector<Token> const& tokens) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named
      * registers and functions. Then, it passes all gathered data into
@@ -174,7 +174,7 @@ map_invocable_addresses(
 static viua::internals::types::bytecode_size write_code_blocks_section(
     ofstream& out,
     invocables_t const& blocks,
-    const std::vector<std::string>& linked_block_names,
+    std::vector<std::string> const& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
 
@@ -261,7 +261,7 @@ static viua::internals::types::bytecode_size write_code_blocks_section(
 }
 
 static std::string get_main_function(
-    const std::vector<std::string>& available_functions) {
+    std::vector<std::string> const& available_functions) {
     auto main_function = std::string{};
     for (auto f : available_functions) {
         if (f == "main/0" or f == "main/1" or f == "main/2") {
@@ -274,7 +274,7 @@ static std::string get_main_function(
 
 static void check_main_function(
     std::string const& main_function,
-    const std::vector<Token>& main_function_tokens) {
+    std::vector<Token> const& main_function_tokens) {
     // Why three newlines?
     //
     // Here's why:
@@ -493,7 +493,7 @@ void generate(std::vector<Token> const& tokens,
               invocables_t& blocks,
               std::string const& filename,
               std::string& compilename,
-              const std::vector<std::string>& commandline_given_links,
+              std::vector<std::string> const& commandline_given_links,
               compilationflags_t const& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE

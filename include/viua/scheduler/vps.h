@@ -121,7 +121,7 @@ class Virtual_process_scheduler {
 
     void operator()();
 
-    void bootstrap(const std::vector<std::string>&);
+    void bootstrap(std::vector<std::string> const&);
     void launch();
     void shutdown();
     void join();

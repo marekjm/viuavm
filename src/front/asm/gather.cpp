@@ -24,7 +24,7 @@
 using namespace std;
 
 
-invocables_t gather_functions(const std::vector<viua::cg::lex::Token>& tokens) {
+invocables_t gather_functions(std::vector<viua::cg::lex::Token> const& tokens) {
     invocables_t invocables;
 
     invocables.names      = assembler::ce::get_function_names(tokens);
@@ -39,7 +39,7 @@ invocables_t gather_functions(const std::vector<viua::cg::lex::Token>& tokens) {
     return invocables;
 }
 
-invocables_t gather_blocks(const std::vector<viua::cg::lex::Token>& tokens) {
+invocables_t gather_blocks(std::vector<viua::cg::lex::Token> const& tokens) {
     invocables_t invocables;
 
     invocables.names      = assembler::ce::get_block_names(tokens);
@@ -51,7 +51,7 @@ invocables_t gather_blocks(const std::vector<viua::cg::lex::Token>& tokens) {
 }
 
 map<std::string, std::string> gather_meta_information(
-    const std::vector<viua::cg::lex::Token>& tokens) {
+    std::vector<viua::cg::lex::Token> const& tokens) {
     map<std::string, std::string> meta_information;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;

@@ -45,19 +45,19 @@ struct compilationflags_t {
 
 
 std::vector<std::vector<std::string>> decode_line_tokens(
-    const std::vector<std::string>&);
+    std::vector<std::string> const&);
 std::vector<std::vector<std::string>> decode_line(std::string const&);
 
-invocables_t gather_functions(const std::vector<viua::cg::lex::Token>&);
-invocables_t gather_blocks(const std::vector<viua::cg::lex::Token>&);
+invocables_t gather_functions(std::vector<viua::cg::lex::Token> const&);
+invocables_t gather_blocks(std::vector<viua::cg::lex::Token> const&);
 std::map<std::string, std::string> gather_meta_information(
-    const std::vector<viua::cg::lex::Token>&);
+    std::vector<viua::cg::lex::Token> const&);
 
 viua::internals::types::bytecode_size assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks);
 void generate(std::vector<viua::cg::lex::Token> const&,
@@ -65,7 +65,7 @@ void generate(std::vector<viua::cg::lex::Token> const&,
               invocables_t&,
               std::string const&,
               std::string&,
-              const std::vector<std::string>&,
+              std::vector<std::string> const&,
               compilationflags_t const&);
 
 

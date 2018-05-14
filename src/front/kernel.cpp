@@ -46,7 +46,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
 
 
 static bool usage(const std::string program,
-                  const std::vector<std::string>& args) {
+                  std::vector<std::string> const& args) {
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;

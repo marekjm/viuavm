@@ -42,7 +42,7 @@ using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 
 template<class T>
-static auto enumerate(const std::vector<T>& v)
+static auto enumerate(std::vector<T> const& v)
     -> std::vector<pair<typename std::vector<T>::size_type, T>> {
     auto enumerated_vector =
         std::vector<pair<typename std::vector<T>::size_type, T>>{};
@@ -57,7 +57,7 @@ static auto enumerate(const std::vector<T>& v)
 }
 
 static void encode_json(std::string const& filename,
-                        const std::vector<Token>& tokens) {
+                        std::vector<Token> const& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";
@@ -134,7 +134,7 @@ static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
 static void display_results(std::string const& filename,
-                            const std::vector<Token>& tokens) {
+                            std::vector<Token> const& tokens) {
     if (DISPLAY_SIZE) {
         try {
             cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;

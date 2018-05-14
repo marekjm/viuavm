@@ -282,8 +282,8 @@ static auto binary_lt[[maybe_unused]](std::vector<bool> lhs,
 }
 
 
-static auto binary_addition(const std::vector<bool>& lhs,
-                            const std::vector<bool>& rhs) -> std::vector<bool> {
+static auto binary_addition(std::vector<bool> const& lhs,
+                            std::vector<bool> const& rhs) -> std::vector<bool> {
     auto result               = std::vector<bool>{};
     auto const size_of_result = std::max(lhs.size(), rhs.size());
     result.reserve(size_of_result + 1);

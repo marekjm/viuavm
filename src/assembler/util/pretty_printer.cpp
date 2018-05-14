@@ -52,7 +52,7 @@ auto viua::assembler::util::pretty_printer::send_control_seq(
 
 
 auto viua::assembler::util::pretty_printer::underline_error_token(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     decltype(tokens.size()) i,
     viua::cg::lex::Invalid_syntax const& error) -> void {
     /*
@@ -155,7 +155,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_line(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     viua::cg::lex::Invalid_syntax const& error,
     decltype(tokens.size()) i,
     size_t const line_no_width) -> decltype(i) {
@@ -192,7 +192,7 @@ auto viua::assembler::util::pretty_printer::display_error_line(
     return i;
 }
 auto viua::assembler::util::pretty_printer::display_context_line(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     viua::cg::lex::Invalid_syntax const&,
     decltype(tokens.size()) i,
     size_t const line_no_width) -> decltype(i) {
@@ -231,7 +231,7 @@ auto viua::assembler::util::pretty_printer::display_error_header(
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_location(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     const viua::cg::lex::Invalid_syntax error) -> void {
     const unsigned context_lines          = 2;
     decltype(error.line()) context_before = 0,
@@ -259,7 +259,7 @@ auto viua::assembler::util::pretty_printer::display_error_location(
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_in_context(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     const viua::cg::lex::Invalid_syntax error,
     std::string const& filename) -> void {
     display_error_header(error, filename);
@@ -267,7 +267,7 @@ auto viua::assembler::util::pretty_printer::display_error_in_context(
     display_error_location(tokens, error);
 }
 auto viua::assembler::util::pretty_printer::display_error_in_context(
-    const std::vector<viua::cg::lex::Token>& tokens,
+    std::vector<viua::cg::lex::Token> const& tokens,
     const viua::cg::lex::Traced_syntax_error error,
     std::string const& filename) -> void {
     for (auto const& e : error.errors) {

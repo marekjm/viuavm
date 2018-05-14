@@ -39,8 +39,8 @@ using Token       = viua::cg::lex::Token;
 
 
 static bool is_defined(std::string function_name,
-                       const std::vector<std::string>& function_names,
-                       const std::vector<std::string>& function_signatures) {
+                       std::vector<std::string> const& function_names,
+                       std::vector<std::string> const& function_signatures) {
     bool is_undefined =
         (find(function_names.begin(), function_names.end(), function_name)
          == function_names.end());
@@ -54,9 +54,9 @@ static bool is_defined(std::string function_name,
     return (not is_undefined);
 }
 void assembler::verify::function_calls_are_defined(
-    const std::vector<Token>& tokens,
-    const std::vector<std::string>& function_names,
-    const std::vector<std::string>& function_signatures) {
+    std::vector<Token> const& tokens,
+    std::vector<std::string> const& function_names,
+    std::vector<std::string> const& function_signatures) {
     ostringstream report("");
     auto line = std::string{};
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
@@ -108,9 +108,9 @@ void assembler::verify::function_calls_are_defined(
 }
 
 void assembler::verify::callable_creations(
-    const std::vector<Token>& tokens,
-    const std::vector<std::string>& function_names,
-    const std::vector<std::string>& function_signatures) {
+    std::vector<Token> const& tokens,
+    std::vector<std::string> const& function_names,
+    std::vector<std::string> const& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
          i < tokens.size();
          ++i) {

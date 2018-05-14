@@ -716,7 +716,7 @@ void viua::scheduler::Virtual_process_scheduler::operator()() {
 }
 
 void viua::scheduler::Virtual_process_scheduler::bootstrap(
-    const std::vector<std::string>& commandline_arguments) {
+    std::vector<std::string> const& commandline_arguments) {
     auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 

@@ -503,8 +503,8 @@ static void push_unwrapped_lines(
     bool const invert,
     Token const& inner_target_token,
     std::vector<Token>& final_tokens,
-    const std::vector<Token>& unwrapped_tokens,
-    const std::vector<Token>& input_tokens,
+    std::vector<Token> const& unwrapped_tokens,
+    std::vector<Token> const& input_tokens,
     std::remove_reference<decltype(input_tokens)>::type::size_type& i) {
     const auto limit = input_tokens.size();
     if (invert) {
@@ -538,7 +538,7 @@ static void push_unwrapped_lines(
     }
 }
 static void unwrap_subtokens(std::vector<Token>& unwrapped_tokens,
-                             const std::vector<Token>& subtokens,
+                             std::vector<Token> const& subtokens,
                              Token const& token) {
     for (auto subt : unwrap_lines(subtokens)) {
         unwrapped_tokens.push_back(subt);
@@ -546,7 +546,7 @@ static void unwrap_subtokens(std::vector<Token>& unwrapped_tokens,
     unwrapped_tokens.emplace_back(token.line(), token.character(), "\n");
 }
 static auto get_subtokens(
-    const std::vector<Token>& input_tokens,
+    std::vector<Token> const& input_tokens,
     std::remove_reference<decltype(input_tokens)>::type::size_type i) -> std::
     tuple<decltype(i), std::vector<Token>, unsigned, unsigned, unsigned> {
     std::string paren_type         = input_tokens.at(i);
@@ -589,7 +589,7 @@ static auto get_subtokens(
             toplevel_subexpressions_balance,
             toplevel_subexpressions};
 }
-static auto get_innermost_target_token(const std::vector<Token>& subtokens,
+static auto get_innermost_target_token(std::vector<Token> const& subtokens,
                                        Token const& t) -> Token {
     Token inner_target_token;
     try {
@@ -621,7 +621,7 @@ static auto get_innermost_target_token(const std::vector<Token>& subtokens,
     }
     return inner_target_token;
 }
-static auto get_counter_token(const std::vector<Token>& subtokens,
+static auto get_counter_token(std::vector<Token> const& subtokens,
                               const unsigned toplevel_subexpressions) -> Token {
     return Token{subtokens.at(0).line(),
                  subtokens.at(0).character(),

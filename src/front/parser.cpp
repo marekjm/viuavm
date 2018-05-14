@@ -53,7 +53,7 @@ using viua::cg::lex::Traced_syntax_error;
 
 
 template<class T>
-static auto enumerate(const std::vector<T>& v)
+static auto enumerate(std::vector<T> const& v)
     -> std::vector<pair<typename std::vector<T>::size_type, T>> {
     auto enumerated_vector =
         std::vector<pair<typename std::vector<T>::size_type, T>>{};

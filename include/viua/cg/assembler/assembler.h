@@ -49,7 +49,7 @@ auto getint(std::string const& s, bool const = false) -> int_op;
 auto getint_with_rs_type(std::string const&,
                          const viua::internals::Register_sets,
                          bool const = false) -> int_op;
-auto getint(const std::vector<viua::cg::lex::Token>& tokens,
+auto getint(std::vector<viua::cg::lex::Token> const& tokens,
             decltype(tokens.size())) -> int_op;
 auto getbyte(std::string const& s) -> byte_op;
 auto getfloat(std::string const& s) -> float_op;
@@ -66,37 +66,37 @@ auto get3(std::string s, bool fill_third = true)
 }  // namespace operands
 
 namespace ce {
-auto getmarks(const std::vector<viua::cg::lex::Token>& tokens)
+auto getmarks(std::vector<viua::cg::lex::Token> const& tokens)
     -> std::map<std::string,
                 std::remove_reference<decltype(tokens)>::type::size_type>;
-auto getlinks(const std::vector<viua::cg::lex::Token>&)
+auto getlinks(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;
 
-auto get_function_names(const std::vector<viua::cg::lex::Token>&)
+auto get_function_names(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;
-auto get_signatures(const std::vector<viua::cg::lex::Token>&)
+auto get_signatures(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;
-auto get_block_names(const std::vector<viua::cg::lex::Token>&)
+auto get_block_names(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;
-auto get_block_signatures(const std::vector<viua::cg::lex::Token>&)
+auto get_block_signatures(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;
 auto get_invokables(std::string const& type,
-                    const std::vector<viua::cg::lex::Token>&)
+                    std::vector<viua::cg::lex::Token> const&)
     -> std::map<std::string, std::vector<std::string>>;
 auto get_invokables_token_bodies(std::string const&,
-                                 const std::vector<viua::cg::lex::Token>&)
+                                 std::vector<viua::cg::lex::Token> const&)
     -> std::map<std::string, std::vector<viua::cg::lex::Token>>;
 }  // namespace ce
 
 namespace verify {
-auto function_calls_are_defined(const std::vector<viua::cg::lex::Token>&,
-                                const std::vector<std::string>&,
-                                const std::vector<std::string>&) -> void;
-auto callable_creations(const std::vector<viua::cg::lex::Token>&,
-                        const std::vector<std::string>&,
-                        const std::vector<std::string>&) -> void;
+auto function_calls_are_defined(std::vector<viua::cg::lex::Token> const&,
+                                std::vector<std::string> const&,
+                                std::vector<std::string> const&) -> void;
+auto callable_creations(std::vector<viua::cg::lex::Token> const&,
+                        std::vector<std::string> const&,
+                        std::vector<std::string> const&) -> void;
 auto manipulation_of_defined_registers(
-    const std::vector<viua::cg::lex::Token>&,
+    std::vector<viua::cg::lex::Token> const&,
     const std::map<std::string, std::vector<viua::cg::lex::Token>>&,
     bool const) -> void;
 }  // namespace verify

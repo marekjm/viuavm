@@ -30,7 +30,7 @@ using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 
 
-static auto invalid_syntax(const std::vector<Token>& tokens,
+static auto invalid_syntax(std::vector<Token> const& tokens,
                            const std::string message) -> Invalid_syntax {
     auto invalid_syntax_error = Invalid_syntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};

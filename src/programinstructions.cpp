@@ -252,7 +252,7 @@ Program& Program::opbits(int_op target, int_op count) {
     return (*this);
 }
 
-Program& Program::opbits(int_op target, const std::vector<uint8_t> bit_string) {
+Program& Program::opbits(int_op target, std::vector<uint8_t> const bit_string) {
     addr_ptr = cg::bytecode::opbits(addr_ptr, target, bit_string);
     return (*this);
 }

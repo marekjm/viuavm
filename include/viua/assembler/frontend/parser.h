@@ -125,7 +125,7 @@ struct Parsed_source {
 
 
 template<typename T> class vector_view {
-    const std::vector<T>& vec;
+    std::vector<T> const& vec;
     const typename std::remove_reference_t<decltype(vec)>::size_type offset;
 
   public:
@@ -170,7 +170,7 @@ auto parse_closure(const vector_view<viua::cg::lex::Token> tokens,
                    Instructions_block&) -> decltype(tokens)::size_type;
 auto parse_block(const vector_view<viua::cg::lex::Token> tokens,
                  Instructions_block&) -> decltype(tokens)::size_type;
-auto parse(const std::vector<viua::cg::lex::Token>&) -> Parsed_source;
+auto parse(std::vector<viua::cg::lex::Token> const&) -> Parsed_source;
 }}}}  // namespace viua::assembler::frontend::parser
 
 

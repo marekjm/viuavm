@@ -177,7 +177,7 @@ auto assemble_parameter_op(Program& program,
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 auto assemble_bit_shift_instruction(Program& program,
-                                    const std::vector<Token>& tokens,
+                                    std::vector<Token> const& tokens,
                                     const Token_index i) -> void {
     Token_index target = i + 1;
     Token_index lhs    = target + 2;

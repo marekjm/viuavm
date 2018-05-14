@@ -563,7 +563,7 @@ auto viua::assembler::frontend::parser::parse_block(
     return i;
 }
 
-auto viua::assembler::frontend::parser::parse(const std::vector<Token>& tokens)
+auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
     -> Parsed_source {
     Parsed_source parsed;
 
