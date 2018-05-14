@@ -108,7 +108,7 @@ auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     // accidentally deferring a frame twice!
     frame->deferred_calls.clear();
 }
-auto viua::process::Stack::register_deferred_calls(const bool push_this_stack)
+auto viua::process::Stack::register_deferred_calls(bool const push_this_stack)
     -> void {
     // Mark current stack as the one to return to after all
     // the deferred calls complete, *but* only if the stack is not exhausted as

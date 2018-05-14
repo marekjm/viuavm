@@ -115,7 +115,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
 auto viua::assembler::frontend::parser::parse_operand(
     const vector_view<Token> tokens,
     std::unique_ptr<Operand>& operand,
-    const bool integer_literal_means_offset) -> decltype(tokens)::size_type {
+    bool const integer_literal_means_offset) -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();

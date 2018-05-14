@@ -45,10 +45,10 @@ auto resolve_jump(
     -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>;
 auto convert_token_to_timeout_operand(viua::cg::lex::Token const) -> timeout_op;
 
-auto getint(std::string const& s, const bool = false) -> int_op;
+auto getint(std::string const& s, bool const = false) -> int_op;
 auto getint_with_rs_type(std::string const&,
                          const viua::internals::Register_sets,
-                         const bool = false) -> int_op;
+                         bool const = false) -> int_op;
 auto getint(const std::vector<viua::cg::lex::Token>& tokens,
             decltype(tokens.size())) -> int_op;
 auto getbyte(std::string const& s) -> byte_op;
@@ -98,7 +98,7 @@ auto callable_creations(const std::vector<viua::cg::lex::Token>&,
 auto manipulation_of_defined_registers(
     const std::vector<viua::cg::lex::Token>&,
     const std::map<std::string, std::vector<viua::cg::lex::Token>>&,
-    const bool) -> void;
+    bool const) -> void;
 }  // namespace verify
 
 namespace utils {

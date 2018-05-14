@@ -753,7 +753,7 @@ viua::scheduler::Virtual_process_scheduler::Virtual_process_scheduler(
     std::vector<std::unique_ptr<viua::process::Process>>* fp,
     mutex* fp_mtx,
     condition_variable* fp_cv,
-    const bool enable_tracing)
+    bool const enable_tracing)
         : attached_kernel(akernel)
         , tracing_enabled(enable_tracing)
         , free_processes(fp)

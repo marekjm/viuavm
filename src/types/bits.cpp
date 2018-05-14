@@ -1344,7 +1344,7 @@ auto viua::types::Bits::at(size_type i) const -> bool {
     return underlying_array.at(i);
 }
 
-auto viua::types::Bits::set(size_type i, const bool value) -> bool {
+auto viua::types::Bits::set(size_type i, bool const value) -> bool {
     auto const was         = at(i);
     underlying_array.at(i) = value;
     return was;
@@ -1362,7 +1362,7 @@ auto viua::types::Bits::shl(size_type n) -> std::unique_ptr<Bits> {
     return std::make_unique<Bits>(result.first);
 }
 
-auto viua::types::Bits::shr(size_type n, const bool padding)
+auto viua::types::Bits::shr(size_type n, bool const padding)
     -> std::unique_ptr<Bits> {
     auto const result = binary_shr(underlying_array, n, padding);
     underlying_array  = std::move(result.second);

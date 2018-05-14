@@ -124,7 +124,7 @@ static std::string resolve_register_name(
     const map<string, std::string>& named_registers,
     Token token,
     std::string name,
-    const bool allow_direct_access = false) {
+    bool const allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::Invalid_syntax(token,
                                             "expected operand, found newline");
@@ -195,7 +195,7 @@ static void check_use_of_register_index(
     Registers& registers,
     map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
-    const bool allow_direct_access_to_target = true) {
+    bool const allow_direct_access_to_target = true) {
     auto resolved_register_name = std::string{};
     try {
         resolved_register_name =
@@ -240,7 +240,7 @@ static void check_use_of_register(
     Registers& registers,
     map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
-    const bool allow_direct_access_to_target = true) {
+    bool const allow_direct_access_to_target = true) {
     check_use_of_register_index(tokens,
                                 i,
                                 by,
@@ -367,11 +367,11 @@ static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type,
                              Registers&,
                              const map<std::string, TokenVector>&,
-                             const bool);
+                             bool const);
 static void check_block_body(TokenVector const&,
                              Registers&,
                              const map<std::string, TokenVector>&,
-                             const bool);
+                             bool const);
 
 static void erase_register(Registers& registers,
                            map<std::string, std::string>& named_registers,
@@ -424,7 +424,7 @@ static void check_block_body(TokenVector const& body_tokens,
                              Registers& registers,
                              map<std::string, std::string> named_registers,
                              const map<std::string, TokenVector>& block_bodies,
-                             const bool debug) {
+                             bool const debug) {
     using TokenIndex = TokenVector::size_type;
 
     for (; i < body_tokens.size(); ++i) {
@@ -1281,7 +1281,7 @@ static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type i,
                              Registers& registers,
                              const map<std::string, TokenVector>& block_bodies,
-                             const bool debug) {
+                             bool const debug) {
     map<std::string, std::string> named_registers;
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);
@@ -1289,14 +1289,14 @@ static void check_block_body(TokenVector const& body_tokens,
 static void check_block_body(TokenVector const& body_tokens,
                              Registers& registers,
                              const map<std::string, TokenVector>& block_bodies,
-                             const bool debug) {
+                             bool const debug) {
     check_block_body(body_tokens, 0, registers, block_bodies, debug);
 }
 
 void assembler::verify::manipulation_of_defined_registers(
     TokenVector const& tokens,
     const map<std::string, TokenVector>& block_bodies,
-    const bool debug) {
+    bool const debug) {
     auto opened_function = std::string{};
     set<std::string> attributes;
 

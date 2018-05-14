@@ -150,7 +150,7 @@ class Stack {
     auto back() const -> decltype(frames.back());
 
     auto register_deferred_calls_from(Frame*) -> void;
-    auto register_deferred_calls(const bool = true) -> void;
+    auto register_deferred_calls(bool const = true) -> void;
     auto pop() -> std::unique_ptr<Frame>;
 
     auto size() const -> decltype(frames)::size_type;
@@ -188,7 +188,7 @@ class Process {
      * emit additional (debugging, profiling, tracing) information
      * regarding executed code.
      */
-    const bool tracing_enabled;
+    bool const tracing_enabled;
     auto get_trace_line(viua::internals::types::byte const*) const
         -> std::string;
     auto emit_trace_line(viua::internals::types::byte const*) const -> void;
@@ -491,7 +491,7 @@ class Process {
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Virtual_process_scheduler*,
             viua::process::Process*,
-            const bool = false);
+            bool const = false);
     ~Process();
 
     static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =

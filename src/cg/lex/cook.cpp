@@ -26,7 +26,7 @@
 using namespace std;
 
 namespace viua { namespace cg { namespace lex {
-auto cook(std::vector<Token> tokens, const bool with_replaced_names)
+auto cook(std::vector<Token> tokens, bool const with_replaced_names)
     -> std::vector<Token> {
     /*
      * Remove whitespace as first step to reduce noise in token stream.

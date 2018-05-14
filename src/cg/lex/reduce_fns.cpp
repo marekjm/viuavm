@@ -500,7 +500,7 @@ auto move_inline_blocks_out(std::vector<Token> input_tokens)
 }
 
 static void push_unwrapped_lines(
-    const bool invert,
+    bool const invert,
     Token const& inner_target_token,
     std::vector<Token>& final_tokens,
     const std::vector<Token>& unwrapped_tokens,

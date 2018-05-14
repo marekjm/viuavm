@@ -152,7 +152,7 @@ auto parse_attributes(const vector_view<viua::cg::lex::Token> tokens,
     -> decltype(tokens)::size_type;
 auto parse_operand(const vector_view<viua::cg::lex::Token> tokens,
                    std::unique_ptr<Operand>&,
-                   const bool = false) -> decltype(tokens)::size_type;
+                   bool const = false) -> decltype(tokens)::size_type;
 auto mnemonic_to_opcode(const std::string mnemonic) -> OPCODE;
 auto parse_instruction(const vector_view<viua::cg::lex::Token> tokens,
                        std::unique_ptr<Instruction>&)

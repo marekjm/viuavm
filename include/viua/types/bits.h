@@ -37,13 +37,13 @@ class Bits : public viua::types::Value {
     auto size() const -> size_type;
 
     auto at(size_type) const -> bool;
-    auto set(size_type, const bool = true) -> bool;
+    auto set(size_type, bool const = true) -> bool;
     auto flip(size_type) -> bool;
 
     auto clear() -> void;
 
     auto shl(size_type) -> std::unique_ptr<Bits>;
-    auto shr(size_type, const bool) -> std::unique_ptr<Bits>;
+    auto shr(size_type, bool const) -> std::unique_ptr<Bits>;
     auto shr(size_type) -> std::unique_ptr<Bits>;
     auto ashl(size_type) -> std::unique_ptr<Bits>;
     auto ashr(size_type) -> std::unique_ptr<Bits>;

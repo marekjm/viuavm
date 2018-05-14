@@ -465,7 +465,7 @@ void viua::process::Process::migrate_to(
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
                                 viua::scheduler::Virtual_process_scheduler* sch,
                                 viua::process::Process* pt,
-                                const bool enable_tracing)
+                                bool const enable_tracing)
         : tracing_enabled(enable_tracing)
         , scheduler(sch)
         , parent_process(pt)

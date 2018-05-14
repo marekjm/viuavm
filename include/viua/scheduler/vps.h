@@ -53,7 +53,7 @@ class Virtual_process_scheduler {
      * emit additional (debugging, profiling, tracing) information
      * regarding executed code.
      */
-    const bool tracing_enabled;
+    bool const tracing_enabled;
 
     std::vector<std::unique_ptr<viua::process::Process>>* free_processes;
     std::mutex* free_processes_mutex;
@@ -132,7 +132,7 @@ class Virtual_process_scheduler {
         std::vector<std::unique_ptr<viua::process::Process>>*,
         std::mutex*,
         std::condition_variable*,
-        const bool = false);
+        bool const = false);
     Virtual_process_scheduler(Virtual_process_scheduler&&);
     ~Virtual_process_scheduler();
 };
