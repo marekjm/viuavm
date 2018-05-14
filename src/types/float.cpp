@@ -24,7 +24,7 @@
 using namespace std;
 using namespace viua::types;
 
-const std::string viua::types::Float::type_name = "Float";
+std::string const viua::types::Float::type_name = "Float";
 
 
 std::string Float::type() const {

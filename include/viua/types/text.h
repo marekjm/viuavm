@@ -55,7 +55,7 @@ class Text : public Value {
     auto parse(std::string) -> decltype(text);
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     std::string type() const override;
     std::string str() const override;

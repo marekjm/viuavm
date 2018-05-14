@@ -87,7 +87,7 @@ auto viua::assembler::frontend::parser::parse_attributes(
     ++i;  // skip '[['
 
     while (i < tokens.size() and tokens.at(i) != "]]") {
-        const std::string key = tokens.at(i++);
+        std::string const key = tokens.at(i++);
         auto value            = std::string{};
 
         if (tokens.at(i) == ",") {
@@ -277,7 +277,7 @@ auto viua::assembler::frontend::parser::parse_operand(
 }
 
 auto viua::assembler::frontend::parser::mnemonic_to_opcode(
-    const std::string mnemonic) -> OPCODE {
+    std::string const mnemonic) -> OPCODE {
     OPCODE opcode = NOP;
     for (auto const& each : OP_NAMES) {
         if (each.second == mnemonic) {

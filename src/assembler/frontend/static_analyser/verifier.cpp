@@ -31,7 +31,7 @@ using viua::cg::lex::Traced_syntax_error;
 
 
 static auto invalid_syntax(std::vector<Token> const& tokens,
-                           const std::string message) -> Invalid_syntax {
+                           std::string const message) -> Invalid_syntax {
     auto invalid_syntax_error = Invalid_syntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
          i < tokens.size();
@@ -78,7 +78,7 @@ static auto verify_wrapper(Parsed_source const& source, Verifier verifier)
 
 
 static auto is_defined_block_name(Parsed_source const& source,
-                                  const std::string name) -> bool {
+                                  std::string const name) -> bool {
     auto is_undefined =
         (source.blocks.end()
          == find_if(source.blocks.begin(),

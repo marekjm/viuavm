@@ -26,7 +26,7 @@
 #include <viua/types/object.h>
 using namespace std;
 
-const std::string viua::types::Object::type_name = "Object";
+std::string const viua::types::Object::type_name = "Object";
 
 std::string viua::types::Object::type() const {
     return object_type_name;

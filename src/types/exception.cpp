@@ -21,7 +21,7 @@
 #include <viua/types/exception.h>
 using namespace std;
 
-const std::string viua::types::Exception::type_name = "Exception";
+std::string const viua::types::Exception::type_name = "Exception";
 
 
 std::string viua::types::Exception::what() const {

@@ -62,7 +62,7 @@ struct Boolean_literal : public Operand {
     std::string content;
 };
 struct Void_literal : public Operand {
-    const std::string content = "void";
+    std::string const content = "void";
 };
 struct Function_name_literal : public Operand {
     std::string content;
@@ -153,7 +153,7 @@ auto parse_attributes(const vector_view<viua::cg::lex::Token> tokens,
 auto parse_operand(const vector_view<viua::cg::lex::Token> tokens,
                    std::unique_ptr<Operand>&,
                    bool const = false) -> decltype(tokens)::size_type;
-auto mnemonic_to_opcode(const std::string mnemonic) -> OPCODE;
+auto mnemonic_to_opcode(std::string const mnemonic) -> OPCODE;
 auto parse_instruction(const vector_view<viua::cg::lex::Token> tokens,
                        std::unique_ptr<Instruction>&)
     -> decltype(tokens)::size_type;

@@ -27,10 +27,10 @@
 
 namespace viua { namespace types {
 class Atom : public Value {
-    const std::string value;
+    std::string const value;
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     virtual std::string type() const override;
     virtual bool boolean() const override;

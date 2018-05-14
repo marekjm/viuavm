@@ -23,7 +23,7 @@
 #include <viua/types/value.h>
 using namespace std;
 
-const std::string viua::types::Function::type_name = "Function";
+std::string const viua::types::Function::type_name = "Function";
 
 
 viua::types::Function::Function(std::string const& name)

@@ -54,9 +54,9 @@ auto getint(std::vector<viua::cg::lex::Token> const& tokens,
 auto getbyte(std::string const& s) -> byte_op;
 auto getfloat(std::string const& s) -> float_op;
 
-auto normalise_binary_literal(const std::string s) -> std::string;
-auto octal_to_binary_literal(const std::string s) -> std::string;
-auto hexadecimal_to_binary_literal(const std::string s) -> std::string;
+auto normalise_binary_literal(std::string const s) -> std::string;
+auto octal_to_binary_literal(std::string const s) -> std::string;
+auto hexadecimal_to_binary_literal(std::string const s) -> std::string;
 auto convert_token_to_bitstring_operand(const viua::cg::lex::Token)
     -> std::vector<uint8_t>;
 

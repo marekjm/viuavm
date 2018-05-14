@@ -39,7 +39,7 @@ class Object : public Value {
     std::map<std::string, std::unique_ptr<Value>> attributes;
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     std::string type() const override;
     bool boolean() const override;

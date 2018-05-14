@@ -34,7 +34,7 @@ class Closure : public Function {
     std::unique_ptr<viua::kernel::Register_set> local_register_set;
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     auto type() const -> std::string override;
     auto str() const -> std::string override;

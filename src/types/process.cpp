@@ -27,7 +27,7 @@
 #include <viua/types/process.h>
 using namespace std;
 
-const std::string viua::types::Process::type_name = "Process";
+std::string const viua::types::Process::type_name = "Process";
 
 std::string viua::types::Process::type() const {
     return "Process";

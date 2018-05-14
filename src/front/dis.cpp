@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
 
 
     for (unsigned i = 0; i < blocks.size(); ++i) {
-        const std::string name = blocks[i];
+        std::string const name = blocks[i];
 
         uint64_t el_size = 0;
         if (i < (blocks.size() - 1)) {
@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        const std::string name        = functions[i];
+        std::string const name        = functions[i];
         element_sizes[name]           = function_sizes[name];
         element_types[name]           = "function";
         element_address_mapping[name] = function_address_mapping[name];
@@ -293,7 +293,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        const std::string name = elements[i];
+        std::string const name = elements[i];
         const auto el_size     = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {

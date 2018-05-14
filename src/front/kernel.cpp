@@ -45,7 +45,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
-static bool usage(const std::string program,
+static bool usage(std::string const program,
                   std::vector<std::string> const& args) {
     bool show_help    = false;
     bool show_version = false;

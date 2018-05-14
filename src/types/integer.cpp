@@ -26,7 +26,7 @@
 using namespace std;
 using namespace viua::types;
 
-const std::string viua::types::Integer::type_name = "Integer";
+std::string const viua::types::Integer::type_name = "Integer";
 
 std::string Integer::type() const {
     return "Integer";

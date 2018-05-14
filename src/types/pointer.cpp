@@ -28,7 +28,7 @@
 #include <viua/types/value.h>
 using namespace std;
 
-const std::string viua::types::Pointer::type_name = "Pointer";
+std::string const viua::types::Pointer::type_name = "Pointer";
 
 void viua::types::Pointer::attach() {
     points_to->pointers.push_back(this);

@@ -36,7 +36,7 @@ class Boolean : public viua::types::Value {
     bool b;
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     auto type() const -> std::string override;
     auto str() const -> std::string override;

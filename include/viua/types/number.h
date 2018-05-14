@@ -42,7 +42,7 @@ class Number : public Value {
      *  Otherwise, they will not be usable by arithmetic instructions.
      */
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     std::string type() const override;
     std::string str() const override = 0;

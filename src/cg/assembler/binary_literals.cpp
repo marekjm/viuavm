@@ -57,7 +57,7 @@ static auto strip_leading_zeroes(std::string const s) -> string {
 auto assembler::operands::octal_to_binary_literal(std::string const s)
     -> string {
     ostringstream oss;
-    static map<const char, const std::string> const lookup = {
+    static map<const char, std::string const> const lookup = {
         {
             '0',
             "000",
@@ -99,7 +99,7 @@ auto assembler::operands::octal_to_binary_literal(std::string const s)
 auto assembler::operands::hexadecimal_to_binary_literal(std::string const s)
     -> std::string {
     ostringstream oss;
-    static map<const char, const std::string> const lookup = {
+    static map<const char, std::string const> const lookup = {
         {
             '0',
             "0000",

@@ -37,7 +37,7 @@ using namespace std;
 using namespace viua::assertions;
 using namespace viua::types;
 
-const std::string viua::types::String::type_name = "String";
+std::string const viua::types::String::type_name = "String";
 
 std::string String::type() const {
     return "String";

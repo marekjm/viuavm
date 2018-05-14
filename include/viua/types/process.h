@@ -45,7 +45,7 @@ class Process : public Value {
     viua::process::PID saved_pid;
 
   public:
-    static const std::string type_name;
+    static std::string const type_name;
 
     /*
      * For use by the VM and user code.

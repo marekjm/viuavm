@@ -126,10 +126,10 @@ class Stack {
                                                        // top-most frame on the
                                                        // stack
 
-    void adjust_instruction_pointer(const Try_frame*, const std::string);
+    void adjust_instruction_pointer(const Try_frame*, std::string const);
     auto unwind_call_stack_to(const Frame*) -> void;
     auto unwind_try_stack_to(const Try_frame*) -> void;
-    auto unwind_to(const Try_frame*, const std::string) -> void;
+    auto unwind_to(const Try_frame*, std::string const) -> void;
     auto find_catch_frame() -> std::tuple<Try_frame*, std::string>;
 
   public:

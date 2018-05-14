@@ -179,7 +179,7 @@ auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
 
 auto viua::process::Stack::adjust_instruction_pointer(
     const Try_frame* tframe,
-    const std::string handler_found_for_type) -> void {
+    std::string const handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(
         tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
@@ -227,7 +227,7 @@ auto viua::process::Stack::unwind_try_stack_to(const Try_frame* tframe)
 }
 
 auto viua::process::Stack::unwind_to(const Try_frame* tframe,
-                                     const std::string handler_found_for_type)
+                                     std::string const handler_found_for_type)
     -> void {
     adjust_instruction_pointer(tframe, handler_found_for_type);
     unwind_call_stack_to(tframe->associated_frame);
