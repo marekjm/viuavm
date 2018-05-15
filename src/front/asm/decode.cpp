@@ -24,6 +24,9 @@
 using namespace std;
 
 
+namespace viua {
+    namespace front {
+        namespace assembler {
 auto decode_line_tokens(std::vector<std::string> const& tokens)
     -> std::vector<std::vector<std::string>> {
     auto decoded_lines = std::vector<std::vector<std::string>>{};
@@ -114,3 +117,4 @@ auto decode_line(std::string const& s)
     -> std::vector<std::vector<std::string>> {
     return decode_line_tokens(viua::cg::tokenizer::tokenize(s));
 }
+}}}

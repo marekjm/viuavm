@@ -307,9 +307,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    invocables_t functions;
+    auto functions = viua::front::assembler::invocables_t{};
     try {
-        functions = gather_functions(cooked_tokens);
+        functions = viua::front::assembler::gather_functions(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
@@ -320,9 +320,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    invocables_t blocks;
+    auto blocks = viua::front::assembler::invocables_t{};
     try {
-        blocks = gather_blocks(cooked_tokens);
+        blocks = viua::front::assembler::gather_blocks(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
@@ -369,14 +369,14 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    compilationflags_t flags;
+    auto flags = viua::front::assembler::compilationflags_t{};
     flags.as_lib  = AS_LIB;
     flags.verbose = VERBOSE;
     flags.debug   = DEBUG;
     flags.scream  = SCREAM;
 
     if (SHOW_META) {
-        auto meta = gather_meta_information(cooked_tokens);
+        auto meta = viua::front::assembler::gather_meta_information(cooked_tokens);
         for (auto each : meta) {
             cout << each.first << " = "
                  << str::enquote(str::strencode(each.second)) << endl;

@@ -29,6 +29,10 @@
 #include <viua/program.h>
 
 
+namespace viua {
+    namespace front {
+        namespace assembler {
+
 struct invocables_t {
     std::vector<std::string> names;
     std::vector<std::string> signatures;
@@ -44,29 +48,30 @@ struct compilationflags_t {
 };
 
 
-std::vector<std::vector<std::string>> decode_line_tokens(
-    std::vector<std::string> const&);
-std::vector<std::vector<std::string>> decode_line(std::string const&);
+auto decode_line_tokens(
+    std::vector<std::string> const&) -> std::vector<std::vector<std::string>>;
+auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
-invocables_t gather_functions(std::vector<viua::cg::lex::Token> const&);
-invocables_t gather_blocks(std::vector<viua::cg::lex::Token> const&);
-std::map<std::string, std::string> gather_meta_information(
-    std::vector<viua::cg::lex::Token> const&);
+auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
+auto gather_meta_information(
+    std::vector<viua::cg::lex::Token> const&) -> std::map<std::string, std::string>;
 
-viua::internals::types::bytecode_size assemble_instruction(
+auto assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
     std::vector<viua::cg::lex::Token> const& tokens,
     std::map<std::string,
-             std::remove_reference<decltype(tokens)>::type::size_type>& marks);
-void generate(std::vector<viua::cg::lex::Token> const&,
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks) -> viua::internals::types::bytecode_size;
+auto generate(std::vector<viua::cg::lex::Token> const&,
               invocables_t&,
               invocables_t&,
               std::string const&,
               std::string&,
               std::vector<std::string> const&,
-              compilationflags_t const&);
+              compilationflags_t const&) -> void;
+}}}
 
 
 #endif
