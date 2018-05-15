@@ -369,14 +369,15 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    auto flags = viua::front::assembler::compilationflags_t{};
+    auto flags    = viua::front::assembler::compilationflags_t{};
     flags.as_lib  = AS_LIB;
     flags.verbose = VERBOSE;
     flags.debug   = DEBUG;
     flags.scream  = SCREAM;
 
     if (SHOW_META) {
-        auto meta = viua::front::assembler::gather_meta_information(cooked_tokens);
+        auto meta =
+            viua::front::assembler::gather_meta_information(cooked_tokens);
         for (auto each : meta) {
             cout << each.first << " = "
                  << str::enquote(str::strencode(each.second)) << endl;

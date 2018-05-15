@@ -28,9 +28,9 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/kernel/registerset.h>
-#include <viua/util/memory.h>
 #include <viua/types/exception.h>
 #include <viua/types/value.h>
+#include <viua/util/memory.h>
 
 
 namespace viua { namespace process {
@@ -88,7 +88,7 @@ auto fetch_object(Op_address_type, viua::process::Process*)
 template<typename RequestedType>
 auto fetch_object_of(Op_address_type ip, viua::process::Process* p)
     -> std::tuple<Op_address_type, RequestedType*> {
-    auto [ addr_, fetched] = fetch_object(ip, p);
+    auto [addr_, fetched] = fetch_object(ip, p);
 
     RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
     if (not converted) {

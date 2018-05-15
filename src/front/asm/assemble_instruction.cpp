@@ -234,16 +234,15 @@ using viua::assembler::backend::op_assemblers::assemble_op_structremove;
 using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
 using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 
-namespace viua {
-    namespace front {
-        namespace assembler {
+namespace viua { namespace front { namespace assembler {
 auto assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,
     viua::internals::types::bytecode_size i,
     std::vector<Token> const& tokens,
     std::map<std::string,
-             std::remove_reference<decltype(tokens)>::type::size_type>& marks) -> viua::internals::types::bytecode_size {
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks)
+    -> viua::internals::types::bytecode_size {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -565,4 +564,4 @@ auto assemble_instruction(
     ++i;  // skip the newline
     return i;
 }
-}}}
+}}}  // namespace viua::front::assembler

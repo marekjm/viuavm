@@ -29,9 +29,7 @@
 #include <viua/program.h>
 
 
-namespace viua {
-    namespace front {
-        namespace assembler {
+namespace viua { namespace front { namespace assembler {
 
 struct invocables_t {
     std::vector<std::string> names;
@@ -48,14 +46,14 @@ struct compilationflags_t {
 };
 
 
-auto decode_line_tokens(
-    std::vector<std::string> const&) -> std::vector<std::vector<std::string>>;
+auto decode_line_tokens(std::vector<std::string> const&)
+    -> std::vector<std::vector<std::string>>;
 auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
 auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
 auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
-auto gather_meta_information(
-    std::vector<viua::cg::lex::Token> const&) -> std::map<std::string, std::string>;
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const&)
+    -> std::map<std::string, std::string>;
 
 auto assemble_instruction(
     Program& program,
@@ -63,7 +61,8 @@ auto assemble_instruction(
     viua::internals::types::bytecode_size i,
     std::vector<viua::cg::lex::Token> const& tokens,
     std::map<std::string,
-             std::remove_reference<decltype(tokens)>::type::size_type>& marks) -> viua::internals::types::bytecode_size;
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks)
+    -> viua::internals::types::bytecode_size;
 auto generate(std::vector<viua::cg::lex::Token> const&,
               invocables_t&,
               invocables_t&,
@@ -71,7 +70,7 @@ auto generate(std::vector<viua::cg::lex::Token> const&,
               std::string&,
               std::vector<std::string> const&,
               compilationflags_t const&) -> void;
-}}}
+}}}  // namespace viua::front::assembler
 
 
 #endif

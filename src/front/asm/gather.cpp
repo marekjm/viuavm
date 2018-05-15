@@ -24,10 +24,9 @@
 using namespace std;
 
 
-namespace viua {
-    namespace front {
-        namespace assembler {
-auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens) -> invocables_t {
+namespace viua { namespace front { namespace assembler {
+auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens)
+    -> invocables_t {
     auto invocables = invocables_t{};
 
     invocables.names      = ::assembler::ce::get_function_names(tokens);
@@ -42,7 +41,8 @@ auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens) -> invoca
     return invocables;
 }
 
-auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens) -> invocables_t {
+auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
+    -> invocables_t {
     auto invocables = invocables_t{};
 
     invocables.names      = ::assembler::ce::get_block_names(tokens);
@@ -53,8 +53,8 @@ auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens) -> invocable
     return invocables;
 }
 
-auto gather_meta_information(
-    std::vector<viua::cg::lex::Token> const& tokens) -> map<std::string, std::string> {
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
+    -> map<std::string, std::string> {
     auto meta_information = map<std::string, std::string>{};
 
     for (auto i = std::remove_reference<decltype(tokens)>::type::size_type{0};
@@ -79,4 +79,4 @@ auto gather_meta_information(
 
     return meta_information;
 }
-}}}
+}}}  // namespace viua::front::assembler

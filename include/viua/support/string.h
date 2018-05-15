@@ -60,7 +60,7 @@ auto join(std::string const& s, std::vector<std::string> const& v)
 template<typename T>
 auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
     auto const sz = seq.size();
-    auto oss = std::ostringstream{};
+    auto oss      = std::ostringstream{};
     for (auto i = std::remove_const_t<decltype(sz)>{0}; i < sz; ++i) {
         oss << seq[i];
         if (i < (sz - 1)) {
@@ -81,7 +81,8 @@ auto strmul(T const& s, size_t const times) -> std::string {
 
 auto lstrip(std::string const& s) -> std::string;
 
-auto lshare(std::string const& s, std::string const& w) -> std::string::size_type;
+auto lshare(std::string const& s, std::string const& w)
+    -> std::string::size_type;
 auto contains(std::string const& s, char const c) -> bool;
 
 using LevenshteinDistance = std::string::size_type;

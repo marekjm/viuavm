@@ -98,14 +98,16 @@ const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
 static auto compile(
     Program& program,
     std::vector<Token> const& tokens,
-    std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>&
-        marks) -> Program& {
+    std::map<std::string,
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks)
+    -> Program& {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
     auto instruction = viua::internals::types::bytecode_size{0};
     for (auto i = decltype(tokens.size()){0}; i < tokens.size();) {
-        i = viua::front::assembler::assemble_instruction(program, instruction, i, tokens, marks);
+        i = viua::front::assembler::assemble_instruction(
+            program, instruction, i, tokens, marks);
     }
 
     return program;
@@ -154,10 +156,10 @@ static void assemble(Program& program, std::vector<Token> const& tokens) {
 }
 
 
-static auto
-map_invocable_addresses(
+static auto map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction,
-    viua::front::assembler::invocables_t const& blocks) -> std::map<std::string, viua::internals::types::bytecode_size> {
+    viua::front::assembler::invocables_t const& blocks)
+    -> std::map<std::string, viua::internals::types::bytecode_size> {
     map<std::string, viua::internals::types::bytecode_size> addresses;
     for (std::string name : blocks.names) {
         addresses[name] = starting_instruction;
@@ -175,7 +177,8 @@ static auto write_code_blocks_section(
     std::ofstream& out,
     viua::front::assembler::invocables_t const& blocks,
     std::vector<std::string> const& linked_block_names,
-    viua::internals::types::bytecode_size block_bodies_size_so_far = 0) -> viua::internals::types::bytecode_size {
+    viua::internals::types::bytecode_size block_bodies_size_so_far = 0)
+    -> viua::internals::types::bytecode_size {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
 
     for (std::string name : blocks.names) {
@@ -348,10 +351,12 @@ static void check_main_function(
 
 static auto generate_entry_function(
     viua::internals::types::bytecode_size bytes,
-    std::map<std::string, viua::internals::types::bytecode_size> function_addresses,
+    std::map<std::string, viua::internals::types::bytecode_size>
+        function_addresses,
     viua::front::assembler::invocables_t& functions,
     std::string const& main_function,
-    viua::internals::types::bytecode_size starting_instruction) -> viua::internals::types::bytecode_size {
+    viua::internals::types::bytecode_size starting_instruction)
+    -> viua::internals::types::bytecode_size {
     if (DEBUG) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
              << send_control_seq(ATTR_RESET);
@@ -488,9 +493,7 @@ static auto generate_entry_function(
     return bytes;
 }
 
-namespace viua {
-    namespace front {
-        namespace assembler {
+namespace viua { namespace front { namespace assembler {
 auto generate(std::vector<Token> const& tokens,
               viua::front::assembler::invocables_t& functions,
               viua::front::assembler::invocables_t& blocks,
@@ -553,12 +556,14 @@ auto generate(std::vector<Token> const& tokens,
     // MAP FUNCTIONS TO ADDRESSES AND
     // MAP BLOCKS TO ADDRESSES AND
     // SET STARTING INSTRUCTION
-    auto starting_instruction =
-        viua::internals::types::bytecode_size{0};  // the bytecode offset to first
-            // executable instruction
+    auto starting_instruction = viua::internals::types::bytecode_size{
+        0};  // the bytecode offset to first
+             // executable instruction
 
-    auto function_addresses = std::map<std::string, viua::internals::types::bytecode_size>{};
-    auto block_addresses = std::map<std::string, viua::internals::types::bytecode_size>{};
+    auto function_addresses =
+        std::map<std::string, viua::internals::types::bytecode_size>{};
+    auto block_addresses =
+        std::map<std::string, viua::internals::types::bytecode_size>{};
     try {
         block_addresses = map_invocable_addresses(starting_instruction, blocks);
         function_addresses =
@@ -572,15 +577,18 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     auto links = ::assembler::ce::getlinks(tokens);
-   auto
-        linked_libs_bytecode = std::vector<tuple<std::string, viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>>{};
+    auto linked_libs_bytecode =
+        std::vector<tuple<std::string,
+                          viua::internals::types::bytecode_size,
+                          std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto linked_function_names = std::vector<std::string>{};
     auto linked_block_names    = std::vector<std::string>{};
-   auto
-        linked_libs_jumptables = std::map<std::string, std::vector<viua::internals::types::bytecode_size>>{};
+    auto linked_libs_jumptables =
+        std::map<std::string,
+                 std::vector<viua::internals::types::bytecode_size>>{};
 
     // map of symbol names to name of the module the symbol came from
-   auto symbol_sources = std::map<std::string, std::string>{};
+    auto symbol_sources = std::map<std::string, std::string>{};
     for (auto const f : functions.names) {
         symbol_sources[f] = filename;
     }
@@ -607,8 +615,7 @@ auto generate(std::vector<Token> const& tokens,
             }
         }
 
-        auto fn_addresses =
-            loader.get_function_addresses();
+        auto fn_addresses = loader.get_function_addresses();
         for (auto const fn : fn_names) {
             function_addresses[fn] = 0;  // for now we just build a list of all
                                          // available functions
@@ -704,8 +711,7 @@ auto generate(std::vector<Token> const& tokens,
 
         auto fn_names = loader.get_functions();
 
-        auto lib_jumps =
-            loader.get_jumps();
+        auto lib_jumps = loader.get_jumps();
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
@@ -715,7 +721,8 @@ auto generate(std::vector<Token> const& tokens,
             cout << ": ";
             cout << "[loader] entries in jump table: " << lib_jumps.size()
                  << endl;
-            for (auto i = decltype(lib_jumps)::size_type{0}; i < lib_jumps.size();
+            for (auto i = decltype(lib_jumps)::size_type{0};
+                 i < lib_jumps.size();
                  ++i) {
                 cout << "  jump at byte: " << lib_jumps[i] << endl;
             }
@@ -723,8 +730,7 @@ auto generate(std::vector<Token> const& tokens,
 
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        auto fn_addresses =
-            loader.get_function_addresses();
+        auto fn_addresses = loader.get_function_addresses();
         for (auto const fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             if (DEBUG) {
@@ -805,15 +811,20 @@ auto generate(std::vector<Token> const& tokens,
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-   auto
-        functions_bytecode = std::map<std::string, tuple<viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>>{};
-  auto
-        block_bodies_bytecode = std::map<std::string, tuple<viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>>{};
+    auto functions_bytecode =
+        std::map<std::string,
+                 tuple<viua::internals::types::bytecode_size,
+                       std::unique_ptr<viua::internals::types::byte[]>>>{};
+    auto block_bodies_bytecode =
+        std::map<std::string,
+                 tuple<viua::internals::types::bytecode_size,
+                       std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto functions_section_size    = viua::internals::types::bytecode_size{0};
     auto block_bodies_section_size = viua::internals::types::bytecode_size{0};
 
-   auto
-        jump_positions = std::vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>{};
+    auto jump_positions =
+        std::vector<tuple<viua::internals::types::bytecode_size,
+                          viua::internals::types::bytecode_size>>{};
 
     for (auto const name : blocks.names) {
         // do not generate bytecode for blocks that were linked
@@ -874,9 +885,9 @@ auto generate(std::vector<Token> const& tokens,
 
         auto jumps = func.jumps();
 
-       auto
-            local_jumps = std::vector<tuple<viua::internals::types::bytecode_size,
-                          viua::internals::types::bytecode_size>>{};
+        auto local_jumps =
+            std::vector<tuple<viua::internals::types::bytecode_size,
+                              viua::internals::types::bytecode_size>>{};
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
@@ -982,8 +993,9 @@ auto generate(std::vector<Token> const& tokens,
 
         auto jumps = func.jumps();
 
-       auto
-            local_jumps = std::vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>{};
+        auto local_jumps =
+            std::vector<tuple<viua::internals::types::bytecode_size,
+                              viua::internals::types::bytecode_size>>{};
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
@@ -1261,4 +1273,4 @@ auto generate(std::vector<Token> const& tokens,
               static_cast<std::streamsize>(bytes));
     out.close();
 }
-}}}
+}}}  // namespace viua::front::assembler
