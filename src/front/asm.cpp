@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    auto functions = viua::front::assembler::invocables_t{};
+    auto functions = viua::front::assembler::Invocables{};
     try {
         functions = viua::front::assembler::gather_functions(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
@@ -320,7 +320,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    auto blocks = viua::front::assembler::invocables_t{};
+    auto blocks = viua::front::assembler::Invocables{};
     try {
         blocks = viua::front::assembler::gather_blocks(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
@@ -369,7 +369,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    auto flags    = viua::front::assembler::compilationflags_t{};
+    auto flags    = viua::front::assembler::Compilation_flags{};
     flags.as_lib  = AS_LIB;
     flags.verbose = VERBOSE;
     flags.debug   = DEBUG;

@@ -158,7 +158,7 @@ static void assemble(Program& program, std::vector<Token> const& tokens) {
 
 static auto map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction,
-    viua::front::assembler::invocables_t const& blocks)
+    viua::front::assembler::Invocables const& blocks)
     -> std::map<std::string, viua::internals::types::bytecode_size> {
     map<std::string, viua::internals::types::bytecode_size> addresses;
     for (std::string name : blocks.names) {
@@ -175,7 +175,7 @@ static auto map_invocable_addresses(
 
 static auto write_code_blocks_section(
     std::ofstream& out,
-    viua::front::assembler::invocables_t const& blocks,
+    viua::front::assembler::Invocables const& blocks,
     std::vector<std::string> const& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0)
     -> viua::internals::types::bytecode_size {
@@ -353,7 +353,7 @@ static auto generate_entry_function(
     viua::internals::types::bytecode_size bytes,
     std::map<std::string, viua::internals::types::bytecode_size>
         function_addresses,
-    viua::front::assembler::invocables_t& functions,
+    viua::front::assembler::Invocables& functions,
     std::string const& main_function,
     viua::internals::types::bytecode_size starting_instruction)
     -> viua::internals::types::bytecode_size {
@@ -495,12 +495,12 @@ static auto generate_entry_function(
 
 namespace viua { namespace front { namespace assembler {
 auto generate(std::vector<Token> const& tokens,
-              viua::front::assembler::invocables_t& functions,
-              viua::front::assembler::invocables_t& blocks,
+              viua::front::assembler::Invocables& functions,
+              viua::front::assembler::Invocables& blocks,
               std::string const& filename,
               std::string& compilename,
               std::vector<std::string> const& commandline_given_links,
-              viua::front::assembler::compilationflags_t const& flags) -> void {
+              viua::front::assembler::Compilation_flags const& flags) -> void {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     auto bytes = viua::internals::types::bytecode_size{0};

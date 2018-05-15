@@ -26,8 +26,8 @@ using namespace std;
 
 namespace viua { namespace front { namespace assembler {
 auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens)
-    -> invocables_t {
-    auto invocables = invocables_t{};
+    -> Invocables {
+    auto invocables = Invocables{};
 
     invocables.names      = ::assembler::ce::get_function_names(tokens);
     invocables.signatures = ::assembler::ce::get_signatures(tokens);
@@ -42,8 +42,8 @@ auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens)
 }
 
 auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
-    -> invocables_t {
-    auto invocables = invocables_t{};
+    -> Invocables {
+    auto invocables = Invocables{};
 
     invocables.names      = ::assembler::ce::get_block_names(tokens);
     invocables.signatures = ::assembler::ce::get_block_signatures(tokens);

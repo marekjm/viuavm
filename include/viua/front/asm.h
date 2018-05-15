@@ -31,13 +31,13 @@
 
 namespace viua { namespace front { namespace assembler {
 
-struct invocables_t {
+struct Invocables {
     std::vector<std::string> names;
     std::vector<std::string> signatures;
     std::map<std::string, std::vector<viua::cg::lex::Token>> tokens;
 };
 
-struct compilationflags_t {
+struct Compilation_flags {
     bool as_lib;
 
     bool verbose;
@@ -50,8 +50,8 @@ auto decode_line_tokens(std::vector<std::string> const&)
     -> std::vector<std::vector<std::string>>;
 auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
-auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
-auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> invocables_t;
+auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> Invocables;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> Invocables;
 auto gather_meta_information(std::vector<viua::cg::lex::Token> const&)
     -> std::map<std::string, std::string>;
 
@@ -64,12 +64,12 @@ auto assemble_instruction(
              std::remove_reference<decltype(tokens)>::type::size_type>& marks)
     -> viua::internals::types::bytecode_size;
 auto generate(std::vector<viua::cg::lex::Token> const&,
-              invocables_t&,
-              invocables_t&,
+              Invocables&,
+              Invocables&,
               std::string const&,
               std::string&,
               std::vector<std::string> const&,
-              compilationflags_t const&) -> void;
+              Compilation_flags const&) -> void;
 }}}  // namespace viua::front::assembler
 
 
