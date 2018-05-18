@@ -589,11 +589,11 @@ auto generate(std::vector<Token> const& tokens,
 
     // map of symbol names to name of the module the symbol came from
     auto symbol_sources = std::map<std::string, std::string>{};
-    for (auto const f : functions.names) {
+    for (auto const& f : functions.names) {
         symbol_sources[f] = filename;
     }
 
-    for (auto const lnk : commandline_given_links) {
+    for (auto const& lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
         } else {
@@ -602,7 +602,7 @@ auto generate(std::vector<Token> const& tokens,
     }
 
     // gather all linked function names
-    for (auto const lnk : links) {
+    for (auto const& lnk : links) {
         auto loader = Loader{lnk};
         loader.load();
 
@@ -616,7 +616,7 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         auto fn_addresses = loader.get_function_addresses();
-        for (auto const fn : fn_names) {
+        for (auto const& fn : fn_names) {
             function_addresses[fn] = 0;  // for now we just build a list of all
                                          // available functions
             symbol_sources[fn] = lnk;
@@ -643,7 +643,7 @@ auto generate(std::vector<Token> const& tokens,
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     auto local_function_names = functions.names;
-    for (auto name : linked_function_names) {
+    for (auto const& name : linked_function_names) {
         functions.names.emplace_back(name);
     }
 
@@ -731,7 +731,7 @@ auto generate(std::vector<Token> const& tokens,
         linked_libs_jumptables[lnk] = lib_jumps;
 
         auto fn_addresses = loader.get_function_addresses();
-        for (auto const fn : fn_names) {
+        for (auto const& fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             if (DEBUG) {
                 cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -826,7 +826,7 @@ auto generate(std::vector<Token> const& tokens,
         std::vector<tuple<viua::internals::types::bytecode_size,
                           viua::internals::types::bytecode_size>>{};
 
-    for (auto const name : blocks.names) {
+    for (auto const& name : blocks.names) {
         // do not generate bytecode for blocks that were linked
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
@@ -923,7 +923,7 @@ auto generate(std::vector<Token> const& tokens,
     // functions section size, must be offset by the size of block section
     functions_section_size = block_bodies_section_size;
 
-    for (auto const name : functions.names) {
+    for (auto const& name : functions.names) {
         // do not generate bytecode for functions that were linked
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),
