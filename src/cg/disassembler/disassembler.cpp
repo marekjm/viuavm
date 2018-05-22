@@ -474,6 +474,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case IDEC:
     case SELF:
     case ARGC:
+    case ALLOCATE_REGISTERS:
     case STRUCT:
     case WRAPINCREMENT:
     case WRAPDECREMENT:

@@ -168,6 +168,7 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {DEFER, "defer"},
     {ARG, "arg"},
     {ARGC, "argc"},
+    {ALLOCATE_REGISTERS, "allocate_registers"},
     {PROCESS, "process"},
     {SELF, "self"},
     {JOIN, "join"},

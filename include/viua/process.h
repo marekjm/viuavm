@@ -401,6 +401,7 @@ class Process {
     auto oppamv(Op_address_type) -> Op_address_type;
     auto oparg(Op_address_type) -> Op_address_type;
     auto opargc(Op_address_type) -> Op_address_type;
+    auto opallocate_registers(Op_address_type) -> Op_address_type;
 
     auto opcall(Op_address_type) -> Op_address_type;
     auto optailcall(Op_address_type) -> Op_address_type;

@@ -415,6 +415,8 @@ auto check_op_arg(Register_usage_profile& register_usage_profile,
                   Instruction const& instruction) -> void;
 auto check_op_argc(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
+auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
+                   Instruction const& instruction) -> void;
 auto check_op_process(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_self(Register_usage_profile& register_usage_profile,

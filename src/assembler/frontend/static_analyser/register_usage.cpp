@@ -361,6 +361,9 @@ auto check_register_usage_for_instruction_block_impl(
             case ARGC:
                 check_op_argc(register_usage_profile, *instruction);
                 break;
+            case ALLOCATE_REGISTERS:
+                check_op_allocate_registers(register_usage_profile, *instruction);
+                break;
             case PROCESS:
                 check_op_process(register_usage_profile, *instruction);
                 break;

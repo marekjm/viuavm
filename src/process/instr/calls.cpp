@@ -143,6 +143,10 @@ auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
+auto viua::process::Process::opallocate_registers(Op_address_type addr) -> Op_address_type {
+    return addr;
+}
+
 auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
     viua::kernel::Register* return_register = nullptr;
