@@ -25,6 +25,13 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_allocate_registers(Register_usage_profile&,
-                   Instruction const&) -> void {
+                   Instruction const& instruction) -> void {
+    auto const operand = get_operand<Register_index>(instruction, 0);
+
+    auto const max_register_index = viua::internals::types::register_index{8};
+    if (operand->index >= max_register_index) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                "cannot allocate more than " + std::to_string(max_register_index) + " local registers");
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
