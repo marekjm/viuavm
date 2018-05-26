@@ -129,7 +129,7 @@ template<typename T> class vector_view {
     const typename std::remove_reference_t<decltype(vec)>::size_type offset;
 
   public:
-    using size_type = decltype(offset);
+    using size_type = std::remove_const_t<decltype(offset)>;
 
     auto at(decltype(offset) const i) const -> T const& {
         return vec.at(offset + i);
