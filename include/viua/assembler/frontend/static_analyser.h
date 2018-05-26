@@ -21,6 +21,7 @@
 #define VIUA_ASSEMBLER_FRONTEND_STATIC_ANALYSER_H
 
 
+#include <optional>
 #include <set>
 #include <string>
 #include <viua/assembler/frontend/parser.h>
@@ -113,6 +114,8 @@ class Register_usage_profile {
      */
     std::set<Register> maybe_unused_registers;
 
+    std::optional<viua::internals::types::register_index> no_of_allocated_registers;
+
     auto fresh(Register const) const -> bool;
 
   public:
@@ -140,6 +143,9 @@ class Register_usage_profile {
     auto erase(Register const r, viua::cg::lex::Token const& token) -> void;
     auto erased(Register const r) const -> bool;
     auto erased_where(Register const r) const -> viua::cg::lex::Token;
+
+    auto allocated_registers(viua::internals::types::register_index const) -> void;
+    auto allocated_registers() const -> std::optional<viua::internals::types::register_index>;
 
     auto begin() const -> decltype(defined_registers.begin());
     auto end() const -> decltype(defined_registers.end());

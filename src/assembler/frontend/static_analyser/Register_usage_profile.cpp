@@ -93,6 +93,13 @@ auto Register_usage_profile::erased_where(Register const r) const -> Token {
     return erased_registers.at(r);
 }
 
+auto Register_usage_profile::allocated_registers(viua::internals::types::register_index const n) -> void {
+    no_of_allocated_registers = n;
+}
+auto Register_usage_profile::allocated_registers() const -> std::optional<viua::internals::types::register_index> {
+    return no_of_allocated_registers;
+}
+
 auto Register_usage_profile::begin() const
     -> decltype(defined_registers.begin()) {
     return defined_registers.begin();
