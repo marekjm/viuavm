@@ -144,7 +144,6 @@ template<typename T> class vector_view {
             : vec(v.vec), offset(v.offset + o) {}
 };
 
-
 auto parse_attribute_value(const vector_view<viua::cg::lex::Token> tokens,
                            std::string&) -> decltype(tokens)::size_type;
 auto parse_attributes(const vector_view<viua::cg::lex::Token> tokens,

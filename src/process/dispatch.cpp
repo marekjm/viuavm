@@ -77,13 +77,13 @@ auto viua::process::Process::get_trace_line(
         }
         trace_line << ' '
                    << std::string{
-                          reinterpret_cast<char const* const>(working_address)};
+                          reinterpret_cast<char const*>(working_address)};
     }
     if (static_cast<OPCODE>(*for_address) == TAILCALL
         or static_cast<OPCODE>(*for_address) == DEFER) {
         trace_line << ' ';
         trace_line << std::string{
-            reinterpret_cast<char const* const>(for_address + 1)};
+            reinterpret_cast<char const*>(for_address + 1)};
     }
     if (static_cast<OPCODE>(*for_address) == RETURN) {
         trace_line << " from " + stack->back()->function_name;
