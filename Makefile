@@ -16,9 +16,10 @@ CLANG_SANITISER_FLAGS=  -fstack-protector-strong \
 						-fsanitize=leak \
 						-fsanitize=address
 # No -fsanitize=address for GCC because of too many false positives.
+# No -fsanitize=leak for GCC because it broke on my Arch Linux after
+# last update.
 GCC_SANITISER_FLAGS=    -fstack-protector-strong \
-						-fsanitize=undefined \
-						-fsanitize=leak
+						-fsanitize=undefined
 
 
 # These are generic flags that should be used for compiling Viua VM.
