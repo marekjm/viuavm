@@ -24,81 +24,51 @@ using namespace std;
 
 
 Program& Program::opnop() {
-    /*  Inserts nop instuction.
-     */
     addr_ptr = cg::bytecode::opnop(addr_ptr);
     return (*this);
 }
 
 Program& Program::opizero(int_op regno) {
-    /*  Inserts izero instuction.
-     */
     addr_ptr = cg::bytecode::opizero(addr_ptr, regno);
     return (*this);
 }
 
 Program& Program::opinteger(int_op regno, int_op i) {
-    /*  Inserts integer instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  regno:int - register number
-     *  i:int     - value to store
-     */
     addr_ptr = cg::bytecode::opinteger(addr_ptr, regno, i);
     return (*this);
 }
 
 Program& Program::opiinc(int_op regno) {
-    /*  Inserts iinc instuction.
-     */
     addr_ptr = cg::bytecode::opiinc(addr_ptr, regno);
     return (*this);
 }
 
 Program& Program::opidec(int_op regno) {
-    /*  Inserts idec instuction.
-     */
     addr_ptr = cg::bytecode::opidec(addr_ptr, regno);
     return (*this);
 }
 
 Program& Program::opfloat(int_op regno, viua::internals::types::plain_float f) {
-    /*  Inserts float instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  regno - register number
-     *  f     - value to store
-     */
     addr_ptr = cg::bytecode::opfloat(addr_ptr, regno, f);
     return (*this);
 }
 
 Program& Program::opitof(int_op a, int_op b) {
-    /*  Inserts itof instruction to bytecode.
-     */
     addr_ptr = cg::bytecode::opitof(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opftoi(int_op a, int_op b) {
-    /*  Inserts ftoi instruction to bytecode.
-     */
     addr_ptr = cg::bytecode::opftoi(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opstoi(int_op a, int_op b) {
-    /*  Inserts stoi instruction to bytecode.
-     */
     addr_ptr = cg::bytecode::opstoi(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opstof(int_op a, int_op b) {
-    /*  Inserts stof instruction to bytecode.
-     */
     addr_ptr = cg::bytecode::opstof(addr_ptr, a, b);
     return (*this);
 }
@@ -149,8 +119,6 @@ Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
 }
 
 Program& Program::opstring(int_op reg, std::string s) {
-    /*  Inserts string instruction.
-     */
     addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
@@ -473,25 +441,11 @@ Program& Program::opsaturatingudiv(int_op target, int_op lhs, int_op rhs) {
 }
 
 Program& Program::opmove(int_op a, int_op b) {
-    /*  Inserts move instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number (move from...)
-     *  b - register number (move to...)
-     */
     addr_ptr = cg::bytecode::opmove(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opcopy(int_op a, int_op b) {
-    /*  Inserts copy instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number (copy from...)
-     *  b - register number (copy to...)
-     */
     addr_ptr = cg::bytecode::opcopy(addr_ptr, a, b);
     return (*this);
 }
@@ -507,46 +461,26 @@ Program& Program::opptrlive(int_op target, int_op source) {
 }
 
 Program& Program::opswap(int_op a, int_op b) {
-    /*  Inserts swap instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
     addr_ptr = cg::bytecode::opswap(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opdelete(int_op reg) {
-    /*  Inserts delete instuction.
-     */
     addr_ptr = cg::bytecode::opdelete(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::opisnull(int_op a, int_op b) {
-    /*  Inserts isnull instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
     addr_ptr = cg::bytecode::opisnull(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opprint(int_op reg) {
-    /*  Inserts print instuction.
-     */
     addr_ptr = cg::bytecode::opprint(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::opecho(int_op reg) {
-    /*  Inserts echo instuction.
-     */
     addr_ptr = cg::bytecode::opecho(addr_ptr, reg);
     return (*this);
 }
@@ -554,8 +488,6 @@ Program& Program::opecho(int_op reg) {
 Program& Program::opcapture(int_op target_closure,
                             int_op target_register,
                             int_op source_register) {
-    /*  Inserts clbing instuction.
-     */
     addr_ptr = cg::bytecode::opcapture(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
@@ -564,8 +496,6 @@ Program& Program::opcapture(int_op target_closure,
 Program& Program::opcapturecopy(int_op target_closure,
                                 int_op target_register,
                                 int_op source_register) {
-    /*  Inserts opcapturecopy instuction.
-     */
     addr_ptr = cg::bytecode::opcapturecopy(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
@@ -574,77 +504,42 @@ Program& Program::opcapturecopy(int_op target_closure,
 Program& Program::opcapturemove(int_op target_closure,
                                 int_op target_register,
                                 int_op source_register) {
-    /*  Inserts opcapturemove instuction.
-     */
     addr_ptr = cg::bytecode::opcapturemove(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
 Program& Program::opclosure(int_op reg, std::string const& fn) {
-    /*  Inserts closure instuction.
-     */
     addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
     return (*this);
 }
 
 Program& Program::opfunction(int_op reg, std::string const& fn) {
-    /*  Inserts function instuction.
-     */
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
     return (*this);
 }
 
 Program& Program::opframe(int_op a, int_op b) {
-    /*  Inserts frame instruction to bytecode.
-     */
     addr_ptr = cg::bytecode::opframe(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opparam(int_op a, int_op b) {
-    /*  Inserts param instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
     addr_ptr = cg::bytecode::opparam(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::oppamv(int_op a, int_op b) {
-    /*  Inserts pamv instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
     addr_ptr = cg::bytecode::oppamv(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::oparg(int_op a, int_op b) {
-    /*  Inserts arg instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - argument number
-     *  b - register number
-     */
     addr_ptr = cg::bytecode::oparg(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::opargc(int_op a) {
-    /*  Inserts argc instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - target register
-     */
     addr_ptr = cg::bytecode::opargc(addr_ptr, a);
     return (*this);
 }
