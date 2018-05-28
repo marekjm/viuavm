@@ -36,6 +36,12 @@ auto Register_usage_profile::defresh() -> void {
 auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void {
+    if (not in_bounds(r)) {
+        throw Invalid_syntax{t, ("access to register "
+                + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
+                + " register(s) allocated"
+                )};
+    }
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
             .append(
@@ -44,6 +50,26 @@ auto Register_usage_profile::define(Register const r,
                 Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }
     defined_registers.insert_or_assign(r, std::pair<Token, Register>(t, r));
+    fresh_registers.insert(r);
+}
+auto Register_usage_profile::define(Register const r,
+                                    Token const index,
+                                    Token const register_set,
+                                    bool const allow_overwrites) -> void {
+    if (not in_bounds(r)) {
+        throw Invalid_syntax{index, ("access to register "
+                + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
+                + " register(s) allocated"
+                )}.add(register_set);
+    }
+    if (defined(r) and fresh(r) and not allow_overwrites) {
+        throw Traced_syntax_error{}
+            .append(
+                viua::cg::lex::Unused_value{index, "overwrite of unused value:"})
+            .append(
+                Invalid_syntax{at(r).first}.note("unused value defined here:"));
+    }
+    defined_registers.insert_or_assign(r, std::pair<Token, Register>(index, r));
     fresh_registers.insert(r);
 }
 auto Register_usage_profile::defined(Register const r) const -> bool {
@@ -98,6 +124,10 @@ auto Register_usage_profile::allocated_registers(viua::internals::types::registe
 }
 auto Register_usage_profile::allocated_registers() const -> std::optional<viua::internals::types::register_index> {
     return no_of_allocated_registers;
+}
+
+auto Register_usage_profile::in_bounds(Register const r) const -> bool {
+    return not (allocated_registers() and r.index >= allocated_registers().value());
 }
 
 auto Register_usage_profile::begin() const

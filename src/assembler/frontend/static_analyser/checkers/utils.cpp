@@ -173,6 +173,14 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
+
+    if (not rup.in_bounds(r)) {
+        throw Invalid_syntax{r.tokens.at(0), ("access to register "
+                + std::to_string(r.index) + " with only " + std::to_string(rup.allocated_registers().value())
+                + " register(s) allocated X"
+                )}.add(r.tokens.at(1));
+    }
+
     if (not rup.defined(Register(r))) {
         auto empty_or_erased = (rup.erased(Register(r)) ? "erased" : "empty");
 
