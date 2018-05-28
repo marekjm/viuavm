@@ -185,6 +185,7 @@ class Program {
     Program& oppamv(int_op, int_op);
     Program& oparg(int_op, int_op);
     Program& opargc(int_op);
+    Program& opallocate_registers(int_op);
 
     Program& opcall(int_op, std::string const&);
     Program& opcall(int_op, int_op);

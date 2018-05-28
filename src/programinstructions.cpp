@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -646,6 +646,11 @@ Program& Program::opargc(int_op a) {
      *  a - target register
      */
     addr_ptr = cg::bytecode::opargc(addr_ptr, a);
+    return (*this);
+}
+
+Program& Program::opallocate_registers(int_op a) {
+    addr_ptr = cg::bytecode::opallocate_registers(addr_ptr, a);
     return (*this);
 }
 

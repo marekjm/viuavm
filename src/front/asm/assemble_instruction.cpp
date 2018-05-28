@@ -486,6 +486,8 @@ auto assemble_instruction(
             program, tokens, i);
     } else if (tokens.at(i) == "argc") {
         assemble_single_register_op<&Program::opargc>(program, tokens, i);
+    } else if (tokens.at(i) == "allocate_registers") {
+        assemble_single_register_op<&Program::opallocate_registers>(program, tokens, i);
     } else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {

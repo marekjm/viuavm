@@ -878,6 +878,12 @@ auto opargc(viua::internals::types::byte* addr_ptr, int_op a)
     return insert_ri_operand(addr_ptr, a);
 }
 
+auto opallocate_registers(viua::internals::types::byte* addr_ptr, int_op a)
+    -> viua::internals::types::byte* {
+    *(addr_ptr++) = ALLOCATE_REGISTERS;
+    return insert_ri_operand(addr_ptr, a);
+}
+
 auto opcall(viua::internals::types::byte* addr_ptr,
             int_op reg,
             std::string const& fn_name) -> viua::internals::types::byte* {

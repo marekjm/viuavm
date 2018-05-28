@@ -288,6 +288,8 @@ auto oparg(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opargc(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
+auto opallocate_registers(viua::internals::types::byte*, int_op)
+    -> viua::internals::types::byte*;
 auto opcall(viua::internals::types::byte*, int_op, std::string const&)
     -> viua::internals::types::byte*;
 auto opcall(viua::internals::types::byte*, int_op, int_op)
