@@ -1400,6 +1400,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "argc") {
             ++i;
             tie(increase, i) = size_of_argc(tokens, i);
+        } else if (tokens.at(i) == "allocate_registers") {
+            ++i;
+            tie(increase, i) = size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
         } else if (tokens.at(i) == "process") {
             ++i;
             tie(increase, i) = size_of_process(tokens, i);
