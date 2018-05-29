@@ -46,6 +46,7 @@ class Frame {
         return return_address;
     }
 
+    auto set_local_register_set(std::unique_ptr<viua::kernel::Register_set>) -> void;
     auto set_local_register_set(viua::kernel::Register_set* const,
                                 bool const receives_ownership = true) -> void;
 

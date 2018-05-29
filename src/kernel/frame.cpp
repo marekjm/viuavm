@@ -21,6 +21,11 @@
 #include <viua/kernel/frame.h>
 
 
+auto Frame::set_local_register_set(std::unique_ptr<viua::kernel::Register_set> rs
+                           ) -> void {
+    local_register_set.reset(rs.release(), true);   // FIXME use std::move() instead of .release()
+}
+
 auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
                                    bool const receives_ownership) -> void {
     local_register_set.reset(rs, receives_ownership);
