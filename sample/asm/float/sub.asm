@@ -20,6 +20,8 @@
 ; This script tests float subtraction.
 
 .function: main/1
+    allocate_registers %3 local
+
     float %1 3.098
     float %2 2.083
     sub %3 %1 %2

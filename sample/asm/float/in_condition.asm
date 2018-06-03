@@ -21,6 +21,8 @@
 ; Basically, it justs tests correctness of the .boolean() method override in Integer objects.
 
 .function: main/1
+    allocate_registers %3 local
+
     float %1 0.0001
 
     ; generate false
