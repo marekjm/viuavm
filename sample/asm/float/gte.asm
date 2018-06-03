@@ -21,6 +21,8 @@
 ; Its expected output is "true".
 
 .function: main/1
+    allocate_registers %3 local
+
     float %1 local 4.0
     float %2 local 3.99
     gte %1 local %1 local %2 local

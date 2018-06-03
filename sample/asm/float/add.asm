@@ -23,6 +23,8 @@
 ; true porpose of this script, though.
 
 .function: main/1
+    allocate_registers %5 local
+
     float %1 local 4.0
     float %2 local -3.5
     add %3 local %1 local %2 local

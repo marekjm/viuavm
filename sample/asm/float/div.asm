@@ -20,6 +20,8 @@
 ; Test support for float division.
 
 .function: main/1
+    allocate_registers %4 local
+
     float %1 local 3.14
     float %2 local 2.0
     div %3 local %1 local %2 local
