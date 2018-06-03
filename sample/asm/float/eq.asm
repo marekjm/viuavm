@@ -21,12 +21,12 @@
 ; Its expected output is "true".
 
 .function: main/1
-    float %1 0.69
-    float %2 0.69
-    eq %1 %1 %2
+    float %1 local 0.69
+    float %2 local 0.69
+    eq %1 local %1 local %2 local
 
     ; should be true
-    print %1
+    print %1 local
     izero %0 local
     return
 .end

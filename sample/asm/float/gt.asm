@@ -21,10 +21,10 @@
 ; Its expected output is "true".
 
 .function: main/1
-    float %1 3.99
-    float %2 3.98
-    gt %1 %1 %2
-    print %1
+    float %1 local 3.99
+    float %2 local 3.98
+    gt %1 local %1 local %2 local
+    print %1 local
     izero %0 local
     return
 .end
