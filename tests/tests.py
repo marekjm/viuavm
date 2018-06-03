@@ -535,9 +535,6 @@ class FloatInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/float'
 
-    def testFstoreDefault(self):
-        runTest(self, 'fstore_default.asm', '0.000000', 0)
-
     def testFADD(self):
         runTest(self, 'add.asm', '0.500000', 0)
 
