@@ -433,7 +433,7 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , process_id(this)
         , is_hidden(false) {
     global_register_set =
-        std::make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
+        std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
     auto s                      = std::make_unique<Stack>(frm->function_name,
                                 this,
                                 global_register_set.get(),

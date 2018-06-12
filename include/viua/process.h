@@ -115,7 +115,7 @@ class Stack {
     /*
      *  Global register set of parent process.
      */
-    viua::kernel::RegisterSet* global_register_set;
+    viua::kernel::Register_set* global_register_set;
 
     /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -137,7 +137,7 @@ class Stack {
 
     viua::scheduler::Virtual_process_scheduler* scheduler;
 
-    auto bind(viua::kernel::RegisterSet*) -> void;
+    auto bind(viua::kernel::Register_set*) -> void;
 
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
@@ -167,8 +167,8 @@ class Stack {
 
     Stack(std::string,
           Process*,
-          viua::kernel::RegisterSet*,
-          viua::scheduler::VirtualProcessScheduler*);
+          viua::kernel::Register_set*,
+          viua::scheduler::Virtual_process_scheduler*);
 
     static uint16_t const MAX_STACK_SIZE = 8192;
 };

@@ -27,17 +27,17 @@ using viua::util::memory::aligned_write;
 
 
 int_op::int_op()
-        : type(IntegerOperandType::PLAIN)
+        : type(Integer_operand_type::PLAIN)
         , rs_type(viua::internals::Register_sets::LOCAL)
         , value(0) {}
-int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n)
+int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
         : type(t), rs_type(viua::internals::Register_sets::LOCAL), value(n) {}
-int_op::int_op(IntegerOperandType t,
+int_op::int_op(Integer_operand_type t,
                viua::internals::Register_sets rst,
                viua::internals::types::plain_int n)
         : type(t), rs_type(rst), value(n) {}
 int_op::int_op(viua::internals::types::plain_int n)
-        : type(IntegerOperandType::PLAIN)
+        : type(Integer_operand_type::PLAIN)
         , rs_type(viua::internals::Register_sets::LOCAL)
         , value(n) {}
 

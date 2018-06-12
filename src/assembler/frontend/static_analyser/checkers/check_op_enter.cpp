@@ -46,7 +46,7 @@ auto check_op_enter(Register_usage_profile& register_usage_profile,
     } catch (std::out_of_range const& e) {
         throw Invalid_syntax{label->tokens.at(0), "reference to undefined block: " + label->tokens.at(0).str()};
     } catch (Invalid_syntax& e) {
-        throw TracedSyntaxError{}.append(e).append(Invalid_syntax{
+        throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
             label->tokens.at(0), "after entering block " + block_name});
     } catch (Traced_syntax_error& e) {
         throw e.append(Invalid_syntax{label->tokens.at(0),

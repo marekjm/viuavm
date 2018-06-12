@@ -140,9 +140,6 @@ auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     auto const return_register = fetch_optional_and_advance_addr<viua::kernel::Register*>(
         fetch_register, addr, this);
-    auto const return_register =
-        fetch_optional_and_advance_addr<viua::kernel::Register*>(
-            fetch_register, addr, this);
 
     auto call_name = std::string{};
     auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);

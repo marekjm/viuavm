@@ -27,8 +27,8 @@ using namespace std;
 
 viua::process::Stack::Stack(std::string fn,
                             Process* pp,
-                            viua::kernel::RegisterSet* gs,
-                            viua::scheduler::VirtualProcessScheduler* sch)
+                            viua::kernel::Register_set* gs,
+                            viua::scheduler::Virtual_process_scheduler* sch)
         : current_state(STATE::RUNNING)
         , entry_function(fn)
         , parent_process(pp)
@@ -66,7 +66,7 @@ auto viua::process::Stack::state_of(const STATE s) -> STATE {
 }
 
 auto viua::process::Stack::bind(
-                                viua::kernel::RegisterSet* gs) -> void {
+                                viua::kernel::Register_set* gs) -> void {
     global_register_set         = gs;
 }
 

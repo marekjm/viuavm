@@ -134,6 +134,7 @@ auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
     addr                 = addr_;
     return result;
 }
+
 template<typename... Result>
 using Fetchs_fn =
     std::function<std::tuple<viua::internals::types::byte*, Result...>(
