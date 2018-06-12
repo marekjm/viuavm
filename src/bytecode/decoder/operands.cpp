@@ -105,7 +105,7 @@ static auto extract_register_index(Op_address_type ip,
                                 : std::string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
-        auto const register_type = extract<viua::internals::RegisterSets>(ip);
+        auto const register_type = extract<viua::internals::Register_sets>(ip);
         auto const i =
             static_cast<viua::types::Integer*>(process->register_at(register_index, register_type)->get());
         // FIXME Number::negative() -> bool is needed
@@ -249,8 +249,8 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(
                 ip);
         ip += sizeof(viua::internals::types::register_index);
 
-        auto const register_type = extract<viua::internals::RegisterSets>(ip);
-        ip += sizeof(viua::internals::RegisterSets);
+        auto const register_type = extract<viua::internals::Register_sets>(ip);
+        ip += sizeof(viua::internals::Register_sets);
 
         // FIXME once dynamic operand types are implemented the need for this
         // cast will go away because the operand *will* be encoded as a real

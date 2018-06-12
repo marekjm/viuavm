@@ -38,12 +38,12 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     // would know the register set to which it is attached, and what is its
     // index. The plain Register type does not know this information.
     auto const [target_rs, target_ri] =
-        fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
+        fetch_and_advance_addr<viua::internals::Register_sets, Register_index>(
             viua::bytecode::decoder::operands::fetch_register_type_and_index,
             addr,
             this);
 
-    auto const [ pack_start_rs, pack_start_ri ] = fetch_and_advance_addr<viua::internals::RegisterSets, Register_index>(
+    auto const [ pack_start_rs, pack_start_ri ] = fetch_and_advance_addr<viua::internals::Register_sets, Register_index>(
         viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
 
     auto const pack_size = fetch_and_advance_addr<Register_index>(
@@ -69,7 +69,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     }
     // Check the pack_size, because if it's zero then it doesn't matter what
     // register set is used because there will be no packing.
-    if (pack_size and (pack_start_rs != viua::internals::RegisterSets::LOCAL)) {
+    if (pack_size and (pack_start_rs != viua::internals::Register_sets::LOCAL)) {
         throw make_unique<viua::types::Exception>(
             "packing vector from non-local register set is not allowed: "
             + std::to_string(static_cast<uint64_t>(pack_start_rs)) + " "

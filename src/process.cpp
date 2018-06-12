@@ -37,8 +37,8 @@ viua::internals::types::register_index const
 
 auto viua::process::Process::register_at(
     viua::internals::types::register_index i,
-    viua::internals::RegisterSets rs) -> viua::kernel::Register* {
-    if (rs == viua::internals::RegisterSets::LOCAL) {
+    viua::internals::Register_sets rs) -> viua::kernel::Register* {
+    if (rs == viua::internals::Register_sets::LOCAL) {
         return stack->back()->local_register_set->register_at(i);
     } else if (rs == viua::internals::Register_sets::STATIC) {
         ensure_static_registers(stack->back()->function_name);

@@ -160,9 +160,9 @@ auto ::assembler::operands::resolve_register(Token const token,
     return out.str();
 }
 
-auto ::assembler::operands::resolve_rs_type(Token const token)
+auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internals::Register_sets {
     if (token == "local") {
-        return viua::internals::RegisterSets::LOCAL;
+        return viua::internals::Register_sets::LOCAL;
     } else if (token == "static") {
         return viua::internals::Register_sets::STATIC;
     } else if (token == "global") {
@@ -238,7 +238,7 @@ static auto convert_token_to_double(viua::cg::lex::Token const& token) -> double
     try {
         return std::stod(token.str());
     } catch (std::invalid_argument const&) {
-        throw viua::cg::lex::InvalidSyntax{token, "invalid floating point literal"};
+        throw viua::cg::lex::Invalid_syntax{token, "invalid floating point literal"};
     }
 }
 

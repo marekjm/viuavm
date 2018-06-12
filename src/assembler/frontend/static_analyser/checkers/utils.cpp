@@ -41,7 +41,7 @@ using viua::cg::lex::Traced_syntax_error;
 using viua::internals::Register_sets;
 auto register_set_names = std::map<Register_sets, std::string>{
     {
-        RegisterSets::GLOBAL,
+        Register_sets::GLOBAL,
         "global",
     },
     {
