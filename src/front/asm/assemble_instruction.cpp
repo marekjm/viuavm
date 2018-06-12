@@ -231,17 +231,6 @@ using viua::assembler::backend::op_assemblers::assemble_op_structremove;
 using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
 using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 
-static auto convert_token_to_double(viua::cg::lex::Token const& token) -> double {
-    if (token.str() == "default") {
-        return 0.0;
-    }
-    try {
-        return std::stod(token.str());
-    } catch (std::invalid_argument const&) {
-        throw viua::cg::lex::Invalid_syntax{token, "invalid floating point literal"};
-    }
-}
-
 namespace viua { namespace front { namespace assembler {
 auto assemble_instruction(
     Program& program,
