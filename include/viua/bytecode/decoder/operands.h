@@ -137,12 +137,12 @@ auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
 
 template<typename... Result>
 using Fetchs_fn =
-    std::function<std::tuple<viua::internals::types::byte*, Result...>(
-        viua::internals::types::byte*,
+    std::function<std::tuple<Op_address_type, Result...>(
+        Op_address_type,
         viua::process::Process*)>;
 template<typename A, typename B>
 auto fetch_and_advance_addr(Fetchs_fn<A, B> const& fn,
-                            viua::internals::types::byte*& addr,
+                            Op_address_type& addr,
                             viua::process::Process* process)
     -> std::tuple<A, B> {
     auto [addr_, a, b] = fn(addr, process);
