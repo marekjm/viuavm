@@ -1648,42 +1648,6 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     def testIDEC(self):
         runTestThrowsException(self, 'idec.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Function'",))
 
-    def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm',
-        ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFLT(self):
-        runTestThrowsException(self, 'flt.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
-    def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm',
-                ('Exception', "fetched invalid type: expected 'Number' but got 'Text'",))
-
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
@@ -2105,7 +2069,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'vat_on_empty_register.asm', './sample/asm/static_analysis_errors/vat_on_empty_register.asm:21:18: error: use of empty local register "1"')
 
     def testVlenOnEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', './sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:13: error: use of empty local register "1"')
+        runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', './sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:19: error: use of empty local register "1"')
 
     def testPointerFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', './sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:18: error: pointer from empty local register "1"')
