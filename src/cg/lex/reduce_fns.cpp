@@ -795,7 +795,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.back().original("default");
             continue;
         }
-        if (match(input_tokens, i, {"integer", "", "default"})) {
+        if (match(input_tokens, i, {"integer", "", "", "default"})) {
             tokens.push_back(input_tokens.at(++i));  // push target register
                                                      // token
             ++i;
@@ -804,7 +804,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.back().original("default");
             continue;
         }
-        if (match(input_tokens, i, {"float", "", "default"})) {
+        if (match(input_tokens, i, {"float", "", "", "default"})) {
             tokens.push_back(input_tokens.at(++i));  // push target register
                                                      // token
             ++i;
@@ -814,7 +814,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.back().original("default");
             continue;
         }
-        if (match(input_tokens, i, {"string", "", "default"})) {
+        if (match(input_tokens, i, {"string", "", "", "default"})) {
             tokens.push_back(input_tokens.at(++i));  // push target register
                                                      // token
             ++i;
@@ -824,7 +824,7 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.back().original("default");
             continue;
         }
-        if (match(input_tokens, i, {"receive", "", "default"})) {
+        if (match(input_tokens, i, {"receive", "", "", "default"})) {
             ++i;
             if (input_tokens.at(i) == "default") {
                 tokens.emplace_back(input_tokens.at(i).line(),
