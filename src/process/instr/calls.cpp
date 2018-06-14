@@ -141,7 +141,6 @@ auto viua::process::Process::opallocate_registers(Op_address_type addr) -> Op_ad
     auto const [ addr_, register_set, no_of_registers ] = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
 
     auto allocated = std::make_unique<viua::kernel::Register_set>(no_of_registers);
-    *(stack->currently_used_register_set) = allocated.get();
     stack->back()->set_local_register_set(std::move(allocated));
 
     return addr_;
