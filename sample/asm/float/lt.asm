@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -21,12 +21,12 @@
 ; Its expected output is "true".
 
 .function: main/1
-    allocate_registers %3 local
+    allocate_registers %4 local
 
-    float %1 1.00098
-    float %2 1.00099
-    lt %3 %1 %2
-    print %3
+    float %1 local 1.00098
+    float %2 local 1.00099
+    lt %3 local %1 local %2 local
+    print %3 local
     izero %0 local
     return
 .end

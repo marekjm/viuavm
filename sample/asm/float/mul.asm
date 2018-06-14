@@ -20,7 +20,7 @@
 ; This script tests float multiplication.
 
 .function: main/1
-    allocate_registers %3 local
+    allocate_registers %4 local
 
     float %1 4.0
     float %2 2.001
