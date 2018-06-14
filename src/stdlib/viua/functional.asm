@@ -29,49 +29,49 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg %1 %0
-    arg %2 %1
+    arg %1 local %0
+    arg %2 local %1
 
     ; vector for filtered values
-    vector %3
+    vector %3 local
 
     ; initial loop counter and
     ; loop termination variable
-    izero %4
-    vlen %5 %2
+    izero %4 local
+    vlen %5 local %2 local
 
     ; while (...) {
     .mark: loop_begin
-    if (gte %6 %4 %5) loop_end loop_body
+    if (gte %6 local %4 local %5 local) local loop_end loop_body
 
     .mark: loop_body
 
     ; call filtering function to determine whether current element
     ; is a valid value
     frame %1
-    vat %7 %2 @4
-    param %0 %7
-    call %8 %1
+    vat %7 local %2 local @4 local
+    param %0 %7 local
+    call %8 local %1 local
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if %8 element_ok next_iter
+    if %8 local element_ok next_iter
 
     .mark: element_ok
-    vpush %3 %7
+    vpush %3 local %7 local
 
     .mark: next_iter
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
     ; }
-    iinc %4
+    iinc %4 local
     jump loop_begin
 
     .mark: loop_end
 
     ; move result vector into return register
-    move %0 %3
+    move %0 local %3 local
     return
 .end
 
@@ -81,28 +81,28 @@
     ;       * a closure, or a function object to call,
     ;       * a vector of values that will be supplied as parameters to given callback,
     ;
-    arg (.name: %iota callback) %0
-    arg (.name: %iota list) %1
+    arg (.name: %iota callback) local %0
+    arg (.name: %iota list) local %1
 
     ; setup loop counter and
     ; loop termination variable
-    izero (.name: %iota counter)
-    vlen (.name: %iota list_length) %list
+    izero (.name: %iota counter) local
+    vlen (.name: %iota list_length) local %list local
 
     ; loop condition
     .mark: loop_begin
-    if (lt %iota %counter %list_length) loop_body loop_end
+    if (lt %iota local %counter local %list_length local) local loop_body loop_end
 
     .mark: loop_body
 
     ; extract parameter value
-    vat (.name: %iota element) %list @counter
+    vat (.name: %iota element) local %list local @counter local
 
     ; invoke given callback
-    frame ^[(param %0 %element)]
-    call void %callback
+    frame ^[(param %0 %element local)]
+    call void %callback local
 
-    iinc %counter
+    iinc %counter local
     jump loop_begin
 
     .mark: loop_end
@@ -117,57 +117,57 @@
     ; then, it maps (i.e. calls) the given function on every element of given vector
     ; and returns a vector containing modified values.
     ; returned vector is a newly created one - this function does not modify vectors in place.
-    arg %1 %0
-    arg %2 %1
+    arg %1 local %0
+    arg %2 local %1
 
     ; new vector to store mapped values
-    vector %3
+    vector %3 local
 
     ; set initial counter value and
     ; loop termination variable
-    izero %4
-    vlen %5 %2
+    izero %4 local
+    vlen %5 local %2 local
 
     ; while (...) {
     .mark: loop_begin
-    gte %6 %4 %5
-    if %6 loop_end loop_body
+    gte %6 local %4 local %5 local
+    if %6 local loop_end loop_body
 
     .mark: loop_body
 
     ; call supplied function on current element
     frame %1
-    vat %7 %2 @4
-    param %0 %7
-    call %8 %1
+    vat %7 local %2 local @4 local
+    param %0 %7 local
+    call %8 local %1 local
 
     ; push result to new vector
-    vpush %3 %8
+    vpush %3 local %8 local
 
     ; increase loop counter and go back to the beginning
     ;     ++i;
     ; }
-    iinc %4
+    iinc %4 local
     jump loop_begin
 
     .mark: loop_end
 
     ; move vector with mapped values to the return register
-    move %0 %3
+    move %0 local %3 local
     return
 .end
 
 .block: std::functional::apply::__try_calling
     ; FIXME refactor this to use ^[] syntax
     frame %1
-    param %0 %2
-    call %3 %1
-    move %0 %3
+    param %0 %2 local
+    call %3 local %1 local
+    move %0 local %3 local
     leave
 .end
 .block: std::functional::apply::__catch
     ; just ignore the error if the function didn't return a value
-    delete (draw %4)
+    delete (draw %4 local) local
     leave
 .end
 ; FIXME Remove the no_sa attribute after the new SA is able to handle this function.
@@ -181,8 +181,8 @@
     .name: %2 parameter
 
     ; extract the parameters
-    arg %func %0
-    arg %parameter %1
+    arg %func local %0
+    arg %parameter local %1
 
     ; apply the function to the parameter...
     ;frame %1
@@ -195,7 +195,7 @@
     return
 .end
 
-.function: std::functional::invoke/2
+.function: [[no_sa]] std::functional::invoke/2
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter
@@ -203,7 +203,7 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg %1 %0
+    arg %1 local %0
     arg %2 local %1
 
     ; take length of the vector
@@ -241,7 +241,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    call %8 local %1
-    move %0 %8 local
+    call %8 local %1 local
+    move %0 local %8 local
     return
 .end
