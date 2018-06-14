@@ -20,19 +20,19 @@
 .function: running_detached/1
     .name: %iota counter
     .name: %iota limit
-    izero %counter
-    integer %limit 4
+    izero %counter local
+    integer %limit local 4
 
-    send (arg %iota %0) (self %iota)
+    send (arg %iota local %0) local (self %iota local) local
 
     .name: %iota message
-    string %message "Hello World! (from long-running detached process) "
+    string %message local "Hello World! (from long-running detached process) "
 
     .mark: loop
-    if (gte %iota %counter %limit) after_loop
-    echo %message
-    print %counter
-    iinc %counter
+    if (gte %iota local %counter local %limit local) local after_loop
+    echo %message local
+    print %counter local
+    iinc %counter local
     jump loop
     .mark: after_loop
 
@@ -40,10 +40,10 @@
 .end
 
 .function: main/1
-    frame ^[(pamv %0 (self %1))]
+    frame ^[(pamv %0 (self %1 local) local)]
     process void running_detached/1
 
-    receive %1
+    receive %1 local
 
     nop
     nop
@@ -63,9 +63,9 @@
     nop
 
     ; this throws, cannot join detached process
-    join %0 %1
+    join void %1 local
 
-    print (string %3 "main/1 exited")
+    print (string %3 local "main/1 exited") local
 
     izero %0 local
     return

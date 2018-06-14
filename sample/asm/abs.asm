@@ -29,17 +29,17 @@
     .name: %iota is_negative
 
     ; store the int, of which we want to get an absolute value
-    integer %number -17
+    integer %number local -17
 
     ; if the int is less than zero, multiply it by -1
     ; else, branch directly to print instruction
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
-    if (not (lt %is_negative %number (integer %zero 0))) final_print
-    mul %number (integer %iota -1)
+    if (not (lt %is_negative local %number local (integer %zero local 0) local) local) local final_print
+    mul %number local (integer %iota local -1) local
 
     .mark: final_print
-    print %number
+    print %number local
     izero %0 local
     return
 .end

@@ -18,6 +18,6 @@
 ;
 
 .function: lib::foo/1
-    print (arg %1 %0)
+    print (arg %1 local %0 local) local
     return
 .end

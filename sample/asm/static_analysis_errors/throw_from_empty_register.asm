@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    throw %1
+    throw %1 local
 
     izero %0 local
     return

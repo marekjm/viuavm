@@ -38,48 +38,52 @@
 .closure: closure_level_3/1
     ; expects 1, 2 and 3 to be captured integers
     .name: 5 accumulator
-    move %0 (add %accumulator (arg %4 %0) (add %accumulator %3 (add %accumulator %1 %2)))
+    arg %4 local %0
+    add %accumulator local %1 local %2 local
+    add %accumulator local %3 local %accumulator local
+    add %accumulator local %4 local %accumulator local
+    move %0 local %accumulator local
     return
 .end
 
 .closure: closure_level_2/1
-    closure %0 closure_level_3/1
+    closure %0 local closure_level_3/1
     ; registers 1 and 2 are occupied by captured integers
     ; but they must be captured by the "closure_level_3"
-    capture %0 %1 %1
-    capture %0 %2 %2
-    capture %0 %3 (arg %3 %0)
+    capture %0 local %1 %1 local
+    capture %0 local %2 %2 local
+    capture %0 local %3 (arg %3 local %0) local
     return
 .end
 
 .closure: closure_level_1/1
-    closure %0 closure_level_2/1
+    closure %0 local closure_level_2/1
     ; register 1 is occupied by captured integer
     ; but it must be captured by the "closure_level_2"
-    capture %0 %1 %1
-    capture %0 %2 (arg %2 %0)
+    capture %0 local %1 %1 local
+    capture %0 local %2 (arg %2 local %0) local
     return
 .end
 
 .function: closure_maker/1
     ; create the outermost closure
-    closure %0 closure_level_1/1
-    capture %0 %1 (arg %1 %0)
+    closure %0 local closure_level_1/1
+    capture %0 local %1 (arg %1 local %0) local
     return
 .end
 
 .function: main/1
-    frame ^[(param %0 (integer %1 1))]
-    call %2 closure_maker/1
+    frame ^[(param %0 (integer %1 local 1) local)]
+    call %2 local closure_maker/1
 
-    frame ^[(param %0 (integer %1 2))]
-    call %3 %2
+    frame ^[(param %0 (integer %1 local 2) local)]
+    call %3 local %2 local
 
-    frame ^[(param %0 (integer %1 3))]
-    call %4 %3
+    frame ^[(param %0 (integer %1 local 3) local)]
+    call %4 local %3 local
 
-    frame ^[(param %0 (integer %1 4))]
-    print (call %5 %4)
+    frame ^[(param %0 (integer %1 local 4) local)]
+    print (call %5 local %4 local) local
 
     izero %0 local
     return

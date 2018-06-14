@@ -19,9 +19,9 @@
 
 .function: main/0
     jump after
-    print (string %1 "Hello World!")
+    print (string %1 local "Hello World!") local
     .mark: after
-    if (not (izero %1)) 1 -4
+    if (not (izero %1 local) local) local 1 -4
 
     izero %0 local
     return

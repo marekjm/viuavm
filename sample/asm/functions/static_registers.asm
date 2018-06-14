@@ -40,11 +40,11 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (lt %4 local %1 static (arg %3 local %0))) finish
+    if (not (lt %4 local %1 static (arg %3 local %0) local) local) local finish
 
     .mark: report
     print %1 static
-    frame ^[(param %0 %3)]
+    frame ^[(param %0 %3 local)]
     tailcall counter/1
 
     .mark: finish
@@ -52,7 +52,7 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (integer %1 10))]
+    frame ^[(param %0 (integer %1 local 10) local)]
     call void counter/1
     izero %0 local
     return

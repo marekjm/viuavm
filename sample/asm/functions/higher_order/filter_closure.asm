@@ -19,13 +19,13 @@
 
 .closure: is_divisible_by/1
     .name: 2 bound_variable
-    arg %1 %0
+    arg %1 local %0
 
     .mark: loop_begin
-    if (lt %3 %1 %bound_variable) loop_end loop_body
+    if (lt %3 local %1 local %bound_variable local) local loop_end loop_body
 
     .mark: loop_body
-    sub %1 %1 %bound_variable
+    sub %1 local %1 local %bound_variable local
     jump loop_begin
 
     .mark: loop_end
@@ -33,14 +33,14 @@
     ; make zero "true" and
     ; non-zero values "false"
     ; FIXME: find out why `not (move 0 1)` causes memory leak
-    not (copy %0 %1)
+    not (copy %0 local %1 local) local
     return
 .end
 
 .function: is_divisible_by_2/0
-    closure %1 is_divisible_by/1
-    capturemove %1 %2 (integer %2 2)
-    move %0 %1
+    closure %1 local is_divisible_by/1
+    capturemove %1 local %2 (integer %2 local 2) local
+    move %0 local %1 local
     return
 .end
 
@@ -49,62 +49,62 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg %1 %0
-    arg %2 %1
+    arg %1 local %0
+    arg %2 local %1
 
     ; vector for filtered values
-    vector %3
+    vector %3 local
 
     ; initial loop counter and
     ; loop termination variable
-    izero %4
-    vlen %5 %2
+    izero %4 local
+    vlen %5 local %2 local
 
     ; while (...) {
     .mark: loop_begin
-    if (gte %6 %4 %5) loop_end
+    if (gte %6 local %4 local %5 local) local loop_end
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame ^[(param %0 *(vat %7 %2 %4))] %0
-    call %8 %1
+    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)] %0
+    call %8 local %1 local
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if %8 element_ok next_iter
+    if %8 local element_ok next_iter
 
     .mark: element_ok
-    vpush %3 *7
+    vpush %3 local *7 local
 
     .mark: next_iter
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
     ; }
-    iinc %4
+    iinc %4 local
     jump loop_begin
 
     .mark: loop_end
 
     ; move result vector into return register
-    move %0 %3
+    move %0 local %3 local
     return
 .end
 
 .function: main/1
-    vpush (vector %1) (integer %2 1)
-    vpush %1 (integer %2 2)
-    vpush %1 (integer %2 3)
-    vpush %1 (integer %2 4)
-    vpush %1 (integer %2 5)
+    vpush (vector %1 local) local (integer %2 local 1) local
+    vpush %1 local (integer %2 local 2) local
+    vpush %1 local (integer %2 local 3) local
+    vpush %1 local (integer %2 local 4) local
+    vpush %1 local (integer %2 local 5) local
 
-    print %1
+    print %1 local
 
     frame %0
-    call %3 is_divisible_by_2/0
+    call %3 local is_divisible_by_2/0
 
-    frame ^[(param %0 %3) (param %1 %1)]
-    print (call %4 filter_closure/2)
+    frame ^[(param %0 %3 local) (param %1 %1 local)]
+    print (call %4 local filter_closure/2) local
 
     izero %0 local
     return

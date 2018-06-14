@@ -18,14 +18,14 @@
 ;
 
 .function: main/1
-    integer %1 42
+    integer %1 local 42
     ; delete the register
-    delete %1
+    delete %1 local
 
     ; check if register 1 is null and
     ; store the value in register 2
-    isnull %2 %1
-    print %2
+    isnull %2 local %1 local
+    print %2 local
 
     izero %0 local
     return

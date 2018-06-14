@@ -23,11 +23,11 @@
 
 .function: main/0
     frame %3
-    param %0 (integer %1 1)
-    param %1 %1
-    param %2 %1
-    pamv %2 %1
-    call foo/3
+    param %0 (integer %1 local 1) local
+    param %1 %1 local
+    param %2 %1 local
+    pamv %2 %1 local
+    call void foo/3
 
     izero %0 local
     return

@@ -23,11 +23,11 @@
 .end
 
 .function: main/0
-    izero %1
-    frame ^[(pamv %0 %1)]
+    izero %1 local
+    frame ^[(pamv %0 %1 local)]
     call foo/1
 
-    print %1
+    print %1 local
 
     izero %0 local
     return

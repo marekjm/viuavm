@@ -18,7 +18,7 @@
 ;
 
 .function: jumprint/1
-    if (lt %2 (integer %2 local 42) local (arg %1 local %0) local) lesser +1
+    if (lt %2 local (integer %2 local 42) local (arg %1 local %0) local) local lesser +1
     string %3 local ":-)"
     jump +2
 

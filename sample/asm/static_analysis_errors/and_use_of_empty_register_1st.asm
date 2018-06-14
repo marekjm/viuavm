@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    and %3 %1 %2
+    and %3 local %1 local %2 local
 
     izero %0 local
     return

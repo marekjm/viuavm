@@ -42,20 +42,20 @@ class Register {
     mask_type mask;
 
   public:
-    void reset(std::unique_ptr<viua::types::Value>);
-    bool empty() const;
+    auto reset(std::unique_ptr<viua::types::Value>) -> void;
+    auto empty() const -> bool;
 
-    viua::types::Value* get();
-    viua::types::Value* release();
-    std::unique_ptr<viua::types::Value> give();
+    auto get() -> viua::types::Value*;
+    auto release() -> viua::types::Value*;
+    auto give() -> std::unique_ptr<viua::types::Value>;
 
-    void swap(Register&);
+    auto swap(Register&) -> void;
 
-    mask_type set_mask(mask_type);
-    mask_type get_mask() const;
-    mask_type flag(mask_type);
-    mask_type unflag(mask_type);
-    bool is_flagged(mask_type) const;
+    auto set_mask(mask_type) -> mask_type;
+    auto get_mask() const -> mask_type;
+    auto flag(mask_type) -> mask_type;
+    auto unflag(mask_type) -> mask_type;
+    auto is_flagged(mask_type) const -> bool;
 
     Register();
     Register(std::unique_ptr<viua::types::Value>);

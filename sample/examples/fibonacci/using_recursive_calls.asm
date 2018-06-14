@@ -19,29 +19,29 @@
 
 .function: fibonacci/1
     .name: 1 current_value
-    arg %current_value %0
+    arg %current_value local %0
 
-    if %current_value +1 fibonacci/1__finished
+    if %current_value local +1 fibonacci/1__finished
 
-    frame ^[(pamv %0 (idec (copy %2 %current_value)))]
-    call %2 fibonacci/1
+    frame ^[(pamv %0 (idec (copy %2 local %current_value local) local) local)]
+    call %2 local fibonacci/1
 
-    add %current_value %2
+    add %current_value local %2 local
 
     .mark: fibonacci/1__finished
-    move %0 %current_value
+    move %0 local %current_value local
     return
 .end
 
 .function: main/0
     .name: 1 result
 
-    integer %result 5
+    integer %result local 5
 
-    frame ^[(pamv %0 %result)]
-    call %result fibonacci/1
+    frame ^[(pamv %0 %result local)]
+    call %result local fibonacci/1
 
-    print %result
+    print %result local
 
     izero %0 local
     return

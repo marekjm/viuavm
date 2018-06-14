@@ -18,7 +18,7 @@
 ;
 
 .function: greeter/0
-    print (string %iota "Hello World!")
+    print (string %iota local "Hello World!") local
     return
 .end
 

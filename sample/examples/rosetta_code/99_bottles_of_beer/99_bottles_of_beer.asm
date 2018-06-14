@@ -19,16 +19,16 @@
 
 .function: bottles_of_beer_text/1
     .name: %iota number_of_bottles
-    arg %number_of_bottles %0
+    arg %number_of_bottles local %0
 
     .name: %iota bottles_of_beer
     ; support for "1 bottle of beer" and "N bottles of beer"
-    if (eq %iota %number_of_bottles (integer %iota 1)) +1 +3
-    text %bottles_of_beer " bottle of beer"
+    if (eq %iota local %number_of_bottles local (integer %iota local 1) local) local +1 +3
+    text %bottles_of_beer local " bottle of beer"
     jump +2
-    text %bottles_of_beer " bottles of beer"
+    text %bottles_of_beer local " bottles of beer"
 
-    move %0 %bottles_of_beer
+    move %0 local %bottles_of_beer local
     return
 .end
 
@@ -40,18 +40,18 @@
     ;   Take one down, pass it around
     ;
     .name: %iota number_of_bottles
-    arg %number_of_bottles %0
+    arg %number_of_bottles local %0
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles)]
-    call %bottles_of_beer bottles_of_beer_text/1
+    frame ^[(param %0 %number_of_bottles local)]
+    call %bottles_of_beer local bottles_of_beer_text/1
 
-    echo %number_of_bottles
-    echo %bottles_of_beer
-    print (text %iota " on the wall")
-    echo %number_of_bottles
-    print %bottles_of_beer
-    print (text %iota "Take one down, pass it around")
+    echo %number_of_bottles local
+    echo %bottles_of_beer local
+    print (text %iota local " on the wall") local
+    echo %number_of_bottles local
+    print %bottles_of_beer local
+    print (text %iota local "Take one down, pass it around") local
 
     return
 .end
@@ -67,58 +67,58 @@
     arg %number_of_bottles %0
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles)]
-    call %bottles_of_beer bottles_of_beer_text/1
+    frame ^[(param %0 %number_of_bottles local)]
+    call %bottles_of_beer local bottles_of_beer_text/1
 
     .name: %iota on_the_wall
-    text %on_the_wall " on the wall"
+    text %on_the_wall local " on the wall"
 
     ; say "No more" instead of "0 bottles"
-    if %number_of_bottles +1 +3
-    echo %number_of_bottles
+    if %number_of_bottles local +1 +3
+    echo %number_of_bottles local
     jump +3
-    echo (text %iota "No more")
+    echo (text %iota local "No more") local
 
-    echo %bottles_of_beer
-    print %on_the_wall
+    echo %bottles_of_beer local
+    print %on_the_wall local
 
-    if %number_of_bottles +1 +3
-    print (text %iota "")
+    if %number_of_bottles local +1 +3
+    print (text %iota local "") local
 
     return
 .end
 
 .function: bottles_of_beer/1
     .name: %iota total_number_of_bottles
-    arg %total_number_of_bottles %0
+    arg %total_number_of_bottles local %0
 
     ; display first three lines of a paragraph
-    frame ^[(param %0 %total_number_of_bottles)]
+    frame ^[(param %0 %total_number_of_bottles local)]
     call void first_print/1
 
     ; decrement the number of bottles
-    idec %total_number_of_bottles
+    idec %total_number_of_bottles local
 
     ; display last line of a paragraph
-    frame ^[(param %0 %total_number_of_bottles)]
+    frame ^[(param %0 %total_number_of_bottles local)]
     call void second_print/1
 
     ; immediately return if there are no more bottles
-    if %total_number_of_bottles theres_more +1
+    if %total_number_of_bottles local theres_more +1
     return
 
     .mark: theres_more
     ; if there are more bottles
     ; call the function once more
-    frame ^[(pamv %0 %total_number_of_bottles)]
+    frame ^[(pamv %0 %total_number_of_bottles local)]
     tailcall bottles_of_beer/1
 .end
 
 .function: main/0
     .name: %iota total_number_of_bottles
-    integer %total_number_of_bottles 9
+    integer %total_number_of_bottles local 9
 
-    frame ^[(pamv %0 %total_number_of_bottles)]
+    frame ^[(pamv %0 %total_number_of_bottles local)]
     call void bottles_of_beer/1
 
     izero %0 local

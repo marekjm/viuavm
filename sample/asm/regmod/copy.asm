@@ -17,12 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script checks if the copy instruction works correctly.
-; The instruction should copy the value of one register into another.
 .function: main/1
-    integer %1 1
-    copy %2 %1
-    print %2
+    integer %1 local 1
+    copy %2 local %1 local
+    print %2 local
     izero %0 local
     return
 .end

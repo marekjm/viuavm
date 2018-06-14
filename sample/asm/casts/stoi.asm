@@ -21,7 +21,7 @@
     string %1 local "42"
     integer %2 local 27
 
-    stoi %3 local %1
+    stoi %3 local %1 local
     print (add %3 local %2 local %3 local) local
 
     izero %0 local

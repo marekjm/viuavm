@@ -23,16 +23,16 @@
     ; multiply "result" (reference) by "number" (copy)
     ; and store the resulting integer in "result"
     ; calculation is available outside of the local scope
-    mul %result (arg %result %1) (arg %number %0)
-    idec %number
+    mul %result local (arg %result local %1) local (arg %number local %0) local
+    idec %number local
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (eq %4 %number (integer %3 0)) finish
+    if (eq %4 local %number local (integer %3 local 0) local) local finish
 
     ; this frame must be the same as in "main"
     ; result must still be a reference
-    frame ^[(pamv %0 %number) (pamv %1 %result)]
+    frame ^[(pamv %0 %number local) (pamv %1 %result local)]
     tailcall factorial/2
 
     .mark: finish
@@ -43,17 +43,17 @@
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial
-    integer %number 8
+    integer %number local 8
 
     ; create frame for two parameters:
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param %0 %number) (pamv %1 (integer %result 1))]
-    call %result factorial/2
+    frame ^[(param %0 %number local) (pamv %1 (integer %result local 1) local)]
+    call %result local factorial/2
 
     ; print result
-    print %result
+    print %result local
     izero %0 local
     return
 .end

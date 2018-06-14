@@ -18,10 +18,10 @@
 ;
 
 .function: main/1
-    function %1 foo/0
+    function %1 local foo/0
 
     frame %0
-    call void %1
+    call void %1 local
 
     izero %0 local
     return

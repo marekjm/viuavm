@@ -20,10 +20,10 @@
 .function: main/0
     .name: %iota a_vector
     vector %a_vector local
-    vpush %a_vector local (integer %0 0)
-    vpush %a_vector local (integer %0 1)
-    vpush %a_vector local (integer %0 2)
-    vpush %a_vector local (integer %0 3)
+    vpush %a_vector local (integer %0 local 0) local
+    vpush %a_vector local (integer %0 local 1) local
+    vpush %a_vector local (integer %0 local 2) local
+    vpush %a_vector local (integer %0 local 3) local
 
     .name: %iota an_index
     integer %an_index local 5

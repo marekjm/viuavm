@@ -19,25 +19,25 @@
 
 .function: child_process/1
     .name: 1 counter
-    if (idec (arg %counter %0)) +1 end_this
-    frame ^[(pamv %0 %counter)]
+    if (idec (arg %counter local %0) local) local +1 end_this
+    frame ^[(pamv %0 %counter local)]
     tailcall child_process/1
     .mark: end_this
-    string %0 "child process done"
+    string %0 local "child process done"
     return
 .end
 .function: child_process/0
     ; 1024 to force the scheduler to preempt the process at least one time
     ; while the parent process waits.
-    frame ^[(pamv %0 (integer %1 1024))]
+    frame ^[(pamv %0 (integer %1 local 1024) local)]
     tailcall child_process/1
     return
 .end
 
 .function: main/0
     frame %0
-    process %1 child_process/0
-    print (join %2 %1)
+    process %1 local child_process/0
+    print (join %2 local %1 local) local
     izero %0 local
     return
 .end

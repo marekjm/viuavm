@@ -21,15 +21,15 @@
     .name: 2 len
     .name: 3 counter
 
-    vlen %len (arg %1 %0)
-    integer %counter 0
+    vlen %len local (arg %1 local %0) local
+    integer %counter local 0
 
     .mark: loop
-    if (lt %4 %counter %len) +1 break
+    if (lt %4 local %counter local %len local) local +1 break
 
-    print *(vat %5 %1 @counter)
+    print *(vat %5 local %1 local @counter local) local
 
-    iinc %counter
+    iinc %counter local
     jump loop
 
     .mark: break

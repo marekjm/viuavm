@@ -23,7 +23,7 @@
 
 .function: main/0
     frame %1
-    pamv %0 %1
+    pamv %0 %1 local
     call foo/1
 
     izero %0 local

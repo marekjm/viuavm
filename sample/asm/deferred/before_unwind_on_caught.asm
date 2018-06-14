@@ -42,7 +42,7 @@
 .function: main/0
     try
     catch "Integer" .block: catch_Integer
-        print (draw %2 local)
+        print (draw %2 local) local
         leave
     .end
     enter .block: try_this

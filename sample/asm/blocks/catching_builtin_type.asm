@@ -19,14 +19,14 @@
 
 .block: handle_integer
     ; draw caught object into 2 register
-    draw %2
-    print %2
+    draw %2 local
+    print %2 local
     leave
 .end
 
 .block: main_block
-    integer %1 42
-    throw %1
+    integer %1 local 42
+    throw %1 local
     leave
 .end
 

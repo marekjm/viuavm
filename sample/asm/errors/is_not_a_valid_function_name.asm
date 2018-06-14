@@ -23,7 +23,7 @@
 
 .function: main/0
     frame %0
-    call foo/x
+    call void foo/x
     izero %0 local
     return
 .end

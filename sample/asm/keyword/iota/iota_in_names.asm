@@ -21,11 +21,11 @@
     .name: %iota hello_world 
     .name: %iota forty_two
 
-    string %hello_world "Hello World!"
-    integer %forty_two 42
+    string %hello_world local "Hello World!"
+    integer %forty_two local 42
 
-    print %1 ; should print "Hello World!"
-    print %2 ; should print 42
+    print %1 local ; should print "Hello World!"
+    print %2 local ; should print 42
 
     izero %0 local
     return

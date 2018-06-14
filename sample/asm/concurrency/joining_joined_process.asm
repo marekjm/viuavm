@@ -33,7 +33,7 @@
     nop
     nop
     nop
-    print (arg %1 %0)
+    print (arg %1 local %0) local
     return
 .end
 

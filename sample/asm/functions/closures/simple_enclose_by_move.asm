@@ -19,18 +19,18 @@
 
 .function: a_closure/0
     ; expects register 1 to be captured object
-    print %1
+    print %1 local
     return
 .end
 
 .function: main/1
-    closure %1 a_closure/0
-    capturemove %1 %1 (string %2 "Hello World!")
+    closure %1 local a_closure/0
+    capturemove %1 local %1 (string %2 local "Hello World!") local
 
-    print (isnull %3 %2)
+    print (isnull %3 local %2 local) local
 
     frame %0
-    call void %1
+    call void %1 local
 
     izero %0 local
     return

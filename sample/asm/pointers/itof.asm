@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (integer (.name: %iota o) 0)
-    print (itof %iota *pointer)
+    ptr (.name: %iota pointer) local (integer (.name: %iota o) local 0) local
+    print (itof %iota local *pointer local) local
 
     izero %0 local
     return

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,21 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.bsignature: misc::argsvector
+.function: main/0
+    float %1 local default
+    print %1 local
 
-.function: foo/4
-    import "misc"
-
-    try
-    enter misc::argsvector
-
-    print %1
-    return
-.end
-
-.function: main/1
-    frame ^[(param %0 (integer %1 0)) (param %1 (integer %2 1)) (param %2 (integer %3 2)) (param %3 (integer %4 3))]
-    call void foo/4
     izero %0 local
     return
 .end

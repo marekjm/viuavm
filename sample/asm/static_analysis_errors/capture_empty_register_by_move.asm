@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    capturemove %2 %1
+    capturemove %2 local %1 %1 local
 
     izero %0 local
     return

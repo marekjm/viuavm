@@ -18,12 +18,16 @@
 ;
 
 .function: main/1
-    integer (.name: %iota forty_two) 42
-    integer (.name: %iota sixty_nine) 69
+    .name: %iota forty_two
+    .name: %iota sixty_nine
 
-    lt (.name: %iota compared) %forty_two %sixty_nine
+    integer %forty_two local 42
+    integer %sixty_nine local 69
 
-    print (add %iota %sixty_nine %compared)
+    .name: %iota compared
+    lt %compared local %forty_two local %sixty_nine local
+
+    print (add %iota local %sixty_nine local %compared local) local
 
     izero %0 local
     return

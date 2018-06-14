@@ -19,15 +19,15 @@
 
 .function: child_process/1
     .name: 1 counter
-    if (idec (arg %counter %0)) +1 end_this
-    frame ^[(pamv %0 %counter)]
+    if (idec (arg %counter local %0) local) local +1 end_this
+    frame ^[(pamv %0 %counter local)]
     tailcall child_process/1
     .mark: end_this
-    string %0 "child process done"
+    string %0 local "child process done"
     return
 .end
 .function: child_process/0
-    frame ^[(pamv %0 (integer %1 65536))]
+    frame ^[(pamv %0 (integer %1 local 65536) local)]
     tailcall child_process/1
     return
 .end

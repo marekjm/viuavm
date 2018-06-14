@@ -18,7 +18,7 @@
 ;
 
 .block: main_block
-    integer %1 42
+    integer %1 local 42
     leave
 .end
 
@@ -26,7 +26,7 @@
     try
     enter main_block
     ; leave instructions lead here
-    print %1
+    print %1 local
 
     izero %0 local
     return

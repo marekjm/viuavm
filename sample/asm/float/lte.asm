@@ -23,10 +23,11 @@
 .function: main/1
     allocate_registers %4 local
 
-    float %1 1.098
-    float %2 1.099
-    lte %3 %1 %2
-    print %3
+    float %1 local 1.098
+    float %2 local 1.099
+    lte %3 local %1 local %2 local
+    print %3 local
+
     izero %0 local
     return
 .end

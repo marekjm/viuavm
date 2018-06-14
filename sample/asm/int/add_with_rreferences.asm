@@ -18,12 +18,12 @@
 ;
 
 .function: main/1
-    integer %1 -1
-    integer %2 1
-    integer %3 2
+    integer %1 local -1
+    integer %2 local 1
+    integer %3 local 2
 
-    print (add %4 %1 @3)
+    print (add %4 local %1 local @3 local) local
 
-    izero %0 local
+    izero %0 local local
     return
 .end

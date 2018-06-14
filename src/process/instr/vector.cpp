@@ -29,25 +29,25 @@
 #include <viua/types/vector.h>
 using namespace std;
 
+using viua::bytecode::decoder::operands::fetch_and_advance_addr;
+using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
+using Register_index = viua::internals::types::register_index;
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
-    viua::internals::Register_sets target_rs =
-        viua::internals::Register_sets::CURRENT;
-    viua::internals::types::register_index target_ri = 0;
-    tie(addr, target_rs, target_ri) =
-        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
-                                                                         this);
+    // FIXME This could be reduced if there was a Attached_register type which
+    // would know the register set to which it is attached, and what is its
+    // index. The plain Register type does not know this information.
+    auto const [target_rs, target_ri] =
+        fetch_and_advance_addr<viua::internals::Register_sets, Register_index>(
+            viua::bytecode::decoder::operands::fetch_register_type_and_index,
+            addr,
+            this);
 
-    viua::internals::Register_sets pack_start_rs =
-        viua::internals::Register_sets::CURRENT;
-    viua::internals::types::register_index pack_start_ri = 0;
-    tie(addr, pack_start_rs, pack_start_ri) =
-        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
-                                                                         this);
+    auto const [ pack_start_rs, pack_start_ri ] = fetch_and_advance_addr<viua::internals::Register_sets, Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_type_and_index, addr, this);
 
-    viua::internals::types::register_index pack_size = 0;
-    tie(addr, pack_size) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const pack_size = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
     if ((target_ri > pack_start_ri)
         and (target_ri < (pack_start_ri + pack_size))) {
@@ -56,19 +56,28 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
         // register
         throw make_unique<viua::types::Exception>("vector would pack itself");
     }
-    if ((pack_start_ri + pack_size) >= currently_used_register_set->size()) {
+    if ((pack_start_ri + pack_size)
+        >= stack->back()->local_register_set->size()) {
         throw make_unique<viua::types::Exception>(
             "vector: packing outside of register set range");
     }
-    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+    for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
             throw make_unique<viua::types::Exception>(
                 "vector: cannot pack null register");
         }
     }
+    // Check the pack_size, because if it's zero then it doesn't matter what
+    // register set is used because there will be no packing.
+    if (pack_size and (pack_start_rs != viua::internals::Register_sets::LOCAL)) {
+        throw make_unique<viua::types::Exception>(
+            "packing vector from non-local register set is not allowed: "
+            + std::to_string(static_cast<uint64_t>(pack_start_rs)) + " "
+            + std::to_string(pack_size));
+    }
 
     auto v = make_unique<viua::types::Vector>();
-    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+    for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         v->push(register_at(pack_start_ri + i, pack_start_rs)->give());
     }
 
@@ -79,22 +88,20 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opvinsert(Op_address_type addr)
     -> Op_address_type {
-    viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
-            addr, this);
+    auto const vector_operand = fetch_and_advance_addr<viua::types::Vector*>(
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>,
+        addr,
+        this);
 
-    std::unique_ptr<viua::types::Value> object;
+    auto object = std::unique_ptr<viua::types::Value>{};
     if (viua::bytecode::decoder::operands::get_operand_type(addr)
         == OT_POINTER) {
-        viua::types::Value* source = nullptr;
-        tie(addr, source) =
-            viua::bytecode::decoder::operands::fetch_object(addr, this);
+        auto const source = fetch_and_advance_addr<viua::types::Value*>(
+            viua::bytecode::decoder::operands::fetch_object, addr, this);
         object = source->copy();
     } else {
-        viua::kernel::Register* source = nullptr;
-        tie(addr, source) =
-            viua::bytecode::decoder::operands::fetch_register(addr, this);
+        auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
+            viua::bytecode::decoder::operands::fetch_register, addr, this);
         object = source->give();
     }
 

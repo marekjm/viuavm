@@ -53,38 +53,38 @@
     import "random"
 
     ; extract commandline operands vector
-    arg %1 %0
-    vlen %2 %1
+    arg %1 local %0
+    vlen %2 local %1 local
 
     ; extract lower bound if 2 or more operands were given, default to 0 otherwise
-    integer %3 2
-    if (gte %5 %2 %3) +1 default_lower_bound
-    idec %3
-    stoi %4 *(vat %3 %1 @3)
+    integer %3 local 2
+    if (gte %5 local %2 local %3 local) local +1 default_lower_bound
+    idec %3 local
+    stoi %4 local *(vat %3 local %1 local @3 local) local
     ; register holding object obtained from vector must be emptied before reuse
-    move %3 %4
+    move %3 local %4 local
     ; jump two instructions to skip default lower bound assignment
     jump +2
 
     .mark: default_lower_bound
-    integer %3 0
+    integer %3 local 0
 
     ; extract upper bound if 3 or more operands were given, default to 100 otherwise
-    integer %4 3
-    if (gte %5 %2 %4) +1 default_upper_bound
-    idec %4
-    stoi %5 *(vat %4 %1 @4)
+    integer %4 local 3
+    if (gte %5 local %2 local %4 local) local +1 default_upper_bound
+    idec %4 local
+    stoi %5 local *(vat %4 local %1 local @4 local) local
     ; register holding object obtained from vector must be emptied before reuse
-    move %4 %5
+    move %4 local %5 local
     ; jump two instructions to skip default upper bound assignment
     jump +2
 
     .mark: default_upper_bound
-    integer %4 100
+    integer %4 local 100
 
     ; random integer between lower and upper bound
-    frame ^[(param %0 %3) (param %1 %4)]
-    print (call %6 std::random::randint)
+    frame ^[(param %0 %3 local) (param %1 %4 local)]
+    print (call %6 local std::random::randint) local
 
     izero %0 local
     return

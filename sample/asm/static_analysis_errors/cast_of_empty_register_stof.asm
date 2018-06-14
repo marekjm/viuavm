@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    stof %2 %1
+    stof %2 local %1 local
 
     izero %0 local
     return

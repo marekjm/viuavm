@@ -22,28 +22,28 @@
 
     .name: %iota minus_one
     .name: %iota minus_two
-    integer %minus_one -1
-    integer %minus_two -2
+    integer %minus_one local -1
+    integer %minus_two local -2
 
     .name: %iota tmp
-    if (not (isnull %tmp %vec)) logic
-    vpush (vpush (vector %vec) (integer %tmp 1)) (integer %tmp 1)
+    if (not (isnull %tmp local %vec local) local) local logic
+    vpush (vpush (vector %vec local) local (integer %tmp local 1) local) local (integer %tmp local 1) local
 
     .mark: logic
 
     .name: %iota number
     .name: %iota length
-    arg %number %0
+    arg %number local %0
 
     .mark: loop
     .name: %iota result
-    if (not (lt %iota (vlen %length %vec) %number)) finished
-    add %result *(vat %iota %vec %minus_one) *(vat %iota %vec %minus_two)
-    vpush %vec %result
+    if (not (lt %iota local (vlen %length local %vec local) local %number local) local) local finished
+    add %result local *(vat %iota local %vec local %minus_one local) local *(vat %iota local %vec local %minus_two local) local
+    vpush %vec local %result local
     jump loop
 
     .mark: finished
-    copy %0 *(vat %iota %vec %minus_one)
+    copy %0 local *(vat %iota local %vec local %minus_one local) local
     return
 .end
 
@@ -51,8 +51,8 @@
     ; expected result is 1134903170
 
     .name: 2 result
-    frame ^[(param %0 (integer %1 45))]
-    print (call %result iterfib/1)
+    frame ^[(param %0 (integer %1 local 45) local)]
+    print (call %result local iterfib/1) local
 
     izero %0 local
     return

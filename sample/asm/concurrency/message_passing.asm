@@ -19,20 +19,20 @@
 
 .function: run_in_a_process/1
     ; send our PID back to parent
-    send (arg %iota %0) (self %iota)
+    send (arg %iota local %0) local (self %iota local) local
 
-    print (receive %iota 10s)
+    print (receive %iota local 10s) local
     return
 .end
 
 .function: main/1
     .name: %iota pid
-    frame ^[(pamv %0 (self %pid))]
+    frame ^[(pamv %0 (self %pid local) local)]
     process void run_in_a_process/1
 
-    receive %pid 10s
+    receive %pid local 10s
 
-    send %pid (string %iota "Hello message passing World!")
+    send %pid local (string %iota local "Hello message passing World!") local
 
     izero %0 local
     return

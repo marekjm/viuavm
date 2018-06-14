@@ -19,7 +19,7 @@
 
 .function: watchdog_process/0
     .mark: watchdog_start
-    throw (remove %4 local (arg %1 local %0) local (string %3 local "function") local)
+    throw (structremove %4 local (arg %1 local %0) local (atom %3 local 'function') local) local
 
     return
 .end
@@ -60,7 +60,7 @@
     nop
     nop
     nop
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
     return
 .end
 

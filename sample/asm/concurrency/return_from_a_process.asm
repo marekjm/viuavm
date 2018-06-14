@@ -18,13 +18,13 @@
 ;
 
 .function: run_in_a_process/0
-    integer %0 42
+    integer %0 local 42
     return
 .end
 
 .function: main/1
     frame %0
-    print (join %2 (process %1 run_in_a_process/0))
+    print (join %2 local (process %1 local run_in_a_process/0) local) local
     izero %0 local
     return
 .end

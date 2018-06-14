@@ -18,17 +18,17 @@
 ;
 
 .function: boolean/1
-    move %0 (not (not (arg %1 %0)))
+    move %0 local (not (not (arg %1 local %0 local) local) local) local
     return
 .end
 
 .function: main/1
-    izero %1
+    izero %1 local
 
-    frame ^[(param %0 %1)]
-    call %1 boolean/1
+    frame ^[(param %0 %1 local)]
+    call %1 local boolean/1
 
-    print (not (print %1))
+    print (not (print %1 local) local) local
 
     izero %0 local
     return

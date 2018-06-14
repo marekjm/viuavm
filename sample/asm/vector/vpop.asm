@@ -18,15 +18,15 @@
 ;
 
 .function: main/1
-    print (vlen %3 (vector %2))
+    print (vlen %3 local (vector %2 local) local) local
 
-    vpush %2 (string %1 "Hello World!")
-    print (vlen %3 %2)
+    vpush %2 local (string %1 local "Hello World!") local
+    print (vlen %3 local %2 local) local
 
-    vpop %4 %2
-    print (vlen %3 %2)
+    vpop %4 local %2 local
+    print (vlen %3 local %2 local) local
 
-    print %4
+    print %4 local
 
     izero %0 local
     return

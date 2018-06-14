@@ -18,13 +18,13 @@
 ;
 
 .function: foo/0
-    function %1 bar/0
+    function %1 local bar/0
     frame %0
-    tailcall %1
+    tailcall %1 local
 .end
 
 .function: bar/0
-    throw (integer %iota 42)
+    throw (integer %iota local 42) local
     return
 .end
 

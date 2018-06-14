@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    print (float %iota default)
+    print (float %iota local default) local
 
     izero %0 local
     return

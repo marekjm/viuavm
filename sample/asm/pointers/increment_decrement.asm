@@ -18,13 +18,13 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (integer (.name: %iota number) 42)
+    ptr (.name: %iota pointer) local (integer (.name: %iota number) local 42) local
 
     iinc *pointer
-    print %number
+    print %number local
 
     idec *pointer
-    print %number
+    print %number local
 
     izero %0 local
     return

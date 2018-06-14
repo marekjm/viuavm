@@ -22,23 +22,23 @@
     .name: 2 modulo
     .name: 3 result
 
-    integer %number 166737
-    integer %modulo 176
+    integer %number local 166737
+    integer %modulo local 176
 
-    copy %result %number
+    copy %result local %number local
 
     ; if number is less than modulo, jump straight to result printing
-    lt %4 %number %modulo
-    if %4 final
+    lt %4 local %number local %modulo local
+    if %4 local final
 
     ; otherwise we must perform some calculations
-    div %number %number %modulo
-    mul %number %number %modulo
-    sub %result %result %number
+    div %number local %number local %modulo local
+    mul %number local %number local %modulo local
+    sub %result local %result local %number local
 
 
     .mark: final
-    print %result
+    print %result local
     izero %0 local
     return
 .end

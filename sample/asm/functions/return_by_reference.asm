@@ -18,27 +18,27 @@
 ;
 
 .closure: by_reference/0
-    move %0 %1
+    move %0 local %1 local
     return
 .end
 
 .function: main/1
     ; store a number in register
-    integer %1 69
+    integer %1 local 69
 
     ; create a closure and capture a value by reference
-    closure %2 by_reference/0
-    capture %2 %1 %1
+    closure %2 local by_reference/0
+    capture %2 local %1 %1 local
 
     frame %0
-    ; store return value in another register (it is a reference!)
-    call %3 %2
+    ; store return value in another register (it is a reference!) local
+    call %3 local %2 local
 
     ; assign different value to it
-    integer %3 42
+    integer %3 local 42
 
-    ; check if return-by-reference is working (should print 42)
-    print %1
+    ; check if return-by-reference is working (should print 42) local
+    print %1 local
 
     izero %0 local
     return

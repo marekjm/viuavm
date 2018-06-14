@@ -18,42 +18,42 @@
 ;
 
 .block: pull_and_do_nothing
-    draw %3
+    draw %3 local
     leave
 .end
 
 .block: await_message
-    idec %1
-    receive %3 100ms
+    idec %1 local
+    receive %3 local 100ms
     leave
 .end
 
 .function: message_sender/2
     .name: %iota times
     .name: %iota pid
-    arg %times .iota: 0  %iota
-    arg %pid %1
+    arg %times local .iota: 0  %iota
+    arg %pid local %1
 
     try
     catch "Exception" pull_and_do_nothing
     enter await_message
 
-    if %times next_iteration
-    send %pid (string %3 "Hello World!")
+    if %times local next_iteration
+    send %pid local (string %3 local "Hello World!") local
     return
 
     .mark: next_iteration
-    frame ^[(pamv %iota %times) (pamv %iota %pid)]
+    frame ^[(pamv %iota %times local) (pamv %iota %pid local)]
     tailcall message_sender/2
 
     return
 .end
 
 .function: main/0
-    frame ^[(pamv %iota (integer %1 5)) (pamv %iota (self %1))]
+    frame ^[(pamv %iota (integer %1 local 5) local) (pamv %iota (self %1 local) local)]
     process void message_sender/2
 
-    print (receive %iota infinity)
+    print (receive %iota local infinity) local
 
     izero %0 local
     return

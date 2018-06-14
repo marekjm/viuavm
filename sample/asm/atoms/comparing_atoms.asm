@@ -22,8 +22,8 @@
     atom (.name: %iota an_atom_again) local 'an_atom'
     atom (.name: %iota another_atom) local 'another_atom'
 
-    print (atomeq %iota local %an_atom local %an_atom_again local) local
-    print (atomeq %iota local %an_atom local %another_atom local) local
+    print (atomeq %iota %an_atom local %an_atom_again local) local
+    print (atomeq %iota %an_atom local %another_atom local) local
 
     izero %0 local
     return

@@ -18,7 +18,7 @@
 ;
 
 .closure: closure/0
-    throw %1
+    throw %1 local
     return
 .end
 
@@ -26,13 +26,13 @@
     .name: %iota a_closure
     .name: %iota an_int
 
-    integer %an_int 42
+    integer %an_int local 42
 
-    closure %a_closure closure/0
-    capturemove %a_closure %1 %an_int
+    closure %a_closure local closure/0
+    capturemove %a_closure local %1 %an_int local
 
     frame %0
-    tailcall %a_closure
+    tailcall %a_closure local
 .end
 
 .function: main/0

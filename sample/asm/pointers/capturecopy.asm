@@ -18,18 +18,18 @@
 ;
 
 .closure: printer/0
-    print %1
+    print %1 local
     return
 .end
 
 .function: main/0
-    ptr (.name: %iota pointer) (string (.name: %iota o) "Hello World!")
+    ptr (.name: %iota pointer) local (string (.name: %iota o) local "Hello World!") local
 
-    closure (.name: %iota cl) printer/0
-    capturecopy %cl %1 *pointer
+    closure (.name: %iota cl) local printer/0
+    capturecopy %cl local %1 *pointer local
 
     frame %0
-    call void %cl
+    call void %cl local
 
     izero %0 local
     return

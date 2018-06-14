@@ -18,10 +18,10 @@
 ;
 
 .function: main/0
-    print (string %1 "Hello World!")
-    echo (string %1 "received ")
-    echo (argc %1)
-    print (string %1 " arguments")
+    print (string %1 local "Hello World!") local
+    echo (string %1 local "received ") local
+    echo (argc %1 local) local
+    print (string %1 local " arguments") local
     izero %0 local
     return
 .end

@@ -113,10 +113,8 @@ class Stack {
     std::unique_ptr<viua::types::Value> caught;
 
     /*
-     *  Currently used register, and
-     *  global register set of parent process.
+     *  Global register set of parent process.
      */
-    viua::kernel::Register_set** currently_used_register_set;
     viua::kernel::Register_set* global_register_set;
 
     /*  Variables set after the VM has executed bytecode.
@@ -132,7 +130,6 @@ class Stack {
     auto unwind_to(const Try_frame*, std::string const) -> void;
     auto find_catch_frame() -> std::tuple<Try_frame*, std::string>;
 
-  public:
     auto set_return_value() -> void;
 
     auto state_of() const -> STATE;
@@ -140,8 +137,7 @@ class Stack {
 
     viua::scheduler::Virtual_process_scheduler* scheduler;
 
-    auto bind(viua::kernel::Register_set**, viua::kernel::Register_set*)
-        -> void;
+    auto bind(viua::kernel::Register_set*) -> void;
 
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
@@ -171,7 +167,6 @@ class Stack {
 
     Stack(std::string,
           Process*,
-          viua::kernel::Register_set**,
           viua::kernel::Register_set*,
           viua::scheduler::Virtual_process_scheduler*);
 
@@ -211,15 +206,6 @@ class Process {
 
     std::unique_ptr<viua::kernel::Register_set> global_register_set;
 
-    /*
-     * This pointer points different register sets during the process's
-     * lifetime. It can be explicitly adjusted by the user code (using "ress"
-     * instruction), or implicitly by the VM (e.g. when calling a closure).
-     * FIXME Remove this. It is not needed after "ress" was removed. The
-     * "current" pseudo-register set must also be removed for this to be viable.
-     */
-    viua::kernel::Register_set* currently_used_register_set;
-
     // Static registers
     std::map<std::string, std::unique_ptr<viua::kernel::Register_set>>
         static_registers;
@@ -232,11 +218,6 @@ class Process {
 
     std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
-    viua::types::Value* fetch(viua::internals::types::register_index) const;
-    std::unique_ptr<viua::types::Value> pop(
-        viua::internals::types::register_index);
-    void place(viua::internals::types::register_index,
-               std::unique_ptr<viua::types::Value>);
     void ensure_static_registers(std::string);
 
     /*  Methods dealing with stack and frame manipulation, and
@@ -438,11 +419,6 @@ class Process {
     auto dispatch(Op_address_type) -> Op_address_type;
     auto tick() -> Op_address_type;
 
-    viua::types::Value* obtain(viua::internals::types::register_index) const;
-    void put(viua::internals::types::register_index,
-             std::unique_ptr<viua::types::Value>);
-
-    viua::kernel::Register* register_at(viua::internals::types::register_index);
     viua::kernel::Register* register_at(viua::internals::types::register_index,
                                         viua::internals::Register_sets);
 

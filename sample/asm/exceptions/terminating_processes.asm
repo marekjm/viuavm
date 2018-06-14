@@ -3,17 +3,17 @@
 --
 --   This file is part of Viua VM.
 --
---   Viua VM is free software: you can redistribute it and/%or %modify
+--   Viua VM is free software: you can redistribute it and/or modify
 --   it under the terms of the GNU General Public License as published by
 --   the Free Software Foundation, either version 3 of the License, or
 --   (at your option) any later version.
 --
 --   Viua VM is distributed in the hope that it will be useful,
 --   but WITHOUT ANY WARRANTY; without even the implied warranty of
---   MERCHANTABILITY or %FITNESS %FOR %A PARTICULAR PURPOSE.  See the
+--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 --   GNU General Public License for more details.
 --
---   You should have received a copy %of %the GNU General Public License
+--   You should have received a copy of the GNU General Public License
 --   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 --
 
@@ -22,12 +22,12 @@
 .function: will_be_terminated/0
     ; wait for some time before throwing to display the stack trace roughly
     ; in the middle of output
-    frame ^[(pamv %0 (integer %1 512))]
+    frame ^[(pamv %0 (integer %1 local 512) local)]
     call std::misc::cycle/1
 
     ; it does not really matter what is thrown here, as long as it is not
     ; caught and causes the process to crash
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
 
     return
 .end
@@ -39,13 +39,13 @@
     ; run another one
     ;
     ; this is just means to have a few dummy processes running concurrently
-    frame ^[(pamv %0 (arg %1 %1))]
+    frame ^[(pamv %0 (arg %1 local %1) local)]
     call std::misc::cycle/1
 
     ; print hello to the screen to show that the process #n just finished running
     ; where #n is the "ID" assigned by the caller
-    echo (string %1 "Hello World from process ")
-    print (arg %1 %0)
+    echo (string %1 local "Hello World from process ") local
+    print (arg %1 local %0) local
 
     return
 .end
@@ -68,7 +68,7 @@
 
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2
-    param %1 (arg %1 %0)
+    param %1 (arg %1 local %0) local
     process void cycle_burner/2
 
     return
@@ -88,25 +88,25 @@
     ;
     ; make the processes run for varying periods of time by
     ; giving them different numbers of cycles to burn though
-    frame ^[(pamv %0 (integer %1 1000))]
+    frame ^[(pamv %0 (integer %1 local 1000) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 100))]
+    frame ^[(pamv %0 (integer %1 local 100) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 400))]
+    frame ^[(pamv %0 (integer %1 local 400) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 600))]
+    frame ^[(pamv %0 (integer %1 local 600) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 128))]
+    frame ^[(pamv %0 (integer %1 local 128) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 64))]
+    frame ^[(pamv %0 (integer %1 local 64) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 312))]
+    frame ^[(pamv %0 (integer %1 local 312) local)]
     call spawn_process/1
 
     ; all the processes are detached

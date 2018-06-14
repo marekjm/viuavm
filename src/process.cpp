@@ -35,35 +35,10 @@ using namespace std;
 viua::internals::types::register_index const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
 
-
-viua::types::Value* viua::process::Process::fetch(
-    viua::internals::types::register_index index) const {
-    /*  Return pointer to object at given register.
-     *  This method safeguards against reaching for out-of-bounds registers and
-     *  reading from an empty register.
-     */
-    viua::types::Value* object = currently_used_register_set->get(index);
-    if (dynamic_cast<viua::types::Reference*>(object)) {
-        object = static_cast<viua::types::Reference*>(object)->points_to();
-    }
-    return object;
-}
-viua::types::Value* viua::process::Process::obtain(
-    viua::internals::types::register_index index) const {
-    return fetch(index);
-}
-
-viua::kernel::Register* viua::process::Process::register_at(
-    viua::internals::types::register_index i) {
-    return currently_used_register_set->register_at(i);
-}
-
-viua::kernel::Register* viua::process::Process::register_at(
+auto viua::process::Process::register_at(
     viua::internals::types::register_index i,
-    viua::internals::Register_sets rs) {
-    if (rs == viua::internals::Register_sets::CURRENT) {
-        return currently_used_register_set->register_at(i);
-    } else if (rs == viua::internals::Register_sets::LOCAL) {
+    viua::internals::Register_sets rs) -> viua::kernel::Register* {
+    if (rs == viua::internals::Register_sets::LOCAL) {
         return stack->back()->local_register_set->register_at(i);
     } else if (rs == viua::internals::Register_sets::STATIC) {
         ensure_static_registers(stack->back()->function_name);
@@ -77,25 +52,6 @@ viua::kernel::Register* viua::process::Process::register_at(
     }
 }
 
-std::unique_ptr<viua::types::Value> viua::process::Process::pop(
-    viua::internals::types::register_index index) {
-    return currently_used_register_set->pop(index);
-}
-void viua::process::Process::place(viua::internals::types::register_index index,
-                                   std::unique_ptr<viua::types::Value> obj) {
-    /** Place an object in register with given index.
-     *
-     *  Before placing an object in register, a check is preformed if the
-     * register is empty. If not - the `viua::types::Value` previously stored in
-     * it is destroyed.
-     *
-     */
-    currently_used_register_set->set(index, std::move(obj));
-}
-void viua::process::Process::put(viua::internals::types::register_index index,
-                                 std::unique_ptr<viua::types::Value> o) {
-    place(index, std::move(o));
-}
 void viua::process::Process::ensure_static_registers(
     std::string function_name) {
     /** Makes sure that static register set for requested function is
@@ -125,7 +81,6 @@ void viua::process::Process::push_frame() {
         throw make_unique<viua::types::Exception>(oss.str());
     }
 
-    currently_used_register_set = stack->frame_new->local_register_set.get();
     if (find(stack->begin(), stack->end(), stack->frame_new) != stack->end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << stack->frame_new.get()
@@ -470,7 +425,6 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , scheduler(sch)
         , parent_process(pt)
         , global_register_set(nullptr)
-        , currently_used_register_set(nullptr)
         , stack(nullptr)
         , finished(false)
         , is_joinable(true)
@@ -479,15 +433,13 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , process_id(this)
         , is_hidden(false) {
     global_register_set =
-        make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
-    currently_used_register_set = frm->local_register_set.get();
-    auto s                      = make_unique<Stack>(frm->function_name,
+        std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
+    auto s                      = std::make_unique<Stack>(frm->function_name,
                                 this,
-                                &currently_used_register_set,
                                 global_register_set.get(),
                                 scheduler);
     s->emplace_back(std::move(frm));
-    s->bind(&currently_used_register_set, global_register_set.get());
+    s->bind(global_register_set.get());
     stack           = s.get();
     stacks[s.get()] = std::move(s);
 }

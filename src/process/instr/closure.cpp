@@ -31,20 +31,24 @@
 #include <viua/types/value.h>
 using namespace std;
 
+using viua::bytecode::decoder::operands::fetch_and_advance_addr;
+using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
+using Register_index = viua::internals::types::register_index;
+
 
 auto viua::process::Process::opcapture(Op_address_type addr)
     -> Op_address_type {
-    viua::types::Closure* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Closure>(addr, this);
+    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Closure>,
+        addr,
+        this);
 
-    viua::internals::types::register_index target_register = 0;
-    tie(addr, target_register) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const target_register = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
-    viua::kernel::Register* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
     if (target_register >= target->rs()->size()) {
         throw make_unique<viua::types::Exception>(
@@ -74,17 +78,17 @@ auto viua::process::Process::opcapture(Op_address_type addr)
 
 auto viua::process::Process::opcapturecopy(Op_address_type addr)
     -> Op_address_type {
-    viua::types::Closure* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Closure>(addr, this);
+    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Closure>,
+        addr,
+        this);
 
-    viua::internals::types::register_index target_register = 0;
-    tie(addr, target_register) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const target_register = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
-    viua::types::Value* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto const source = fetch_and_advance_addr<viua::types::Value*>(
+        viua::bytecode::decoder::operands::fetch_object, addr, this);
 
     if (target_register >= target->rs()->size()) {
         throw make_unique<viua::types::Exception>(
@@ -99,17 +103,17 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr)
 
 auto viua::process::Process::opcapturemove(Op_address_type addr)
     -> Op_address_type {
-    viua::types::Closure* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Closure>(addr, this);
+    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Closure>,
+        addr,
+        this);
 
-    viua::internals::types::register_index target_register = 0;
-    tie(addr, target_register) =
-        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    auto const target_register = fetch_and_advance_addr<Register_index>(
+        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
 
-    viua::kernel::Register* source = nullptr;
-    tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
     if (target_register >= target->rs()->size()) {
         throw make_unique<viua::types::Exception>(
@@ -126,16 +130,14 @@ auto viua::process::Process::opclosure(Op_address_type addr)
     -> Op_address_type {
     /** Create a closure from a function.
      */
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
-    auto function_name = std::string{};
-    tie(addr, function_name) =
-        viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto const function_name = fetch_and_advance_addr<std::string>(
+        viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
     auto rs = make_unique<viua::kernel::Register_set>(
-        currently_used_register_set->size());
+        stack->back()->local_register_set->size());
     auto closure =
         make_unique<viua::types::Closure>(function_name, std::move(rs));
 
@@ -152,13 +154,11 @@ auto viua::process::Process::opfunction(Op_address_type addr)
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
+        viua::bytecode::decoder::operands::fetch_register, addr, this);
 
-    auto function_name = std::string{};
-    tie(addr, function_name) =
-        viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto const function_name = fetch_and_advance_addr<std::string>(
+        viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
     *target = make_unique<viua::types::Function>(function_name);
 

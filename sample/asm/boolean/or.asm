@@ -18,22 +18,22 @@
 ;
 
 .function: boolean/1
-    move %0 (not (not (arg %1 %0)))
+    move %0 local (not (not (arg %1 local %0 local) local) local) local
     return
 .end
 
 .function: main/1
-    frame ^[(pamv %0 (izero %1))]
-    call %1 boolean/1
+    frame ^[(pamv %0 (izero %1 local) local)]
+    call %1 local boolean/1
 
-    frame ^[(pamv %0 (integer %2 1))]
-    call %2 boolean/1
+    frame ^[(pamv %0 (integer %2 local 1) local)]
+    call %2 local boolean/1
 
-    or %3 %1 %2
+    or %3 local %1 local %2 local
 
-    print %1
-    print %2
-    print %3
+    print %1 local
+    print %2 local
+    print %3 local
 
     izero %0 local
     return

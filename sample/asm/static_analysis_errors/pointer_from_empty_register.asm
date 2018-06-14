@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    ptr %2 %1
+    ptr %2 local %1 local
 
     izero %0 local
     return

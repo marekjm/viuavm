@@ -20,7 +20,7 @@
 ;.signature: lib::foo/1
 
 .function: main/1
-    frame ^[(pamv %0 (string %1 "Hello World!"))]
+    frame ^[(pamv %0 (string %1 local "Hello World!") local)]
     call lib::foo/1
 
     izero %0 local
