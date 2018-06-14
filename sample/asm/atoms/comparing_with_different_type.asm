@@ -21,7 +21,7 @@
     atom (.name: %iota an_atom) local 'an_atom'
     integer (.name: %iota an_integer) local 42
 
-    print (atomeq %iota %an_atom local %an_integer local)
+    print (atomeq %iota %an_atom local %an_integer local) local
 
     izero %0 local
     return
