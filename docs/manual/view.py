@@ -155,6 +155,8 @@ KEYWORD_WRAP_BEGIN_REGEX = re.compile(r'\\wrap{begin}')
 KEYWORD_WRAP_END_REGEX = re.compile(r'\\wrap{end}')
 KEYWORD_LIST_BEGIN_REGEX = re.compile(r'\\list{begin}')
 KEYWORD_LIST_END_REGEX = re.compile(r'\\list{end}')
+KEYWORD_LISTED_BEGIN_REGEX = re.compile(r'\\listed{begin}')
+KEYWORD_LISTED_END_REGEX = re.compile(r'\\listed{end}')
 KEYWORD_ITEM_REGEX = re.compile(r'\\item')
 KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
 KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
@@ -215,6 +217,12 @@ def into_paragraphs(text):
             para = []
             continue
         if each == r'\list{begin}' or each == r'\list{end}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
+        if KEYWORD_LISTED_BEGIN_REGEX.match(each) or each == r'\listed{end}':
             if para:
                 paragraphs.append(para)
             paragraphs.append([each])
@@ -907,6 +915,10 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
     in_list = False
     new_list_item = False
 
+    in_listed = False
+    in_listed_sorted = False
+    listed_items = []
+
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
@@ -929,6 +941,19 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
         if each == r'\list{end}':
             in_list = False
             indent -= 2
+            continue
+        if each.startswith(r'\listed{begin}'):
+            params = build_params(PARAMETER_REGEX.findall(each[len(r'\listed{begin}'):]), {
+                'sorted': Types.boolean,
+            }, default = {
+                'sorted': False,
+            })
+
+            in_listed = True
+            in_listed_sorted = params['sorted']
+            continue
+        if each == r'\listed{end}':
+            in_listed = False
             continue
         if each == r'\item':
             new_list_item = True
@@ -964,6 +989,39 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             render_heading(heading_text, indent, noise = params['noise'], ref = params['ref'])
             continue
         if each.startswith(COMMENT_MARKER):
+            continue
+
+        if in_listed:
+            listed_items.append(each)
+            continue
+        if (not in_listed) and listed_items:
+            listed_items = listed_items[0].splitlines()
+            longest_item = max(map(len, listed_items))
+
+            if in_listed_sorted:
+                listed_items = sorted(listed_items)
+
+            def chunks(seq, chunk_length):
+                chunked = []
+
+                i = 0
+                while i < len(seq):
+                    chunked.append(seq[i : i + chunk_length])
+                    i += chunk_length
+
+                return chunked
+
+            chunked = chunks(listed_items, 4)
+            chunked = [list(map(lambda element: element.ljust(longest_item + 4), each)) for each in chunked]
+
+            text = '\n'.join([''.join(each) for each in chunked])
+            text = textwrap.indent(
+                text = text,
+                prefix = (' ' * (indent + DEFAULT_INDENT_WIDTH)),
+            )
+            print(text)
+
+            listed_items = []
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
