@@ -995,8 +995,9 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             listed_items.append(each)
             continue
         if (not in_listed) and listed_items:
-            listed_items = listed_items[0].splitlines()
+            listed_items = [each.strip() for each in listed_items[0].splitlines()]
             longest_item = max(map(len, listed_items))
+            charactes_for_one_item = longest_item + 4
 
             if in_listed_sorted:
                 listed_items = sorted(listed_items)
@@ -1011,13 +1012,18 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
 
                 return chunked
 
-            chunked = chunks(listed_items, 4)
-            chunked = [list(map(lambda element: element.ljust(longest_item + 4), each)) for each in chunked]
+            listed_indent = (indent + DEFAULT_INDENT_WIDTH)
+            words_per_chunk = ((LINE_WIDTH - listed_indent) // charactes_for_one_item)
+
+            chunked = chunks(listed_items, chunk_length = words_per_chunk)
+            chunked = [list(map(lambda element: element.ljust(charactes_for_one_item), each))
+                       for each
+                       in chunked]
 
             text = '\n'.join([''.join(each) for each in chunked])
             text = textwrap.indent(
                 text = text,
-                prefix = (' ' * (indent + DEFAULT_INDENT_WIDTH)),
+                prefix = (' ' * listed_indent),
             )
             print(text)
 
