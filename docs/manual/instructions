@@ -1,4 +1,4 @@
-There are 138 instructions currently implemented by the VM:
+There are 138 instructions in the instruction set currently implemented by the VM:
 
 \listed{begin}{sorted=true}
     nop
@@ -144,8 +144,7 @@ There are 138 instructions currently implemented by the VM:
 
 \break
 
-This section contains a reference for Viua VM instruction set, and
-has a description of every one of them; with documented inputs, outputs, and exceptions.
+This section contains a reference for every one of them, with documented inputs, outputs, and exceptions.
 
 It is loosely modelled after Appendix A to William Hohl's 2009 book "ARM Assembly Language: Fundamentals and
 Techniques" (ISBN 9781439806104).
