@@ -19,8 +19,8 @@
 
 .function: adder/1
     ; expects register 1 to be an captured integer
-    arg %2 %0
-    add %0 %2 %1
+    arg %2 local %0
+    add %0 local %2 local %1 local
     return
 .end
 
@@ -31,30 +31,30 @@
     ; example:
     ;   make_adder(3)(5) == 8
     .name: 1 number
-    arg %number %0
-    closure %2 adder/1
-    capture %2 %1 %1
-    move %0 %2
+    arg %number local %0
+    closure %2 local adder/1
+    capture %2 local %1 %1 local
+    move %0 local %2 local
     return
 .end
 
 .function: main/1
     ; create the adder function
     .name: 2 add_three
-    frame ^[(param %0 (integer %1 3))]
-    call %add_three make_adder/1
+    frame ^[(param %0 (integer %1 local 3) local)]
+    call %add_three local make_adder/1
 
     ; add_three(2)
-    frame ^[(param %0 (integer %3 2))]
-    print (call %4 %add_three)
+    frame ^[(param %0 (integer %3 local 2) local)]
+    print (call %4 local %add_three local) local
 
     ; add_three(5)
-    frame ^[(param %0 (integer %3 5))]
-    print (call %4 %add_three)
+    frame ^[(param %0 (integer %3 local 5) local)]
+    print (call %4 local %add_three local) local
 
     ; add_three(13)
-    frame ^[(param %0 (integer %3 13))]
-    print (call %4 %add_three)
+    frame ^[(param %0 (integer %3 local 13))]
+    print (call %4 local %add_three local) local
 
     izero %0 local
     return

@@ -28,17 +28,24 @@ using namespace std;
 
 
 void viua::scheduler::ffi::ff_call_processor(
-    vector<unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>>* requests,
-    map<string, ForeignFunction*>* foreign_functions, mutex* ff_map_mtx, mutex* mtx, condition_variable* cv) {
+    std::vector<std::unique_ptr<
+        viua::scheduler::ffi::Foreign_function_call_request>>* requests,
+    map<std::string, ForeignFunction*>* foreign_functions,
+    mutex* ff_map_mtx,
+    mutex* mtx,
+    condition_variable* cv) {
     while (true) {
         unique_lock<mutex> lock(*mtx);
 
-        // wait in a loop, because wait_for() can still return even if the requests queue is empty
-        while (not cv->wait_for(lock, chrono::milliseconds(2000),
-                                [requests]() { return not requests->empty(); }))
+        // wait in a loop, because wait_for() can still return even if the
+        // requests queue is empty
+        while (not cv->wait_for(lock, chrono::milliseconds(2000), [requests]() {
+            return not requests->empty();
+        }))
             ;
 
-        unique_ptr<ForeignFunctionCallRequest> request(std::move(requests->front()));
+        std::unique_ptr<Foreign_function_call_request> request(
+            std::move(requests->front()));
         requests->erase(requests->begin());
 
         // unlock as soon as the request is obtained
@@ -49,14 +56,15 @@ void viua::scheduler::ffi::ff_call_processor(
             break;
         }
 
-        string call_name = request->function_name();
+        std::string call_name = request->function_name();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
-            request->raise(
-                make_unique<viua::types::Exception>("call to unregistered foreign function: " + call_name));
+            request->raise(make_unique<viua::types::Exception>(
+                "call to unregistered foreign function: " + call_name));
         } else {
             auto function = foreign_functions->at(call_name);
-            ff_map_lock.unlock();  // unlock the mutex - foreign call can block for unspecified period of time
+            ff_map_lock.unlock();  // unlock the mutex - foreign call can block
+                                   // for unspecified period of time
             request->call(function);
         }
 

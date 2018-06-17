@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -35,461 +35,445 @@
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
 #include <viua/pid.h>
-#include <viua/types/prototype.h>
 #include <viua/types/value.h>
 
 
-const viua::internals::types::register_index DEFAULT_REGISTER_SIZE = 255;
-const uint16_t MAX_STACK_SIZE = 8192;
-
-
-class HaltException : public std::runtime_error {
+class Halt_exception : public std::runtime_error {
   public:
-    HaltException() : std::runtime_error("execution halted") {}
+    Halt_exception() : std::runtime_error("execution halted") {}
 };
 
 
-namespace viua {
-    namespace scheduler {
-        class VirtualProcessScheduler;
-    }
-}  // namespace viua
+namespace viua { namespace scheduler {
+class Virtual_process_scheduler;
+}}  // namespace viua::scheduler
 
-namespace viua {
-    namespace process {
-        class Process;
+namespace viua { namespace process {
+class Process;
 
-        class Stack {
-          public:
-            enum class STATE {
-                /*
-                 * Before stack begins executing.
-                 */
-                UNINITIALISED,
+using viua::internals::types::Op_address_type;
 
-                /*
-                 * Normal state.
-                 * Stack is executing instructions normally.
-                 */
-                RUNNING,
+class Stack {
+  public:
+    enum class STATE {
+        /*
+         * Before stack begins executing.
+         */
+        UNINITIALISED,
 
-                /*
-                 * Stack is suspended because of deferred calls it triggered when returning
-                 * from a call normally.
-                 * The VM should finish executing any stacks spawned by this stack's
-                 * deferred calls, and then return to continue executing this stack.
-                 */
-                SUSPENDED_BY_DEFERRED_ON_FRAME_POP,
+        /*
+         * Normal state.
+         * Stack is executing instructions normally.
+         */
+        RUNNING,
 
-                /*
-                 * Stack is suspended until deferred calls triggered  by stack unwinding have
-                 * finished running.
-                 */
-                SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING,
+        /*
+         * Stack is suspended because of deferred calls it triggered when
+         * returning from a call normally. The VM should finish executing any
+         * stacks spawned by this stack's deferred calls, and then return to
+         * continue executing this stack.
+         */
+        SUSPENDED_BY_DEFERRED_ON_FRAME_POP,
 
-                /*
-                 * Entered after execution hits the `halt` opcode.
-                 * Execution is stopped *immediately* after entering this state meaning
-                 * that the stack is not unwound, deferred calls are not invoked, etc.
-                 */
-                HALTED,
-            };
+        /*
+         * Stack is suspended until deferred calls triggered  by stack unwinding
+         * have finished running.
+         */
+        SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING,
 
-          private:
-            std::vector<std::unique_ptr<Frame>> frames;
-            STATE current_state = STATE::UNINITIALISED;
+        /*
+         * Entered after execution hits the `halt` opcode.
+         * Execution is stopped *immediately* after entering this state meaning
+         * that the stack is not unwound, deferred calls are not invoked, etc.
+         */
+        HALTED,
+    };
 
-          public:
-            const std::string entry_function;
-            Process* parent_process;
+  private:
+    std::vector<std::unique_ptr<Frame>> frames;
+    STATE current_state = STATE::UNINITIALISED;
 
-            viua::internals::types::byte* jump_base;
-            viua::internals::types::byte* instruction_pointer;
+  public:
+    std::string const entry_function;
+    Process* parent_process;
 
-            std::unique_ptr<Frame> frame_new;
-            using size_type = decltype(frames)::size_type;
+    Op_address_type jump_base;
+    Op_address_type instruction_pointer;
 
-            std::vector<std::unique_ptr<TryFrame>> tryframes;
-            std::unique_ptr<TryFrame> try_frame_new;
+    std::unique_ptr<Frame> frame_new;
+    using size_type = decltype(frames)::size_type;
 
-            /*  Slot for thrown objects (typically exceptions).
-             *  Can be set either by user code, or the VM.
-             */
-            std::unique_ptr<viua::types::Value> thrown;
-            std::unique_ptr<viua::types::Value> caught;
+    std::vector<std::unique_ptr<Try_frame>> tryframes;
+    std::unique_ptr<Try_frame> try_frame_new;
 
-            /*
-             *  Currently used register, and
-             *  global register set of parent process.
-             */
-            viua::kernel::RegisterSet** currently_used_register_set;
-            viua::kernel::RegisterSet* global_register_set;
+    /*  Slot for thrown objects (typically exceptions).
+     *  Can be set either by user code, or the VM.
+     */
+    std::unique_ptr<viua::types::Value> thrown;
+    std::unique_ptr<viua::types::Value> caught;
 
-            /*  Variables set after the VM has executed bytecode.
-             *  They describe exit conditions of the bytecode that just stopped running.
-             */
-            std::unique_ptr<viua::types::Value> return_value;  // return value of top-most frame on the stack
+    /*
+     *  Global register set of parent process.
+     */
+    viua::kernel::Register_set* global_register_set;
 
-            void adjust_instruction_pointer(const TryFrame*, const std::string);
-            auto unwind_call_stack_to(const Frame*) -> void;
-            auto unwind_try_stack_to(const TryFrame*) -> void;
-            auto unwind_to(const TryFrame*, const std::string) -> void;
-            auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
+    /*  Variables set after the VM has executed bytecode.
+     *  They describe exit conditions of the bytecode that just stopped running.
+     */
+    std::unique_ptr<viua::types::Value> return_value;  // return value of
+                                                       // top-most frame on the
+                                                       // stack
 
-          public:
-            auto set_return_value() -> void;
+    void adjust_instruction_pointer(const Try_frame*, std::string const);
+    auto unwind_call_stack_to(const Frame*) -> void;
+    auto unwind_try_stack_to(const Try_frame*) -> void;
+    auto unwind_to(const Try_frame*, std::string const) -> void;
+    auto find_catch_frame() -> std::tuple<Try_frame*, std::string>;
 
-            auto state_of() const -> STATE;
-            auto state_of(const STATE) -> STATE;
+    auto set_return_value() -> void;
 
-            viua::scheduler::VirtualProcessScheduler* scheduler;
+    auto state_of() const -> STATE;
+    auto state_of(const STATE) -> STATE;
 
-            auto bind(viua::kernel::RegisterSet**, viua::kernel::RegisterSet*) -> void;
+    viua::scheduler::Virtual_process_scheduler* scheduler;
 
-            auto begin() const -> decltype(frames.begin());
-            auto end() const -> decltype(frames.end());
+    auto bind(viua::kernel::Register_set*) -> void;
 
-            auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
-            auto back() const -> decltype(frames.back());
+    auto begin() const -> decltype(frames.begin());
+    auto end() const -> decltype(frames.end());
 
-            auto register_deferred_calls_from(Frame*) -> void;
-            auto register_deferred_calls(const bool = true) -> void;
-            auto pop() -> std::unique_ptr<Frame>;
+    auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
+    auto back() const -> decltype(frames.back());
 
-            auto size() const -> decltype(frames)::size_type;
-            auto clear() -> void;
+    auto register_deferred_calls_from(Frame*) -> void;
+    auto register_deferred_calls(bool const = true) -> void;
+    auto pop() -> std::unique_ptr<Frame>;
 
-            auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
+    auto size() const -> decltype(frames)::size_type;
+    auto clear() -> void;
 
-            auto prepare_frame(viua::internals::types::register_index, viua::internals::types::register_index)
-                -> Frame*;
-            auto push_prepared_frame() -> void;
+    auto emplace_back(std::unique_ptr<Frame> f)
+        -> decltype(frames.emplace_back(f));
 
-            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
-            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
-            auto unwind() -> void;
+    auto prepare_frame(viua::internals::types::register_index,
+                       viua::internals::types::register_index) -> Frame*;
+    auto push_prepared_frame() -> void;
 
-            Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*,
-                  viua::scheduler::VirtualProcessScheduler*);
-        };
+    auto adjust_jump_base_for_block(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    auto unwind() -> void;
 
-        class Process {
+    Stack(std::string,
+          Process*,
+          viua::kernel::Register_set*,
+          viua::scheduler::Virtual_process_scheduler*);
+
+    static uint16_t const MAX_STACK_SIZE = 8192;
+};
+
+class Process {
 #ifdef AS_DEBUG_HEADER
-          public:
+  public:
 #endif
-            friend Stack;
-            /*
-             * Variables set below control whether the VM should gather and
-             * emit additional (debugging, profiling, tracing) information
-             * regarding executed code.
-             */
-            const bool tracing_enabled;
-            auto get_trace_line(viua::internals::types::byte*) const -> std::string;
-            auto emit_trace_line(viua::internals::types::byte*) const -> void;
+    friend Stack;
+    /*
+     * Variables set below control whether the VM should gather and
+     * emit additional (debugging, profiling, tracing) information
+     * regarding executed code.
+     */
+    bool const tracing_enabled;
+    auto get_trace_line(viua::internals::types::byte const*) const
+        -> std::string;
+    auto emit_trace_line(viua::internals::types::byte const*) const -> void;
 
-            /*
-             * Pointer to scheduler the process is currently bound to.
-             * This is not constant because processes may migrate between
-             * schedulers during load balancing.
-             */
-            viua::scheduler::VirtualProcessScheduler* scheduler;
+    /*
+     * Pointer to scheduler the process is currently bound to.
+     * This is not constant because processes may migrate between
+     * schedulers during load balancing.
+     */
+    viua::scheduler::Virtual_process_scheduler* scheduler;
 
-            /*
-             * Parent process of this process.
-             * May be null if this process has been detached.
-             */
-            viua::process::Process* parent_process;
+    /*
+     * Parent process of this process.
+     * May be null if this process has been detached.
+     */
+    viua::process::Process* parent_process;
 
-            std::string watchdog_function{""};
-            bool watchdog_failed{false};
+    std::string watchdog_function{""};
+    bool watchdog_failed{false};
 
-            std::unique_ptr<viua::kernel::RegisterSet> global_register_set;
+    std::unique_ptr<viua::kernel::Register_set> global_register_set;
 
-            /*
-             * This pointer points different register sets during the process's lifetime.
-             * It can be explicitly adjusted by the user code (using "ress" instruction), or
-             * implicitly by the VM (e.g. when calling a closure).
-             */
-            viua::kernel::RegisterSet* currently_used_register_set;
-
-            // Static registers
-            std::map<std::string, std::unique_ptr<viua::kernel::RegisterSet>> static_registers;
+    // Static registers
+    std::map<std::string, std::unique_ptr<viua::kernel::Register_set>>
+        static_registers;
 
 
-            // Call stack
-            std::map<Stack*, std::unique_ptr<Stack>> stacks;
-            Stack* stack;
-            std::stack<Stack*> stacks_order;
+    // Call stack
+    std::map<Stack*, std::unique_ptr<Stack>> stacks;
+    Stack* stack;
+    std::stack<Stack*> stacks_order;
 
-            std::queue<std::unique_ptr<viua::types::Value>> message_queue;
+    std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
-            viua::types::Value* fetch(viua::internals::types::register_index) const;
-            std::unique_ptr<viua::types::Value> pop(viua::internals::types::register_index);
-            void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
-            void ensure_static_registers(std::string);
+    void ensure_static_registers(std::string);
 
-            /*  Methods dealing with stack and frame manipulation, and
-             *  function calls.
-             */
-            Frame* request_new_frame(viua::internals::types::register_index arguments_size = 0,
-                                     viua::internals::types::register_index registers_size = 0);
-            TryFrame* request_new_try_frame();
-            void push_frame();
-            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
-            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
-            // call native (i.e. written in Viua) function
-            viua::internals::types::byte* call_native(viua::internals::types::byte*, const std::string&,
-                                                      viua::kernel::Register*, const std::string&);
-            // call foreign (i.e. from a C++ extension) function
-            viua::internals::types::byte* call_foreign(viua::internals::types::byte*, const std::string&,
-                                                       viua::kernel::Register*, const std::string&);
-            // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            viua::internals::types::byte* call_foreign_method(viua::internals::types::byte*,
-                                                              viua::types::Value*, const std::string&,
-                                                              viua::kernel::Register*, const std::string&);
+    /*  Methods dealing with stack and frame manipulation, and
+     *  function calls.
+     */
+    Frame* request_new_frame(
+        viua::internals::types::register_index arguments_size = 0,
+        viua::internals::types::register_index registers_size = 0);
+    Try_frame* request_new_try_frame();
+    void push_frame();
+    auto adjust_jump_base_for_block(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    auto adjust_jump_base_for(std::string const&)
+        -> viua::internals::types::Op_address_type;
+    // call native (i.e. written in Viua) function
+    auto call_native(Op_address_type,
+                     std::string const&,
+                     viua::kernel::Register* const,
+                     std::string const&) -> Op_address_type;
+    // call foreign (i.e. from a C++ extension) function
+    auto call_foreign(Op_address_type,
+                      std::string const&,
+                      viua::kernel::Register* const,
+                      std::string const&) -> Op_address_type;
 
-            auto push_deferred(std::string) -> void;
+    auto push_deferred(std::string const) -> void;
 
-            std::atomic_bool finished;
-            std::atomic_bool is_joinable;
-            std::atomic_bool is_suspended;
-            viua::internals::types::process_time_slice_type process_priority;
-            std::mutex process_mtx;
+    std::atomic_bool finished;
+    std::atomic_bool is_joinable;
+    std::atomic_bool is_suspended;
+    viua::internals::types::process_time_slice_type process_priority;
+    std::mutex process_mtx;
 
-            /*  viua::process::Process identifier.
-             */
-            viua::process::PID process_id;
-            bool is_hidden;
+    /*  viua::process::Process identifier.
+     */
+    viua::process::PID process_id;
+    bool is_hidden;
 
-            /*  Timeouts for message passing, and
-             *  multiprocessing.
-             */
-            std::chrono::steady_clock::time_point waiting_until;
-            bool timeout_active = false;
-            bool wait_until_infinity = false;
+    /*  Timeouts for message passing, and
+     *  multiprocessing.
+     */
+    std::chrono::steady_clock::time_point waiting_until;
+    bool timeout_active      = false;
+    bool wait_until_infinity = false;
 
-            /*  Methods implementing individual instructions.
-             */
-            viua::internals::types::byte* opizero(viua::internals::types::byte*);
-            viua::internals::types::byte* opinteger(viua::internals::types::byte*);
-            viua::internals::types::byte* opiinc(viua::internals::types::byte*);
-            viua::internals::types::byte* opidec(viua::internals::types::byte*);
+    /*  Methods implementing individual instructions.
+     */
+    auto opizero(Op_address_type) -> Op_address_type;
+    auto opinteger(Op_address_type) -> Op_address_type;
+    auto opiinc(Op_address_type) -> Op_address_type;
+    auto opidec(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opfloat(viua::internals::types::byte*);
+    auto opfloat(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opitof(viua::internals::types::byte*);
-            viua::internals::types::byte* opftoi(viua::internals::types::byte*);
-            viua::internals::types::byte* opstoi(viua::internals::types::byte*);
-            viua::internals::types::byte* opstof(viua::internals::types::byte*);
+    auto opitof(Op_address_type) -> Op_address_type;
+    auto opftoi(Op_address_type) -> Op_address_type;
+    auto opstoi(Op_address_type) -> Op_address_type;
+    auto opstof(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opsub(viua::internals::types::byte*);
-            viua::internals::types::byte* opmul(viua::internals::types::byte*);
-            viua::internals::types::byte* opdiv(viua::internals::types::byte*);
-            viua::internals::types::byte* oplt(viua::internals::types::byte*);
-            viua::internals::types::byte* oplte(viua::internals::types::byte*);
-            viua::internals::types::byte* opgt(viua::internals::types::byte*);
-            viua::internals::types::byte* opgte(viua::internals::types::byte*);
-            viua::internals::types::byte* opeq(viua::internals::types::byte*);
+    auto opadd(Op_address_type) -> Op_address_type;
+    auto opsub(Op_address_type) -> Op_address_type;
+    auto opmul(Op_address_type) -> Op_address_type;
+    auto opdiv(Op_address_type) -> Op_address_type;
+    auto oplt(Op_address_type) -> Op_address_type;
+    auto oplte(Op_address_type) -> Op_address_type;
+    auto opgt(Op_address_type) -> Op_address_type;
+    auto opgte(Op_address_type) -> Op_address_type;
+    auto opeq(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opstring(viua::internals::types::byte*);
+    auto opstring(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* optext(viua::internals::types::byte*);
-            viua::internals::types::byte* optexteq(viua::internals::types::byte*);
-            viua::internals::types::byte* optextat(viua::internals::types::byte*);
-            viua::internals::types::byte* optextsub(viua::internals::types::byte*);
-            viua::internals::types::byte* optextlength(viua::internals::types::byte*);
-            viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte*);
-            viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*);
-            viua::internals::types::byte* optextconcat(viua::internals::types::byte*);
+    auto optext(Op_address_type) -> Op_address_type;
+    auto optexteq(Op_address_type) -> Op_address_type;
+    auto optextat(Op_address_type) -> Op_address_type;
+    auto optextsub(Op_address_type) -> Op_address_type;
+    auto optextlength(Op_address_type) -> Op_address_type;
+    auto optextcommonprefix(Op_address_type) -> Op_address_type;
+    auto optextcommonsuffix(Op_address_type) -> Op_address_type;
+    auto optextconcat(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opvector(viua::internals::types::byte*);
-            viua::internals::types::byte* opvinsert(viua::internals::types::byte*);
-            viua::internals::types::byte* opvpush(viua::internals::types::byte*);
-            viua::internals::types::byte* opvpop(viua::internals::types::byte*);
-            viua::internals::types::byte* opvat(viua::internals::types::byte*);
-            viua::internals::types::byte* opvlen(viua::internals::types::byte*);
+    auto opvector(Op_address_type) -> Op_address_type;
+    auto opvinsert(Op_address_type) -> Op_address_type;
+    auto opvpush(Op_address_type) -> Op_address_type;
+    auto opvpop(Op_address_type) -> Op_address_type;
+    auto opvat(Op_address_type) -> Op_address_type;
+    auto opvlen(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* boolean(viua::internals::types::byte*);
-            viua::internals::types::byte* opnot(viua::internals::types::byte*);
-            viua::internals::types::byte* opand(viua::internals::types::byte*);
-            viua::internals::types::byte* opor(viua::internals::types::byte*);
+    auto opboolean(Op_address_type) -> Op_address_type;
+    auto opnot(Op_address_type) -> Op_address_type;
+    auto opand(Op_address_type) -> Op_address_type;
+    auto opor(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opbits(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitand(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitor(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitnot(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitxor(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitat(viua::internals::types::byte*);
-            viua::internals::types::byte* opbitset(viua::internals::types::byte*);
-            viua::internals::types::byte* opshl(viua::internals::types::byte*);
-            viua::internals::types::byte* opshr(viua::internals::types::byte*);
-            viua::internals::types::byte* opashl(viua::internals::types::byte*);
-            viua::internals::types::byte* opashr(viua::internals::types::byte*);
-            viua::internals::types::byte* oprol(viua::internals::types::byte*);
-            viua::internals::types::byte* opror(viua::internals::types::byte*);
+    auto opbits(Op_address_type) -> Op_address_type;
+    auto opbitand(Op_address_type) -> Op_address_type;
+    auto opbitor(Op_address_type) -> Op_address_type;
+    auto opbitnot(Op_address_type) -> Op_address_type;
+    auto opbitxor(Op_address_type) -> Op_address_type;
+    auto opbitat(Op_address_type) -> Op_address_type;
+    auto opbitset(Op_address_type) -> Op_address_type;
+    auto opshl(Op_address_type) -> Op_address_type;
+    auto opshr(Op_address_type) -> Op_address_type;
+    auto opashl(Op_address_type) -> Op_address_type;
+    auto opashr(Op_address_type) -> Op_address_type;
+    auto oprol(Op_address_type) -> Op_address_type;
+    auto opror(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opwrapincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opwrapdecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opwrapadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opwrapsub(viua::internals::types::byte*);
-            viua::internals::types::byte* opwrapmul(viua::internals::types::byte*);
-            viua::internals::types::byte* opwrapdiv(viua::internals::types::byte*);
+    auto opwrapincrement(Op_address_type) -> Op_address_type;
+    auto opwrapdecrement(Op_address_type) -> Op_address_type;
+    auto opwrapadd(Op_address_type) -> Op_address_type;
+    auto opwrapsub(Op_address_type) -> Op_address_type;
+    auto opwrapmul(Op_address_type) -> Op_address_type;
+    auto opwrapdiv(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opcheckedsincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedsdecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedsadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedssub(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedsmul(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedsdiv(viua::internals::types::byte*);
+    auto opcheckedsincrement(Op_address_type) -> Op_address_type;
+    auto opcheckedsdecrement(Op_address_type) -> Op_address_type;
+    auto opcheckedsadd(Op_address_type) -> Op_address_type;
+    auto opcheckedssub(Op_address_type) -> Op_address_type;
+    auto opcheckedsmul(Op_address_type) -> Op_address_type;
+    auto opcheckedsdiv(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opcheckeduincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedudecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckeduadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedusub(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedumul(viua::internals::types::byte*);
-            viua::internals::types::byte* opcheckedudiv(viua::internals::types::byte*);
+    auto opcheckeduincrement(Op_address_type) -> Op_address_type;
+    auto opcheckedudecrement(Op_address_type) -> Op_address_type;
+    auto opcheckeduadd(Op_address_type) -> Op_address_type;
+    auto opcheckedusub(Op_address_type) -> Op_address_type;
+    auto opcheckedumul(Op_address_type) -> Op_address_type;
+    auto opcheckedudiv(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opsaturatingsincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingsdecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingsadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingssub(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingsmul(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingsdiv(viua::internals::types::byte*);
+    auto opsaturatingsincrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingsdecrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingsadd(Op_address_type) -> Op_address_type;
+    auto opsaturatingssub(Op_address_type) -> Op_address_type;
+    auto opsaturatingsmul(Op_address_type) -> Op_address_type;
+    auto opsaturatingsdiv(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opsaturatinguincrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingudecrement(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatinguadd(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingusub(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingumul(viua::internals::types::byte*);
-            viua::internals::types::byte* opsaturatingudiv(viua::internals::types::byte*);
+    auto opsaturatinguincrement(Op_address_type) -> Op_address_type;
+    auto opsaturatingudecrement(Op_address_type) -> Op_address_type;
+    auto opsaturatinguadd(Op_address_type) -> Op_address_type;
+    auto opsaturatingusub(Op_address_type) -> Op_address_type;
+    auto opsaturatingumul(Op_address_type) -> Op_address_type;
+    auto opsaturatingudiv(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opmove(viua::internals::types::byte*);
-            viua::internals::types::byte* opcopy(viua::internals::types::byte*);
-            viua::internals::types::byte* opptr(viua::internals::types::byte*);
-            viua::internals::types::byte* opswap(viua::internals::types::byte*);
-            viua::internals::types::byte* opdelete(viua::internals::types::byte*);
-            viua::internals::types::byte* opisnull(viua::internals::types::byte*);
+    auto opmove(Op_address_type) -> Op_address_type;
+    auto opcopy(Op_address_type) -> Op_address_type;
+    auto opptr(Op_address_type) -> Op_address_type;
+    auto opptrlive(Op_address_type) -> Op_address_type;
+    auto opswap(Op_address_type) -> Op_address_type;
+    auto opdelete(Op_address_type) -> Op_address_type;
+    auto opisnull(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opress(viua::internals::types::byte*);
+    auto opprint(Op_address_type) -> Op_address_type;
+    auto opecho(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opprint(viua::internals::types::byte*);
-            viua::internals::types::byte* opecho(viua::internals::types::byte*);
+    auto opcapture(Op_address_type) -> Op_address_type;
+    auto opcapturecopy(Op_address_type) -> Op_address_type;
+    auto opcapturemove(Op_address_type) -> Op_address_type;
+    auto opclosure(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opcapture(viua::internals::types::byte*);
-            viua::internals::types::byte* opcapturecopy(viua::internals::types::byte*);
-            viua::internals::types::byte* opcapturemove(viua::internals::types::byte*);
-            viua::internals::types::byte* opclosure(viua::internals::types::byte*);
+    auto opfunction(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opfunction(viua::internals::types::byte*);
+    auto opframe(Op_address_type) -> Op_address_type;
+    auto opparam(Op_address_type) -> Op_address_type;
+    auto oppamv(Op_address_type) -> Op_address_type;
+    auto oparg(Op_address_type) -> Op_address_type;
+    auto opargc(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opframe(viua::internals::types::byte*);
-            viua::internals::types::byte* opparam(viua::internals::types::byte*);
-            viua::internals::types::byte* oppamv(viua::internals::types::byte*);
-            viua::internals::types::byte* oparg(viua::internals::types::byte*);
-            viua::internals::types::byte* opargc(viua::internals::types::byte*);
+    auto opcall(Op_address_type) -> Op_address_type;
+    auto optailcall(Op_address_type) -> Op_address_type;
+    auto opdefer(Op_address_type) -> Op_address_type;
+    auto opprocess(Op_address_type) -> Op_address_type;
+    auto opself(Op_address_type) -> Op_address_type;
+    auto opjoin(Op_address_type) -> Op_address_type;
+    auto opsend(Op_address_type) -> Op_address_type;
+    auto opreceive(Op_address_type) -> Op_address_type;
+    auto opwatchdog(Op_address_type) -> Op_address_type;
+    auto opreturn(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opcall(viua::internals::types::byte*);
-            viua::internals::types::byte* optailcall(viua::internals::types::byte*);
-            viua::internals::types::byte* opdefer(viua::internals::types::byte*);
-            viua::internals::types::byte* opprocess(viua::internals::types::byte*);
-            viua::internals::types::byte* opself(viua::internals::types::byte*);
-            viua::internals::types::byte* opjoin(viua::internals::types::byte*);
-            viua::internals::types::byte* opsend(viua::internals::types::byte*);
-            viua::internals::types::byte* opreceive(viua::internals::types::byte*);
-            viua::internals::types::byte* opwatchdog(viua::internals::types::byte*);
-            viua::internals::types::byte* opreturn(viua::internals::types::byte*);
+    auto opjump(Op_address_type) -> Op_address_type;
+    auto opif(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opjump(viua::internals::types::byte*);
-            viua::internals::types::byte* opif(viua::internals::types::byte*);
+    auto optry(Op_address_type) -> Op_address_type;
+    auto opcatch(Op_address_type) -> Op_address_type;
+    auto opdraw(Op_address_type) -> Op_address_type;
+    auto openter(Op_address_type) -> Op_address_type;
+    auto opthrow(Op_address_type) -> Op_address_type;
+    auto opleave(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* optry(viua::internals::types::byte*);
-            viua::internals::types::byte* opcatch(viua::internals::types::byte*);
-            viua::internals::types::byte* opdraw(viua::internals::types::byte*);
-            viua::internals::types::byte* openter(viua::internals::types::byte*);
-            viua::internals::types::byte* opthrow(viua::internals::types::byte*);
-            viua::internals::types::byte* opleave(viua::internals::types::byte*);
+    auto opatom(Op_address_type) -> Op_address_type;
+    auto opatomeq(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opclass(viua::internals::types::byte*);
-            viua::internals::types::byte* opderive(viua::internals::types::byte*);
-            viua::internals::types::byte* opattach(viua::internals::types::byte*);
-            viua::internals::types::byte* opregister(viua::internals::types::byte*);
+    auto opstruct(Op_address_type) -> Op_address_type;
+    auto opstructinsert(Op_address_type) -> Op_address_type;
+    auto opstructremove(Op_address_type) -> Op_address_type;
+    auto opstructkeys(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opatom(viua::internals::types::byte*);
-            viua::internals::types::byte* opatomeq(viua::internals::types::byte*);
+    auto opimport(Op_address_type) -> Op_address_type;
 
-            viua::internals::types::byte* opstruct(viua::internals::types::byte*);
-            viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
-            viua::internals::types::byte* opstructremove(viua::internals::types::byte*);
-            viua::internals::types::byte* opstructkeys(viua::internals::types::byte*);
+  public:
+    auto dispatch(Op_address_type) -> Op_address_type;
+    auto tick() -> Op_address_type;
 
-            viua::internals::types::byte* opnew(viua::internals::types::byte*);
-            viua::internals::types::byte* opmsg(viua::internals::types::byte*);
-            viua::internals::types::byte* opinsert(viua::internals::types::byte*);
-            viua::internals::types::byte* opremove(viua::internals::types::byte*);
+    viua::kernel::Register* register_at(viua::internals::types::register_index,
+                                        viua::internals::Register_sets);
 
-            viua::internals::types::byte* opimport(viua::internals::types::byte*);
+    bool joinable() const;
+    void join();
+    void detach();
 
-          public:
-            viua::internals::types::byte* dispatch(viua::internals::types::byte*);
-            viua::internals::types::byte* tick();
+    void suspend();
+    void wakeup();
+    bool suspended() const;
 
-            viua::types::Value* obtain(viua::internals::types::register_index) const;
-            void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+    viua::process::Process* parent() const;
+    std::string starting_function() const;
 
-            viua::kernel::Register* register_at(viua::internals::types::register_index);
-            viua::kernel::Register* register_at(viua::internals::types::register_index,
-                                                viua::internals::RegisterSets);
+    void pass(std::unique_ptr<viua::types::Value>);
 
-            bool joinable() const;
-            void join();
-            void detach();
+    auto priority() const -> decltype(process_priority);
+    void priority(decltype(process_priority) p);
 
-            void suspend();
-            void wakeup();
-            bool suspended() const;
+    bool stopped() const;
 
-            viua::process::Process* parent() const;
-            std::string starting_function() const;
+    bool terminated() const;
+    viua::types::Value* get_active_exception();
+    std::unique_ptr<viua::types::Value> transfer_active_exception();
+    void raise(std::unique_ptr<viua::types::Value>);
+    void handle_active_exception();
 
-            void pass(std::unique_ptr<viua::types::Value>);
+    void migrate_to(viua::scheduler::Virtual_process_scheduler*);
 
-            auto priority() const -> decltype(process_priority);
-            void priority(decltype(process_priority) p);
+    std::unique_ptr<viua::types::Value> get_return_value();
 
-            bool stopped() const;
+    bool watchdogged() const;
+    std::string watchdog() const;
+    auto become(std::string const&, std::unique_ptr<Frame>) -> Op_address_type;
 
-            bool terminated() const;
-            viua::types::Value* get_active_exception();
-            std::unique_ptr<viua::types::Value> transfer_active_exception();
-            void raise(std::unique_ptr<viua::types::Value>);
-            void handle_active_exception();
+    auto begin() -> Op_address_type;
+    auto execution_at() const -> decltype(Stack::instruction_pointer);
 
-            void migrate_to(viua::scheduler::VirtualProcessScheduler*);
+    std::vector<Frame*> trace() const;
 
-            std::unique_ptr<viua::types::Value> get_return_value();
+    viua::process::PID pid() const;
+    bool hidden() const;
+    void hidden(bool);
 
-            bool watchdogged() const;
-            std::string watchdog() const;
-            viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
+    bool empty() const;
 
-            viua::internals::types::byte* begin();
-            auto execution_at() const -> decltype(Stack::instruction_pointer);
+    Process(std::unique_ptr<Frame>,
+            viua::scheduler::Virtual_process_scheduler*,
+            viua::process::Process*,
+            bool const = false);
+    ~Process();
 
-            std::vector<Frame*> trace() const;
-
-            viua::process::PID pid() const;
-            bool hidden() const;
-            void hidden(bool);
-
-            bool empty() const;
-
-            Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*,
-                    viua::process::Process*, const bool = false);
-            ~Process();
-        };
-    }  // namespace process
-}  // namespace viua
+    static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =
+        255;
+};
+}}  // namespace viua::process
 
 
 #endif

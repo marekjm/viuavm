@@ -18,16 +18,16 @@
 ;
 
 .function: main/1
-    string %1 "Hello World"
+    string %1 local "Hello World"
 
     jump +3
 
-    print %1
+    print %1 local
     jump +2
 
     jump -2
 
-    delete %1
+    delete %1 local
 
     izero %0 local
     return

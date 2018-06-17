@@ -28,41 +28,38 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-    namespace types {
-        class Object : public Value {
-            /** A generic object class.
-             *
-             *  This type is used internally inside the VM.
-             */
-          private:
-            std::string object_type_name;
-            std::map<std::string, std::unique_ptr<Value>> attributes;
+namespace viua { namespace types {
+class Object : public Value {
+    /** A generic object class.
+     *
+     *  This type is used internally inside the VM.
+     */
+  private:
+    std::string object_type_name;
+    std::map<std::string, std::unique_ptr<Value>> attributes;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            std::string type() const override;
-            bool boolean() const override;
+    std::string type() const override;
+    bool boolean() const override;
 
-            std::string str() const override;
+    std::string str() const override;
 
-            std::vector<std::string> bases() const override;
-            std::vector<std::string> inheritancechain() const override;
+    void insert(std::string const& key, std::unique_ptr<Value> value);
+    std::unique_ptr<Value> remove(std::string const& key);
 
-            void insert(const std::string& key, std::unique_ptr<Value> value);
-            std::unique_ptr<Value> remove(const std::string& key);
+    void set(std::string const&, std::unique_ptr<Value>);
+    inline Value* at(std::string const& s) {
+        return attributes.at(s).get();
+    }
 
-            void set(const std::string&, std::unique_ptr<Value>);
-            inline Value* at(const std::string& s) { return attributes.at(s).get(); }
+    virtual std::unique_ptr<Value> copy() const override;
 
-            virtual std::unique_ptr<Value> copy() const override;
-
-            Object(const std::string& tn);
-            virtual ~Object();
-        };
-    }  // namespace types
-}  // namespace viua
+    Object(std::string const& tn);
+    virtual ~Object();
+};
+}}  // namespace viua::types
 
 
 #endif

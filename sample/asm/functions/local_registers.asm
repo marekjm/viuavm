@@ -17,25 +17,21 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: set_69/0
-    ress global
-    integer %2 69
-    move %0 %2
-    move %2 %0
+.function: [[no_sa]] set_666/0
+    integer %2 global 666
+    .unused: %2
     return
 .end
 
 .function: main/1
-    integer %2 42
+    integer %2 local 42
 
     frame %0
-    call void set_69/0
-    print %2
+    call void set_666/0
+    print %2 local
 
-    ress global
-    print %2
+    print %2 global
 
-    ress local
     izero %0 local
     return
 .end

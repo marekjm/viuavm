@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    if %1 +1 +2
+    if %1 local +1 +2
 
     izero %0 local
     return

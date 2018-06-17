@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer) (float (.name: %iota o) 0.00)
-    print (ftoi %iota *pointer)
+    ptr (.name: %iota pointer) local (float (.name: %iota o) local 0.00) local
+    print (ftoi %iota local *pointer local) local
 
     izero %0 local
     return

@@ -21,31 +21,43 @@
 #include <viua/types/exception.h>
 using namespace std;
 
-const string viua::types::Exception::type_name = "Exception";
+std::string const viua::types::Exception::type_name = "Exception";
 
 
-string viua::types::Exception::what() const {
+std::string viua::types::Exception::what() const {
     /** Stay compatible with standatd exceptions and
      *  provide what() method.
      */
     return cause;
 }
 
-string viua::types::Exception::etype() const {
+std::string viua::types::Exception::etype() const {
     /** Returns exception type.
      *
-     *  Basic type is 'viua::types::Exception' and is returned by the type() method.
-     *  This method returns detailed type of the exception.
+     *  Basic type is 'viua::types::Exception' and is returned by the type()
+     * method. This method returns detailed type of the exception.
      */
     return detailed_type;
 }
 
-string viua::types::Exception::type() const { return "Exception"; }
-string viua::types::Exception::str() const { return cause; }
-string viua::types::Exception::repr() const { return (etype() + ": " + str::enquote(cause)); }
-bool viua::types::Exception::boolean() const { return true; }
+std::string viua::types::Exception::type() const {
+    return "Exception";
+}
+std::string viua::types::Exception::str() const {
+    return cause;
+}
+std::string viua::types::Exception::repr() const {
+    return (etype() + ": " + str::enquote(cause));
+}
+bool viua::types::Exception::boolean() const {
+    return true;
+}
 
-unique_ptr<viua::types::Value> viua::types::Exception::copy() const { return make_unique<Exception>(cause); }
+std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
+    return make_unique<Exception>(cause);
+}
 
-viua::types::Exception::Exception(string s) : cause(s), detailed_type("Exception") {}
-viua::types::Exception::Exception(string ts, string cs) : cause(cs), detailed_type(ts) {}
+viua::types::Exception::Exception(std::string s)
+        : cause(s), detailed_type("Exception") {}
+viua::types::Exception::Exception(std::string ts, string cs)
+        : cause(cs), detailed_type(ts) {}

@@ -1,0 +1,1 @@
+{"author.name": "Marek Marecki", "author.email": "marejm@ozro.pw", "message": "It was not easy, and the rebase onto devel was... painful.\nI am not sure whether the move is finished, but tests pass and\nI don't want to risk another days-long rebasing process.", "timestamp": 1528921277.597183}

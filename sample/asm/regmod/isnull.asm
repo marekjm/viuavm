@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    print (isnull %2 %1)
+    print (isnull %2 local %1 local) local
 
     izero %0 local
     return

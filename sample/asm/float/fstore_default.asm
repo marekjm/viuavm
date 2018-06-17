@@ -18,7 +18,8 @@
 ;
 
 .function: main/0
-    print (float %1)
+    float %1 local default
+    print %1 local
 
     izero %0 local
     return

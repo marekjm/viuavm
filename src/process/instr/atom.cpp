@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,12 +26,14 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opatom(viua::internals::types::byte* addr) {
+auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    string s;
-    tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+    auto s = std::string{};
+    tie(addr, s) =
+        viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
     *target = make_unique<viua::types::Atom>(str::strdecode(s));
 
@@ -39,17 +41,16 @@ viua::internals::types::byte* viua::process::Process::opatom(viua::internals::ty
 }
 
 
-viua::internals::types::byte* viua::process::Process::opatomeq(viua::internals::types::byte* addr) {
+auto viua::process::Process::opatomeq(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Atom *first = nullptr, *second = nullptr;
-    tie(addr, first) =
-        viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(first)>::type>(addr,
-                                                                                                       this);
-    tie(addr, second) =
-        viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(second)>::type>(addr,
-                                                                                                        this);
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(first)>::type>(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(second)>::type>(addr, this);
 
     *target = make_unique<viua::types::Boolean>(*first == *second);
 

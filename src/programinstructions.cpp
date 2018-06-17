@@ -148,14 +148,14 @@ Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opstring(int_op reg, string s) {
+Program& Program::opstring(int_op reg, std::string s) {
     /*  Inserts string instruction.
      */
     addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
 
-Program& Program::optext(int_op reg, string s) {
+Program& Program::optext(int_op reg, std::string s) {
     addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
     return (*this);
 }
@@ -174,8 +174,12 @@ Program& Program::optextat(int_op target, int_op source, int_op index) {
     addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
     return (*this);
 }
-Program& Program::optextsub(int_op target, int_op source, int_op begin_index, int_op end_index) {
-    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index, end_index);
+Program& Program::optextsub(int_op target,
+                            int_op source,
+                            int_op begin_index,
+                            int_op end_index) {
+    addr_ptr = cg::bytecode::optextsub(
+        addr_ptr, target, source, begin_index, end_index);
     return (*this);
 }
 Program& Program::optextlength(int_op target, int_op source) {
@@ -195,8 +199,11 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
-Program& Program::opvector(int_op index, int_op pack_start_index, int_op pack_length) {
-    addr_ptr = cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
+Program& Program::opvector(int_op index,
+                           int_op pack_start_index,
+                           int_op pack_length) {
+    addr_ptr =
+        cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 
@@ -245,7 +252,7 @@ Program& Program::opbits(int_op target, int_op count) {
     return (*this);
 }
 
-Program& Program::opbits(int_op target, const vector<uint8_t> bit_string) {
+Program& Program::opbits(int_op target, std::vector<uint8_t> const bit_string) {
     addr_ptr = cg::bytecode::opbits(addr_ptr, target, bit_string);
     return (*this);
 }
@@ -494,6 +501,11 @@ Program& Program::opptr(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::opptrlive(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::opptrlive(addr_ptr, target, source);
+    return (*this);
+}
+
 Program& Program::opswap(int_op a, int_op b) {
     /*  Inserts swap instruction to bytecode.
      *
@@ -525,17 +537,6 @@ Program& Program::opisnull(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::opress(string a) {
-    /*  Inserts ress instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register set ID
-     */
-    addr_ptr = cg::bytecode::opress(addr_ptr, a);
-    return (*this);
-}
-
 Program& Program::opprint(int_op reg) {
     /*  Inserts print instuction.
      */
@@ -550,35 +551,44 @@ Program& Program::opecho(int_op reg) {
     return (*this);
 }
 
-Program& Program::opcapture(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapture(int_op target_closure,
+                            int_op target_register,
+                            int_op source_register) {
     /*  Inserts clbing instuction.
      */
-    addr_ptr = cg::bytecode::opcapture(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapture(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturecopy(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapturecopy(int_op target_closure,
+                                int_op target_register,
+                                int_op source_register) {
     /*  Inserts opcapturecopy instuction.
      */
-    addr_ptr = cg::bytecode::opcapturecopy(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturecopy(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::opcapturemove(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapturemove(int_op target_closure,
+                                int_op target_register,
+                                int_op source_register) {
     /*  Inserts opcapturemove instuction.
      */
-    addr_ptr = cg::bytecode::opcapturemove(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturemove(
+        addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::opclosure(int_op reg, const string& fn) {
+Program& Program::opclosure(int_op reg, std::string const& fn) {
     /*  Inserts closure instuction.
      */
     addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
     return (*this);
 }
 
-Program& Program::opfunction(int_op reg, const string& fn) {
+Program& Program::opfunction(int_op reg, std::string const& fn) {
     /*  Inserts function instuction.
      */
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
@@ -639,7 +649,7 @@ Program& Program::opargc(int_op a) {
     return (*this);
 }
 
-Program& Program::opcall(int_op reg, const string& fn_name) {
+Program& Program::opcall(int_op reg, std::string const& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
@@ -655,7 +665,7 @@ Program& Program::opcall(int_op reg, int_op fn) {
     return (*this);
 }
 
-Program& Program::optailcall(const string& fn_name) {
+Program& Program::optailcall(std::string const& fn_name) {
     /*  Inserts tailcall instruction.
      *  Byte offset is calculated automatically.
      */
@@ -668,7 +678,7 @@ Program& Program::optailcall(int_op fn) {
     return (*this);
 }
 
-Program& Program::opdefer(const string& fn_name) {
+Program& Program::opdefer(std::string const& fn_name) {
     addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
     return (*this);
 }
@@ -678,7 +688,7 @@ Program& Program::opdefer(int_op fn) {
     return (*this);
 }
 
-Program& Program::opprocess(int_op ref, const string& fn_name) {
+Program& Program::opprocess(int_op ref, std::string const& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);
 }
@@ -710,12 +720,13 @@ Program& Program::opreceive(int_op ref, timeout_op timeout) {
     return (*this);
 }
 
-Program& Program::opwatchdog(const string& fn_name) {
+Program& Program::opwatchdog(std::string const& fn_name) {
     addr_ptr = cg::bytecode::opwatchdog(addr_ptr, fn_name);
     return (*this);
 }
 
-Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTYPE is_absolute) {
+Program& Program::opjump(viua::internals::types::bytecode_size addr,
+                         enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -731,17 +742,22 @@ Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTY
     return (*this);
 }
 
-Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth,
-                       enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false,
+Program& Program::opif(int_op regc,
+                       viua::internals::types::bytecode_size addr_truth,
+                       enum JUMPTYPE absolute_truth,
+                       viua::internals::types::bytecode_size addr_false,
                        enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
     viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for opcode
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for operand-type marker
-    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets);  // for rs-type marker
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::types::byte);  // for opcode
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::types::byte);  // for operand-type marker
+    jump_position_in_bytecode +=
+        sizeof(viua::internals::Register_sets);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
@@ -764,7 +780,7 @@ Program& Program::optry() {
     return (*this);
 }
 
-Program& Program::opcatch(string type_name, string block_name) {
+Program& Program::opcatch(std::string type_name, std::string block_name) {
     /*  Inserts catch instruction.
      */
     addr_ptr = cg::bytecode::opcatch(addr_ptr, type_name, block_name);
@@ -778,7 +794,7 @@ Program& Program::opdraw(int_op regno) {
     return (*this);
 }
 
-Program& Program::openter(string block_name) {
+Program& Program::openter(std::string block_name) {
     /*  Inserts enter instruction.
      *  Byte offset is calculated automatically.
      */
@@ -800,42 +816,14 @@ Program& Program::opleave() {
     return (*this);
 }
 
-Program& Program::opimport(string module_name) {
+Program& Program::opimport(std::string module_name) {
     /*  Inserts import instruction.
      */
     addr_ptr = cg::bytecode::opimport(addr_ptr, module_name);
     return (*this);
 }
 
-Program& Program::opclass(int_op reg, const string& class_name) {
-    /*  Inserts class instuction.
-     */
-    addr_ptr = cg::bytecode::opclass(addr_ptr, reg, class_name);
-    return (*this);
-}
-
-Program& Program::opderive(int_op reg, const string& base_class_name) {
-    /*  Inserts derive instuction.
-     */
-    addr_ptr = cg::bytecode::opderive(addr_ptr, reg, base_class_name);
-    return (*this);
-}
-
-Program& Program::opattach(int_op reg, const string& function_name, const string& method_name) {
-    /*  Inserts attach instuction.
-     */
-    addr_ptr = cg::bytecode::opattach(addr_ptr, reg, function_name, method_name);
-    return (*this);
-}
-
-Program& Program::opregister(int_op reg) {
-    /*  Inserts register instuction.
-     */
-    addr_ptr = cg::bytecode::opregister(addr_ptr, reg);
-    return (*this);
-}
-
-Program& Program::opatom(int_op reg, string s) {
+Program& Program::opatom(int_op reg, std::string const& s) {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
 }
@@ -862,35 +850,6 @@ Program& Program::opstructremove(int_op target, int_op key, int_op source) {
 
 Program& Program::opstructkeys(int_op a, int_op b) {
     addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
-    return (*this);
-}
-
-Program& Program::opnew(int_op reg, const string& class_name) {
-    addr_ptr = cg::bytecode::opnew(addr_ptr, reg, class_name);
-    return (*this);
-}
-
-Program& Program::opmsg(int_op reg, const string& method_name) {
-    /*  Inserts msg instuction.
-     */
-    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
-    return (*this);
-}
-
-Program& Program::opmsg(int_op reg, int_op method_name) {
-    /*  Inserts msg instuction.
-     */
-    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
-    return (*this);
-}
-
-Program& Program::opinsert(int_op target, int_op key, int_op source) {
-    addr_ptr = cg::bytecode::opinsert(addr_ptr, target, key, source);
-    return (*this);
-}
-
-Program& Program::opremove(int_op target, int_op key, int_op source) {
-    addr_ptr = cg::bytecode::opremove(addr_ptr, target, key, source);
     return (*this);
 }
 

@@ -18,11 +18,11 @@
 ;
 
 .function: main/0
-    vector (.name: %iota container)
+    vector (.name: %iota container) local
 
-    vpush %container (integer %iota 0)
-    vpop void %container void
-    print %container
+    vpush %container local (integer %iota local 0) local
+    vpop void %container local void
+    print %container local
 
     izero %0 local
     return

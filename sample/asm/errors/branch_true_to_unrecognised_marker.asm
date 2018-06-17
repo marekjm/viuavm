@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    izero %1
+    izero %1 local
 
-    if %1 foo +1
+    if %1 local foo +1
 
     izero %0 local
     return

@@ -20,40 +20,40 @@
 .function: fibonacci/2
     .name: 1 current_value
     .name: 2 accumulator
-    arg %current_value %0
-    arg %accumulator %1
+    arg %current_value local %0
+    arg %accumulator local %1
 
-    if %current_value +1 fibonacci/2__finished
+    if %current_value local +1 fibonacci/2__finished
 
-    add %accumulator %current_value
+    add %accumulator local %current_value local
 
-    frame ^[(pamv %0 (idec %current_value)) (pamv %1 %accumulator)]
+    frame ^[(pamv %0 (idec %current_value local) local) (pamv %1 %accumulator local)]
     tailcall fibonacci/2
 
     .mark: fibonacci/2__finished
-    move %0 %accumulator
+    move %0 local %accumulator local
     return
 .end
 
 .function: fibonacci/1
     .name: 2 accumulator
 
-    frame ^[(pamv %0 (arg %1 %0)) (pamv %1 (izero %accumulator))]
-    call %accumulator fibonacci/2
+    frame ^[(pamv %0 (arg %1 local %0) local) (pamv %1 (izero %accumulator local) local)]
+    call %accumulator local fibonacci/2
 
-    move %0 %accumulator
+    move %0 local %accumulator local
     return
 .end
 
 .function: main/0
     .name: 1 result
 
-    integer %result 5
+    integer %result local 5
 
-    frame ^[(pamv %0 %result)]
-    call %result fibonacci/1
+    frame ^[(pamv %0 %result local)]
+    call %result local fibonacci/1
 
-    print %result
+    print %result local
 
     izero %0 local
     return

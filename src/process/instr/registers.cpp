@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,49 +27,72 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opmove(viua::internals::types::byte* addr) {
+auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register *target = nullptr, *source = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     *target = std::move(*source);
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::types::byte* addr) {
+auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     *target = source->copy();
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opptr(viua::internals::types::byte* addr) {
+auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     *target = source->pointer(this);
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opswap(viua::internals::types::byte* addr) {
+auto viua::process::Process::opptrlive(Op_address_type addr)
+    -> Op_address_type {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Pointer* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Pointer>(addr, this);
+
+    *target = std::make_unique<viua::types::Boolean>(not source->expired());
+
+    return addr;
+}
+auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register *target = nullptr, *source = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     target->swap(*source);
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::types::byte* addr) {
+auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target->empty()) {
         throw make_unique<viua::types::Exception>("delete of null register");
@@ -78,34 +101,14 @@ viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::
 
     return addr;
 }
-viua::internals::types::byte* viua::process::Process::opisnull(viua::internals::types::byte* addr) {
+auto viua::process::Process::opisnull(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register *target = nullptr, *source = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     *target = make_unique<viua::types::Boolean>(source->empty());
-
-    return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::opress(viua::internals::types::byte* addr) {
-    viua::internals::types::registerset_type_marker to_register_set = 0;
-    tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_registerset_type(addr, this);
-
-    switch (static_cast<viua::internals::RegisterSets>(to_register_set)) {
-        case viua::internals::RegisterSets::GLOBAL:
-            currently_used_register_set = global_register_set.get();
-            break;
-        case viua::internals::RegisterSets::LOCAL:
-            currently_used_register_set = stack->back()->local_register_set.get();
-            break;
-        case viua::internals::RegisterSets::STATIC:
-            ensure_static_registers(stack->back()->function_name);
-            currently_used_register_set = static_registers.at(stack->back()->function_name).get();
-            break;
-        default:
-            throw make_unique<viua::types::Exception>("illegal register set ID in ress instruction");
-    }
 
     return addr;
 }

@@ -21,14 +21,14 @@
 .signature: std::io::getline
 
 .block: check_the_number
-    stoi %3 %3
+    stoi %3 local %3 local
     leave
 .end
 
 .block: failed_to_convert
-    echo (string %10 "guess: exception: ")
-    print (draw %9)
-    integer %3 -1
+    echo (string %10 local "guess: exception: ") local
+    print (draw %9 local) local
+    integer %3 local -1
     leave
 .end
 
@@ -38,41 +38,41 @@
     import "io"
 
     ; random integer between 1 and 100
-    frame ^[(param %0 (integer %2 1)) (param %1 (integer %2 101))]
-    call %1 std::random::randint
+    frame ^[(param %0 (integer %2 local 1) local) (param %1 (integer %2 local 101) local)]
+    call %1 local std::random::randint
 
     ; enter zero to abort the game
     izero %0 local
 
     .mark: take_a_guess
-    string %2 "guess the number: "
-    echo %2
+    string %2 local "guess the number: "
+    echo %2 local
 
     frame %0
-    call %3 std::io::getline
+    call %3 local std::io::getline
 
     try
     catch "Exception" failed_to_convert
     enter check_the_number
 
-    if (eq %4 %3 %0) abort
-    if (eq %4 %3 %1) correct
+    if (eq %4 local %3 local %0 local) local abort
+    if (eq %4 local %3 local %1 local) local correct
 
-    if (lt %4 %3 %1) +1 +3
-    string %4 "guess: your number is less than the target"
+    if (lt %4 local %3 local %1 local) local +1 +3
+    string %4 local "guess: your number is less than the target"
     jump incorrect
-    string %4 "guess: your number is greater than the target"
+    string %4 local "guess: your number is greater than the target"
     .mark: incorrect
-    print %4
+    print %4 local
     jump take_a_guess
 
     .mark: correct
-    print (string %2 "guess: correct")
+    print (string %2 local "guess: correct") local
     jump exit
 
     .mark: abort
-    echo (string %2 "game aborted: target number was ")
-    print %1
+    echo (string %2 local "game aborted: target number was ") local
+    print %1 local
 
     .mark: exit
     izero %0 local

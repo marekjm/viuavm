@@ -20,10 +20,10 @@
 ; Test support for float division.
 
 .function: main/1
-    float %1 3.14
-    float %2 2.0
-    div %3 %1 %2
-    print %3
+    float %1 local 3.14
+    float %2 local 2.0
+    div %3 local %1 local %2 local
+    print %3 local
     izero %0 local
     return
 .end

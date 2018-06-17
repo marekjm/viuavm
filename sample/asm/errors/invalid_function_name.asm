@@ -18,12 +18,12 @@
 ;
 
 .function: valid/1
-    print (arg %1 %0)
+    print (arg %1 local %0) local
     return
 .end
 
 .function: another_valid/0
-    frame ^[(pamv %0 (string %1 "Hello World!"))]
+    frame ^[(pamv %0 (string %1 local "Hello World!") local)]
     tailcall valid/1
 .end
 

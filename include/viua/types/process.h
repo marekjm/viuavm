@@ -34,42 +34,38 @@
 
 
 // we only need a pointer so class declaration will be sufficient
-namespace viua {
-    namespace kernel {
-        class Kernel;
-    }
-}  // namespace viua
+namespace viua { namespace kernel {
+class Kernel;
+}}  // namespace viua::kernel
 
 
-namespace viua {
-    namespace types {
-        class Process : public Value {
-            viua::process::Process* thrd;
-            viua::process::PID saved_pid;
+namespace viua { namespace types {
+class Process : public Value {
+    viua::process::Process* thrd;
+    viua::process::PID saved_pid;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            /*
-             * For use by the VM and user code.
-             * Provides interface common to all values in Viua.
-             */
-            std::string type() const override;
-            std::string str() const override;
-            std::string repr() const override;
-            bool boolean() const override;
-            std::unique_ptr<Value> copy() const override;
+    /*
+     * For use by the VM and user code.
+     * Provides interface common to all values in Viua.
+     */
+    std::string type() const override;
+    std::string str() const override;
+    std::string repr() const override;
+    bool boolean() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            /*
-             * For use by the VM.
-             * User code has no way of discovering PIDs - it must receive them.
-             */
-            viua::process::PID pid() const;
+    /*
+     * For use by the VM.
+     * User code has no way of discovering PIDs - it must receive them.
+     */
+    viua::process::PID pid() const;
 
-            Process(viua::process::Process*);
-        };
-    }  // namespace types
-}  // namespace viua
+    Process(viua::process::Process*);
+};
+}}  // namespace viua::types
 
 
 #endif

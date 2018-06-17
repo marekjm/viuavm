@@ -27,40 +27,41 @@
 
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
-    namespace kernel {
-        class Kernel;
-    }
+namespace process {
+class Process;
+}
+namespace kernel {
+class Kernel;
+}
 }  // namespace viua
 
 
-namespace viua {
-    namespace scheduler {
-        namespace ffi {
-            class ForeignFunctionCallRequest {
-                std::unique_ptr<Frame> frame;
-                viua::process::Process* caller_process;
-                viua::kernel::Kernel* kernel;
+namespace viua { namespace scheduler { namespace ffi {
+class Foreign_function_call_request {
+    std::unique_ptr<Frame> frame;
+    viua::process::Process* caller_process;
+    viua::kernel::Kernel* kernel;
 
-              public:
-                std::string function_name() const;
-                void call(ForeignFunction*);
-                void raise(std::unique_ptr<viua::types::Value>);
-                void wakeup();
+  public:
+    std::string function_name() const;
+    void call(ForeignFunction*);
+    void raise(std::unique_ptr<viua::types::Value>);
+    void wakeup();
 
-                ForeignFunctionCallRequest(Frame* fr, viua::process::Process* cp, viua::kernel::Kernel* c)
-                    : frame(fr), caller_process(cp), kernel(c) {}
-                ~ForeignFunctionCallRequest() {}
-            };
+    Foreign_function_call_request(Frame* fr,
+                                  viua::process::Process* cp,
+                                  viua::kernel::Kernel* c)
+            : frame(fr), caller_process(cp), kernel(c) {}
+    ~Foreign_function_call_request() {}
+};
 
-            void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>>* requests,
-                                   std::map<std::string, ForeignFunction*>* foreign_functions,
-                                   std::mutex* ff_map_mtx, std::mutex* mtx, std::condition_variable* cv);
-        }  // namespace ffi
-    }      // namespace scheduler
-}  // namespace viua
+void ff_call_processor(
+    std::vector<std::unique_ptr<Foreign_function_call_request>>* requests,
+    std::map<std::string, ForeignFunction*>* foreign_functions,
+    std::mutex* ff_map_mtx,
+    std::mutex* mtx,
+    std::condition_variable* cv);
+}}}  // namespace viua::scheduler::ffi
 
 
 #endif

@@ -43,8 +43,6 @@ Variable and parameter names
     auto const listening_port = int{4242};
 
 Always use all-lowercase snake\_case.
-(Almost) Always use auto (if possible).
-(Almost) Always use brace-initialisation.
 
 Constant names
 --------------
@@ -57,9 +55,50 @@ Apply rules for variables for local constants.
 
 ----
 
+## Initialisation, declarations, types
+
+(Almost) Always use auto (if possible).
+
+    auto answer = int{42};  // good
+    int answer = 42;        // bad
+
+(Almost) Always use brace-initialisation.
+
+    auto x = Foo{};     // good
+    auto x = Foo();     // bad
+
+Use consistent const (a.k.a. "const on the right").
+
+    auto const n = int{42};     // good
+    const auto n = int{42};     // bad
+
+    auto f(int const x) -> int; // good
+    auto f(const int x) -> int; // bad
+
+Pointer character (`*`) is associated with the *type*, not the *name*.
+
+    /*
+     * Use viua::util::memory::dumb_ptr<T> to create "dumb pointer" types.
+     */
+    auto ptr = viua::util::memory::dumb_ptr<int>{};
+
+    auto f(int* const x) -> int; // good
+    auto f(const int* x) -> int; // bad
+
+Use one declaration per line, unless using destructuring bindings.
+
+    // good
+    auto x = int{42};
+    auto y = int{43};
+
+    // also good
+    auto [ x, y ] = some_fn();
+
+----
+
 ## Indentation
 
-Ident by four spaces.
+Indent by four spaces.
 
 This is good:
 
@@ -86,9 +125,19 @@ This is good:
 
     auto f(int const x) {
 
+    if (x) {
+
+    while (x) {
+
 This is not:
 
     auto f(int const x)
+    {
+
+    if (x)
+    {
+
+    while (x)
     {
 
 ----

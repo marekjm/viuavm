@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    prnt (string "Hello World!")
+    prnt (string %1 local "Hello World!") local
     izero %0 local
     return
 .end

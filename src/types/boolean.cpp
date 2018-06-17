@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,21 +18,27 @@
  */
 
 #include <viua/types/boolean.h>
-using namespace std;
 
-const string viua::types::Boolean::type_name = "Boolean";
+std::string const viua::types::Boolean::type_name = "Boolean";
 
-string viua::types::Boolean::type() const { return "Boolean"; }
+auto viua::types::Boolean::type() const -> std::string {
+    return "Boolean";
+}
 
-string viua::types::Boolean::str() const { return (b ? "true" : "false"); }
+auto viua::types::Boolean::str() const -> std::string {
+    return (b ? "true" : "false");
+}
 
-bool viua::types::Boolean::boolean() const { return b; }
+auto viua::types::Boolean::boolean() const -> bool {
+    return b;
+}
 
-bool& viua::types::Boolean::value() { return b; }
+auto viua::types::Boolean::value() -> bool& {
+    return b;
+}
 
-vector<string> viua::types::Boolean::bases() const { return vector<string>{"Number"}; }
-vector<string> viua::types::Boolean::inheritancechain() const { return vector<string>{"Number", "Value"}; }
+auto viua::types::Boolean::copy() const -> std::unique_ptr<viua::types::Value> {
+    return std::make_unique<Boolean>(b);
+}
 
-unique_ptr<viua::types::Value> viua::types::Boolean::copy() const { return make_unique<Boolean>(b); }
-
-viua::types::Boolean::Boolean(bool v) : b(v) {}
+viua::types::Boolean::Boolean(bool const v) : b(v) {}

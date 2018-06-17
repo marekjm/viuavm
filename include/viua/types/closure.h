@@ -29,35 +29,33 @@
 #include <viua/types/function.h>
 
 
-namespace viua {
-    namespace types {
-        class Closure : public Function {
-            std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
-            std::string function_name;
+namespace viua { namespace types {
+class Closure : public Function {
+    std::unique_ptr<viua::kernel::Register_set> local_register_set;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            std::string repr() const override;
+    auto type() const -> std::string override;
+    auto str() const -> std::string override;
+    auto repr() const -> std::string override;
 
-            bool boolean() const override;
+    auto boolean() const -> bool override;
 
-            std::unique_ptr<Value> copy() const override;
+    auto copy() const -> std::unique_ptr<Value> override;
 
-            std::string name() const override;
-            viua::kernel::RegisterSet* rs() const;
-            auto release() -> viua::kernel::RegisterSet*;
-            auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
-            auto empty() const -> bool;
-            void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+    auto name() const -> std::string override;
+    auto rs() const -> viua::kernel::Register_set*;
+    auto release() -> viua::kernel::Register_set*;
+    auto give() -> std::unique_ptr<viua::kernel::Register_set>;
+    auto empty() const -> bool;
+    auto set(viua::internals::types::register_index const,
+             std::unique_ptr<viua::types::Value>) -> void;
 
-            Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
-            virtual ~Closure();
-        };
-    }  // namespace types
-}  // namespace viua
+    Closure(std::string const&, std::unique_ptr<viua::kernel::Register_set>);
+    virtual ~Closure();
+};
+}}  // namespace viua::types
 
 
 #endif

@@ -25,10 +25,10 @@
 #pragma once
 
 enum OperandType : uint8_t {
-    OT_REGISTER_INDEX,            // register index
-    OT_REGISTER_REFERENCE,        // register reference (indirect register index)
-    OT_REGISTER_INDEX_ANNOTATED,  // register index with an annotation from which
-                                  // register set it should be taken
+    OT_REGISTER_INDEX,      // register index
+    OT_REGISTER_REFERENCE,  // register reference (indirect register index)
+    OT_REGISTER_INDEX_ANNOTATED,  // register index with an annotation from
+                                  // which register set it should be taken
 
     OT_POINTER,  // index of register containing a pointer that
                  // should be dereferenced (should be decoded to
@@ -61,80 +61,80 @@ enum OperandType : uint8_t {
     OT_FALSE,  // encodes literal false
 };
 
-namespace viua {
-    namespace internals {
-        enum class AccessSpecifier {
-            DIRECT,
-            REGISTER_INDIRECT,
-            POINTER_DEREFERENCE,
-        };
+namespace viua { namespace internals {
+enum class Access_specifier {
+    DIRECT,
+    REGISTER_INDIRECT,
+    POINTER_DEREFERENCE,
+};
 
-        using ValueTypesType = uint32_t;
-        enum class ValueTypes : ValueTypesType {
-            /*
-             * This is the type that is used when it is not known what type a value actually has.
-             * When the type can be inferred UNDEFINED may be swapped for the actual type.
-             */
-            UNDEFINED = 0,
+using ValueTypesType = uint32_t;
+enum class Value_types : ValueTypesType {
+    /*
+     * This is the type that is used when it is not known what type a value
+     * actually has. When the type can be inferred UNDEFINED may be swapped for
+     * the actual type.
+     */
+    UNDEFINED = 0,
 
-            /*
-             * This is the type of void value.
-             * It is not actually used (as it is not possible to create a void value), but is defined here for
-             * the sake of completeness.
-             */
-            VOID = 1 << 0,
+    /*
+     * This is the type of void value.
+     * It is not actually used (as it is not possible to create a void value),
+     * but is defined here for the sake of completeness.
+     */
+    VOID = 1 << 0,
 
-            /*
-             * Numeric types.
-             *
-             * Some instructions require an INTEGER (e.g. "iinc" and "idec", bit shifts), and
-             * some accept both INTEGER and FLOAT values (e.g. arithmetic ops).
-             * The NUMBER alias is used for these "relaxed" ops that accept either.
-             */
-            INTEGER = 1 << 2,
-            FLOAT = 1 << 3,
-            NUMBER = (INTEGER | FLOAT),
+    /*
+     * Numeric types.
+     *
+     * Some instructions require an INTEGER (e.g. "iinc" and "idec", bit
+     * shifts), and some accept both INTEGER and FLOAT values (e.g. arithmetic
+     * ops). The NUMBER alias is used for these "relaxed" ops that accept
+     * either.
+     */
+    INTEGER = 1 << 2,
+    FLOAT   = 1 << 3,
+    NUMBER  = (INTEGER | FLOAT),
 
-            /*
-             * Produced by comparison ops (e.g. "eq", "lt", "texteq", "atomeq").
-             */
-            BOOLEAN = 1 << 4,
+    /*
+     * Produced by comparison ops (e.g. "eq", "lt", "texteq", "atomeq").
+     */
+    BOOLEAN = 1 << 4,
 
-            /*
-             * Type of UTF-8 encoded Unicode text.
-             */
-            TEXT = 1 << 5,
+    /*
+     * Type of UTF-8 encoded Unicode text.
+     */
+    TEXT = 1 << 5,
 
-            /*
-             * Type of a basic string.
-             * FIXME DEPRECATED
-             */
-            STRING = 1 << 6,
+    /*
+     * Type of a basic string.
+     * FIXME DEPRECATED
+     */
+    STRING = 1 << 6,
 
-            VECTOR = 1 << 7,
+    VECTOR = 1 << 7,
 
-            BITS = 1 << 8,
+    BITS = 1 << 8,
 
-            FUNCTION = 1 << 9,
-            CLOSURE = 1 << 10,
-            INVOCABLE = (FUNCTION | CLOSURE),
+    FUNCTION  = 1 << 9,
+    CLOSURE   = 1 << 10,
+    INVOCABLE = (FUNCTION | CLOSURE),
 
-            ATOM = 1 << 11,
+    ATOM = 1 << 11,
 
-            PID = 1 << 12,
+    PID = 1 << 12,
 
-            STRUCT = 1 << 13,
+    STRUCT = 1 << 13,
 
-            /*
-             * Object type.
-             * Used by 'class', 'derive', 'new', etc. instructions.
-             * FIXME DEPRECATED
-             */
-            OBJECT = 1 << 14,
+    /*
+     * Object type.
+     * Used by 'class', 'derive', 'new', etc. instructions.
+     * FIXME DEPRECATED
+     */
+    OBJECT = 1 << 14,
 
-            POINTER = 1 << 15,
-        };
-    }  // namespace internals
-}  // namespace viua
+    POINTER = 1 << 15,
+};
+}}  // namespace viua::internals
 
 #endif

@@ -18,17 +18,17 @@
 ;
 
 .function: print_number_of_params/
-    print (argc %1)
+    print (argc %1 local) local
     return
 .end
 
 .function: main/1
-    print (argc %1)
+    print (argc %1 local) local
 
-    izero %2
+    izero %2 local
 
-    frame ^[(param %0 %2) (param %1 %2)]
-    call print_number_of_params/
+    frame ^[(param %0 %2 local) (param %1 %2 local)]
+    call void print_number_of_params/
 
     frame %0
     call void print_number_of_params/

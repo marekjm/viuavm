@@ -17,13 +17,11 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script tests integer subtraction.
-
 .function: main/1
-    integer %1 4
-    integer %2 3
-    sub %3 %1 %2
-    print %3
+    integer %1 local 4
+    integer %2 local 3
+    sub %3 local %1 local %2 local
+    print %3 local
     izero %0 local
     return
 .end

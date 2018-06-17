@@ -1,10 +1,10 @@
 .function: main/0
-    string %1 "answer to life"
-    integer %2 42
+    string %1 local "answer to life"
+    integer %2 local 42
 
-    vector %3 %1 %2
+    vector %3 local %1 local %2
 
-    print %3
+    print %3 local
 
     izero %0 local
     return

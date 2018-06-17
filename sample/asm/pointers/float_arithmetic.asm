@@ -18,11 +18,11 @@
 ;
 
 .function: main/0
-    ptr (.name: %iota pointer_to_a) (float (.name: %iota a) 2.14)
-    ptr (.name: %iota pointer_to_b) (float (.name: %iota b) 1.41)
+    ptr (.name: %iota pointer_to_a) local (float (.name: %iota a) local 2.14) local
+    ptr (.name: %iota pointer_to_b) local (float (.name: %iota b) local 1.41) local
 
-    add (.name: %iota number) *pointer_to_a *pointer_to_b
-    print %number
+    add (.name: %iota number) local *pointer_to_a local *pointer_to_b local
+    print %number local
 
     izero %0 local
     return

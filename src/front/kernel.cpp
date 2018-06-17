@@ -41,16 +41,17 @@ using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
-const char* NOTE_LOADED_ASM =
-    "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
+                              "which cannot be run without prior compilation";
 
 
-static bool usage(const string program, const vector<string>& args) {
-    bool show_help = false;
+static bool usage(std::string const program,
+                  std::vector<std::string> const& args) {
+    bool show_help    = false;
     bool show_version = false;
-    bool verbose = false;
-    bool show_info = false;
-    bool show_json = false;
+    bool verbose      = false;
+    bool show_info    = false;
+    bool show_json    = false;
 
     for (auto option : args) {
         if (option == "--help" or option == "-h") {
@@ -68,9 +69,11 @@ static bool usage(const string program, const vector<string>& args) {
         } else if (option == "--json") {
             show_json = true;
         } else if (str::startswith(option, "-")) {
-            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_RED) << "error"
+                 << send_control_seq(ATTR_RESET);
             cerr << ": unknown option: ";
-            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << send_control_seq(COLOR_FG_WHITE) << option
+                 << send_control_seq(ATTR_RESET);
             cerr << endl;
             exit(1);
         } else {
@@ -81,8 +84,10 @@ static bool usage(const string program, const vector<string>& args) {
 
     if (show_json) {
         cout << "{\"version\": \"" << VERSION << '.' << MICRO
-             << "\", \"sched\": {\"ffi\": " << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
-        cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers() << "}}\n";
+             << "\", \"sched\": {\"ffi\": "
+             << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
+        cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers()
+             << "}}\n";
         return true;
     }
 
@@ -97,33 +102,37 @@ static bool usage(const string program, const vector<string>& args) {
     }
     if (show_info) {
         cout << ' ';
-        cout << "[sched:ffi=" << viua::kernel::Kernel::no_of_ffi_schedulers() << ']';
+        cout << "[sched:ffi=" << viua::kernel::Kernel::no_of_ffi_schedulers()
+             << ']';
         cout << ' ';
-        cout << "[sched:vp=" << viua::kernel::Kernel::no_of_vp_schedulers() << ']' << endl;
+        cout << "[sched:vp=" << viua::kernel::Kernel::no_of_vp_schedulers()
+             << ']' << endl;
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] <executable>\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
-             << "    "
-             << "-v, --verbose            - show verbose output\n"
-             << "    "
-             << "-i, --info               - show information about VM configuration (number of schedulers, "
-                "version etc.)\n"
-             << "    "
-             << "    --json               - same as --info but in JSON format\n";
+        cout
+            << "    "
+            << "-V, --version            - show version\n"
+            << "    "
+            << "-h, --help               - display this message\n"
+            << "    "
+            << "-v, --verbose            - show verbose output\n"
+            << "    "
+            << "-i, --info               - show information about VM "
+               "configuration (number of schedulers, "
+               "version etc.)\n"
+            << "    "
+            << "    --json               - same as --info but in JSON format\n";
     }
 
     return (show_help or show_version or show_info);
 }
 
 int main(int argc, char* argv[]) {
-    // setup command line arguments vector
-    vector<string> args;
+    // setup command line arguments std::vector
+    auto args = std::vector<std::string>{};
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
@@ -137,14 +146,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string filename = "";
-    filename = args[0];
+    auto filename = std::string{};
+    filename      = args[0];
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;
         return 1;
     }
-    if (!support::env::is_file(filename)) {
+    if (!viua::support::env::is_file(filename)) {
         cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
@@ -156,7 +165,7 @@ int main(int argc, char* argv[]) {
     } catch (const char* e) {
         cout << "error: " << e << endl;
         return 1;
-    } catch (const string& e) {
+    } catch (std::string const& e) {
         cout << "error: " << e << endl;
         return 1;
     }
@@ -169,19 +178,19 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    viua::front::vm::load_standard_prototypes(&kernel);
-
     try {
         kernel.run();
     } catch (const viua::types::Exception* e) {
-        cout << "VM error: an irrecoverable VM exception occured: " << e->what() << endl;
+        cout << "VM error: an irrecoverable VM exception occured: " << e->what()
+             << endl;
         return 1;
-    } catch (const std::exception& e) {
-        cout << "VM error: an irrecoverable host exception occured: " << e.what() << endl;
+    } catch (std::exception const& e) {
+        cout << "VM error: an irrecoverable host exception occured: "
+             << e.what() << endl;
         return 1;
     }
-    // the catch (...) is intentionally omitted, if we can't provide useful information about
-    // the error it's better to just crash
+    // the catch (...) is intentionally omitted, if we can't provide useful
+    // information about the error it's better to just crash
 
     return kernel.exit();
 }

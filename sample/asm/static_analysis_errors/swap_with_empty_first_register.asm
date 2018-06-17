@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    swap %1 %2
+    swap %1 local %2 local
 
     izero %0 local
     return

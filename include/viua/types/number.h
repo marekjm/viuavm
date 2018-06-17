@@ -30,46 +30,47 @@
 
 
 namespace viua {
-    using float32 = float;
-    using float64 = double;
+using float32 = float;
+using float64 = double;
 
-    namespace types {
-        namespace numeric {
-            class Number : public Value {
-                /** Base number type.
-                 *
-                 *  All types representing numbers *must* inherit from
-                 *  this class.
-                 *  Otherwise, they will not be usable by arithmetic instructions.
-                 */
-              public:
-                static const std::string type_name;
+namespace types { namespace numeric {
+class Number : public Value {
+    /** Base number type.
+     *
+     *  All types representing numbers *must* inherit from
+     *  this class.
+     *  Otherwise, they will not be usable by arithmetic instructions.
+     */
+  public:
+    static std::string const type_name;
 
-                std::string type() const override;
-                std::string str() const override = 0;
-                bool boolean() const override = 0;
+    std::string type() const override;
+    std::string str() const override = 0;
+    bool boolean() const override    = 0;
 
-                virtual bool negative() const;
+    virtual bool negative() const;
 
-                virtual auto as_integer() const -> int64_t = 0;
-                virtual auto as_float() const -> float64 = 0;
+    virtual auto as_integer() const -> int64_t = 0;
+    virtual auto as_float() const -> float64   = 0;
 
-                virtual auto operator+(const Number&) const -> std::unique_ptr<Number> = 0;
-                virtual auto operator-(const Number&) const -> std::unique_ptr<Number> = 0;
-                virtual auto operator*(const Number&)const -> std::unique_ptr<Number> = 0;
-                virtual auto operator/(const Number&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator+(Number const&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator-(Number const&) const -> std::unique_ptr<Number> = 0;
+    virtual auto operator*(Number const&)const -> std::unique_ptr<Number>  = 0;
+    virtual auto operator/(Number const&) const -> std::unique_ptr<Number> = 0;
 
-                virtual auto operator<(const Number&) const -> std::unique_ptr<Boolean> = 0;
-                virtual auto operator<=(const Number&) const -> std::unique_ptr<Boolean> = 0;
-                virtual auto operator>(const Number&) const -> std::unique_ptr<Boolean> = 0;
-                virtual auto operator>=(const Number&) const -> std::unique_ptr<Boolean> = 0;
-                virtual auto operator==(const Number&) const -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator<(Number const&) const -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator<=(Number const&) const
+        -> std::unique_ptr<Boolean>                                         = 0;
+    virtual auto operator>(Number const&) const -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator>=(Number const&) const
+        -> std::unique_ptr<Boolean> = 0;
+    virtual auto operator==(Number const&) const
+        -> std::unique_ptr<Boolean> = 0;
 
-                Number();
-                virtual ~Number();
-            };
-        }  // namespace numeric
-    }      // namespace types
+    Number();
+    virtual ~Number();
+};
+}}  // namespace types::numeric
 }  // namespace viua
 
 

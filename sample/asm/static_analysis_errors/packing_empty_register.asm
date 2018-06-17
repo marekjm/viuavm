@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    izero %2
-    izero %3
-    vector %1 %2 %4
+    izero %2 local
+    izero %3 local
+    vector %1 local %2 local %4
 
     izero %0 local
     return

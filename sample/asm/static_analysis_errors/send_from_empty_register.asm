@@ -23,8 +23,8 @@
 
 .function: main/0
     frame %0
-    process %1 child_process/0
-    send %1 %2
+    process %1 local child_process/0
+    send %1 local %2 local
 
     izero %0 local
     return

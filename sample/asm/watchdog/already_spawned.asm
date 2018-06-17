@@ -18,19 +18,19 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) %0
+    arg (.name: %iota death_message) local %0
 
     .name: %iota exception
-    remove %exception %1 (string %exception "exception")
+    structremove %exception %1 (atom %exception 'exception')
 
     .name: %iota aborted_function
-    remove %aborted_function %1 (string %aborted_function "function")
+    structremove %aborted_function %1 (atom %aborted_function 'function')
 
-    echo (string (.name: %iota message) "process spawned with <")
-    echo %aborted_function
-    echo (string %message "> killed by >>>")
-    echo %exception
-    print (string %message "<<<")
+    echo (string (.name: %iota message) local "process spawned with <") local
+    echo %aborted_function local
+    echo (string %message local "> killed by >>>") local
+    echo %exception local
+    print (string %message local "<<<") local
 
     return
 .end
@@ -69,7 +69,7 @@
     nop
     nop
     nop
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
     return
 .end
 

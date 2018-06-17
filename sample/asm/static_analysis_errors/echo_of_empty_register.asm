@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    echo %1
+    echo %1 local
 
     izero %0 local
     return

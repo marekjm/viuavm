@@ -18,13 +18,13 @@
 ;
 
 .function: main/0
-    string %1 "Hello World!"
-    integer %2 1
+    string %1 local "Hello World!"
+    integer %2 local 1
 
-    print %1
-    print %2
-    print @2
-    print @-1
+    print %1 local
+    print %2 local
+    print @2 local
+    print @-1 local
 
     izero %0 local
     return

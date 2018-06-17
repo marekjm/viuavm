@@ -19,27 +19,27 @@
 
 .function: a_closure/0
     ; expects register 1 to be captured
-    print %1
+    print %1 local
     return
 .end
 
 .function: main/1
-    string %1 "Hello World!"
+    string %1 local "Hello World!"
 
-    closure %2 a_closure/0
-    capturecopy %2 %1 %1
+    closure %2 local a_closure/0
+    capturecopy %2 local %1 %1 local
 
-    print %1
+    print %1 local
     ; call the closure
     frame %0
-    call void %2
+    call void %2 local
 
     ; this should not affect the object captured a "a_closure"
-    print (integer %1 42)
+    print (integer %1 local 42) local
 
     ; call the closure
     frame %0
-    call void %2
+    call void %2 local
 
     izero %0 local
     return

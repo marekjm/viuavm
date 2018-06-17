@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,54 +27,67 @@
 using namespace std;
 
 
-viua::internals::types::byte* viua::process::Process::opstruct(viua::internals::types::byte* addr) {
+auto viua::process::Process::opstruct(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     *target = make_unique<viua::types::Struct>();
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opstructinsert(viua::internals::types::byte* addr) {
+auto viua::process::Process::opstructinsert(Op_address_type addr)
+    -> Op_address_type {
     viua::types::Struct* struct_operand = nullptr;
     tie(addr, struct_operand) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
+            addr, this);
 
     viua::types::Atom* key = nullptr;
-    tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(addr, this);
+    tie(addr, key) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
+            addr, this);
 
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
+    if (viua::bytecode::decoder::operands::get_operand_type(addr)
+        == OT_POINTER) {
         viua::types::Value* source = nullptr;
-        tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        tie(addr, source) =
+            viua::bytecode::decoder::operands::fetch_object(addr, this);
         struct_operand->insert(*key, source->copy());
     } else {
         viua::kernel::Register* source = nullptr;
-        tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+        tie(addr, source) =
+            viua::bytecode::decoder::operands::fetch_register(addr, this);
         struct_operand->insert(*key, source->give());
     }
 
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opstructremove(viua::internals::types::byte* addr) {
+auto viua::process::Process::opstructremove(Op_address_type addr)
+    -> Op_address_type {
     bool void_target = viua::bytecode::decoder::operands::is_void(addr);
     viua::kernel::Register* target = nullptr;
 
     if (not void_target) {
-        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+        tie(addr, target) =
+            viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     viua::types::Struct* struct_operand = nullptr;
     tie(addr, struct_operand) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
+            addr, this);
 
     viua::types::Atom* key = nullptr;
-    tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(addr, this);
+    tie(addr, key) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
+            addr, this);
 
-    unique_ptr<viua::types::Value> result{struct_operand->remove(*key)};
+    std::unique_ptr<viua::types::Value> result{struct_operand->remove(*key)};
     if (not void_target) {
         *target = std::move(result);
     }
@@ -82,17 +95,20 @@ viua::internals::types::byte* viua::process::Process::opstructremove(viua::inter
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opstructkeys(viua::internals::types::byte* addr) {
+auto viua::process::Process::opstructkeys(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Struct* struct_operand = nullptr;
     tie(addr, struct_operand) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
+            addr, this);
 
     auto struct_keys = struct_operand->keys();
-    auto keys = make_unique<viua::types::Vector>();
-    for (const auto& each : struct_keys) {
+    auto keys        = make_unique<viua::types::Vector>();
+    for (auto const& each : struct_keys) {
         keys->push(make_unique<viua::types::Atom>(each));
     }
 

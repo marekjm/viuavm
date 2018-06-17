@@ -12,7 +12,7 @@
  *  |                 ||    |      |    |       \          ||       |  |       |
  *  |_________________||____|      |____|        \_________||_______|  |_______|
  *
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -36,6 +36,6 @@
 #pragma once
 
 const char* VERSION = "0.9.0";
-const char* MICRO = "1210";
+const char* MICRO   = "1565";
 
 #endif

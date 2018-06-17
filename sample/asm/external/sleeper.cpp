@@ -29,7 +29,7 @@
 using namespace std;
 
 
-static auto sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+static auto sleeper_lazy_print(Frame*, viua::kernel::Register_set*, viua::kernel::Register_set*,
                                viua::process::Process*, viua::kernel::Kernel*) -> void {
     cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -50,8 +50,8 @@ static auto sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel:
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"sleeper::lazy_print/0", &sleeper_lazy_print}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports() { return functions; }

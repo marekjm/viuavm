@@ -22,17 +22,17 @@
     .name: 2 one
 
     ; store zero and one in registers
-    integer %zero 0
-    integer %one 1
+    integer %zero local 0
+    integer %one local 1
 
     ; swap objects so that register "zero" now contains 1, and
     ; register "one" contains 0
-    swap %zero %one
+    swap %zero local %one local
 
     ; print 0 and 1
     ; this should actually print 1 and 0
-    print %zero
-    print %one
+    print %zero local
+    print %one local
 
     izero %0 local
     return

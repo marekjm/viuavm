@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vat %2 %1 0
+    vat %2 local %1 local 0
 
     izero %0 local
     return

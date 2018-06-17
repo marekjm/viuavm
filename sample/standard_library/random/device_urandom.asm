@@ -27,7 +27,7 @@
     ; if gathered entropy bytes are not sufficient to form an integer,
     ; pseudo-random bytes will be used
     frame %0
-    print (call %1 std::random::device::urandom)
+    print (call %1 local std::random::device::urandom) local
 
     izero %0 local
     return

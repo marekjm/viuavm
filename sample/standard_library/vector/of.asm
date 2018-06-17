@@ -20,19 +20,17 @@
 .signature: std::vector::of/2
 
 .function: return_integer/1
-    arg %0 %0
+    arg %0 local %0
     return
 .end
 
 .function: main/1
     import "std::vector"
 
-    register (class %1 Foo)
+    frame ^[(pamv %0 (integer %1 local 8) local) (pamv %1 (function %1 local return_integer/1) local)]
+    call %1 local std::vector::of/2
 
-    frame ^[(pamv %0 (integer %1 8)) (pamv %1 (function %1 return_integer/1))]
-    call %1 std::vector::of/2
-
-    print %1
+    print %1 local
 
     izero %0 local
     return

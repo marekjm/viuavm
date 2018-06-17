@@ -22,19 +22,23 @@
 #include <viua/types/struct.h>
 using namespace std;
 
-const string viua::types::Struct::type_name = "Struct";
+std::string const viua::types::Struct::type_name = "Struct";
 
-string viua::types::Struct::type() const { return "Struct"; }
+std::string viua::types::Struct::type() const {
+    return "Struct";
+}
 
-bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
+bool viua::types::Struct::boolean() const {
+    return (not attributes.empty());
+}
 
-string viua::types::Struct::str() const {
+std::string viua::types::Struct::str() const {
     ostringstream oss;
 
     oss << '{';
 
     auto i = attributes.size();
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         oss << str::enquote(each.first, '\'') << ": " << each.second->repr();
         if (--i) {
             oss << ", ";
@@ -46,32 +50,33 @@ string viua::types::Struct::str() const {
     return oss.str();
 }
 
-string viua::types::Struct::repr() const { return str(); }
+std::string viua::types::Struct::repr() const {
+    return str();
+}
 
-vector<string> viua::types::Struct::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Struct::inheritancechain() const { return vector<string>{"Value"}; }
-
-void viua::types::Struct::insert(const string& key, unique_ptr<viua::types::Value> value) {
+void viua::types::Struct::insert(std::string const& key,
+                                 std::unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::remove(const string& key) {
-    unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
+std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
+    std::string const& key) {
+    std::unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;
 }
 
-vector<string> viua::types::Struct::keys() const {
-    vector<string> ks;
-    for (const auto& each : attributes) {
+std::vector<std::string> viua::types::Struct::keys() const {
+    auto ks = std::vector<std::string>{};
+    for (auto const& each : attributes) {
         ks.push_back(each.first);
     }
     return ks;
 }
 
-unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
     auto copied = make_unique<Struct>();
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         copied->insert(each.first, each.second->copy());
     }
     return copied;

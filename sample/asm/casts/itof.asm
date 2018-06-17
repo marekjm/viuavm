@@ -18,9 +18,9 @@
 ;
 
 .function: main/1
-    integer %1 4
-    itof %2 %1
-    print %2
+    integer %1 local 4
+    itof %2 local %1 local
+    print %2 local
     izero %0 local
     return
 .end

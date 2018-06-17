@@ -25,16 +25,16 @@
     leave
 .end
 .block: handle_Integer
-    draw %1
-    echo (string %2 "looks ")
+    draw %1 local
+    echo (string %2 local "looks ") local
 
-    if %1 +2
-    string %2 "truthy"
-    string %2 "falsey"
+    if %1 local +2
+    string %2 local "truthy"
+    string %2 local "falsey"
 
-    echo %2
-    echo (string %2 ": ")
-    print %1
+    echo %2 local
+    echo (string %2 local ": ") local
+    print %1 local
 
     leave
 .end

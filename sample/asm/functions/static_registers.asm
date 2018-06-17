@@ -18,41 +18,33 @@
 ;
 
 .function: counter/1
-    ; FIXME static analyser does not handle swicthes between registers sets well
-    ; switch to static register set
-    ress static
-
     ; if register 1 is *not null* jump to increase marker
     ; otherwise continue execution to perform initial set up of static registers
-    if (not (isnull %2 %1)) increase
+    isnull %2 local %1 static
+    not %2 local %2 local
+    if %2 local increase
 
     ; these instructions are executed only when 1 register was null
     ; they first setup static counter variable
-    integer %1 0
+    integer %1 static 0
 
-    ; then, switch to local registers and...
-    ress local
     ; 1) fake taking counter from static registers (it's zero during first pass anyway)
-    integer %1 0
+    integer %1 local 0
     ; 2) fetch the argument
-    arg %3 %0
+    arg %3 local %0
     ; 3) jump straight to report mark
     jump report
 
     .mark: increase
-    ; FIXME static analyser does not handle swicthes between registers sets well
-    iinc %1
-
-    copy %1 local %1 current
-    ress local
+    iinc %1 static
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (lt %4 %1 (arg %3 %0))) finish
+    if (not (lt %4 local %1 static (arg %3 local %0) local) local) local finish
 
     .mark: report
-    print %1
-    frame ^[(param %0 %3)]
+    print %1 static
+    frame ^[(param %0 %3 local)]
     tailcall counter/1
 
     .mark: finish
@@ -60,7 +52,7 @@
 .end
 
 .function: main/1
-    frame ^[(param %0 (integer %1 10))]
+    frame ^[(param %0 (integer %1 local 10) local)]
     call void counter/1
     izero %0 local
     return

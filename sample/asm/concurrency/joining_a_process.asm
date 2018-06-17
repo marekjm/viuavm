@@ -33,20 +33,20 @@
     nop
     nop
     nop
-    print (arg %1 %0)
+    print (arg %1 local %0) local
     return
 .end
 
 .function: print_eager/1
-    print (arg %1 %0)
+    print (arg %1 local %0) local
     return
 .end
 
 .function: main/1
-    frame ^[(param %0 (string %1 "Hello concurrent World! (1)"))]
+    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
     process %3 local print_lazy/1
 
-    frame ^[(param %0 (string %2 "Hello concurrent World! (2)"))]
+    frame ^[(param %0 (string %2 local "Hello concurrent World! (2)") local)]
     process %4 local print_lazy/1
 
     join void %3 local

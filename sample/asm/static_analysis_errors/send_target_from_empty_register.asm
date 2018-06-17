@@ -19,7 +19,7 @@
 
 .function: main/0
     .name: 1 pid
-    send %pid (izero %2)  ; note that 'pid' is empty
+    send %pid local (izero %2 local) local  ; note that 'pid' is empty
 
     izero %0 local
     return

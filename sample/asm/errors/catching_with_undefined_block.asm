@@ -18,7 +18,7 @@
 ;
 
 .block: main/0__try
-    throw (integer %1 42)
+    throw (integer %1 local 42) local
     leave
 .end
 

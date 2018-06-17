@@ -28,20 +28,26 @@
 using namespace std;
 
 
-static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
+static void os_system(Frame* frame,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
+                      viua::process::Process*,
+                      viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
-        throw make_unique<viua::types::Exception>("expected command to launch (string) as parameter 0");
+        throw make_unique<viua::types::Exception>(
+            "expected command to launch (string) as parameter 0");
     }
-    string command = frame->arguments->get(0)->str();
-    int ret = system(command.c_str());
+    auto const command = frame->arguments->get(0)->str();
+    auto const ret     = system(command.c_str());
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(ret));
 }
 
 
-const ForeignFunctionSpec functions[] = {
-    {"os::system", &os_system},
+const Foreign_function_spec functions[] = {
+    {"std::os::system/1", &os_system},
     {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports() {
+    return functions;
+}

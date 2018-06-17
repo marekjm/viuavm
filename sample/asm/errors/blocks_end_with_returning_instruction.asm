@@ -18,7 +18,7 @@
 ;
 
 .block: foo__block
-    izero %0
+    izero %0 local
 .end
 
 .function: main/0

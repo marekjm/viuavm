@@ -39,25 +39,27 @@ using namespace std;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
+bool VERBOSE      = false;
 
 bool AS_LIB = false;
 
 
 using namespace viua::assembler::frontend::parser;
-using viua::cg::lex::InvalidSyntax;
+using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
-using viua::cg::lex::TracedSyntaxError;
+using viua::cg::lex::Traced_syntax_error;
 
 
 template<class T>
-static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
-    vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
+static auto enumerate(std::vector<T> const& v)
+    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    auto enumerated_vector =
+        std::vector<pair<typename std::vector<T>::size_type, T>>{};
 
-    typename vector<T>::size_type i = 0;
-    for (const auto& each : v) {
+    typename std::vector<T>::size_type i = 0;
+    for (auto const& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
     }
@@ -65,7 +67,10 @@ static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::siz
     return enumerated_vector;
 }
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program,
+                  bool show_help,
+                  bool show_version,
+                  bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM lexer, version ";
     }
@@ -91,9 +96,9 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     return (show_help or show_version);
 }
 
-static string read_file(ifstream& in) {
+static std::string read_file(ifstream& in) {
     ostringstream source_in;
-    string line;
+    auto line = std::string{};
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -103,13 +108,13 @@ static string read_file(ifstream& in) {
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    auto args   = std::vector<std::string>{};
+    auto option = std::string{};
 
-    string filename(""), compilename("");
+    std::string filename(""), compilename("");
 
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
 
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
@@ -146,7 +151,7 @@ int main(int argc, char* argv[]) {
         cout << "fatal: no file to tokenize" << endl;
         return 1;
     }
-    if (!support::env::is_file(filename)) {
+    if (!viua::support::env::is_file(filename)) {
         cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
@@ -159,32 +164,37 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string source = read_file(in);
+    std::string source = read_file(in);
 
-    auto raw_tokens = viua::cg::lex::tokenise(source);
-    vector<Token> tokens;
-    vector<Token> normalised_tokens;
+    auto raw_tokens        = viua::cg::lex::tokenise(source);
+    auto tokens            = std::vector<Token>{};
+    auto normalised_tokens = std::vector<Token>{};
 
     try {
-        tokens = viua::cg::lex::cook(raw_tokens);
+        tokens            = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+    } catch (viua::cg::lex::Invalid_syntax const& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 
     try {
-        auto parsed_source = viua::assembler::frontend::parser::parse(normalised_tokens);
+        auto parsed_source =
+            viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
-    } catch (const viua::cg::lex::InvalidSyntax& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+    } catch (viua::cg::lex::Invalid_syntax const& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
-    } catch (const viua::cg::lex::TracedSyntaxError& e) {
-        viua::assembler::util::pretty_printer::display_error_in_context(raw_tokens, e, filename);
+    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+        viua::assembler::util::pretty_printer::display_error_in_context(
+            raw_tokens, e, filename);
         return 1;
     }
 

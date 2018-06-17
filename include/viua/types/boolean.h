@@ -27,33 +27,28 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-    namespace types {
-        class Boolean : public viua::types::Value {
-            /** Boolean object.
-             *
-             *  This type is used to hold true and false values.
-             */
-            bool b;
+namespace viua { namespace types {
+class Boolean : public viua::types::Value {
+    /** Boolean object.
+     *
+     *  This type is used to hold true and false values.
+     */
+    bool b;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            bool boolean() const override;
+    auto type() const -> std::string override;
+    auto str() const -> std::string override;
+    auto boolean() const -> bool override;
 
-            bool& value();
+    auto value() -> bool&;
 
-            virtual std::vector<std::string> bases() const override;
-            virtual std::vector<std::string> inheritancechain() const override;
+    auto copy() const -> std::unique_ptr<Value> override;
 
-            std::unique_ptr<Value> copy() const override;
-
-            Boolean(bool v = false);
-        };
-    }  // namespace types
-}  // namespace viua
+    Boolean(bool const v = false);
+};
+}}  // namespace viua::types
 
 
 #endif

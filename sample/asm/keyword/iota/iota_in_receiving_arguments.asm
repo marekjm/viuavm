@@ -19,13 +19,13 @@
 
 .function: sample/2
     .iota: 0
-    print (arg %1 %iota)
-    print (arg %1 %iota)
+    print (arg %1 local %iota) local
+    print (arg %1 local %iota) local
     return
 .end
 
 .function: main/0
-    frame ^[(pamv %iota (string %1 "Hello World!")) (pamv %iota (integer %1 42))]
+    frame ^[(pamv %iota (string %1 local "Hello World!") local) (pamv %iota (integer %1 local 42) local)]
     call sample/2
 
     izero %0 local

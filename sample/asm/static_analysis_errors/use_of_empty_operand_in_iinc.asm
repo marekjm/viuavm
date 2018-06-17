@@ -19,7 +19,7 @@
 
 .function: main/0
     .name: %iota value
-    iinc %value
+    iinc %value local
 
     izero %0 local
     return

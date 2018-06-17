@@ -18,28 +18,28 @@
 ;
 
 .function: worker_process/1
-    echo (string %1 "Hello from #")
-    echo (arg %2 %0)
-    print (string %1 " worker process!")
+    echo (string %1 local "Hello from #") local
+    echo (arg %2 local %0) local
+    print (string %1 local " worker process!") local
     return
 .end
 
 .function: process_spawner/1
-    echo (string %1 "number of worker processes: ")
+    echo (string %1 local "number of worker processes: ") local
 
     .name: 1 limit
-    print (arg %limit %0)
+    print (arg %limit local %0) local
 
     .name: 3 counter
-    izero %counter
+    izero %counter local
 
     .mark: begin_loop
-    if (gte %4 %counter %limit) end_loop +1
+    if (gte %4 local %counter local %limit local) local end_loop +1
 
-    frame ^[(param %0 %counter)]
+    frame ^[(param %0 %counter local)]
     process void worker_process/1
 
-    iinc %counter
+    iinc %counter local
     jump begin_loop
     .mark: end_loop
 
@@ -51,14 +51,14 @@
 .signature: std::io::getline/0
 
 .function: get_number_of_processes_to_spawn/0
-    echo (string %4 "number of processes to spawn: ")
+    echo (string %4 local "number of processes to spawn: ") local
     frame %0
-    stoi %0 (call %4 std::io::getline/0)
+    stoi %0 local (call %4 local std::io::getline/0) local
     return
 .end
 
 .function: run_process_spawner/1
-    frame ^[(param %0 (arg %1 %0))]
+    frame ^[(param %0 (arg %1 local %0) local)]
     process void process_spawner/1
     return
 .end
@@ -68,9 +68,9 @@
     import "io"
 
     frame %0
-    call %4 get_number_of_processes_to_spawn/0
+    call %4 local get_number_of_processes_to_spawn/0
 
-    frame ^[(param %0 %4)]
+    frame ^[(param %0 %4 local)]
     call run_process_spawner/1
 
     izero %0 local

@@ -21,7 +21,7 @@
     nop
     nop
 
-    if %2 3 2
+    if %2 local 3 2
 
     izero %0 local
     return

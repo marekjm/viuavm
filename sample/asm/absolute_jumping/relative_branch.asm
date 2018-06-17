@@ -21,13 +21,13 @@
     .name: 1 text_to_print
     .name: 2 condition
 
-    string %text_to_print "Hello World"
-    integer %condition 42
+    string %text_to_print local "Hello World"
+    integer %condition local 42
 
-    if %condition +2 +1
-    string %text_to_print "Goodby World, you fail this test"
+    if %condition local +2 +1
+    string %text_to_print local "Goodby World, you fail this test"
 
-    print %text_to_print
+    print %text_to_print local
 
     izero %0 local
     return

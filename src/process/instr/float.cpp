@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,19 +26,19 @@
 #include <viua/types/float.h>
 #include <viua/types/integer.h>
 #include <viua/types/value.h>
-using namespace std;
+#include <viua/util/memory.h>
 
 
-viua::internals::types::byte* viua::process::Process::opfloat(viua::internals::types::byte* addr) {
-    /*  Run float instruction.
-     */
-    viua::kernel::Register* target = nullptr;
-    float value = 0.0;
+auto viua::process::Process::opfloat(Op_address_type addr) -> Op_address_type {
+    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    auto value  = float{0.0};
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
+    std::tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    std::tie(addr, value) =
+        viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    *target = make_unique<viua::types::Float>(value);
+    *target = std::make_unique<viua::types::Float>(value);
 
     return addr;
 }

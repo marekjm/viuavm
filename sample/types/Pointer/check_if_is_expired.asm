@@ -20,23 +20,23 @@
 .signature: Pointer::expired/1
 
 .function: isExpired/1
-    frame ^[(param %0 (arg %1 %0))]
-    call %2 Pointer::expired/1
-    echo (string %3 "expired: ")
-    move %0 (print %2)
+    arg %1 local %0
+    not %2 local (ptrlive %2 local %1 local) local
+    echo (string %3 local "expired: ") local
+    move %0 (print %2 local) local
     return
 .end
 
 .function: main/1
-    integer %1 42
-    ptr %2 %1
+    integer %1 local 42
+    ptr %2 local %1 local
 
-    frame ^[(param %0 %2)]
+    frame ^[(param %0 %2 local)]
     call void isExpired/1
 
-    delete %1
+    delete %1 local
 
-    frame ^[(param %0 %2)]
+    frame ^[(param %0 %2 local)]
     call void isExpired/1
 
     izero %0 local

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,40 +24,49 @@
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
-using namespace std;
+#include <viua/util/memory.h>
 
 
-viua::internals::types::byte* viua::process::Process::opecho(viua::internals::types::byte* addr) {
-    viua::types::Value* source{nullptr};
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    cout << source->str();
+auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type {
+    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
+    std::tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    std::cout << source->str();
     return addr;
 }
 
-viua::internals::types::byte* viua::process::Process::opprint(viua::internals::types::byte* addr) {
-    viua::types::Value* source{nullptr};
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    cout << source->str() + '\n';
+auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type {
+    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
+    std::tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    std::cout << source->str() + '\n';
     return addr;
 }
 
 
-viua::internals::types::byte* viua::process::Process::opjump(viua::internals::types::byte* addr) {
-    viua::internals::types::byte* target =
-        (stack->jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
+auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type {
+    auto target = Op_address_type{
+        stack->jump_base
+        + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
+                                                                      this)};
     if (target == addr) {
-        throw make_unique<viua::types::Exception>("aborting: JUMP instruction pointing to itself");
+        throw std::make_unique<viua::types::Exception>(
+            "aborting: JUMP instruction pointing to itself");
     }
     return target;
 }
 
-viua::internals::types::byte* viua::process::Process::opif(viua::internals::types::byte* addr) {
-    viua::types::Value* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type {
+    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
+    std::tie(addr, source) =
+        viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    viua::internals::types::bytecode_size addr_true = 0, addr_false = 0;
-    tie(addr, addr_true) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
-    tie(addr, addr_false) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
+    auto addr_true  = viua::internals::types::bytecode_size{0};
+    auto addr_false = viua::internals::types::bytecode_size{0};
+    std::tie(addr, addr_true) =
+        viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
+    std::tie(addr, addr_false) =
+        viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
 
     return (stack->jump_base + (source->boolean() ? addr_true : addr_false));
 }

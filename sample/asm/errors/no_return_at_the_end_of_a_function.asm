@@ -18,7 +18,7 @@
 ;
 
 .function: foo/0
-    print (string %1 "Hello World!")
+    print (string %1 local "Hello World!") local
 .end
 
 .function: main/1

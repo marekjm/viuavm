@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    print (move %2 (integer %1 1))
+    print (move %2 local (integer %1 local 1) local) local
 
     izero %0 local
     return

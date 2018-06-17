@@ -29,30 +29,30 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-    namespace assertions {
-        void assert_typeof(viua::types::Value* object, const std::string& expected);
+namespace viua { namespace assertions {
+void assert_typeof(viua::types::Value* object, std::string const& expected);
 
-        template<typename T, typename U> inline bool any_equal(const T& to_compare, const U& first) {
-            return (to_compare == first);
-        }
-        template<typename T, typename U, typename... R>
-        bool any_equal(const T& to_compare, const U& first, const R&... rest) {
-            return ((to_compare == first) or any_equal(to_compare, rest...));
-        }
+template<typename T, typename U>
+inline bool any_equal(T const& to_compare, U const& first) {
+    return (to_compare == first);
+}
+template<typename T, typename U, typename... R>
+bool any_equal(T const& to_compare, U const& first, R const&... rest) {
+    return ((to_compare == first) or any_equal(to_compare, rest...));
+}
 
-        using Arity = viua::internals::types::register_index;
+using Arity = viua::internals::types::register_index;
 
-        template<typename... A> void assert_arity(const Frame* frame, const A&... valid_arities) {
-            Arity arity = frame->arguments->size();
-            if (not any_equal(arity, valid_arities...)) {
-                auto ex = std::unique_ptr<viua::types::Exception>{};
-                ex.reset(new ArityException(arity, {valid_arities...}));
-                throw ex;
-            }
-        }
-    }  // namespace assertions
-}  // namespace viua
+template<typename... A>
+void assert_arity(const Frame* frame, A const&... valid_arities) {
+    Arity arity = frame->arguments->size();
+    if (not any_equal(arity, valid_arities...)) {
+        auto ex = std::unique_ptr<viua::types::Exception>{};
+        ex.reset(new Arity_exception(arity, {valid_arities...}));
+        throw ex;
+    }
+}
+}}  // namespace viua::assertions
 
 
 #endif

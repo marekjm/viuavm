@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    vinsert %2 (izero %1) 0
+    vinsert %2 local (izero %1 local) local 0
 
     izero %0 local
     return

@@ -29,13 +29,15 @@
 #include <viua/program.h>
 
 
-struct invocables_t {
+namespace viua { namespace front { namespace assembler {
+
+struct Invocables {
     std::vector<std::string> names;
     std::vector<std::string> signatures;
     std::map<std::string, std::vector<viua::cg::lex::Token>> tokens;
 };
 
-struct compilationflags_t {
+struct Compilation_flags {
     bool as_lib;
 
     bool verbose;
@@ -44,19 +46,31 @@ struct compilationflags_t {
 };
 
 
-std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
-std::vector<std::vector<std::string>> decode_line(const std::string&);
+auto decode_line_tokens(std::vector<std::string> const&)
+    -> std::vector<std::vector<std::string>>;
+auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
-invocables_t gather_functions(const std::vector<viua::cg::lex::Token>&);
-invocables_t gather_blocks(const std::vector<viua::cg::lex::Token>&);
-std::map<std::string, std::string> gather_meta_information(const std::vector<viua::cg::lex::Token>&);
+auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> Invocables;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> Invocables;
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const&)
+    -> std::map<std::string, std::string>;
 
-viua::internals::types::bytecode_size assemble_instruction(
-    Program& program, viua::internals::types::bytecode_size& instruction,
-    viua::internals::types::bytecode_size i, const std::vector<viua::cg::lex::Token>& tokens,
-    std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks);
-void generate(std::vector<viua::cg::lex::Token> const&, invocables_t&, invocables_t&, const std::string&,
-              std::string&, const std::vector<std::string>&, const compilationflags_t&);
+auto assemble_instruction(
+    Program& program,
+    viua::internals::types::bytecode_size& instruction,
+    viua::internals::types::bytecode_size i,
+    std::vector<viua::cg::lex::Token> const& tokens,
+    std::map<std::string,
+             std::remove_reference<decltype(tokens)>::type::size_type>& marks)
+    -> viua::internals::types::bytecode_size;
+auto generate(std::vector<viua::cg::lex::Token> const&,
+              Invocables&,
+              Invocables&,
+              std::string const&,
+              std::string&,
+              std::vector<std::string> const&,
+              Compilation_flags const&) -> void;
+}}}  // namespace viua::front::assembler
 
 
 #endif

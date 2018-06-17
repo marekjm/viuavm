@@ -26,19 +26,23 @@
 #include <viua/types/object.h>
 using namespace std;
 
-const string viua::types::Object::type_name = "Object";
+std::string const viua::types::Object::type_name = "Object";
 
-string viua::types::Object::type() const { return object_type_name; }
-bool viua::types::Object::boolean() const { return true; }
+std::string viua::types::Object::type() const {
+    return object_type_name;
+}
+bool viua::types::Object::boolean() const {
+    return true;
+}
 
-string viua::types::Object::str() const {
+std::string viua::types::Object::str() const {
     ostringstream oss;
 
     oss << object_type_name << '#';
     oss << '{';
-    const auto limit = attributes.size();
+    const auto limit                           = attributes.size();
     std::remove_const<decltype(limit)>::type i = 0;
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         oss << each.first << ": " << each.second->repr();
         if (++i < limit) {
             oss << ", ";
@@ -49,22 +53,25 @@ string viua::types::Object::str() const {
     return oss.str();
 }
 
-unique_ptr<viua::types::Value> viua::types::Object::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
     auto cp = make_unique<viua::types::Object>(object_type_name);
-    for (const auto& each : attributes) {
+    for (auto const& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
     return std::move(cp);
 }
 
-void viua::types::Object::set(const string& name, unique_ptr<viua::types::Value> object) {
+void viua::types::Object::set(std::string const& name,
+                              std::unique_ptr<viua::types::Value> object) {
     attributes[name] = std::move(object);
 }
 
-void viua::types::Object::insert(const string& key, unique_ptr<viua::types::Value> value) {
+void viua::types::Object::insert(std::string const& key,
+                                 std::unique_ptr<viua::types::Value> value) {
     set(key, std::move(value));
 }
-unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
+std::unique_ptr<viua::types::Value> viua::types::Object::remove(
+    std::string const& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;
@@ -75,8 +82,5 @@ unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
     return o;
 }
 
-vector<string> viua::types::Object::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Object::inheritancechain() const { return vector<string>{"Value"}; }
-
-viua::types::Object::Object(const std::string& tn) : object_type_name(tn) {}
+viua::types::Object::Object(std::string const& tn) : object_type_name(tn) {}
 viua::types::Object::~Object() {}

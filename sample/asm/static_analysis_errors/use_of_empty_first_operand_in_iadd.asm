@@ -19,9 +19,9 @@
 
 .function: main/0
     .name: %iota first
-    izero (.name: %iota second)
+    izero (.name: %iota second) local
 
-    add (.name: %iota value) %first %second
+    add (.name: %iota value) local %first local %second local
 
     izero %0 local
     return

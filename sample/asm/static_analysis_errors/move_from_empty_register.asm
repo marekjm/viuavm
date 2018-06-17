@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    move %1 %0
+    move %1 local %0 local
 
     izero %0 local
     return

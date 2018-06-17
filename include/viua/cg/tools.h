@@ -27,26 +27,14 @@
 #include <viua/cg/lex.h>
 
 
-namespace viua {
-    namespace cg {
-        namespace tools {
-            template<class T> static auto any(T item, T other) -> bool { return (item == other); }
-            template<class T, class... R> static auto any(T item, T first, R... rest) -> bool {
-                if (item == first) {
-                    return true;
-                }
-                return any(item, rest...);
-            }
-
-            auto calculate_bytecode_size_of_first_n_instructions2(
-                std::vector<viua::cg::lex::Token> const& tokens,
-                std::remove_reference<decltype(tokens)>::type::size_type const limit)
-                -> viua::internals::types::bytecode_size;
-            auto calculate_bytecode_size2(std::vector<viua::cg::lex::Token> const&)
-                -> viua::internals::types::bytecode_size;
-        }  // namespace tools
-    }      // namespace cg
-}  // namespace viua
+namespace viua { namespace cg { namespace tools {
+auto calculate_bytecode_size_of_first_n_instructions2(
+    std::vector<viua::cg::lex::Token> const& tokens,
+    std::remove_reference<decltype(tokens)>::type::size_type const limit)
+    -> viua::internals::types::bytecode_size;
+auto calculate_bytecode_size2(std::vector<viua::cg::lex::Token> const&)
+    -> viua::internals::types::bytecode_size;
+}}}  // namespace viua::cg::tools
 
 
 #endif

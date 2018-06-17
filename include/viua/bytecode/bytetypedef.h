@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,36 +24,34 @@
 
 #include <stdint.h>
 
-namespace viua {
-    namespace internals {
-        namespace types {
-            typedef uint8_t byte;
+namespace viua { namespace internals {
+namespace types {
+typedef uint8_t byte;
+using Op_address_type = byte const*;
 
-            typedef uint64_t bytecode_size;
-            typedef uint32_t register_index;
+typedef uint64_t bytecode_size;
+typedef uint32_t register_index;
 
-            typedef uint32_t schedulers_count;
-            typedef uint64_t processes_count;
+typedef uint32_t schedulers_count;
+typedef uint64_t processes_count;
 
-            typedef uint16_t process_time_slice_type;
+typedef uint16_t process_time_slice_type;
 
-            typedef int32_t plain_int;
-            typedef double plain_float;
+typedef int32_t plain_int;
+typedef double plain_float;
 
-            typedef uint32_t timeout;
+typedef uint32_t timeout;
 
-            typedef uint8_t registerset_type_marker;
+typedef uint8_t registerset_type_marker;
 
-            typedef uint64_t bits_size;
-        }  // namespace types
+typedef uint64_t bits_size;
+}  // namespace types
 
-        enum class RegisterSets : types::registerset_type_marker {
-            CURRENT = 0,
-            GLOBAL,
-            LOCAL,
-            STATIC,
-        };
-    }  // namespace internals
-}  // namespace viua
+enum class Register_sets : types::registerset_type_marker {
+    GLOBAL = 0,
+    LOCAL,
+    STATIC,
+};
+}}  // namespace viua::internals
 
 #endif

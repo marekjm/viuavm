@@ -17,15 +17,13 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This script tests integer multiplication.
-
 .function: main/1
-    integer %1 4
-    integer %2 4
-    integer %3 -15
-    mul %4 %1 %2
-    add %3 %4 %3
-    print %3
+    integer %1 local 4
+    integer %2 local 4
+    integer %3 local -15
+    mul %4 local %1 local %2 local
+    add %3 local %4 local %3 local
+    print %3 local
     izero %0 local
     return
 .end

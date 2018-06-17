@@ -27,32 +27,31 @@
 using namespace std;
 
 
-string viua::types::Value::type() const { return "Value"; }
-string viua::types::Value::str() const {
+std::string viua::types::Value::type() const {
+    return "Value";
+}
+std::string viua::types::Value::str() const {
     ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-string viua::types::Value::repr() const { return str(); }
+std::string viua::types::Value::repr() const {
+    return str();
+}
 bool viua::types::Value::boolean() const {
     /*  Boolean defaults to false.
-     *  This is because in if, loops etc. we will NOT execute code depending on unknown state.
-     *  If a derived object overrides this method it is free to return true as it sees fit, but
-     *  the default is to NOT carry any actions.
+     *  This is because in if, loops etc. we will NOT execute code depending on
+     * unknown state. If a derived object overrides this method it is free to
+     * return true as it sees fit, but the default is to NOT carry any actions.
      */
     return false;
 }
 
 
-unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
+std::unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
     const viua::process::Process* process_of_origin) {
     return make_unique<viua::types::Pointer>(this, process_of_origin);
 }
-
-
-vector<string> viua::types::Value::bases() const { return vector<string>{"Value"}; }
-vector<string> viua::types::Value::inheritancechain() const { return vector<string>{"Value"}; }
-
 
 viua::types::Value::~Value() {
     for (auto p : pointers) {

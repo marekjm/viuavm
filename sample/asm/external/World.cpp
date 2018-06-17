@@ -25,14 +25,14 @@
 using namespace std;
 
 
-static auto hello(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
+static auto hello(Frame*, viua::kernel::Register_set*, viua::kernel::Register_set*, viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
     cout << "Hello World!" << endl;
 }
 
 
-const ForeignFunctionSpec functions[] = {
+const Foreign_function_spec functions[] = {
     {"World::print_hello/0", &hello}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports() { return functions; }

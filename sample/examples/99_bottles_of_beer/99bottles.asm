@@ -30,54 +30,54 @@
 ;
 
 .function: main/1
-    integer %0 99
+    integer %0 local 99
 
-    string %1 " bottles"
-    string %2 " of beer"
-    string %3 " on the wall"
-    string %4 "Take one down, pass it around"
-    string %5 ""
-    string %6 "No more"
+    string %1 local " bottles"
+    string %2 local " of beer"
+    string %3 local " on the wall"
+    string %4 local "Take one down, pass it around"
+    string %5 local ""
+    string %6 local "No more"
 
-    integer %7 1
+    integer %7 local 1
     jump again
 
 .mark: one_beer
-    string %1 " bottle"
+    string %1 local " bottle"
 
 .mark: again
 
-    echo %0
-    echo %1
-    echo %2
-    print %3
+    echo %0 local
+    echo %1 local
+    echo %2 local
+    print %3 local
 
-    echo %0
-    echo %1
-    print %2
+    echo %0 local
+    echo %1 local
+    print %2 local
 
-    print %4
+    print %4 local
 
-    idec %0
+    idec %0 local
 
-    if %0 more_beer
-    echo %6
+    if %0 local more_beer
+    echo %6 local
     jump rest
 
 .mark: more_beer
-    echo %0
+    echo %0 local
     jump rest
 
 .mark: rest
-    echo %1
-    echo %2
-    print %3
+    echo %1 local
+    echo %2 local
+    print %3 local
 
-    print %5
+    print %5 local
 
-    eq %8 %7 %0
-    if %8 one_beer
-    if %0 again
+    eq %8 local %7 local %0 local
+    if %8 local one_beer
+    if %0 local again
 
     izero %0 local
     return

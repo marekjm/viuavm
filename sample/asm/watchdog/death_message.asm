@@ -18,69 +18,74 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) %0
-    remove (.name: %iota exception) %1 (string %exception "exception")
-    remove (.name: %iota aborted_function) %1 (string %aborted_function "function")
+    .name: %iota death_message
+    .name: %iota exception
+    .name: %iota aborted_function
 
-    echo (string (.name: %iota message) "[WARNING] process '")
-    echo %aborted_function
-    echo (string %message "' killed by >>>")
-    echo %exception
-    print (string %message "<<<")
+    arg %death_message local %0
+    structremove %exception local %death_message local (atom %exception local 'exception') local
+    structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
+
+    .name: %iota message
+    echo (string %message local "[WARNING] process '") local
+    echo %aborted_function local
+    echo (string %message local "' killed by >>>") local
+    echo %exception local
+    print (string %message local "<<<") local
 
     return
 .end
 
 .function: a_detached_concurrent_process/0
-    frame ^[(pamv %0 (integer %1 32))]
+    frame ^[(pamv %0 (integer %1 local 32) local)]
     call std::misc::cycle/1
 
-    print (string %1 "Hello World (from detached process)!")
+    print (string %1 local "Hello World (from detached process)!") local
 
-    frame ^[(pamv %0 (integer %1 512))]
+    frame ^[(pamv %0 (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    print (string %1 "Hello World (from detached process) after a runaway exception!")
+    print (string %1 local "Hello World (from detached process) after a runaway exception!") local
 
-    frame ^[(pamv %0 (integer %1 512))]
+    frame ^[(pamv %0 (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (string %1 "a_detached_concurrent_process"))]
+    frame ^[(pamv %0 (string %1 local "a_detached_concurrent_process") local)]
     call log_exiting_detached/1
 
     return
 .end
 
 .function: a_joined_concurrent_process/0
-    frame ^[(pamv %0 (integer %1 128))]
-    call std::misc::cycle/1
+    frame ^[(pamv %0 (integer %1 local 128) local)]
+    call void std::misc::cycle/1
 
-    print (string %1 "Hello World (from joined process)!")
+    print (string %1 local "Hello World (from joined process)!") local
 
-    frame ^[(pamv %0 (string %1 "a_joined_concurrent_process"))]
-    call log_exiting_joined/1
+    frame ^[(pamv %0 (string %1 local "a_joined_concurrent_process") local)]
+    call void log_exiting_joined/1
 
-    throw (string %2 "OH NOES!")
+    throw (string %2 local "OH NOES!") local
 
     return
 .end
 
 .function: log_exiting_main/0
-    print (string %2 "process [  main  ]: 'main' exiting")
+    print (string %2 local "process [  main  ]: 'main' exiting") local
     return
 .end
 .function: log_exiting_detached/1
-    arg %1 %0
-    echo (string %2 "process [detached]: '")
-    echo %1
-    print (string %2 "' exiting")
+    arg %1 local %0
+    echo (string %2 local "process [detached]: '") local
+    echo %1 local
+    print (string %2 local "' exiting") local
     return
 .end
 .function: log_exiting_joined/1
-    arg %1 %0
-    echo (string %2 "process [ joined ]: '")
-    echo %1
-    print (string %2 "' exiting")
+    arg %1 local %0
+    echo (string %2 local "process [ joined ]: '") local
+    echo %1 local
+    print (string %2 local "' exiting") local
     return
 .end
 
@@ -95,8 +100,8 @@
     process void a_detached_concurrent_process/0
 
     frame %0
-    process %2 a_joined_concurrent_process/0
-    join %0 %2
+    process %2 local a_joined_concurrent_process/0
+    join void %2 local
 
     frame %0
     call log_exiting_main/0

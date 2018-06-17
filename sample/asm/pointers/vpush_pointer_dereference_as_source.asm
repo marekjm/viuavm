@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    vector (.name: %iota container)
-    ptr (.name: %iota pointer) (integer (.name: %iota value) 0)
+    vector (.name: %iota container) local
+    ptr (.name: %iota pointer) local (integer (.name: %iota value) local 0) local
 
-    vpush %container *pointer
-    print %container
-    print %value
+    vpush %container local *pointer local
+    print %container local
+    print %value local
 
     izero %0 local
     return

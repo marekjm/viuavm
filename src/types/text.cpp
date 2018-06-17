@@ -23,28 +23,30 @@
 #include <viua/types/text.h>
 using namespace std;
 
-const string viua::types::Text::type_name = "Text";
+std::string const viua::types::Text::type_name = "Text";
 
 namespace {
-    const uint8_t UTF8_1ST_ROW = 0b00000000;
-    const uint8_t UTF8_2ND_ROW = 0b11000000;
-    const uint8_t UTF8_3RD_ROW = 0b11100000;
-    const uint8_t UTF8_4TH_ROW = 0b11110000;
-    const uint8_t UTF8_FILLING = 0b10000000;
+const uint8_t UTF8_1ST_ROW = 0b00000000;
+const uint8_t UTF8_2ND_ROW = 0b11000000;
+const uint8_t UTF8_3RD_ROW = 0b11100000;
+const uint8_t UTF8_4TH_ROW = 0b11110000;
+const uint8_t UTF8_FILLING = 0b10000000;
 
-    const uint8_t UTF8_1ST_ROW_NORMALISER = 0b10000000;
-    const uint8_t UTF8_2ND_ROW_NORMALISER = 0b11100000;
-    const uint8_t UTF8_3RD_ROW_NORMALISER = 0b11110000;
-    const uint8_t UTF8_4TH_ROW_NORMALISER = 0b11111000;
-    const uint8_t UTF8_FILLING_NORMALISER = 0b11000000;
+const uint8_t UTF8_1ST_ROW_NORMALISER = 0b10000000;
+const uint8_t UTF8_2ND_ROW_NORMALISER = 0b11100000;
+const uint8_t UTF8_3RD_ROW_NORMALISER = 0b11110000;
+const uint8_t UTF8_4TH_ROW_NORMALISER = 0b11111000;
+const uint8_t UTF8_FILLING_NORMALISER = 0b11000000;
 }  // namespace
 
 static auto is_continuation_byte(uint8_t b) -> bool {
     return ((UTF8_FILLING_NORMALISER & b) == UTF8_FILLING);
 }
-static auto is_continuation_byte(char b) -> bool { return is_continuation_byte(static_cast<uint8_t>(b)); }
-auto viua::types::Text::parse(string s) -> decltype(text) {
-    vector<Character> parsed_text;
+static auto is_continuation_byte(char b) -> bool {
+    return is_continuation_byte(static_cast<uint8_t>(b));
+}
+auto viua::types::Text::parse(std::string s) -> decltype(text) {
+    auto parsed_text = std::vector<Character>{};
 
     char ss[5];
     ss[4] = '\0';
@@ -71,14 +73,18 @@ auto viua::types::Text::parse(string s) -> decltype(text) {
 
         if ((UTF8_1ST_ROW_NORMALISER & ss[0]) == UTF8_1ST_ROW) {
             // do nothing
-        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW and is_continuation_byte(ss[1])) {
+        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW
+                   and is_continuation_byte(ss[1])) {
             ++i;
-        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW and is_continuation_byte(ss[1]) and
-                   is_continuation_byte(ss[2])) {
+        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])) {
             ++i;
             ++i;
-        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW and is_continuation_byte(ss[1]) and
-                   is_continuation_byte(ss[2]) and is_continuation_byte(ss[3])) {
+        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])
+                   and is_continuation_byte(ss[3])) {
             ++i;
             ++i;
             ++i;
@@ -92,31 +98,41 @@ auto viua::types::Text::parse(string s) -> decltype(text) {
     return parsed_text;
 }
 
-viua::types::Text::Text(string s) : text(parse(s)) {}
-viua::types::Text::Text(vector<Character> s) : text(std::move(s)) {}
+viua::types::Text::Text(std::string s) : text(parse(s)) {}
+viua::types::Text::Text(std::vector<Character> s) : text(std::move(s)) {}
 viua::types::Text::Text(Text&& s) : text(std::move(s.text)) {}
 
-string viua::types::Text::type() const { return "Text"; }
+std::string viua::types::Text::type() const {
+    return "Text";
+}
 
-string viua::types::Text::str() const {
+std::string viua::types::Text::str() const {
     ostringstream oss;
-    for (const auto& each : text) {
+    for (auto const& each : text) {
         oss << each;
     }
     return oss.str();
 }
 
-string viua::types::Text::repr() const { return str::enquote(str()); }
+std::string viua::types::Text::repr() const {
+    return str::enquote(str());
+}
 
-bool viua::types::Text::boolean() const { return false; }
+bool viua::types::Text::boolean() const {
+    return false;
+}
 
-std::unique_ptr<viua::types::Value> viua::types::Text::copy() const { return std::make_unique<Text>(text); }
+std::unique_ptr<viua::types::Value> viua::types::Text::copy() const {
+    return std::make_unique<Text>(text);
+}
 
-auto viua::types::Text::operator==(const viua::types::Text& other) const -> bool {
+auto viua::types::Text::operator==(viua::types::Text const& other) const
+    -> bool {
     return (text == other.text);
 }
 
-auto viua::types::Text::operator+(const viua::types::Text& other) const -> Text {
+auto viua::types::Text::operator+(viua::types::Text const& other) const
+    -> Text {
     decltype(text) copied;
     for (size_type i = 0; i < size(); ++i) {
         copied.push_back(text.at(i));
@@ -127,14 +143,21 @@ auto viua::types::Text::operator+(const viua::types::Text& other) const -> Text 
     return copied;
 }
 
-auto viua::types::Text::at(const size_type i) const -> Character { return text.at(i); }
+auto viua::types::Text::at(const size_type i) const -> Character {
+    return text.at(i);
+}
 
 
-auto viua::types::Text::signed_size() const -> int64_t { return static_cast<int64_t>(text.size()); }
-auto viua::types::Text::size() const -> size_type { return text.size(); }
+auto viua::types::Text::signed_size() const -> int64_t {
+    return static_cast<int64_t>(text.size());
+}
+auto viua::types::Text::size() const -> size_type {
+    return text.size();
+}
 
 
-auto viua::types::Text::sub(size_type first_index, size_type last_index) const -> decltype(text) {
+auto viua::types::Text::sub(size_type first_index, size_type last_index) const
+    -> decltype(text) {
     decltype(text) copied;
     for (size_type i = first_index; i < size() and i < last_index; ++i) {
         copied.push_back(text.at(i));
@@ -146,24 +169,26 @@ auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
 }
 
 
-auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
+auto viua::types::Text::common_prefix(Text const& other) const -> size_type {
     size_type length_of_common_prefix = 0;
-    auto limit = max(size(), other.size());
+    auto limit                        = max(size(), other.size());
 
-    while (length_of_common_prefix < limit and
-           text.at(length_of_common_prefix) == other.at(length_of_common_prefix)) {
+    while (length_of_common_prefix < limit
+           and text.at(length_of_common_prefix)
+                   == other.at(length_of_common_prefix)) {
         ++length_of_common_prefix;
     }
 
     return length_of_common_prefix;
 }
-auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
+auto viua::types::Text::common_suffix(Text const& other) const -> size_type {
     size_type length_of_common_suffix = 0;
 
-    size_type this_index = size() - 1;
+    size_type this_index  = size() - 1;
     size_type other_index = other.size() - 1;
 
-    while ((this_index and other_index) and text.at(this_index) == other.at(other_index)) {
+    while ((this_index and other_index)
+           and text.at(this_index) == other.at(other_index)) {
         ++length_of_common_suffix;
         --this_index;
         --other_index;

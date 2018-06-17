@@ -31,59 +31,57 @@
 
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
-    namespace kernel {
-        class Kernel;
-    }
+namespace process {
+class Process;
+}
+namespace kernel {
+class Kernel;
+}
 }  // namespace viua
 
 
-namespace viua {
-    namespace types {
-        class Text : public Value {
-            /**
-             *  This type is designed to hold UTF-8 encoded text.
-             *  Viua becomes tied to Unicode and the UTF-8 encoding.
-             */
-          public:
-            using Character = std::string;
+namespace viua { namespace types {
+class Text : public Value {
+    /**
+     *  This type is designed to hold UTF-8 encoded text.
+     *  Viua becomes tied to Unicode and the UTF-8 encoding.
+     */
+  public:
+    using Character = std::string;
 
-          private:
-            std::vector<Character> text;
+  private:
+    std::vector<Character> text;
 
-            auto parse(std::string) -> decltype(text);
+    auto parse(std::string) -> decltype(text);
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            std::string repr() const override;
-            bool boolean() const override;
+    std::string type() const override;
+    std::string str() const override;
+    std::string repr() const override;
+    bool boolean() const override;
 
-            std::unique_ptr<Value> copy() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            auto operator==(const Text&) const -> bool;
-            auto operator+(const Text&) const -> Text;
+    auto operator==(Text const&) const -> bool;
+    auto operator+(Text const&) const -> Text;
 
-            using size_type = decltype(text)::size_type;
-            auto at(const size_type) const -> Character;
-            auto signed_size() const -> int64_t;
-            auto size() const -> size_type;
-            auto sub(size_type, size_type) const -> decltype(text);
-            auto sub(size_type) const -> decltype(text);
-            auto common_prefix(const Text&) const -> size_type;
-            auto common_suffix(const Text&) const -> size_type;
+    using size_type = decltype(text)::size_type;
+    auto at(const size_type) const -> Character;
+    auto signed_size() const -> int64_t;
+    auto size() const -> size_type;
+    auto sub(size_type, size_type) const -> decltype(text);
+    auto sub(size_type) const -> decltype(text);
+    auto common_prefix(Text const&) const -> size_type;
+    auto common_suffix(Text const&) const -> size_type;
 
-            Text(std::vector<Character>);
-            Text(std::string);
-            Text(Text&&);
-            ~Text() {}
-        };
-    }  // namespace types
-}  // namespace viua
+    Text(std::vector<Character>);
+    Text(std::string);
+    Text(Text&&);
+    ~Text() {}
+};
+}}  // namespace viua::types
 
 
 #endif

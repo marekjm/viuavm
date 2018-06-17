@@ -24,44 +24,59 @@
 using namespace std;
 
 
-invocables_t gather_functions(const vector<viua::cg::lex::Token>& tokens) {
-    invocables_t invocables;
+namespace viua { namespace front { namespace assembler {
+auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens)
+    -> Invocables {
+    auto invocables = Invocables{};
 
-    invocables.names = assembler::ce::get_function_names(tokens);
-    invocables.signatures = assembler::ce::get_signatures(tokens);
-    invocables.tokens = assembler::ce::get_invokables_token_bodies("function", tokens);
-    for (const auto& each : assembler::ce::get_invokables_token_bodies("closure", tokens)) {
+    invocables.names      = ::assembler::ce::get_function_names(tokens);
+    invocables.signatures = ::assembler::ce::get_signatures(tokens);
+    invocables.tokens =
+        ::assembler::ce::get_invokables_token_bodies("function", tokens);
+    for (auto const& each :
+         ::assembler::ce::get_invokables_token_bodies("closure", tokens)) {
         invocables.tokens[each.first] = each.second;
     }
 
     return invocables;
 }
 
-invocables_t gather_blocks(const vector<viua::cg::lex::Token>& tokens) {
-    invocables_t invocables;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
+    -> Invocables {
+    auto invocables = Invocables{};
 
-    invocables.names = assembler::ce::get_block_names(tokens);
-    invocables.signatures = assembler::ce::get_block_signatures(tokens);
-    invocables.tokens = assembler::ce::get_invokables_token_bodies("block", tokens);
+    invocables.names      = ::assembler::ce::get_block_names(tokens);
+    invocables.signatures = ::assembler::ce::get_block_signatures(tokens);
+    invocables.tokens =
+        ::assembler::ce::get_invokables_token_bodies("block", tokens);
 
     return invocables;
 }
 
-map<string, string> gather_meta_information(const vector<viua::cg::lex::Token>& tokens) {
-    map<string, string> meta_information;
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
+    -> map<std::string, std::string> {
+    auto meta_information = map<std::string, std::string>{};
 
-    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+    for (auto i = std::remove_reference<decltype(tokens)>::type::size_type{0};
+         i < tokens.size();
+         ++i) {
         if (tokens.at(i) == ".info:") {
-            viua::cg::lex::Token key = tokens.at(i + 1), value = tokens.at(i + 2);
+            auto const key   = tokens.at(i + 1);
+            auto const value = tokens.at(i + 2);
             if (key == "\n") {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing key and value in .info: directive");
+                throw viua::cg::lex::Invalid_syntax(
+                    tokens.at(i), "missing key and value in .info: directive");
             }
             if (value == "\n") {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing value in .info: directive");
+                throw viua::cg::lex::Invalid_syntax(
+                    tokens.at(i), "missing value in .info: directive");
             }
-            meta_information.emplace(key, str::strdecode(value.str().substr(1, value.str().size() - 2)));
+            meta_information.emplace(
+                key,
+                str::strdecode(value.str().substr(1, value.str().size() - 2)));
         }
     }
 
     return meta_information;
 }
+}}}  // namespace viua::front::assembler

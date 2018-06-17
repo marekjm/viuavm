@@ -28,36 +28,34 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-    namespace types {
-        class Exception : public Value {
-            /** Exception type.
-             *
-             *  Thrown when irrecoverable conditions are encountered
-             *  during program execution.
-             */
-          protected:
-            std::string cause;
-            std::string detailed_type;
+namespace viua { namespace types {
+class Exception : public Value {
+    /** Exception type.
+     *
+     *  Thrown when irrecoverable conditions are encountered
+     *  during program execution.
+     */
+  protected:
+    std::string cause;
+    std::string detailed_type;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            std::string type() const override;
-            std::string str() const override;
-            std::string repr() const override;
-            bool boolean() const override;
+    std::string type() const override;
+    std::string str() const override;
+    std::string repr() const override;
+    bool boolean() const override;
 
-            std::unique_ptr<Value> copy() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            virtual std::string what() const;
-            virtual std::string etype() const;
+    virtual std::string what() const;
+    virtual std::string etype() const;
 
-            Exception(std::string s = "");
-            Exception(std::string ts, std::string cs);
-        };
-    }  // namespace types
-}  // namespace viua
+    Exception(std::string s = "");
+    Exception(std::string ts, std::string cs);
+};
+}}  // namespace viua::types
 
 
 #endif

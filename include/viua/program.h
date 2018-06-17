@@ -51,8 +51,9 @@ class Program {
     viua::internals::types::byte* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
-     *  Jumps must be recalculated because each function is compiled separately with jump offset 0, but
-     *  when they are assembled into a single binary the offsets change.
+     *  Jumps must be recalculated because each function is compiled separately
+     * with jump offset 0, but when they are assembled into a single binary the
+     * offsets change.
      */
     std::vector<viua::internals::types::byte*> branches;
 
@@ -111,7 +112,7 @@ class Program {
     Program& opor(int_op, int_op, int_op);
 
     Program& opbits(int_op, int_op);
-    Program& opbits(int_op, const std::vector<uint8_t>);
+    Program& opbits(int_op, std::vector<uint8_t> const);
     Program& opbitand(int_op, int_op, int_op);
     Program& opbitor(int_op, int_op, int_op);
     Program& opbitnot(int_op, int_op);
@@ -164,8 +165,8 @@ class Program {
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
+    Program& opptrlive(int_op, int_op);
     Program& opswap(int_op, int_op);
-    Program& opress(std::string);
     Program& opdelete(int_op);
     Program& opisnull(int_op, int_op);
 
@@ -175,9 +176,9 @@ class Program {
     Program& opcapture(int_op, int_op, int_op);
     Program& opcapturecopy(int_op, int_op, int_op);
     Program& opcapturemove(int_op, int_op, int_op);
-    Program& opclosure(int_op, const std::string&);
+    Program& opclosure(int_op, std::string const&);
 
-    Program& opfunction(int_op, const std::string&);
+    Program& opfunction(int_op, std::string const&);
 
     Program& opframe(int_op, int_op);
     Program& opparam(int_op, int_op);
@@ -185,22 +186,25 @@ class Program {
     Program& oparg(int_op, int_op);
     Program& opargc(int_op);
 
-    Program& opcall(int_op, const std::string&);
+    Program& opcall(int_op, std::string const&);
     Program& opcall(int_op, int_op);
-    Program& optailcall(const std::string&);
+    Program& optailcall(std::string const&);
     Program& optailcall(int_op);
-    Program& opdefer(const std::string&);
+    Program& opdefer(std::string const&);
     Program& opdefer(int_op);
-    Program& opprocess(int_op, const std::string&);
+    Program& opprocess(int_op, std::string const&);
     Program& opprocess(int_op, int_op);
     Program& opself(int_op);
     Program& opjoin(int_op, int_op, timeout_op);
     Program& opsend(int_op, int_op);
     Program& opreceive(int_op, timeout_op);
-    Program& opwatchdog(const std::string&);
+    Program& opwatchdog(std::string const&);
     Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
-    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE,
-                  viua::internals::types::bytecode_size, enum JUMPTYPE);
+    Program& opif(int_op,
+                  viua::internals::types::bytecode_size,
+                  enum JUMPTYPE,
+                  viua::internals::types::bytecode_size,
+                  enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);
@@ -211,12 +215,7 @@ class Program {
 
     Program& opimport(std::string);
 
-    Program& opclass(int_op, const std::string&);
-    Program& opderive(int_op, const std::string&);
-    Program& opattach(int_op, const std::string&, const std::string&);
-    Program& opregister(int_op);
-
-    Program& opatom(int_op, std::string);
+    Program& opatom(int_op, std::string const&);
     Program& opatomeq(int_op, int_op, int_op);
 
     Program& opstruct(int_op);
@@ -224,22 +223,17 @@ class Program {
     Program& opstructremove(int_op, int_op, int_op);
     Program& opstructkeys(int_op, int_op);
 
-    Program& opnew(int_op, const std::string&);
-    Program& opmsg(int_op, const std::string&);
-    Program& opmsg(int_op, int_op);
-    Program& opinsert(int_op, int_op, int_op);
-    Program& opremove(int_op, int_op, int_op);
-
     Program& opreturn();
     Program& ophalt();
 
 
     /** Functions driving after-insertion calculations.
-     *  These must be called after the bytecode is already generated as they must know
-     *  size of the program.
+     *  These must be called after the bytecode is already generated as they
+     * must know size of the program.
      */
     Program& calculate_jumps(
-        std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>,
+        std::vector<std::tuple<viua::internals::types::bytecode_size,
+                               viua::internals::types::bytecode_size>>,
         std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 
@@ -252,8 +246,8 @@ class Program {
     viua::internals::types::bytecode_size size();
 
     Program(viua::internals::types::bytecode_size bts = 2);
-    Program(const Program& that);
-    Program& operator=(const Program& that);
+    Program(Program const& that);
+    Program& operator=(Program const& that);
 };
 
 

@@ -19,7 +19,7 @@
 
 .function: main/0
     frame %0
-    call void %1
+    call void %1 local
 
     izero %0 local
     return

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,12 +20,12 @@
 #ifndef SUPPORT_POINTER_H
 #define SUPPORT_POINTER_H
 
-namespace pointer {
-    template<class T, class S> auto inc(S*& p) -> void {
-        T* ptr = reinterpret_cast<T*>(p);
-        ptr++;
-        p = reinterpret_cast<S*>(ptr);
-    }
-}  // namespace pointer
+namespace viua { namespace support { namespace pointer {
+template<class T, class S> auto inc(S*& p) -> void {
+    auto ptr = reinterpret_cast<T*>(p);
+    ptr++;
+    p = reinterpret_cast<S*>(ptr);
+}
+}}}  // namespace viua::support::pointer
 
 #endif

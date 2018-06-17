@@ -18,29 +18,29 @@
 ;
 
 .function: run_in_a_process/0
-    ; will cause a memory leak on detached processes
-    throw (receive %1)
+    ; FIXME will cause a memory leak on detached processes
+    throw (receive %1 local) local
     return
 .end
 
 .block: try_process_exception
-    join %0 %1
+    join void %1 local
     leave
 .end
 
 .block: handle_process_exception
-    echo (string %3 "exception transferred from process ")
-    echo %1
-    echo (string %3 ": ")
-    print (draw %3)
+    echo (string %3 local "exception transferred from process ") local
+    echo %1 local
+    echo (string %3 local ": ") local
+    print (draw %3 local) local
     leave
 .end
 
 .function: main/1
     frame %0
-    process %1 run_in_a_process/0
+    process %1 local run_in_a_process/0
 
-    send %1 (string %2 "Hello exception transferring World!")
+    send %1 local (string %2 local "Hello exception transferring World!") local
 
     try
     catch "String" handle_process_exception

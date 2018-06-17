@@ -23,12 +23,12 @@
 ; true porpose of this script, though.
 
 .function: main/1
-    float %1 4.0
-    float %2 -3.5
-    add %3 %1 %2
-    float %4 0
-    add %3 %3 %4
-    print %3
+    float %1 local 4.0
+    float %2 local -3.5
+    add %3 local %1 local %2 local
+    float %4 local 0
+    add %3 local %3 local %4 local
+    print %3 local
     izero %0 local
     return
 .end

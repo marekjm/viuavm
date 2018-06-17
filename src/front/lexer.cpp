@@ -32,21 +32,23 @@ using namespace std;
 
 
 // MISC FLAGS
-bool SHOW_HELP = false;
+bool SHOW_HELP    = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
+bool VERBOSE      = false;
 
 
-using Token = viua::cg::lex::Token;
-using InvalidSyntax = viua::cg::lex::InvalidSyntax;
+using Token          = viua::cg::lex::Token;
+using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 
 template<class T>
-static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
-    vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
+static auto enumerate(std::vector<T> const& v)
+    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    auto enumerated_vector =
+        std::vector<pair<typename std::vector<T>::size_type, T>>{};
 
-    typename vector<T>::size_type i = 0;
-    for (const auto& each : v) {
+    typename std::vector<T>::size_type i = 0;
+    for (auto const& each : v) {
         enumerated_vector.emplace_back(i, each);
         ++i;
     }
@@ -54,18 +56,22 @@ static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::siz
     return enumerated_vector;
 }
 
-static void encode_json(const string& filename, const vector<Token>& tokens) {
+static void encode_json(std::string const& filename,
+                        std::vector<Token> const& tokens) {
     cout << "{";
     cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     cout << str::enquote("tokens") << ": [";
 
     const auto limit = tokens.size();
-    for (const auto& t : enumerate(tokens)) {
+    for (auto const& t : enumerate(tokens)) {
         cout << "{";
         cout << str::enquote("line") << ": " << t.second.line() << ", ";
-        cout << str::enquote("character") << ": " << t.second.character() << ", ";
-        cout << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << ", ";
-        cout << str::enquote("original") << ": " << str::enquote(str::strencode(t.second.original()));
+        cout << str::enquote("character") << ": " << t.second.character()
+             << ", ";
+        cout << str::enquote("content") << ": "
+             << str::enquote(str::strencode(t.second.str())) << ", ";
+        cout << str::enquote("original") << ": "
+             << str::enquote(str::strencode(t.second.original()));
         cout << '}';
         if (t.first + 1 < limit) {
             cout << ", ";
@@ -75,7 +81,10 @@ static void encode_json(const string& filename, const vector<Token>& tokens) {
     cout << "]}\n";
 }
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program,
+                  bool show_help,
+                  bool show_version,
+                  bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM lexer, version ";
     }
@@ -94,11 +103,13 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "-h, --help               - display this message\n"
              // misc options
              << "    "
-             << "    --size               - calculate and display compiled bytecode size\n"
+             << "    --size               - calculate and display compiled "
+                "bytecode size\n"
              << "    "
              << "    --raw                - dump raw token list\n"
              << "    "
-             << "    --ws                 - reduce whitespace and remove comments\n"
+             << "    --ws                 - reduce whitespace and remove "
+                "comments\n"
              << "    "
              << "    --dirs               - reduce directives\n";
     }
@@ -106,9 +117,9 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     return (show_help or show_version);
 }
 
-static string read_file(ifstream& in) {
+static std::string read_file(ifstream& in) {
     ostringstream source_in;
-    string line;
+    auto line = std::string{};
     while (getline(in, line)) {
         source_in << line << '\n';
     }
@@ -116,19 +127,22 @@ static string read_file(ifstream& in) {
     return source_in.str();
 }
 
-static bool DISPLAY_SIZE = false;
-static bool DISPLAY_RAW = false;
-static bool MANUAL_REDUCING = false;
+static bool DISPLAY_SIZE      = false;
+static bool DISPLAY_RAW       = false;
+static bool MANUAL_REDUCING   = false;
 static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
-static void display_results(const string& filename, const vector<Token>& tokens) {
+static void display_results(std::string const& filename,
+                            std::vector<Token> const& tokens) {
     if (DISPLAY_SIZE) {
         try {
             cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
-        } catch (const InvalidSyntax& e) {
-            cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
-            cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
+        } catch (Invalid_syntax const& e) {
+            cerr << filename << ':' << e.line_number << ':'
+                 << e.character_in_line;
+            cerr << ": error: invalid syntax: " << str::strencode(e.content)
+                 << endl;
         }
         return;
     }
@@ -138,13 +152,13 @@ static void display_results(const string& filename, const vector<Token>& tokens)
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
-    vector<string> args;
-    string option;
+    auto args   = std::vector<std::string>{};
+    auto option = std::string{};
 
-    string filename(""), compilename("");
+    std::string filename(""), compilename("");
 
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
+        option = std::string(argv[i]);
 
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
@@ -159,16 +173,16 @@ int main(int argc, char* argv[]) {
             DISPLAY_SIZE = true;
             continue;
         } else if (option == "--raw") {
-            DISPLAY_RAW = true;
+            DISPLAY_RAW     = true;
             MANUAL_REDUCING = true;
             continue;
         } else if (option == "--ws") {
             REDUCE_WHITESPACE = true;
-            MANUAL_REDUCING = true;
+            MANUAL_REDUCING   = true;
             continue;
         } else if (option == "--dirs") {
             REDUCE_DIRECTIVES = true;
-            MANUAL_REDUCING = true;
+            MANUAL_REDUCING   = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cerr << "error: unknown option: " << option << endl;
@@ -193,7 +207,7 @@ int main(int argc, char* argv[]) {
         cout << "fatal: no file to tokenize" << endl;
         return 1;
     }
-    if (!support::env::is_file(filename)) {
+    if (!viua::support::env::is_file(filename)) {
         cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
@@ -206,9 +220,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string source = read_file(in);
+    std::string source = read_file(in);
 
-    vector<Token> tokens;
+    auto tokens = std::vector<Token>{};
     try {
         tokens = viua::cg::lex::tokenise(source);
         if (not MANUAL_REDUCING) {
@@ -236,10 +250,12 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_mark_directive(tokens);
             }
         }
-    } catch (const InvalidSyntax& e) {
-        string message = e.what();
-        cerr << filename << ':' << e.line_number + 1 << ':' << e.character_in_line + 1
-             << ": error: " << (message.size() ? message : "invalid syntax") << endl;
+    } catch (Invalid_syntax const& e) {
+        std::string message = e.what();
+        cerr << filename << ':' << e.line_number + 1 << ':'
+             << e.character_in_line + 1
+             << ": error: " << (message.size() ? message : "invalid syntax")
+             << endl;
         return 1;
     }
 

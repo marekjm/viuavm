@@ -28,57 +28,51 @@
 
 
 namespace viua {
-    namespace kernel {
-        class Kernel;
-    }
+namespace kernel {
+class Kernel;
+}
 
-    namespace types {
-        class Pointer : public Value {
-            Value* points_to;
-            bool valid;
-            /*
-             *  Pointer of origin is a parallelism-safety token.
-             *  Viua asserts that pointers can be dereferenced only
-             *  inside the process that spawned them -- otherwise
-             *  there is no way to ensure that the pointer is still valid
-             *  without sophisticated sycnhronisation schemes.
-             *  Also, since the VM employs shared-nothing concurrency,
-             *  pointer dereferences outside of the process that taken the
-             *  pointer should be illegal by definition (even if the access
-             *  could be made safe).
-             */
-            const viua::process::Process* process_of_origin;
+namespace types {
+class Pointer : public Value {
+    Value* points_to;
+    bool valid;
+    /*
+     *  Pointer of origin is a parallelism-safety token.
+     *  Viua asserts that pointers can be dereferenced only
+     *  inside the process that spawned them -- otherwise
+     *  there is no way to ensure that the pointer is still valid
+     *  without sophisticated sycnhronisation schemes.
+     *  Also, since the VM employs shared-nothing concurrency,
+     *  pointer dereferences outside of the process that taken the
+     *  pointer should be illegal by definition (even if the access
+     *  could be made safe).
+     */
+    viua::process::Process const* process_of_origin;
 
-            void attach();
-            void detach();
+    void attach();
+    void detach();
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            void invalidate(Value* t);
-            bool expired();
-            auto authenticate(const viua::process::Process*) -> void;
-            void reset(Value* t);
-            Value* to(const viua::process::Process*);
+    void invalidate(Value* t);
+    bool expired();
+    auto authenticate(viua::process::Process const*) -> void;
+    void reset(Value* t);
+    Value* to(viua::process::Process const*);
 
-            virtual void expired(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                                 viua::process::Process*, viua::kernel::Kernel*);
+    std::string str() const override;
 
-            std::string str() const override;
+    std::string type() const override;
+    bool boolean() const override;
 
-            std::string type() const override;
-            bool boolean() const override;
+    std::unique_ptr<Value> copy() const override;
 
-            std::vector<std::string> bases() const override;
-            std::vector<std::string> inheritancechain() const override;
-
-            std::unique_ptr<Value> copy() const override;
-
-            Pointer(const viua::process::Process*);
-            Pointer(Value* t, const viua::process::Process*);
-            virtual ~Pointer();
-        };
-    }  // namespace types
+    Pointer(viua::process::Process const*);
+    Pointer(Value* t, viua::process::Process const*);
+    virtual ~Pointer();
+};
+}  // namespace types
 }  // namespace viua
 
 

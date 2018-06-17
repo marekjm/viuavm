@@ -25,33 +25,28 @@
 #include <viua/types/value.h>
 
 
-namespace viua {
-    namespace types {
-        class Atom : public Value {
-            const std::string value;
+namespace viua { namespace types {
+class Atom : public Value {
+    std::string const value;
 
-          public:
-            static const std::string type_name;
+  public:
+    static std::string const type_name;
 
-            virtual std::string type() const override;
-            virtual bool boolean() const override;
+    virtual std::string type() const override;
+    virtual bool boolean() const override;
 
-            virtual std::string str() const override;
-            virtual std::string repr() const override;
+    virtual std::string str() const override;
+    virtual std::string repr() const override;
 
-            virtual std::vector<std::string> bases() const override;
-            virtual std::vector<std::string> inheritancechain() const override;
+    operator std::string() const;
+    auto operator==(Atom const&) const -> bool;
 
-            operator std::string() const;
-            auto operator==(const Atom&) const -> bool;
+    virtual std::unique_ptr<Value> copy() const override;
 
-            virtual std::unique_ptr<Value> copy() const override;
-
-            Atom(std::string);
-            ~Atom() override = default;
-        };
-    }  // namespace types
-}  // namespace viua
+    Atom(std::string);
+    ~Atom() override = default;
+};
+}}  // namespace viua::types
 
 
 #endif

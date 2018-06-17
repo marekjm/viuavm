@@ -18,14 +18,14 @@
 ;
 
 .function: main/1
-    vector (.name: %iota a_vector)
-    print (vlen (.name: %iota length) %a_vector)
+    vector (.name: %iota a_vector) local
+    print (vlen (.name: %iota length) local %a_vector local) local
 
-    vpush %a_vector (string %iota "Hello World!")
-    print (vlen %length %a_vector)
+    vpush %a_vector local (string %iota local "Hello World!") local
+    print (vlen %length local %a_vector local) local
 
-    vat (.name: %iota something) %a_vector (integer %iota -1)
-    print (vlen %length %a_vector)
+    vat (.name: %iota something) local %a_vector local (integer %iota local -1) local
+    print (vlen %length local %a_vector local) local
 
     print *something
 

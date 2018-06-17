@@ -29,23 +29,28 @@
 #include <viua/util/exceptions.h>
 
 
-class OutOfRangeException : public viua::types::Exception {
+class Out_of_range_exception : public viua::types::Exception {
   public:
-    std::string type() const { return "OutOfRangeException"; }
-    OutOfRangeException(const std::string& s) : viua::types::Exception(s) {}
+    std::string type() const {
+        return "Out_of_range_exception";
+    }
+    Out_of_range_exception(std::string const& s) : viua::types::Exception(s) {}
 };
 
-class ArityException : public viua::types::Exception {
+class Arity_exception : public viua::types::Exception {
     viua::internals::types::register_index got_arity;
     std::vector<decltype(got_arity)> valid_arities;
 
   public:
-    std::string type() const override { return "ArityException"; }
+    std::string type() const override {
+        return "Arity_exception";
+    }
 
     std::string str() const override {
-        std::ostringstream oss;
+        auto oss = std::ostringstream{};
         oss << "got arity " << got_arity << ", expected one of {";
-        for (decltype(valid_arities)::size_type i = 0; i < valid_arities.size(); ++i) {
+        for (decltype(valid_arities)::size_type i = 0; i < valid_arities.size();
+             ++i) {
             oss << valid_arities[i];
             if (i < (valid_arities.size() - 1)) {
                 oss << ", ";
@@ -56,67 +61,91 @@ class ArityException : public viua::types::Exception {
     }
 
     std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<ArityException>(got_arity, valid_arities);
+        return viua::util::exceptions::make_unique_exception<Arity_exception>(
+            got_arity, valid_arities);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 
-    ArityException(decltype(got_arity) a, decltype(valid_arities) v) : got_arity(a), valid_arities(v) {}
-    ~ArityException() {}
+    Arity_exception(decltype(got_arity) a, decltype(valid_arities) v)
+            : got_arity(a), valid_arities(v) {}
+    ~Arity_exception() {}
 };
 
-class TypeException : public viua::types::Exception {
+class Type_exception : public viua::types::Exception {
     std::string expected;
     std::string got;
 
   public:
-    std::string type() const override { return "TypeException"; }
+    std::string type() const override {
+        return "Type_exception";
+    }
 
     std::string str() const override {
-        std::ostringstream oss;
+        auto oss = std::ostringstream{};
         oss << "expected " << expected << ", got " << got;
         return oss.str();
     }
 
     std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<TypeException>(expected, got);
+        return viua::util::exceptions::make_unique_exception<Type_exception>(
+            expected, got);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override {
+        return str();
+    }
 
-    TypeException(decltype(expected) e, decltype(got) g) : expected(e), got(g) {}
-    ~TypeException() {}
+    Type_exception(decltype(expected) e, decltype(got) g)
+            : expected(e), got(g) {}
+    ~Type_exception() {}
 };
 
-class UnresolvedAtomException : public viua::types::Exception {
+class Unresolved_atom_exception : public viua::types::Exception {
     std::string atom;
 
   public:
-    std::string type() const override { return "UnresolvedAtomException"; }
-
-    std::string str() const override { return ("atom '" + atom + "' could not be resolved"); }
-
-    std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<UnresolvedAtomException>(atom);
+    std::string type() const override {
+        return "Unresolved_atom_exception";
     }
 
-    std::string what() const override { return str(); }
+    std::string str() const override {
+        return ("atom '" + atom + "' could not be resolved");
+    }
 
-    UnresolvedAtomException(decltype(atom) a) : atom(a) {}
-    ~UnresolvedAtomException() {}
+    std::unique_ptr<Value> copy() const override {
+        return viua::util::exceptions::make_unique_exception<
+            Unresolved_atom_exception>(atom);
+    }
+
+    std::string what() const override {
+        return str();
+    }
+
+    Unresolved_atom_exception(decltype(atom) a) : atom(a) {}
+    ~Unresolved_atom_exception() {}
 };
 
-class OperandTypeException : public viua::types::Exception {
+class Operand_type_exception : public viua::types::Exception {
   public:
-    std::string type() const override { return "OperandTypeException"; }
-
-    std::string str() const override { return "invalid operand type"; }
-
-    std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<OperandTypeException>();
+    std::string type() const override {
+        return "Operand_type_exception";
     }
 
-    std::string what() const override { return str(); }
+    std::string str() const override {
+        return "invalid operand type";
+    }
+
+    std::unique_ptr<Value> copy() const override {
+        return viua::util::exceptions::make_unique_exception<
+            Operand_type_exception>();
+    }
+
+    std::string what() const override {
+        return str();
+    }
 };
 
 #endif
