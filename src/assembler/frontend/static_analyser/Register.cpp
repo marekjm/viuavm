@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
 #include <viua/assembler/frontend/static_analyser.h>
 
 namespace viua { namespace assembler { namespace frontend {
@@ -36,4 +37,16 @@ auto Register::operator==(Register const& that) const -> bool {
 
 Register::Register(viua::assembler::frontend::parser::Register_index const& ri)
         : index(ri.index), register_set(ri.rss) {}
+
+auto to_string(Register const& r) -> std::string {
+    std::ostringstream oss;
+
+    oss << r.index << ' ';
+    oss << ::viua::assembler::frontend::static_analyser::checkers::to_string(r.register_set);
+    oss << " {";
+    oss << ::viua::assembler::frontend::static_analyser::checkers::to_string(r.value_type);
+    oss << "}";
+
+    return oss.str();
+}
 }}}}  // namespace viua::assembler::frontend::static_analyser

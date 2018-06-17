@@ -107,7 +107,7 @@ auto check_register_usage_for_instruction_block_impl(
     InstructionIndex mnemonic_counter) -> void {
     using namespace viua::assembler::frontend::static_analyser::checkers;
 
-    map<Register, Closure> created_closures;
+    std::map<Register, Closure> created_closures;
 
     for (; i < ib.body.size(); ++i) {
         auto const& line = ib.body.at(i);

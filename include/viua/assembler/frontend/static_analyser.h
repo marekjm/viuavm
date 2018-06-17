@@ -53,6 +53,7 @@ struct Register {
     Register() = default;
     Register(viua::assembler::frontend::parser::Register_index const&);
 };
+auto to_string(Register const&) -> std::string;
 
 struct Closure {
     std::string name;
