@@ -17,13 +17,15 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: variable_changing_function/0
+.closure: variable_changing_function/0
     ; expects register 1 to be an captured object
     integer %1 local 42
     return
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     ; create a closure and capture object in register 1 with it
     closure %2 local variable_changing_function/0
     capture %2 local %1 (string %1 local "Hello World!") local

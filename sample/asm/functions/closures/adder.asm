@@ -18,6 +18,8 @@
 ;
 
 .closure: adder/1
+    allocate_registers %3 local
+
     ; expects register 1 to be an captured integer
     arg %2 local %0
     add %0 local %2 local %1 local
@@ -30,6 +32,8 @@
     ;
     ; example:
     ;   make_adder(3)(5) == 8
+    allocate_registers %3 local
+
     .name: 1 number
     arg %number local %0
     closure %2 local adder/1
@@ -39,6 +43,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     ; create the adder function
     .name: 2 add_three
     frame ^[(param %0 (integer %1 local 3) local)]

@@ -17,13 +17,17 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: printer_function/0
+.closure: printer_function/0
+    allocate_registers %2 local
+
     ; expects register 1 to be an captured object
     print %1 local
     return
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     ; create a closure and capture object in register 1 with it
     closure %2 local printer_function/0
     capture %2 local %1 (string %1 local "Hello World!") local

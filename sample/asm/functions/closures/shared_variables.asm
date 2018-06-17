@@ -17,21 +17,24 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: closure_printer/0
+.closure: closure_printer/0
     ; it has to be 2, because 2 register has been bound
     print %2 local
     return
 .end
 
-.function: closure_setter/1
+.closure: closure_setter/1
     arg %1 local %0
 
+    ;print %2 local
     ; overwrite bound value with whatever we got
     copy %2 local %1 local
     return
 .end
 
 .function: returns_closures/0
+    allocate_registers %5 local
+
     ; create a vector to store closures
     vector %1 local %0 local %0
 
@@ -58,6 +61,8 @@
 .end
 
 .function: main/1
+    allocate_registers %6 local
+
     frame %0
     call (.name: %iota the_closures) local returns_closures/0
 

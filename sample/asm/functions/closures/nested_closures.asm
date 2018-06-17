@@ -66,6 +66,8 @@
 .end
 
 .function: closure_maker/1
+    allocate_registers %2 local
+
     ; create the outermost closure
     closure %0 local closure_level_1/1
     capture %0 local %1 (arg %1 local %0) local
@@ -73,6 +75,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     frame ^[(param %0 (integer %1 local 1) local)]
     call %2 local closure_maker/1
 
