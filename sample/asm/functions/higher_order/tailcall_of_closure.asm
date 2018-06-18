@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -23,6 +23,8 @@
 .end
 
 .function: test/0
+    allocate_registers %3 local
+
     .name: %iota a_closure
     .name: %iota an_int
 
@@ -36,6 +38,8 @@
 .end
 
 .function: main/0
+    allocate_registers %1 local
+
     frame %0
     call void test/0
 

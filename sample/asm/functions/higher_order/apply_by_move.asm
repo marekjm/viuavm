@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
+    allocate_registers %2 local
+
     mul %0 local (arg %1 local %0) %1 local
     return
 .end
@@ -31,6 +33,8 @@
     ; it just passes the parameter without additional processing
     .name: 1 func
     .name: 2 parameter
+
+    allocate_registers %4 local
 
     ; apply the function to the parameter...
     frame ^[(pamv %0 (arg %parameter local %1) local)]
@@ -44,6 +48,8 @@
 .function: main/1
     ; applies function square/1(int) to 5 and
     ; prints the result
+    allocate_registers %4 local
+
     integer %1 local 5
     function %2 local square/1
 

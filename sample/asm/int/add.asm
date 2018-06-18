@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -23,6 +23,8 @@
 ; true porpose of this script, though.
 
 .function: main/1
+    allocate_registers %5 local
+
     integer %1 local 4
     integer %2 local -3
     add %3 local %1 local %2 local

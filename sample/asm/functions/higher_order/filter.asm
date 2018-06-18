@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: is_divisible_by_2/1
+    allocate_registers %4 local
+
     arg %1 local %0
     integer %2 local 2
 
@@ -40,6 +42,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
+    allocate_registers %9 local
+
     arg %1 local %0
     arg %2 local %1
 
@@ -82,6 +86,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     vpush (vector %1 local) local (integer %2 local 1) local
     vpush %1 local (integer %2 local 2) local
     vpush %1 local (integer %2 local 3) local

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -23,6 +23,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     try
     enter main_block
     ; leave instructions lead here

@@ -17,13 +17,15 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: a_closure/0
+.closure: a_closure/0
     ; expects register 1 to be captured object
     print %1 local
     return
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     closure %1 local a_closure/0
     capturemove %1 local %1 (string %2 local "Hello World!") local
 

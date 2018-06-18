@@ -17,13 +17,15 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: foo/0
+.closure: foo/0
     ; register 1 is captured from 'returns_closure' function
     print %1 local
     return
 .end
 
 .function: returns_closure/0
+    allocate_registers %3 local
+
     closure %2 local foo/0
     capturecopy %2 local %1 (integer %1 local 42) local
     move %0 local %2 local
@@ -31,6 +33,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     .name: 1 bar
     ; call function that returns the closure
     frame %0
@@ -38,7 +42,7 @@
 
     ; create frame for our closure and
     ; call it
-    frame %0 %0
+    frame %0
     call void %bar local
 
     izero %0 local

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,17 +18,23 @@
 ;
 
 .function: foo/0
+    allocate_registers %2 local
+
     function %1 local bar/0
     frame %0
     tailcall %1 local
 .end
 
 .function: bar/0
+    allocate_registers %2 local
+
     throw (integer %iota local 42) local
     return
 .end
 
 .function: main/0
+    allocate_registers %1 local
+
     frame %0
     call void foo/0
 

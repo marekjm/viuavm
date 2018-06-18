@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -22,7 +22,9 @@
     return
 .end
 
-.function: main/1
+.function: [[no_sa]] main/1
+    allocate_registers %4 local
+
     ; store a number in register
     integer %1 local 69
 

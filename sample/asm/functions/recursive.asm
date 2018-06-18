@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: recursive/2
+    allocate_registers %4 local
+
     .name: 1 counter
     .name: 2 zero
 
@@ -30,16 +32,18 @@
     print %counter local
 
     frame ^[(param %0 %counter local) (pamv %1 %zero local)]
-    call recursive/2
+    call void recursive/2
 
     .mark: break_rec
     return
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     ; create frame and set initial parameters
     frame ^[(param %0 (integer %1 local 10) local) (pamv %1 (integer %2 local 0) local)]
-    call recursive/2
+    call void recursive/2
 
     izero %0 local
     return

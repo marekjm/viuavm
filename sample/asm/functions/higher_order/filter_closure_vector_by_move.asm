@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: is_divisible_by/1
+.closure: is_divisible_by/1
     .name: 2 bound_variable
     arg %1 local %0
 
@@ -38,6 +38,8 @@
 .end
 
 .function: is_divisible_by_2/0
+    allocate_registers %3 local
+
     closure %1 local is_divisible_by/1
     capturemove %1 local %2 (integer %2 local 2) local
     move %0 local %1 local
@@ -49,6 +51,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
+    allocate_registers %9 local
+
     arg %1 local %0
     arg %2 local %1
 
@@ -92,6 +96,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     vpush (vector %1 local) local (integer %2 local 1) local
     vpush %1 local (integer %2 local 2) local
     vpush %1 local (integer %2 local 3) local

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,12 +18,16 @@
 ;
 
 .function: [[no_sa]] set_666/0
+    allocate_registers %0 local
+
     integer %2 global 666
     .unused: %2
     return
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     integer %2 local 42
 
     frame %0

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: sum/4
+    allocate_registers %5 local
+
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
     .name: %iota a
@@ -38,6 +40,8 @@
 .end
 
 .function: invoke/2
+    allocate_registers %9 local
+
     ; this function takes two parameters:
     ;    1) local a function object
     ;    2) local a vector of parameters for function given as first parameter
@@ -67,7 +71,7 @@
 
     .mark: while_body
 
-    .name: %iota local slot
+    .name: %iota slot
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
@@ -88,6 +92,8 @@
 .end
 
 .function: main/1
+    allocate_registers %9 local
+
     ; create the vector
     vpush (vector %1 local) local (integer %2 local 20) local
     vpush %1 local (integer %3 local 16) local

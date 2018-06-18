@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: square/1
+    allocate_registers %2 local
+
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     mul %0 local (arg %1 local %0) local %1 local
@@ -25,6 +27,8 @@
 .end
 
 .function: apply/2
+    allocate_registers %4 local
+
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -42,6 +46,8 @@
 .end
 
 .function: map/2
+    allocate_registers %9 local
+
     ; this function takes two arguments:
     ;   * a function,
     ;   * a vector,
@@ -82,6 +88,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     ; applies function square/1(int) local to 5 and
     ; prints the result
 

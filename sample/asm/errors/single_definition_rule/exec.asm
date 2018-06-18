@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 ;.signature: lib::foo/1
 
 .function: main/1
+    allocate_registers %2 local
+
     frame ^[(pamv %0 (string %1 local "Hello World!") local)]
     call lib::foo/1
 

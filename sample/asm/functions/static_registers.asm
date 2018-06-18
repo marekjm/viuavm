@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,7 +17,9 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: counter/1
+.function: [[no_sa]] counter/1
+    allocate_registers %5 local
+
     ; if register 1 is *not null* jump to increase marker
     ; otherwise continue execution to perform initial set up of static registers
     isnull %2 local %1 static
@@ -52,6 +54,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     frame ^[(param %0 (integer %1 local 10) local)]
     call void counter/1
     izero %0 local
