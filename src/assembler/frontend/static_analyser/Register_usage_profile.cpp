@@ -37,10 +37,14 @@ auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void {
     if (not in_bounds(r)) {
-        throw Invalid_syntax{t, ("access to register "
-                + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
-                + " register(s) allocated"
-                )};
+        throw Traced_syntax_error{}
+            .append(Invalid_syntax{t, ("access to register "
+                    + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
+                    + " register(s) allocated"
+                    )})
+            .append(Invalid_syntax{allocated_where().value(), ""}
+                    .note("increase this value to " + std::to_string(r.index + 1) + " to fix this issue")
+                    );
     }
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
@@ -57,10 +61,14 @@ auto Register_usage_profile::define(Register const r,
                                     Token const register_set,
                                     bool const allow_overwrites) -> void {
     if (not in_bounds(r)) {
-        throw Invalid_syntax{index, ("access to register "
+        throw Traced_syntax_error{}
+        .append(Invalid_syntax{index, ("access to register "
                 + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
                 + " register(s) allocated"
-                )}.add(register_set);
+                )}.add(register_set))
+            .append(Invalid_syntax{allocated_where().value(), ""}
+                    .note("increase this value to " + std::to_string(r.index + 1) + " to fix this issue")
+                    );
     }
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
@@ -124,6 +132,12 @@ auto Register_usage_profile::allocated_registers(viua::internals::types::registe
 }
 auto Register_usage_profile::allocated_registers() const -> std::optional<viua::internals::types::register_index> {
     return no_of_allocated_registers;
+}
+auto Register_usage_profile::allocated_where(viua::cg::lex::Token const& token) -> void {
+    where_registers_were_allocated = token;
+}
+auto Register_usage_profile::allocated_where() -> std::optional<viua::cg::lex::Token> {
+    return where_registers_were_allocated;
 }
 
 auto Register_usage_profile::in_bounds(Register const r) const -> bool {

@@ -116,6 +116,7 @@ class Register_usage_profile {
     std::set<Register> maybe_unused_registers;
 
     std::optional<viua::internals::types::register_index> no_of_allocated_registers;
+    std::optional<viua::cg::lex::Token> where_registers_were_allocated;
 
     auto fresh(Register const) const -> bool;
 
@@ -151,6 +152,8 @@ class Register_usage_profile {
 
     auto allocated_registers(viua::internals::types::register_index const) -> void;
     auto allocated_registers() const -> std::optional<viua::internals::types::register_index>;
+    auto allocated_where(viua::cg::lex::Token const&) -> void;
+    auto allocated_where() -> std::optional<viua::cg::lex::Token>;
 
     auto in_bounds(Register const) const -> bool;
 

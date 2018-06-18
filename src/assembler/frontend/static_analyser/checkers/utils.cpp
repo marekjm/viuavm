@@ -170,10 +170,14 @@ auto check_use_of_register(Register_usage_profile& rup,
     }
 
     if (not rup.in_bounds(r)) {
-        throw Invalid_syntax{r.tokens.at(0), ("access to register "
+        throw Traced_syntax_error{}
+        .append(Invalid_syntax{r.tokens.at(0), ("access to register "
                 + std::to_string(r.index) + " with only " + std::to_string(rup.allocated_registers().value())
                 + " register(s) allocated X"
-                )}.add(r.tokens.at(1));
+                )}.add(r.tokens.at(1)))
+            .append(Invalid_syntax{rup.allocated_where().value(), ""}
+                    .note("increase this value to " + std::to_string(r.index + 1) + " to fix this issue")
+                    );
     }
 
     if (not rup.defined(Register(r))) {
