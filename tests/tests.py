@@ -508,10 +508,6 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIntegersInCondition(self):
         runTest(self, 'in_condition.asm', 'true', 0)
 
-    @unittest.skip('')
-    def testBooleanAsInteger(self):
-        runTest(self, 'boolean_as_int.asm', '70', 0)
-
 
 class BooleanInstructionsTests(unittest.TestCase):
     """Tests for boolean instructions.
