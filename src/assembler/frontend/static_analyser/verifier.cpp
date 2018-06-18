@@ -402,8 +402,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                                 .append(Invalid_syntax(
                                             instruction->tokens.at(0),
                                             "double pass to parameter slot "
-                                                + to_string(slot_index))
-
+                                                + std::to_string(slot_index))
                                             .add(instruction->operands.at(0)
                                                      ->tokens.at(0)))
                                 .append(
@@ -430,7 +429,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                                                        "gap in frame"))
                                 .append(
                                     Invalid_syntax(instruction->tokens.at(0),
-                                                   ("slot " + to_string(j)
+                                                   ("slot " + std::to_string(j)
                                                     + " left empty at")));
                         }
                     }
