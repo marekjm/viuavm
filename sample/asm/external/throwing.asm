@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -30,6 +30,8 @@
 .end
 
 .function: watchdog_process/0
+    allocate_registers %3 local
+
     arg (.name: %iota death_message) local %0
 
     .name: %iota exception
@@ -40,6 +42,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     watchdog watchdog_process/0
 
     import "build/test/throwing"

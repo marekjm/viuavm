@@ -22,6 +22,8 @@
 .end
 
 .function: main/0
+    allocate_registers %1 local
+
     izero %0 local
     return
 .end

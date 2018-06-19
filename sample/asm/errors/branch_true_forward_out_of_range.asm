@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %2 local
+
     izero %1 local
 
     if %1 local +3

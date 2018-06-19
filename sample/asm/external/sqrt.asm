@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: math::sqrt/1
 
 .function: main/1
+    allocate_registers %3 local
+
     import "build/test/math"
 
     frame ^[(param %0 (float %1 local 3.0) local)]

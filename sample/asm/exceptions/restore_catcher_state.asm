@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: tertiary/1
+    allocate_registers %5 local
+
     arg %3 local %0
     integer %4 local [[maybe_unused]] 300
     throw %3 local
@@ -25,6 +27,8 @@
 .end
 
 .function: secondary/1
+    allocate_registers %5 local
+
     arg %2 local %0
     integer %4 local [[maybe_unused]] 200
 
@@ -37,6 +41,8 @@
 .end
 
 .function: main/1
+    allocate_registers %5 local
+
     integer %4 local [[maybe_unused]] 50
 
     try

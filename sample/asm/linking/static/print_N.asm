@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .function: print_N::print_42/0
+    allocate_registers %2 local
+
     print (integer %1 local 42) local
     return
 .end
 
 .function: print_N::print_69/0
+    allocate_registers %2 local
+
     print (integer %1 local 69) local
     return
 .end

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,10 +18,14 @@
 ;
 
 .function: foo/3
+    allocate_registers %0 local
+
     return
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     frame %3
     param %0 (integer %1 local 1) local
     pamv %2 %1 local

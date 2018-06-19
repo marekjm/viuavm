@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %3 local
+
     nop
     nop
 
