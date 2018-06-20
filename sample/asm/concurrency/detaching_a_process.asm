@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: running_detached/0
+    allocate_registers %9 local
+
     izero (.name: %iota counter) local
     integer (.name: %iota limit) local 4
     text (.name: %iota report_text_format) local "Hello World! (from long-running detached process) "
@@ -43,6 +45,8 @@
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     frame %0
     process void running_detached/0
 

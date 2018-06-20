@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: child_process/1
+    allocate_registers %2 local
+
     .name: 1 counter
     if (idec (arg %counter local %0) local) local +1 end_this
     frame ^[(pamv %0 %counter local)]
@@ -27,12 +29,16 @@
     return
 .end
 .function: child_process/0
+    allocate_registers %2 local
+
     frame ^[(pamv %0 (integer %1 local 65536) local)]
     tailcall child_process/1
     return
 .end
 
 .function: main/0
+    allocate_registers %3 local
+
     frame %0
     process %1 local child_process/0
     print (join %2 local %1 local 10ms) local

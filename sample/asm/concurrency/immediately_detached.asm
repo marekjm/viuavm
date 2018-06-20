@@ -18,6 +18,8 @@
 ;
 
 .function: running_detached/0
+    allocate_registers %2 local
+
     nop
     nop
     nop
@@ -113,6 +115,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     frame %0
     process void running_detached/0
 

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: running_detached/1
+    allocate_registers %7 local
+
     .name: %iota counter
     .name: %iota limit
     izero %counter local
@@ -40,6 +42,8 @@
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     frame ^[(pamv %0 (self %1 local) local)]
     process void running_detached/1
 

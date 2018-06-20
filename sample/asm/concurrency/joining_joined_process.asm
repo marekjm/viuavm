@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: print_lazy/1
+    allocate_registers %2 local
+
     nop
     nop
     nop
@@ -38,6 +40,8 @@
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
     process %3 local print_lazy/1
 

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: run_in_a_process/1
+    allocate_registers %4 local
+
     ; send our PID back to parent
     send (arg %iota local %0) local (self %iota local) local
 
@@ -26,6 +28,8 @@
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     .name: %iota pid
     frame ^[(pamv %0 (self %pid local) local)]
     process void run_in_a_process/1
