@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %6 local
+
     vector (.name: %iota a_vector) local
     print (vlen (.name: %iota length) local %a_vector local) local
 
@@ -27,7 +29,7 @@
     vat (.name: %iota something) local %a_vector local (integer %iota local -1) local
     print (vlen %length local %a_vector local) local
 
-    print *something
+    print *something local
 
     izero %0 local
     return

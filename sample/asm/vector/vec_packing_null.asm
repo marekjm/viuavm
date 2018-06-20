@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %4 local
+
     string %2 local "answer to life"
     integer %3 local 42
 

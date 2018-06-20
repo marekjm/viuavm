@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,9 +18,20 @@
 ;
 
 .function: main/1
-    integer %1 local 0
+    allocate_registers %4 local
 
-    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vector %2 local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local (copy %3 local %1 local) local) local %1 local
+    integer %1 local 0
+    vector %2 local %0 local %0
+
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local (copy %3 local %1 local) local
+    vpush %2 local %1 local
+
     print (vlen %3 local %2 local) local
 
     izero %0 local
