@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: World::print_hello/0
 
 .function: main/1
+    allocate_registers %2 local
+
     import "build/test/World"
 
     watchdog World::print_hello/0

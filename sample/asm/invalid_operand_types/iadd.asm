@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %4 local
+
     integer %1 local 1
     string %2 local "Oh, look, a bug"
 

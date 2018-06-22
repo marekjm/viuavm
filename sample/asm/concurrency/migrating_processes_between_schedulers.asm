@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: std::misc::cycle/1
 
 .function: print_hello/1
+    allocate_registers %6 local
+
     frame ^[(pamv %0 (integer %1 local 64) local)]
     call std::misc::cycle/1
 
@@ -44,12 +46,16 @@
 .end
 
 .function: process_spawner/1
+    allocate_registers %2 local
+
     frame ^[(pamv %0 (arg %1 local %0) local)]
     process void print_hello/1
     return
 .end
 
 .function: spawn_processes/1
+    allocate_registers %2 local
+
     .name: 1 limit
     arg %limit local %0
 
@@ -71,6 +77,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     -- spawn several processes, each printing a different "Hello {number}!"
     -- the hellos do not have to appear in the order their functions are
     -- called if there are multiple VP schedulers spawned

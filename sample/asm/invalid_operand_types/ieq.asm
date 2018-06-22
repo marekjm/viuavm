@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %4 local
+
     text %1 local "Hello World!"
     integer %2 local 42
     eq %3 local %1 local %2 local

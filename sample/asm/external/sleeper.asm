@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -22,6 +22,8 @@
 
 
 .function: printer_wrapper/1
+    allocate_registers %2 local
+
     ; just print %the parameter received
     frame ^[(pamv %0 (arg %1 local %0) local)]
     call void printer::print/1
@@ -30,6 +32,8 @@
 .end
 
 .function: process_spawner/1
+    allocate_registers %2 local
+
     ; call printer::print/1 in a new process to
     ; not block the execution, and
     ; detach the process as we do not care about its return value
@@ -39,17 +43,23 @@
 .end
 
 .function: lazy_print_process/0
+    allocate_registers %2 local
+
     frame %0
     call void sleeper::lazy_print/0
     return
 .end
 .function: lazy_print_spawner/0
+    allocate_registers %2 local
+
     frame %0
     process void lazy_print_process/0
     return
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     ; import "foreign printer module"
     import "build/test/printer"
     import "build/test/sleeper"

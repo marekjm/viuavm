@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %2 local
+
     function %1 local main/1
     idec %1 local
 

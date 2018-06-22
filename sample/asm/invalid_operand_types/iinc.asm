@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %2 local
+
     text %1 local "Hello World!"
     iinc %1 local
 

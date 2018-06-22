@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/2
+    allocate_registers %2 local
+
     print (string %1 local "Hello World!") local
     echo (string %1 local "received ") local
     echo (argc %1 local) local

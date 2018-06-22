@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: foo/0
+    allocate_registers %2 local
+
     try
     enter .block: bar
         leave
@@ -26,6 +28,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     try
     enter .block: bar
         leave

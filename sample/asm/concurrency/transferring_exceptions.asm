@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: run_in_a_process/0
+    allocate_registers %2 local
+
     ; FIXME will cause a memory leak on detached processes
     throw (receive %1 local) local
     return
@@ -37,6 +39,8 @@
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     frame %0
     process %1 local run_in_a_process/0
 

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,18 +18,22 @@
 ;
 
 .function: supervisor_function/0
+    allocate_registers %2 local
+
     ; uncomment the `receive 1` and
     ; the program is no longer broken
     ;receive 1
-    -- this program tests if the machine can quit if
-    -- watchdog is pathologically broken
-    --
-    -- this test will fail if this watchdog function gets
-    -- at least one message
+    ; this program tests if the machine can quit if
+    ; watchdog is pathologically broken
+    ;
+    ; this test will fail if this watchdog function gets
+    ; at least one message
     return
 .end
 
 .function: will_be_killed_by_a_runaway_exception/0
+    allocate_registers %4 local
+
     integer %1 local 80
 
     string %3 local "iterations left: "
@@ -47,6 +51,8 @@
 .end
 
 .function: std::util::cpu::cycle/1
+    allocate_registers %5 local
+
     ; executes at least N cycles
     ;
     .name: 1 counter
@@ -69,6 +75,8 @@
 .end
 
 .function: main/1
+    allocate_registers %4 local
+
     watchdog supervisor_function/0
 
     print (string %3 local "main/1 exiting") local

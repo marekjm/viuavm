@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -29,6 +29,8 @@
 .end
 
 .function: message_sender/2
+    allocate_registers %4 local
+
     .name: %iota times
     .name: %iota pid
     arg %times local .iota: 0  %iota
@@ -50,6 +52,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     frame ^[(pamv %iota (integer %1 local 5) local) (pamv %iota (self %1 local) local)]
     process void message_sender/2
 

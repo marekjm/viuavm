@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .function: run_in_a_process/0
+    allocate_registers %1 local
+
     integer %0 local 42
     return
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     frame %0
     print (join %2 local (process %1 local run_in_a_process/0) local) local
     izero %0 local

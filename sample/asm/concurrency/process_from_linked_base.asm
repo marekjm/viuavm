@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: test_module::test_function/0
 
 .function: main/0
+    allocate_registers %2 local
+
     import "test_module"
 
     frame %0
