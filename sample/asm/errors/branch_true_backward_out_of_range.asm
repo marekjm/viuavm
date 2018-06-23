@@ -22,7 +22,7 @@
 
     izero %1 local
 
-    if %1 local -2
+    if %1 local -3
 
     izero %0 local
     return

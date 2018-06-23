@@ -24,7 +24,7 @@
 .end
 
 .function: main/0
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     frame %0
     process %1 local child_process/0

@@ -20,7 +20,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    if (izero %0 local) local here 2
+    if (izero %0 local) local here 3
 
     .mark: here
     print (string %1 local "Hello World!") local
