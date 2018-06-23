@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: global_printer/1
+    allocate_registers %3 local
+
     send (arg %1 local %0) local (self %2 local) local
 
     ; wait until a message arrives
@@ -32,6 +34,8 @@
 .end
 
 .function: global_writer/2
+    allocate_registers %4 local
+
     ; put second parameter (whatever it is) in
     ; global register 1
     arg %1 global %1
@@ -48,6 +52,8 @@
 .signature: std::misc::cycle/1
 
 .function: main/0
+    allocate_registers %3 local
+
     ; spawn printer process
     ; it immediately waits for a message to arrive
     ; first message it receives should crash it

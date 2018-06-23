@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: sample/2
+    allocate_registers %2 local
+
     .iota: 0
     print (arg %1 local %iota) local
     print (arg %1 local %iota) local
@@ -25,6 +27,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     frame ^[(pamv %iota (string %1 local "Hello World!") local) (pamv %iota (integer %1 local 42) local)]
     call sample/2
 

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %2 local
+
     atom %1 local 'an_atom'
     print %1 local
 

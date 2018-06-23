@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,8 +18,10 @@
 ;
 
 .function: main/0
+    allocate_registers %3 local
+
     ptr (.name: %iota pointer) local (string (.name: %iota message) local "Hello World!") local
-    print *pointer
+    print *pointer local
 
     izero %0 local
     return

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %4 local
+
     ptr (.name: %iota pointer_to_a) local (integer (.name: %iota a) local 0) local
 
     print (not %iota local *pointer_to_a local) local

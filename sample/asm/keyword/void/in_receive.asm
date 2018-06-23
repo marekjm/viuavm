@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .function: sender/1
+    allocate_registers %3 local
+
     send (arg (.name: %iota pid) local %0) local (string %iota local "Hello World!") local
     return
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     frame ^[(pamv %iota (self %iota local) local)]
     process void sender/1
 

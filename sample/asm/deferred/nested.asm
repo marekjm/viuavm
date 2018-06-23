@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .function: foo/0
+    allocate_registers %2 local
+
     print (text %1 local "foo") local
     return
 .end
 
 .function: bar/0
+    allocate_registers %2 local
+
     frame %0
     defer baz/0
 
@@ -31,6 +35,8 @@
 .end
 
 .function: baz/0
+    allocate_registers %2 local
+
     frame %0
     defer bay/0
 
@@ -39,11 +45,15 @@
 .end
 
 .function: bay/0
+    allocate_registers %2 local
+
     print (text %1 local "bay") local
     return
 .end
 
 .function: main/0
+    allocate_registers %1 local
+
     frame %0
     defer foo/0
 

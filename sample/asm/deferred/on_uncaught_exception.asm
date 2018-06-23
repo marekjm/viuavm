@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,17 +17,23 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 .function: foo/0
+    allocate_registers %2 local
+
     print (text %1 local "Hello deferred Foo!") local
     return
 .end
 
 .function: bar/0
+    allocate_registers %2 local
+
     print (text %1 local "Hello deferred Bar!") local
     return
 .end
 
 
 .function: main/0
+    allocate_registers %2 local
+
     frame %0
     defer bar/0
 

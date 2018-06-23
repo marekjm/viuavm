@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: add/2
+    allocate_registers %3 local
+
     arg (.name: %iota lhs) local %0
     arg (.name: %iota rhs) local %0
 
@@ -27,6 +29,8 @@
 .end
 
 .function: multiply/2
+    allocate_registers %3 local
+
     arg (.name: %iota lhs) local %0
     arg (.name: %iota rhs) local %0
 
@@ -36,6 +40,8 @@
 .end
 
 .function: main/0
+    allocate_registers %6 local
+
     function (.name: %iota adder) local add/2
     function (.name: %iota multipler) local multiply/2
 

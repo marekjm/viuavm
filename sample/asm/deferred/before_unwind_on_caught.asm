@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,16 +18,22 @@
 ;
 
 .function: print_me/1
+    allocate_registers %2 local
+
     print *(arg %1 local %0) local
     return
 .end
 
 .function: throwing/0
+    allocate_registers %2 local
+
     throw (integer %1 local 666) local
     return
 .end
 
 .function: unfortunate/0
+    allocate_registers %3 local
+
     text %1 local "Hello World before stack unwinding!"
 
     frame ^[(pamv %0 (ptr %2 local %1 local) local)]
@@ -40,6 +46,8 @@
 .end
 
 .function: main/0
+    allocate_registers %3 local
+
     try
     catch "Integer" .block: catch_Integer
         print (draw %2 local) local

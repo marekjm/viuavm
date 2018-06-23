@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: broken_process/0
+    allocate_registers %2 local
+
     nop
     nop
     nop
@@ -58,6 +60,8 @@
 .signature: undefined_function/0
 
 .function: main/1
+    allocate_registers %1 local
+
     watchdog undefined_function/0
 
     frame %0

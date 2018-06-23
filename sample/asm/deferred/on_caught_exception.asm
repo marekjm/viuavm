@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,16 +18,22 @@
 ;
 
 .function: foo/0
+    allocate_registers %2 local
+
     print (text %1 local "Hello foo World!") local
     return
 .end
 
 .function: bar/0
+    allocate_registers %2 local
+
     print (text %1 local "Hello bar World!") local
     return
 .end
 
 .function: throwing/0
+    allocate_registers %2 local
+
     frame %0
     defer foo/0
 
@@ -51,6 +57,8 @@
 .end
 
 .function: main/0
+    allocate_registers %3 local
+
     try
     catch "Integer" main__catch
     enter main__try

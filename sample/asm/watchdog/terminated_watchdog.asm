@@ -18,6 +18,8 @@
 ;
 
 .function: watchdog_process/0
+    allocate_registers %5 local
+
     .mark: watchdog_start
     throw (structremove %4 local (arg %1 local %0) local (atom %3 local 'function') local) local
 
@@ -25,6 +27,8 @@
 .end
 
 .function: broken_process/0
+    allocate_registers %2 local
+
     watchdog watchdog_process/0
 
     nop
@@ -65,6 +69,8 @@
 .end
 
 .function: main/1
+    allocate_registers %1 local
+
     frame %0
     process void broken_process/0
 

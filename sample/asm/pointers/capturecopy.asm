@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .closure: printer/0
+    allocate_registers %2 local
+
     print %1 local
     return
 .end
 
 .function: main/0
+    allocate_registers %4 local
+
     ptr (.name: %iota pointer) local (string (.name: %iota o) local "Hello World!") local
 
     closure (.name: %iota cl) local printer/0

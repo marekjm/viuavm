@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,7 +20,9 @@
 .iota: 4
 
 .function: main/0
-    -- code goes here
+    allocate_registers %1 local
+
+    ; code goes here
 
     izero %0 local
     return
