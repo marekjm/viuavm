@@ -34,6 +34,7 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
     using viua::assembler::frontend::parser::Label;
     using viua::assembler::frontend::parser::Offset;
     using viua::cg::lex::Invalid_syntax;
+    using viua::cg::lex::Traced_syntax_error;
 
     auto target = instruction.operands.at(0).get();
 
@@ -42,8 +43,19 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
         if (jump_target > 0) {
             i = get_line_index_of_instruction(
                 mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
-            check_register_usage_for_instruction_block_impl(
-                register_usage_profile, ps, ib, i, mnemonic_counter);
+            try {
+                check_register_usage_for_instruction_block_impl(
+                    register_usage_profile, ps, ib, i, mnemonic_counter);
+            } catch (Invalid_syntax& e) {
+                throw Traced_syntax_error{}.append(e).append(
+                    Invalid_syntax{instruction.tokens.at(0),
+                                   "after a jump here:"}
+                        .add(instruction.operands.at(0)->tokens.at(0)));
+            } catch (Traced_syntax_error& e) {
+                throw e.append(Invalid_syntax{instruction.tokens.at(0),
+                                              "after a jump here:"}
+                                   .add(instruction.operands.at(0)->tokens.at(0)));
+            }
         }
     } else if (auto label = dynamic_cast<Label*>(target); label) {
         auto jump_target = ib.marker_map.at(label->tokens.at(0));
