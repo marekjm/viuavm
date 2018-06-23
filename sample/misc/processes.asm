@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: run_in_a_process/1
+    allocate_registers %5 local
+
     arg %1 local %0
 
     text %2 local "spawned process "
@@ -41,6 +43,8 @@
 .end
 
 .function: spawn_processes/2
+    allocate_registers %4 local
+
     .name: 1 counter
     arg %counter local %0
 
@@ -67,6 +71,8 @@
 .end
 
 .function: process_spawner/1
+    allocate_registers %4 local
+
     echo (string %2 local "process_spawner/1: ") local
     .name: 1 limit
     echo (arg %1 local %0) local
@@ -77,6 +83,8 @@
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     frame ^[(param %0 (integer %1 local 4000) local)]
     process %1 local process_spawner/1
 

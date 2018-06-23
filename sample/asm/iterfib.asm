@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: iterfib/1
+    allocate_registers %8 local
+
     .name: %iota vec
 
     .name: %iota minus_one
@@ -48,6 +50,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     ; expected result is 1134903170
 
     .name: 2 result

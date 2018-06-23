@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %4 local
+
     text (.name: %iota hello_world) local "Hello World!"
     text (.name: %iota goodbye_world) local "Goodbye World!"
 

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: get_good_struct/0
+    allocate_registers %4 local
+
     struct (.name: %iota container) local
 
     atom (.name: %iota key) local 'answer'
@@ -29,6 +31,8 @@
 .end
 
 .function: get_bad_struct/0
+    allocate_registers %4 local
+
     struct (.name: %iota container) local
 
     atom (.name: %iota key) local 'answer'
@@ -40,6 +44,8 @@
 .end
 
 .function: main/0
+    allocate_registers %5 local
+
     frame %0
     call (.name: %iota good_struct) local get_good_struct/0
 

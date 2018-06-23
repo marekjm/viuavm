@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: watchdog_process/1
+    allocate_registers %7 local
+
     .name: %iota death_message
     .name: %iota exception
     .name: %iota aborted_function
@@ -47,6 +49,8 @@
 .end
 
 .function: a_detached_concurrent_process/0
+    allocate_registers %2 local
+
     watchdog watchdog_process/1
 
     frame ^[(pamv %0 (integer %1 local 32) local)]
@@ -69,6 +73,8 @@
 .end
 
 .function: formatting/2
+    allocate_registers %5 local
+
     arg (.name: %iota divide_what) local %0
     arg (.name: %iota divide_by) local %1
 
@@ -84,6 +90,8 @@
     return
 .end
 .function: a_division_executing_process/2
+    allocate_registers %5 local
+
     watchdog watchdog_process/1
 
     frame ^[(pamv %0 (integer %1 local 128) local)]
@@ -113,10 +121,14 @@
 .end
 
 .function: log_exiting_main/0
+    allocate_registers %3 local
+
     print (string %2 local "process [  main  ]: 'main' exiting") local
     return
 .end
 .function: log_exiting_detached/1
+    allocate_registers %3 local
+
     arg %1 local %0
     echo (string %2 local "process [detached]: '") local
     echo %1 local
@@ -124,6 +136,8 @@
     return
 .end
 .function: log_exiting_joined/0
+    allocate_registers %3 local
+
     arg %1 local %0
     echo (string %2 local "process [ joined ]: '") local
     echo %1 local
@@ -134,6 +148,8 @@
 .signature: std::misc::cycle/1
 
 .function: main/1
+    allocate_registers %5 local
+
     import "std::misc"
 
     frame %0

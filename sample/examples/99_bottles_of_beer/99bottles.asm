@@ -28,8 +28,14 @@
 ;   Added 'local' after 'izero' at the end of main function to conform
 ;   to Viua spec.
 ;
+;   EDIT #3, 2018-06-23, by Marek Marecki
+;
+;   Added 'allocate_registers' to confirm to Viua spec.
+;
 
 .function: main/1
+    allocate_registers %9 local
+
     integer %0 local 99
 
     string %1 local " bottles"

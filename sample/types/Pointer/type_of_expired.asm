@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: std::typesystem::typeof/1
 
 .function: main/0
+    allocate_registers %4 local
+
     string %1 local "Hello World!"
     ptr %2 local %1 local
     delete %1 local

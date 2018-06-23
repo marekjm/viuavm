@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: worker_process/1
+    allocate_registers %3 local
+
     echo (string %1 local "Hello from #") local
     echo (arg %2 local %0) local
     print (string %1 local " worker process!") local
@@ -25,6 +27,8 @@
 .end
 
 .function: process_spawner/1
+    allocate_registers %5 local
+
     echo (string %1 local "number of worker processes: ") local
 
     .name: 1 limit
@@ -51,6 +55,8 @@
 .signature: std::io::getline/0
 
 .function: get_number_of_processes_to_spawn/0
+    allocate_registers %5 local
+
     echo (string %4 local "number of processes to spawn: ") local
     frame %0
     stoi %0 local (call %4 local std::io::getline/0) local
@@ -58,19 +64,23 @@
 .end
 
 .function: run_process_spawner/1
+    allocate_registers %2 local
+
     frame ^[(param %0 (arg %1 local %0) local)]
     process void process_spawner/1
     return
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     ; the standard "io" library contains std::io::getline
     import "io"
 
     frame %0
-    call %4 local get_number_of_processes_to_spawn/0
+    call %1 local get_number_of_processes_to_spawn/0
 
-    frame ^[(param %0 %4 local)]
+    frame ^[(param %0 %1 local)]
     call run_process_spawner/1
 
     izero %0 local

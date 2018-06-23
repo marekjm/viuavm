@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
+;   Copyright (C) 2017, 2018 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,12 +18,16 @@
 ;
 
 .function: a_function/1
+    allocate_registers %2 local
+
     print (arg %1 local %0) local
     izero %0 local
     return
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     integer %1 local 42
 
     text %2 local "Hello World!"

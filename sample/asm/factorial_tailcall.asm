@@ -18,6 +18,8 @@
 ;
 
 .function: factorial/2
+    allocate_registers %4 local
+
     .name: 1 number
     .name: 0 result
     ; multiply "result" (reference) by "number" (copy)
@@ -40,6 +42,8 @@
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial

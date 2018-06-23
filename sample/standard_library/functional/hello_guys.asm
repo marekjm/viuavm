@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: greetings/1
+    allocate_registers %2 local
+
     echo (string %1 local "Hello ") local
     echo (arg %1 local %0) local
     print (string %1 local '!') local
@@ -27,6 +29,8 @@
 .signature: std::functional::apply/2
 
 .function: main/1
+    allocate_registers %3 local
+
     import "std::functional"
 
     function %1 local greetings/1

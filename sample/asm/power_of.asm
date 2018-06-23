@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,12 +20,16 @@
 ; purpose of this program is to compute n-th power of a number
 
 .function: dummy/0
+    allocate_registers %1 local
+
     ; this function is here to stress jump calculation
     izero %0 local
     return
 .end
 
 .function: power_of/2
+    allocate_registers %7 local
+
     .name: 1 base
     .name: 2 exponent
     .name: 3 zero
@@ -63,6 +67,8 @@
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     frame ^[(param %0 (integer %1 local 4) local) (param %1 (integer %2 local 3) local)]
     print (call %1 local power_of/2) local
 

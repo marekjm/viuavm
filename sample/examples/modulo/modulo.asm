@@ -7,6 +7,8 @@
 ;
 
 .function: main/0
+  allocate_registers %4 local
+
   ;%2 = %3 mod %2
   float %2 local 4
   float %3 local 7
@@ -55,6 +57,8 @@
 .end
 
 .function: mod/2
+  allocate_registers %9 local
+
   ; result = arg0 mod arg1
   .name: %0 result
   .name: %1 tmp_str

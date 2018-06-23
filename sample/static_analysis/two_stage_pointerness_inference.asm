@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
+;   Copyright (C) 2017, 2018 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/1
+    allocate_registers %3 local
+
     ; An argument is extracted.
     ; At this point the SA is unable to make any assumptions about
     ; the type of the value contained in the register.

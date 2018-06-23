@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
+;   Copyright (C) 2017, 2018 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: main/0
+    allocate_registers %4 local
+
     print (bits %2 local (integer %1 local 8) local) local
     print (bitnot %3 local %2 local) local
 

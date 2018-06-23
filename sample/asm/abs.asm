@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -24,6 +24,8 @@
 ; the purpose of this program is to find an absolute value of an integer
 
 .function: main/1
+    allocate_registers %4 local
+
     .name: %iota number
     .name: %iota zero
     .name: %iota is_negative

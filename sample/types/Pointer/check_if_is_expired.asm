@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .signature: Pointer::expired/1
 
 .function: isExpired/1
+    allocate_registers %4 local
+
     arg %1 local %0
     not %2 local (ptrlive %2 local %1 local) local
     echo (string %3 local "expired: ") local
@@ -28,6 +30,8 @@
 .end
 
 .function: main/1
+    allocate_registers %3 local
+
     integer %1 local 42
     ptr %2 local %1 local
 

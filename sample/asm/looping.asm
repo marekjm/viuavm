@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -21,6 +21,8 @@
 ; It displays numbers from 0 to 10.
 
 .function: main/1
+    allocate_registers %4 local
+
     integer %1 local 0
     integer %2 local 10
 

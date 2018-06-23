@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: fibonacci/2
+    allocate_registers %3 local
+
     .name: 1 current_value
     .name: 2 accumulator
     arg %current_value local %0
@@ -36,6 +38,8 @@
 .end
 
 .function: fibonacci/1
+    allocate_registers %3 local
+
     .name: 2 accumulator
 
     frame ^[(pamv %0 (arg %1 local %0) local) (pamv %1 (izero %accumulator local) local)]
@@ -46,6 +50,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     .name: 1 result
 
     integer %result local 5

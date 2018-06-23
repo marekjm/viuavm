@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: is_not_negative/1
+    allocate_registers %3 local
+
     gte %0 local (arg %1 local %0) local (izero %2 local) local
     return
 .end
@@ -25,6 +27,8 @@
 .signature: std::vector::any/2
 
 .function: main/1
+    allocate_registers %6 local
+
     import "std::vector"
 
     vpush (vpush (vpush (vector %2 local) local (integer %1 local -1) local) local (integer %1 local 0) local) local (integer %1 local 1) local

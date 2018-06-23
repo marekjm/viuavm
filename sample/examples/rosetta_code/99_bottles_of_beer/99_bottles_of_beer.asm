@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki <marekjm@ozro.pw>
+;   Copyright (C) 2017, 2018 Marek Marecki <marekjm@ozro.pw>
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: bottles_of_beer_text/1
+    allocate_registers %5 local
+
     .name: %iota number_of_bottles
     arg %number_of_bottles local %0
 
@@ -33,6 +35,8 @@
 .end
 
 .function: first_print/1
+    allocate_registers %5 local
+
     ; this function prints the
     ;
     ;   N bottles of beer on the wall
@@ -57,6 +61,8 @@
 .end
 
 .function: second_print/1
+    allocate_registers %6 local
+
     ; this function prints the
     ;
     ;   No more bottles of beer on the wall /
@@ -89,6 +95,8 @@
 .end
 
 .function: bottles_of_beer/1
+    allocate_registers %2 local
+
     .name: %iota total_number_of_bottles
     arg %total_number_of_bottles local %0
 
@@ -115,6 +123,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     .name: %iota total_number_of_bottles
     integer %total_number_of_bottles local 9
 

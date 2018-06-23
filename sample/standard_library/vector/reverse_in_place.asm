@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -21,6 +21,8 @@
 .signature: std::vector::reverse_in_place/1
 
 .function: main/1
+    allocate_registers %3 local
+
     import "std::vector"
 
     frame ^[(pamv %0 (integer %1 local 8) local)]

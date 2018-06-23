@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: adder/1
+    allocate_registers %2 local
+
     add %0 local (arg %0 local %0) local (integer %1 local 21) local
     return
 .end
@@ -25,6 +27,8 @@
 .signature: std::functional::apply/2
 
 .function: main/1
+    allocate_registers %2 local
+
     import "std::functional"
 
     frame ^[(pamv %0 (function %1 local adder/1) local) (pamv %1 (integer %1 local 21) local)]

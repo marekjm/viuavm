@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2017 Marek Marecki
+;   Copyright (C) 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,11 +18,15 @@
 ;
 
 .function: by_quux/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_quux/0") local
     return
 .end
 
 .function: quux/0
+    allocate_registers %2 local
+
     frame %0
     defer by_quux/0
 
@@ -32,11 +36,15 @@
 .end
 
 .function: by_bax/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_bax/0") local
     return
 .end
 
 .function: bax/0
+    allocate_registers %0 local
+
     frame %0
     defer by_bax/0
 
@@ -47,11 +55,15 @@
 .end
 
 .function: by_bay/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_bay/0") local
     return
 .end
 
 .function: bay/0
+    allocate_registers %0 local
+
     frame %0
     defer by_bay/0
 
@@ -62,11 +74,15 @@
 .end
 
 .function: by_baz/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_baz/0") local
     return
 .end
 
 .function: baz/0
+    allocate_registers %0 local
+
     frame %0
     defer by_baz/0
 
@@ -77,11 +93,15 @@
 .end
 
 .function: by_bar/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_bar/0") local
     return
 .end
 
 .function: bar/0
+    allocate_registers %0 local
+
     frame %0
     defer by_bar/0
 
@@ -92,11 +112,15 @@
 .end
 
 .function: by_foo/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_foo/0") local
     return
 .end
 
 .function: foo/0
+    allocate_registers %0 local
+
     frame %0
     defer by_foo/0
 
@@ -107,11 +131,15 @@
 .end
 
 .function: by_main/0
+    allocate_registers %2 local
+
     print (text %iota local "Hello from by_main/0") local
     return
 .end
 
 .function: main/0
+    allocate_registers %1 local
+
     frame %0
     defer by_main/0
 

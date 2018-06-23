@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -21,6 +21,8 @@
 ; integer related instructions.
 
 .function: foo/0
+    allocate_registers %17 local
+
     integer %1 local 16
     integer %16 local 1
 
@@ -33,8 +35,11 @@
 .end
 
 .function: main/1
-    frame %0 %17
+    allocate_registers %1 local
+
+    frame %0
     call void foo/0
+
     izero %0 local
     return
 .end

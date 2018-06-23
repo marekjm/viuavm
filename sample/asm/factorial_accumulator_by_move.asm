@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: factorial/2
+    allocate_registers %5 local
+
     .name: 1 number
     .name: 2 result
     ; multiply "result" (reference) by "number" (copy)
@@ -41,6 +43,8 @@
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial

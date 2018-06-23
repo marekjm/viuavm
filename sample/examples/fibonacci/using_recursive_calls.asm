@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,6 +18,8 @@
 ;
 
 .function: fibonacci/1
+    allocate_registers %3 local
+
     .name: 1 current_value
     arg %current_value local %0
 
@@ -34,6 +36,8 @@
 .end
 
 .function: main/0
+    allocate_registers %2 local
+
     .name: 1 result
 
     integer %result local 5

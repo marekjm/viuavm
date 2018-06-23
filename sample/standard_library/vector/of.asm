@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,11 +20,15 @@
 .signature: std::vector::of/2
 
 .function: return_integer/1
+    allocate_registers %1 local
+
     arg %0 local %0
     return
 .end
 
 .function: main/1
+    allocate_registers %2 local
+
     import "std::vector"
 
     frame ^[(pamv %0 (integer %1 local 8) local) (pamv %1 (function %1 local return_integer/1) local)]
