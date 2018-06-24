@@ -1,0 +1,8 @@
+Allocates a set of N local registers.
+It is a compile-time error to access a register outside of allocated range.
+
+This should always be the first instruction to appear in a normal function.
+Closures should not use this instruction, though, as their register set is
+externally allocated.
+It is a compile-time error to put this instruction as a not-first instruction
+in a function body.
