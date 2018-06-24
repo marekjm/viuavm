@@ -23,7 +23,7 @@
     nop
     nop
 
-    jump 2
+    jump 3
 
     izero %0 local
     return
