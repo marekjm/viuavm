@@ -18,7 +18,7 @@
 ;
 
 .function: iterfib/1
-    allocate_registers %8 local
+    allocate_registers %12 local
 
     .name: %iota vec
 
@@ -27,9 +27,10 @@
     integer %minus_one local -1
     integer %minus_two local -2
 
+    vector %vec local
+
     .name: %iota tmp
-    if (not (isnull %tmp local %vec local) local) local logic
-    vpush (vpush (vector %vec local) local (integer %tmp local 1) local) local (integer %tmp local 1) local
+    vpush (vpush %vec local (integer %tmp local 1) local) local (integer %tmp local 1) local
 
     .mark: logic
 
@@ -50,7 +51,7 @@
 .end
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     ; expected result is 1134903170
 

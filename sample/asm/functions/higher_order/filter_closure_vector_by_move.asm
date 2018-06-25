@@ -38,7 +38,7 @@
 .end
 
 .function: is_divisible_by_2/0
-    allocate_registers %3 local
+    allocate_registers %4 local
 
     closure %1 local is_divisible_by/1
     capturemove %1 local %2 (integer %2 local 2) local

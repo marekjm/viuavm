@@ -18,7 +18,7 @@
 ;
 
 .function: foo/0
-    allocate_registers %0 local
+    allocate_registers %1 local
 
     return
 .end

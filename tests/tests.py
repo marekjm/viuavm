@@ -2238,7 +2238,7 @@ class StaticAnalysis(unittest.TestCase):
 
     def testIzeroReportedAsUnused(self):
         runTestFailsToAssembleDetailed(self, 'izero_reported_as_unused.asm', [
-            '21:11: error: unused integer in register "1"',
+            '23:11: error: unused integer in register "1"',
             '20:12: error: in function main/0',
         ])
 
@@ -2255,9 +2255,9 @@ class StaticAnalysis(unittest.TestCase):
 
     def testFstoreStoresFloats(self):
         runTestFailsToAssembleDetailed(self, 'fstore_stores_floats.asm', [
-            '22:10: error: invalid type of value contained in register',
-            '22:10: note: expected integer, got float',
-            '21:11: note: register defined here',
+            '24:10: error: invalid type of value contained in register',
+            '24:10: note: expected integer, got float',
+            '23:11: note: register defined here',
             '20:12: error: in function main/0',
         ])
 
@@ -2277,20 +2277,20 @@ class StaticAnalysis(unittest.TestCase):
 
     def testInferringTypesForArgs(self):
         runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
-            '32:22: error: invalid type of value contained in register',
-            '32:22: note: expected string, got integer',
-            '23:9: note: register defined here',
-            '25:10: note: type inferred here',
+            '34:22: error: invalid type of value contained in register',
+            '34:22: note: expected string, got integer',
+            '25:9: note: register defined here',
+            '27:10: note: type inferred here',
             '                 ^ deduced type is \'integer\'',
             '20:12: error: in function main/1',
         ])
 
     def testInferenceIncludesPointeredTypes(self):
         runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
-            '26:19: error: invalid type of value contained in register',
-            '26:19: note: expected string, got pointer to integer',
-            '21:9: note: register defined here',
-            '23:10: note: type inferred here',
+            '28:19: error: invalid type of value contained in register',
+            '28:19: note: expected string, got pointer to integer',
+            '23:9: note: register defined here',
+            '25:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
         ])
@@ -2317,8 +2317,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testClosureCapturesByMoveMakeInaccessible(self):
         runTestFailsToAssembleDetailed(self, 'closure_captures_by_move_make_inaccessible.asm', [
-            '34:11: error: use of erased local register "2"',
-            '29:5: note: erased here:',
+            '36:11: error: use of erased local register "2"',
+            '31:5: note: erased here:',
             '25:12: error: in function main/0',
         ])
 
@@ -2326,9 +2326,9 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'closure_captures_invalid_type.asm', [
             '21:10: error: invalid type of value contained in register',
             '21:10: note: expected integer, got text',
-            '30:26: note: register defined here',
+            '32:26: note: register defined here',
             '20:11: error: in a closure defined here:',
-            '27:13: error: when instantiated here:',
+            '29:13: error: when instantiated here:',
             '26:12: error: in function main/0',
         ])
 
@@ -2346,10 +2346,10 @@ class StaticAnalysis(unittest.TestCase):
 
     def testCallToInvalidType(self):
         runTestFailsToAssembleDetailed(self, 'call_to_invalid_type.asm', [
-            '33:15: error: invalid type of value contained in register',
-            '33:15: note: expected invocable, got text',
-            '29:10: note: register defined here',
-            '27:12: error: in function main/1',
+            '37:15: error: invalid type of value contained in register',
+            '37:15: note: expected invocable, got text',
+            '33:10: note: register defined here',
+            '29:12: error: in function main/1',
         ])
 
     def testTailCallToInvalidType(self):
@@ -2362,10 +2362,10 @@ class StaticAnalysis(unittest.TestCase):
 
     def testInvalidTypeForIndirectParameterPass(self):
         runTestFailsToAssembleDetailed(self, 'invalid_type_for_indirect_parameter_pass.asm', [
-            '32:10: error: invalid type of value contained in register',
-            '32:10: note: expected integer, got text',
-            '29:10: note: register defined here',
-            '26:12: error: in function main/1',
+            '36:10: error: invalid type of value contained in register',
+            '36:10: note: expected integer, got text',
+            '33:10: note: register defined here',
+            '28:12: error: in function main/1',
         ])
 
     def testJumpSkippingADefinitionInstruction(self):
@@ -2376,8 +2376,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testInvalidAccessTypeForSwap(self):
         runTestFailsToAssembleDetailed(self, 'invalid_access_type_for_swap.asm', [
-            '24:19: error: invalid access mode',
-            '24:19: note: can only swap using direct access mode',
+            '26:19: error: invalid access mode',
+            '26:19: note: can only swap using direct access mode',
             '                          ^ did you mean \'%2\'?',
             '20:12: error: in function main/0',
         ])
@@ -2721,7 +2721,8 @@ class KeywordIotaTests(unittest.TestCase):
         runTestSplitlines(self, 'iota_in_receiving_arguments.asm', ['Hello World!', '42'])
 
     def testInvalidArgumentToIota(self):
-        runTestFailsToAssemble(self, 'invalid_argument_to_iota.asm', "./sample/asm/keyword/iota/invalid_argument_to_iota.asm:21:12: error: invalid argument to '.iota:' directive: foo")
+        runTestFailsToAssemble(self, 'invalid_argument_to_iota.asm',
+            "./sample/asm/keyword/iota/invalid_argument_to_iota.asm:23:12: error: invalid argument to '.iota:' directive: foo")
 
     def testIotaDirectiveUsedOutsideOfIotaScope(self):
         runTestFailsToAssemble(self, 'iota_directive_used_outside_of_iota_scope.asm', "./sample/asm/keyword/iota/iota_directive_used_outside_of_iota_scope.asm:20:1: error: '.iota:' directive used outside of iota scope")
@@ -2759,8 +2760,8 @@ class KeywordDefaultTests(unittest.TestCase):
 
     def testDefaultInArg(self):
         runTestFailsToAssembleDetailed(self, 'arg.asm', [
-                '21:16: error: use of void as input register:',
-                '20:12: error: in function foo/1',
+            '23:16: error: use of void as input register:',
+            '20:12: error: in function foo/1',
        ])
 
     def testDefaultInCall(self):
@@ -3023,7 +3024,8 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'receive_timeout_default.asm', 'Hello World!')
 
     def testReceiveTimeoutFailsToAssemble(self):
-        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:18: error: invalid operand')
+        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm',
+            './sample/asm/concurrency/receive_invalid_timeout.asm:23:18: error: invalid operand')
 
     def testJoinDefaultTimeout(self):
         runTest(self, 'join_timeout_default.asm', 'child process done')
@@ -3119,9 +3121,9 @@ class AtomTests(unittest.TestCase):
         # This was before the "new SA".
         # runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
         runTestFailsToAssembleDetailed(self, 'comparing_with_different_type.asm', [
-            '24:40: error: invalid type of value contained in register',
-            '24:40: note: expected atom, got integer',
-            '22:21: note: register defined here',
+            '26:40: error: invalid type of value contained in register',
+            '26:40: note: expected atom, got integer',
+            '24:21: note: register defined here',
             '20:12: error: in function main/0',
         ])
 

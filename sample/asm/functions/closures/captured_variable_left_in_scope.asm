@@ -18,8 +18,6 @@
 ;
 
 .closure: printer_function/0
-    allocate_registers %2 local
-
     ; expects register 1 to be an captured object
     print %1 local
     return

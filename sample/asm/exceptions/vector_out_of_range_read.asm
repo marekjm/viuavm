@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    allocate_registers %3 local
+    allocate_registers %5 local
 
     vector %1 local
     vpush %1 local (integer %3 local 42) local

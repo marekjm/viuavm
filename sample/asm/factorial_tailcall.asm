@@ -18,7 +18,7 @@
 ;
 
 .function: factorial/2
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: 1 number
     .name: 0 result

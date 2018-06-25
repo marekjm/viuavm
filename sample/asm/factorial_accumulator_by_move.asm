@@ -43,7 +43,7 @@
 .end
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     .name: 1 number
     .name: 2 result

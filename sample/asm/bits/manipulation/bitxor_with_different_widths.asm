@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     bits (.name: %iota longer) local 0b1101000100100111
     bits (.name: %iota shorter) local            0b1101

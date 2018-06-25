@@ -24,7 +24,7 @@
 ; the purpose of this program is to find an absolute value of an integer
 
 .function: main/1
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: %iota number
     .name: %iota zero

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %3 local
+    allocate_registers %4 local
 
     bits (.name: %iota bitstring) local 0b10011101
     print %bitstring local

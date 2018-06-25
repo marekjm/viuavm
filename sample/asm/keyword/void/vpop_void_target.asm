@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     vector (.name: %iota container) local
 

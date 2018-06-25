@@ -18,8 +18,6 @@
 ;
 
 .closure: printer/0
-    allocate_registers %2 local
-
     print %1 local
     return
 .end

@@ -39,7 +39,7 @@
 .end
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     ; create frame and set initial parameters
     frame ^[(param %0 (integer %1 local 10) local) (pamv %1 (integer %2 local 0) local)]

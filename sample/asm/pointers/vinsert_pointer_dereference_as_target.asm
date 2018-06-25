@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %3 local
+    allocate_registers %4 local
 
     ptr (.name: %iota pointer) local (vector (.name: %iota container) local) local
     integer (.name: %iota value) local 0

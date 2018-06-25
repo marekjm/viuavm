@@ -18,8 +18,6 @@
 ;
 
 .closure: adder/1
-    allocate_registers %3 local
-
     ; expects register 1 to be an captured integer
     arg %2 local %0
     add %0 local %2 local %1 local
