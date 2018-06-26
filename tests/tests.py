@@ -2247,9 +2247,9 @@ class StaticAnalysis(unittest.TestCase):
 
     def testPreventComparingNumbersAndText(self):
         runTestFailsToAssembleDetailed(self, 'prevent_comparing_numbers_and_text.asm', [
-            '28:40: error: invalid type of value contained in register',
-            '28:40: note: expected number, got text',
-            '26:10: note: register defined here',
+            '30:40: error: invalid type of value contained in register',
+            '30:40: note: expected number, got text',
+            '28:10: note: register defined here',
             '20:12: error: in function main/0',
         ])
 
@@ -2297,10 +2297,10 @@ class StaticAnalysis(unittest.TestCase):
 
     def testPartialPointernessInference(self):
         runTestFailsToAssembleDetailed(self, 'partial_pointerness_inference.asm', [
-            '47:13: error: invalid type of value contained in register',
-            '47:13: note: expected vector, got pointer to value',
-            '24:9: note: register defined here',
-            '33:11: note: type inferred here',
+            '49:13: error: invalid type of value contained in register',
+            '49:13: note: expected vector, got pointer to value',
+            '26:9: note: register defined here',
+            '35:11: note: type inferred here',
             '                  ^ deduced type is \'pointer to value\'',
             '20:12: error: in function main/1',
         ])
@@ -2340,7 +2340,7 @@ class StaticAnalysis(unittest.TestCase):
             '20:11: error: in a closure defined here:',
             '32:13: error: when instantiated here:',
             '30:11: error: in a closure defined here:',
-            '46:13: error: when instantiated here:',
+            '48:13: error: when instantiated here:',
             '44:12: error: in function main/1',
         ])
 
@@ -2354,10 +2354,10 @@ class StaticAnalysis(unittest.TestCase):
 
     def testTailCallToInvalidType(self):
         runTestFailsToAssembleDetailed(self, 'tailcall_to_invalid_type.asm', [
-            '33:14: error: invalid type of value contained in register',
-            '33:14: note: expected invocable, got text',
-            '29:10: note: register defined here',
-            '27:12: error: in function main/1',
+            '37:14: error: invalid type of value contained in register',
+            '37:14: note: expected invocable, got text',
+            '33:10: note: register defined here',
+            '29:12: error: in function main/1',
         ])
 
     def testInvalidTypeForIndirectParameterPass(self):
@@ -2370,7 +2370,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testJumpSkippingADefinitionInstruction(self):
         runTestFailsToAssembleDetailed(self, 'jump_skipping_a_definition_instruction.asm', [
-            '24:11: error: use of empty local register "1"',
+            '26:11: error: use of empty local register "1"',
+            '23:5: error: after a jump here:',
             '20:12: error: in function main/0',
         ])
 
@@ -2384,8 +2385,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testOverwriteOfUnused(self):
         runTestFailsToAssembleDetailed(self, 'overwrite_of_unused_value.asm', [
-            '22:13: error: overwrite of unused value:',
-            '21:13: note: unused value defined here:',
+            '24:13: error: overwrite of unused value:',
+            '23:13: note: unused value defined here:',
             '20:12: error: in function main/0',
         ])
 
