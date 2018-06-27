@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     struct (.name: %iota container) local
 

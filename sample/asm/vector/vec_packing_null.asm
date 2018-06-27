@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/0
+.function: [[no_sa]] main/0
     allocate_registers %4 local
 
     string %2 local "answer to life"

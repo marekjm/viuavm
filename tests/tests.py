@@ -1311,9 +1311,16 @@ class VectorInstructionsTests(unittest.TestCase):
         # pass --no-sa because we want to test runtime exception
         runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vector: packing outside of register set range',), assembly_opts=('--no-sa',))
 
-    def testPackingVecRefusesToPackNullRegister(self):
+    def testPackingVecRefusesToPackNullRegisterRunTime(self):
         # pass --no-sa because we want to test runtime exception
         runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vector: cannot pack null register',), assembly_opts=('--no-sa',))
+
+    @unittest.skip('conflicts with runtime-error test')
+    def testPackingVecRefusesToPackNullRegisterCompileTime(self):
+        # pass --no-sa because we want to test runtime exception
+        runTestFailsToAssembleDetailed(self, 'vec_packing_null.asm', [
+            '20:12: error: in function main/0',
+        ])
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
@@ -2263,8 +2270,8 @@ class StaticAnalysis(unittest.TestCase):
 
     def testVinsertErasesDirectlyAccessedRegisters(self):
         runTestFailsToAssembleDetailed(self, 'vinsert_erases_directly_accessed_registers.asm', [
-            '26:11: error: use of erased local register "1"',
-            '24:5: note: erased here:',
+            '28:11: error: use of erased local register "1"',
+            '26:5: note: erased here:',
             '20:12: error: in function main/0',
         ])
 
