@@ -18,7 +18,7 @@
 ;
 
 .function: [[no_sa]] main/0
-    allocate_registers %4 local
+    allocate_registers %11 local
 
     string %2 local "answer to life"
     integer %3 local 42

@@ -18,7 +18,7 @@
 ;
 
 .function: watchdog_process/1
-    allocate_registers %7 local
+    allocate_registers %9 local
 
     .name: %iota death_message
     .name: %iota exception

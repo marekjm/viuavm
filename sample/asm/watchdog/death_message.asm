@@ -61,7 +61,7 @@
 .end
 
 .function: a_joined_concurrent_process/0
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     frame ^[(pamv %0 (integer %1 local 128) local)]
     call void std::misc::cycle/1
