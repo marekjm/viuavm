@@ -284,12 +284,11 @@ auto viua::process::Stack::unwind() -> void {
 }
 
 auto viua::process::Stack::prepare_frame(
-    viua::internals::types::register_index arguments_size,
-    viua::internals::types::register_index registers_size) -> Frame* {
+    viua::internals::types::register_index const arguments_size) -> Frame* {
     if (frame_new) {
         throw "requested new frame while last one is unused";
     }
-    frame_new = make_unique<Frame>(nullptr, arguments_size, registers_size);
+    frame_new = make_unique<Frame>(nullptr, arguments_size);
     return frame_new.get();
 }
 

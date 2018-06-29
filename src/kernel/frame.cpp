@@ -32,14 +32,12 @@ auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
 }
 
 Frame::Frame(viua::internals::types::byte const* const ra,
-             viua::internals::types::register_index const argsize,
-             viua::internals::types::register_index const regsize)
+             viua::internals::types::register_index const argsize)
         : return_address{ra}
         , arguments{nullptr}
         , local_register_set{nullptr}
         , return_register{nullptr} {
     arguments          = std::make_unique<viua::kernel::Register_set>(argsize);
-    local_register_set = std::make_unique<viua::kernel::Register_set>(regsize);
 }
 Frame::Frame(Frame const& that) : return_address{that.return_address} {
     // FIXME: copy the registers maybe?

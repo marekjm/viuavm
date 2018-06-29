@@ -39,10 +39,12 @@ auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
      */
     auto const arguments = fetch_and_advance_addr<Register_index>(
         fetch_register_index, addr, this);
-    auto const local_registers = fetch_and_advance_addr<Register_index>(
+
+    // FIXME: ignore number of local registers, but it is still encoded
+    fetch_and_advance_addr<Register_index>(
         fetch_register_index, addr, this);
 
-    request_new_frame(arguments, local_registers);
+    request_new_frame(arguments);
 
     return addr;
 }

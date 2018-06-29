@@ -155,8 +155,8 @@ class Stack {
     auto emplace_back(std::unique_ptr<Frame> f)
         -> decltype(frames.emplace_back(f));
 
-    auto prepare_frame(viua::internals::types::register_index,
-                       viua::internals::types::register_index) -> Frame*;
+    auto prepare_frame(viua::internals::types::register_index const
+                       ) -> Frame*;
     auto push_prepared_frame() -> void;
 
     auto adjust_jump_base_for_block(std::string const&)
@@ -224,8 +224,7 @@ class Process {
      *  function calls.
      */
     Frame* request_new_frame(
-        viua::internals::types::register_index arguments_size = 0,
-        viua::internals::types::register_index registers_size = 0);
+        viua::internals::types::register_index const arguments_size = 0);
     Try_frame* request_new_try_frame();
     void push_frame();
     auto adjust_jump_base_for_block(std::string const&)

@@ -68,9 +68,9 @@ void viua::process::Process::ensure_static_registers(
 }
 
 Frame* viua::process::Process::request_new_frame(
-    viua::internals::types::register_index arguments_size,
-    viua::internals::types::register_index registers_size) {
-    return stack->prepare_frame(arguments_size, registers_size);
+    viua::internals::types::register_index const arguments_size
+    ) {
+    return stack->prepare_frame(arguments_size);
 }
 void viua::process::Process::push_frame() {
     if (stack->size() > Stack::MAX_STACK_SIZE) {

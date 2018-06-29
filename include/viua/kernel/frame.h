@@ -51,8 +51,7 @@ class Frame {
                                 bool const receives_ownership = true) -> void;
 
     Frame(viua::internals::types::byte const* const,
-          viua::internals::types::register_index const,
-          viua::internals::types::register_index const = 16);
+          viua::internals::types::register_index const);
     Frame(Frame const&);
 };
 

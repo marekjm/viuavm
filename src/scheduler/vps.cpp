@@ -717,8 +717,9 @@ void viua::scheduler::Virtual_process_scheduler::operator()() {
 
 void viua::scheduler::Virtual_process_scheduler::bootstrap(
     std::vector<std::string> const& commandline_arguments) {
-    auto initial_frame           = make_unique<Frame>(nullptr, 0, 2);
+    auto initial_frame           = std::make_unique<Frame>(nullptr, 0);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
+    initial_frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(2));
 
     auto cmdline = make_unique<viua::types::Vector>();
     auto limit   = commandline_arguments.size();
