@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -19,6 +19,8 @@
 
 .function: misc::boolean/1
     ; this function returns boolean value of its parameter
+    allocate_registers %1 local
+
     not (not (arg %0 %0))
     return
 .end
@@ -26,6 +28,8 @@
 .function: std::misc::cycle/1
     ; executes at least N cycles
     ;
+    allocate_registers %4 local
+
     arg (.name: %iota counter) %0
 
     .name: iota i
