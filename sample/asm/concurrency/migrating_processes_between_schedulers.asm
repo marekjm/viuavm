@@ -59,16 +59,16 @@
     .name: 1 limit
     arg %limit local %0
 
-    -- run until "limit" hits zero
+    ; run until "limit" hits zero
     if %limit local +1 spawn_processes/1__epilogue
 
-    -- spawn a printer process with current limit value
-    -- as its only parameter
+    ; spawn a printer process with current limit value
+    ; as its only parameter
     frame ^[(param %0 %limit local)]
     call process_spawner/1
     idec %limit local
 
-    -- tail-recursive call to spawn more printer processes
+    ; tail-recursive call to spawn more printer processes
     frame ^[(pamv %0 %limit local)]
     tailcall spawn_processes/1
 
@@ -79,16 +79,16 @@
 .function: main/0
     allocate_registers %2 local
 
-    -- spawn several processes, each printing a different "Hello {number}!"
-    -- the hellos do not have to appear in the order their functions are
-    -- called if there are multiple VP schedulers spawned
-    --
-    -- this program is embarrassingly simple - it's just prints, but there is
-    -- so many of them that the first VP scheduler starts to feel overwhelmed and
-    -- calls for help by posting the processes to the CPU to let other schedulers
-    -- adopt them
-    --
-    -- so what this program does is saturate the schedulers
+    ; spawn several processes, each printing a different "Hello {number}!"
+    ; the hellos do not have to appear in the order their functions are
+    ; called if there are multiple VP schedulers spawned
+    ;
+    ; this program is embarrassingly simple - it's just prints, but there is
+    ; so many of them that the first VP scheduler starts to feel overwhelmed and
+    ; calls for help by posting the processes to the CPU to let other schedulers
+    ; adopt them
+    ;
+    ; so what this program does is saturate the schedulers
 
     import "std::misc"
 
