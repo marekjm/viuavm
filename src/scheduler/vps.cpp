@@ -734,7 +734,7 @@ void viua::scheduler::Virtual_process_scheduler::bootstrap(
 }
 
 void viua::scheduler::Virtual_process_scheduler::launch() {
-    scheduler_thread = thread([this] { (*this)(); });
+    scheduler_thread = std::thread([this] { (*this)(); });
 }
 
 void viua::scheduler::Virtual_process_scheduler::shutdown() {
