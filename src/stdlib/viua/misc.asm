@@ -30,17 +30,17 @@
     ;
     allocate_registers %4 local
 
-    arg (.name: %iota counter) %0
+    arg (.name: %iota counter) local %0
 
     .name: iota i
-    sub %counter %counter (integer %i 9)
-    div %counter %counter (integer %i 2)
+    sub %counter local %counter local (integer %i local 9) local
+    div %counter local %counter local (integer %i local 2) local
 
-    izero (.name: %iota zero)
+    izero (.name: %iota zero) local
 
     .mark: __loop_begin
-    if (lte %i %counter %zero) __loop_end +1
-    idec %counter
+    if (lte %i local %counter local %zero local) local __loop_end +1
+    idec %counter local
     jump __loop_begin
     .mark: __loop_end
 
