@@ -52,7 +52,10 @@ class Frame {
 
     Frame(viua::internals::types::byte const* const,
           viua::internals::types::register_index const);
-    Frame(Frame const&);
+    Frame(Frame const&) = delete;
+    Frame(Frame&&) = delete;
+    auto operator=(Frame const&) = delete;
+    auto operator=(Frame&&) = delete;
 };
 
 

@@ -39,7 +39,3 @@ Frame::Frame(viua::internals::types::byte const* const ra,
         , return_register{nullptr} {
     arguments          = std::make_unique<viua::kernel::Register_set>(argsize);
 }
-Frame::Frame(Frame const& that) : return_address{that.return_address} {
-    // FIXME: copy the registers maybe?
-    // FIXME: oh, and the arguments too, while you're at it!
-}
