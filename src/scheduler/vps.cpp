@@ -752,8 +752,8 @@ int viua::scheduler::Virtual_process_scheduler::exit() const {
 viua::scheduler::Virtual_process_scheduler::Virtual_process_scheduler(
     viua::kernel::Kernel* akernel,
     std::vector<std::unique_ptr<viua::process::Process>>* fp,
-    mutex* fp_mtx,
-    condition_variable* fp_cv,
+    std::mutex* fp_mtx,
+    std::condition_variable* fp_cv,
     bool const enable_tracing)
         : attached_kernel(akernel)
         , tracing_enabled(enable_tracing)
