@@ -33,6 +33,18 @@ by issue `7c06177872c3a718510a54e6513820f8fe0fb99b` in the embedded issue reposi
 ; Valid main functions are main/0, main/1 and main/2.
 ;
 .function: main/0
+    ; Allocate local register set.
+    ; This is done explicitly by the callee because it is an
+    ; implementation detail - if a newer version of the function
+    ; requires fewer registers the code using it should not have
+    ; to be compiled.
+    ; Also, when a module is reloaded the code using it can stay
+    ; the same as long as the number and types of parameters of
+    ; the function stay the same.
+    ;
+    ; In this function, two local registers are allocated.
+    allocate_registers %2 local
+
     ; Store text value in register with index 1.
     ; The text instruction shares operand order with majority of
     ; other instructions:
