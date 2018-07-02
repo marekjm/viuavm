@@ -39,6 +39,7 @@ static auto math_sqrt(Frame* frame, viua::kernel::Register_set*, viua::kernel::R
     }
 
     auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_float());
+    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(0, std::make_unique<viua::types::Float>(square_root));
 }
 
