@@ -22,6 +22,8 @@
     ;
     ; N is received as first and only parameter
     ;
+    allocate_registers %5 local
+
     .name: 1 limit
     arg %limit %0
 
@@ -47,6 +49,8 @@
     ; N is received as first parameter.
     ; The spawning function is received as the second parameter.
     ;
+    allocate_registers %5 local
+
     .name: 1 limit
     .name: 2 fn
     arg %limit local %0
@@ -76,6 +80,8 @@
     ; Vector passed as the parameter is emptied.
     ; Reversing is *NOT* performed in-place.
     ;
+    allocate_registers %4 local
+
     .name: 1 source
     .name: 0 result
     arg %source %0
@@ -99,6 +105,8 @@
     ; This function expects to receive its parameter by move (to avoid
     ; copying).
     ;
+    allocate_registers %5 local
+
     .name: 0 source
     arg %source local %0
 
@@ -128,6 +136,8 @@
 .function: std::vector::every/2
     ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
     ;
+    allocate_registers %7 local
+
     .name: 1 vec
     .name: 2 fn
     arg %vec %0
@@ -162,6 +172,8 @@
 .function: std::vector::any/2
     ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
     ;
+    allocate_registers %7 local
+
     .name: 1 vec
     .name: 2 fn
     arg %vec %0
