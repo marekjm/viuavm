@@ -45,7 +45,7 @@
 .end
 
 .function: main/1
-    allocate_registers %4 local
+    allocate_registers %2 local
 
     frame %0
     process void running_detached/0
@@ -67,7 +67,7 @@
     nop
     nop
 
-    print (string %3 local "main/1 exited") local
+    print (string %1 local "main/1 exited") local
 
     izero %0 local
     return

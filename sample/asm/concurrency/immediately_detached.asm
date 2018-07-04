@@ -115,7 +115,7 @@
 .end
 
 .function: main/0
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     frame %0
     process void running_detached/0

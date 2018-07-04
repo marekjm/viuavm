@@ -40,16 +40,16 @@
 .end
 
 .function: main/1
-    allocate_registers %4 local
+    allocate_registers %3 local
 
     frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
-    process %3 local print_lazy/1
+    process %2 local print_lazy/1
 
     ; this is OK
-    join void %3 local
+    join void %2 local
 
     ; this throws an exception
-    join void %3 local
+    join void %2 local
 
     izero %0 local
     return

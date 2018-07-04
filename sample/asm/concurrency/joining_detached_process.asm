@@ -42,7 +42,7 @@
 .end
 
 .function: main/1
-    allocate_registers %4 local
+    allocate_registers %3 local
 
     frame ^[(pamv %0 (self %1 local) local)]
     process void running_detached/1
@@ -69,7 +69,7 @@
     ; this throws, cannot join detached process
     join void %1 local
 
-    print (string %3 local "main/1 exited") local
+    print (string %2 local "main/1 exited") local
 
     izero %0 local
     return
