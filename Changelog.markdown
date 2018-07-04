@@ -69,6 +69,11 @@ There are several categories of change:
 - feature: `ptrlive` instruction for checking whether a pointer is "live", i.e. valid and can be accessed
   without errors
 - bic: it is now illegal to pack vectors from register sets other than `local`
+- bic: `frame` instructions no longer allocate local register sets for call frames - the callee-issued
+  `allocate_registers` instruction is now responsible for it, since the number of local registers is an
+  implementation detail private to each function. Hiding this information from callers removes the need
+  to recompile calling modules in case a function changes the number of local registers it needs. Read
+  about the new instruction at https://docs.viuavm.org/
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
