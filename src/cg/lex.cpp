@@ -162,6 +162,9 @@ Unused_value::Unused_value(Token token)
 Unused_value::Unused_value(Token token, std::string s)
         : Invalid_syntax(token, s) {}
 
+Unused_register::Unused_register(Token token, std::string s)
+        : Invalid_syntax(token, s) {}
+
 auto Traced_syntax_error::what() const -> const char* {
     return errors.front().what();
 }

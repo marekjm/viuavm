@@ -90,6 +90,10 @@ struct Unused_value : public Invalid_syntax {
     Unused_value(Token, std::string);
 };
 
+struct Unused_register : public Invalid_syntax {
+    Unused_register(Token, std::string);
+};
+
 struct Traced_syntax_error {
     std::vector<Invalid_syntax> errors;
 

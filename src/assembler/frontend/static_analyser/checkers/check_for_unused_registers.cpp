@@ -53,5 +53,17 @@ auto check_for_unused_registers(
             throw viua::cg::lex::Unused_value{each.second.first, msg.str()};
         }
     }
+
+    for (auto i = viua::internals::types::register_index{1}; i < register_usage_profile.allocated_registers(); ++i) {
+        auto index = viua::assembler::frontend::parser::Register_index{};
+        index.index = i;
+        index.rss = viua::internals::Register_sets::LOCAL;
+        auto const slot = viua::assembler::frontend::static_analyser::Register{index};
+        if ((not register_usage_profile.defined(slot)) and (not register_usage_profile.used(slot))) {
+            throw viua::cg::lex::Unused_register{
+                register_usage_profile.allocated_where().value(),
+                "unused local register " + std::to_string(i)}.note("allocated here:");
+        }
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
