@@ -153,7 +153,7 @@ class Register_usage_profile {
     auto allocated_registers(viua::internals::types::register_index const) -> void;
     auto allocated_registers() const -> std::optional<viua::internals::types::register_index>;
     auto allocated_where(viua::cg::lex::Token const&) -> void;
-    auto allocated_where() -> std::optional<viua::cg::lex::Token>;
+    auto allocated_where() const -> std::optional<viua::cg::lex::Token>;
 
     auto in_bounds(Register const) const -> bool;
 

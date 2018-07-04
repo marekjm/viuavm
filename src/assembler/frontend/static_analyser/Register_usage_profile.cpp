@@ -136,7 +136,7 @@ auto Register_usage_profile::allocated_registers() const -> std::optional<viua::
 auto Register_usage_profile::allocated_where(viua::cg::lex::Token const& token) -> void {
     where_registers_were_allocated = token;
 }
-auto Register_usage_profile::allocated_where() -> std::optional<viua::cg::lex::Token> {
+auto Register_usage_profile::allocated_where() const -> std::optional<viua::cg::lex::Token> {
     return where_registers_were_allocated;
 }
 
