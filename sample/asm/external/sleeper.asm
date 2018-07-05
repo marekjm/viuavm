@@ -43,14 +43,14 @@
 .end
 
 .function: lazy_print_process/0
-    allocate_registers %2 local
+    allocate_registers %0 local
 
     frame %0
     call void sleeper::lazy_print/0
     return
 .end
 .function: lazy_print_spawner/0
-    allocate_registers %2 local
+    allocate_registers %0 local
 
     frame %0
     process void lazy_print_process/0

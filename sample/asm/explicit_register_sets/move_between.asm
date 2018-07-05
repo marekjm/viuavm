@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %4 local
+    allocate_registers %2 local
 
     string %1 local "Hello World!"
     print %1 local
