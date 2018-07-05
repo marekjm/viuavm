@@ -168,6 +168,15 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
+    if (r.rss == Register_sets::STATIC) {
+        /*
+         * Do not check static register set access.
+         * There is currently no simple (or complicated) way to check if such
+         * accesses are correct or not.
+         * FIXME Maybe check static register set accesses?
+         */
+        return;
+    }
 
     if (not rup.in_bounds(r)) {
         throw Traced_syntax_error{}

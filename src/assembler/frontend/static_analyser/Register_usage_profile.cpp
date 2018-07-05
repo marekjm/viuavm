@@ -36,7 +36,14 @@ auto Register_usage_profile::defresh() -> void {
 auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void {
-    if (not in_bounds(r)) {
+    using viua::internals::Register_sets;
+    if ((not in_bounds(r)) and !(r.register_set == Register_sets::GLOBAL or r.register_set == Register_sets::STATIC)) {
+        /*
+         * Do not thrown on global or static register set access.
+         * There is currently no simple (or complicated) way to check if such
+         * accesses are correct or not.
+         * FIXME Maybe check global and static register set accesses?
+         */
         throw Traced_syntax_error{}
             .append(Invalid_syntax{t, ("access to register "
                     + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
@@ -60,7 +67,14 @@ auto Register_usage_profile::define(Register const r,
                                     Token const index,
                                     Token const register_set,
                                     bool const allow_overwrites) -> void {
-    if (not in_bounds(r)) {
+    using viua::internals::Register_sets;
+    if ((not in_bounds(r)) and !(r.register_set == Register_sets::GLOBAL or r.register_set == Register_sets::STATIC)) {
+        /*
+         * Do not thrown on global or static register set access.
+         * There is currently no simple (or complicated) way to check if such
+         * accesses are correct or not.
+         * FIXME Maybe check global and static register set accesses?
+         */
         throw Traced_syntax_error{}
         .append(Invalid_syntax{index, ("access to register "
                 + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
