@@ -18,9 +18,9 @@
 ;
 
 .function: main/1
-    allocate_registers %3 local
+    allocate_registers %2 local
 
-    print (isnull %2 local %1 local) local
+    print (isnull %1 local %1 local) local
 
     izero %0 local
     return
