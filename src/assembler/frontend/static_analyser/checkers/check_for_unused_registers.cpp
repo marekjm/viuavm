@@ -17,7 +17,6 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <sstream>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
@@ -37,11 +36,6 @@ auto check_for_unused_registers(
         index.index = i;
         index.rss = viua::internals::Register_sets::LOCAL;
         auto const slot = viua::assembler::frontend::static_analyser::Register{index};
-
-        std::cerr << "  register " << i;
-        std::cerr << ": defined = " << register_usage_profile.defined(slot);
-        std::cerr << ", used = " << register_usage_profile.used(slot);
-        std::cerr << std::endl;
 
         if ((not register_usage_profile.defined(slot)) and (not register_usage_profile.used(slot))) {
             throw viua::cg::lex::Unused_register{
