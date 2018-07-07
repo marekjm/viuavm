@@ -21,15 +21,18 @@
 ; integer related instructions.
 
 .function: foo/0
-    allocate_registers %17 local
+    allocate_registers %3 local
 
-    integer %1 local 16
-    integer %16 local 1
+    .name: 1 first
+    .name: 2 second
 
-    print %1 local
-    print @1 local
-    print %16 local
-    print @16 local
+    integer %first local 2
+    integer %second local 1
+
+    print %first local
+    print @first local
+    print %second local
+    print @second local
 
     return
 .end

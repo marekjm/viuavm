@@ -1459,7 +1459,7 @@ class SampleProgramsTests(unittest.TestCase):
         runTestReturnsIntegers(self, 'looping.asm', [i for i in range(0, 11)])
 
     def testRegisterReferencesInIntegerOperands(self):
-        runTestReturnsIntegers(self, 'registerref.asm', [16, 1, 1, 16])
+        runTestReturnsIntegers(self, 'registerref.asm', [2, 1, 1, 2])
 
     def testCalculatingFactorial(self):
         """The code that is tested by this unit is not the best implementation of factorial calculation.
