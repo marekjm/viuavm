@@ -62,7 +62,7 @@ auto check_for_unused_registers(
         if ((not register_usage_profile.defined(slot)) and (not register_usage_profile.used(slot))) {
             throw viua::cg::lex::Unused_register{
                 register_usage_profile.allocated_where().value(),
-                "unused local register " + std::to_string(i)}.note("allocated here:");
+                "unused local register " + std::to_string(i)};
         }
     }
 }
