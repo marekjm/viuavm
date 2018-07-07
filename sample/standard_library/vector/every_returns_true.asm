@@ -28,16 +28,16 @@
 .signature: std::vector::of_ints/1
 
 .function: main/1
-    allocate_registers %6 local
+    allocate_registers %5 local
 
     import "std::vector"
 
     frame ^[(param %0 (integer %1 local 20) local)]
     call %2 local std::vector::of_ints/1
 
-    frame ^[(param %0 %2 local) (pamv %1 (function %4 local is_not_negative/1) local)]
-    call %5 local std::vector::every/2
-    print %5 local
+    frame ^[(param %0 %2 local) (pamv %1 (function %3 local is_not_negative/1) local)]
+    call %4 local std::vector::every/2
+    print %4 local
 
     izero %0 local
     return

@@ -18,15 +18,15 @@
 ;
 
 .function: watchdog_process/1
-    allocate_registers %6 local
+    allocate_registers %5 local
 
     arg %1 local %0
 
-    structremove %4 local %1 local (atom %3 local 'function') local
+    structremove %3 local %1 local (atom %2 local 'function') local
 
-    echo (string %5 local "process spawned with <") local
-    echo %4 local
-    print (string %5 local "> died") local
+    echo (string %4 local "process spawned with <") local
+    echo %3 local
+    print (string %4 local "> died") local
 
     return
 .end
@@ -74,7 +74,7 @@
 .end
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     ;frame %0
     ;watchdog watchdog_process/0

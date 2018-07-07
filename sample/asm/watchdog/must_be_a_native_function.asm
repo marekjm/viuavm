@@ -20,7 +20,7 @@
 .signature: World::print_hello/0
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     import "build/test/World"
 

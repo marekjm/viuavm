@@ -121,9 +121,9 @@
 .end
 
 .function: log_exiting_main/0
-    allocate_registers %3 local
+    allocate_registers %2 local
 
-    print (string %2 local "process [  main  ]: 'main' exiting") local
+    print (string %1 local "process [  main  ]: 'main' exiting") local
     return
 .end
 .function: log_exiting_detached/1
@@ -148,14 +148,14 @@
 .signature: std::misc::cycle/1
 
 .function: main/1
-    allocate_registers %5 local
+    allocate_registers %3 local
 
     import "std::misc"
 
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (integer %3 local 42) local) (param %1 (integer %4 local 0) local)]
+    frame ^[(param %0 (integer %1 local 42) local) (param %1 (integer %2 local 0) local)]
     process void a_division_executing_process/2
 
     frame %0

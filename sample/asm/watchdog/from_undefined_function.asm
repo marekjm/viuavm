@@ -58,7 +58,7 @@
 .end
 
 .function: main/1
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     watchdog undefined_function/0
 
