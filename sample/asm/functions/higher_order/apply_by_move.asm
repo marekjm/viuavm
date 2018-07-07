@@ -31,10 +31,10 @@
     ;
     ; this function is type agnostic
     ; it just passes the parameter without additional processing
+    allocate_registers %4 local
+
     .name: 1 func
     .name: 2 parameter
-
-    allocate_registers %4 local
 
     ; apply the function to the parameter...
     frame ^[(pamv %0 (arg %parameter local %1) local)]
