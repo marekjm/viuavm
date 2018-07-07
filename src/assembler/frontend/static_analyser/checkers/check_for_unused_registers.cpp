@@ -28,6 +28,9 @@ namespace static_analyser { namespace checkers {
 auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void {
     const auto& limit = register_usage_profile.allocated_registers();
+    if (not limit) {
+        return;
+    }
     if (limit.value() == 0) {
         return;
     }
