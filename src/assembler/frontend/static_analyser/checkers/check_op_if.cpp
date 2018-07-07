@@ -109,6 +109,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
     }
 
     auto register_with_unused_value = std::string{};
+    auto unused_register = std::string{};
 
     try {
         Register_usage_profile register_usage_profile_if_true =
@@ -120,6 +121,10 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             ib,
             jump_target_if_true,
             mnemonic_counter);
+    } catch (viua::cg::lex::Unused_register& e) {
+        // Do not fail yet, because the register may be used by false branch.
+        // Save the error for later rethrowing.
+        unused_register = e.what();
     } catch (viua::cg::lex::Unused_value& e) {
         // Do not fail yet, because the value may be used by false branch.
         // Save the error for later rethrowing.
@@ -145,6 +150,18 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             ib,
             jump_target_if_false,
             mnemonic_counter);
+    } catch (viua::cg::lex::Unused_register& e) {
+        if (unused_register == e.what()) {
+            throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
+                instruction.tokens.at(0), "after taking either branch:"});
+        } else {
+            /*
+             * If an error was thrown for a different register it means that the
+             * register that was unused in true branch was used in the false one
+             * (so no errror), and the register for which the false branch threw
+             * was used in the true one (so no error either).
+             */
+        }
     } catch (viua::cg::lex::Unused_value& e) {
         if (register_with_unused_value == e.what()) {
             throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
