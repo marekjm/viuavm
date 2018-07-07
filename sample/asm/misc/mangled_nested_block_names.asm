@@ -18,7 +18,7 @@
 ;
 
 .function: foo/0
-    allocate_registers %2 local
+    allocate_registers %0 local
 
     try
     enter .block: bar
@@ -28,7 +28,7 @@
 .end
 
 .function: main/0
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     try
     enter .block: bar

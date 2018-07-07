@@ -18,7 +18,7 @@
 ;
 
 .function: supervisor_function/0
-    allocate_registers %2 local
+    allocate_registers %0 local
 
     ; uncomment the `receive 1` and
     ; the program is no longer broken
@@ -75,11 +75,11 @@
 .end
 
 .function: main/1
-    allocate_registers %4 local
+    allocate_registers %2 local
 
     watchdog supervisor_function/0
 
-    print (string %3 local "main/1 exiting") local
+    print (string %1 local "main/1 exiting") local
     izero %0 local
     return
 .end
