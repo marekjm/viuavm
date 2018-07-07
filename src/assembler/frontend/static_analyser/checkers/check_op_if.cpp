@@ -206,34 +206,5 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
                                .add(instruction.operands.at(2)->tokens.at(0)));
         }
     }
-
-    {
-        /*
-         * Check for unsued registers again. This is needed because if one
-         * branch has an unused register, and the second one has both an
-         * unused register *and* an unused value then the error won't be
-         * detected even if the same register is unused.
-         * The same way around - with unused value, and unused value and
-         * register in the second branch.
-         *
-         * This is a FIXME, because this is an unacceptable lack of quality
-         * in the static analyser...
-         * See issue 505732b9905aae8656f94b9f45847fa91ce55c7b.
-         */
-        auto error_unused_register = std::string{};
-        try {
-            check_for_unused_registers(register_usage_profile_if_true);
-        } catch (viua::cg::lex::Unused_register& e) {
-            error_unused_register = e.what();
-        }
-        try {
-            check_for_unused_registers(register_usage_profile_if_false);
-        } catch (viua::cg::lex::Unused_register& e) {
-            if (error_unused_register == e.what()) {
-                throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
-                    instruction.tokens.at(0), "after taking either branch:"});
-            }
-        }
-    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
