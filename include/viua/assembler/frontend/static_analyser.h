@@ -481,6 +481,8 @@ auto check_op_structkeys(Register_usage_profile& register_usage_profile,
 
 auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void;
+auto check_for_unused_values(
+    Register_usage_profile const& register_usage_profile) -> void;
 auto check_closure_instantiations(
     Register_usage_profile const& register_usage_profile,
     Parsed_source const& ps,

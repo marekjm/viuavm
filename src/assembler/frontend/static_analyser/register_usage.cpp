@@ -489,6 +489,7 @@ auto check_register_usage_for_instruction_block_impl(
      * instructions block.
      */
     check_for_unused_registers(register_usage_profile);
+    check_for_unused_values(register_usage_profile);
     check_closure_instantiations(register_usage_profile, ps, created_closures);
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
