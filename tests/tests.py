@@ -1715,8 +1715,6 @@ class TryCatchBlockTests(unittest.TestCase):
     PATH = './sample/asm/blocks'
 
     def testBasicNoThrowNoCatchBlock(self):
-        # FIXME implement running block checks as they are entered; then, default assembly options may
-        # be used
         runTest(self, 'basic.asm', '42')
 
     def testCatchingBuiltinType(self):
