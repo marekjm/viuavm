@@ -29,6 +29,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
+    allocate_registers %9 local
+
     arg %1 local %0
     arg %2 local %1
 
@@ -81,6 +83,8 @@
     ;       * a closure, or a function object to call,
     ;       * a vector of values that will be supplied as parameters to given callback,
     ;
+    allocate_registers %7 local
+
     arg (.name: %iota callback) local %0
     arg (.name: %iota list) local %1
 
@@ -117,6 +121,8 @@
     ; then, it maps (i.e. calls) the given function on every element of given vector
     ; and returns a vector containing modified values.
     ; returned vector is a newly created one - this function does not modify vectors in place.
+    allocate_registers %9 local
+
     arg %1 local %0
     arg %2 local %1
 
