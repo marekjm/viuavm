@@ -62,6 +62,7 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
                                      + std::to_string(j)};
         }
         register_usage_profile.erase(checker, instruction.tokens.at(0));
+        register_usage_profile.use(checker, instruction.tokens.at(0));
     }
 
     auto val         = Register{};
