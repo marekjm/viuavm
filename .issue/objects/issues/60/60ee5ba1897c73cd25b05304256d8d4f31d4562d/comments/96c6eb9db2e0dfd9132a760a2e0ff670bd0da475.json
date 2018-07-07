@@ -1,0 +1,1 @@
+{"author.name": "Marek Marecki", "author.email": "marejm@ozro.pw", "message": "On 4294967296 it wraps around and returns 0... This must be fixed.", "timestamp": 1529338972.075948}
