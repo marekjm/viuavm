@@ -2,3 +2,9 @@ Pops the current call frame off the stack.
 
 Before the frame is popped, all deferred calls scheduled by the \instruction{defer} instruction are executed
 till completion.
+
+This instruction moves a value from `local register 0` (if any) to a "return value register".
+If the caller requested a return value then it is taken from this "return value register".
+If the caller did not request a return value, the value present in "return value register" is destroyed.
+Even if the caller did not request a return value, contents of `local register 0` are moved into the "return
+value register".

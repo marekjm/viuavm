@@ -1,6 +1,6 @@
 \section{begin}
 
-Viua is a CISC machine, and its instructions vary in complexity from very simple (e.g. adding two
+Instructions in Viua vary in complexity from very simple (e.g. adding two
 integers) to complex and expensive ones (e.g. performing signed saturating multiplication).
 
 \heading{INSTRUCTION CATEGORIES}
@@ -78,3 +78,5 @@ but it works (as of 2018-02-05) and there are no plans to change it.
 
 %% INSTRUCTION SET ARCHITECTURE
 \section{end}
+
+%% vim:set ft=tex:

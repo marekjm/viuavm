@@ -333,3 +333,5 @@ indexes - `1', `4', etc.
 
 %% VIUA VM ASSEMBLY LANGUAGE
 \section{end}
+
+%% vim:set ft=tex:

@@ -12,6 +12,16 @@ Every instruction advances the execution of the program by manipulating values p
 \heading{REGISTERS}{ref=registers}
 \section{begin}
 
+All data in a Viua VM program is held in registers.
+Viua has no concept of "memory" in the traditional sense (as a byte-addressable array of bytes).
+This means that a value cannot be stored to, or loaded from, memory.
+
+To cover a wide range of use cases Viua provides several different register sets.
+These sets vary in lifetime and visibility, and are described in section \ref{registers.register_sets}.
+With this architecture the need for explicit memory should be reduced.
+If a "store-and-load" functionality is needed it may be emulated using a combination of processes, global and
+static registers.
+
 \heading{A REGISTER}
 \section{begin}
 
@@ -31,10 +41,14 @@ add %output local %lhs local %rhs local
 
 A register belongs to one of available register sets.
 
+A register may be empty, or full - it never exists in an "uninitialised" state where it contains some
+unspecified value but is not empty.
+In Viua a register either contains a valid value, or nothing.
+
 %% A REGISTER
 \section{end}
 
-\heading{REGISTER SETS}
+\heading{REGISTER SETS}{ref=registers.register_sets}
 \section{begin}
 
 Registers are grouped in register sets.
@@ -280,12 +294,6 @@ iinc @3 local
 %% FETCH MODES
 \section{end}
 
-%% REGISTERS
-\section{end}
-
-%% PROGRAMMING MODEL
-\section{end}
-
 \heading{REGISTER ADDRESSING}
 \section{begin}
 
@@ -326,6 +334,12 @@ copy %1 static *1 local
 
 will copy a value dereferenced from a pointer located in local register 1 into static register 1.
 
+\section{end}
+
+%% REGISTERS
+\section{end}
+
+%% PROGRAMMING MODEL
 \section{end}
 
 %% INTRODUCTION

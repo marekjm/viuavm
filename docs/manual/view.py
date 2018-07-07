@@ -155,6 +155,8 @@ KEYWORD_WRAP_BEGIN_REGEX = re.compile(r'\\wrap{begin}')
 KEYWORD_WRAP_END_REGEX = re.compile(r'\\wrap{end}')
 KEYWORD_LIST_BEGIN_REGEX = re.compile(r'\\list{begin}')
 KEYWORD_LIST_END_REGEX = re.compile(r'\\list{end}')
+KEYWORD_LISTED_BEGIN_REGEX = re.compile(r'\\listed{begin}')
+KEYWORD_LISTED_END_REGEX = re.compile(r'\\listed{end}')
 KEYWORD_ITEM_REGEX = re.compile(r'\\item')
 KEYWORD_INDENT_REGEX = re.compile(r'\\indent{(\d*)}')
 KEYWORD_DEDENT_REGEX = re.compile(r'\\dedent{(\d*|all)}')
@@ -215,6 +217,12 @@ def into_paragraphs(text):
             para = []
             continue
         if each == r'\list{begin}' or each == r'\list{end}':
+            if para:
+                paragraphs.append(para)
+            paragraphs.append([each])
+            para = []
+            continue
+        if KEYWORD_LISTED_BEGIN_REGEX.match(each) or each == r'\listed{end}':
             if para:
                 paragraphs.append(para)
             paragraphs.append([each])
@@ -406,6 +414,44 @@ def parse_and_expand(text, syntax, documented_instructions):
 
     return expanded_text
 
+def render_multiline_heading(heading_text, index, indent, noise, extra, ref):
+    colorise_with = None
+    if section_tracker.depth() < 2:
+        colorise_with = COLOR_SECTION_MAJOR
+    if section_tracker.depth() == 2:
+        colorise_with = COLOR_SECTION_MINOR
+    if section_tracker.depth() > 2:
+        colorise_with = COLOR_SECTION_SUBSECTION
+
+    format_line_title = '{prefix}[{index}] {text}'
+    format_line_ref = '{prefix}{index_prefix}{ref}'
+    ref_name = ''
+    if ref is not None:
+        ref_name = ' {{{}}}'.format(ref)
+    top_marker = ''
+    top_marker_spacing = ''
+    if RENDERING_MODE == RENDERING_MODE_HTML_ASCII_ART:
+        format_line_title = '{prefix}[{index}] <a id="{slug}"></a><a href="#{slug}">{text}</a>{top_marker_spacing}{top_marker}'
+        format_line_ref = '{prefix}{index_prefix}{ref}'
+        top_marker_spacing = (' ' * (LINE_WIDTH - indent - len(index) - len(heading_text) - 1 -
+            len(TOP_MARKER)))
+        top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
+
+    print(format_line_title.format(
+        prefix = (' ' * indent),
+        index = index,
+        slug = section_tracker.slug(index),
+        text = colorise(heading_text, colorise_with),
+        top_marker = top_marker,
+        top_marker_spacing = top_marker_spacing,
+    ))
+    index_prefix = len(index) + 2   # +2 for '[' and ']'
+    print(format_line_ref.format(
+        prefix = (' ' * indent),
+        index_prefix = (' ' * index_prefix),
+        ref = ref_name,
+    ))
+
 def render_heading(heading_text, indent, noise = False, extra = None, ref = None):
     colorise_with = None
     if section_tracker.depth() < 2:
@@ -428,7 +474,7 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
             len(TOP_MARKER)))
         top_marker = '<a href="#0">{}</a>'.format(TOP_MARKER)
 
-    print(format_line.format(
+    rendered_line = format_line.format(
         prefix = (' ' * indent),
         index = index,
         slug = section_tracker.slug(index),
@@ -436,7 +482,13 @@ def render_heading(heading_text, indent, noise = False, extra = None, ref = None
         ref = ref_name,
         top_marker = top_marker,
         top_marker_spacing = top_marker_spacing,
-    ))
+    )
+
+    visible_width = indent + len(index) + 2 + 1 + len(section_tracker.slug(index)) + len(ref_name)
+    if visible_width >= (LINE_WIDTH - len(TOP_MARKER)):
+        return render_multiline_heading(heading_text, index, indent, noise, extra, ref)
+
+    print(rendered_line)
 
 class Types:
     @staticmethod
@@ -863,6 +915,10 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
     in_list = False
     new_list_item = False
 
+    in_listed = False
+    in_listed_sorted = False
+    listed_items = []
+
     for each in paragraphs:
         if each == r'\reflow{off}':
             reflow = False
@@ -885,6 +941,19 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
         if each == r'\list{end}':
             in_list = False
             indent -= 2
+            continue
+        if each.startswith(r'\listed{begin}'):
+            params = build_params(PARAMETER_REGEX.findall(each[len(r'\listed{begin}'):]), {
+                'sorted': Types.boolean,
+            }, default = {
+                'sorted': False,
+            })
+
+            in_listed = True
+            in_listed_sorted = params['sorted']
+            continue
+        if each == r'\listed{end}':
+            in_listed = False
             continue
         if each == r'\item':
             new_list_item = True
@@ -920,6 +989,45 @@ def render_paragraphs(paragraphs, documented_instructions, syntax = None, indent
             render_heading(heading_text, indent, noise = params['noise'], ref = params['ref'])
             continue
         if each.startswith(COMMENT_MARKER):
+            continue
+
+        if in_listed:
+            listed_items.append(each)
+            continue
+        if (not in_listed) and listed_items:
+            listed_items = [each.strip() for each in listed_items[0].splitlines()]
+            longest_item = max(map(len, listed_items))
+            charactes_for_one_item = longest_item + 4
+
+            if in_listed_sorted:
+                listed_items = sorted(listed_items)
+
+            def chunks(seq, chunk_length):
+                chunked = []
+
+                i = 0
+                while i < len(seq):
+                    chunked.append(seq[i : i + chunk_length])
+                    i += chunk_length
+
+                return chunked
+
+            listed_indent = (indent + DEFAULT_INDENT_WIDTH)
+            words_per_chunk = ((LINE_WIDTH - listed_indent) // charactes_for_one_item)
+
+            chunked = chunks(listed_items, chunk_length = words_per_chunk)
+            chunked = [list(map(lambda element: element.ljust(charactes_for_one_item), each))
+                       for each
+                       in chunked]
+
+            text = '\n'.join([''.join(each) for each in chunked])
+            text = textwrap.indent(
+                text = text,
+                prefix = (' ' * listed_indent),
+            )
+            print(text)
+
+            listed_items = []
             continue
 
         text = parse_and_expand(each, syntax = syntax, documented_instructions = documented_instructions)
