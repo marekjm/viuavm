@@ -2839,10 +2839,12 @@ class MiscExceptionTests(unittest.TestCase):
         )
 
     def testCatchingExceptionThrownInDifferentModule(self):
+        # remove --no-sa when SA for blocks (try and enter) is implemented
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
         lib_path = 'test_module.vlib'
-        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
-        runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
+        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',),)
+        runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0', assembly_opts =
+        ('--no-sa',),)
 
     def testVectorOutOfRangeRead(self):
         runTestThrowsException(self, 'vector_out_of_range_read.asm', ('Out_of_range_exception', 'positive vector index out of range',))
