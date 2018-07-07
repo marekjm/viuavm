@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,7 +18,7 @@
 ;
 
 .function: factorial/2
-    allocate_registers %5 local
+    allocate_registers %4 local
 
     .name: 1 number
     .name: 0 result
@@ -30,7 +30,7 @@
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (eq %4 local %number local (integer %3 local 0) local) local finish
+    if (eq %3 local %number local (integer %2 local 0) local) local finish
 
     ; this frame must be the same as in "main"
     ; result must still be a reference
