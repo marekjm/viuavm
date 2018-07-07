@@ -29,54 +29,64 @@ There are several categories of change:
 
 # From 0.9.0 to 0.9.1
 
-- feature: bit manipulation instructions (and, or, xor; arithmetic and logical shifts; rotates), and
-  bit literals (binary, octal, and hexadecimal)
-- feature: setting `VIUA_DISASM_INVALID_RS_TYPES` environment variable to `yes` will make the disassembler
-  output unknown register set types instead of aborting; this may be useful if the binary that needs to
-  be disassembled is somewhat damaged, but the disassembler will not try too hard anyway
-- fix: fixed unalidnes stores and loads in bytecode module loader (important at runtime), program and
-  bytecode generators, and assembler frontend
-- fix: the `if` instruction supports specifying register set specifiers for its source operand
-- enhancement: moved to C++14's `make_unique`, making the VM core less likely to contain leaks
-- fix: disassembler correctly outputs register set specifiers for `if`, `streq`, `insert`, and
-  `remove` instructions
+- feature: bit manipulation instructions (and, or, xor; arithmetic and logical shifts;
+  rotates), and bit literals (binary, octal, and hexadecimal)
+- feature: setting `VIUA_DISASM_INVALID_RS_TYPES` environment variable to `yes` will
+  make the disassembler output unknown register set types instead of aborting; this may
+  be useful if the binary that needs to be disassembled is somewhat damaged, but the
+  disassembler will not try too hard anyway
+- fix: fixed unalidnes stores and loads in bytecode module loader (important at
+  runtime), program and bytecode generators, and assembler frontend
+- fix: the `if` instruction supports specifying register set specifiers for its source
+  operand
+- enhancement: moved to C++14's `make_unique`, making the VM core less likely to
+  contain leaks
+- fix: disassembler correctly outputs register set specifiers for `if`, `streq`,
+  `insert`, and `remove` instructions
 - feature: disassemler outputs per-instruction offsets when `--debug` flag is in effect
-- feature: attributes for functions (`.function: [[attr0, attr1]] fun/0`) providing additional details about
-  functions the assembler can use
-- feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
+- feature: attributes for functions (`.function: [[attr0, attr1]] fun/0`) providing
+  additional details about functions the assembler can use
+- feature: `no_sa` function attribute disabling static analysis for function marked
+  with this attribute
 - enhancement: C++ standard used for Viua VM development was updated to C++17
 - fix: when displaying errors newlines are no longer underlined
-- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for reporting this)
-- feature: new SA providing vastly enhanced analysis, and more detailed error messages and traces when
-  compared with the older one (enabled with `--new-sa` flag)
-- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks like a valid one
+- fix, bic: `vinsert` no longer takes literals in the index operand (thanks @vktgz for
+  reporting this)
+- feature: new SA providing vastly enhanced analysis, and more detailed error messages
+  and traces when compared with the older one (enabled with `--new-sa` flag)
+- feature: assembler provides "did you mean 'foo'?" notes if an unknown mnemonic looks
+  like a valid one
 - feature: static analyser is now able to check closure instantiations
-- feature: static analuser is now strict about the types being used consitently, and features some mild form
-  of type inference to keep track of types of the values the program it compiles is using
-- fix: joining process using `void` register as output fetches the return value of the process being joined
-  actually making it unjoinable
+- feature: static analuser is now strict about the types being used consitently, and
+  features some mild form of type inference to keep track of types of the values the
+  program it compiles is using
+- fix: joining process using `void` register as output fetches the return value of the
+  process being joined actually making it unjoinable
 - bic: rename `strstore` to `string`
 - bic: rename `istore` to `integer`
 - bic: rename `fstore` to `float`
-- feature: `wrapincrement`, `wrapdecrement`, `wrapadd`, `wrapsub`, `wrapmul`, and `wrapdiv` instructions for
-  modulo arithmetic on fixed-width integers
-- feature: `checkedsincrement`, `checkedsdecrement`, `checkedsadd`, `checkedssub` `checkedsmul`, and
-  `checkedsdiv` instructions for checked signed arithmetic on fixed-width integers
-- feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`, `saturatingssub`,
-  `saturatingsmul`, and `saturatingsdiv` instructions for saturating signed arithmetic on fixed-width integers
+- feature: `wrapincrement`, `wrapdecrement`, `wrapadd`, `wrapsub`, `wrapmul`, and
+  `wrapdiv` instructions for modulo arithmetic on fixed-width integers
+- feature: `checkedsincrement`, `checkedsdecrement`, `checkedsadd`, `checkedssub`,
+  `checkedsmul`, and `checkedsdiv` instructions for checked signed arithmetic on
+  fixed-width integers
+- feature: `saturatingsincrement`, `saturatingsdecrement`, `saturatingsadd`,
+  `saturatingssub`, `saturatingsmul`, and `saturatingsdiv` instructions for saturating
+  signed arithmetic on fixed-width integers
 - feature: `draw` instruction now supports `void` as target register
 - bic: remove `ress` instruction
-- feature: `ptrlive` instruction for checking whether a pointer is "live", i.e. valid and can be accessed
-  without errors
+- feature: `ptrlive` instruction for checking whether a pointer is "live", i.e. valid
+  and can be accessed without errors
 - bic: it is now illegal to pack vectors from register sets other than `local`
-- bic: `frame` instructions no longer allocate local register sets for call frames - the callee-issued
-  `allocate_registers` instruction is now responsible for it, since the number of local registers is an
-  implementation detail private to each function. Hiding this information from callers removes the need
-  to recompile calling modules in case a function changes the number of local registers it needs. Read
-  about the new instruction at https://docs.viuavm.org/
+- bic: `frame` instructions no longer allocate local register sets for call frames -
+  the callee-issued `allocate_registers` instruction is now responsible for it, since
+  the number of local registers is an implementation detail private to each function.
+  Hiding this information from callers removes the need to recompile calling modules
+  in case a function changes the number of local registers it needs. Read about the
+  new instruction at https://docs.viuavm.org/
 
-Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
-signed arithmetic is requested.
+Fixed-width arithmetic instructions interpret bit strings as two's complement
+fixed-width integers when signed arithmetic is requested.
 
 
 ----
