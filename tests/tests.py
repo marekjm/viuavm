@@ -1720,7 +1720,8 @@ class TryCatchBlockTests(unittest.TestCase):
         runTest(self, 'basic.asm', '42')
 
     def testCatchingBuiltinType(self):
-        runTest(self, 'catching_builtin_type.asm', '42')
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
+        runTest(self, 'catching_builtin_type.asm', '42', assembly_opts = ('--no-sa',),)
 
 
 @unittest.skip('new SA is almost ready')
@@ -2830,7 +2831,7 @@ class MiscExceptionTests(unittest.TestCase):
         runTest(self, 'nullregister_access.asm', "exception encountered: read from null register: 1", assembly_opts=('--no-sa',))
 
     def testCatcherState(self):
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         runTestSplitlines(self,
             'restore_catcher_state.asm',
             ['42','100','42','100'],
@@ -2839,7 +2840,7 @@ class MiscExceptionTests(unittest.TestCase):
         )
 
     def testCatchingExceptionThrownInDifferentModule(self):
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
         lib_path = 'test_module.vlib'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',),)
@@ -2907,7 +2908,7 @@ class ExternalModulesTests(unittest.TestCase):
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         # or maybe the leak originates in Viua code but I haven't found the leak
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         runTest(self, 'throwing.asm', 'OH NOES!', 0, assembly_opts = ('--no-sa',),)
 
     def testManyHelloWorld(self):
@@ -3177,11 +3178,11 @@ class DeferredCallsTests(unittest.TestCase):
         )
 
     def testDeferredCallsActivatedOnStackUnwindingWhenExceptionCaught(self):
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         runTestSplitlines(self, 'on_caught_exception.asm', ['Hello bar World!', 'Hello foo World!', '42'], assembly_opts = ('--no-sa',),)
 
     def testDeferredCallsAreInvokedBeforeStackIsUnwoundOnCaughtException(self):
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         runTestSplitlines(self,
             name = 'before_unwind_on_caught.asm',
             expected_output = [ 'Hello World before stack unwinding!', '666', ],
@@ -3219,7 +3220,7 @@ class DeferredCallsTests(unittest.TestCase):
         )
 
     def testDeepCaught(self):
-        # remove --no-sa when SA for blocks (try and enter) is implemented
+        # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         runTestSplitlines(
             self,
             name = 'deep_caught.asm',
