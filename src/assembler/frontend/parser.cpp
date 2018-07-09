@@ -133,7 +133,14 @@ auto viua::assembler::frontend::parser::parse_operand(
         ri->add(tokens.at(i));  // add index token
 
         if (str::isnum(tok.substr(1), false)) {
-            ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
+            try {
+                ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
+            } catch (std::out_of_range&) {
+                throw Invalid_syntax{tokens.at(0),
+                    "register index outside of defined range (max allowed register index is "
+                        + std::to_string(std::numeric_limits<viua::internals::types::register_index>::max() - 1)
+                        + ')'};
+            }
             ri->resolved = true;
         } else if (str::isnum(tok.substr(1), true)) {
             throw Invalid_syntax(tokens.at(0),

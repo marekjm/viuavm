@@ -29,8 +29,8 @@ auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     auto const operand = get_operand<Register_index>(instruction, 0);
 
-    auto const max_register_index = std::numeric_limits<viua::internals::types::register_index>::max();
-    if (operand->index >= max_register_index) {
+    auto const max_register_index = std::numeric_limits<viua::internals::types::register_index>::max() - 1;
+    if (operand->index > max_register_index) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                 "cannot allocate more than " + std::to_string(max_register_index) + " local registers");
     }
