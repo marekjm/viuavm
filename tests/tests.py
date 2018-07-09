@@ -2000,6 +2000,19 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm',
                 './sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:23:5: error: main function uses invalid register set to return a value: static')
 
+    def test_registers_allocated_too_few(self):
+        runTestFailsToAssembleDetailed(self, 'registers_allocated_too_few.asm', [
+            '23:11: error: access to register 0 with only 0 register(s) allocated',
+            '21:24: note: increase this value to 1 to fix this issue',
+            '20:12: error: in function main/0',
+        ])
+
+    def test_registers_allocated_too_many(self):
+        runTestFailsToAssembleDetailed(self, 'registers_allocated_too_many.asm', [
+            '21:24: error: unused local register 1',
+            '20:12: error: in function main/0',
+        ])
+
 
 class StaticAnalysis(unittest.TestCase):
     PATH = './sample/static_analysis'
