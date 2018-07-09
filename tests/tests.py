@@ -1724,7 +1724,6 @@ class TryCatchBlockTests(unittest.TestCase):
 
 class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
     PATH = './sample/asm/static_analysis_errors'
-    ASM_FLAGS = ('--new-sa',)
 
     def testMoveFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'move_from_empty_register.asm',

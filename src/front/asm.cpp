@@ -52,7 +52,6 @@ bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
 bool REPORT_BYTECODE_SIZE    = false;
 bool PERFORM_STATIC_ANALYSIS = true;
-bool USE_NEW_SA              = true;
 bool SHOW_META               = false;
 
 bool VERBOSE = false;
@@ -138,10 +137,7 @@ static bool usage(const char* program,
              << "    "
              << "    --no-sa              - disable static checking of "
                 "register accesses (use in case of "
-                "false positives)\n"
-             << "    --new-sa             - use new static analyser (more "
-                "precise, with better features, but "
-                "without coverage of all instructions yet)\n";
+                "false positives)\n";
     }
 
     return (show_help or show_version);
@@ -211,9 +207,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--no-sa") {
             PERFORM_STATIC_ANALYSIS = false;
-            continue;
-        } else if (option == "--new-sa") {
-            USE_NEW_SA = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cerr << send_control_seq(COLOR_FG_RED) << "error"
@@ -341,13 +334,8 @@ int main(int argc, char* argv[]) {
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
         if (PERFORM_STATIC_ANALYSIS) {
-            if (USE_NEW_SA) {
-                viua::assembler::frontend::static_analyser::
-                    check_register_usage(parsed_source);
-            } else {
-                assembler::verify::manipulation_of_defined_registers(
-                    cooked_tokens_without_names_replaced, blocks.tokens, DEBUG);
-            }
+            viua::assembler::frontend::static_analyser::
+                check_register_usage(parsed_source);
         }
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(

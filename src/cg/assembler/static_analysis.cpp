@@ -368,10 +368,6 @@ static void check_block_body(TokenVector const& body_tokens,
                              Registers&,
                              const map<std::string, TokenVector>&,
                              bool const);
-static void check_block_body(TokenVector const&,
-                             Registers&,
-                             const map<std::string, TokenVector>&,
-                             bool const);
 
 static void erase_register(Registers& registers,
                            map<std::string, std::string>& named_registers,
@@ -1285,72 +1281,4 @@ static void check_block_body(TokenVector const& body_tokens,
     map<std::string, std::string> named_registers;
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);
-}
-static void check_block_body(TokenVector const& body_tokens,
-                             Registers& registers,
-                             const map<std::string, TokenVector>& block_bodies,
-                             bool const debug) {
-    check_block_body(body_tokens, 0, registers, block_bodies, debug);
-}
-
-void assembler::verify::manipulation_of_defined_registers(
-    TokenVector const& tokens,
-    const map<std::string, TokenVector>& block_bodies,
-    bool const debug) {
-    auto opened_function = std::string{};
-    set<std::string> attributes;
-
-    TokenVector body;
-    for (TokenVector::size_type i = 0; i < tokens.size(); ++i) {
-        auto token = tokens.at(i);
-        if (token == ".function:") {
-            ++i;
-            if (tokens.at(i) == "[[") {
-                ++i;  // skip the opening '[['
-                while (tokens.at(i) != "]]") {
-                    attributes.insert(tokens.at(i++));
-                    if (tokens.at(i) == ",") {
-                        ++i;
-                    }
-                }
-                ++i;  // skip the closing ']]'
-            }
-            opened_function = tokens.at(i);
-            if (debug) {
-                cout << "analysing '" << opened_function << "'\n";
-            }
-            i = skip_till_next_line(tokens, i);
-            continue;
-        }
-        if (token == ".end") {
-            if (debug) {
-                cout << "running analysis of '" << opened_function << "' ("
-                     << body.size() << " tokens)\n";
-            }
-            Registers registers;
-            try {
-                if (not attributes.count("no_sa")) {
-                    check_block_body(body, registers, block_bodies, debug);
-                }
-            } catch (viua::cg::lex::Invalid_syntax const& e) {
-                throw viua::cg::lex::Traced_syntax_error().append(e).append(
-                    viua::cg::lex::Invalid_syntax(
-                        tokens.at(i - body.size() - 2),
-                        ("in function " + opened_function)));
-            } catch (viua::cg::lex::Traced_syntax_error& e) {
-                throw e.append(viua::cg::lex::Invalid_syntax(
-                    tokens.at(i - body.size() - 2),
-                    ("in function " + opened_function)));
-            }
-            body.clear();
-            opened_function = "";
-            attributes.clear();
-            i = skip_till_next_line(tokens, i);
-            continue;
-        }
-        if (opened_function == "") {
-            continue;
-        }
-        body.push_back(token);
-    }
 }

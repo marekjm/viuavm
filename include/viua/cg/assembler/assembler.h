@@ -95,10 +95,6 @@ auto function_calls_are_defined(std::vector<viua::cg::lex::Token> const&,
 auto callable_creations(std::vector<viua::cg::lex::Token> const&,
                         std::vector<std::string> const&,
                         std::vector<std::string> const&) -> void;
-auto manipulation_of_defined_registers(
-    std::vector<viua::cg::lex::Token> const&,
-    const std::map<std::string, std::vector<viua::cg::lex::Token>>&,
-    bool const) -> void;
 }  // namespace verify
 
 namespace utils {
