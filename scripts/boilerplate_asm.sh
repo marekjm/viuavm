@@ -25,7 +25,9 @@ echo ";
 ;
 
 .function: main/0
-    -- code goes here
+    allocate_registers %1 local
+
+    ; code goes here
 
     izero %0 local
     return
