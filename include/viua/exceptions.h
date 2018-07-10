@@ -148,4 +148,30 @@ class Operand_type_exception : public viua::types::Exception {
     }
 };
 
+namespace viua {
+namespace runtime {
+namespace exceptions {
+class Zero_division : public viua::types::Exception {
+  public:
+    std::string type() const override {
+        return "Zero_division";
+    }
+
+    std::string str() const override {
+        return "zero division";
+    }
+
+    std::unique_ptr<Value> copy() const override {
+        return viua::util::exceptions::make_unique_exception<
+            Zero_division>();
+    }
+
+    std::string what() const override {
+        return str();
+    }
+};
+}
+}
+}
+
 #endif

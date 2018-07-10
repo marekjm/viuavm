@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <string>
+#include <viua/exceptions.h>
 #include <viua/types/boolean.h>
 #include <viua/types/float.h>
 using namespace std;
@@ -67,6 +68,9 @@ auto Float::operator*(numeric::Number const& that) const
 }
 auto Float::operator/(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
+    if (that.as_integer() == 0) {
+        throw viua::util::exceptions::make_unique_exception<viua::runtime::exceptions::Zero_division>();
+    }
     return make_unique<Float>(number / that.as_float());
 }
 
