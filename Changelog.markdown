@@ -84,6 +84,7 @@ There are several categories of change:
   Hiding this information from callers removes the need to recompile calling modules
   in case a function changes the number of local registers it needs. Read about the
   new instruction at https://docs.viuavm.org/
+- fix: throw an exception in division by zero in `div` instruction
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
