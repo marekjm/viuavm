@@ -481,6 +481,9 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIDIV(self):
         runTest(self, 'div.asm', '1', 0)
 
+    def test_div_by_zero(self):
+        runTestThrowsException(self, 'div_by_zero.asm', ('Zero_division', 'zero division'))
+
     def testIDEC(self):
         runTest(self, 'dec.asm', '1', 0)
 
@@ -543,6 +546,9 @@ class FloatInstructionsTests(unittest.TestCase):
 
     def testFDIV(self):
         runTest(self, 'div.asm', '1.570000', 0)
+
+    def test_div_by_zero(self):
+        runTestThrowsException(self, 'div_by_zero.asm', ('Zero_division', 'zero division'))
 
     def testFLT(self):
         runTest(self, 'lt.asm', 'true', 0)
