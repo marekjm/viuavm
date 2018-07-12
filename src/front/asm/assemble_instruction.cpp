@@ -160,7 +160,8 @@ auto ::assembler::operands::resolve_register(Token const token,
     return out.str();
 }
 
-auto ::assembler::operands::resolve_rs_type(Token const token) -> viua::internals::Register_sets {
+auto ::assembler::operands::resolve_rs_type(Token const token)
+    -> viua::internals::Register_sets {
     if (token == "local") {
         return viua::internals::Register_sets::LOCAL;
     } else if (token == "static") {
@@ -484,7 +485,8 @@ auto assemble_instruction(
     } else if (tokens.at(i) == "argc") {
         assemble_single_register_op<&Program::opargc>(program, tokens, i);
     } else if (tokens.at(i) == "allocate_registers") {
-        assemble_single_register_op<&Program::opallocate_registers>(program, tokens, i);
+        assemble_single_register_op<&Program::opallocate_registers>(
+            program, tokens, i);
     } else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
     } else if (tokens.at(i) == "tailcall") {

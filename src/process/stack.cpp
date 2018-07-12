@@ -65,9 +65,8 @@ auto viua::process::Stack::state_of(const STATE s) -> STATE {
     return previous_state;
 }
 
-auto viua::process::Stack::bind(
-                                viua::kernel::Register_set* gs) -> void {
-    global_register_set         = gs;
+auto viua::process::Stack::bind(viua::kernel::Register_set* gs) -> void {
+    global_register_set = gs;
 }
 
 auto viua::process::Stack::begin() const -> decltype(frames.begin()) {

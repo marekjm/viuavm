@@ -118,14 +118,13 @@ auto fetch_raw_float(Op_address_type, viua::process::Process*)
  *  These functions are used by instructions whose operands are always
  *  immediates.
  */
-auto extract_primitive_uint64(Op_address_type,
-                              viua::process::Process*) -> uint64_t;
+auto extract_primitive_uint64(Op_address_type, viua::process::Process*)
+    -> uint64_t;
 
 template<typename Result>
 using Fetch_fn =
-    std::function<std::tuple<Op_address_type, Result>(
-        Op_address_type,
-        viua::process::Process*)>;
+    std::function<std::tuple<Op_address_type, Result>(Op_address_type,
+                                                      viua::process::Process*)>;
 template<typename Result>
 auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
                             Op_address_type& addr,
@@ -136,10 +135,9 @@ auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
 }
 
 template<typename... Result>
-using Fetchs_fn =
-    std::function<std::tuple<Op_address_type, Result...>(
-        Op_address_type,
-        viua::process::Process*)>;
+using Fetchs_fn = std::function<std::tuple<Op_address_type, Result...>(
+    Op_address_type,
+    viua::process::Process*)>;
 template<typename A, typename B>
 auto fetch_and_advance_addr(Fetchs_fn<A, B> const& fn,
                             Op_address_type& addr,

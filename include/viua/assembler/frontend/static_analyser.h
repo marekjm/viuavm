@@ -115,7 +115,8 @@ class Register_usage_profile {
      */
     std::set<Register> maybe_unused_registers;
 
-    std::optional<viua::internals::types::register_index> no_of_allocated_registers;
+    std::optional<viua::internals::types::register_index>
+        no_of_allocated_registers;
     std::optional<viua::cg::lex::Token> where_registers_were_allocated;
 
     auto fresh(Register const) const -> bool;
@@ -150,8 +151,10 @@ class Register_usage_profile {
     auto erased(Register const r) const -> bool;
     auto erased_where(Register const r) const -> viua::cg::lex::Token;
 
-    auto allocated_registers(viua::internals::types::register_index const) -> void;
-    auto allocated_registers() const -> std::optional<viua::internals::types::register_index>;
+    auto allocated_registers(viua::internals::types::register_index const)
+        -> void;
+    auto allocated_registers() const
+        -> std::optional<viua::internals::types::register_index>;
     auto allocated_where(viua::cg::lex::Token const&) -> void;
     auto allocated_where() const -> std::optional<viua::cg::lex::Token>;
 
@@ -432,7 +435,7 @@ auto check_op_arg(Register_usage_profile& register_usage_profile,
 auto check_op_argc(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
+                                 Instruction const& instruction) -> void;
 auto check_op_process(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_self(Register_usage_profile& register_usage_profile,

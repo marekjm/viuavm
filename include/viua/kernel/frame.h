@@ -46,14 +46,15 @@ class Frame {
         return return_address;
     }
 
-    auto set_local_register_set(std::unique_ptr<viua::kernel::Register_set>) -> void;
+    auto set_local_register_set(std::unique_ptr<viua::kernel::Register_set>)
+        -> void;
     auto set_local_register_set(viua::kernel::Register_set* const,
                                 bool const receives_ownership = true) -> void;
 
     Frame(viua::internals::types::byte const* const,
           viua::internals::types::register_index const);
     Frame(Frame const&) = delete;
-    Frame(Frame&&) = delete;
+    Frame(Frame&&)      = delete;
     auto operator=(Frame const&) = delete;
     auto operator=(Frame&&) = delete;
 };

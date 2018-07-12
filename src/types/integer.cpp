@@ -84,7 +84,8 @@ auto Integer::operator*(numeric::Number const& that) const
 auto Integer::operator/(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
     if (that.as_integer() == 0) {
-        throw viua::util::exceptions::make_unique_exception<viua::runtime::exceptions::Zero_division>();
+        throw viua::util::exceptions::make_unique_exception<
+            viua::runtime::exceptions::Zero_division>();
     }
     return make_unique<Integer>(number / that.as_integer());
 }

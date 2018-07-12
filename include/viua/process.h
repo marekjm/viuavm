@@ -155,8 +155,7 @@ class Stack {
     auto emplace_back(std::unique_ptr<Frame> f)
         -> decltype(frames.emplace_back(f));
 
-    auto prepare_frame(viua::internals::types::register_index const
-                       ) -> Frame*;
+    auto prepare_frame(viua::internals::types::register_index const) -> Frame*;
     auto push_prepared_frame() -> void;
 
     auto adjust_jump_base_for_block(std::string const&)

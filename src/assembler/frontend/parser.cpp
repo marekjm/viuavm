@@ -134,11 +134,17 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         if (str::isnum(tok.substr(1), false)) {
             try {
-                ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
+                ri->index =
+                    static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
             } catch (std::out_of_range&) {
-                throw Invalid_syntax{tokens.at(0),
-                    "register index outside of defined range (max allowed register index is "
-                        + std::to_string(std::numeric_limits<viua::internals::types::register_index>::max() - 1)
+                throw Invalid_syntax{
+                    tokens.at(0),
+                    "register index outside of defined range (max allowed "
+                    "register index is "
+                        + std::to_string(
+                              std::numeric_limits<
+                                  viua::internals::types::register_index>::max()
+                              - 1)
                         + ')'};
             }
             ri->resolved = true;
@@ -159,7 +165,8 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         auto has_rss = true;
         if (tokens.at(i) == "current") {
-            throw Invalid_syntax{tokens.at(i), "current register set is illegal"};
+            throw Invalid_syntax{tokens.at(i),
+                                 "current register set is illegal"};
         } else if (tokens.at(i) == "local") {
             ri->rss = Register_sets::LOCAL;
         } else if (tokens.at(i) == "static") {
@@ -322,7 +329,9 @@ auto viua::assembler::frontend::parser::parse_instruction(
         throw Invalid_syntax(tokens.at(i), "expected mnemonic");
     }
     if (viua::cg::lex::is_register_set_name(tokens.at(i).str())) {
-        auto error = Invalid_syntax(tokens.at(i), "register set specifier does not follow register index");
+        auto error = Invalid_syntax(
+            tokens.at(i),
+            "register set specifier does not follow register index");
         throw error;
     }
     if (not viua::cg::lex::is_mnemonic(tokens.at(i).str())) {

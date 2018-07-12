@@ -41,8 +41,7 @@ auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
         fetch_register_index, addr, this);
 
     // FIXME: ignore number of local registers, but it is still encoded
-    fetch_and_advance_addr<Register_index>(
-        fetch_register_index, addr, this);
+    fetch_and_advance_addr<Register_index>(fetch_register_index, addr, this);
 
     request_new_frame(arguments);
 
@@ -139,18 +138,23 @@ auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opallocate_registers(Op_address_type addr) -> Op_address_type {
-    auto const [ addr_, register_set, no_of_registers ] = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
+auto viua::process::Process::opallocate_registers(Op_address_type addr)
+    -> Op_address_type {
+    auto const [addr_, register_set, no_of_registers] =
+        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
+                                                                         this);
 
-    auto allocated = std::make_unique<viua::kernel::Register_set>(no_of_registers);
+    auto allocated =
+        std::make_unique<viua::kernel::Register_set>(no_of_registers);
     stack->back()->set_local_register_set(std::move(allocated));
 
     return addr_;
 }
 
 auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
-    auto const return_register = fetch_optional_and_advance_addr<viua::kernel::Register*>(
-        fetch_register, addr, this);
+    auto const return_register =
+        fetch_optional_and_advance_addr<viua::kernel::Register*>(
+            fetch_register, addr, this);
 
     auto call_name = std::string{};
     auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
@@ -181,7 +185,7 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     }
 
     auto caller = (is_native ? &viua::process::Process::call_native
-                                   : &viua::process::Process::call_foreign);
+                             : &viua::process::Process::call_foreign);
     return (this->*caller)(
         addr, call_name, return_register.value_or(nullptr), "");
 }

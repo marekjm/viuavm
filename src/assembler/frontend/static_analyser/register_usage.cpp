@@ -362,7 +362,8 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_argc(register_usage_profile, *instruction);
                 break;
             case ALLOCATE_REGISTERS:
-                check_op_allocate_registers(register_usage_profile, *instruction);
+                check_op_allocate_registers(register_usage_profile,
+                                            *instruction);
                 break;
             case PROCESS:
                 check_op_process(register_usage_profile, *instruction);
@@ -507,15 +508,15 @@ static auto check_register_usage_for_instruction_block(
             first_line.get());
     if (not instruction) {
         throw viua::cg::lex::Invalid_syntax{
-            first_line->tokens.at(0)
-            , "first instruction must be 'allocate_registers' for local registers"
-        };
+            first_line->tokens.at(0),
+            "first instruction must be 'allocate_registers' for local "
+            "registers"};
     }
     if (instruction->opcode != ALLOCATE_REGISTERS) {
         throw viua::cg::lex::Invalid_syntax{
-            first_line->tokens.at(0)
-            , "first instruction must be 'allocate_registers' for local registers"
-        };
+            first_line->tokens.at(0),
+            "first instruction must be 'allocate_registers' for local "
+            "registers"};
     }
 
     Register_usage_profile register_usage_profile;

@@ -52,9 +52,10 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
                                    "after a jump here:"}
                         .add(instruction.operands.at(0)->tokens.at(0)));
             } catch (Traced_syntax_error& e) {
-                throw e.append(Invalid_syntax{instruction.tokens.at(0),
-                                              "after a jump here:"}
-                                   .add(instruction.operands.at(0)->tokens.at(0)));
+                throw e.append(
+                    Invalid_syntax{instruction.tokens.at(0),
+                                   "after a jump here:"}
+                        .add(instruction.operands.at(0)->tokens.at(0)));
             }
         }
     } else if (auto label = dynamic_cast<Label*>(target); label) {

@@ -68,8 +68,7 @@ void viua::process::Process::ensure_static_registers(
 }
 
 Frame* viua::process::Process::request_new_frame(
-    viua::internals::types::register_index const arguments_size
-    ) {
+    viua::internals::types::register_index const arguments_size) {
     return stack->prepare_frame(arguments_size);
 }
 void viua::process::Process::push_frame() {
@@ -434,10 +433,8 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , is_hidden(false) {
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
-    auto s                      = std::make_unique<Stack>(frm->function_name,
-                                this,
-                                global_register_set.get(),
-                                scheduler);
+    auto s = std::make_unique<Stack>(
+        frm->function_name, this, global_register_set.get(), scheduler);
     s->emplace_back(std::move(frm));
     s->bind(global_register_set.get());
     stack           = s.get();

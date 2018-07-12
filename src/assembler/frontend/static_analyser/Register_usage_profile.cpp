@@ -37,7 +37,9 @@ auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void {
     using viua::internals::Register_sets;
-    if ((not in_bounds(r)) and !(r.register_set == Register_sets::GLOBAL or r.register_set == Register_sets::STATIC)) {
+    if ((not in_bounds(r))
+        and !(r.register_set == Register_sets::GLOBAL
+              or r.register_set == Register_sets::STATIC)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -45,13 +47,14 @@ auto Register_usage_profile::define(Register const r,
          * FIXME Maybe check global and static register set accesses?
          */
         throw Traced_syntax_error{}
-            .append(Invalid_syntax{t, ("access to register "
-                    + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
-                    + " register(s) allocated"
-                    )})
-            .append(Invalid_syntax{allocated_where().value(), ""}
-                    .note("increase this value to " + std::to_string(r.index + 1) + " to fix this issue")
-                    );
+            .append(Invalid_syntax{
+                t,
+                ("access to register " + std::to_string(r.index) + " with only "
+                 + std::to_string(allocated_registers().value())
+                 + " register(s) allocated")})
+            .append(Invalid_syntax{allocated_where().value(), ""}.note(
+                "increase this value to " + std::to_string(r.index + 1)
+                + " to fix this issue"));
     }
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
@@ -68,7 +71,9 @@ auto Register_usage_profile::define(Register const r,
                                     Token const register_set,
                                     bool const allow_overwrites) -> void {
     using viua::internals::Register_sets;
-    if ((not in_bounds(r)) and !(r.register_set == Register_sets::GLOBAL or r.register_set == Register_sets::STATIC)) {
+    if ((not in_bounds(r))
+        and !(r.register_set == Register_sets::GLOBAL
+              or r.register_set == Register_sets::STATIC)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -76,18 +81,20 @@ auto Register_usage_profile::define(Register const r,
          * FIXME Maybe check global and static register set accesses?
          */
         throw Traced_syntax_error{}
-        .append(Invalid_syntax{index, ("access to register "
-                + std::to_string(r.index) + " with only " + std::to_string(allocated_registers().value())
-                + " register(s) allocated"
-                )}.add(register_set))
-            .append(Invalid_syntax{allocated_where().value(), ""}
-                    .note("increase this value to " + std::to_string(r.index + 1) + " to fix this issue")
-                    );
+            .append(Invalid_syntax{
+                index,
+                ("access to register " + std::to_string(r.index) + " with only "
+                 + std::to_string(allocated_registers().value())
+                 + " register(s) allocated")}
+                        .add(register_set))
+            .append(Invalid_syntax{allocated_where().value(), ""}.note(
+                "increase this value to " + std::to_string(r.index + 1)
+                + " to fix this issue"));
     }
     if (defined(r) and fresh(r) and not allow_overwrites) {
         throw Traced_syntax_error{}
-            .append(
-                viua::cg::lex::Unused_value{index, "overwrite of unused value:"})
+            .append(viua::cg::lex::Unused_value{index,
+                                                "overwrite of unused value:"})
             .append(
                 Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }
@@ -141,21 +148,26 @@ auto Register_usage_profile::erased_where(Register const r) const -> Token {
     return erased_registers.at(r);
 }
 
-auto Register_usage_profile::allocated_registers(viua::internals::types::register_index const n) -> void {
+auto Register_usage_profile::allocated_registers(
+    viua::internals::types::register_index const n) -> void {
     no_of_allocated_registers = n;
 }
-auto Register_usage_profile::allocated_registers() const -> std::optional<viua::internals::types::register_index> {
+auto Register_usage_profile::allocated_registers() const
+    -> std::optional<viua::internals::types::register_index> {
     return no_of_allocated_registers;
 }
-auto Register_usage_profile::allocated_where(viua::cg::lex::Token const& token) -> void {
+auto Register_usage_profile::allocated_where(viua::cg::lex::Token const& token)
+    -> void {
     where_registers_were_allocated = token;
 }
-auto Register_usage_profile::allocated_where() const -> std::optional<viua::cg::lex::Token> {
+auto Register_usage_profile::allocated_where() const
+    -> std::optional<viua::cg::lex::Token> {
     return where_registers_were_allocated;
 }
 
 auto Register_usage_profile::in_bounds(Register const r) const -> bool {
-    return not (allocated_registers() and r.index >= allocated_registers().value());
+    return not(allocated_registers()
+               and r.index >= allocated_registers().value());
 }
 
 auto Register_usage_profile::begin() const

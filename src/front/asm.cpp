@@ -334,8 +334,8 @@ int main(int argc, char* argv[]) {
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
         if (PERFORM_STATIC_ANALYSIS) {
-            viua::assembler::frontend::static_analyser::
-                check_register_usage(parsed_source);
+            viua::assembler::frontend::static_analyser::check_register_usage(
+                parsed_source);
         }
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(

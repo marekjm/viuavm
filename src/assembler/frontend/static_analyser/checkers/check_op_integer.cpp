@@ -42,7 +42,8 @@ auto check_op_integer(Register_usage_profile& register_usage_profile,
     val.index        = operand->index;
     val.register_set = operand->rss;
     val.value_type   = viua::internals::Value_types::INTEGER;
-    register_usage_profile.define(val, operand->tokens.at(0), operand->tokens.at(1));
+    register_usage_profile.define(
+        val, operand->tokens.at(0), operand->tokens.at(1));
 
     if (operand->attributes.count("maybe_unused")) {
         register_usage_profile.use(Register{*operand}, operand->tokens.at(0));

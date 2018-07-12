@@ -40,7 +40,8 @@ static auto typeof(Frame* frame,
     if (auto const pointer =
             dynamic_cast<viua::types::Pointer*>(frame->arguments->get(0));
         pointer) {
-        frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
+        frame->set_local_register_set(
+            std::make_unique<viua::kernel::Register_set>(1));
         frame->local_register_set->set(
             0, make_unique<viua::types::String>(pointer->to(process)->type()));
     } else {

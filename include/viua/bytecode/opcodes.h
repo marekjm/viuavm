@@ -344,7 +344,7 @@ enum OPCODE : viua::internals::types::byte {
     ARG,   // move an object from argument register to a normal register (inside
            // a function call),
     ARGC,  // store number of supplied parameters in a register
-    ALLOCATE_REGISTERS, // allocates specified number of registers
+    ALLOCATE_REGISTERS,  // allocates specified number of registers
 
     PROCESS,   // spawn a process (call a function and run it in a different
                // process)

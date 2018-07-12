@@ -1572,7 +1572,8 @@ viua::types::Bits::Bits(size_type const size, uint8_t const* const source) {
         auto const a_byte = *(source + byte_index);
 
         for (auto i = 0u; i < 8; ++i) {
-            auto const mask = static_cast<std::remove_const_t<decltype(one)>>(one << i);
+            auto const mask =
+                static_cast<std::remove_const_t<decltype(one)>>(one << i);
             underlying_array.at((size * 8) - 1
                                 - ((byte_index * 8) + (7u - i))) =
                 (a_byte & mask);

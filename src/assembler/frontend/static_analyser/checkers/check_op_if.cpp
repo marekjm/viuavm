@@ -109,7 +109,7 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
     }
 
     auto register_with_unused_value = std::string{};
-    auto unused_register = std::string{};
+    auto unused_register            = std::string{};
 
     Register_usage_profile register_usage_profile_if_true =
         register_usage_profile;

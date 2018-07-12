@@ -21,9 +21,10 @@
 #include <viua/kernel/frame.h>
 
 
-auto Frame::set_local_register_set(std::unique_ptr<viua::kernel::Register_set> rs
-                           ) -> void {
-    local_register_set.reset(rs.release(), true);   // FIXME use std::move() instead of .release()
+auto Frame::set_local_register_set(
+    std::unique_ptr<viua::kernel::Register_set> rs) -> void {
+    local_register_set.reset(rs.release(), true);  // FIXME use std::move()
+                                                   // instead of .release()
 }
 
 auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
@@ -37,5 +38,5 @@ Frame::Frame(viua::internals::types::byte const* const ra,
         , arguments{nullptr}
         , local_register_set{nullptr}
         , return_register{nullptr} {
-    arguments          = std::make_unique<viua::kernel::Register_set>(argsize);
+    arguments = std::make_unique<viua::kernel::Register_set>(argsize);
 }
