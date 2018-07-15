@@ -99,20 +99,10 @@ Program& Program::calculate_jumps(
         // we're doing we *know* that this location points to uint64_t even if
         // it is stored inside the viua::internals::types::byte array
         ptr = reinterpret_cast<uint64_t*>(program.get() + position);
-        if (debug) {
-            cout << "[bcgen:jump] calculating jump at " << position
-                 << " (target: " << *ptr << ") with offset " << offset << endl;
-        }
         adjustment =
             viua::cg::tools::calculate_bytecode_size_of_first_n_instructions2(
                 tokens, load_aligned<uint64_t>(ptr));
         aligned_write(ptr) = (offset + adjustment);
-        if (debug) {
-            cout << "[bcgen:jump] calculated jump at " << position
-                 << " (total: " << adjustment << ") with offset " << offset
-                 << " = ";
-            cout << *ptr << endl;
-        }
     }
 
     return (*this);
