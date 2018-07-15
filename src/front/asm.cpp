@@ -177,6 +177,9 @@ int main(int argc, char* argv[]) {
         }
         args.emplace_back(argv[i]);
     }
+    if (EARLY_VERIFICATION_ONLY) {
+        compilename = "/dev/null";
+    }
 
     if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) {
         return 0;
@@ -305,10 +308,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-
-    if (EARLY_VERIFICATION_ONLY) {
-        return 0;
-    }
     if (REPORT_BYTECODE_SIZE) {
         cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens)
              << endl;
