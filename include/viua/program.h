@@ -242,9 +242,11 @@ class Program {
 
     viua::internals::types::bytecode_size size();
 
-    Program(viua::internals::types::bytecode_size bts = 2);
+    Program(viua::internals::types::bytecode_size const bts = 2);
     Program(Program const& that);
-    Program& operator=(Program const& that);
+    Program(Program&&) = delete;
+    auto operator=(Program const&) -> Program& = delete;
+    auto operator=(Program&&) -> Program& = delete;
 };
 
 

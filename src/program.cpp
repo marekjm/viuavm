@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,6 +18,7 @@
  */
 
 #include <cstdint>
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -125,43 +126,22 @@ std::vector<uint64_t> Program::jumps() {
     return jmps;
 }
 
-Program::Program(uint64_t bts) : bytes(bts), debug(false), scream(false) {
-    program = make_unique<viua::internals::types::byte[]>(bytes);
+Program::Program(viua::internals::types::bytecode_size const bts) : bytes(bts), debug(false), scream(false) {
+    program = std::make_unique<viua::internals::types::byte[]>(bytes);
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP
      * instructions) is a safe way to prevent many hiccups.
      */
-    for (decltype(bytes) i = 0; i < bytes; ++i) {
-        program[i] = viua::internals::types::byte(0);
-    }
+    std::fill_n(program.get(), bytes, viua::internals::types::byte{0});
     addr_ptr = program.get();
 }
 Program::Program(Program const& that)
         : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
-    program = make_unique<viua::internals::types::byte[]>(bytes);
-    for (decltype(bytes) i = 0; i < bytes; ++i) {
-        program[i] = that.program[i];
-    }
+    program = std::make_unique<viua::internals::types::byte[]>(bytes);
+    std::copy_n(program.get(), bytes, that.program.get());
     addr_ptr = program.get() + (that.addr_ptr - that.program.get());
+
     for (unsigned i = 0; i < that.branches.size(); ++i) {
         branches.push_back(program.get()
                            + (that.branches[i] - that.program.get()));
     }
-}
-Program& Program::operator=(Program const& that) {
-    if (this != &that) {
-        bytes   = that.bytes;
-        program = make_unique<viua::internals::types::byte[]>(bytes);
-        for (decltype(bytes) i = 0; i < bytes; ++i) {
-            program[i] = that.program[i];
-        }
-        addr_ptr = program.get() + (that.addr_ptr - that.program.get());
-        while (branches.size()) {
-            branches.pop_back();
-        }
-        for (unsigned i = 0; i < that.branches.size(); ++i) {
-            branches.push_back(program.get()
-                               + (that.branches[i] - that.program.get()));
-        }
-    }
-    return (*this);
 }
