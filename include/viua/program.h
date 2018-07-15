@@ -63,169 +63,165 @@ class Program {
 
   public:
     // instruction insertion interface
-    Program& opnop();
+    auto opnop() -> Program&;
 
-    Program& opizero(int_op);
-    Program& opinteger(int_op, int_op);
-    Program& opiinc(int_op);
-    Program& opidec(int_op);
+    auto opizero(int_op) -> Program&;
+    auto opinteger(int_op, int_op) -> Program&;
+    auto opiinc(int_op) -> Program&;
+    auto opidec(int_op) -> Program&;
 
-    Program& opfloat(int_op, viua::internals::types::plain_float);
+    auto opfloat(int_op, viua::internals::types::plain_float) -> Program&;
 
-    Program& opitof(int_op, int_op);
-    Program& opftoi(int_op, int_op);
-    Program& opstoi(int_op, int_op);
-    Program& opstof(int_op, int_op);
+    auto opitof(int_op, int_op) -> Program&;
+    auto opftoi(int_op, int_op) -> Program&;
+    auto opstoi(int_op, int_op) -> Program&;
+    auto opstof(int_op, int_op) -> Program&;
 
-    Program& opadd(int_op, int_op, int_op);
-    Program& opsub(int_op, int_op, int_op);
-    Program& opmul(int_op, int_op, int_op);
-    Program& opdiv(int_op, int_op, int_op);
+    auto opadd(int_op, int_op, int_op) -> Program&;
+    auto opsub(int_op, int_op, int_op) -> Program&;
+    auto opmul(int_op, int_op, int_op) -> Program&;
+    auto opdiv(int_op, int_op, int_op) -> Program&;
 
-    Program& oplt(int_op, int_op, int_op);
-    Program& oplte(int_op, int_op, int_op);
-    Program& opgt(int_op, int_op, int_op);
-    Program& opgte(int_op, int_op, int_op);
-    Program& opeq(int_op, int_op, int_op);
+    auto oplt(int_op, int_op, int_op) -> Program&;
+    auto oplte(int_op, int_op, int_op) -> Program&;
+    auto opgt(int_op, int_op, int_op) -> Program&;
+    auto opgte(int_op, int_op, int_op) -> Program&;
+    auto opeq(int_op, int_op, int_op) -> Program&;
 
-    Program& opstring(int_op, std::string);
+    auto opstring(int_op, std::string) -> Program&;
 
-    Program& optext(int_op, std::string);
-    Program& optext(int_op, int_op);
-    Program& optexteq(int_op, int_op, int_op);
-    Program& optextat(int_op, int_op, int_op);
-    Program& optextsub(int_op, int_op, int_op, int_op);
-    Program& optextlength(int_op, int_op);
-    Program& optextcommonprefix(int_op, int_op, int_op);
-    Program& optextcommonsuffix(int_op, int_op, int_op);
-    Program& optextconcat(int_op, int_op, int_op);
+    auto optext(int_op, std::string) -> Program&;
+    auto optext(int_op, int_op) -> Program&;
+    auto optexteq(int_op, int_op, int_op) -> Program&;
+    auto optextat(int_op, int_op, int_op) -> Program&;
+    auto optextsub(int_op, int_op, int_op, int_op) -> Program&;
+    auto optextlength(int_op, int_op) -> Program&;
+    auto optextcommonprefix(int_op, int_op, int_op) -> Program&;
+    auto optextcommonsuffix(int_op, int_op, int_op) -> Program&;
+    auto optextconcat(int_op, int_op, int_op) -> Program&;
 
-    Program& opvector(int_op, int_op, int_op);
-    Program& opvinsert(int_op, int_op, int_op);
-    Program& opvpush(int_op, int_op);
-    Program& opvpop(int_op, int_op, int_op);
-    Program& opvat(int_op, int_op, int_op);
-    Program& opvlen(int_op, int_op);
+    auto opvector(int_op, int_op, int_op) -> Program&;
+    auto opvinsert(int_op, int_op, int_op) -> Program&;
+    auto opvpush(int_op, int_op) -> Program&;
+    auto opvpop(int_op, int_op, int_op) -> Program&;
+    auto opvat(int_op, int_op, int_op) -> Program&;
+    auto opvlen(int_op, int_op) -> Program&;
 
-    Program& opnot(int_op, int_op);
-    Program& opand(int_op, int_op, int_op);
-    Program& opor(int_op, int_op, int_op);
+    auto opnot(int_op, int_op) -> Program&;
+    auto opand(int_op, int_op, int_op) -> Program&;
+    auto opor(int_op, int_op, int_op) -> Program&;
 
-    Program& opbits(int_op, int_op);
-    Program& opbits(int_op, std::vector<uint8_t> const);
-    Program& opbitand(int_op, int_op, int_op);
-    Program& opbitor(int_op, int_op, int_op);
-    Program& opbitnot(int_op, int_op);
-    Program& opbitxor(int_op, int_op, int_op);
-    Program& opbitat(int_op, int_op, int_op);
-    Program& opbitset(int_op, int_op, int_op);
-    Program& opbitset(int_op, int_op, bool);
-    Program& opshl(int_op, int_op, int_op);
-    Program& opshr(int_op, int_op, int_op);
-    Program& opashl(int_op, int_op, int_op);
-    Program& opashr(int_op, int_op, int_op);
-    Program& oprol(int_op, int_op);
-    Program& opror(int_op, int_op);
+    auto opbits(int_op, int_op) -> Program&;
+    auto opbits(int_op, std::vector<uint8_t> const) -> Program&;
+    auto opbitand(int_op, int_op, int_op) -> Program&;
+    auto opbitor(int_op, int_op, int_op) -> Program&;
+    auto opbitnot(int_op, int_op) -> Program&;
+    auto opbitxor(int_op, int_op, int_op) -> Program&;
+    auto opbitat(int_op, int_op, int_op) -> Program&;
+    auto opbitset(int_op, int_op, int_op) -> Program&;
+    auto opbitset(int_op, int_op, bool) -> Program&;
+    auto opshl(int_op, int_op, int_op) -> Program&;
+    auto opshr(int_op, int_op, int_op) -> Program&;
+    auto opashl(int_op, int_op, int_op) -> Program&;
+    auto opashr(int_op, int_op, int_op) -> Program&;
+    auto oprol(int_op, int_op) -> Program&;
+    auto opror(int_op, int_op) -> Program&;
 
-    Program& opwrapincrement(int_op);
-    Program& opwrapdecrement(int_op);
-    Program& opwrapadd(int_op, int_op, int_op);
-    Program& opwrapsub(int_op, int_op, int_op);
-    Program& opwrapmul(int_op, int_op, int_op);
-    Program& opwrapdiv(int_op, int_op, int_op);
+    auto opwrapincrement(int_op) -> Program&;
+    auto opwrapdecrement(int_op) -> Program&;
+    auto opwrapadd(int_op, int_op, int_op) -> Program&;
+    auto opwrapsub(int_op, int_op, int_op) -> Program&;
+    auto opwrapmul(int_op, int_op, int_op) -> Program&;
+    auto opwrapdiv(int_op, int_op, int_op) -> Program&;
 
-    Program& opcheckedsincrement(int_op);
-    Program& opcheckedsdecrement(int_op);
-    Program& opcheckedsadd(int_op, int_op, int_op);
-    Program& opcheckedssub(int_op, int_op, int_op);
-    Program& opcheckedsmul(int_op, int_op, int_op);
-    Program& opcheckedsdiv(int_op, int_op, int_op);
+    auto opcheckedsincrement(int_op) -> Program&;
+    auto opcheckedsdecrement(int_op) -> Program&;
+    auto opcheckedsadd(int_op, int_op, int_op) -> Program&;
+    auto opcheckedssub(int_op, int_op, int_op) -> Program&;
+    auto opcheckedsmul(int_op, int_op, int_op) -> Program&;
+    auto opcheckedsdiv(int_op, int_op, int_op) -> Program&;
 
-    Program& opcheckeduincrement(int_op);
-    Program& opcheckedudecrement(int_op);
-    Program& opcheckeduadd(int_op, int_op, int_op);
-    Program& opcheckedusub(int_op, int_op, int_op);
-    Program& opcheckedumul(int_op, int_op, int_op);
-    Program& opcheckedudiv(int_op, int_op, int_op);
+    auto opcheckeduincrement(int_op) -> Program&;
+    auto opcheckedudecrement(int_op) -> Program&;
+    auto opcheckeduadd(int_op, int_op, int_op) -> Program&;
+    auto opcheckedusub(int_op, int_op, int_op) -> Program&;
+    auto opcheckedumul(int_op, int_op, int_op) -> Program&;
+    auto opcheckedudiv(int_op, int_op, int_op) -> Program&;
 
-    Program& opsaturatingsincrement(int_op);
-    Program& opsaturatingsdecrement(int_op);
-    Program& opsaturatingsadd(int_op, int_op, int_op);
-    Program& opsaturatingssub(int_op, int_op, int_op);
-    Program& opsaturatingsmul(int_op, int_op, int_op);
-    Program& opsaturatingsdiv(int_op, int_op, int_op);
+    auto opsaturatingsincrement(int_op) -> Program&;
+    auto opsaturatingsdecrement(int_op) -> Program&;
+    auto opsaturatingsadd(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingssub(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingsmul(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingsdiv(int_op, int_op, int_op) -> Program&;
 
-    Program& opsaturatinguincrement(int_op);
-    Program& opsaturatingudecrement(int_op);
-    Program& opsaturatinguadd(int_op, int_op, int_op);
-    Program& opsaturatingusub(int_op, int_op, int_op);
-    Program& opsaturatingumul(int_op, int_op, int_op);
-    Program& opsaturatingudiv(int_op, int_op, int_op);
+    auto opsaturatinguincrement(int_op) -> Program&;
+    auto opsaturatingudecrement(int_op) -> Program&;
+    auto opsaturatinguadd(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingusub(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingumul(int_op, int_op, int_op) -> Program&;
+    auto opsaturatingudiv(int_op, int_op, int_op) -> Program&;
 
-    Program& opmove(int_op, int_op);
-    Program& opcopy(int_op, int_op);
-    Program& opptr(int_op, int_op);
-    Program& opptrlive(int_op, int_op);
-    Program& opswap(int_op, int_op);
-    Program& opdelete(int_op);
-    Program& opisnull(int_op, int_op);
+    auto opmove(int_op, int_op) -> Program&;
+    auto opcopy(int_op, int_op) -> Program&;
+    auto opptr(int_op, int_op) -> Program&;
+    auto opptrlive(int_op, int_op) -> Program&;
+    auto opswap(int_op, int_op) -> Program&;
+    auto opdelete(int_op) -> Program&;
+    auto opisnull(int_op, int_op) -> Program&;
 
-    Program& opprint(int_op);
-    Program& opecho(int_op);
+    auto opprint(int_op) -> Program&;
+    auto opecho(int_op) -> Program&;
 
-    Program& opcapture(int_op, int_op, int_op);
-    Program& opcapturecopy(int_op, int_op, int_op);
-    Program& opcapturemove(int_op, int_op, int_op);
-    Program& opclosure(int_op, std::string const&);
+    auto opcapture(int_op, int_op, int_op) -> Program&;
+    auto opcapturecopy(int_op, int_op, int_op) -> Program&;
+    auto opcapturemove(int_op, int_op, int_op) -> Program&;
+    auto opclosure(int_op, std::string const&) -> Program&;
 
-    Program& opfunction(int_op, std::string const&);
+    auto opfunction(int_op, std::string const&) -> Program&;
 
-    Program& opframe(int_op, int_op);
-    Program& opparam(int_op, int_op);
-    Program& oppamv(int_op, int_op);
-    Program& oparg(int_op, int_op);
-    Program& opargc(int_op);
-    Program& opallocate_registers(int_op);
+    auto opframe(int_op, int_op) -> Program&;
+    auto opparam(int_op, int_op) -> Program&;
+    auto oppamv(int_op, int_op) -> Program&;
+    auto oparg(int_op, int_op) -> Program&;
+    auto opargc(int_op) -> Program&;
+    auto opallocate_registers(int_op) -> Program&;
 
-    Program& opcall(int_op, std::string const&);
-    Program& opcall(int_op, int_op);
-    Program& optailcall(std::string const&);
-    Program& optailcall(int_op);
-    Program& opdefer(std::string const&);
-    Program& opdefer(int_op);
-    Program& opprocess(int_op, std::string const&);
-    Program& opprocess(int_op, int_op);
-    Program& opself(int_op);
-    Program& opjoin(int_op, int_op, timeout_op);
-    Program& opsend(int_op, int_op);
-    Program& opreceive(int_op, timeout_op);
-    Program& opwatchdog(std::string const&);
-    Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
-    Program& opif(int_op,
-                  viua::internals::types::bytecode_size,
-                  enum JUMPTYPE,
-                  viua::internals::types::bytecode_size,
-                  enum JUMPTYPE);
+    auto opcall(int_op, std::string const&) -> Program&;
+    auto opcall(int_op, int_op) -> Program&;
+    auto optailcall(std::string const&) -> Program&;
+    auto optailcall(int_op) -> Program&;
+    auto opdefer(std::string const&) -> Program&;
+    auto opdefer(int_op) -> Program&;
+    auto opprocess(int_op, std::string const&) -> Program&;
+    auto opprocess(int_op, int_op) -> Program&;
+    auto opself(int_op) -> Program&;
+    auto opjoin(int_op, int_op, timeout_op) -> Program&;
+    auto opsend(int_op, int_op) -> Program&;
+    auto opreceive(int_op, timeout_op) -> Program&;
+    auto opwatchdog(std::string const&) -> Program&;
+    auto opjump(viua::internals::types::bytecode_size, enum JUMPTYPE) -> Program&;
+    auto opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE, viua::internals::types::bytecode_size, enum JUMPTYPE) -> Program&;
 
-    Program& optry();
-    Program& opcatch(std::string, std::string);
-    Program& opdraw(int_op);
-    Program& openter(std::string);
-    Program& opthrow(int_op);
-    Program& opleave();
+    auto optry() -> Program&;
+    auto opcatch(std::string, std::string) -> Program&;
+    auto opdraw(int_op) -> Program&;
+    auto openter(std::string) -> Program&;
+    auto opthrow(int_op) -> Program&;
+    auto opleave() -> Program&;
 
-    Program& opimport(std::string);
+    auto opimport(std::string) -> Program&;
 
-    Program& opatom(int_op, std::string const&);
-    Program& opatomeq(int_op, int_op, int_op);
+    auto opatom(int_op, std::string const&) -> Program&;
+    auto opatomeq(int_op, int_op, int_op) -> Program&;
 
-    Program& opstruct(int_op);
-    Program& opstructinsert(int_op, int_op, int_op);
-    Program& opstructremove(int_op, int_op, int_op);
-    Program& opstructkeys(int_op, int_op);
+    auto opstruct(int_op) -> Program&;
+    auto opstructinsert(int_op, int_op, int_op) -> Program&;
+    auto opstructremove(int_op, int_op, int_op) -> Program&;
+    auto opstructkeys(int_op, int_op) -> Program&;
 
-    Program& opreturn();
-    Program& ophalt();
+    auto opreturn() -> Program&;
+    auto ophalt() -> Program&;
 
 
     /** Functions driving after-insertion calculations.
