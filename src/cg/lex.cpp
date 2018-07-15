@@ -1420,7 +1420,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "insert" or token == "structinsert") {
+        } else if (token == "structinsert") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(
@@ -1444,7 +1444,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "remove" or token == "structremove") {
+        } else if (token == "structremove") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {
