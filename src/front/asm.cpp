@@ -239,18 +239,15 @@ int main(int argc, char* argv[]) {
         commandline_given_links.emplace_back(args[i]);
     }
 
-
-    auto source     = read_file(filename);
+    auto const source     = read_file(filename);
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced,
+    decltype(raw_tokens) cooked_tokens,
         normalised_tokens;
     try {
         cooked_tokens =
             viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
-        cooked_tokens_without_names_replaced =
-            viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
         normalised_tokens =
-            viua::cg::lex::normalise(viua::cg::lex::cook(raw_tokens));
+            viua::cg::lex::normalise(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
