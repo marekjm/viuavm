@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -56,10 +56,6 @@ class Program {
      * offsets change.
      */
     std::vector<viua::internals::types::byte*> branches;
-
-    // simple, whether to print debugging information or not
-    bool debug;
-    bool scream;
 
   public:
     // instruction insertion interface
@@ -236,9 +232,6 @@ class Program {
 
     auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
     auto fill(std::unique_ptr<viua::internals::types::byte[]>) -> Program&;
-
-    auto setdebug(bool d = true) -> Program&;
-    auto setscream(bool d = true) -> Program&;
 
     auto size() const -> viua::internals::types::bytecode_size;
 

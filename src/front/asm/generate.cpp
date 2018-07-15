@@ -48,8 +48,6 @@ using viua::assembler::util::pretty_printer::send_control_seq;
 
 
 extern bool VERBOSE;
-extern bool DEBUG;
-extern bool SCREAM;
 
 
 using Token = viua::cg::lex::Token;
@@ -211,24 +209,9 @@ static auto write_code_blocks_section(
     bwrite(out, block_ids_section_size);
 
     for (std::string name : blocks.names) {
-        if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "writing block '";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                 << send_control_seq(ATTR_RESET);
-            cout << "' to block address table";
-        }
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
-            if (DEBUG) {
-                cout << ": delayed" << endl;
-            }
             continue;
-        }
-        if (DEBUG) {
-            cout << endl;
         }
 
         /*
@@ -357,16 +340,6 @@ static auto generate_entry_function(
     std::string const& main_function,
     viua::internals::types::bytecode_size starting_instruction)
     -> viua::internals::types::bytecode_size {
-    if (DEBUG) {
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "generating ";
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << ENTRY_FUNCTION_NAME
-             << send_control_seq(ATTR_RESET);
-        cout << " function" << endl;
-    }
-
     auto entry_function_tokens = std::vector<Token>{};
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
@@ -509,8 +482,7 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////
     // GET MAIN FUNCTION NAME
     auto main_function = get_main_function(functions.names);
-    if (((VERBOSE and main_function != "main/1" and main_function != "")
-         or DEBUG)
+    if (((VERBOSE and main_function != "main/1" and main_function != ""))
         and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
@@ -536,7 +508,7 @@ auto generate(std::vector<Token> const& tokens,
     if (not flags.as_lib and main_is_defined) {
         check_main_function(main_function, functions.tokens.at(main_function));
     }
-    if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
+    if (not main_is_defined and VERBOSE and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -621,21 +593,6 @@ auto generate(std::vector<Token> const& tokens,
                                          // available functions
             symbol_sources[fn] = lnk;
             linked_function_names.emplace_back(fn);
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "prelinking function ";
-                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn
-                     << send_control_seq(ATTR_RESET);
-                cout << " from module ";
-                cout << send_control_seq(COLOR_FG_WHITE) << lnk
-                     << send_control_seq(ATTR_RESET);
-                cout << endl;
-            }
         }
     }
 
@@ -693,59 +650,17 @@ auto generate(std::vector<Token> const& tokens,
 
     auto current_link_offset = bytes;
     for (auto lnk : links) {
-        if (DEBUG or VERBOSE) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "[loader] linking with: '";
-            cout << send_control_seq(COLOR_FG_WHITE) << lnk
-                 << send_control_seq(ATTR_RESET);
-            cout << "'" << endl;
-        }
-
         auto loader = Loader{lnk};
         loader.load();
 
         auto fn_names = loader.get_functions();
 
         auto lib_jumps = loader.get_jumps();
-        if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "[loader] entries in jump table: " << lib_jumps.size()
-                 << endl;
-            for (auto i = decltype(lib_jumps)::size_type{0};
-                 i < lib_jumps.size();
-                 ++i) {
-                cout << "  jump at byte: " << lib_jumps[i] << endl;
-            }
-        }
-
         linked_libs_jumptables[lnk] = lib_jumps;
 
         auto fn_addresses = loader.get_function_addresses();
         for (auto const& fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "\"" << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn
-                     << send_control_seq(ATTR_RESET) << "\": ";
-                cout << "entry point at byte: " << current_link_offset << '+'
-                     << fn_addresses.at(fn);
-                cout << endl;
-            }
         }
 
         linked_libs_bytecode.emplace_back(
@@ -765,7 +680,7 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////
     // REPORT TOTAL BYTECODE SIZE
-    if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
+    if (VERBOSE and linked_function_names.size() != 0) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -774,23 +689,11 @@ auto generate(std::vector<Token> const& tokens,
         cout << ": ";
         cout << "total required bytes: " << bytes << " bytes" << endl;
     }
-    if (DEBUG) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "required bytes: " << (bytes - (bytes - current_link_offset))
-             << " local, ";
-        cout << (bytes - current_link_offset) << " linked";
-        cout << endl;
-    }
 
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
-    if ((VERBOSE or DEBUG) and not flags.as_lib) {
+    if (VERBOSE and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -833,7 +736,7 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        if (VERBOSE or DEBUG) {
+        if (VERBOSE) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
             cout << ": ";
@@ -849,7 +752,7 @@ auto generate(std::vector<Token> const& tokens,
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size2(
                 blocks.tokens.at(name));
-            if (VERBOSE or DEBUG) {
+            if (VERBOSE) {
                 cout << " (" << fun_bytes << " bytes at byte "
                      << block_bodies_section_size << ')' << endl;
             }
@@ -860,20 +763,7 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         auto func = Program{fun_bytes};
-        func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "assembling block '";
-                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                     << send_control_seq(ATTR_RESET);
-                cout << "'\n";
-            }
             assemble(func, strip_attributes(blocks.tokens.at(name)));
         } catch (std::string const& e) {
             throw("in block '" + name + "': " + e);
@@ -904,16 +794,6 @@ auto generate(std::vector<Token> const& tokens,
         // extend jump table with jumps from current block
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
             auto const jmp = jumps[i];
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "pushed relative jump to jump table: " << jmp << '+'
-                     << block_bodies_section_size << endl;
-            }
             jump_table.emplace_back(jmp + block_bodies_section_size);
         }
 
@@ -932,26 +812,10 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        if (VERBOSE or DEBUG) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "generating bytecode for function \"";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                 << send_control_seq(ATTR_RESET);
-            cout << '"';
-        }
         auto fun_bytes = viua::internals::types::bytecode_size{0};
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size2(
                 functions.tokens.at(name));
-            if (VERBOSE or DEBUG) {
-                cout << " (" << fun_bytes << " bytes at byte "
-                     << functions_section_size << ')' << endl;
-            }
         } catch (std::string const& e) {
             throw("failed function size count (during pre-assembling): " + e);
         } catch (std::out_of_range const& e) {
@@ -959,20 +823,7 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         auto func = Program{fun_bytes};
-        func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "assembling function '";
-                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                     << send_control_seq(ATTR_RESET);
-                cout << "'\n";
-            }
             assemble(func, strip_attributes(functions.tokens.at(name)));
         } catch (std::string const& e) {
             auto const msg =
@@ -1013,16 +864,6 @@ auto generate(std::vector<Token> const& tokens,
         // extend jump table with jumps from current function
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "pushed relative jump to jump table: " << jmp << '+'
-                     << functions_section_size << endl;
-            }
             jump_table.emplace_back(jmp + functions_section_size);
         }
 
@@ -1052,20 +893,7 @@ auto generate(std::vector<Token> const& tokens,
     }
 
     bwrite(out, meta_information_map_size);
-    if (DEBUG) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "writing meta information\n";
-    }
     for (auto each : meta_information_map) {
-        if (DEBUG) {
-            cout << "  " << str::enquote(each.first) << ": "
-                 << str::enquote(each.second) << endl;
-        }
         strwrite(out, each.first);
         strwrite(out, each.second);
     }
@@ -1075,16 +903,6 @@ auto generate(std::vector<Token> const& tokens,
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
     if (flags.as_lib) {
-        if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "jump table has " << jump_table.size() << " entries"
-                 << endl;
-        }
         viua::internals::types::bytecode_size total_jumps = jump_table.size();
         bwrite(out, total_jumps);
 
@@ -1153,18 +971,6 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "pushing bytecode of local block '";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                 << send_control_seq(ATTR_RESET);
-            cout << "' to final byte array" << endl;
-        }
         viua::internals::types::bytecode_size fun_size =
             get<0>(block_bodies_bytecode[name]);
         viua::internals::types::byte* fun_bytecode =
@@ -1188,18 +994,6 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "pushing bytecode of local function '";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                 << send_control_seq(ATTR_RESET);
-            cout << "' to final byte array" << endl;
-        }
         viua::internals::types::bytecode_size fun_size =
             get<0>(functions_bytecode[name]);
         viua::internals::types::byte* fun_bytecode =
@@ -1219,9 +1013,7 @@ auto generate(std::vector<Token> const& tokens,
         viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 
-        // tie(lib_name, linked_size, linked_bytecode) = lnk;
-
-        if (VERBOSE or DEBUG) {
+        if (VERBOSE) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
             cout << ": ";
@@ -1244,22 +1036,11 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         viua::internals::types::bytecode_size jmp, jmp_target;
-        for (decltype(linked_jumptable)::size_type i = 0;
+        for (auto i = decltype(linked_jumptable)::size_type{0};
              i < linked_jumptable.size();
              ++i) {
             jmp                      = linked_jumptable[i];
             aligned_read(jmp_target) = (linked_bytecode + jmp);
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "adjusting jump: at position " << jmp << ", "
-                     << jmp_target << '+' << bytes_offset << " -> "
-                     << (jmp_target + bytes_offset) << endl;
-            }
             aligned_write(linked_bytecode + jmp) += bytes_offset;
         }
 

@@ -48,17 +48,6 @@ auto Program::fill(std::unique_ptr<viua::internals::types::byte[]> code) -> Prog
 }
 
 
-auto Program::setdebug(bool d) -> Program& {
-    debug = d;
-    return (*this);
-}
-
-auto Program::setscream(bool d) -> Program& {
-    scream = d;
-    return (*this);
-}
-
-
 auto Program::size() const -> uint64_t {
     return bytes;
 }
@@ -92,7 +81,7 @@ auto Program::jumps() const -> std::vector<uint64_t> {
     return jmps;
 }
 
-Program::Program(viua::internals::types::bytecode_size const bts) : bytes(bts), debug(false), scream(false) {
+Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts} {
     program = std::make_unique<viua::internals::types::byte[]>(bytes);
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP
      * instructions) is a safe way to prevent many hiccups.

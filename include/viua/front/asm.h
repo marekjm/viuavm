@@ -41,8 +41,6 @@ struct Compilation_flags {
     bool as_lib;
 
     bool verbose;
-    bool debug;
-    bool scream;
 };
 
 

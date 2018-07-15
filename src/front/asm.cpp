@@ -55,9 +55,6 @@ bool PERFORM_STATIC_ANALYSIS = true;
 bool SHOW_META               = false;
 
 bool VERBOSE = false;
-bool DEBUG   = false;
-bool SCREAM  = false;
-
 
 static bool usage(const char* program,
                   bool show_help,
@@ -86,35 +83,6 @@ static bool usage(const char* program,
              << "    "
              << "-v, --verbose            - show verbose output\n"
              << "    "
-             << "-d, --debug              - show debugging output\n"
-             << "    "
-             << "    --scream             - show so much debugging output it "
-                "becomes noisy\n"
-
-             // warning reporting level control
-             << "    "
-             << "-W, --Wall               - warn about everything\n"
-             << "    "
-             << "    --Wmissing-return    - warn about missing 'return' "
-                "instruction at the end of functions\n"
-             << "    "
-             << "    --Wundefined-arity   - warn about functions declared with "
-                "undefined arity\n"
-
-             // error reporting level control
-             << "    "
-             << "-E, --Eall               - treat all warnings as errors\n"
-             << "    "
-             << "    --Emissing-return    - treat missing 'return' instruction "
-                "at the end of function as "
-                "error\n"
-             << "    "
-             << "    --Eundefined-arity   - treat functions declared with "
-                "undefined arity as errors\n"
-             << "    "
-             << "    --Ehalt-is-last      - treat 'halt' being used as last "
-                "instruction of 'main' function "
-                "as error\n"
 
              // compilation options
              << "    "
@@ -124,10 +92,6 @@ static bool usage(const char* program,
              << "    "
              << "-C, --verify             - verify source code correctness "
                 "without actually compiling it\n"
-             << "    "
-             << "                           this option turns assembler into "
-                "source level debugger and "
-                "static code analyzer hybrid\n"
              << "    "
              << "    --size               - calculate and report final "
                 "bytecode size\n"
@@ -173,12 +137,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
-            continue;
-        } else if (option == "--debug" or option == "-d") {
-            DEBUG = true;
-            continue;
-        } else if (option == "--scream") {
-            SCREAM = true;
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc - 1) {
@@ -257,7 +215,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (VERBOSE or DEBUG) {
+    if (VERBOSE) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -360,8 +318,6 @@ int main(int argc, char* argv[]) {
     auto flags    = viua::front::assembler::Compilation_flags{};
     flags.as_lib  = AS_LIB;
     flags.verbose = VERBOSE;
-    flags.debug   = DEBUG;
-    flags.scream  = SCREAM;
 
     if (SHOW_META) {
         auto meta =

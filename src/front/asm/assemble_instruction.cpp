@@ -37,9 +37,6 @@
 using namespace std;
 
 
-extern bool DEBUG;
-extern bool SCREAM;
-
 using viua::assembler::util::pretty_printer::ATTR_RESET;
 using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
@@ -195,18 +192,6 @@ auto ::assembler::operands::convert_token_to_timeout_operand(
     }
     return timeout_op{timeout_milliseconds};
 }
-static auto log_location_being_assembled(Token const& token) -> void {
-    if (DEBUG and SCREAM) {
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "debug"
-             << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "<file>:" << token.line() << ':' << token.character();
-        cout << ": assembling '";
-        cout << send_control_seq(COLOR_FG_WHITE) << token.str()
-             << send_control_seq(ATTR_RESET);
-        cout << "' instruction\n";
-    }
-}
 
 using viua::assembler::backend::op_assemblers::assemble_arithmetic_instruction;
 using viua::assembler::backend::op_assemblers::assemble_bit_shift_instruction;
@@ -246,7 +231,6 @@ auto assemble_instruction(
      *  uses bytecode generation API to fill the program with instructions and
      *  from them generate the bytecode.
      */
-    log_location_being_assembled(tokens.at(i));
 
     if (tokens.at(i) == "nop") {
         program.opnop();
