@@ -28,512 +28,512 @@ auto Program::opnop() -> Program& {
     return (*this);
 }
 
-auto Program::opizero(int_op regno) -> Program& {
+auto Program::opizero(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opizero(addr_ptr, regno);
     return (*this);
 }
 
-auto Program::opinteger(int_op regno, int_op i) -> Program& {
+auto Program::opinteger(int_op const regno, int_op const i) -> Program& {
     addr_ptr = cg::bytecode::opinteger(addr_ptr, regno, i);
     return (*this);
 }
 
-auto Program::opiinc(int_op regno) -> Program& {
+auto Program::opiinc(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opiinc(addr_ptr, regno);
     return (*this);
 }
 
-auto Program::opidec(int_op regno) -> Program& {
+auto Program::opidec(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opidec(addr_ptr, regno);
     return (*this);
 }
 
-auto Program::opfloat(int_op regno, viua::internals::types::plain_float f) -> Program& {
+auto Program::opfloat(int_op const regno, viua::internals::types::plain_float const f) -> Program& {
     addr_ptr = cg::bytecode::opfloat(addr_ptr, regno, f);
     return (*this);
 }
 
-auto Program::opitof(int_op a, int_op b) -> Program& {
+auto Program::opitof(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opitof(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opftoi(int_op a, int_op b) -> Program& {
+auto Program::opftoi(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opftoi(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opstoi(int_op a, int_op b) -> Program& {
+auto Program::opstoi(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opstoi(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opstof(int_op a, int_op b) -> Program& {
+auto Program::opstof(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opstof(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opmul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opmul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opdiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opdiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::oplt(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::oplt(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::oplt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::oplte(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::oplte(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::oplte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opgt(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opgt(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opgt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opgte(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opgte(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opgte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opeq(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opeq(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opeq(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opstring(int_op reg, std::string s) -> Program& {
+auto Program::opstring(int_op const reg, std::string const s) -> Program& {
     addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
     return (*this);
 }
 
-auto Program::optext(int_op reg, std::string s) -> Program& {
+auto Program::optext(int_op const reg, std::string const s) -> Program& {
     addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
     return (*this);
 }
 
-auto Program::optext(int_op a, int_op b) -> Program& {
+auto Program::optext(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::optext(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::optexteq(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::optexteq(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::optextat(int_op target, int_op source, int_op index) -> Program& {
+auto Program::optextat(int_op const target, int_op const source, int_op const index) -> Program& {
     addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
     return (*this);
 }
-auto Program::optextsub(int_op target, int_op source, int_op begin_index, int_op end_index) -> Program& {
+auto Program::optextsub(int_op const target, int_op const source, int_op const begin_index, int_op const end_index) -> Program& {
     addr_ptr = cg::bytecode::optextsub(
         addr_ptr, target, source, begin_index, end_index);
     return (*this);
 }
-auto Program::optextlength(int_op target, int_op source) -> Program& {
+auto Program::optextlength(int_op const target, int_op const source) -> Program& {
     addr_ptr = cg::bytecode::optextlength(addr_ptr, target, source);
     return (*this);
 }
-auto Program::optextcommonprefix(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::optextcommonprefix(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::optextcommonprefix(addr_ptr, target, lhs, rhs);
     return (*this);
 }
-auto Program::optextcommonsuffix(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::optextcommonsuffix(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::optextcommonsuffix(addr_ptr, target, lhs, rhs);
     return (*this);
 }
-auto Program::optextconcat(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::optextconcat(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::optextconcat(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opvector(int_op index, int_op pack_start_index, int_op pack_length) -> Program& {
+auto Program::opvector(int_op const index, int_op const pack_start_index, int_op const pack_length) -> Program& {
     addr_ptr =
         cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 
-auto Program::opvinsert(int_op vec, int_op src, int_op dst) -> Program& {
+auto Program::opvinsert(int_op const vec, int_op const src, int_op const dst) -> Program& {
     addr_ptr = cg::bytecode::opvinsert(addr_ptr, vec, src, dst);
     return (*this);
 }
 
-auto Program::opvpush(int_op vec, int_op src) -> Program& {
+auto Program::opvpush(int_op const vec, int_op const src) -> Program& {
     addr_ptr = cg::bytecode::opvpush(addr_ptr, vec, src);
     return (*this);
 }
 
-auto Program::opvpop(int_op vec, int_op dst, int_op pos) -> Program& {
+auto Program::opvpop(int_op const vec, int_op const dst, int_op const pos) -> Program& {
     addr_ptr = cg::bytecode::opvpop(addr_ptr, vec, dst, pos);
     return (*this);
 }
 
-auto Program::opvat(int_op vec, int_op dst, int_op at) -> Program& {
+auto Program::opvat(int_op const vec, int_op const dst, int_op const at) -> Program& {
     addr_ptr = cg::bytecode::opvat(addr_ptr, vec, dst, at);
     return (*this);
 }
 
-auto Program::opvlen(int_op vec, int_op reg) -> Program& {
+auto Program::opvlen(int_op const vec, int_op const reg) -> Program& {
     addr_ptr = cg::bytecode::opvlen(addr_ptr, vec, reg);
     return (*this);
 }
 
-auto Program::opnot(int_op target, int_op source) -> Program& {
+auto Program::opnot(int_op const target, int_op const source) -> Program& {
     addr_ptr = cg::bytecode::opnot(addr_ptr, target, source);
     return (*this);
 }
 
-auto Program::opand(int_op regr, int_op rega, int_op regb) -> Program& {
+auto Program::opand(int_op const regr, int_op const rega, int_op const regb) -> Program& {
     addr_ptr = cg::bytecode::opand(addr_ptr, regr, rega, regb);
     return (*this);
 }
 
-auto Program::opor(int_op regr, int_op rega, int_op regb) -> Program& {
+auto Program::opor(int_op const regr, int_op const rega, int_op const regb) -> Program& {
     addr_ptr = cg::bytecode::opor(addr_ptr, regr, rega, regb);
     return (*this);
 }
 
-auto Program::opbits(int_op target, int_op count) -> Program& {
+auto Program::opbits(int_op const target, int_op const count) -> Program& {
     addr_ptr = cg::bytecode::opbits(addr_ptr, target, count);
     return (*this);
 }
 
-auto Program::opbits(int_op target, std::vector<uint8_t> const bit_string) -> Program& {
+auto Program::opbits(int_op const target, std::vector<uint8_t> const bit_string) -> Program& {
     addr_ptr = cg::bytecode::opbits(addr_ptr, target, bit_string);
     return (*this);
 }
 
-auto Program::opbitand(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opbitand(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitand(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opbitor(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opbitor(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitor(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opbitnot(int_op target, int_op lhs) -> Program& {
+auto Program::opbitnot(int_op const target, int_op const lhs) -> Program& {
     addr_ptr = cg::bytecode::opbitnot(addr_ptr, target, lhs);
     return (*this);
 }
 
-auto Program::opbitxor(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opbitxor(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitxor(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opbitat(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opbitat(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitat(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opbitset(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opbitset(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opbitset(int_op target, int_op lhs, bool rhs) -> Program& {
+auto Program::opbitset(int_op const target, int_op const lhs, bool const rhs) -> Program& {
     addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opshl(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opshl(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opshl(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opshr(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opshr(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opshr(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opashl(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opashl(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opashl(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opashr(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opashr(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opashr(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::oprol(int_op target, int_op count) -> Program& {
+auto Program::oprol(int_op const target, int_op const count) -> Program& {
     addr_ptr = cg::bytecode::oprol(addr_ptr, target, count);
     return (*this);
 }
 
-auto Program::opror(int_op target, int_op count) -> Program& {
+auto Program::opror(int_op const target, int_op const count) -> Program& {
     addr_ptr = cg::bytecode::opror(addr_ptr, target, count);
     return (*this);
 }
 
-auto Program::opwrapincrement(int_op target) -> Program& {
+auto Program::opwrapincrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opwrapincrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opwrapdecrement(int_op target) -> Program& {
+auto Program::opwrapdecrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opwrapdecrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opwrapadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opwrapadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opwrapadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opwrapsub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opwrapsub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opwrapsub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opwrapmul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opwrapmul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opwrapmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opwrapdiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opwrapdiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opwrapdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedsincrement(int_op target) -> Program& {
+auto Program::opcheckedsincrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opcheckedsincrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opcheckedsdecrement(int_op target) -> Program& {
+auto Program::opcheckedsdecrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opcheckedsdecrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opcheckedsadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedsadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedsadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedssub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedssub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedssub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedsmul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedsmul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedsmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedsdiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedsdiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedsdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckeduincrement(int_op target) -> Program& {
+auto Program::opcheckeduincrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opcheckeduincrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opcheckedudecrement(int_op target) -> Program& {
+auto Program::opcheckedudecrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opcheckedudecrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opcheckeduadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckeduadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckeduadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedusub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedusub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedusub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedumul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedumul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedumul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opcheckedudiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opcheckedudiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opcheckedudiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingsincrement(int_op target) -> Program& {
+auto Program::opsaturatingsincrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingsincrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opsaturatingsdecrement(int_op target) -> Program& {
+auto Program::opsaturatingsdecrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingsdecrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opsaturatingsadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingsadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingsadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingssub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingssub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingssub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingsmul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingsmul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingsmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingsdiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingsdiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingsdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatinguincrement(int_op target) -> Program& {
+auto Program::opsaturatinguincrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opsaturatinguincrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opsaturatingudecrement(int_op target) -> Program& {
+auto Program::opsaturatingudecrement(int_op const target) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingudecrement(addr_ptr, target);
     return (*this);
 }
 
-auto Program::opsaturatinguadd(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatinguadd(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatinguadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingusub(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingusub(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingusub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingumul(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingumul(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingumul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opsaturatingudiv(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opsaturatingudiv(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opsaturatingudiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opmove(int_op a, int_op b) -> Program& {
+auto Program::opmove(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opmove(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opcopy(int_op a, int_op b) -> Program& {
+auto Program::opcopy(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opcopy(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opptr(int_op a, int_op b) -> Program& {
+auto Program::opptr(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opptr(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opptrlive(int_op target, int_op source) -> Program& {
+auto Program::opptrlive(int_op const target, int_op const source) -> Program& {
     addr_ptr = cg::bytecode::opptrlive(addr_ptr, target, source);
     return (*this);
 }
 
-auto Program::opswap(int_op a, int_op b) -> Program& {
+auto Program::opswap(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opswap(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opdelete(int_op reg) -> Program& {
+auto Program::opdelete(int_op const reg) -> Program& {
     addr_ptr = cg::bytecode::opdelete(addr_ptr, reg);
     return (*this);
 }
 
-auto Program::opisnull(int_op a, int_op b) -> Program& {
+auto Program::opisnull(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opisnull(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opprint(int_op reg) -> Program& {
+auto Program::opprint(int_op const reg) -> Program& {
     addr_ptr = cg::bytecode::opprint(addr_ptr, reg);
     return (*this);
 }
 
-auto Program::opecho(int_op reg) -> Program& {
+auto Program::opecho(int_op const reg) -> Program& {
     addr_ptr = cg::bytecode::opecho(addr_ptr, reg);
     return (*this);
 }
 
-auto Program::opcapture(int_op target_closure, int_op target_register, int_op source_register) -> Program& {
+auto Program::opcapture(int_op const target_closure, int_op const target_register, int_op const source_register) -> Program& {
     addr_ptr = cg::bytecode::opcapture(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-auto Program::opcapturecopy(int_op target_closure, int_op target_register, int_op source_register) -> Program& {
+auto Program::opcapturecopy(int_op const target_closure, int_op const target_register, int_op const source_register) -> Program& {
     addr_ptr = cg::bytecode::opcapturecopy(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-auto Program::opcapturemove(int_op target_closure, int_op target_register, int_op source_register) -> Program& {
+auto Program::opcapturemove(int_op const target_closure, int_op const target_register, int_op const source_register) -> Program& {
     addr_ptr = cg::bytecode::opcapturemove(
         addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-auto Program::opclosure(int_op reg, std::string const& fn) -> Program& {
+auto Program::opclosure(int_op const reg, std::string const& fn) -> Program& {
     addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
     return (*this);
 }
 
-auto Program::opfunction(int_op reg, std::string const& fn) -> Program& {
+auto Program::opfunction(int_op const reg, std::string const& fn) -> Program& {
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
     return (*this);
 }
 
-auto Program::opframe(int_op a, int_op b) -> Program& {
+auto Program::opframe(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opframe(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opparam(int_op a, int_op b) -> Program& {
+auto Program::opparam(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opparam(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::oppamv(int_op a, int_op b) -> Program& {
+auto Program::oppamv(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::oppamv(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::oparg(int_op a, int_op b) -> Program& {
+auto Program::oparg(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::oparg(addr_ptr, a, b);
     return (*this);
 }
 
-auto Program::opargc(int_op a) -> Program& {
+auto Program::opargc(int_op const a) -> Program& {
     addr_ptr = cg::bytecode::opargc(addr_ptr, a);
     return (*this);
 }
 
-auto Program::opallocate_registers(int_op a) -> Program& {
+auto Program::opallocate_registers(int_op const a) -> Program& {
     addr_ptr = cg::bytecode::opallocate_registers(addr_ptr, a);
     return (*this);
 }
@@ -579,8 +579,6 @@ auto Program::opprocess(int_op const reg, int_op const fn) -> Program& {
 }
 
 auto Program::opself(int_op const target) -> Program& {
-    /*  Inserts self instuction.
-     */
     addr_ptr = cg::bytecode::opself(addr_ptr, target);
     return (*this);
 }
@@ -615,7 +613,7 @@ auto Program::opjump(viua::internals::types::bytecode_size const addr, enum JUMP
 }
 
 auto Program::opif(int_op const regc, viua::internals::types::bytecode_size const addr_truth, enum JUMPTYPE const absolute_truth, viua::internals::types::bytecode_size const addr_false, enum JUMPTYPE const absolute_false) -> Program& {
-    viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
+    auto jump_position_in_bytecode = addr_ptr;
 
     jump_position_in_bytecode +=
         sizeof(viua::internals::types::byte);  // for opcode
@@ -648,7 +646,7 @@ auto Program::opcatch(std::string const type_name, std::string const block_name)
     return (*this);
 }
 
-auto Program::opdraw(int_op regno) -> Program& {
+auto Program::opdraw(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opdraw(addr_ptr, regno);
     return (*this);
 }
@@ -658,7 +656,7 @@ auto Program::openter(std::string const block_name) -> Program& {
     return (*this);
 }
 
-auto Program::opthrow(int_op regno) -> Program& {
+auto Program::opthrow(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opthrow(addr_ptr, regno);
     return (*this);
 }
@@ -673,32 +671,32 @@ auto Program::opimport(std::string const module_name) -> Program& {
     return (*this);
 }
 
-auto Program::opatom(int_op reg, std::string const& s) -> Program& {
+auto Program::opatom(int_op const reg, std::string const& s) -> Program& {
     addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
     return (*this);
 }
 
-auto Program::opatomeq(int_op target, int_op lhs, int_op rhs) -> Program& {
+auto Program::opatomeq(int_op const target, int_op const lhs, int_op const rhs) -> Program& {
     addr_ptr = cg::bytecode::opatomeq(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-auto Program::opstruct(int_op regno) -> Program& {
+auto Program::opstruct(int_op const regno) -> Program& {
     addr_ptr = cg::bytecode::opstruct(addr_ptr, regno);
     return (*this);
 }
 
-auto Program::opstructinsert(int_op target, int_op key, int_op source) -> Program& {
+auto Program::opstructinsert(int_op const target, int_op const key, int_op const source) -> Program& {
     addr_ptr = cg::bytecode::opstructinsert(addr_ptr, target, key, source);
     return (*this);
 }
 
-auto Program::opstructremove(int_op target, int_op key, int_op source) -> Program& {
+auto Program::opstructremove(int_op const target, int_op const key, int_op const source) -> Program& {
     addr_ptr = cg::bytecode::opstructremove(addr_ptr, target, key, source);
     return (*this);
 }
 
-auto Program::opstructkeys(int_op a, int_op b) -> Program& {
+auto Program::opstructkeys(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
     return (*this);
 }
