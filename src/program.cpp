@@ -36,16 +36,8 @@ using viua::util::memory::load_aligned;
 
 auto Program::bytecode() const
     -> std::unique_ptr<viua::internals::types::byte[]> {
-    /*  Returns pointer to a copy of the bytecode.
-     *  Each call produces new copy.
-     *
-     *  Calling code is responsible for proper destruction of the allocated
-     * memory.
-     */
-    auto tmp = make_unique<viua::internals::types::byte[]>(bytes);
-    for (decltype(bytes) i = 0; i < bytes; ++i) {
-        tmp[i] = program[i];
-    }
+    auto tmp = std::make_unique<viua::internals::types::byte[]>(bytes);
+    std::copy_n(program.get(), size(), tmp.get());
     return tmp;
 }
 
@@ -76,16 +68,14 @@ auto Program::calculate_jumps(
     std::vector<tuple<uint64_t, uint64_t>> const jump_positions,
     std::vector<Token> const& tokens) -> Program& {
 
-    uint64_t position, offset;
-    uint64_t adjustment;
     for (auto jmp : jump_positions) {
-        tie(position, offset) = jmp;
+        auto const [position, offset] = jmp;
 
         // usually beware of the reinterpret_cast<>'s but here we *know* what
         // we're doing we *know* that this location points to uint64_t even if
         // it is stored inside the viua::internals::types::byte array
-        ptr = reinterpret_cast<uint64_t*>(program.get() + position);
-        adjustment =
+        auto const ptr = reinterpret_cast<uint64_t*>(program.get() + position);
+        auto const adjustment =
             viua::cg::tools::calculate_bytecode_size_of_first_n_instructions2(
                 tokens, load_aligned<uint64_t>(ptr));
         aligned_write(ptr) = (offset + adjustment);
