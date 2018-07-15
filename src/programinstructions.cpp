@@ -707,8 +707,6 @@ auto Program::opreturn() -> Program& {
 }
 
 auto Program::ophalt() -> Program& {
-    /*  Inserts halt instruction.
-     */
     addr_ptr = cg::bytecode::ophalt(addr_ptr);
     return (*this);
 }
