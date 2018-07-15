@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
     //////////////////////////////////////////
     // GATHER LINKS OBTAINED FROM COMMAND LINE
     auto commandline_given_links = std::vector<std::string>{};
-    for (unsigned i = 1; i < args.size(); ++i) {
+    for (auto i = decltype(args)::size_type{1}; i < args.size(); ++i) {
         commandline_given_links.emplace_back(args[i]);
     }
 
