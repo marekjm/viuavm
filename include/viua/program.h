@@ -228,19 +228,19 @@ class Program {
      *  These must be called after the bytecode is already generated as they
      * must know size of the program.
      */
-    Program& calculate_jumps(
+    auto calculate_jumps(
         std::vector<std::tuple<viua::internals::types::bytecode_size,
-                               viua::internals::types::bytecode_size>>,
-        std::vector<viua::cg::lex::Token>&);
-    std::vector<viua::internals::types::bytecode_size> jumps();
+                               viua::internals::types::bytecode_size>> const,
+        std::vector<viua::cg::lex::Token> const&) -> Program&;
+    auto jumps() const -> std::vector<viua::internals::types::bytecode_size>;
 
     auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
-    Program& fill(std::unique_ptr<viua::internals::types::byte[]>);
+    auto fill(std::unique_ptr<viua::internals::types::byte[]>) -> Program&;
 
-    Program& setdebug(bool d = true);
-    Program& setscream(bool d = true);
+    auto setdebug(bool d = true) -> Program&;
+    auto setscream(bool d = true) -> Program&;
 
-    viua::internals::types::bytecode_size size();
+    auto size() const -> viua::internals::types::bytecode_size;
 
     Program(viua::internals::types::bytecode_size const bts = 2);
     Program(Program const& that);
