@@ -35,47 +35,21 @@ using bytecode_size_type = viua::internals::types::bytecode_size;
 namespace viua { namespace cg { namespace tools {
 static auto size_of_register_index_operand_with_rs_type(
     TokenVector const& tokens,
-    TokenVector::size_type i) -> tuple<bytecode_size_type, decltype(i)> {
+    TokenVector::size_type i) -> std::tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
 
     if (tokens.at(i) == "void" or tokens.at(i) == "true"
         or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    } else if (tokens.at(i).str().at(0) == '%'
+    } else if (auto const sigil = tokens.at(i).str().at(0); (sigil == '%' or sigil == '@' or sigil == '*')
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
-        // FIXME register set specifiers are mandatory now
-        if (tokens.at(i) == "local" or tokens.at(i) == "static"
-            or tokens.at(i) == "global") {
-            ++i;
-        }
-    } else if (tokens.at(i).str().at(0) == '@') {
-        calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::Register_sets);
-        calculated_size += sizeof(viua::internals::types::register_index);
-        ++i;
-
-        // FIXME register set specifiers are mandatory now
-        if (tokens.at(i) == "local" or tokens.at(i) == "static"
-            or tokens.at(i) == "global") {
-            ++i;
-        }
-    } else if (tokens.at(i).str().at(0) == '*') {
-        calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::Register_sets);
-        calculated_size += sizeof(viua::internals::types::register_index);
-        ++i;
-
-        // FIXME register set specifiers are mandatory now
-        if (tokens.at(i) == "local" or tokens.at(i) == "static"
-            or tokens.at(i) == "global") {
-            ++i;
-        }
+        ++i;  // for register set specifier
     } else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
