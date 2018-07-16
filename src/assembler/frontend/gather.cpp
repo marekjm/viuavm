@@ -24,7 +24,7 @@
 using namespace std;
 
 
-namespace viua { namespace front { namespace assembler {
+namespace viua { namespace assembler { namespace frontend {
 auto gather_functions(std::vector<viua::cg::lex::Token> const& tokens)
     -> Invocables {
     auto invocables = Invocables{};
@@ -79,4 +79,4 @@ auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
 
     return meta_information;
 }
-}}}  // namespace viua::front::assembler
+}}}
