@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,10 +27,17 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
+#include <viua/front/asm.h>
 #include <viua/cg/lex.h>
 
 
-namespace viua { namespace assembler { namespace frontend { namespace parser {
+namespace viua { namespace assembler { namespace frontend {
+
+auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> viua::front::assembler::Invocables;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens) -> viua::front::assembler::Invocables;
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens) -> std::map<std::string, std::string>;
+
+namespace parser {
 struct Operand {
     std::vector<viua::cg::lex::Token> tokens;
     std::map<std::string, std::string> attributes;

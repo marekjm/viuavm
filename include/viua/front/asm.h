@@ -48,11 +48,6 @@ auto decode_line_tokens(std::vector<std::string> const&)
     -> std::vector<std::vector<std::string>>;
 auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
-auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> Invocables;
-auto gather_blocks(std::vector<viua::cg::lex::Token> const&) -> Invocables;
-auto gather_meta_information(std::vector<viua::cg::lex::Token> const&)
-    -> std::map<std::string, std::string>;
-
 auto assemble_instruction(
     Program& program,
     viua::internals::types::bytecode_size& instruction,

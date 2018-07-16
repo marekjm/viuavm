@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) {
 
     auto functions = viua::front::assembler::Invocables{};
     try {
-        functions = viua::front::assembler::gather_functions(cooked_tokens);
+        functions = viua::assembler::frontend::gather_functions(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
 
     auto blocks = viua::front::assembler::Invocables{};
     try {
-        blocks = viua::front::assembler::gather_blocks(cooked_tokens);
+        blocks = viua::assembler::frontend::gather_blocks(cooked_tokens);
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
@@ -317,7 +317,7 @@ int main(int argc, char* argv[]) {
 
     if (SHOW_META) {
         auto meta =
-            viua::front::assembler::gather_meta_information(cooked_tokens);
+            viua::assembler::frontend::gather_meta_information(cooked_tokens);
         for (auto each : meta) {
             cout << each.first << " = "
                  << str::enquote(str::strencode(each.second)) << endl;

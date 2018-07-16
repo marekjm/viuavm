@@ -27,6 +27,7 @@
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tokenizer.h>
 #include <viua/cg/tools.h>
+#include <viua/assembler/frontend/parser.h>
 #include <viua/front/asm.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
@@ -885,7 +886,7 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////////
     // WRITE META-INFORMATION MAP
-    auto meta_information_map = gather_meta_information(tokens);
+    auto meta_information_map = viua::assembler::frontend::gather_meta_information(tokens);
     viua::internals::types::bytecode_size meta_information_map_size = 0;
     for (auto each : meta_information_map) {
         meta_information_map_size +=

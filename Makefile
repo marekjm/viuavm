@@ -594,7 +594,6 @@ build/bin/vm/asm: build/front/asm.o \
 	build/front/asm/generate.o \
 	$(OP_ASSEMBLERS) \
 	build/front/asm/assemble_instruction.o \
-	build/front/asm/gather.o \
 	build/front/asm/decode.o \
 	build/program.o \
 	build/programinstructions.o \
@@ -615,6 +614,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/support/env.o \
 	build/cg/assembler/binary_literals.o \
 	build/assembler/frontend/parser.o \
+	build/assembler/frontend/gather.o \
 	build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/frontend/static_analyser/register_usage.o \
 	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
