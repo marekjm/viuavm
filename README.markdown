@@ -1,7 +1,6 @@
 # Viua VM ![Latest Release](https://img.shields.io/github/tag/marekjm/viuavm.svg)
 
-[![Build Status](https://travis-ci.org/marekjm/viuavm.svg)](https://travis-ci.org/marekjm/viuavm)
-[![Build Status](https://vi.viuavm.org/builds/status_latest.png)](https://ci.viuavm.org/builds/latest.html)
+[![Build Status](https://ci.viuavm.org/builds/status_latest.png)](https://ci.viuavm.org/builds/latest.html)
 [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/7140.svg)](https://scan.coverity.com/projects/marekjm-viuavm)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/581/badge)](https://bestpractices.coreinfrastructure.org/projects/581)
 [![Open issues](https://img.shields.io/github/issues/marekjm/viuavm.svg)](https://github.com/marekjm/viuavm/issues)
