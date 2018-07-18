@@ -814,3 +814,10 @@ build/bin/opcodes.bin: src/bytecode/opcd.cpp \
 # DEPENDENCY LIBRARIES
 build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 	$(CC) $(CFLAGS) $(COPTIMIZATIONFLAGS) -c -o $@ $<
+
+
+#######################################################################
+# TOOLING
+build/tooling/exec/assembler.bin: \
+	src/tooling/exec/assembler/main.o
+	$(CXX) $(CXXFLAGS) -o $@ $<
