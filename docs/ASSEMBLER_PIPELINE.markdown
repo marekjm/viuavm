@@ -154,3 +154,37 @@ module text buffer.
 ## 10. Output file creation
 
 Save the output buffer to the file.
+
+
+------------------------------------------------------------------------
+
+# File layout
+
+Executables:
+
+```
+src/tooling/exec/assembler
+src/tooling/exec/disassembler
+src/tooling/exec/kernel
+src/tooling/exec/debugger
+src/tooling/exec/fmt
+```
+
+Libraries:
+
+```
+src/tooling/libs/lexer
+src/tooling/libs/parser
+src/tooling/libs/sa
+src/tooling/libs/assembler
+src/tooling/libs/disassembler
+src/tooling/libs/errors
+```
+
+Utilities:
+
+```
+src/util/env/
+src/util/string/
+src/util/memory/
+```
