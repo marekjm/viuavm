@@ -49,6 +49,42 @@ static auto usage(std::vector<std::string> const& args) -> bool {
     if (version_screen) {
         std::cout << "Viua VM assembler version " << VERSION << '.' << MICRO << std::endl;
     }
+    if (help_screen) {
+        if (version_screen) {
+            std::cout << '\n';
+        }
+        std::cout << "SYNOPSIS\n";
+        std::cout << "    " << args.at(0) << " [<option>...] [-o <output>] <source>.asm [<module>...]\n";
+        std::cout << '\n';
+        std::cout << "    <option> is any option that is accepted by the assembler.\n";
+        std::cout << "    <output> is the file to which the assembled bytecode will be written."
+                     " The default is to write output to `a.out` file.\n";
+        std::cout << "    <source> is the name of the file containing the Viua VM assembly language"
+                     " program to be assembled.\n";
+        std::cout << "    <module> is a module that is to be statically linked to the currently assembled"
+                     " file.\n";
+
+        std::cout << '\n';
+
+        std::cout << "OPTIONS\n";
+        std::cout << "    -h, --help        - display help screen\n";
+        std::cout << "        --version     - display version\n";
+        std::cout << "    -o, --out <file>  - write output to <file>; the default is to write to `a.out`\n";
+        std::cout << "    -c, --lib         - assemble as a linkable module; the default is to assemble an"
+                     " executable\n";
+        std::cout << "    -C, --verify      - perform static analysis, but do not output bytecode\n";
+        std::cout << "        --no-sa       - disable static analysis (useful in case of false positives"
+                     " being thrown by the SA engine)\n";
+
+        std::cout << '\n';
+
+        std::cout << "COPYRIGHT\n";
+        std::cout << "    Copyright (C) 2018 Marek Marecki\n";
+        std::cout << "    License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n";
+        std::cout << "    This is free software: you are free to change and redistribute it.\n";
+        std::cout << "    There is NO WARRANTY, to the extent permitted by law.\n";
+
+    }
 
     return (help_screen or version_screen);
 }
