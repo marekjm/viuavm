@@ -19,22 +19,19 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 #include <viua/version.h>
-
-static auto make_args(int const argc, char const* const argv[]) -> std::vector<std::string> {
-    auto args = std::vector<std::string>{};
-    std::copy_n(argv, argc, std::back_inserter(args));
-    return args;
-}
+#include <viua/tooling/errors/compile_time.h>
+#include <viua/util/string/escape_sequences.h>
 
 std::string const OPTION_HELP_LONG = "--help";
 std::string const OPTION_HELP_SHORT = "-h";
 std::string const OPTION_VERSION = "--version";
 
 static auto usage(std::vector<std::string> const& args) -> bool {
-    auto help_screen = args.empty();
+    auto help_screen = (args.size() == 1);
     auto version_screen = false;
     if (std::find(args.begin(), args.end(), OPTION_HELP_LONG) != args.end()) {
         help_screen = true;
@@ -83,10 +80,55 @@ static auto usage(std::vector<std::string> const& args) -> bool {
         std::cout << "    License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n";
         std::cout << "    This is free software: you are free to change and redistribute it.\n";
         std::cout << "    There is NO WARRANTY, to the extent permitted by law.\n";
-
     }
 
     return (help_screen or version_screen);
+}
+
+static auto make_args(int const argc, char const* const argv[]) -> std::vector<std::string> {
+    auto args = std::vector<std::string>{};
+    std::copy_n(argv, argc, std::back_inserter(args));
+    return args;
+}
+
+struct Parsed_args {
+    bool verbose = false;
+    bool enabled_sa = true;
+
+    std::string output_file = "a.out";
+    std::string input_file;
+
+    std::vector<std::string> linked_modules;
+
+    std::map<std::string, std::string> options;
+};
+
+static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
+    auto parsed = Parsed_args{};
+
+    auto i = std::remove_reference_t<decltype(args)>::size_type{1};
+
+    /*
+     * Parse options at first. Stop parsing on first token that does not start with
+     * '--', or is '--'.
+     */
+    for (; i < args.size(); ++i) {
+        auto const& arg = args.at(i);
+
+        if (arg == "--") {
+            ++i;
+            break;
+        }
+    }
+
+    if (i == args.size()) {
+        viua::tooling::errors::compile_time::display_error_and_exit(
+            viua::tooling::errors::compile_time::Compile_time_error::No_input_file
+        );
+    }
+    parsed.input_file = args.at(i);
+
+    return parsed;
 }
 
 auto main(int argc, char* argv[]) -> int {
@@ -94,6 +136,8 @@ auto main(int argc, char* argv[]) -> int {
     if (usage(args)) {
         return 0;
     }
+
+    auto const parsed_args = parse_args(args);
 
     return 0;
 }

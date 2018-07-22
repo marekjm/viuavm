@@ -819,5 +819,7 @@ build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 #######################################################################
 # TOOLING
 build/tooling/exec/assembler.bin: \
-	src/tooling/exec/assembler/main.o
-	$(CXX) $(CXXFLAGS) -o $@ $<
+	build/tooling/exec/assembler/main.o \
+	build/tooling/errors/compile_time.o \
+	build/util/string/escape_sequences.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
