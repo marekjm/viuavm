@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -169,6 +170,19 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
             }
         }
     }
+
+    return tokens;
+}
+auto strip_spaces(std::vector<Token> const& source) -> std::vector<Token> {
+    auto tokens = std::vector<Token>{};
+
+    auto const space = std::string{" "};
+    auto const tab = std::string{"\t"};
+    std::copy_if(source.begin(), source.end(), std::back_inserter(tokens),
+    [&space, &tab](Token const& each) -> bool {
+        auto const s = each.str();
+        return (s != space) and (s != tab);
+    });
 
     return tokens;
 }

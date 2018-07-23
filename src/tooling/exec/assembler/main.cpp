@@ -230,9 +230,12 @@ auto main(int argc, char* argv[]) -> int {
     auto const source = read_file(parsed_args.input_file);
     auto const raw_tokens = viua::tooling::libs::lexer::tokenise(source);
 
+    using viua::tooling::libs::lexer::strip_spaces;
+    auto const tokens = strip_spaces(raw_tokens);
+
 #ifdef JSON_TOKEN_DUMP
-    std::cerr << raw_tokens.size() << std::endl;
-    std::cerr << to_json(raw_tokens) << std::endl;
+    std::cerr << tokens.size() << std::endl;
+    std::cerr << to_json(tokens) << std::endl;
 #endif
 
     return 0;
