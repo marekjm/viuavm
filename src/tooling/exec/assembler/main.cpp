@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <sstream>
 #include <string>
@@ -28,6 +29,7 @@
 #include <viua/tooling/errors/compile_time.h>
 #include <viua/util/filesystem.h>
 #include <viua/util/string/escape_sequences.h>
+#include <viua/tooling/libs/lexer/tokenise.h>
 
 std::string const OPTION_HELP_LONG = "--help";
 std::string const OPTION_HELP_SHORT = "-h";
@@ -163,7 +165,7 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
     return parsed;
 }
 
-static std::string read_file(std::string const& path) {
+static auto read_file(std::string const& path) -> std::string {
     std::ifstream in(path, std::ios::in | std::ios::binary);
 
     std::ostringstream source_in;
@@ -174,6 +176,36 @@ static std::string read_file(std::string const& path) {
 
     return source_in.str();
 }
+
+#ifdef JSON_TOKEN_DUMP
+static auto to_json(viua::tooling::libs::lexer::Token const& token) -> std::string {
+    auto o = std::ostringstream{};
+
+    o << '{';
+    o << std::quoted("line") << ':' << token.line();
+    o << ',';
+    o << std::quoted("character") << ':' << token.character();
+    o << ',';
+    o << std::quoted("content") << ':' << std::quoted(token.str());
+    o << ',';
+    o << std::quoted("original") << ':' << std::quoted(token.original());
+    o << '}';
+
+    return o.str();
+}
+static auto to_json(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std::string {
+    auto o = std::ostringstream{};
+
+    o << '[' << '\n';
+    o << ' ' << to_json(tokens.at(0)) << '\n';
+    for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1}; i < tokens.size(); ++i) {
+        o << ',' << to_json(tokens.at(i)) << '\n';
+    }
+    o << ']';
+
+    return o.str();
+}
+#endif
 
 auto main(int argc, char* argv[]) -> int {
     auto const args = make_args(argc, argv);
@@ -196,6 +228,12 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     auto const source = read_file(parsed_args.input_file);
+    auto const raw_tokens = viua::tooling::libs::lexer::tokenise(source);
+
+#ifdef JSON_TOKEN_DUMP
+    std::cerr << raw_tokens.size() << std::endl;
+    std::cerr << to_json(raw_tokens) << std::endl;
+#endif
 
     return 0;
 }

@@ -822,5 +822,7 @@ build/tooling/exec/assembler.bin: \
 	build/tooling/exec/assembler/main.o \
 	build/tooling/errors/compile_time.o \
 	build/util/string/escape_sequences.o \
-	build/util/filesystem.o
+	build/util/string/ops.o \
+	build/util/filesystem.o \
+	build/tooling/libs/lexer/tokenise.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
