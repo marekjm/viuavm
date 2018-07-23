@@ -27,6 +27,7 @@ namespace util {
 namespace string {
 namespace ops {
 auto extract(std::string const&) -> std::string;
+auto strencode(std::string const&) -> std::string;
 }}}}
 
 #endif

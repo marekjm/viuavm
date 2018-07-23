@@ -29,6 +29,7 @@
 #include <viua/tooling/errors/compile_time.h>
 #include <viua/util/filesystem.h>
 #include <viua/util/string/escape_sequences.h>
+#include <viua/util/string/ops.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 std::string const OPTION_HELP_LONG = "--help";
@@ -177,6 +178,7 @@ static auto read_file(std::string const& path) -> std::string {
     return source_in.str();
 }
 
+#define JSON_TOKEN_DUMP
 #ifdef JSON_TOKEN_DUMP
 static auto to_json(viua::tooling::libs::lexer::Token const& token) -> std::string {
     auto o = std::ostringstream{};
@@ -186,9 +188,9 @@ static auto to_json(viua::tooling::libs::lexer::Token const& token) -> std::stri
     o << ',';
     o << std::quoted("character") << ':' << token.character();
     o << ',';
-    o << std::quoted("content") << ':' << std::quoted(token.str());
+    o << std::quoted("content") << ':' << std::quoted(viua::util::string::ops::strencode(token.str()));
     o << ',';
-    o << std::quoted("original") << ':' << std::quoted(token.original());
+    o << std::quoted("original") << ':' << std::quoted(viua::util::string::ops::strencode(token.original()));
     o << '}';
 
     return o.str();

@@ -72,4 +72,65 @@ auto extract(std::string const& s) -> std::string {
 
     return chnk.str();
 }
+
+auto strencode(std::string const& s) -> std::string {
+    /** Encode escape sequences in strings.
+     *
+     *  This function recognizes escape sequences as listed on:
+     *  http://en.cppreference.com/w/cpp/language/escape
+     *  The function does not recognize sequences for:
+     *      - arbitrary octal numbers (escape: \nnn),
+     *      - arbitrary hexadecimal numbers (escape: \xnn),
+     *      - short arbitrary Unicode values (escape: \unnnn),
+     *      - long arbitrary Unicode values (escape: \Unnnnnnnn),
+     *
+     */
+    auto encoded = std::ostringstream{};
+    auto c       = char{};
+    auto escape  = bool{false};
+    for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
+        switch (s[i]) {
+        case '\\':
+            escape = true;
+            c      = '\\';
+            break;
+        case '\a':
+            escape = true;
+            c      = 'a';
+            break;
+        case '\b':
+            escape = true;
+            c      = 'b';
+            break;
+        case '\f':
+            escape = true;
+            c      = 'f';
+            break;
+        case '\n':
+            escape = true;
+            c      = 'n';
+            break;
+        case '\r':
+            escape = true;
+            c      = 'r';
+            break;
+        case '\t':
+            escape = true;
+            c      = 't';
+            break;
+        case '\v':
+            escape = true;
+            c      = 'v';
+            break;
+        default:
+            escape = false;
+            c      = s[i];
+        }
+        if (escape) {
+            encoded << '\\';
+        }
+        encoded << c;
+    }
+    return encoded.str();
+}
 }}}}
