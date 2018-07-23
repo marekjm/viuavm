@@ -186,4 +186,23 @@ auto strip_spaces(std::vector<Token> const& source) -> std::vector<Token> {
 
     return tokens;
 }
+auto strip_comments(std::vector<Token> const& source) -> std::vector<Token> {
+    auto tokens = std::vector<Token>{};
+
+    auto const comment_marker = std::string{";"};
+    auto skip = false;
+    for (auto const& each : source) {
+        if (each.str() == comment_marker) {
+            skip = true;
+        }
+        if (not skip) {
+            tokens.push_back(each);
+        }
+        if (each.str() == std::string{"\n"}) {
+            skip = false;
+        }
+    }
+
+    return tokens;
+}
 }}}}
