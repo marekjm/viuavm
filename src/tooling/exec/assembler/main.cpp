@@ -106,17 +106,31 @@ struct Parsed_args {
 static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
     auto parsed = Parsed_args{};
 
-    auto i = std::remove_reference_t<decltype(args)>::size_type{1};
-
     /*
      * Parse options at first. Stop parsing on first token that does not start with
      * '--', or is '--'.
      */
+    auto i = std::remove_reference_t<decltype(args)>::size_type{1};
     for (; i < args.size(); ++i) {
         auto const& arg = args.at(i);
 
-        if (arg == "--") {
+        if (arg == "-o" or arg == "--output") {
+            parsed.output_file = args.at(++i);
+        } else if (arg == "--verbose") {
+            parsed.verbose = true;
+        } else if (arg == "-h" or arg == "--help") {
+            // do nothing
+        } else if (arg == "--version") {
+            // do nothing
+        } else if (arg == "--") {
             ++i;
+            break;
+        } else if (arg.find("--") == 0) {
+            viua::tooling::errors::compile_time::display_error_and_exit(
+                viua::tooling::errors::compile_time::Compile_time_error::Unknown_option
+                , arg
+            );
+        } else if (arg.find("--") != 0) {
             break;
         }
     }
@@ -138,6 +152,11 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     auto const parsed_args = parse_args(args);
+
+    if (parsed_args.verbose) {
+        std::cerr << "input file: " << parsed_args.input_file << std::endl;
+        std::cerr << "output file: " << parsed_args.output_file << std::endl;
+    }
 
     return 0;
 }

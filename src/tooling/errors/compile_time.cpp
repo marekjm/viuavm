@@ -33,6 +33,7 @@ namespace compile_time {
 std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Unknown_error, "unknown error" },
     { Compile_time_error::No_input_file, "no input file" },
+    { Compile_time_error::Unknown_option, "unknown option" },
 };
 
 auto display_error_and_exit(Compile_time_error const error_code) -> void {
@@ -45,6 +46,20 @@ auto display_error_and_exit(Compile_time_error const error_code) -> void {
     std::cerr << std::setw(4) << std::setfill('0') << static_cast<uint64_t>(error_code);
     std::cerr << send_escape_seq(ATTR_RESET) << ": ";
     std::cerr << compile_time_error_descriptions.at(error_code) << std::endl;
+    exit(1);
+}
+
+auto display_error_and_exit(Compile_time_error const error_code, std::string const message) -> void {
+    using viua::util::string::escape_sequences::COLOR_FG_RED;
+    using viua::util::string::escape_sequences::COLOR_FG_WHITE;
+    using viua::util::string::escape_sequences::ATTR_RESET;
+    using viua::util::string::escape_sequences::send_escape_seq;
+    std::cerr << send_escape_seq(COLOR_FG_RED) << "error" << send_escape_seq(ATTR_RESET) << ": ";
+    std::cerr << send_escape_seq(COLOR_FG_RED) << "EC";
+    std::cerr << std::setw(4) << std::setfill('0') << static_cast<uint64_t>(error_code);
+    std::cerr << send_escape_seq(ATTR_RESET) << ": ";
+    std::cerr << compile_time_error_descriptions.at(error_code);
+    std::cerr << ": " << message << std::endl;
     exit(1);
 }
 }

@@ -17,6 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
+
 namespace viua {
 namespace tooling {
 namespace errors {
@@ -24,9 +26,11 @@ namespace compile_time {
 enum class Compile_time_error {
     Unknown_error,
     No_input_file,
+    Unknown_option,
 };
 
 auto display_error_and_exit(Compile_time_error const) -> void;
+auto display_error_and_exit(Compile_time_error const, std::string const) -> void;
 }
 }
 }
