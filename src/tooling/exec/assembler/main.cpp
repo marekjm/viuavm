@@ -18,8 +18,10 @@
  */
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <viua/version.h>
@@ -161,6 +163,18 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
     return parsed;
 }
 
+static std::string read_file(std::string const& path) {
+    std::ifstream in(path, std::ios::in | std::ios::binary);
+
+    std::ostringstream source_in;
+    auto line = std::string{};
+    while (std::getline(in, line)) {
+        source_in << line << '\n';
+    }
+
+    return source_in.str();
+}
+
 auto main(int argc, char* argv[]) -> int {
     auto const args = make_args(argc, argv);
     if (usage(args)) {
@@ -180,6 +194,8 @@ auto main(int argc, char* argv[]) -> int {
             , parsed_args.input_file
         );
     }
+
+    auto const source = read_file(parsed_args.input_file);
 
     return 0;
 }
