@@ -24,6 +24,7 @@
 #include <vector>
 #include <viua/version.h>
 #include <viua/tooling/errors/compile_time.h>
+#include <viua/util/filesystem.h>
 #include <viua/util/string/escape_sequences.h>
 
 std::string const OPTION_HELP_LONG = "--help";
@@ -94,6 +95,8 @@ static auto make_args(int const argc, char const* const argv[]) -> std::vector<s
 struct Parsed_args {
     bool verbose = false;
     bool enabled_sa = true;
+    bool sa_only = false;
+    bool linkable_module = false;
 
     std::string output_file = "a.out";
     std::string input_file;
@@ -118,6 +121,10 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
             parsed.output_file = args.at(++i);
         } else if (arg == "--verbose") {
             parsed.verbose = true;
+        } else if (arg == "-c") {
+            parsed.linkable_module = true;
+        } else if (arg == "-C" or arg == "--verify") {
+            parsed.sa_only = true;
         } else if (arg == "-h" or arg == "--help") {
             // do nothing
         } else if (arg == "--version") {
@@ -141,6 +148,15 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
         );
     }
     parsed.input_file = args.at(i);
+    if (parsed.input_file.size() == 0) {
+        viua::tooling::errors::compile_time::display_error_and_exit(
+            viua::tooling::errors::compile_time::Compile_time_error::No_input_file
+        );
+    }
+
+    if (parsed.sa_only) {
+        parsed.output_file = "/dev/null";
+    }
 
     return parsed;
 }
@@ -156,6 +172,13 @@ auto main(int argc, char* argv[]) -> int {
     if (parsed_args.verbose) {
         std::cerr << "input file: " << parsed_args.input_file << std::endl;
         std::cerr << "output file: " << parsed_args.output_file << std::endl;
+    }
+
+    if (not viua::util::filesystem::is_file(parsed_args.input_file)) {
+        viua::tooling::errors::compile_time::display_error_and_exit(
+            viua::tooling::errors::compile_time::Compile_time_error::Not_a_file
+            , parsed_args.input_file
+        );
     }
 
     return 0;

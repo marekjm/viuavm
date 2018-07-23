@@ -821,5 +821,6 @@ build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 build/tooling/exec/assembler.bin: \
 	build/tooling/exec/assembler/main.o \
 	build/tooling/errors/compile_time.o \
-	build/util/string/escape_sequences.o
+	build/util/string/escape_sequences.o \
+	build/util/filesystem.o
 	$(CXX) $(CXXFLAGS) -o $@ $^

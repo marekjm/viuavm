@@ -25,8 +25,9 @@ namespace errors {
 namespace compile_time {
 enum class Compile_time_error {
     Unknown_error,
-    No_input_file,
     Unknown_option,
+    No_input_file,
+    Not_a_file,
 };
 
 auto display_error_and_exit(Compile_time_error const) -> void;
