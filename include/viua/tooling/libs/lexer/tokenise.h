@@ -59,8 +59,11 @@ class Token {
 };
 
 auto tokenise(std::string const&) -> std::vector<Token>;
-auto strip_spaces(std::vector<Token> const&) -> std::vector<Token>;
-auto strip_comments(std::vector<Token> const&) -> std::vector<Token>;
+auto cook(std::vector<Token> const&) -> std::vector<Token>;
+
+auto strip_spaces(std::vector<Token>) -> std::vector<Token>;
+auto strip_comments(std::vector<Token>) -> std::vector<Token>;
+
 }}}}
 
 #endif

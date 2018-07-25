@@ -173,12 +173,107 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
 
     return tokens;
 }
-auto strip_spaces(std::vector<Token> const& source) -> std::vector<Token> {
+
+template<class T, typename... R> bool adjacent(T first, T second) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return true;
+}
+template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return adjacent(second, rest...);
+}
+static auto match_adjacent(
+    std::vector<Token> const& tokens,
+    std::remove_reference<decltype(tokens)>::type::size_type i,
+    std::vector<std::string> const& sequence) -> bool {
+    if (i + sequence.size() >= tokens.size()) {
+        return false;
+    }
+
+    decltype(i) n = 0;
+    while (n < sequence.size()) {
+        // empty string in the sequence means "any token"
+        if ((not sequence.at(n).empty())
+            and tokens.at(i + n) != sequence.at(n)) {
+            return false;
+        }
+        if (n and not adjacent(tokens.at(i + n - 1), tokens.at(i + n))) {
+            return false;
+        }
+        ++n;
+    }
+
+    return true;
+}
+static auto join_tokens(std::vector<Token> const tokens,
+                 decltype(tokens)::size_type const from,
+                 decltype(from) const to) -> std::string {
+    std::ostringstream joined;
+
+    for (auto i = from; i < tokens.size() and i < to; ++i) {
+        joined << tokens.at(i).str();
+    }
+
+    return joined.str();
+}
+static auto reduce_token_sequence(std::vector<Token> input_tokens,
+                           std::vector<std::string> const sequence)
+    -> std::vector<Token> {
+    decltype(input_tokens) tokens;
+
+    const auto limit = input_tokens.size();
+    for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+        const auto t = input_tokens.at(i);
+        if (match_adjacent(input_tokens, i, sequence)) {
+            tokens.emplace_back(
+                t.line(),
+                t.character(),
+                join_tokens(input_tokens, i, (i + sequence.size())));
+            i += (sequence.size() - 1);
+            continue;
+        }
+        tokens.push_back(t);
+    }
+
+    return tokens;
+}
+
+auto cook(std::vector<Token> const& source) -> std::vector<Token> {
+    auto tokens = source;
+
+    tokens = strip_spaces(strip_comments(std::move(tokens)));
+
+    tokens = reduce_token_sequence(std::move(tokens), {".", "function", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "end"});
+
+    return tokens;
+}
+
+auto strip_spaces(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
+    auto iter = source.begin();
+
+    /*
+     * Let's trim newlines from the beginning of the token stream.
+     * They are useless.
+     */
+    while (iter != source.end() and (*iter == "\n")) {
+        ++iter;
+    }
 
     auto const space = std::string{" "};
     auto const tab = std::string{"\t"};
-    std::copy_if(source.begin(), source.end(), std::back_inserter(tokens),
+    std::copy_if(iter, source.end(), std::back_inserter(tokens),
     [&space, &tab](Token const& each) -> bool {
         auto const s = each.str();
         return (s != space) and (s != tab);
@@ -186,7 +281,7 @@ auto strip_spaces(std::vector<Token> const& source) -> std::vector<Token> {
 
     return tokens;
 }
-auto strip_comments(std::vector<Token> const& source) -> std::vector<Token> {
+auto strip_comments(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
     auto const comment_marker = std::string{";"};
