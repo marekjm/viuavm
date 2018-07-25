@@ -294,6 +294,39 @@ static auto reduce_scoped_names(std::vector<Token> source) -> std::vector<Token>
 
     return tokens;
 }
+static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
+    auto tokens = std::vector<Token>{};
+
+    for (auto i = decltype(source)::size_type{0}; i < source.size(); ++i) {
+        auto const& token = source.at(i);
+
+        using viua::tooling::libs::lexer::classifier::is_decimal_integer;
+        if (source.at(i) == "-" and is_decimal_integer(source.at(i + 1).str()) and source.at(i + 2) == "."
+                and is_decimal_integer(source.at(i + 3).str())) {
+            tokens.emplace_back(
+                token.line()
+                , token.character()
+                , join_tokens(source, i, i + 4)
+            );
+            i += 3;
+            continue;
+        }
+        if (is_decimal_integer(source.at(i).str()) and source.at(i + 1) == "."
+                and is_decimal_integer(source.at(i + 2).str())) {
+            tokens.emplace_back(
+                token.line()
+                , token.character()
+                , join_tokens(source, i, i + 3)
+            );
+            i += 2;
+            continue;
+        }
+
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
 
 auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     auto tokens = source;
@@ -318,6 +351,7 @@ auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     tokens = reduce_token_sequence(std::move(tokens), {"]", "]"});
 
     tokens = reduce_scoped_names(std::move(tokens));
+    tokens = reduce_floats(std::move(tokens));
 
     return tokens;
 }
