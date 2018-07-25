@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <viua/util/string/ops.h>
+#include <viua/tooling/libs/lexer/classifier.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 namespace viua {
@@ -248,6 +249,52 @@ static auto reduce_token_sequence(std::vector<Token> input_tokens,
     return tokens;
 }
 
+static auto reduce_scoped_names(std::vector<Token> source) -> std::vector<Token> {
+    auto tokens = std::vector<Token>{};
+
+    auto const limit = source.size();
+
+    for (auto i = decltype(source)::size_type{0}; i < limit; ++i) {
+        auto const& token = source.at(i);
+
+        using viua::tooling::libs::lexer::classifier::is_id;
+
+        if (is_id(token.str())) {
+            auto j = i;
+            auto scoped_name_tokens = std::vector<Token>{};
+            if (is_id(token.str()) and source.at(j + 1) == "::" and is_id(source.at(j + 2).str())
+                    and adjacent(token, source.at(j + 1), source.at(j + 2))) {
+                scoped_name_tokens.push_back(source.at(j));        // id
+                scoped_name_tokens.push_back(source.at(j + 1));    // ::
+                scoped_name_tokens.push_back(source.at(j + 2));    // id
+
+                j += 2;
+
+                while (source.at(j + 1) == "::" and is_id(source.at(j + 2).str())
+                        and adjacent(source.at(j), source.at(j + 1), source.at(j + 2))) {
+                    scoped_name_tokens.push_back(source.at(j + 1));  // ::
+                    scoped_name_tokens.push_back(source.at(j + 2));  // id
+                    j += 2;
+                }
+            }
+
+            if (not scoped_name_tokens.empty()) {
+                tokens.emplace_back(
+                    token.line()
+                    , token.character()
+                    , join_tokens(scoped_name_tokens, 0, scoped_name_tokens.size())
+                );
+                i = j;
+                continue;
+            }
+        }
+
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
 auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     auto tokens = source;
 
@@ -269,6 +316,8 @@ auto cook(std::vector<Token> const& source) -> std::vector<Token> {
 
     tokens = reduce_token_sequence(std::move(tokens), {"[", "["});
     tokens = reduce_token_sequence(std::move(tokens), {"]", "]"});
+
+    tokens = reduce_scoped_names(std::move(tokens));
 
     return tokens;
 }
