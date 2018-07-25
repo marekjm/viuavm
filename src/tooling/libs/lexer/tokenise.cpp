@@ -254,7 +254,21 @@ auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     tokens = strip_spaces(strip_comments(std::move(tokens)));
 
     tokens = reduce_token_sequence(std::move(tokens), {".", "function", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "closure", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "block", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "signature", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "bsignature", ":"});
     tokens = reduce_token_sequence(std::move(tokens), {".", "end"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "info", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "name", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "import", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "mark", ":"});
+    tokens = reduce_token_sequence(std::move(tokens), {".", "iota", ":"});
+
+    tokens = reduce_token_sequence(std::move(tokens), {":", ":"});
+
+    tokens = reduce_token_sequence(std::move(tokens), {"[", "["});
+    tokens = reduce_token_sequence(std::move(tokens), {"]", "]"});
 
     return tokens;
 }
