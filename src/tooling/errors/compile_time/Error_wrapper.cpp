@@ -17,28 +17,15 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIUA_TOOLING_ERRORS_COMPILE_TIME_H
-#define VIUA_TOOLING_ERRORS_COMPILE_TIME_H
-
-#include <string>
+#include <viua/tooling/errors/compile_time.h>
+#include <viua/tooling/errors/compile_time/errors.h>
 
 namespace viua {
 namespace tooling {
 namespace errors {
 namespace compile_time {
-enum class Compile_time_error {
-    Unknown_error,
-    Unknown_option,
-    No_input_file,
-    Not_a_file,
-    Unexpected_token,
-};
-
-auto display_error_and_exit(Compile_time_error const) -> void;
-auto display_error_and_exit(Compile_time_error const, std::string const) -> void;
+auto Error_wrapper::append(Error e) -> Error_wrapper& {
+    errors.emplace_back(std::move(e));
+    return *this;
 }
-}
-}
-}
-
-#endif
+}}}}
