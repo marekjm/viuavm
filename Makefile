@@ -818,6 +818,7 @@ build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 
 #######################################################################
 # TOOLING
+build/tooling/libs/lexer/tokenise.o: build/tooling/libs/lexer/normaliser.o
 build/tooling/exec/assembler.bin: \
 	build/tooling/exec/assembler/main.o \
 	build/tooling/errors/compile_time.o \
@@ -826,5 +827,7 @@ build/tooling/exec/assembler.bin: \
 	build/util/filesystem.o \
 	build/tooling/libs/lexer/tokenise.o \
 	build/tooling/libs/lexer/classifier.o \
-	build/tooling/libs/lexer/normaliser.o
+	build/tooling/libs/lexer/normaliser.o \
+	build/tooling/errors/compile_time/Error.o \
+	build/tooling/errors/compile_time/Error_wrapper.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
