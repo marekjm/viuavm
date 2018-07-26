@@ -301,25 +301,42 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
         auto const& token = source.at(i);
 
         using viua::tooling::libs::lexer::classifier::is_decimal_integer;
-        if (source.at(i) == "-" and is_decimal_integer(source.at(i + 1).str()) and source.at(i + 2) == "."
-                and is_decimal_integer(source.at(i + 3).str())) {
-            tokens.emplace_back(
-                token.line()
-                , token.character()
-                , join_tokens(source, i, i + 4)
-            );
-            i += 3;
-            continue;
+        try {
+            auto const& minus = source.at(i);
+            auto const& before_dot = source.at(i + 1);
+            auto const& dot = source.at(i + 2);
+            auto const& after_dot = source.at(i + 3);
+            if (minus == "-" and is_decimal_integer(before_dot.str()) and dot == "."
+                    and is_decimal_integer(after_dot.str())
+                    and adjacent(minus, before_dot, dot, after_dot)) {
+                tokens.emplace_back(
+                    token.line()
+                    , token.character()
+                    , join_tokens(source, i, i + 4)
+                );
+                i += 3;
+                continue;
+            }
+        } catch (std::out_of_range const&) {
+            // do nothing
         }
-        if (is_decimal_integer(source.at(i).str()) and source.at(i + 1) == "."
-                and is_decimal_integer(source.at(i + 2).str())) {
-            tokens.emplace_back(
-                token.line()
-                , token.character()
-                , join_tokens(source, i, i + 3)
-            );
-            i += 2;
-            continue;
+        try {
+            auto const& before_dot = source.at(i);
+            auto const& dot = source.at(i + 1);
+            auto const& after_dot = source.at(i + 2);
+            if (is_decimal_integer(before_dot.str()) and dot == "."
+                    and is_decimal_integer(after_dot.str())
+                    and adjacent(before_dot, dot, after_dot)) {
+                tokens.emplace_back(
+                    token.line()
+                    , token.character()
+                    , join_tokens(source, i, i + 3)
+                );
+                i += 2;
+                continue;
+            }
+        } catch (std::out_of_range const&) {
+            // do nothing
         }
 
         tokens.push_back(token);
@@ -334,14 +351,20 @@ static auto reduce_offset_jumps(std::vector<Token> source) -> std::vector<Token>
         auto const& token = source.at(i);
 
         using viua::tooling::libs::lexer::classifier::is_decimal_integer;
-        if ((token.str() == "+" or token.str() == "-") and is_decimal_integer(source.at(i + 1).str())) {
-            tokens.emplace_back(
-                token.line()
-                , token.character()
-                , join_tokens(source, i, i + 2)
-            );
-            ++i;
-            continue;
+        try {
+            auto const& offset = source.at(i + 1);
+            if ((token.str() == "+" or token.str() == "-") and is_decimal_integer(offset.str())
+                    and adjacent(token, offset)) {
+                tokens.emplace_back(
+                    token.line()
+                    , token.character()
+                    , join_tokens(source, i, i + 2)
+                );
+                ++i;
+                continue;
+            }
+        } catch (std::out_of_range const&) {
+            // do nothing
         }
 
         tokens.push_back(token);
