@@ -39,4 +39,10 @@ auto is_decimal_integer(std::string const& s) -> bool {
     auto const decimal_integer = std::regex{"^(0|[1-9][0-9]*)$"};
     return regex_match(s, decimal_integer);
 }
+auto is_access_type_specifier(std::string const& s) -> bool {
+    return (   s == "%"  // direct access
+            or s == "@"  // register indirect access
+            or s == "*"  // pointer dereference access
+           );
+}
 }}}}}
