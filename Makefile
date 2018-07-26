@@ -825,5 +825,6 @@ build/tooling/exec/assembler.bin: \
 	build/util/string/ops.o \
 	build/util/filesystem.o \
 	build/tooling/libs/lexer/tokenise.o \
-	build/tooling/libs/lexer/classifier.o
+	build/tooling/libs/lexer/classifier.o \
+	build/tooling/libs/lexer/normaliser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
