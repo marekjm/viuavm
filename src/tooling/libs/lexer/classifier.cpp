@@ -28,14 +28,10 @@ namespace libs {
 namespace lexer {
 namespace classifier {
 auto is_id(std::string const& s) -> bool {
-    /*  Returns true if s is a valid identifier.
-     */
     static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*$"};
     return regex_match(s, identifier);
 }
 auto is_decimal_integer(std::string const& s) -> bool {
-    /*  Returns true if s is a valid identifier.
-     */
     auto const decimal_integer = std::regex{"^(0|[1-9][0-9]*)$"};
     return regex_match(s, decimal_integer);
 }
