@@ -23,6 +23,7 @@
 #include <vector>
 #include <viua/util/string/ops.h>
 #include <viua/tooling/libs/lexer/classifier.h>
+#include <viua/tooling/libs/lexer/normaliser.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 namespace viua {
@@ -398,6 +399,8 @@ auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     tokens = reduce_scoped_names(std::move(tokens));
     tokens = reduce_floats(std::move(tokens));
     tokens = reduce_offset_jumps(std::move(tokens));
+
+    tokens = normaliser::normalise(std::move(tokens));
 
     return tokens;
 }
