@@ -37,6 +37,15 @@ auto Error::character() const -> viua::tooling::libs::lexer::Token::Position_typ
     return main_token.character();
 }
 
+auto Error::note(std::string n) -> Error& {
+    attached_notes.emplace_back(std::move(n));
+    return *this;
+}
+
+auto Error::notes() const -> std::vector<std::string> const& {
+    return attached_notes;
+}
+
 auto Error::what() const -> std::string {
     return viua::tooling::errors::compile_time::display_error(cause) + ": " + message;
 }

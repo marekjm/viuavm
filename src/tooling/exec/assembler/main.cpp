@@ -188,10 +188,31 @@ static auto display_error_header(
 ) -> std::string {
     std::ostringstream o;
 
+    using viua::util::string::escape_sequences::COLOR_FG_RED;
+    using viua::util::string::escape_sequences::COLOR_FG_WHITE;
+    using viua::util::string::escape_sequences::COLOR_FG_CYAN;
+    using viua::util::string::escape_sequences::ATTR_RESET;
+    using viua::util::string::escape_sequences::send_escape_seq;
+
     if (not error.what().empty()) {
-        o << filename << ':' << error.line() + 1 << ':' << error.character() + 1 << ": ";
-        o << "error: ";
-        o << error.what() << '\n';
+        o << send_escape_seq(COLOR_FG_WHITE) << filename << send_escape_seq(ATTR_RESET);
+        o << ':';
+        o << send_escape_seq(COLOR_FG_WHITE) << error.line() + 1 << send_escape_seq(ATTR_RESET);
+        o << ':';
+        o << send_escape_seq(COLOR_FG_WHITE) << error.character() + 1 << send_escape_seq(ATTR_RESET);
+        o << ": ";
+        o << send_escape_seq(COLOR_FG_RED) << "error" << send_escape_seq(ATTR_RESET);
+        o << ": " << error.what() << '\n';
+    }
+    for (auto const& note : error.notes()) {
+        o << send_escape_seq(COLOR_FG_WHITE) << filename << send_escape_seq(ATTR_RESET);
+        o << ':';
+        o << send_escape_seq(COLOR_FG_WHITE) << error.line() + 1 << send_escape_seq(ATTR_RESET);
+        o << ':';
+        o << send_escape_seq(COLOR_FG_WHITE) << error.character() + 1 << send_escape_seq(ATTR_RESET);
+        o << ": ";
+        o << send_escape_seq(COLOR_FG_CYAN) << "note" << send_escape_seq(ATTR_RESET);
+        o << ": " << note << '\n';
     }
 
     return o.str();

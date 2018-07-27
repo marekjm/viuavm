@@ -45,6 +45,9 @@ struct Error {
     auto line() const -> viua::tooling::libs::lexer::Token::Position_type;
     auto character() const -> viua::tooling::libs::lexer::Token::Position_type;
 
+    auto note(std::string) -> Error&;
+    auto notes() const -> std::vector<std::string> const&;
+
     auto what() const -> std::string;
     auto error_type() const -> Compile_time_error;
 
