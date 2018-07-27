@@ -35,6 +35,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Unknown_option, "unknown option" },
     { Compile_time_error::No_input_file, "no input file" },
     { Compile_time_error::Not_a_file, "not a file" },
+    { Compile_time_error::Unexpected_token, "unexpected token" },
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

@@ -22,11 +22,13 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <viua/version.h>
 #include <viua/tooling/errors/compile_time.h>
+#include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/util/filesystem.h>
 #include <viua/util/string/escape_sequences.h>
 #include <viua/util/string/ops.h>
@@ -178,6 +180,119 @@ static auto read_file(std::string const& path) -> std::string {
     return source_in.str();
 }
 
+using viua::tooling::libs::lexer::Token;
+using token_index_type = std::vector<Token>::size_type;
+static auto display_error_header(
+    viua::tooling::errors::compile_time::Error const& error
+    , std::string const& filename
+) -> std::string {
+    std::ostringstream o;
+
+    if (not error.what().empty()) {
+        o << filename << ':' << error.line() + 1 << ':' << error.character() + 1 << ": ";
+        o << "error: ";
+        o << error.what() << '\n';
+    }
+
+    return o.str();
+}
+static auto display_error_line(
+    std::ostream& o
+    , std::vector<Token> const& tokens
+    , viua::tooling::errors::compile_time::Error const& error
+    , token_index_type i
+    , std::string::size_type const line_no_width
+) -> token_index_type {
+    auto const token_line = error.line();
+
+    o << ">>>>";
+    o << ' ';  // to separate the ">>>>" on error lines from the line number
+    o << std::setw(static_cast<int>(line_no_width));
+    o << token_line + 1;
+    o << ' ';  // to separate line number from line content
+
+    o << tokens.at(i).str();
+
+    return ++i;
+}
+static auto display_context_line(
+    std::ostream& o
+    , std::vector<Token> const& tokens
+    , viua::tooling::errors::compile_time::Error const& error
+    , token_index_type i
+    , std::string::size_type const line_no_width
+) -> token_index_type {
+    auto const token_line = error.line();
+
+    o << "    ";  // message indent, ">>>>" on error lines
+    o << ' ';     // to separate the ">>>>" on error lines from the line number
+    o << std::setw(static_cast<int>(line_no_width));
+    o << token_line + 1;
+    o << ' ';     // to separate line number from line content
+
+    o << tokens.at(i).str();
+
+    return ++i;
+}
+static auto display_error_location(
+    std::vector<Token> const& tokens
+    , viua::tooling::errors::compile_time::Error const& error
+) -> std::string {
+    std::ostringstream o;
+
+    auto const context_lines = size_t{2};
+    auto const context_before = ((error.line() >= context_lines) ? (error.line() - context_lines) : 0);
+    auto const context_after = (error.line() + context_lines);
+    auto const line_no_width = std::to_string(context_after).size();
+
+    auto lines_displayed = std::set<Token::Position_type>{};
+    for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{0}; i < tokens.size(); ++i) {
+        auto const& each = tokens.at(i);
+
+        if (each.line() > context_after) {
+            break;
+        }
+        if (each.line() < context_before) {
+            continue;
+        }
+        if (lines_displayed.count(each.line())) {
+            continue;
+        }
+
+        if (each.line() == error.line()) {
+            i = display_error_line(o, tokens, error, i, line_no_width);
+        } else {
+            i = display_context_line(o, tokens, error, i, line_no_width);
+        }
+
+        lines_displayed.insert(each.line());
+    }
+
+    return o.str();
+}
+static auto display_error_in_context(
+    std::ostream& o
+    , std::vector<Token> const& tokens
+    , viua::tooling::errors::compile_time::Error const& error
+    , std::string const& filename
+) -> void {
+    o << display_error_header(error, filename);
+    o << '\n';
+    o << display_error_location(tokens, error);
+}
+static auto display_error_in_context(
+    std::vector<Token> const& tokens
+    , viua::tooling::errors::compile_time::Error_wrapper const& error
+    , std::string const& filename
+) -> void {
+    std::ostringstream o;
+    for (auto const& e : error.errors()) {
+        display_error_in_context(o, tokens, e, filename);
+        o << '\n';
+    }
+    std::cerr << o.str();
+}
+
 #define JSON_TOKEN_DUMP
 #ifdef JSON_TOKEN_DUMP
 static auto to_json(viua::tooling::libs::lexer::Token const& token) -> std::string {
@@ -231,7 +346,14 @@ auto main(int argc, char* argv[]) -> int {
 
     auto const source = read_file(parsed_args.input_file);
     auto const raw_tokens = viua::tooling::libs::lexer::tokenise(source);
-    auto const tokens = viua::tooling::libs::lexer::cook(raw_tokens);
+    auto const tokens = [&raw_tokens, &parsed_args]() -> auto {
+        try {
+            return viua::tooling::libs::lexer::cook(raw_tokens);
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+            display_error_in_context(raw_tokens, e, parsed_args.input_file);
+            exit(1);
+        }
+    }();
 
 #ifdef JSON_TOKEN_DUMP
     std::cerr << tokens.size() << std::endl;
