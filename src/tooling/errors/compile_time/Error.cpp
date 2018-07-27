@@ -46,6 +46,28 @@ auto Error::notes() const -> std::vector<std::string> const& {
     return attached_notes;
 }
 
+auto Error::add(viua::tooling::libs::lexer::Token const token) -> Error& {
+    tokens.push_back(token);
+    return *this;
+}
+auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool {
+    if (token.line() == main_token.line()
+        and token.character() >= main_token.character()
+        and token.ends(true) <= main_token.ends(true)) {
+        return true;
+    }
+    for (auto const& each : tokens) {
+        if (token.line() != each.line()) {
+            continue;
+        }
+        if (token.character() >= each.character()
+            and token.ends(true) <= each.ends(true)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 auto Error::str() const -> std::string {
     return message;
 }

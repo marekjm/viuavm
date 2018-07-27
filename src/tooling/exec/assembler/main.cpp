@@ -226,16 +226,39 @@ static auto display_error_line(
 ) -> token_index_type {
     auto const token_line = error.line();
 
+    using viua::util::string::escape_sequences::COLOR_FG_WHITE;
+    using viua::util::string::escape_sequences::COLOR_FG_RED;
+    using viua::util::string::escape_sequences::COLOR_FG_YELLOW;
+    using viua::util::string::escape_sequences::ATTR_RESET;
+    using viua::util::string::escape_sequences::send_escape_seq;
+
+    o << send_escape_seq(COLOR_FG_RED);
     o << ">>>>";
     o << ' ';  // to separate the ">>>>" on error lines from the line number
     o << std::setw(static_cast<int>(line_no_width));
+    o << send_escape_seq(COLOR_FG_YELLOW);
     o << token_line + 1;
+    o << send_escape_seq(ATTR_RESET);
     o << " | ";     // to separate line number from line content
+    o << send_escape_seq(COLOR_FG_WHITE);
 
-    o << tokens.at(i).str();
-    o << '\n';
+    using viua::util::string::escape_sequences::COLOR_FG_ORANGE_RED_1;
 
-    return ++i;
+    while (i < tokens.size() and tokens.at(i).line() == token_line) {
+        auto highlighted = false;
+        if (error.match(tokens.at(i))) {
+            o << send_escape_seq(COLOR_FG_ORANGE_RED_1);
+            highlighted = true;
+        }
+        o << tokens.at(i++).str();
+        if (highlighted) {
+            o << send_escape_seq(COLOR_FG_WHITE);
+        }
+    }
+
+    o << send_escape_seq(ATTR_RESET);
+
+    return i - 1;
 }
 static auto display_context_line(
     std::ostream& o

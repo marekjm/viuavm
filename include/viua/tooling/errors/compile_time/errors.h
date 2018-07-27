@@ -48,6 +48,9 @@ struct Error {
     auto note(std::string) -> Error&;
     auto notes() const -> std::vector<std::string> const&;
 
+    auto add(viua::tooling::libs::lexer::Token) -> Error&;
+    auto match(viua::tooling::libs::lexer::Token const) const -> bool;
+
     auto str() const -> std::string;
     auto what() const -> std::string;
     auto error_type() const -> Compile_time_error;
