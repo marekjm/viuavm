@@ -34,6 +34,7 @@ enum class Compile_time_error {
     Unexpected_token,
 };
 
+auto display_error(Compile_time_error const) -> std::string;
 auto display_error_and_exit(Compile_time_error const) -> void;
 auto display_error_and_exit(Compile_time_error const, std::string const) -> void;
 }

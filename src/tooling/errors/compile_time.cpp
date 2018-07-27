@@ -37,16 +37,28 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Not_a_file, "not a file" },
 };
 
+auto display_error(Compile_time_error const error_code) -> std::string {
+    using viua::util::string::escape_sequences::COLOR_FG_RED;
+    using viua::util::string::escape_sequences::ATTR_RESET;
+    using viua::util::string::escape_sequences::send_escape_seq;
+
+    std::ostringstream o;
+    o << send_escape_seq(COLOR_FG_RED) << "EC";
+    o << std::setw(4) << std::setfill('0') << static_cast<uint64_t>(error_code);
+    o << send_escape_seq(ATTR_RESET);
+    o << ": ";
+    o << compile_time_error_descriptions.at(error_code);
+    return o.str();
+}
+
 auto display_error_and_exit(Compile_time_error const error_code) -> void {
     using viua::util::string::escape_sequences::COLOR_FG_RED;
     using viua::util::string::escape_sequences::COLOR_FG_WHITE;
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::send_escape_seq;
     std::cerr << send_escape_seq(COLOR_FG_RED) << "error" << send_escape_seq(ATTR_RESET) << ": ";
-    std::cerr << send_escape_seq(COLOR_FG_RED) << "EC";
-    std::cerr << std::setw(4) << std::setfill('0') << static_cast<uint64_t>(error_code);
-    std::cerr << send_escape_seq(ATTR_RESET) << ": ";
-    std::cerr << compile_time_error_descriptions.at(error_code) << std::endl;
+    std::cerr << display_error(error_code);
+    std::cerr << std::endl;
     exit(1);
 }
 
@@ -56,10 +68,7 @@ auto display_error_and_exit(Compile_time_error const error_code, std::string con
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::send_escape_seq;
     std::cerr << send_escape_seq(COLOR_FG_RED) << "error" << send_escape_seq(ATTR_RESET) << ": ";
-    std::cerr << send_escape_seq(COLOR_FG_RED) << "EC";
-    std::cerr << std::setw(4) << std::setfill('0') << static_cast<uint64_t>(error_code);
-    std::cerr << send_escape_seq(ATTR_RESET) << ": ";
-    std::cerr << compile_time_error_descriptions.at(error_code);
+    std::cerr << display_error(error_code);
     std::cerr << ": " << message << std::endl;
     exit(1);
 }
