@@ -29,6 +29,17 @@ Error::Error(Compile_time_error const e, viua::tooling::libs::lexer::Token t, st
     , main_token{t}
     , message{m} {
 }
+
+auto Error::line() const -> viua::tooling::libs::lexer::Token::Position_type {
+    return main_token.line();
+}
+auto Error::character() const -> viua::tooling::libs::lexer::Token::Position_type {
+    return main_token.character();
+}
+
+auto Error::what() const -> std::string {
+    return viua::tooling::errors::compile_time::display_error(cause) + ": " + message;
+}
 }
 }
 }

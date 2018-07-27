@@ -25,7 +25,11 @@ namespace tooling {
 namespace errors {
 namespace compile_time {
 auto Error_wrapper::append(Error e) -> Error_wrapper& {
-    errors.emplace_back(std::move(e));
+    fallout.emplace_back(std::move(e));
     return *this;
+}
+
+auto Error_wrapper::errors() const -> std::vector<Error> const& {
+    return fallout;
 }
 }}}}
