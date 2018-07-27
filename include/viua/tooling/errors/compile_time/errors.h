@@ -48,6 +48,7 @@ struct Error {
     auto note(std::string) -> Error&;
     auto notes() const -> std::vector<std::string> const&;
 
+    auto str() const -> std::string;
     auto what() const -> std::string;
     auto error_type() const -> Compile_time_error;
 

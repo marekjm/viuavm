@@ -194,7 +194,7 @@ static auto display_error_header(
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::send_escape_seq;
 
-    if (not error.what().empty()) {
+    if (not error.str().empty()) {
         o << send_escape_seq(COLOR_FG_WHITE) << filename << send_escape_seq(ATTR_RESET);
         o << ':';
         o << send_escape_seq(COLOR_FG_WHITE) << error.line() + 1 << send_escape_seq(ATTR_RESET);
@@ -230,30 +230,32 @@ static auto display_error_line(
     o << ' ';  // to separate the ">>>>" on error lines from the line number
     o << std::setw(static_cast<int>(line_no_width));
     o << token_line + 1;
-    o << ' ';  // to separate line number from line content
+    o << " | ";     // to separate line number from line content
 
     o << tokens.at(i).str();
+    o << '\n';
 
     return ++i;
 }
 static auto display_context_line(
     std::ostream& o
     , std::vector<Token> const& tokens
-    , viua::tooling::errors::compile_time::Error const& error
     , token_index_type i
     , std::string::size_type const line_no_width
 ) -> token_index_type {
-    auto const token_line = error.line();
+    auto const token_line = tokens.at(i).line();
 
     o << "    ";  // message indent, ">>>>" on error lines
     o << ' ';     // to separate the ">>>>" on error lines from the line number
     o << std::setw(static_cast<int>(line_no_width));
     o << token_line + 1;
-    o << ' ';     // to separate line number from line content
+    o << " | ";     // to separate line number from line content
 
-    o << tokens.at(i).str();
+    while (i < tokens.size() and tokens.at(i).line() == token_line) {
+        o << tokens.at(i++).str();
+    }
 
-    return ++i;
+    return i - 1;
 }
 static auto display_error_location(
     std::vector<Token> const& tokens
@@ -283,7 +285,7 @@ static auto display_error_location(
         if (each.line() == error.line()) {
             i = display_error_line(o, tokens, error, i, line_no_width);
         } else {
-            i = display_context_line(o, tokens, error, i, line_no_width);
+            i = display_context_line(o, tokens, i, line_no_width);
         }
 
         lines_displayed.insert(each.line());

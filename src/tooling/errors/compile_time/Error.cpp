@@ -46,6 +46,9 @@ auto Error::notes() const -> std::vector<std::string> const& {
     return attached_notes;
 }
 
+auto Error::str() const -> std::string {
+    return message;
+}
 auto Error::what() const -> std::string {
     return viua::tooling::errors::compile_time::display_error(cause) + ": " + message;
 }
