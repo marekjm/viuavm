@@ -76,6 +76,14 @@ Token::Token(Position_type const line,
         , character_in_line{ character } {}
 Token::Token() : Token(0, 0, "") {}
 
+auto Token::operator=(Token const& token) -> Token& {
+    content = token.content;
+    original_content = token.original_content;
+    line_number = token.line_number;
+    character_in_line = token.character_in_line;
+    return *this;
+}
+
 auto tokenise(std::string const& source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 

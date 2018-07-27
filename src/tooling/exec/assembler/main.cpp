@@ -217,6 +217,121 @@ static auto display_error_header(
 
     return o.str();
 }
+static auto underline_error_token(
+    std::ostream& o
+    , std::vector<Token> const& tokens
+    , token_index_type i
+    , viua::tooling::errors::compile_time::Error const& error
+    , std::string::size_type const line_no_width
+) -> void {
+    /*
+     * Indent is needed to align an aside note correctly.
+     * The aside note is a additional piece of text that is attached to the
+     * first underlined token, and servers as additional comment for the error
+     * or note.
+     */
+    auto indent = std::ostringstream{};
+
+    // message indent, ">>>>" on error lines
+    o << "    ";
+    indent << "    ";
+
+    // to separate the ">>>>" on error lines from the line number
+    o << ' ';
+    indent << ' ';
+
+    {
+        // line number
+        auto n = line_no_width;
+        while (n--) {
+            o << ' ';
+            indent << ' ';
+        }
+    }
+
+    // to separate line number from line content
+    o << " | ";
+    indent << " | ";
+
+    auto has_matched = false;
+    auto has_matched_for_aside = false;
+    while (i < tokens.size()) {
+        auto const& each = tokens.at(i++);
+        auto match = error.match(each);
+
+        using viua::util::string::escape_sequences::COLOR_FG_RED_1;
+        using viua::util::string::escape_sequences::ATTR_RESET;
+        using viua::util::string::escape_sequences::send_escape_seq;
+
+        if (each == "\n") {
+            o << send_escape_seq(ATTR_RESET);
+            break;
+        }
+
+        if (match) {
+            o << send_escape_seq(COLOR_FG_RED_1);
+        }
+
+        auto c = char{match ? (has_matched ? '~' : '^') : ' '};
+        has_matched = (has_matched or match);
+
+        /*
+         * Indentation for the aside should be increased as long as the token
+         * the aside is attached to is not matched.
+         */
+        has_matched_for_aside = (has_matched_for_aside or error.match_aside(each));
+        if (not has_matched_for_aside) {
+            for (auto j = each.str().size(); j; --j) {
+                indent << ' ';
+            }
+        }
+
+        {
+            auto n = each.str().size();
+
+            /*
+             * A singular decrement, and underlining character switch if neccessary.
+             * Doing the check outside the loop to add significance to the fact that
+             * only the first character of the underline is '^' and all subsequent
+             * ones are '~'. We want underlining to look line this:
+             *
+             *      some tokens to underline
+             *           ^~~~~~
+             *
+             * This 'if' below is just for the first '^' character.
+             * The loop is for the string of '~'.
+             */
+            if (n--) {
+                o << c;
+                if (match) {
+                    c = '~';
+                }
+            }
+            while (n--) {
+                o << c;
+            }
+        }
+
+        if (match) {
+            o << send_escape_seq(ATTR_RESET);
+        }
+    }
+
+    o << '\n';
+
+    if (not error.aside().empty()) {
+        using viua::util::string::escape_sequences::COLOR_FG_RED_1;
+        using viua::util::string::escape_sequences::COLOR_FG_LIGHT_GREEN;
+        using viua::util::string::escape_sequences::ATTR_RESET;
+        using viua::util::string::escape_sequences::send_escape_seq;
+
+        o << indent.str();
+        o << send_escape_seq(COLOR_FG_RED_1) << '^';
+        o << send_escape_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside();
+        o << send_escape_seq(ATTR_RESET);
+        o << '\n';
+    }
+}
 static auto display_error_line(
     std::ostream& o
     , std::vector<Token> const& tokens
@@ -244,6 +359,8 @@ static auto display_error_line(
 
     using viua::util::string::escape_sequences::COLOR_FG_ORANGE_RED_1;
 
+    auto const original_i = i;
+
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
         auto highlighted = false;
         if (error.match(tokens.at(i))) {
@@ -257,6 +374,8 @@ static auto display_error_line(
     }
 
     o << send_escape_seq(ATTR_RESET);
+
+    underline_error_token(o, tokens, original_i, error, line_no_width);
 
     return i - 1;
 }

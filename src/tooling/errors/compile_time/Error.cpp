@@ -68,6 +68,34 @@ auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool {
     return false;
 }
 
+auto Error::aside(std::string a) -> Error& {
+    aside_note = a;
+    aside_token = main_token;
+    return *this;
+}
+auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a) -> Error& {
+    aside_note  = a;
+    aside_token = t;
+    return *this;
+}
+auto Error::aside() const -> std::string {
+    return aside_note;
+}
+auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool {
+    if (token.line() == aside_token.line()
+        and token.character() == aside_token.character()) {
+        return true;
+    }
+    if (token.line() != aside_token.line()) {
+        return false;
+    }
+    if (token.character() >= aside_token.character()
+        and token.ends(true) <= aside_token.ends(true)) {
+        return true;
+    }
+    return false;
+}
+
 auto Error::str() const -> std::string {
     return message;
 }

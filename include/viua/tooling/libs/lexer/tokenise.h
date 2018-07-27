@@ -34,8 +34,8 @@ class Token {
     using Position_type = decltype(content)::size_type;
 
   private:
-    Position_type const line_number;
-    Position_type const character_in_line;
+    Position_type line_number;
+    Position_type character_in_line;
 
   public:
     auto line() const -> Position_type;
@@ -56,6 +56,7 @@ class Token {
 
     Token(Position_type const, Position_type const, std::string);
     Token();
+    auto operator=(Token const&) -> Token&;
 };
 
 auto tokenise(std::string const&) -> std::vector<Token>;

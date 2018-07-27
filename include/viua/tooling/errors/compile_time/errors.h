@@ -40,7 +40,7 @@ struct Error {
     std::vector<std::string> attached_notes;
 
     std::string aside_note;
-    viua::tooling::libs::lexer::Token const aside_token;
+    viua::tooling::libs::lexer::Token aside_token;
 
     auto line() const -> viua::tooling::libs::lexer::Token::Position_type;
     auto character() const -> viua::tooling::libs::lexer::Token::Position_type;
@@ -50,6 +50,11 @@ struct Error {
 
     auto add(viua::tooling::libs::lexer::Token) -> Error&;
     auto match(viua::tooling::libs::lexer::Token const) const -> bool;
+
+    auto aside(std::string) -> Error&;
+    auto aside(viua::tooling::libs::lexer::Token, std::string) -> Error&;
+    auto aside() const -> std::string;
+    auto match_aside(viua::tooling::libs::lexer::Token) const -> bool;
 
     auto str() const -> std::string;
     auto what() const -> std::string;
