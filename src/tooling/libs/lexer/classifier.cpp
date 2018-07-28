@@ -31,6 +31,10 @@ auto is_id(std::string const& s) -> bool {
     static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*$"};
     return regex_match(s, identifier);
 }
+auto is_scoped_id(std::string const& s) -> bool {
+    static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$"};
+    return regex_match(s, identifier);
+}
 auto is_decimal_integer(std::string const& s) -> bool {
     auto const decimal_integer = std::regex{"^(0|[1-9][0-9]*)$"};
     return regex_match(s, decimal_integer);

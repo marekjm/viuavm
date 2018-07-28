@@ -64,6 +64,7 @@ static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_vi
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
     if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
         normalise_register_access(tokens, source.advance(1));
         i += 3;
@@ -71,6 +72,11 @@ static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_vi
         tokens.push_back(token);
         i += 1;
     } else if (is_id(token.str())) {
+        tokens.push_back(Token{token.line(), token.character(), "void"});
+        tokens.push_back(token);
+        tokens.push_back(source.at(i + 1));  // arity separator
+        tokens.push_back(source.at(i + 2));  // arity
+    } else if (is_scoped_id(token.str())) {
         tokens.push_back(Token{token.line(), token.character(), "void"});
         tokens.push_back(token);
         tokens.push_back(source.at(i + 1));  // arity separator

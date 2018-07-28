@@ -28,6 +28,7 @@ namespace libs {
 namespace lexer {
 namespace classifier {
 auto is_id(std::string const&) -> bool;
+auto is_scoped_id(std::string const&) -> bool;
 auto is_decimal_integer(std::string const&) -> bool;
 auto is_access_type_specifier(std::string const&) -> bool;
 }}}}}
