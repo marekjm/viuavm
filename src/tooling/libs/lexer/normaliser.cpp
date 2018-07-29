@@ -44,7 +44,10 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
     tokens.push_back(source.at(0));
 
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
-    if (auto const& register_index = source.at(1); is_decimal_integer(register_index.str())) {
+    using viua::tooling::libs::lexer::classifier::is_id;    // registers may have user-defined names, so
+                                                            // we have to allow ids here (but not scoped
+                                                            // ones!)
+    if (auto const& register_index = source.at(1); is_decimal_integer(register_index.str()) or is_id(register_index.str())) {
         tokens.push_back(register_index);
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
