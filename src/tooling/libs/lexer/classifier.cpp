@@ -51,4 +51,13 @@ auto is_register_set_name(std::string const& s) -> bool {
             or s == "global"
            );
 }
+auto is_quoted_text(std::string const& s) -> bool {
+    if (s.empty()) {
+        return false;
+    }
+    if (s.size() < 2) {
+        return false;
+    }
+    return (s.front() == '"' and s.back() == '"');
+}
 }}}}}
