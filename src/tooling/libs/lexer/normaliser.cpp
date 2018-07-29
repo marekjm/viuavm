@@ -178,6 +178,15 @@ static auto normalise_text(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
+static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(1));
+
+    return i;
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
@@ -190,6 +199,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_allocate_registers(tokens, vector_view{source, i});
         } else if (token == "text") {
             i += normalise_text(tokens, vector_view{source, i});
+        } else if (token == "print") {
+            i += normalise_print(tokens, vector_view{source, i});
         } else {
             tokens.push_back(token);
         }
