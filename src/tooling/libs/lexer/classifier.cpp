@@ -45,4 +45,10 @@ auto is_access_type_specifier(std::string const& s) -> bool {
             or s == "*"  // pointer dereference access
            );
 }
+auto is_register_set_name(std::string const& s) -> bool {
+    return (   s == "local"
+            or s == "static"
+            or s == "global"
+           );
+}
 }}}}}
