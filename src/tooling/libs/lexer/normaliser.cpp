@@ -34,12 +34,14 @@ using index_type = std::vector<Token>::size_type;
 
 /*
  * All normalise_*() functions assume that they are called at the appropriate moment.
- * They return the number of tokens consumed.
+ * They return the number of tokens consumed, so that the counter in the main loop can
+ * be updated like this:
+ *
+ *      i += normalise_fn(...);
+ *
  */
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
-
-    std::cerr << source.at(1).str() << std::endl;
 
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
     if (auto const& register_index = source.at(1); is_decimal_integer(register_index.str())) {
@@ -53,6 +55,18 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
             });
     }
 
+    using viua::tooling::libs::lexer::classifier::is_register_set_name;
+    if (auto const& register_set = source.at(2); is_register_set_name(register_set.str())) {
+        tokens.push_back(register_set);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , register_set
+                , "expected register set specifier"
+            });
+    }
+
     return 3;
 }
 static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
@@ -60,37 +74,42 @@ static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_vi
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
-    std::cerr << source.at(i).str() << std::endl;
-
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_id;
     using viua::tooling::libs::lexer::classifier::is_scoped_id;
     if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
-        normalise_register_access(tokens, source.advance(1));
-        i += 3;
+        i += normalise_register_access(tokens, source.advance(1));
     } else if (token == "void") {
         tokens.push_back(token);
-        i += 1;
-    } else if (is_id(token.str())) {
+        ++i;
+    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+        // normalise the token stream by inserting a return-value-specifier token
         tokens.push_back(Token{token.line(), token.character(), "void"});
-        tokens.push_back(token);
-        tokens.push_back(source.at(i + 1));  // arity separator
-        tokens.push_back(source.at(i + 2));  // arity
-    } else if (is_scoped_id(token.str())) {
-        tokens.push_back(Token{token.line(), token.character(), "void"});
-        tokens.push_back(token);
-        tokens.push_back(source.at(i + 1));  // arity separator
-        tokens.push_back(source.at(i + 2));  // arity
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
                 , token
-                , "expected register access, `void`, or function name"
+                , "expected register access specifier, `void`, or function name"
             });
     }
 
-    return 3;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(source.at(i));    // function name
+        tokens.push_back(source.at(++i));  // arity separator
+        tokens.push_back(source.at(++i));  // arity
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier, `void`, or function name"
+            });
+    }
+
+    return i;
 }
 
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
