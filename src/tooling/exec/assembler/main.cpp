@@ -255,21 +255,18 @@ static auto underline_error_token(
 
     auto has_matched = false;
     auto has_matched_for_aside = false;
+    auto underline = std::ostringstream{};
+
     while (i < tokens.size()) {
         auto const& each = tokens.at(i++);
         auto match = error.match(each);
 
-        using viua::util::string::escape_sequences::COLOR_FG_RED_1;
         using viua::util::string::escape_sequences::ATTR_RESET;
         using viua::util::string::escape_sequences::send_escape_seq;
 
         if (each == "\n") {
             o << send_escape_seq(ATTR_RESET);
             break;
-        }
-
-        if (match) {
-            o << send_escape_seq(COLOR_FG_RED_1);
         }
 
         auto c = char{match ? (has_matched ? '~' : '^') : ' '};
@@ -302,31 +299,36 @@ static auto underline_error_token(
              * The loop is for the string of '~'.
              */
             if (n--) {
-                o << c;
+                underline << c;
                 if (match) {
                     c = '~';
                 }
             }
             while (n--) {
-                o << c;
+                underline << c;
             }
-        }
-
-        if (match) {
-            o << send_escape_seq(ATTR_RESET);
         }
     }
 
+    if (auto const u = underline.str(); not u.empty()) {
+        using viua::util::string::escape_sequences::COLOR_FG_RED_1;
+        using viua::util::string::escape_sequences::ATTR_RESET;
+        using viua::util::string::escape_sequences::send_escape_seq;
+
+        o << send_escape_seq(COLOR_FG_RED_1);
+        o << u;
+        o << send_escape_seq(ATTR_RESET);
+    }
     o << '\n';
 
     if (not error.aside().empty()) {
-        using viua::util::string::escape_sequences::COLOR_FG_RED_1;
+        using viua::util::string::escape_sequences::COLOR_FG_LIGHT_YELLOW;
         using viua::util::string::escape_sequences::COLOR_FG_LIGHT_GREEN;
         using viua::util::string::escape_sequences::ATTR_RESET;
         using viua::util::string::escape_sequences::send_escape_seq;
 
         o << indent.str();
-        o << send_escape_seq(COLOR_FG_RED_1) << '^';
+        o << send_escape_seq(COLOR_FG_LIGHT_YELLOW) << '^';
         o << send_escape_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside();
         o << send_escape_seq(ATTR_RESET);
         o << '\n';
