@@ -193,7 +193,6 @@ static auto normalise_text(std::vector<Token>& tokens, vector_view<Token> const&
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
-    using viua::tooling::libs::lexer::classifier::is_quoted_text;
     if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
     } else {
@@ -205,8 +204,17 @@ static auto normalise_text(std::vector<Token>& tokens, vector_view<Token> const&
             });
     }
 
+    using viua::tooling::libs::lexer::classifier::is_quoted_text;
+    using viua::tooling::libs::lexer::classifier::is_default;
     if (auto const& token = source.at(i); is_quoted_text(token.str())) {
         tokens.push_back(token);
+        ++i;
+    } else if (is_default(token.str())) {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "\"\""
+        }.original(token.str()));
         ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
@@ -252,8 +260,16 @@ static auto normalise_float(std::vector<Token>& tokens, vector_view<Token> const
     }
 
     using viua::tooling::libs::lexer::classifier::is_float;
+    using viua::tooling::libs::lexer::classifier::is_default;
     if (auto const& token = source.at(i); is_float(token.str())) {
         tokens.push_back(token);
+        ++i;
+    } else if (is_default(token.str())) {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "0.0"
+        }.original(token.str()));
         ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}

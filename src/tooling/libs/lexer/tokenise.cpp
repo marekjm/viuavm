@@ -47,8 +47,9 @@ auto Token::str(std::string s) -> void {
 auto Token::original() const -> decltype(original_content) {
     return original_content;
 }
-auto Token::original(std::string s) -> void {
+auto Token::original(std::string s) -> Token& {
     original_content = s;
+    return *this;
 }
 
 auto Token::ends(bool const as_original) const -> Position_type {

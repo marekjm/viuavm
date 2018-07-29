@@ -34,6 +34,7 @@ auto is_access_type_specifier(std::string const&) -> bool;
 auto is_register_set_name(std::string const&) -> bool;
 auto is_quoted_text(std::string const&) -> bool;
 auto is_float(std::string const&) -> bool;
+auto is_default(std::string const&) -> bool;
 }}}}}
 
 #endif

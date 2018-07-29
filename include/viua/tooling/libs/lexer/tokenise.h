@@ -45,7 +45,7 @@ class Token {
     auto str(std::string) -> void;
 
     auto original() const -> decltype(original_content);
-    auto original(std::string) -> void;
+    auto original(std::string) -> Token&;
 
     auto ends(bool const = false) const -> Position_type;
 
