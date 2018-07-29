@@ -187,6 +187,35 @@ static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const
     return i;
 }
 
+static auto normalise_ctor_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); not is_access_type_specifier(token.str())) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
+
+    if (auto const& token = source.at(i); token.str() == "%") {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                , token
+                , "expected direct register access specifier"
+            }.aside("expected \"%\""));
+    }
+
+    return i;
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
@@ -201,6 +230,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_text(tokens, vector_view{source, i});
         } else if (token == "print") {
             i += normalise_print(tokens, vector_view{source, i});
+        } else if (token == "izero") {
+            i += normalise_ctor_instruction(tokens, vector_view{source, i});
         } else {
             tokens.push_back(token);
         }
