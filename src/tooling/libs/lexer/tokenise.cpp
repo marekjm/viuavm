@@ -47,9 +47,8 @@ auto Token::str(std::string s) -> void {
 auto Token::original() const -> decltype(original_content) {
     return original_content;
 }
-auto Token::original(std::string s) -> Token& {
+auto Token::original(std::string s) -> void {
     original_content = s;
-    return *this;
 }
 
 auto Token::ends(bool const as_original) const -> Position_type {
@@ -68,14 +67,15 @@ Token::operator std::string() const {
     return str();
 }
 
-Token::Token(Position_type const line,
-             Position_type const character,
-             std::string text)
+Token::Token(Position_type const line
+             , Position_type const character
+             , std::string text
+             , std::string original)
         : content{ text }
-        , original_content{ text }
+        , original_content{ original.empty() ? text : original }
         , line_number{ line }
         , character_in_line{ character } {}
-Token::Token() : Token(0, 0, "") {}
+Token::Token() : Token(0, 0, "", "") {}
 
 auto Token::operator=(Token const& token) -> Token& {
     content = token.content;

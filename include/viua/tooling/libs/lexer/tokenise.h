@@ -45,7 +45,7 @@ class Token {
     auto str(std::string) -> void;
 
     auto original() const -> decltype(original_content);
-    auto original(std::string) -> Token&;
+    auto original(std::string) -> void;
 
     auto ends(bool const = false) const -> Position_type;
 
@@ -54,7 +54,7 @@ class Token {
 
     explicit operator std::string() const;
 
-    Token(Position_type const, Position_type const, std::string);
+    Token(Position_type const, Position_type const, std::string, std::string = "");
     Token();
     auto operator=(Token const&) -> Token&;
 };

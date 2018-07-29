@@ -214,7 +214,8 @@ static auto normalise_text(std::vector<Token>& tokens, vector_view<Token> const&
             token.line()
             , token.character()
             , "\"\""
-        }.original(token.str()));
+            , token.str()
+        });
         ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
@@ -269,7 +270,8 @@ static auto normalise_float(std::vector<Token>& tokens, vector_view<Token> const
             token.line()
             , token.character()
             , "0.0"
-        }.original(token.str()));
+            , token.str()
+        });
         ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
