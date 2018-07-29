@@ -73,6 +73,48 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
     return 3;
 }
 
+static auto normalise_ctor_target_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    if (auto const& access_specifier = source.at(0); access_specifier != "%") {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                , access_specifier
+                , "expected direct register access specifier"
+            }.aside("expected \"%\""));
+    }
+
+    tokens.push_back(source.at(0));
+
+    using viua::tooling::libs::lexer::classifier::is_decimal_integer;
+    using viua::tooling::libs::lexer::classifier::is_id;    // registers may have user-defined names, so
+                                                            // we have to allow ids here (but not scoped
+                                                            // ones!)
+    if (auto const& register_index = source.at(1); is_decimal_integer(register_index.str()) or is_id(register_index.str())) {
+        tokens.push_back(register_index);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , register_index
+                , "expected register index (decimal integer)"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_register_set_name;
+    if (auto const& register_set = source.at(2); is_register_set_name(register_set.str())) {
+        tokens.push_back(register_set);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , register_set
+                , "expected register set specifier"
+            });
+    }
+
+    return 3;
+}
+
 static auto normalise_call(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -187,13 +229,20 @@ static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const
     return i;
 }
 
-static auto normalise_ctor_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_izero(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+    return normalise_ctor_target_register_access(tokens, source.advance(1));
+}
+
+static auto normalise_float(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
-    if (auto const& token = source.at(i); not is_access_type_specifier(token.str())) {
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+    } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
@@ -202,15 +251,17 @@ static auto normalise_ctor_instruction(std::vector<Token>& tokens, vector_view<T
             });
     }
 
-    if (auto const& token = source.at(i); token.str() == "%") {
-        i += normalise_register_access(tokens, source.advance(1));
+    using viua::tooling::libs::lexer::classifier::is_float;
+    if (auto const& token = source.at(i); is_float(token.str())) {
+        tokens.push_back(token);
+        ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
                 , token
-                , "expected direct register access specifier"
-            }.aside("expected \"%\""));
+                , "expected floating point literal"
+            });
     }
 
     return i;
@@ -231,7 +282,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "print") {
             i += normalise_print(tokens, vector_view{source, i});
         } else if (token == "izero") {
-            i += normalise_ctor_instruction(tokens, vector_view{source, i});
+            i += normalise_izero(tokens, vector_view{source, i});
+        } else if (token == "float") {
+            i += normalise_float(tokens, vector_view{source, i});
         } else {
             tokens.push_back(token);
         }
