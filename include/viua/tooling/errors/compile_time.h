@@ -32,6 +32,7 @@ enum class Compile_time_error {
     No_input_file,
     Not_a_file,
     Unexpected_token,
+    Invalid_access_type_specifier,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

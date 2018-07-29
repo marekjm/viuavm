@@ -69,7 +69,7 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
 
     return 3;
 }
-static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_call(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -112,6 +112,35 @@ static auto normalise_call[[maybe_unused]](std::vector<Token>& tokens, vector_vi
     return i;
 }
 
+static auto normalise_allocate_registers(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); not is_access_type_specifier(token.str())) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier for local register set"
+            });
+    }
+
+    if (auto const& token = source.at(i); token.str() == "%") {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                , token
+                , "expected direct register access specifier"
+            }.aside("expected \"%\""));
+    }
+
+    return i;
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
@@ -120,6 +149,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
 
         if (token == "call") {
             i += normalise_call(tokens, vector_view{source, i});
+        } else if (token == "allocate_registers") {
+            i += normalise_allocate_registers(tokens, vector_view{source, i});
         } else {
             tokens.push_back(token);
         }
