@@ -374,6 +374,16 @@ static auto normalise_integer(std::vector<Token>& tokens, vector_view<Token> con
     return i;
 }
 
+static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+    return normalise_register_access(tokens, source.advance(1)) + 1;
+}
+
+static auto normalise_idec(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+    return normalise_register_access(tokens, source.advance(1)) + 1;
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
@@ -394,6 +404,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_float(tokens, vector_view{source, i});
         } else if (token == "integer") {
             i += normalise_integer(tokens, vector_view{source, i});
+        } else if (token == "iinc") {
+            i += normalise_iinc(tokens, vector_view{source, i});
+        } else if (token == "idec") {
+            i += normalise_idec(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else {
