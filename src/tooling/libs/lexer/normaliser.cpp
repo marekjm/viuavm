@@ -87,6 +87,27 @@ static auto normalise_directive_signature(std::vector<Token>& tokens, vector_vie
     return normalise_function_signature(tokens, source.advance(1)) + 1;
 }
 
+static auto normalise_directive_bsignature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(source.at(i));    // block name
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected block name"
+            });
+    }
+
+    return ++i;
+}
+
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -410,6 +431,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_idec(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
+        } else if (token == ".bsignature:") {
+            i += normalise_directive_bsignature(tokens, vector_view{source, i});
         } else if (token == "\n") {
             tokens.push_back(token);
             ++i;
