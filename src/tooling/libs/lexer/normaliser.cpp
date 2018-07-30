@@ -40,6 +40,53 @@ using index_type = std::vector<Token>::size_type;
  *      i += normalise_fn(...);
  *
  */
+static auto normalise_function_signature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    auto i = std::remove_reference_t<decltype(source)>::size_type{0};
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(source.at(i));    // function name
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected function name"
+            });
+    }
+
+    if (auto const& token = source.at(++i); token == "/") {
+        tokens.push_back(source.at(i));  // arity separator
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected / (arity separator)"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_decimal_integer;
+    if (auto const& token = source.at(++i); is_decimal_integer(token.str())) {
+        tokens.push_back(source.at(i));  // arity
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected arity (decimal integer)"
+            });
+    }
+
+    return ++i;
+}
+
+static auto normalise_directive_signature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+    return normalise_function_signature(tokens, source.advance(1)) + 1;
+}
+
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -303,6 +350,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_izero(tokens, vector_view{source, i});
         } else if (token == "float") {
             i += normalise_float(tokens, vector_view{source, i});
+        } else if (token == ".signature:") {
+            i += normalise_directive_signature(tokens, vector_view{source, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(viua::tooling::errors::compile_time::Error{
