@@ -288,7 +288,7 @@ static auto normalise_float(std::vector<Token>& tokens, vector_view<Token> const
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
-    for (auto i = index_type{0}; i < source.size(); ++i) {
+    for (auto i = index_type{0}; i < source.size();) {
         auto const& token = source.at(i);
 
         if (token == "call") {
@@ -304,7 +304,12 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "float") {
             i += normalise_float(tokens, vector_view{source, i});
         } else {
-            tokens.push_back(token);
+            throw viua::tooling::errors::compile_time::Error_wrapper{}
+                .append(viua::tooling::errors::compile_time::Error{
+                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                    , token
+                    , "expected a directive or an instruction"
+                });
         }
     }
 
