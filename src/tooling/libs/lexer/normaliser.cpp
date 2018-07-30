@@ -287,7 +287,7 @@ static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const
 
 static auto normalise_izero(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
-    return normalise_ctor_target_register_access(tokens, source.advance(1));
+    return normalise_ctor_target_register_access(tokens, source.advance(1)) + 1;
 }
 
 static auto normalise_float(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
