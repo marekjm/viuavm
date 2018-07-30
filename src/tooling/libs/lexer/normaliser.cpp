@@ -410,6 +410,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_idec(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
+        } else if (token == "\n") {
+            tokens.push_back(token);
+            ++i;
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(viua::tooling::errors::compile_time::Error{
