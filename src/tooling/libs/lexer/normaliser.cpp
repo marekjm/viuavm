@@ -459,6 +459,38 @@ static auto normalise_idec(std::vector<Token>& tokens, vector_view<Token> const&
     return normalise_register_access(tokens, source.advance(1)) + 1;
 }
 
+static auto normalise_arg(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(1));  // destination register
+
+    if (auto const& access_specifier = source.at(i); access_specifier != "%") {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                , access_specifier
+                , "expected direct register access specifier"
+            }.aside("expected \"%\""));
+    }
+
+    tokens.push_back(source.at(i));
+
+    using viua::tooling::libs::lexer::classifier::is_decimal_integer;
+    if (auto const& register_index = source.at(++i); is_decimal_integer(register_index.str())) {
+        tokens.push_back(register_index);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , register_index
+                , "expected argument register index (decimal integer)"
+            });
+    }
+
+    return ++i;
+}
+
 static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
@@ -615,6 +647,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_iinc(tokens, vector_view{source, i});
         } else if (token == "idec") {
             i += normalise_idec(tokens, vector_view{source, i});
+        } else if (token == "arg") {
+            i += normalise_arg(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
