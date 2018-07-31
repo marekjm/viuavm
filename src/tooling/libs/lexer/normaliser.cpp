@@ -699,6 +699,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_closure_definition(tokens, vector_view{source, i});
         } else if (token == ".function:") {
             i += normalise_function_definition(tokens, vector_view{source, i});
+        } else if (token == ".end") {
+            tokens.push_back(token);
+            ++i;
         } else if (token == ".block:") {
             i += normalise_block_definition(tokens, vector_view{source, i});
         } else if (token == ".info:") {
