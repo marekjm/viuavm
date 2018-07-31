@@ -686,6 +686,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_iinc(tokens, vector_view{source, i});
         } else if (token == "idec") {
             i += normalise_idec(tokens, vector_view{source, i});
+        } else if (token == "return" or token == "leave") {
+            tokens.push_back(token);
+            ++i;
         } else if (token == "arg") {
             i += normalise_arg(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
