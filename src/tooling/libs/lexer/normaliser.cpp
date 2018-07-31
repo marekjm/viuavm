@@ -543,6 +543,33 @@ static auto normalise_closure_definition(std::vector<Token>& tokens, vector_view
     return i;
 }
 
+static auto normalise_function_definition(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    if (auto const& token = source.at(i); token == "[[") {
+        i += normalise_attribute_list(tokens, source.advance(1));
+    } else {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "[["
+            , token.str()
+        });
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "]]"
+            , token.str()
+        });
+    }
+
+    i += normalise_function_signature(tokens, vector_view{source, i});
+
+    return i;
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
@@ -573,6 +600,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_directive_bsignature(tokens, vector_view{source, i});
         } else if (token == ".closure:") {
             i += normalise_closure_definition(tokens, vector_view{source, i});
+        } else if (token == ".function:") {
+            i += normalise_function_definition(tokens, vector_view{source, i});
         } else if (token == ".info:") {
             i += normalise_directive_info(tokens, vector_view{source, i});
         } else if (token == "\n") {
