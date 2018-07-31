@@ -108,6 +108,39 @@ static auto normalise_directive_bsignature(std::vector<Token>& tokens, vector_vi
     return ++i;
 }
 
+static auto normalise_directive_info(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(source.at(i));    // key
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected module metadata key name (id or scoped id)"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_quoted_text;
+    if (auto const& token = source.at(++i); is_quoted_text(token.str())) {
+        tokens.push_back(source.at(i));    // value
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected module metadata value (quoted string)"
+            });
+    }
+
+    return ++i;
+}
+
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -540,6 +573,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_directive_bsignature(tokens, vector_view{source, i});
         } else if (token == ".closure:") {
             i += normalise_closure_definition(tokens, vector_view{source, i});
+        } else if (token == ".info:") {
+            i += normalise_directive_info(tokens, vector_view{source, i});
         } else if (token == "\n") {
             tokens.push_back(token);
             ++i;
