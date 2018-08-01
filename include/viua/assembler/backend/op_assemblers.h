@@ -167,8 +167,9 @@ auto assemble_parameter_op(Program& program,
     Token_index source = target + 1;
 
     (program
-     .*op)(::assembler::operands::getint(
-               ::assembler::operands::resolve_register(tokens.at(target))),
+     .*op)(::assembler::operands::getint_with_rs_type(
+               ::assembler::operands::resolve_register(tokens.at(target)),
+               viua::internals::Register_sets::FRAME),
            ::assembler::operands::getint_with_rs_type(
                ::assembler::operands::resolve_register(tokens.at(source)),
                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));

@@ -51,6 +51,8 @@ enum class Register_sets : types::registerset_type_marker {
     GLOBAL = 0,
     LOCAL,
     STATIC,
+    FRAME,      // actual parameters (arguments):  what is passed to a function call
+    ARGUMENTS,  // formal parameters (parameters): what the function body sees
 };
 }}  // namespace viua::internals
 
