@@ -94,11 +94,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::STATIC:
             oss << "static";
             break;
-        case viua::internals::Register_sets::FRAME:
-            oss << "frame";
-            break;
         case viua::internals::Register_sets::ARGUMENTS:
             oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
             break;
         default:
             if (viua::support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES")
@@ -125,11 +125,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::STATIC:
             oss << "static";
             break;
-        case viua::internals::Register_sets::FRAME:
-            oss << "frame";
-            break;
         case viua::internals::Register_sets::ARGUMENTS:
             oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
             break;
         default:
             throw "invalid register set detected";
@@ -151,11 +151,11 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::STATIC:
             oss << "static";
             break;
-        case viua::internals::Register_sets::FRAME:
-            oss << "frame";
-            break;
         case viua::internals::Register_sets::ARGUMENTS:
             oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
             break;
         default:
             throw "invalid register set detected";
@@ -515,7 +515,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         break;
     case PARAM:
     case PAMV:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        ptr = disassemble_ri_operand(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         break;
     case SEND:
