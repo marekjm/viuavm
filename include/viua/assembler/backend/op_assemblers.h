@@ -169,7 +169,7 @@ auto assemble_parameter_op(Program& program,
     (program
      .*op)(::assembler::operands::getint_with_rs_type(
                ::assembler::operands::resolve_register(tokens.at(target)),
-               viua::internals::Register_sets::FRAME),
+               viua::internals::Register_sets::ARGUMENTS),
            ::assembler::operands::getint_with_rs_type(
                ::assembler::operands::resolve_register(tokens.at(source)),
                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
