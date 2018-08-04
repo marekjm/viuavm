@@ -421,7 +421,6 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 }
                 if (opcode == MOVE or opcode == COPY) {
                     if (instruction->operands.at(0)->tokens.at(1) != "arguments") {
-                        std::cerr << "nope " << instruction->operands.at(0)->tokens.at(1).str() << std::endl;
                         continue;
                     }
 
