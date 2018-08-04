@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2018 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -173,6 +173,10 @@ auto viua::assembler::frontend::parser::parse_operand(
             ri->rss = Register_sets::STATIC;
         } else if (tokens.at(i) == "global") {
             ri->rss = Register_sets::GLOBAL;
+        } else if (tokens.at(i) == "parameters") {
+            ri->rss = Register_sets::PARAMETERS;
+        } else if (tokens.at(i) == "arguments") {
+            ri->rss = Register_sets::ARGUMENTS;
         } else {
             /*
              * This is just for 'arg' instruction's special-case, where

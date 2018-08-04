@@ -165,6 +165,10 @@ auto ::assembler::operands::resolve_rs_type(Token const token)
         return viua::internals::Register_sets::STATIC;
     } else if (token == "global") {
         return viua::internals::Register_sets::GLOBAL;
+    } else if (token == "arguments") {
+        return viua::internals::Register_sets::ARGUMENTS;
+    } else if (token == "parameters") {
+        return viua::internals::Register_sets::PARAMETERS;
     } else {
         throw viua::cg::lex::Invalid_syntax(
             token, "invalid register set type name: " + token.str());

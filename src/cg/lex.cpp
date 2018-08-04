@@ -362,7 +362,7 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
 }
 
 auto is_register_set_name(string const& s) -> bool {
-    return (s == "local" or s == "static" or s == "global");
+    return (s == "local" or s == "static" or s == "global" or s == "arguments" or s == "parameters");
 }
 static auto is_register_index(std::string const s) -> bool {
     auto const p = s.at(0);
