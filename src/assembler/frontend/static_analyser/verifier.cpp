@@ -346,7 +346,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
                         or opcode == FRAME or opcode == PARAM
-                        or opcode == PAMV)) {
+                        or opcode == PAMV or opcode == MOVE
+                        or opcode == COPY)) {
                     continue;
                 }
 
@@ -371,6 +372,59 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                 }
 
                 if (opcode == PARAM or opcode == PAMV) {
+                    unsigned long slot_index = 0;
+                    bool detected_slot_index = false;
+
+                    auto parameter_index_token =
+                        instruction->operands.at(0)->tokens.at(0);
+                    if (parameter_index_token.str().at(0) == '@') {
+                        slot_index_detection_is_reliable = false;
+                    }
+                    if (parameter_index_token.str().at(0) == '%'
+                        and str::isnum(parameter_index_token.str().substr(1))) {
+                        slot_index =
+                            stoul(parameter_index_token.str().substr(1));
+                        detected_slot_index = true;
+                    }
+
+                    if (detected_slot_index and detected_frame_parameters_count
+                        and slot_index >= frame_parameters_count) {
+                        ostringstream report;
+                        report << "pass to parameter slot " << slot_index
+                               << " in frame with only "
+                               << frame_parameters_count << " slots available";
+                        throw viua::cg::lex::Invalid_syntax(
+                            instruction->tokens.at(0), report.str());
+                    }
+                    if (detected_slot_index
+                        and detected_frame_parameters_count) {
+                        if (filled_slots[slot_index]) {
+                            throw Traced_syntax_error()
+                                .append(Invalid_syntax(
+                                            instruction->tokens.at(0),
+                                            "double pass to parameter slot "
+                                                + std::to_string(slot_index))
+                                            .add(instruction->operands.at(0)
+                                                     ->tokens.at(0)))
+                                .append(
+                                    Invalid_syntax(pass_lines[slot_index], "")
+                                        .note("first pass at"))
+                                .append(
+                                    Invalid_syntax(last_frame->tokens.at(0), "")
+                                        .note("in frame spawned at"));
+                        }
+                        filled_slots[slot_index] = true;
+                        pass_lines[slot_index]   = instruction->tokens.at(0);
+                    }
+
+                    continue;
+                }
+                if (opcode == MOVE or opcode == COPY) {
+                    if (instruction->operands.at(0)->tokens.at(1) != "arguments") {
+                        std::cerr << "nope " << instruction->operands.at(0)->tokens.at(1).str() << std::endl;
+                        continue;
+                    }
+
                     unsigned long slot_index = 0;
                     bool detected_slot_index = false;
 

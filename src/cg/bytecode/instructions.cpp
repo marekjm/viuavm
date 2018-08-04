@@ -760,6 +760,9 @@ auto opsaturatingudiv(viua::internals::types::byte* addr_ptr,
 
 auto opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
+    if (a.rs_type == viua::internals::Register_sets::ARGUMENTS) {
+        return insert_two_ri_instruction(addr_ptr, PAMV, a, b);
+    }
     return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
 }
 
