@@ -335,7 +335,15 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     auto const op = OPCODE(*saved_ptr);
     auto opname   = std::string{};
     try {
-        opname = OP_NAMES.at(op);
+        if (op == PAMV) {
+            /*
+             * PAMV is an internal instruction, not visible to the
+             * user code.
+             */
+            opname = "move";
+        } else {
+            opname = OP_NAMES.at(op);
+        }
         ++ptr;
     } catch (std::out_of_range const& e) {
         auto emsg = ostringstream{};
@@ -514,8 +522,11 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr = disassemble_ri_operand(oss, ptr);
         break;
     case PARAM:
-    case PAMV:
         ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        break;
+    case PAMV:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         break;
     case SEND:

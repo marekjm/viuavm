@@ -464,9 +464,6 @@ auto assemble_instruction(
     } else if (tokens.at(i) == "param") {
         viua::assembler::backend::op_assemblers::assemble_parameter_op<
             &Program::opparam>(program, tokens, i);
-    } else if (tokens.at(i) == "pamv") {
-        viua::assembler::backend::op_assemblers::assemble_parameter_op<
-            &Program::oppamv>(program, tokens, i);
     } else if (tokens.at(i) == "arg") {
         viua::assembler::backend::op_assemblers::assemble_op_arg(
             program, tokens, i);

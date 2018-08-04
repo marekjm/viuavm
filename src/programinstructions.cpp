@@ -518,11 +518,6 @@ auto Program::opparam(int_op const a, int_op const b) -> Program& {
     return (*this);
 }
 
-auto Program::oppamv(int_op const a, int_op const b) -> Program& {
-    addr_ptr = cg::bytecode::oppamv(addr_ptr, a, b);
-    return (*this);
-}
-
 auto Program::oparg(int_op const a, int_op const b) -> Program& {
     addr_ptr = cg::bytecode::oparg(addr_ptr, a, b);
     return (*this);

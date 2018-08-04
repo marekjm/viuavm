@@ -282,8 +282,6 @@ auto opframe(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opparam(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
-auto oppamv(viua::internals::types::byte*, int_op, int_op)
-    -> viua::internals::types::byte*;
 auto oparg(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opargc(viua::internals::types::byte*, int_op)

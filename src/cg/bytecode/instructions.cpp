@@ -760,10 +760,12 @@ auto opsaturatingudiv(viua::internals::types::byte* addr_ptr,
 
 auto opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
-    if (a.rs_type == viua::internals::Register_sets::ARGUMENTS) {
-        return insert_two_ri_instruction(addr_ptr, PAMV, a, b);
-    }
-    return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
+    return insert_two_ri_instruction(
+        addr_ptr
+        , (a.rs_type == viua::internals::Register_sets::ARGUMENTS ? PAMV : MOVE)
+        , a
+        , b
+    );
 }
 
 auto opcopy(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
@@ -863,11 +865,6 @@ auto opframe(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
 auto opparam(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, PARAM, a, b);
-}
-
-auto oppamv(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, PAMV, a, b);
 }
 
 auto oparg(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
