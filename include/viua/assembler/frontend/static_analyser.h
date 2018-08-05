@@ -103,7 +103,7 @@ class Register_usage_profile {
      *
      *      text %1 local "Hello World!"    ; register 1 is defined
      *      delete %1 local                 ; register 1 is erased
-     *      integer %1 local 42              ; register 1 is defined again
+     *      integer %1 local 42             ; register 1 is defined again
      */
     std::map<Register, viua::cg::lex::Token> erased_registers;
 

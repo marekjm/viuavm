@@ -64,7 +64,7 @@
     izero %counter local
 
     .mark: begin_loop
-    frame ^[(pamv %0 (copy %to_push local %counter local) local)]
+    frame ^[(move %0 arguments (copy %to_push local %counter local) local)]
     vpush %vec local (call %to_push local %fn local) local
     iinc %counter local
     ; reuse 'to_push' register since it's empty
