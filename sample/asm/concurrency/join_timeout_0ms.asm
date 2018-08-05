@@ -22,7 +22,7 @@
 
     .name: 1 counter
     if (idec (arg %counter local %0 local) local) local +1 end_this
-    frame ^[(pamv %0 %counter local)]
+    frame ^[(move %0 arguments %counter local)]
     tailcall child_process/1
     .mark: end_this
     string %0 local "child process done"
@@ -31,7 +31,7 @@
 .function: child_process/0
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (integer %1 local 65536) local)]
+    frame ^[(move %0 arguments (integer %1 local 65536) local)]
     tailcall child_process/1
     return
 .end

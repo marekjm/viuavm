@@ -25,7 +25,7 @@
     allocate_registers %2 local
 
     ; just print %the parameter received
-    frame ^[(pamv %0 (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (arg %1 local %0) local)]
     call void printer::print/1
 
     return
@@ -37,7 +37,7 @@
     ; call printer::print/1 in a new process to
     ; not block the execution, and
     ; detach the process as we do not care about its return value
-    frame ^[(pamv %0 (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (arg %1 local %0) local)]
     process void printer_wrapper/1
     return
 .end
@@ -71,40 +71,40 @@
     ; the hellos are printed by foreign functions
     ; this test demonstrates that with more than one FFI scheduler several
     ; foreign function may execute in parallel
-    frame ^[(pamv %0 (text %1 local "Joe") local)]
+    frame ^[(move %0 arguments (text %1 local "Joe") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Robert") local)]
+    frame ^[(move %0 arguments (text %1 local "Robert") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Mike") local)]
+    frame ^[(move %0 arguments (text %1 local "Mike") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Bjarne") local)]
+    frame ^[(move %0 arguments (text %1 local "Bjarne") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Guido") local)]
+    frame ^[(move %0 arguments (text %1 local "Guido") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Dennis") local)]
+    frame ^[(move %0 arguments (text %1 local "Dennis") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Bram") local)]
+    frame ^[(move %0 arguments (text %1 local "Bram") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Herb") local)]
+    frame ^[(move %0 arguments (text %1 local "Herb") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Anthony") local)]
+    frame ^[(move %0 arguments (text %1 local "Anthony") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Alan") local)]
+    frame ^[(move %0 arguments (text %1 local "Alan") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Ada") local)]
+    frame ^[(move %0 arguments (text %1 local "Ada") local)]
     call void process_spawner/1
 
-    frame ^[(pamv %0 (text %1 local "Charles") local)]
+    frame ^[(move %0 arguments (text %1 local "Charles") local)]
     call void process_spawner/1
 
     izero %0 local

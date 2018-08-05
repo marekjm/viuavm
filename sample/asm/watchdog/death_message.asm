@@ -41,20 +41,20 @@
 .function: a_detached_concurrent_process/0
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (integer %1 local 32) local)]
+    frame ^[(move %0 arguments (integer %1 local 32) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process)!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process) after a runaway exception!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (string %1 local "a_detached_concurrent_process") local)]
+    frame ^[(move %0 arguments (string %1 local "a_detached_concurrent_process") local)]
     call log_exiting_detached/1
 
     return
@@ -63,12 +63,12 @@
 .function: a_joined_concurrent_process/0
     allocate_registers %3 local
 
-    frame ^[(pamv %0 (integer %1 local 128) local)]
+    frame ^[(move %0 arguments (integer %1 local 128) local)]
     call void std::misc::cycle/1
 
     print (string %1 local "Hello World (from joined process)!") local
 
-    frame ^[(pamv %0 (string %1 local "a_joined_concurrent_process") local)]
+    frame ^[(move %0 arguments (string %1 local "a_joined_concurrent_process") local)]
     call void log_exiting_joined/1
 
     throw (string %2 local "OH NOES!") local

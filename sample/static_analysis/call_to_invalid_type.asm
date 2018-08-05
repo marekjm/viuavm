@@ -33,7 +33,7 @@
     text %2 local "a_function/1"
 
     frame %1
-    pamv %0 %1 local
+    move %0 arguments %1 local
     call void %2 local
     ;tailcall a_function/1
 

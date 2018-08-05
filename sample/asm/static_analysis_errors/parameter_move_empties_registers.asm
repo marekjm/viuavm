@@ -28,7 +28,7 @@
     allocate_registers %2 local
 
     izero %1 local
-    frame ^[(pamv %0 %1 local)]
+    frame ^[(move %0 arguments %1 local)]
     call foo/1
 
     print %1 local

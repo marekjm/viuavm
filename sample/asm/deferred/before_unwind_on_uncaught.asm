@@ -36,7 +36,7 @@
 
     text %1 local "Hello World before stack unwinding!"
 
-    frame ^[(pamv %0 (ptr %2 local %1 local) local)]
+    frame ^[(move %0 arguments (ptr %2 local %1 local) local)]
     defer print_me/1
 
     frame %0

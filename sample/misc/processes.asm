@@ -66,7 +66,7 @@
 
     ; take advantage of tail recursion in Viua and
     ; elegantly follow with process spawner execution
-    frame ^[(pamv %0 %counter local) (pamv %1 %limit local)]
+    frame ^[(move %0 arguments %counter local) (move %1 arguments %limit local)]
     tailcall spawn_processes/2
 .end
 
@@ -78,7 +78,7 @@
     echo (arg %1 local %0) local
     print (text %2 local " processs to launch") local
 
-    frame ^[(pamv %0 (izero %3 local) local) (pamv %1 %limit local)]
+    frame ^[(move %0 arguments (izero %3 local) local) (move %1 arguments %limit local)]
     tailcall spawn_processes/2
 .end
 

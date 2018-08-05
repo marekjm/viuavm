@@ -22,7 +22,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (string %1 local "Hello World!") local)]
+    frame ^[(move %0 arguments (string %1 local "Hello World!") local)]
     call lib::foo/1
 
     izero %0 local

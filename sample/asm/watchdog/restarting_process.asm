@@ -53,20 +53,20 @@
 
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 local 32) local)]
+    frame ^[(move %0 arguments (integer %1 local 32) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process)!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process) after a runaway exception!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (string %1 local "a_detached_concurrent_process") local)]
+    frame ^[(move %0 arguments (string %1 local "a_detached_concurrent_process") local)]
     call log_exiting_detached/1
 
     return
@@ -94,7 +94,7 @@
 
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 local 128) local)]
+    frame ^[(move %0 arguments (integer %1 local 128) local)]
     call std::misc::cycle/1
 
     .name: 1 divide_what

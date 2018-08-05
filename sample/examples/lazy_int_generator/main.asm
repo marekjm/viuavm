@@ -59,7 +59,7 @@
     ; to loop. It is also *much* more readable than a "normal" loop; at
     ; least when written in Viua VM assembly.
     frame %1
-    pamv %0 %next_value local
+    move %0 arguments %next_value local
     tailcall lazy_generator/1
 .end
 
@@ -92,7 +92,7 @@
     ; do not share state with each other.
     integer %value local 42
     frame %1
-    pamv %0 %value local
+    move %0 arguments %value local
     process %generator local lazy_generator/1
 
     ; Then, we can request values from the generator. It will generate

@@ -37,7 +37,7 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(pamv %0 (arg %parameter local %1) local)]
+    frame ^[(move %0 arguments (arg %parameter local %1) local)]
     call %3 local (arg %func local %0) local
 
     ; ...and return the result

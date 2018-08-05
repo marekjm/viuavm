@@ -109,7 +109,7 @@
     frame %0
     call %3 local is_divisible_by_2/0
 
-    frame ^[(param %0 %3 local) (pamv %1 %1 local)]
+    frame ^[(param %0 %3 local) (move %1 arguments %1 local)]
     print (call %4 local filter_closure/2) local
 
     izero %0 local

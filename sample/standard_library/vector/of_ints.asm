@@ -24,7 +24,7 @@
 
     import "std::vector"
 
-    frame ^[(pamv %0 (integer %1 local 8) local)]
+    frame ^[(move %0 arguments (integer %1 local 8) local)]
     call %1 local std::vector::of_ints/1
 
     print %1 local

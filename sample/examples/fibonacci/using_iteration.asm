@@ -42,7 +42,7 @@
 
     .name: 2 accumulator
 
-    frame ^[(pamv %0 (arg %1 local %0) local) (pamv %1 (izero %accumulator local) local)]
+    frame ^[(move %0 arguments (arg %1 local %0) local) (move %1 arguments (izero %accumulator local) local)]
     call %accumulator local fibonacci/2
 
     move %0 local %accumulator local
@@ -56,7 +56,7 @@
 
     integer %result local 5
 
-    frame ^[(pamv %0 %result local)]
+    frame ^[(move %0 arguments %result local)]
     call %result local fibonacci/1
 
     print %result local

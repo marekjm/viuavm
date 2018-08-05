@@ -37,7 +37,7 @@
     .unused: %2
     ptr %2 local %1 local
 
-    frame ^[(pamv %0 %2 local)]
+    frame ^[(move %0 arguments %2 local)]
     defer print_this_pointer/1
 
     frame %0

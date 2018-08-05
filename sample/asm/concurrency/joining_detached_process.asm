@@ -44,7 +44,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(pamv %0 (self %1 local) local)]
+    frame ^[(move %0 arguments (self %1 local) local)]
     process void running_detached/1
 
     receive %1 local

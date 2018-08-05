@@ -96,7 +96,7 @@
 
     print %1 local
 
-    frame ^[(param %0 (function %3 local is_divisible_by_2/1) local) (pamv %1 %1 local)]
+    frame ^[(param %0 (function %3 local is_divisible_by_2/1) local) (move %1 arguments %1 local)]
     print (call %4 local filter/2) local
 
     izero %0 local

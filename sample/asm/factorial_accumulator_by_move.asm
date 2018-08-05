@@ -34,7 +34,7 @@
 
     ; this frame must be the same as in "main"
     ; result must still be a reference
-    frame ^[(param %0 %number local) (pamv %1 %result local)]
+    frame ^[(param %0 %number local) (move %1 arguments %result local)]
     call %result local factorial/2
 
     .mark: finish
@@ -56,7 +56,7 @@
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param %0 %number local) (pamv %1 %result local)]
+    frame ^[(param %0 %number local) (move %1 arguments %result local)]
     call %result local factorial/2
 
     ; print result

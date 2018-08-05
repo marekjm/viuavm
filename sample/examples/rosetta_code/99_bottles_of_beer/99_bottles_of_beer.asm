@@ -118,7 +118,7 @@
     .mark: theres_more
     ; if there are more bottles
     ; call the function once more
-    frame ^[(pamv %0 %total_number_of_bottles local)]
+    frame ^[(move %0 arguments %total_number_of_bottles local)]
     tailcall bottles_of_beer/1
 .end
 
@@ -128,7 +128,7 @@
     .name: %iota total_number_of_bottles
     integer %total_number_of_bottles local 9
 
-    frame ^[(pamv %0 %total_number_of_bottles local)]
+    frame ^[(move %0 arguments %total_number_of_bottles local)]
     call void bottles_of_beer/1
 
     izero %0 local

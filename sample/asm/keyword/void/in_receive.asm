@@ -27,7 +27,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %iota (self %iota local) local)]
+    frame ^[(move %iota arguments (self %iota local) local)]
     process void sender/1
 
     receive void infinity

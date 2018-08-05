@@ -27,7 +27,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %iota (izero %iota local) local)]
+    frame ^[(move %iota arguments (izero %iota local) local)]
     call void foo/1
 
     izero %0 local

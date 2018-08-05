@@ -37,7 +37,7 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(pamv %0 (arg %parameter local %1) local)]
+    frame ^[(move %0 arguments (arg %parameter local %1) local)]
     call %3 local (arg %func local %0) local
 
     ; ...and return the result
@@ -53,7 +53,7 @@
     integer %1 local 5
     function %2 local square/1
 
-    frame ^[(param %0 %2 local) (pamv %1 %1 local)]
+    frame ^[(param %0 %2 local) (move %1 arguments %1 local)]
     print (call %3 local apply/2) local
 
     izero %0 local

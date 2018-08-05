@@ -57,7 +57,7 @@
     ; spawn printer process
     ; it immediately waits for a message to arrive
     ; first message it receives should crash it
-    frame ^[(pamv %0 (self %iota local) local)]
+    frame ^[(move %0 arguments (self %iota local) local)]
     process void global_printer/1
 
     .name: %iota printer_pid
@@ -66,11 +66,11 @@
 
     ; spawn two independent writer processes
     ; whichever triggers the printer process is not important
-    frame ^[(param %0 %printer_pid local) (pamv %1 (string %2 local "Hello World") local)]
+    frame ^[(param %0 %printer_pid local) (move %1 arguments (string %2 local "Hello World") local)]
     process void global_writer/2
 
     ; this is the second writer process
-    frame ^[(param %0 %printer_pid local) (pamv %1 (string %2 local "broken") local)]
+    frame ^[(param %0 %printer_pid local) (move %1 arguments (string %2 local "broken") local)]
     process void global_writer/2
 
     izero %0 local

@@ -33,7 +33,7 @@
     text %2 local "Hello World!"
 
     frame %1
-    pamv @2 %1 local
+    move @2 arguments %1 local
     call void a_function/1
 
     izero %0 local

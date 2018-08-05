@@ -27,7 +27,7 @@
 .function: another_valid/0
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (string %1 local "Hello World!") local)]
+    frame ^[(move %0 arguments (string %1 local "Hello World!") local)]
     tailcall valid/1
 .end
 

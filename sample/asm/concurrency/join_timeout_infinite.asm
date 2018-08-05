@@ -22,7 +22,7 @@
 
     .name: 1 counter
     if (idec (arg %counter local %0) local) local +1 end_this
-    frame ^[(pamv %0 %counter local)]
+    frame ^[(move %0 arguments %counter local)]
     tailcall child_process/1
     .mark: end_this
     string %0 local "child process done"
@@ -33,7 +33,7 @@
 
     ; 1024 to force the scheduler to preempt the process at least one time
     ; while the parent process waits.
-    frame ^[(pamv %0 (integer %1 local 1024) local)]
+    frame ^[(move %0 arguments (integer %1 local 1024) local)]
     tailcall child_process/1
     return
 .end

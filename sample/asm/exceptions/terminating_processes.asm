@@ -24,7 +24,7 @@
 
     ; wait for some time before throwing to display the stack trace roughly
     ; in the middle of output
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
     ; it does not really matter what is thrown here, as long as it is not
@@ -43,7 +43,7 @@
     ; run another one
     ;
     ; this is just means to have a few dummy processes running concurrently
-    frame ^[(pamv %0 (arg %1 local %1) local)]
+    frame ^[(move %0 arguments (arg %1 local %1) local)]
     call std::misc::cycle/1
 
     ; print hello to the screen to show that the process #n just finished running
@@ -96,25 +96,25 @@
     ;
     ; make the processes run for varying periods of time by
     ; giving them different numbers of cycles to burn though
-    frame ^[(pamv %0 (integer %1 local 1000) local)]
+    frame ^[(move %0 arguments (integer %1 local 1000) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 100) local)]
+    frame ^[(move %0 arguments (integer %1 local 100) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 400) local)]
+    frame ^[(move %0 arguments (integer %1 local 400) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 600) local)]
+    frame ^[(move %0 arguments (integer %1 local 600) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 128) local)]
+    frame ^[(move %0 arguments (integer %1 local 128) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 64) local)]
+    frame ^[(move %0 arguments (integer %1 local 64) local)]
     call spawn_process/1
 
-    frame ^[(pamv %0 (integer %1 local 312) local)]
+    frame ^[(move %0 arguments (integer %1 local 312) local)]
     call spawn_process/1
 
     ; all the processes are detached

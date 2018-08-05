@@ -31,7 +31,7 @@
 
     import "std::vector"
 
-    frame ^[(pamv %0 (integer %1 local 8) local) (pamv %1 (function %1 local return_integer/1) local)]
+    frame ^[(move %0 arguments (integer %1 local 8) local) (move %1 arguments (function %1 local return_integer/1) local)]
     call %1 local std::vector::of/2
 
     print %1 local

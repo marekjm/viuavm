@@ -37,7 +37,7 @@
 
     vpush %2 local (integer %1 local -1) local
 
-    frame ^[(param %0 %2 local) (pamv %1 (function %3 local is_not_negative/1) local)]
+    frame ^[(param %0 %2 local) (move %1 arguments (function %3 local is_not_negative/1) local)]
     call %4 local std::vector::every/2
     print %4 local
 

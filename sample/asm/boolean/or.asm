@@ -27,10 +27,10 @@
 .function: main/1
     allocate_registers %4 local
 
-    frame ^[(pamv %0 (izero %1 local) local)]
+    frame ^[(move %0 arguments (izero %1 local) local)]
     call %1 local boolean/1
 
-    frame ^[(pamv %0 (integer %2 local 1) local)]
+    frame ^[(move %0 arguments (integer %2 local 1) local)]
     call %2 local boolean/1
 
     or %3 local %1 local %2 local

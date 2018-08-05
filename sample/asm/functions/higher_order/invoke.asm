@@ -76,7 +76,7 @@
     ; a register and
     ; pass it as a parameter
     vat %slot local %parameters_list local %loop_counter local
-    pamv @loop_counter (copy %iota local *slot local) local
+    move @loop_counter arguments (copy %iota local *slot local) local
 
     ; loop_counter++
     iinc %loop_counter local
