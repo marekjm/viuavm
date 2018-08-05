@@ -1749,7 +1749,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testParameterMoveFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm',
-                './sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:30:13: error: use of empty local register "1"')
+                './sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:30:23: error: move from empty local register "1"')
 
     def testParameterMoveEmptiesRegisters(self):
         runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm',
@@ -2475,7 +2475,11 @@ class AssemblerErrorTests(unittest.TestCase):
             "./sample/asm/errors/zero_distance_true_branch.asm:26:19: error: zero-distance jump")
 
     def testAtLeastTwoTokensAreRequiredInAWrappedInstruction(self):
-        runTestFailsToAssemble(self, 'at_least_two_tokens_required_in_a_wrapped_instruction.asm', "./sample/asm/errors/at_least_two_tokens_required_in_a_wrapped_instruction.asm:29:28: error: at least two tokens are required in a wrapped instruction")
+        runTestFailsToAssemble(
+            self,
+            'at_least_two_tokens_required_in_a_wrapped_instruction.asm',
+            "./sample/asm/errors/at_least_two_tokens_required_in_a_wrapped_instruction.asm:29:38: error: at least two tokens are required in a wrapped instruction",
+        )
 
     def testInvalidRegisterIndexInNameDirective(self):
         runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name_directive.asm', [
