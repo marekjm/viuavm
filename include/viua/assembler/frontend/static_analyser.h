@@ -425,8 +425,6 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
 auto check_op_frame(Register_usage_profile&, Instruction const&) -> void;
 auto check_op_param(Register_usage_profile& register_usage_profile,
                     Instruction const& instruction) -> void;
-auto check_op_pamv(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
 auto check_op_call(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_tailcall(Register_usage_profile& register_usage_profile,
