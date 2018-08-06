@@ -80,6 +80,8 @@ class Register_usage_profile {
     /*
      * Registers are "fresh" until they either 1/ cross the boundary of an "if"
      * instruction, or 2/ are used. After that they are no longer fresh.
+     * Registers in `arguments` register set are fresh until a calling instruction
+     * is executed (e.g. `call`, or `process`).
      * Overwriting a fresh register is an error because it means that the
      * previously defined value is never used.
      */
@@ -146,6 +148,7 @@ class Register_usage_profile {
     auto use(Register const r, viua::cg::lex::Token const t) -> void;
 
     auto defresh() -> void;
+    auto erase_arguments(viua::cg::lex::Token const) -> void;
 
     auto erase(Register const r, viua::cg::lex::Token const& token) -> void;
     auto erased(Register const r) const -> bool;

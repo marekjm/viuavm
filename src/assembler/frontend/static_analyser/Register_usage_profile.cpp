@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <viua/assembler/frontend/static_analyser.h>
 
 namespace viua { namespace assembler { namespace frontend {
@@ -31,6 +32,21 @@ auto Register_usage_profile::fresh(Register const r) const -> bool {
 
 auto Register_usage_profile::defresh() -> void {
     fresh_registers.clear();
+}
+auto Register_usage_profile::erase_arguments(Token const t) -> void {
+    auto args_regs = std::vector<Register>{};
+    std::copy_if(
+        fresh_registers.begin()
+        , fresh_registers.end()
+        , std::back_inserter(args_regs)
+        , [](Register const& r) -> bool {
+            return r.register_set == viua::internals::Register_sets::ARGUMENTS;
+        }
+    );
+    for (auto const& each : args_regs) {
+        erase(each, t);
+        fresh_registers.erase(fresh_registers.find(each));
+    }
 }
 
 auto Register_usage_profile::define(Register const r,
