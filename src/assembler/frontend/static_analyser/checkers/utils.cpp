@@ -52,6 +52,14 @@ auto register_set_names = std::map<Register_sets, std::string>{
         Register_sets::LOCAL,
         "local",
     },
+    {
+        Register_sets::ARGUMENTS,
+        "arguments",
+    },
+    {
+        Register_sets::PARAMETERS,
+        "parameters",
+    },
 };
 auto to_string(Register_sets const register_set_id) -> std::string {
     return register_set_names.at(register_set_id);
