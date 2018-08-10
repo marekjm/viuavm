@@ -1,4 +1,4 @@
-There are 138 instructions in the instruction set currently implemented by the VM:
+There are 137 instructions in the instruction set currently implemented by the VM:
 
 \listed{begin}{sorted=true}
     nop
