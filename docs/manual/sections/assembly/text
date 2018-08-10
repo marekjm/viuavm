@@ -271,7 +271,8 @@ This is a deficiency that will be fixed somewhen in the future (FIXME).
 
 \heading{PASSING PARAMETERS}
 
-Parameters are passed into the function using either \instruction{param} or \instruction{pamv} instruction.
+Parameters are passed into the function using either \instruction{copy} or \instruction{move} instruction
+with a register in the `arguments` register set as a destination.
 
 \heading{EXTRACTING ARGUMENTS}
 

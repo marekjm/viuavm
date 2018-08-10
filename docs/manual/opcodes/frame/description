@@ -7,6 +7,6 @@ local register set.
 Size of the arguments register set is specified by the first operand.
 Size of the local register set is specified by the second operand.
 
-This instruction *MUST* be executed before any \instruction{param} or
-\instruction{pamv} instructions are (they require a frame to be present
-in the "new call frame" slot).
+This instruction *MUST* be executed before any \instruction{copy} or
+\instruction{move} instructions with a register in "arguments" register
+set are executed.
