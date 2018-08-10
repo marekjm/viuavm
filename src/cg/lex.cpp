@@ -441,18 +441,6 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
                                     input_tokens.at(i + 1).character(),
                                     "%16");
             }
-        } else if (token == "param" or token == "pamv") {
-            tokens.push_back(token);  // mnemonic
-
-            tokens.push_back(input_tokens.at(++i));  // target register
-
-            tokens.push_back(input_tokens.at(++i));  // source register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "local");
-            } else {
-                tokens.push_back(input_tokens.at(++i));
-            }
         } else if (token == "arg") {
             tokens.push_back(token);  // mnemonic
 
@@ -1227,16 +1215,6 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
                                     input_tokens.at(i + 1).character(),
                                     "%16");
-            }
-        } else if (token == "param" or token == "pamv") {
-            tokens.push_back(input_tokens.at(++i));  // target register
-
-            tokens.push_back(input_tokens.at(++i));  // source register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "local");
-            } else {
-                tokens.push_back(input_tokens.at(++i));
             }
         } else if (token == "arg") {
             tokens.push_back(input_tokens.at(++i));  // target register

@@ -852,30 +852,6 @@ static void check_block_body(TokenVector const& body_tokens,
                 body_tokens.at(target));
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "pamv" or token == "param") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
-
-            if (debug) {
-                cout << str::enquote(token) << " from register "
-                     << str::enquote(str::strencode(body_tokens.at(source)))
-                     << endl;
-            }
-            check_use_of_register(
-                body_tokens,
-                source,
-                i,
-                registers,
-                named_registers,
-                ("parameter "
-                 + std::string{token.str() == "pamv" ? "move" : "pass"}
-                 + " from empty register"));
-            if (token == "pamv") {
-                erase_register(
-                    registers, named_registers, body_tokens.at(source), token);
-            }
-
-            i = skip_till_next_line(body_tokens, i);
-            continue;
         } else if (token == "capture" or token == "capturecopy"
                    or token == "capturemove") {
             TokenIndex source = i + 4;

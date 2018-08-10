@@ -708,44 +708,6 @@ static auto size_of_function(TokenVector const& tokens,
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_frame = size_of_instruction_with_two_ri_operands;
-static auto size_of_param(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-    calculated_size += size_increment;
-
-    // for source register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
-static auto size_of_pamv(TokenVector const& tokens, TokenVector::size_type i)
-    -> tuple<bytecode_size_type, decltype(i)> {
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-    calculated_size += size_increment;
-
-    // for source register
-    tie(size_increment, i) =
-        size_of_register_index_operand_with_rs_type(tokens, i);
-    calculated_size += size_increment;
-
-    return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
 static auto size_of_call(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
@@ -1331,12 +1293,6 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "frame") {
             ++i;
             tie(increase, i) = size_of_frame(tokens, i);
-        } else if (tokens.at(i) == "param") {
-            ++i;
-            tie(increase, i) = size_of_param(tokens, i);
-        } else if (tokens.at(i) == "pamv") {
-            ++i;
-            tie(increase, i) = size_of_pamv(tokens, i);
         } else if (tokens.at(i) == "call") {
             ++i;
             tie(increase, i) = size_of_call(tokens, i);
