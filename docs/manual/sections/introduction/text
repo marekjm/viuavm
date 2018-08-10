@@ -165,6 +165,42 @@ Tail calls (facilitated by the \instruction{tailcall} instruction, described in 
 %% LOCAL REGISTER SET
 \section{end}
 
+\heading{ARGUMENTS REGISTER SET}{ref=registers:register_sets:arguments}
+\section{begin}
+
+Arguments register set is allocated by the \instruction{frame} instruction.
+When a function call instruction is executed, this register set is made available to
+the callee as the parameters register set (described in section \ref{registers:register_sets:parameters}),
+and stops being available to the caller (the function that allocated it).
+
+It can only be accessed by \instruction{copy} and \instruction{move} instructions, and
+only when the target register address points to a register in the arguments register set.
+This register set is write-only - no operations may be performed directly on it, except
+for setting arguments for the next function call.
+
+%% ARGUMENTS REGISTER SET
+\section{end}
+
+\heading{PARAMETERS REGISTER SET}{ref=registers:register_sets:parameters}
+\section{begin}
+
+First, the caller allocates this register set using the \instruction{frame} instruction; it is then
+available (to the caller) as the arguments register set (described in section
+\ref{registers:register_sets:arguments}).
+Then, after a function call instruction is executed, the same register set is made available to
+the callee as the parameters register set.
+
+Parameters register set is available for the duration of the function call.
+Its contents are destroyed when the function's frame is popped from the stack.
+
+It can only be accessed by \instruction{copy} and \instruction{move} instructions, and
+only when the source register address points to a register in the parameters register set.
+This register set is read-only and no operations may be performed directly on it, except
+for fetching the parameters from it.
+
+%% PARAMETERS REGISTER SET
+\section{end}
+
 %% DIRECT ACCESS REGISTER SETS
 \section{end}
 
@@ -344,5 +380,3 @@ will copy a value dereferenced from a pointer located in local register 1 into s
 
 %% INTRODUCTION
 \section{end}
-
-%% vim:set ft=tex:
