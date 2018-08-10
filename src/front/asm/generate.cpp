@@ -390,8 +390,9 @@ static auto generate_entry_function(
                  + 3 * sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
-        entry_function_tokens.emplace_back(0, 0, "param");
+        entry_function_tokens.emplace_back(0, 0, "copy");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
@@ -402,8 +403,9 @@ static auto generate_entry_function(
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
-        entry_function_tokens.emplace_back(0, 0, "param");
+        entry_function_tokens.emplace_back(0, 0, "copy");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
@@ -424,8 +426,9 @@ static auto generate_entry_function(
                  + 2 * sizeof(viua::internals::Register_sets)
                  + 2 * sizeof(viua::internals::types::register_index);
 
-        entry_function_tokens.emplace_back(0, 0, "param");
+        entry_function_tokens.emplace_back(0, 0, "copy");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
