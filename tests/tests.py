@@ -1745,7 +1745,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testParameterPassFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'parameter_pass_from_empty_register.asm',
-                './sample/asm/static_analysis_errors/parameter_pass_from_empty_register.asm:30:14: error: use of empty local register "1"')
+                './sample/asm/static_analysis_errors/parameter_pass_from_empty_register.asm:30:23: error: copy from empty local register "1"')
 
     def testParameterMoveFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm',
