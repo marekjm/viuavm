@@ -47,7 +47,7 @@
     arg %number_of_bottles local %0
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles local)]
+    frame ^[(copy %0 arguments %number_of_bottles local)]
     call %bottles_of_beer local bottles_of_beer_text/1
 
     echo %number_of_bottles local
@@ -73,7 +73,7 @@
     arg %number_of_bottles %0
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles local)]
+    frame ^[(copy %0 arguments %number_of_bottles local)]
     call %bottles_of_beer local bottles_of_beer_text/1
 
     .name: %iota on_the_wall
@@ -101,14 +101,14 @@
     arg %total_number_of_bottles local %0
 
     ; display first three lines of a paragraph
-    frame ^[(param %0 %total_number_of_bottles local)]
+    frame ^[(copy %0 arguments %total_number_of_bottles local)]
     call void first_print/1
 
     ; decrement the number of bottles
     idec %total_number_of_bottles local
 
     ; display last line of a paragraph
-    frame ^[(param %0 %total_number_of_bottles local)]
+    frame ^[(copy %0 arguments %total_number_of_bottles local)]
     call void second_print/1
 
     ; immediately return if there are no more bottles

@@ -64,7 +64,7 @@
 
     ; spawn a printer process with current limit value
     ; as its only parameter
-    frame ^[(param %0 %limit local)]
+    frame ^[(copy %0 arguments %limit local)]
     call process_spawner/1
     idec %limit local
 

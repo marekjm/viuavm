@@ -31,7 +31,7 @@
 
     izero %2 local
 
-    frame ^[(param %0 %2 local) (param %1 %2 local)]
+    frame ^[(copy %0 arguments %2 local) (copy %1 arguments %2 local)]
     call void print_number_of_params/
 
     frame %0

@@ -42,7 +42,7 @@
     vat %i local %parameters local (integer %iota local 1) local
     copy %i local *i local
     vat %message local %parameters local (integer %iota local 0) local
-    frame ^[(param %0 *message local) (param %1 (iinc %i local) local)]
+    frame ^[(copy %0 arguments *message local) (copy %1 arguments (iinc %i local) local)]
     process void a_division_executing_process/2
 
     return
@@ -155,7 +155,7 @@
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (integer %1 local 42) local) (param %1 (integer %2 local 0) local)]
+    frame ^[(copy %0 arguments (integer %1 local 42) local) (copy %1 arguments (integer %2 local 0) local)]
     process void a_division_executing_process/2
 
     frame %0

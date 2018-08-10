@@ -33,7 +33,7 @@
 
     vpush (vpush (vpush (vector %2 local) local (integer %1 local -1) local) local (integer %1 local -2) local) local (integer %1 local -3) local
 
-    frame ^[(param %0 %2 local) (move %1 arguments (function %3 local is_not_negative/1) local)]
+    frame ^[(copy %0 arguments %2 local) (move %1 arguments (function %3 local is_not_negative/1) local)]
     call %4 local std::vector::any/2
     print %4 local
 

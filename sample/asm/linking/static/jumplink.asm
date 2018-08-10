@@ -20,7 +20,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    frame ^[(param %0 (integer %1 local 42) local)]
+    frame ^[(copy %0 arguments (integer %1 local 42) local)]
     call jumprint/1
 
     izero %0 local

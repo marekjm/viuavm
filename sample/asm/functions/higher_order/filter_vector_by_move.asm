@@ -61,7 +61,7 @@
 
     ; call filtering function to determine whether current element
     ; is a valid value...
-    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)]
+    frame ^[(copy %0 arguments *(vat %7 local %2 local %4 local) local)]
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -96,7 +96,7 @@
 
     print %1 local
 
-    frame ^[(param %0 (function %3 local is_divisible_by_2/1) local) (move %1 arguments %1 local)]
+    frame ^[(copy %0 arguments (function %3 local is_divisible_by_2/1) local) (move %1 arguments %1 local)]
     print (call %4 local filter/2) local
 
     izero %0 local

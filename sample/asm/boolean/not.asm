@@ -29,7 +29,7 @@
 
     izero %1 local
 
-    frame ^[(param %0 %1 local)]
+    frame ^[(copy %0 arguments %1 local)]
     call %1 local boolean/1
 
     print (not (print %1 local) local) local

@@ -29,7 +29,7 @@
     call %1 local std::vector::of_ints/1
     print %1 local
 
-    frame ^[(param %0 %1 local)]
+    frame ^[(copy %0 arguments %1 local)]
     call %2 local std::vector::reverse_in_place/1
     print %2 local
 

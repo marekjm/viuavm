@@ -69,7 +69,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(param %0 (integer %1 local 4) local) (param %1 (integer %2 local 3) local)]
+    frame ^[(copy %0 arguments (integer %1 local 4) local) (copy %1 arguments (integer %2 local 3) local)]
     print (call %1 local power_of/2) local
 
     izero %0 local

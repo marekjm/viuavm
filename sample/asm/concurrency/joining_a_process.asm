@@ -49,10 +49,10 @@
 .function: main/1
     allocate_registers %5 local
 
-    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
+    frame ^[(copy %0 arguments (string %1 local "Hello concurrent World! (1)") local)]
     process %3 local print_lazy/1
 
-    frame ^[(param %0 (string %2 local "Hello concurrent World! (2)") local)]
+    frame ^[(copy %0 arguments (string %2 local "Hello concurrent World! (2)") local)]
     process %4 local print_lazy/1
 
     join void %3 local

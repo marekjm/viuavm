@@ -77,16 +77,16 @@
 .function: main/1
     allocate_registers %6 local
 
-    frame ^[(param %0 (integer %1 local 1) local)]
+    frame ^[(copy %0 arguments (integer %1 local 1) local)]
     call %2 local closure_maker/1
 
-    frame ^[(param %0 (integer %1 local 2) local)]
+    frame ^[(copy %0 arguments (integer %1 local 2) local)]
     call %3 local %2 local
 
-    frame ^[(param %0 (integer %1 local 3) local)]
+    frame ^[(copy %0 arguments (integer %1 local 3) local)]
     call %4 local %3 local
 
-    frame ^[(param %0 (integer %1 local 4) local)]
+    frame ^[(copy %0 arguments (integer %1 local 4) local)]
     print (call %5 local %4 local) local
 
     izero %0 local

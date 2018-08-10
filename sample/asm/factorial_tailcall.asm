@@ -53,7 +53,7 @@
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param %0 %number local) (move %1 arguments (integer %result local 1) local)]
+    frame ^[(copy %0 arguments %number local) (move %1 arguments (integer %result local 1) local)]
     call %result local factorial/2
 
     ; print result

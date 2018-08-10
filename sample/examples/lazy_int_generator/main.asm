@@ -99,22 +99,22 @@
     ; them on demand, performing the role of an inifinite source of ever
     ; increasing integers.
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 

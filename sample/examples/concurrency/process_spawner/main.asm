@@ -40,7 +40,7 @@
     .mark: begin_loop
     if (gte %4 local %counter local %limit local) local end_loop +1
 
-    frame ^[(param %0 %counter local)]
+    frame ^[(copy %0 arguments %counter local)]
     process void worker_process/1
 
     iinc %counter local
@@ -66,7 +66,7 @@
 .function: run_process_spawner/1
     allocate_registers %2 local
 
-    frame ^[(param %0 (arg %1 local %0) local)]
+    frame ^[(copy %0 arguments (arg %1 local %0) local)]
     process void process_spawner/1
     return
 .end
@@ -80,7 +80,7 @@
     frame %0
     call %1 local get_number_of_processes_to_spawn/0
 
-    frame ^[(param %0 %1 local)]
+    frame ^[(copy %0 arguments %1 local)]
     call run_process_spawner/1
 
     izero %0 local

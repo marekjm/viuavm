@@ -106,11 +106,11 @@
     integer %5 local -2
 
     ; call sum/4() local function
-    frame ^[(param %0 %2 local) (param %1 %3 local) (param %2 %4 local) (param %3 %5 local)]
+    frame ^[(copy %0 arguments %2 local) (copy %1 arguments %3 local) (copy %2 arguments %4 local) (copy %3 arguments %5 local)]
     print (call %6 local sum/4) local
 
     ; call sum/4 function via invoke/2 function
-    frame ^[(param %0 (function %7 local sum/4) local) (param %1 %1 local)]
+    frame ^[(copy %0 arguments (function %7 local sum/4) local) (copy %1 arguments %1 local)]
     print (call %8 local invoke/2) local
 
     izero %0 local

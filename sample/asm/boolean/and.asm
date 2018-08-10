@@ -30,10 +30,10 @@
     izero %1 local
     integer %2 local 1
 
-    frame ^[(param %0 %1 local)]
+    frame ^[(copy %0 arguments %1 local)]
     call %1 local boolean/1
 
-    frame ^[(param %0 %2 local)]
+    frame ^[(copy %0 arguments %2 local)]
     call %2 local boolean/1
 
     and %3 local %1 local %2 local

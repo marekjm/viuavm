@@ -45,19 +45,19 @@
 
     ; create the adder function
     .name: 2 add_three
-    frame ^[(param %0 (integer %1 local 3) local)]
+    frame ^[(copy %0 arguments (integer %1 local 3) local)]
     call %add_three local make_adder/1
 
     ; add_three(2)
-    frame ^[(param %0 (integer %3 local 2) local)]
+    frame ^[(copy %0 arguments (integer %3 local 2) local)]
     print (call %4 local %add_three local) local
 
     ; add_three(5)
-    frame ^[(param %0 (integer %3 local 5) local)]
+    frame ^[(copy %0 arguments (integer %3 local 5) local)]
     print (call %4 local %add_three local) local
 
     ; add_three(13)
-    frame ^[(param %0 (integer %3 local 13))]
+    frame ^[(copy %0 arguments (integer %3 local 13) local)]
     print (call %4 local %add_three local) local
 
     izero %0 local

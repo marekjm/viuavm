@@ -61,7 +61,7 @@
     return
 
     ; spawn a new process
-    frame ^[(param %0 %counter local)]
+    frame ^[(copy %0 arguments %counter local)]
     process void run_in_a_process/1
 
     ; take advantage of tail recursion in Viua and
@@ -85,7 +85,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(param %0 (integer %1 local 4000) local)]
+    frame ^[(copy %0 arguments (integer %1 local 4000) local)]
     process %1 local process_spawner/1
 
     join void %1 local

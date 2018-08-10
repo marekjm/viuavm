@@ -42,7 +42,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
+    frame ^[(copy %0 arguments (string %1 local "Hello concurrent World! (1)") local)]
     process %2 local print_lazy/1
 
     ; this is OK

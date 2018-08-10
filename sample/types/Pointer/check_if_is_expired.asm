@@ -35,12 +35,12 @@
     integer %1 local 42
     ptr %2 local %1 local
 
-    frame ^[(param %0 %2 local)]
+    frame ^[(copy %0 arguments %2 local)]
     call void isExpired/1
 
     delete %1 local
 
-    frame ^[(param %0 %2 local)]
+    frame ^[(copy %0 arguments %2 local)]
     call void isExpired/1
 
     izero %0 local

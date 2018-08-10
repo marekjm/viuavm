@@ -53,7 +53,7 @@
     integer %1 local 5
     function %2 local square/1
 
-    frame ^[(param %0 %2 local) (param %1 %1 local)]
+    frame ^[(copy %0 arguments %2 local) (copy %1 arguments %1 local)]
     print (call %3 local apply/2) local
 
     izero %0 local

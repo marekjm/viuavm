@@ -46,7 +46,7 @@
 
     .mark: report
     print %1 static
-    frame ^[(param %0 %3 local)]
+    frame ^[(copy %0 arguments %3 local)]
     tailcall counter/1
 
     .mark: finish
@@ -56,7 +56,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    frame ^[(param %0 (integer %1 local 10) local)]
+    frame ^[(copy %0 arguments (integer %1 local 10) local)]
     call void counter/1
     izero %0 local
     return

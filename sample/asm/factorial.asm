@@ -29,7 +29,7 @@
     ; finish "factorial" calls
     if (eq %4 local %number local (integer %3 local 0) local) local finish
 
-    frame ^[(param %0 %number local) (param %1 %result local)]
+    frame ^[(copy %0 arguments %number local) (copy %1 arguments %result local)]
     call %result local factorial/2
 
     .mark: finish
@@ -51,7 +51,7 @@
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param %0 %number local) (param %1 %result local)]
+    frame ^[(copy %0 arguments %number local) (copy %1 arguments %result local)]
     call %result local factorial/2
 
     ; print result

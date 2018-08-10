@@ -70,11 +70,11 @@
     iinc %process_counter static
 
     frame %2
-    param %0 %process_counter static
+    copy %0 arguments %process_counter static
 
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2
-    param %1 (arg %1 local %0) local
+    copy %1 arguments (arg %1 local %0) local
     process void cycle_burner/2
 
     return

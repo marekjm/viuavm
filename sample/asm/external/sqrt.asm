@@ -24,7 +24,7 @@
 
     import "build/test/math"
 
-    frame ^[(param %0 (float %1 local 3.0) local)]
+    frame ^[(copy %0 arguments (float %1 local 3.0) local)]
     call %2 local math::sqrt/1
     print %2 local
 

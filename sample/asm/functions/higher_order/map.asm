@@ -37,7 +37,7 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(param %0 (arg %parameter local %1) local)]
+    frame ^[(copy %0 arguments (arg %parameter local %1) local)]
     call %3 local (arg %func local %0) local
 
     ; ...and return the result
@@ -70,7 +70,7 @@
     if (gte %6 local %4 local %5 local) local loop_end
 
     ; call supplied function on current element...
-    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)]
+    frame ^[(copy %0 arguments *(vat %7 local %2 local %4 local) local)]
     ; ...and push result to new vector
     vpush %3 local (call %8 local %1 local) local
 
@@ -101,7 +101,7 @@
 
     print %1 local
 
-    frame ^[(param %0 (function %3 local square/1) local) (param %1 %1 local)]
+    frame ^[(copy %0 arguments (function %3 local square/1) local) (copy %1 arguments %1 local)]
     print (call %4 local map/2) local
 
     izero %0 local

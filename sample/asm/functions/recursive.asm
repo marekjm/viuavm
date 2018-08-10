@@ -31,7 +31,7 @@
     if (lt %3 local (idec %counter local) local %zero local) break_rec
     print %counter local
 
-    frame ^[(param %0 %counter local) (move %1 arguments %zero local)]
+    frame ^[(copy %0 arguments %counter local) (move %1 arguments %zero local)]
     call void recursive/2
 
     .mark: break_rec
@@ -42,7 +42,7 @@
     allocate_registers %3 local
 
     ; create frame and set initial parameters
-    frame ^[(param %0 (integer %1 local 10) local) (move %1 arguments (integer %2 local 0) local)]
+    frame ^[(copy %0 arguments (integer %1 local 10) local) (move %1 arguments (integer %2 local 0) local)]
     call void recursive/2
 
     izero %0 local

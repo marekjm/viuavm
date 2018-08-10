@@ -24,7 +24,7 @@
 
     import "kitchensink"
 
-    frame ^[(param %0 (integer %0 2))]
+    frame ^[(copy %0 arguments (integer %0 2))]
     call std::kitchensink::sleep/1
 
     izero %0 local

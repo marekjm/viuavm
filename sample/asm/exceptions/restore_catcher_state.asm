@@ -32,7 +32,7 @@
     arg %2 local %0
     integer %4 local [[maybe_unused]] 200
 
-    frame ^[(param %0 %2 local)] %5
+    frame ^[(copy %0 arguments %2 local)] %5
     integer %4 local [[maybe_unused]] 250
     call tertiary/1
 
@@ -55,7 +55,7 @@
     enter .block: main_block
         integer %4 local [[maybe_unused]] 100
 
-        frame ^[(param %0 (integer %1 local 42) local)] %5
+        frame ^[(copy %0 arguments (integer %1 local 42) local)] %5
         call secondary/1
 
         integer %2 local 41

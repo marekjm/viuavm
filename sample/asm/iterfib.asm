@@ -56,7 +56,7 @@
     ; expected result is 1134903170
 
     .name: 2 result
-    frame ^[(param %0 (integer %1 local 45) local)]
+    frame ^[(copy %0 arguments (integer %1 local 45) local)]
     print (call %result local iterfib/1) local
 
     izero %0 local
