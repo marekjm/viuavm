@@ -52,7 +52,7 @@
     ; is a valid value
     frame %1
     vat %7 local %2 local @4 local
-    param %0 %7 local
+    copy %0 arguments %7 local
     call %8 local %1 local
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
@@ -103,7 +103,7 @@
     vat (.name: %iota element) local %list local @counter local
 
     ; invoke given callback
-    frame ^[(param %0 %element local)]
+    frame ^[(copy %0 arguments %element local)]
     call void %callback local
 
     iinc %counter local
@@ -144,7 +144,7 @@
     ; call supplied function on current element
     frame %1
     vat %7 local %2 local @4 local
-    param %0 %7 local
+    copy %0 arguments %7 local
     call %8 local %1 local
 
     ; push result to new vector
@@ -166,7 +166,7 @@
 .block: std::functional::apply::__try_calling
     ; FIXME refactor this to use ^[] syntax
     frame %1
-    param %0 %2 local
+    copy %0 arguments %2 local
     call %3 local %1 local
     move %0 local %3 local
     leave
@@ -190,10 +190,6 @@
     arg %func local %0
     arg %parameter local %1
 
-    ; apply the function to the parameter...
-    ;frame %1
-    ;param %0 parameter
-    ;call %3 func
     try
     catch "Exception" std::functional::apply::__catch
     enter std::functional::apply::__try_calling
@@ -236,7 +232,7 @@
     vat %slot local %2 local @loop_counter local
 
     ; add parameter
-    param @loop_counter %slot local
+    copy @loop_counter arguments %slot local
 
     ; loop_counter++
     iinc %loop_counter local

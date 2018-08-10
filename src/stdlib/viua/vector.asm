@@ -157,7 +157,7 @@
     .mark: begin_loop
     vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 *tmp)]
+    frame ^[(copy %0 arguments *tmp local)]
     and %result (call %6 %fn) %result
 
     ; break loop if there wasn't a match
@@ -193,7 +193,7 @@
     .mark: begin_loop
     vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 *tmp)]
+    frame ^[(copy %0 arguments *tmp local)]
     move %result (call %6 %fn)
 
     ; break the loop if there was a match
