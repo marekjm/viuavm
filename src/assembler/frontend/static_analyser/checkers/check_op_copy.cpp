@@ -40,7 +40,7 @@ auto check_op_copy(Register_usage_profile& register_usage_profile,
             .note("expected register index");
     }
 
-    check_use_of_register(register_usage_profile, *source, "copy from");
+    check_use_of_register(register_usage_profile, *source, "copy from", false, true);
     auto type_of_source =
         assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
             register_usage_profile, *source);

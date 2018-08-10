@@ -47,7 +47,7 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
             .note("expected register index");
     }
 
-    check_use_of_register(register_usage_profile, *source, "move from");
+    check_use_of_register(register_usage_profile, *source, "move from", false, true);
     assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 

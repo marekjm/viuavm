@@ -196,7 +196,9 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
                             Register_index const r) -> void;
 auto check_use_of_register(Register_usage_profile&,
                            viua::assembler::frontend::parser::Register_index,
-                           std::string const = "use of") -> void;
+                           std::string const = "use of",
+                           bool const allow_arguments = false,
+                           bool const allow_parameters = false) -> void;
 
 
 using viua::internals::Value_types;

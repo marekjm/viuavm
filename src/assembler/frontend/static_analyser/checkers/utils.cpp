@@ -157,7 +157,9 @@ static auto maybe_mistyped_register_set(
 }
 auto check_use_of_register(Register_usage_profile& rup,
                            viua::assembler::frontend::parser::Register_index r,
-                           std::string const error_core_msg) -> void {
+                           std::string const error_core_msg,
+                           bool const allow_arguments,
+                           bool const allow_parameters) -> void {
     check_if_name_resolved(rup, r);
     if (r.rss == Register_sets::GLOBAL) {
         /*
@@ -176,6 +178,22 @@ auto check_use_of_register(Register_usage_profile& rup,
          * FIXME Maybe check static register set accesses?
          */
         return;
+    }
+    if ((r.rss == Register_sets::ARGUMENTS) and not allow_arguments) {
+        throw Traced_syntax_error{}
+            .append(Invalid_syntax{
+                r.tokens.at(0),
+                "invalid use of arguments register set"}
+                        .add(r.tokens.at(1))
+                        .note("arguments register set may only be used in target register of `copy` and `move` instructions when a frame is allocated"));
+    }
+    if ((r.rss == Register_sets::PARAMETERS) and not allow_parameters) {
+        throw Traced_syntax_error{}
+            .append(Invalid_syntax{
+                r.tokens.at(0),
+                "invalid use of parameters register set"}
+                        .add(r.tokens.at(1))
+                        .note("parameters register set may only be used in source register of `copy` and `move` instructions"));
     }
 
     if (not rup.in_bounds(r)) {
