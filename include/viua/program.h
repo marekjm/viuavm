@@ -177,6 +177,7 @@ class Program {
     auto opfunction(int_op const, std::string const&) -> Program&;
 
     auto opframe(int_op const, int_op const) -> Program&;
+    auto opparam(int_op const, int_op const) -> Program&;
     auto oparg(int_op const, int_op const) -> Program&;
     auto opargc(int_op const) -> Program&;
     auto opallocate_registers(int_op const) -> Program&;

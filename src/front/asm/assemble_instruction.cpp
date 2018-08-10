@@ -461,6 +461,9 @@ auto assemble_instruction(
         assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
     } else if (tokens.at(i) == "frame") {
         assemble_op_frame(program, tokens, i);
+    } else if (tokens.at(i) == "param") {
+        viua::assembler::backend::op_assemblers::assemble_parameter_op<
+            &Program::opparam>(program, tokens, i);
     } else if (tokens.at(i) == "arg") {
         viua::assembler::backend::op_assemblers::assemble_op_arg(
             program, tokens, i);

@@ -341,12 +341,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
              * user code.
              */
             opname = "move";
-        } else if (op == PARAM) {
-            /*
-             * PARAM is an internal instruction, not visible to the
-             * user code.
-             */
-            opname = "copy";
         } else {
             opname = OP_NAMES.at(op);
         }
@@ -528,6 +522,9 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr = disassemble_ri_operand(oss, ptr);
         break;
     case PARAM:
+        ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        break;
     case PAMV:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
