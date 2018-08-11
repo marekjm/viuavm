@@ -1508,9 +1508,6 @@ class FunctionTests(unittest.TestCase):
     def testLocalRegistersInFunctions(self):
         runTestReturnsIntegers(self, 'local_registers.asm', [42, 666], assembly_opts=('--no-sa',))
 
-    def testObtainingNumberOfParameters(self):
-        runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
-
     def testReturningReferences(self):
         # FIXME: disassembler must understand the .closure: directive
         # for now, the --no-sa flag and everything's gonna be find, believe me
