@@ -2913,7 +2913,7 @@ class StructTests(unittest.TestCase):
     def testOverwritingAValueInAStruct(self):
         runTestSplitlines(self, 'overwriting_a_value_in_a_struct.asm', ["{'answer': 666}", "{'answer': 42}"])
 
-    def testObrainingListOfKeysInAStruct(self):
+    def testObtainingListOfKeysInAStruct(self):
         runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', "['answer', 'foo']")
 
     def testStructOfStructs(self):
