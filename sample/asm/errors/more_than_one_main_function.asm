@@ -19,12 +19,11 @@
 
 .function: main/1
     allocate_registers %1 local
-
-    izero %0 local
+    move %0 local %0 parameters
     return
 .end
 
-.function: main/2
+.function: main/0
     allocate_registers %1 local
 
     izero %0 local
