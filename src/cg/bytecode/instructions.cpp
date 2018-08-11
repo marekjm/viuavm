@@ -760,9 +760,17 @@ auto opsaturatingudiv(viua::internals::types::byte* addr_ptr,
 
 auto opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
+    auto opcode = MOVE;
+    if (a.rs_type == viua::internals::Register_sets::ARGUMENTS) {
+        opcode = PAMV;
+    }
+    if (b.rs_type == viua::internals::Register_sets::PARAMETERS) {
+        opcode = ARG;
+    }
+
     return insert_two_ri_instruction(
         addr_ptr
-        , (a.rs_type == viua::internals::Register_sets::ARGUMENTS ? PAMV : MOVE)
+        , opcode
         , a
         , b
     );
