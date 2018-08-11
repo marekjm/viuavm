@@ -217,6 +217,17 @@ auto check_use_of_register(Register_usage_profile& rup,
                 + " to fix this issue"));
     }
 
+    if ((not rup.defined(Register(r))) and r.rss == Register_sets::PARAMETERS) {
+        auto msg = std::ostringstream{};
+        msg << error_core_msg << ' '
+            << to_string(r.rss) << " register "
+            << str::enquote(std::to_string(r.index))
+            << " out of range";
+        auto error = Traced_syntax_error{}.append(
+            Invalid_syntax(r.tokens.at(0), msg.str()));
+        throw error;
+    }
+
     if (not rup.defined(Register(r))) {
         auto empty_or_erased = (rup.erased(Register(r)) ? "erased" : "empty");
 
