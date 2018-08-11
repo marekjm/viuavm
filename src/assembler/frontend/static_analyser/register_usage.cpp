@@ -20,6 +20,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <viua/util/range.h>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/assembler/assembler.h>
@@ -523,6 +524,16 @@ static auto check_register_usage_for_instruction_block(
     Register_usage_profile register_usage_profile;
     viua::assembler::frontend::static_analyser::checkers::
         map_names_to_register_indexes(register_usage_profile, ib);
+
+    // FIXME: This is ad-hoc code - move it to a utility function.
+    auto const function_arity = std::stoul(ib.name.str().substr(ib.name.str().rfind('/')+1));
+    for (auto const each : viua::util::Range(static_cast<viua::internals::types::register_index>(function_arity))) {
+        auto val = Register{};
+        val.index = each;
+        val.register_set = viua::internals::Register_sets::PARAMETERS;
+        register_usage_profile.define(val, ib.name);
+    }
+
     viua::assembler::frontend::static_analyser::checkers::
         check_register_usage_for_instruction_block_impl(
             register_usage_profile,
