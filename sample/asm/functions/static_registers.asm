@@ -33,7 +33,7 @@
     ; 1) fake taking counter from static registers (it's zero during first pass anyway)
     integer %1 local 0
     ; 2) fetch the argument
-    arg %3 local %0
+    move %3 local %0 parameters
     ; 3) jump straight to report mark
     jump report
 

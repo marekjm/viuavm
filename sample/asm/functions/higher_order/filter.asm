@@ -20,7 +20,7 @@
 .function: is_divisible_by_2/1
     allocate_registers %4 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     integer %2 local 2
 
     .mark: loop_begin
@@ -44,8 +44,8 @@
     ;   * a vector with values to be filtered,
     allocate_registers %9 local
 
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; vector for filtered values
     vector %3 local

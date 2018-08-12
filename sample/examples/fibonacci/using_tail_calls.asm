@@ -22,8 +22,8 @@
 
     .name: 1 current_value
     .name: 2 accumulator
-    arg %current_value local %0
-    arg %accumulator local %1
+    move %current_value local %0 parameters
+    move %accumulator local %1 parameters
 
     if %current_value local +1 fibonacci/2__finished
 

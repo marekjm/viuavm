@@ -21,7 +21,7 @@
     allocate_registers %3 local
 
     .name: 1 current_value
-    arg %current_value local %0
+    move %current_value local %0 parameters
 
     if %current_value local +1 fibonacci/1__finished
 

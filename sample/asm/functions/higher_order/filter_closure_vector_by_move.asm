@@ -19,7 +19,7 @@
 
 .closure: is_divisible_by/1
     .name: 2 bound_variable
-    arg %1 local %0
+    move %1 local %0 parameters
 
     .mark: loop_begin
     if (lt %3 local %1 local %bound_variable local) local loop_end loop_body
@@ -53,8 +53,8 @@
     ;   * a vector with values to be filtered,
     allocate_registers %9 local
 
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; vector for filtered values
     vector %3 local

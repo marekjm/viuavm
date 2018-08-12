@@ -18,12 +18,9 @@
 ;
 
 .function: main/2
-    allocate_registers %2 local
-
-    print (string %1 local "Hello World!") local
-    echo (string %1 local "received ") local
-    echo (argc %1 local) local
-    print (string %1 local " arguments") local
+    allocate_registers %1 local
+    move void %0 parameters
+    move void %1 parameters
     izero %0 local
     return
 .end

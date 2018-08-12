@@ -22,7 +22,7 @@
 
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    mul %0 local (arg %1 local %0) local %1 local
+    mul %0 local (move %1 local %0 parameters) local %1 local
     return
 .end
 
@@ -37,8 +37,8 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(copy %0 arguments (arg %parameter local %1) local)]
-    call %3 local (arg %func local %0) local
+    frame ^[(copy %0 arguments (move %parameter local %1 parameters) local)]
+    call %3 local (move %func local %0 parameters) local
 
     ; ...and return the result
     move %0 local %3 local
@@ -54,8 +54,8 @@
     ; then, it maps (i.e. calls) local the given function on every element of given vector
     ; and returns a vector containing modified values.
     ; returned vector is a newly created one - this function does not modify vectors in place.
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; new vector to store mapped values
     vector %3 local

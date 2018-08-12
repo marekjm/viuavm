@@ -69,8 +69,8 @@
   .name: %6 min_res
   .name: %7 max_res
   .name: %8 step
-  arg %arg0 local %0
-  arg %arg1 local %1
+  move %arg0 local %0 parameters
+  move %arg1 local %1 parameters
   ; arg1 <> 0
   if (not (eq %tmp_bool local %arg1 local (float %tmp_float local 0) local) local) local mod_not_zero
   throw (string %tmp_str local "modulo by zero") local

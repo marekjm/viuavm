@@ -19,7 +19,7 @@
 
 .closure: adder/1
     ; expects register 1 to be an captured integer
-    arg %2 local %0
+    move %2 local %0 parameters
     add %0 local %2 local %1 local
     return
 .end
@@ -33,7 +33,7 @@
     allocate_registers %3 local
 
     .name: 1 number
-    arg %number local %0
+    move %number local %0 parameters
     closure %2 local adder/1
     capture %2 local %1 %1 local
     move %0 local %2 local

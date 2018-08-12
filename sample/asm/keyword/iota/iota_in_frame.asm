@@ -20,8 +20,8 @@
 .function: sample/2
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
-    print (arg %1 local %1) local
+    print (move %1 local %0 parameters) local
+    print (move %1 local %1 parameters) local
     return
 .end
 

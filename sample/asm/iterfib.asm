@@ -36,7 +36,7 @@
 
     .name: %iota number
     .name: %iota length
-    arg %number local %0
+    move %number local %0 parameters
 
     .mark: loop
     .name: %iota result

@@ -38,7 +38,7 @@
 
     ; put second parameter (whatever it is) in
     ; global register 1
-    arg %1 global %1
+    move %1 global %1 parameters
 
     ; send message to printer process to trigger it to
     ; print contents of global register 1

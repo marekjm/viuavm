@@ -21,8 +21,8 @@
     allocate_registers %2 local
 
     .iota: 0
-    print (arg %1 local %iota) local
-    print (arg %1 local %iota) local
+    print (move %1 local %iota parameters) local
+    print (move %1 local %iota parameters) local
     return
 .end
 

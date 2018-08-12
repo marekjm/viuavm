@@ -38,7 +38,7 @@
 .closure: closure_level_3/1
     ; expects 1, 2 and 3 to be captured integers
     .name: 5 accumulator
-    arg %4 local %0
+    move %4 local %0 parameters
     add %accumulator local %1 local %2 local
     add %accumulator local %3 local %accumulator local
     add %accumulator local %4 local %accumulator local

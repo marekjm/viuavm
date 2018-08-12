@@ -42,7 +42,7 @@
 
     ; After we received a message, it makes sense to fetch the value
     ; with which we will respond.
-    arg %value local %0
+    move %value local %0 parameters
 
     ; Make a copy of the value and increase it by one. Each time we want
     ; to respond with a value that will be greater by one than the value
@@ -71,7 +71,7 @@
 
     ; Send a request for new value to the generator.
     ; This means sending it our PID.
-    arg %generator local %0
+    move %generator local %0 parameters
     self %this_process local
     send %generator local %this_process local
     receive %0 local infinity

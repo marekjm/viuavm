@@ -20,7 +20,7 @@
 .function: run_in_a_process/1
     allocate_registers %5 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
 
     text %2 local "spawned process "
     text %3 local %1 local
@@ -46,10 +46,10 @@
     allocate_registers %4 local
 
     .name: 1 counter
-    arg %counter local %0
+    move %counter local %0 parameters
 
     .name: 2 limit
-    arg %limit local %1
+    move %limit local %1 parameters
 
     ; if limit is N, processes IDs go from 0 to N-1
     ; this is why the counter is incremented before the

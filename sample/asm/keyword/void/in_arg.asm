@@ -20,7 +20,7 @@
 .function: foo/1
     allocate_registers %1 local
 
-    arg void %0
+    move void %0 parameters
     return
 .end
 

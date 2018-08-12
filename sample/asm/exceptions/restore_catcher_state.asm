@@ -20,7 +20,7 @@
 .function: tertiary/1
     allocate_registers %5 local
 
-    arg %3 local %0
+    move %3 local %0 parameters
     integer %4 local [[maybe_unused]] 300
     throw %3 local
     return
@@ -29,7 +29,7 @@
 .function: secondary/1
     allocate_registers %5 local
 
-    arg %2 local %0
+    move %2 local %0 parameters
     integer %4 local [[maybe_unused]] 200
 
     frame ^[(copy %0 arguments %2 local)] %5
