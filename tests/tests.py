@@ -1750,7 +1750,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testParameterMoveEmptiesRegisters(self):
         runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm',
-                './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:34:11: error: use of erased local register "1"')
+                './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:33:11: error: use of erased local register "1"')
 
     def testSwapWithEmptyFirstRegister(self):
         runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm',
@@ -2087,7 +2087,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
             '28:19: error: invalid type of value contained in register',
             '28:19: note: expected string, got pointer to integer',
-            '23:9: note: register defined here',
+            '23:10: note: register defined here',
             '25:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
@@ -2097,7 +2097,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'partial_pointerness_inference.asm', [
             '49:13: error: invalid type of value contained in register',
             '49:13: note: expected vector, got pointer to value',
-            '26:9: note: register defined here',
+            '26:10: note: register defined here',
             '35:11: note: type inferred here',
             '                  ^ deduced type is \'pointer to value\'',
             '20:12: error: in function main/1',
@@ -2107,7 +2107,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'two_stage_pointerness_inference.asm', [
             '52:13: error: invalid type of value contained in register',
             '52:13: note: expected vector, got integer',
-            '26:9: note: register defined here',
+            '26:10: note: register defined here',
             '44:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
@@ -2658,7 +2658,7 @@ class MiscTests(unittest.TestCase):
         runTestSplitlines(self, name='main0_as_main_function.asm', expected_output=['Hello World!', 'received 0 arguments'])
 
     def testMain2AsMainFunction(self):
-        runTestSplitlines(self, name='main2_as_main_function.asm', expected_output=['Hello World!', 'received 2 arguments'])
+        runTest(self, 'main2_as_main_function.asm', '')
 
     def testBrokenWatchdog(self):
         runTest(self, 'broken_watchdog.asm', 'main/1 exiting')
