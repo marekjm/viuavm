@@ -84,6 +84,13 @@ auto map_names_to_register_indexes(
             static_cast<viua::internals::types::register_index>(stoul(idx));
         auto name = directive->operands.at(1);
 
+        if (str::is_register_set_name(name)) {
+            throw Invalid_syntax{directive->tokens.at(0),
+                                 "invalid register name: " + name}
+                .add(directive->tokens.at(2))
+                .note("'" + name + "' is a register set name");
+        }
+
         if (register_usage_profile.name_to_index.count(name)) {
             throw Invalid_syntax{directive->tokens.at(2),
                                  "register name already taken: " + name}
