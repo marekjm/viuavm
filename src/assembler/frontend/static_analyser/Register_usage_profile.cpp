@@ -55,7 +55,9 @@ auto Register_usage_profile::define(Register const r,
     using viua::internals::Register_sets;
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
-              or r.register_set == Register_sets::STATIC)) {
+              or r.register_set == Register_sets::STATIC
+              or r.register_set == Register_sets::PARAMETERS
+              )) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -89,7 +91,9 @@ auto Register_usage_profile::define(Register const r,
     using viua::internals::Register_sets;
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
-              or r.register_set == Register_sets::STATIC)) {
+              or r.register_set == Register_sets::STATIC
+              or r.register_set == Register_sets::PARAMETERS
+              )) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
