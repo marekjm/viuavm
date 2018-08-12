@@ -432,7 +432,24 @@ auto assemble_instruction(
         assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
             program, tokens, i);
     } else if (tokens.at(i) == "move") {
-        assemble_double_register_op<&Program::opmove>(program, tokens, i);
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+
+        if (tokens.at(target) == "void") {
+            --source;
+            program.opmove(::assembler::operands::getint(
+                       ::assembler::operands::resolve_register(tokens.at(target))),
+                   ::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(source)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        } else {
+            program.opmove(::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(target)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+                   ::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(source)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        }
     } else if (tokens.at(i) == "copy") {
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);
     } else if (tokens.at(i) == "ptr") {
