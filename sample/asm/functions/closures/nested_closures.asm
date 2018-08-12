@@ -52,7 +52,7 @@
     ; but they must be captured by the "closure_level_3"
     capture %0 local %1 %1 local
     capture %0 local %2 %2 local
-    capture %0 local %3 (arg %3 local %0) local
+    capture %0 local %3 (move %3 local %0 parameters) local
     return
 .end
 
@@ -61,7 +61,7 @@
     ; register 1 is occupied by captured integer
     ; but it must be captured by the "closure_level_2"
     capture %0 local %1 %1 local
-    capture %0 local %2 (arg %2 local %0) local
+    capture %0 local %2 (move %2 local %0 parameters) local
     return
 .end
 
@@ -70,7 +70,7 @@
 
     ; create the outermost closure
     closure %0 local closure_level_1/1
-    capture %0 local %1 (arg %1 local %0) local
+    capture %0 local %1 (move %1 local %0 parameters) local
     return
 .end
 

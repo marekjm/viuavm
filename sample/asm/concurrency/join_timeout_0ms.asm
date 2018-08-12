@@ -21,7 +21,7 @@
     allocate_registers %2 local
 
     .name: 1 counter
-    if (idec (arg %counter local %0 local) local) local +1 end_this
+    if (idec (move %counter local %0 parameters) local) local +1 end_this
     frame ^[(move %0 arguments %counter local)]
     tailcall child_process/1
     .mark: end_this

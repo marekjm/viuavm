@@ -20,7 +20,7 @@
 .function: global_printer/1
     allocate_registers %3 local
 
-    send (arg %1 local %0) local (self %2 local) local
+    send (move %1 local %0 parameters) local (self %2 local) local
 
     ; wait until a message arrives
     receive %2 global 10s

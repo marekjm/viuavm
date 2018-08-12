@@ -35,7 +35,7 @@
     nop
     nop
     nop
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
     return
 .end
 

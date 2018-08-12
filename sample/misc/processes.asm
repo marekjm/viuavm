@@ -75,7 +75,7 @@
 
     echo (string %2 local "process_spawner/1: ") local
     .name: 1 limit
-    echo (arg %1 local %0) local
+    echo (move %1 local %0 parameters) local
     print (text %2 local " processs to launch") local
 
     frame ^[(move %0 arguments (izero %3 local) local) (move %1 arguments %limit local)]

@@ -23,7 +23,7 @@
     .name: 2 len
     .name: 3 counter
 
-    vlen %len local (arg %1 local %0) local
+    vlen %len local (move %1 local %0 parameters) local
     integer %counter local 0
 
     .mark: loop

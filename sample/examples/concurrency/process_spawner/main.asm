@@ -21,7 +21,7 @@
     allocate_registers %3 local
 
     echo (string %1 local "Hello from #") local
-    echo (arg %2 local %0) local
+    echo (move %2 local %0 parameters) local
     print (string %1 local " worker process!") local
     return
 .end
@@ -66,7 +66,7 @@
 .function: run_process_spawner/1
     allocate_registers %2 local
 
-    frame ^[(copy %0 arguments (arg %1 local %0) local)]
+    frame ^[(copy %0 arguments (move %1 local %0 parameters) local)]
     process void process_spawner/1
     return
 .end

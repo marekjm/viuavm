@@ -24,7 +24,7 @@
     allocate_registers %2 local
 
     ; just print %the parameter received
-    frame ^[(move %0 arguments (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local)]
     call void printer::print/1
 
     return
@@ -36,7 +36,7 @@
     ; call %printer::print/1 in a new process to
     ; not block the execution, and
     ; detach the process as we do not care about its return value
-    frame ^[(move %0 arguments (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local)]
     process void printer_wrapper/1
     return
 .end

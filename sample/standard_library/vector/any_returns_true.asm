@@ -20,7 +20,7 @@
 .function: is_not_negative/1
     allocate_registers %3 local
 
-    gte %0 local (arg %1 local %0) local (izero %2 local) local
+    gte %0 local (move %1 local %0 parameters) local (izero %2 local) local
     return
 .end
 

@@ -48,7 +48,7 @@
 .function: process_spawner/1
     allocate_registers %2 local
 
-    frame ^[(move %0 arguments (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local)]
     process void print_hello/1
     return
 .end

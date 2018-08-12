@@ -42,7 +42,7 @@
 
     .name: 2 accumulator
 
-    frame ^[(move %0 arguments (arg %1 local %0) local) (move %1 arguments (izero %accumulator local) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local) (move %1 arguments (izero %accumulator local) local)]
     call %accumulator local fibonacci/2
 
     move %0 local %accumulator local

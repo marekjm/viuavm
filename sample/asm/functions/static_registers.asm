@@ -42,7 +42,7 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (lt %4 local %1 static (arg %3 local %0) local) local) local finish
+    if (not (lt %4 local %1 static (move %3 local %0 parameters) local) local) local finish
 
     .mark: report
     print %1 static

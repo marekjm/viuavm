@@ -20,7 +20,7 @@
 .function: jumprint/1
     allocate_registers %4 local
 
-    if (lt %2 local (integer %2 local 42) local (arg %1 local %0) local) local lesser +1
+    if (lt %2 local (integer %2 local 42) local (move %1 local %0 parameters) local) local lesser +1
     string %3 local ":-)"
     jump +2
 

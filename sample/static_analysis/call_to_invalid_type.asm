@@ -20,7 +20,7 @@
 .function: a_function/1
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
 
     izero %0 local
     return

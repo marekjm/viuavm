@@ -21,7 +21,7 @@
     allocate_registers %5 local
 
     .mark: watchdog_start
-    throw (structremove %4 local (arg %1 local %0) local (atom %3 local 'function') local) local
+    throw (structremove %4 local (move %1 local %0 parameters) local (atom %3 local 'function') local) local
 
     return
 .end
