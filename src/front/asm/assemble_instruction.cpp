@@ -478,8 +478,6 @@ auto assemble_instruction(
         assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
     } else if (tokens.at(i) == "frame") {
         assemble_op_frame(program, tokens, i);
-    } else if (tokens.at(i) == "argc") {
-        assemble_single_register_op<&Program::opargc>(program, tokens, i);
     } else if (tokens.at(i) == "allocate_registers") {
         assemble_single_register_op<&Program::opallocate_registers>(
             program, tokens, i);

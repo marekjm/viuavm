@@ -1153,7 +1153,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print" or token == "argc"
+        } else if (token == "izero" or token == "print"
                    or token == "echo" or token == "delete" or token == "draw"
                    or token == "throw" or token == "iinc" or token == "idec"
                    or token == "self" or token == "struct") {
@@ -1932,7 +1932,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print" or token == "argc"
+        } else if (token == "izero" or token == "print"
                    or token == "echo" or token == "delete" or token == "draw"
                    or token == "throw" or token == "iinc" or token == "idec"
                    or token == "self" or token == "struct"

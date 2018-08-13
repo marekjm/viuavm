@@ -376,9 +376,6 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case ARG:
         addr = oparg(addr + 1);
         break;
-    case ARGC:
-        addr = opargc(addr + 1);
-        break;
     case ALLOCATE_REGISTERS:
         addr = opallocate_registers(addr + 1);
         break;

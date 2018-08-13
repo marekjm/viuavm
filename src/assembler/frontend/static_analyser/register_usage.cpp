@@ -348,9 +348,6 @@ auto check_register_usage_for_instruction_block_impl(
             case FRAME:
                 check_op_frame(register_usage_profile, *instruction);
                 break;
-            case PARAM:
-                check_op_param(register_usage_profile, *instruction);
-                break;
             case CALL:
                 check_op_call(register_usage_profile, *instruction);
                 break;
@@ -359,12 +356,6 @@ auto check_register_usage_for_instruction_block_impl(
                 break;
             case DEFER:
                 check_op_defer(register_usage_profile, *instruction);
-                break;
-            case ARG:
-                check_op_arg(register_usage_profile, *instruction);
-                break;
-            case ARGC:
-                check_op_argc(register_usage_profile, *instruction);
                 break;
             case ALLOCATE_REGISTERS:
                 check_op_allocate_registers(register_usage_profile,
@@ -477,6 +468,8 @@ auto check_register_usage_for_instruction_block_impl(
             case BOOL:
                 // FIXME "bool" opcode is not even implemented
                 break;
+            case ARG:
+            case PARAM:
             case PAMV:
                 throw invalid_syntax(
                     instruction->tokens,

@@ -570,7 +570,6 @@ build/bin/vm/vdb: build/front/wdb.o \
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
 OP_ASSEMBLERS= \
-	build/assembler/backend/op_assemblers/assemble_op_arg.o \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
 	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
 	build/assembler/backend/op_assemblers/assemble_op_call.o \
@@ -620,9 +619,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_closure_instantiations.o \
 	build/assembler/frontend/static_analyser/checkers/check_for_unused_registers.o \
 	build/assembler/frontend/static_analyser/checkers/check_for_unused_values.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_argc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_allocate_registers.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_arg.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_arithmetic.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_atomeq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_atom.o \
@@ -661,7 +658,6 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_jump.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_move.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_not.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_param.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_print.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_process.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \

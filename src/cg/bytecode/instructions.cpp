@@ -875,18 +875,6 @@ auto opframe(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     return insert_two_ri_instruction(addr_ptr, FRAME, a, b);
 }
 
-auto oparg(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
-    b.rs_type = viua::internals::Register_sets::PARAMETERS;
-    return insert_two_ri_instruction(addr_ptr, ARG, a, b);
-}
-
-auto opargc(viua::internals::types::byte* addr_ptr, int_op a)
-    -> viua::internals::types::byte* {
-    *(addr_ptr++) = ARGC;
-    return insert_ri_operand(addr_ptr, a);
-}
-
 auto opallocate_registers(viua::internals::types::byte* addr_ptr, int_op a)
     -> viua::internals::types::byte* {
     *(addr_ptr++) = ALLOCATE_REGISTERS;
