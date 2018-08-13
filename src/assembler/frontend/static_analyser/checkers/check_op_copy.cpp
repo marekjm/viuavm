@@ -33,6 +33,14 @@ auto check_op_copy(Register_usage_profile& register_usage_profile,
             .note("expected register index");
     }
 
+    if (target->as == viua::internals::Access_specifier::REGISTER_INDIRECT) {
+        auto r = *target;
+        r.rss  = viua::internals::Register_sets::LOCAL;
+        check_use_of_register(register_usage_profile, r);
+        assert_type_of_register<viua::internals::Value_types::INTEGER>(
+            register_usage_profile, r);
+    }
+
     auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
