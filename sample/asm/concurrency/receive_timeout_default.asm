@@ -33,7 +33,7 @@
 
     .name: %iota times
     .name: %iota pid
-    arg %times local .iota: 0  %iota
+    move %times local .iota: 0 %iota parameters
     move %pid local %1 parameters
 
     try

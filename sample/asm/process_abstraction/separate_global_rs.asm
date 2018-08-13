@@ -44,7 +44,7 @@
     ; print contents of global register 1
     ; it should cause an exception
     .name: 1 printer_process_handle
-    send (arg %printer_process_handle local %0) local (izero %3 local) local
+    send (move %printer_process_handle local %0 parameters) local (izero %3 local) local
 
     return
 .end

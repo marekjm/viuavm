@@ -40,7 +40,7 @@
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    if (not (eq %4 local (arg %exponent local %1) local (izero %zero local) local) local) local algorithm +1
+    if (not (eq %4 local (move %exponent local %1 parameters) local (izero %zero local) local) local) local algorithm +1
     integer %result local 1
     jump final
 
