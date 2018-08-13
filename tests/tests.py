@@ -48,6 +48,8 @@ import unittest
 COMPILED_SAMPLES_PATH = './tests/compiled'
 
 VIUA_KERNEL_PATH = './build/bin/vm/kernel'
+VIUA_ASSEMBLER_PATH_DEFAULT = './build/bin/vm/asm'
+VIUA_ASSEMBLER_PATH = os.environ.get('VIUA_ASM', VIUA_ASSEMBLER_PATH_DEFAULT)
 
 
 class ViuaError(Exception):
@@ -84,7 +86,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
-    asmargs = ('./build/bin/vm/asm',) + opts
+    asmargs = (VIUA_ASSEMBLER_PATH,) + opts
     if out is not None: asmargs += ('--out', out,)
     asmargs += (asm,)
     asmargs += links
