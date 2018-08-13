@@ -22,14 +22,14 @@
 
     .name: iota an_arg
 
-    arg %an_arg local %0    ; This will leave an_arg with undefined type.
+    move %an_arg local %0 parameters    ; This will leave an_arg with undefined type.
 
-    iinc %an_arg local      ; This will infer the type of an_arg to integer;
-                            ; because iinc accepts only integers, an_arg must
-                            ; be an integer for the program to be correct.
-                            ; Since arg leaves types undefined the inferred type
-                            ; does not conflict, and can be used as the new type
-                            ; of the value in register an_arg.
+    iinc %an_arg local  ; This will infer the type of an_arg to integer;
+                        ; because iinc accepts only integers, an_arg must
+                        ; be an integer for the program to be correct.
+                        ; Since arg leaves types undefined the inferred type
+                        ; does not conflict, and can be used as the new type
+                        ; of the value in register an_arg.
 
     stof %iota local %an_arg local  ; Here, a type error will be reported.
                                     ; stof expects a text, but the type of an_arg was

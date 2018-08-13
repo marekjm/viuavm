@@ -2079,7 +2079,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
             '34:22: error: invalid type of value contained in register',
             '34:22: note: expected string, got integer',
-            '25:9: note: register defined here',
+            '25:10: note: register defined here',
             '27:10: note: type inferred here',
             '                 ^ deduced type is \'integer\'',
             '20:12: error: in function main/1',
@@ -2562,12 +2562,6 @@ class KeywordDefaultTests(unittest.TestCase):
     """Tests for `default` keyword.
     """
     PATH = './sample/asm/keyword/default'
-
-    def testDefaultInArg(self):
-        runTestFailsToAssembleDetailed(self, 'arg.asm', [
-            '23:16: error: use of void as input register:',
-            '20:12: error: in function foo/1',
-       ])
 
     def testDefaultInCall(self):
         runTest(self, 'call.asm', '')
