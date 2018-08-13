@@ -25,7 +25,7 @@
     allocate_registers %5 local
 
     .name: 1 limit
-    arg %limit %0
+    move %limit %0 parameters
 
     .name: 0 vec
     vector %vec %3
@@ -53,8 +53,8 @@
 
     .name: 1 limit
     .name: 2 fn
-    arg %limit local %0
-    arg %fn local %1
+    move %limit local %0 parameters
+    move %fn local %1 parameters
 
     .name: 0 vec
     vector %vec local
@@ -84,7 +84,7 @@
 
     .name: 1 source
     .name: 0 result
-    arg %source %0
+    move %source %0 parameters
     vector %result
 
     .name: 2 counter
@@ -108,7 +108,7 @@
     allocate_registers %5 local
 
     .name: 0 source
-    arg %source local %0
+    move %source local %0 parameters
 
     .name: 1 counter_down
     vlen %counter_down local %source local
@@ -140,8 +140,8 @@
 
     .name: 1 vec
     .name: 2 fn
-    arg %vec %0
-    arg %fn %1
+    move %vec %0 parameters
+    move %fn %1 parameters
 
     .name: 0 result
     not (izero %result)
@@ -176,8 +176,8 @@
 
     .name: 1 vec
     .name: 2 fn
-    arg %vec %0
-    arg %fn %1
+    move %vec %0 parameters
+    move %fn %1 parameters
 
     .name: 0 result
     not (izero %result)

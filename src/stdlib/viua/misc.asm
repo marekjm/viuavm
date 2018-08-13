@@ -21,7 +21,7 @@
     ; this function returns boolean value of its parameter
     allocate_registers %1 local
 
-    not (not (arg %0 %0))
+    not (not (move %0 local %0 parameters) local) local
     return
 .end
 
@@ -30,7 +30,7 @@
     ;
     allocate_registers %4 local
 
-    arg (.name: %iota counter) local %0
+    move (.name: %iota counter) local %0 parameters
 
     .name: iota i
     sub %counter local %counter local (integer %i local 9) local
