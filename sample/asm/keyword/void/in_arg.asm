@@ -20,14 +20,14 @@
 .function: foo/1
     allocate_registers %1 local
 
-    arg void %0
+    move void %0 parameters
     return
 .end
 
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %iota (izero %iota local) local)]
+    frame ^[(move %iota arguments (izero %iota local) local)]
     call void foo/1
 
     izero %0 local

@@ -21,7 +21,7 @@
     allocate_registers %5 local
 
     .name: %iota number_of_bottles
-    arg %number_of_bottles local %0
+    move %number_of_bottles local %0 parameters
 
     .name: %iota bottles_of_beer
     ; support for "1 bottle of beer" and "N bottles of beer"
@@ -44,10 +44,10 @@
     ;   Take one down, pass it around
     ;
     .name: %iota number_of_bottles
-    arg %number_of_bottles local %0
+    move %number_of_bottles local %0 parameters
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles local)]
+    frame ^[(copy %0 arguments %number_of_bottles local)]
     call %bottles_of_beer local bottles_of_beer_text/1
 
     echo %number_of_bottles local
@@ -70,10 +70,10 @@
     ;
     ; i.e. the last line of a paragraph
     .name: %iota number_of_bottles
-    arg %number_of_bottles %0
+    move %number_of_bottles %0 parameters
 
     .name: %iota bottles_of_beer
-    frame ^[(param %0 %number_of_bottles local)]
+    frame ^[(copy %0 arguments %number_of_bottles local)]
     call %bottles_of_beer local bottles_of_beer_text/1
 
     .name: %iota on_the_wall
@@ -98,17 +98,17 @@
     allocate_registers %2 local
 
     .name: %iota total_number_of_bottles
-    arg %total_number_of_bottles local %0
+    move %total_number_of_bottles local %0 parameters
 
     ; display first three lines of a paragraph
-    frame ^[(param %0 %total_number_of_bottles local)]
+    frame ^[(copy %0 arguments %total_number_of_bottles local)]
     call void first_print/1
 
     ; decrement the number of bottles
     idec %total_number_of_bottles local
 
     ; display last line of a paragraph
-    frame ^[(param %0 %total_number_of_bottles local)]
+    frame ^[(copy %0 arguments %total_number_of_bottles local)]
     call void second_print/1
 
     ; immediately return if there are no more bottles
@@ -118,7 +118,7 @@
     .mark: theres_more
     ; if there are more bottles
     ; call the function once more
-    frame ^[(pamv %0 %total_number_of_bottles local)]
+    frame ^[(move %0 arguments %total_number_of_bottles local)]
     tailcall bottles_of_beer/1
 .end
 
@@ -128,7 +128,7 @@
     .name: %iota total_number_of_bottles
     integer %total_number_of_bottles local 9
 
-    frame ^[(pamv %0 %total_number_of_bottles local)]
+    frame ^[(move %0 arguments %total_number_of_bottles local)]
     call void bottles_of_beer/1
 
     izero %0 local

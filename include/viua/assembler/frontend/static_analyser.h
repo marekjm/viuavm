@@ -80,6 +80,8 @@ class Register_usage_profile {
     /*
      * Registers are "fresh" until they either 1/ cross the boundary of an "if"
      * instruction, or 2/ are used. After that they are no longer fresh.
+     * Registers in `arguments` register set are fresh until a calling instruction
+     * is executed (e.g. `call`, or `process`).
      * Overwriting a fresh register is an error because it means that the
      * previously defined value is never used.
      */
@@ -103,7 +105,7 @@ class Register_usage_profile {
      *
      *      text %1 local "Hello World!"    ; register 1 is defined
      *      delete %1 local                 ; register 1 is erased
-     *      integer %1 local 42              ; register 1 is defined again
+     *      integer %1 local 42             ; register 1 is defined again
      */
     std::map<Register, viua::cg::lex::Token> erased_registers;
 
@@ -146,6 +148,7 @@ class Register_usage_profile {
     auto use(Register const r, viua::cg::lex::Token const t) -> void;
 
     auto defresh() -> void;
+    auto erase_arguments(viua::cg::lex::Token const) -> void;
 
     auto erase(Register const r, viua::cg::lex::Token const& token) -> void;
     auto erased(Register const r) const -> bool;
@@ -193,7 +196,9 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
                             Register_index const r) -> void;
 auto check_use_of_register(Register_usage_profile&,
                            viua::assembler::frontend::parser::Register_index,
-                           std::string const = "use of") -> void;
+                           std::string const = "use of",
+                           bool const allow_arguments = false,
+                           bool const allow_parameters = false) -> void;
 
 
 using viua::internals::Value_types;
@@ -422,18 +427,12 @@ auto check_op_function(Register_usage_profile& register_usage_profile,
 auto check_op_frame(Register_usage_profile&, Instruction const&) -> void;
 auto check_op_param(Register_usage_profile& register_usage_profile,
                     Instruction const& instruction) -> void;
-auto check_op_pamv(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
 auto check_op_call(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_tailcall(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void;
 auto check_op_defer(Register_usage_profile& register_usage_profile,
                     Instruction const& instruction) -> void;
-auto check_op_arg(Register_usage_profile& register_usage_profile,
-                  Instruction const& instruction) -> void;
-auto check_op_argc(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
 auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
                                  Instruction const& instruction) -> void;
 auto check_op_process(Register_usage_profile& register_usage_profile,

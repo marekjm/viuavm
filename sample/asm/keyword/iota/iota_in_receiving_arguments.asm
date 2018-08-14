@@ -21,15 +21,15 @@
     allocate_registers %2 local
 
     .iota: 0
-    print (arg %1 local %iota) local
-    print (arg %1 local %iota) local
+    print (move %1 local %iota parameters) local
+    print (move %1 local %iota parameters) local
     return
 .end
 
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %iota (string %1 local "Hello World!") local) (pamv %iota (integer %1 local 42) local)]
+    frame ^[(move %iota arguments (string %1 local "Hello World!") local) (move %iota arguments (integer %1 local 42) local)]
     call sample/2
 
     izero %0 local

@@ -27,7 +27,7 @@
     allocate_registers %2 local
 
     frame %1
-    pamv %0 %1 local
+    move %0 arguments %1 local
     call foo/1
 
     izero %0 local

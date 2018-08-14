@@ -21,7 +21,7 @@
     allocate_registers %4 local
 
     ; send our PID back to parent
-    send (arg %iota local %0) local (self %iota local) local
+    send (move %iota local %0 parameters) local (self %iota local) local
 
     print (receive %iota local 10s) local
     return
@@ -31,7 +31,7 @@
     allocate_registers %3 local
 
     .name: %iota pid
-    frame ^[(pamv %0 (self %pid local) local)]
+    frame ^[(move %0 arguments (self %pid local) local)]
     process void run_in_a_process/1
 
     receive %pid local 10s

@@ -20,7 +20,7 @@
 .function: print_me/1
     allocate_registers %2 local
 
-    print *(arg %1 local %0) local
+    print *(move %1 local %0 parameters) local
     return
 .end
 
@@ -36,7 +36,7 @@
 
     text %1 local "Hello World before stack unwinding!"
 
-    frame ^[(pamv %0 (ptr %2 local %1 local) local)]
+    frame ^[(move %0 arguments (ptr %2 local %1 local) local)]
     defer print_me/1
 
     frame %0

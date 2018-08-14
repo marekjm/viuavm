@@ -12,43 +12,43 @@
   ;%2 = %3 mod %2
   float %2 local 4
   float %3 local 7
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "7 mod 4 = 3 : ") local
   print %2 local
   float %2 local 4
   float %3 local -7
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "-7 mod 4 = 1 : ") local
   print %2 local
   float %2 local -4
   float %3 local 7
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "7 mod -4 = -1 : ") local
   print %2 local
   float %2 local -4
   float %3 local -7
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "-7 mod -4 = -3 : ") local
   print %2 local
   float %2 local 4.2
   float %3 local -7
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "-7 mod 4.2 = 1.4 : ") local
   print %2 local
   float %2 local 4
   float %3 local -7.6
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "-7.6 mod 4 = 0.4 : ") local
   print %2 local
   float %2 local 4.2
   float %3 local -7.6
-  frame ^[(param %0 %3 local) (param %1 %2 local)]
+  frame ^[(copy %0 arguments %3 local) (copy %1 arguments %2 local)]
   call %2 local mod/2
   echo (string %1 local "-7.6 mod 4.2 = 0.8 : ") local
   print %2 local
@@ -69,8 +69,8 @@
   .name: %6 min_res
   .name: %7 max_res
   .name: %8 step
-  arg %arg0 local %0
-  arg %arg1 local %1
+  move %arg0 local %0 parameters
+  move %arg1 local %1 parameters
   ; arg1 <> 0
   if (not (eq %tmp_bool local %arg1 local (float %tmp_float local 0) local) local) local mod_not_zero
   throw (string %tmp_str local "modulo by zero") local

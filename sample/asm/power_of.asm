@@ -36,11 +36,11 @@
     .name: 6 result
 
     ; store operands of the power-of operation
-    arg %base local %0
+    move %base local %0 parameters
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    if (not (eq %4 local (arg %exponent local %1) local (izero %zero local) local) local) local algorithm +1
+    if (not (eq %4 local (move %exponent local %1 parameters) local (izero %zero local) local) local) local algorithm +1
     integer %result local 1
     jump final
 
@@ -69,7 +69,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(param %0 (integer %1 local 4) local) (param %1 (integer %2 local 3) local)]
+    frame ^[(copy %0 arguments (integer %1 local 4) local) (copy %1 arguments (integer %2 local 3) local)]
     print (call %1 local power_of/2) local
 
     izero %0 local

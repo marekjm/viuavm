@@ -22,7 +22,7 @@
     ; squares it and returns the result
     allocate_registers %2 local
 
-    mul %0 local (arg %1 local %0) %1 local
+    mul %0 local (move %1 local %0 parameters) %1 local
     return
 .end
 
@@ -37,8 +37,8 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(pamv %0 (arg %parameter local %1) local)]
-    call %3 local (arg %func local %0) local
+    frame ^[(move %0 arguments (move %parameter local %1 parameters) local)]
+    call %3 local (move %func local %0 parameters) local
 
     ; ...and return the result
     move %0 local %3 local
@@ -53,7 +53,7 @@
     integer %1 local 5
     function %2 local square/1
 
-    frame ^[(param %0 %2 local) (param %1 %1 local)]
+    frame ^[(copy %0 arguments %2 local) (copy %1 arguments %1 local)]
     print (call %3 local apply/2) local
 
     izero %0 local

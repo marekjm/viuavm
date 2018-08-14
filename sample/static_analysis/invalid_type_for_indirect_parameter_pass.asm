@@ -20,7 +20,7 @@
 .function: a_function/1
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
     izero %0 local
     return
 .end
@@ -33,7 +33,7 @@
     text %2 local "Hello World!"
 
     frame %1
-    pamv @2 %1 local
+    move @2 arguments %1 local
     call void a_function/1
 
     izero %0 local

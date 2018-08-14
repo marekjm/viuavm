@@ -20,14 +20,14 @@
 .function: valid/1
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
     return
 .end
 
 .function: another_valid/0
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (string %1 local "Hello World!") local)]
+    frame ^[(move %0 arguments (string %1 local "Hello World!") local)]
     frame
     tailcall valid/1
 .end

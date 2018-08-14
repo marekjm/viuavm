@@ -20,7 +20,7 @@
 .function: a_function/1
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
 
     izero %0 local
     return
@@ -33,7 +33,7 @@
     text %2 local "a_function/1"
 
     frame %1
-    pamv %0 %1 local
+    move %0 arguments %1 local
     tailcall %2 local
 
     izero %0 local

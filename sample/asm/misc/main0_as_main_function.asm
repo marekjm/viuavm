@@ -20,10 +20,9 @@
 .function: main/0
     allocate_registers %2 local
 
-    print (string %1 local "Hello World!") local
-    echo (string %1 local "received ") local
-    echo (argc %1 local) local
-    print (string %1 local " arguments") local
+    print (text %1 local "Hello World!") local
+    print (text %1 local "received 0 arguments") local
+
     izero %0 local
     return
 .end

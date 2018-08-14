@@ -28,7 +28,7 @@
 
     import "std/typesystem"
 
-    frame ^[(param %0 (ptr %3 local %2 local) local)]
+    frame ^[(copy %0 arguments (ptr %3 local %2 local) local)]
     call %3 local std::typesystem::typeof/1
 
     print %3 local

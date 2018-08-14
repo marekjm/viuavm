@@ -20,7 +20,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (integer %1 local 0) local)]
+    frame ^[(move %0 arguments (integer %1 local 0) local)]
     call void foo/x
 
     izero %0 local

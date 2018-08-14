@@ -25,24 +25,24 @@
     nop
     nop
     nop
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
     return
 .end
 
 .function: print_eager/1
     allocate_registers %2 local
 
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
     return
 .end
 
 .function: main/1
     allocate_registers %5 local
 
-    frame ^[(param %0 (string %1 local "Hello concurrent World! (1)") local)]
+    frame ^[(copy %0 arguments (string %1 local "Hello concurrent World! (1)") local)]
     process %3 local print_lazy/1
 
-    frame ^[(param %0 (string %2 local "Hello concurrent World! (2)") local)]
+    frame ^[(copy %0 arguments (string %2 local "Hello concurrent World! (2)") local)]
     process %4 local print_eager/1
 
     ; join processes

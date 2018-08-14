@@ -56,7 +56,7 @@
     ; executes at least N cycles
     ;
     .name: 1 counter
-    arg %counter local %0
+    move %counter local %0 parameters
 
     .name: 4 i
     sub %counter local %counter local (integer %i local 9) local

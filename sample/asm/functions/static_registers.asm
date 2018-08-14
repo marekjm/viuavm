@@ -33,7 +33,7 @@
     ; 1) fake taking counter from static registers (it's zero during first pass anyway)
     integer %1 local 0
     ; 2) fetch the argument
-    arg %3 local %0
+    move %3 local %0 parameters
     ; 3) jump straight to report mark
     jump report
 
@@ -42,11 +42,11 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (lt %4 local %1 static (arg %3 local %0) local) local) local finish
+    if (not (lt %4 local %1 static (move %3 local %0 parameters) local) local) local finish
 
     .mark: report
     print %1 static
-    frame ^[(param %0 %3 local)]
+    frame ^[(copy %0 arguments %3 local)]
     tailcall counter/1
 
     .mark: finish
@@ -56,7 +56,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    frame ^[(param %0 (integer %1 local 10) local)]
+    frame ^[(copy %0 arguments (integer %1 local 10) local)]
     call void counter/1
     izero %0 local
     return

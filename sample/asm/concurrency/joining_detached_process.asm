@@ -25,7 +25,7 @@
     izero %counter local
     integer %limit local 4
 
-    send (arg %iota local %0) local (self %iota local) local
+    send (move %iota local %0 parameters) local (self %iota local) local
 
     .name: %iota message
     string %message local "Hello World! (from long-running detached process) "
@@ -44,7 +44,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(pamv %0 (self %1 local) local)]
+    frame ^[(move %0 arguments (self %1 local) local)]
     process void running_detached/1
 
     receive %1 local

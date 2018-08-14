@@ -27,10 +27,10 @@
     .name: %iota c
     .name: %iota d
 
-    arg %a local %0
-    arg %b local %1
-    arg %c local %2
-    arg %d local %3
+    move %a local %0 parameters
+    move %b local %1 parameters
+    move %c local %2 parameters
+    move %d local %3 parameters
 
     add %0 local %a local %b local  ; x = a + b
     add %0 local %0 local %c local  ; x = x + c
@@ -51,8 +51,8 @@
     ; frame
     .name: %iota fn_to_call
     .name: %iota parameters_list
-    arg %fn_to_call local %0
-    arg %parameters_list local %1
+    move %fn_to_call local %0 parameters
+    move %parameters_list local %1 parameters
 
     ; take length of the vector
     .name: %iota vector_length
@@ -76,7 +76,7 @@
     ; a register and
     ; pass it as a parameter
     vat %slot local %parameters_list local %loop_counter local
-    pamv @loop_counter (copy %iota local *slot local) local
+    move @loop_counter arguments (copy %iota local *slot local) local
 
     ; loop_counter++
     iinc %loop_counter local
@@ -106,11 +106,11 @@
     integer %5 local -2
 
     ; call sum/4() local function
-    frame ^[(param %0 %2 local) (param %1 %3 local) (param %2 %4 local) (param %3 %5 local)]
+    frame ^[(copy %0 arguments %2 local) (copy %1 arguments %3 local) (copy %2 arguments %4 local) (copy %3 arguments %5 local)]
     print (call %6 local sum/4) local
 
     ; call sum/4 function via invoke/2 function
-    frame ^[(param %0 (function %7 local sum/4) local) (param %1 %1 local)]
+    frame ^[(copy %0 arguments (function %7 local sum/4) local) (copy %1 arguments %1 local)]
     print (call %8 local invoke/2) local
 
     izero %0 local

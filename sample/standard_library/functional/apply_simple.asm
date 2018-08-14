@@ -20,7 +20,7 @@
 .function: adder/1
     allocate_registers %2 local
 
-    add %0 local (arg %0 local %0) local (integer %1 local 21) local
+    add %0 local (move %0 local %0 parameters) local (integer %1 local 21) local
     return
 .end
 
@@ -31,7 +31,7 @@
 
     import "std::functional"
 
-    frame ^[(pamv %0 (function %1 local adder/1) local) (pamv %1 (integer %1 local 21) local)]
+    frame ^[(move %0 arguments (function %1 local adder/1) local) (move %1 arguments (integer %1 local 21) local)]
     call %1 local std::functional::apply/2
     print %1 local
 

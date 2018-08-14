@@ -20,8 +20,8 @@
 .function: add/2
     allocate_registers %3 local
 
-    arg (.name: %iota lhs) local %0
-    arg (.name: %iota rhs) local %0
+    move (.name: %iota lhs) local %0 parameters
+    move (.name: %iota rhs) local %1 parameters
 
     add %0 local %lhs local %rhs local
 
@@ -31,8 +31,8 @@
 .function: multiply/2
     allocate_registers %3 local
 
-    arg (.name: %iota lhs) local %0
-    arg (.name: %iota rhs) local %0
+    move (.name: %iota lhs) local %0 parameters
+    move (.name: %iota rhs) local %1 parameters
 
     mul %0 local %lhs local %rhs local
 
@@ -51,11 +51,11 @@
     .name: %iota result
 
     ptr %pointer local %adder local
-    frame ^[(param %iota %one local) (param %iota %one local)]
+    frame ^[(copy %iota arguments %one local) (copy %iota arguments %one local)]
     print (call %result local *pointer local) local
 
     ptr %pointer local %multipler local
-    frame ^[(param %iota %one local) (param %iota %one local)]
+    frame ^[(copy %iota arguments %one local) (copy %iota arguments %one local)]
     print (call %result local *pointer local) local
 
     izero %0 local

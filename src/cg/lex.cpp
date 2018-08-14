@@ -362,7 +362,7 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
 }
 
 auto is_register_set_name(string const& s) -> bool {
-    return (s == "local" or s == "static" or s == "global");
+    return (s == "local" or s == "static" or s == "global" or s == "arguments" or s == "parameters");
 }
 static auto is_register_index(std::string const s) -> bool {
     auto const p = s.at(0);
@@ -440,18 +440,6 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
                                     input_tokens.at(i + 1).character(),
                                     "%16");
-            }
-        } else if (token == "param" or token == "pamv") {
-            tokens.push_back(token);  // mnemonic
-
-            tokens.push_back(input_tokens.at(++i));  // target register
-
-            tokens.push_back(input_tokens.at(++i));  // source register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "local");
-            } else {
-                tokens.push_back(input_tokens.at(++i));
             }
         } else if (token == "arg") {
             tokens.push_back(token);  // mnemonic
@@ -1093,7 +1081,42 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "move" or token == "copy" or token == "swap"
+        } else if (token == "move") {
+            tokens.push_back(token);  // mnemonic
+
+            if (input_tokens.at(i + 1) == "[[") {
+                do {
+                    tokens.push_back(input_tokens.at(++i));
+                } while (input_tokens.at(i) != "]]");
+            }
+
+            tokens.push_back(input_tokens.at(++i));  // target register
+            auto target_register_set = std::string{"local"};
+            if (tokens.back() == "void") {
+                // do nothing
+            } else if (not is_register_set_name(input_tokens.at(i + 1))) {
+                tokens.emplace_back(tokens.back().line(),
+                                    tokens.back().character(),
+                                    target_register_set);
+            } else {
+                tokens.push_back(input_tokens.at(++i));
+                target_register_set = tokens.back();
+            }
+
+            if (input_tokens.at(i + 1) == "\n") {
+                throw Invalid_syntax{input_tokens.at(i + 1),
+                                     "missing second operand"}
+                    .add(token);
+            }
+            tokens.push_back(input_tokens.at(++i));
+            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                tokens.emplace_back(tokens.back().line(),
+                                    tokens.back().character(),
+                                    target_register_set);
+            } else {
+                tokens.push_back(input_tokens.at(++i));
+            }
+        } else if (token == "copy" or token == "swap"
                    or token == "ptr" or token == "isnull" or token == "send"
                    or token == "textlength" or token == "structkeys"
                    or token == "bits" or token == "bitset"
@@ -1130,7 +1153,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print" or token == "argc"
+        } else if (token == "izero" or token == "print"
                    or token == "echo" or token == "delete" or token == "draw"
                    or token == "throw" or token == "iinc" or token == "idec"
                    or token == "self" or token == "struct") {
@@ -1227,16 +1250,6 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),
                                     input_tokens.at(i + 1).character(),
                                     "%16");
-            }
-        } else if (token == "param" or token == "pamv") {
-            tokens.push_back(input_tokens.at(++i));  // target register
-
-            tokens.push_back(input_tokens.at(++i));  // source register
-            if (not is_register_set_name(input_tokens.at(i + 1))) {
-                tokens.emplace_back(
-                    tokens.back().line(), tokens.back().character(), "local");
-            } else {
-                tokens.push_back(input_tokens.at(++i));
             }
         } else if (token == "arg") {
             tokens.push_back(input_tokens.at(++i));  // target register
@@ -1839,7 +1852,35 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "move" or token == "copy" or token == "swap"
+        } else if (token == "move") {
+            if (input_tokens.at(i + 1) == "[[") {  // FIXME attributes
+                do {
+                    tokens.push_back(input_tokens.at(++i));
+                } while (input_tokens.at(i) != "]]");
+            }
+
+            tokens.push_back(input_tokens.at(++i));  // target register
+            auto target_register_set = std::string{"local"};
+            if (tokens.back() == "void") {
+                // do nothing
+            } else if (not is_register_set_name(input_tokens.at(i + 1))) {
+                tokens.emplace_back(tokens.back().line(),
+                                    tokens.back().character(),
+                                    target_register_set);
+            } else {
+                tokens.push_back(input_tokens.at(++i));
+                target_register_set = tokens.back();
+            }
+
+            tokens.push_back(input_tokens.at(++i));
+            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                tokens.emplace_back(tokens.back().line(),
+                                    tokens.back().character(),
+                                    target_register_set);
+            } else {
+                tokens.push_back(input_tokens.at(++i));
+            }
+        } else if (token == "copy" or token == "swap"
                    or token == "ptr" or token == "isnull" or token == "send"
                    or token == "textlength" or token == "structkeys"
                    or token == "bitset" or token == "bitat") {
@@ -1891,7 +1932,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print" or token == "argc"
+        } else if (token == "izero" or token == "print"
                    or token == "echo" or token == "delete" or token == "draw"
                    or token == "throw" or token == "iinc" or token == "idec"
                    or token == "self" or token == "struct"

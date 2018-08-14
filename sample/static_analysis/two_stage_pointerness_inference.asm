@@ -23,7 +23,7 @@
     ; An argument is extracted.
     ; At this point the SA is unable to make any assumptions about
     ; the type of the value contained in the register.
-    arg %1 local %0
+    move %1 local %0 parameters
 
     ; Here, the inferencer kicks in for the first time.
     ; SA sees that the value in the register is accessed using the by-pointer

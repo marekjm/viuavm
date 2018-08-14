@@ -52,6 +52,14 @@ auto register_set_names = std::map<Register_sets, std::string>{
         Register_sets::LOCAL,
         "local",
     },
+    {
+        Register_sets::ARGUMENTS,
+        "arguments",
+    },
+    {
+        Register_sets::PARAMETERS,
+        "parameters",
+    },
 };
 auto to_string(Register_sets const register_set_id) -> std::string {
     return register_set_names.at(register_set_id);
@@ -157,7 +165,9 @@ static auto maybe_mistyped_register_set(
 }
 auto check_use_of_register(Register_usage_profile& rup,
                            viua::assembler::frontend::parser::Register_index r,
-                           std::string const error_core_msg) -> void {
+                           std::string const error_core_msg,
+                           bool const allow_arguments,
+                           bool const allow_parameters) -> void {
     check_if_name_resolved(rup, r);
     if (r.rss == Register_sets::GLOBAL) {
         /*
@@ -177,8 +187,24 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
+    if ((r.rss == Register_sets::ARGUMENTS) and not allow_arguments) {
+        throw Traced_syntax_error{}
+            .append(Invalid_syntax{
+                r.tokens.at(0),
+                "invalid use of arguments register set"}
+                        .add(r.tokens.at(1))
+                        .note("arguments register set may only be used in target register of `copy` and `move` instructions when a frame is allocated"));
+    }
+    if ((r.rss == Register_sets::PARAMETERS) and not allow_parameters) {
+        throw Traced_syntax_error{}
+            .append(Invalid_syntax{
+                r.tokens.at(0),
+                "invalid use of parameters register set"}
+                        .add(r.tokens.at(1))
+                        .note("parameters register set may only be used in source register of `copy` and `move` instructions"));
+    }
 
-    if (not rup.in_bounds(r)) {
+    if ((not rup.in_bounds(r)) and r.rss != Register_sets::PARAMETERS) {
         throw Traced_syntax_error{}
             .append(Invalid_syntax{
                 r.tokens.at(0),
@@ -189,6 +215,27 @@ auto check_use_of_register(Register_usage_profile& rup,
             .append(Invalid_syntax{rup.allocated_where().value(), ""}.note(
                 "increase this value to " + std::to_string(r.index + 1)
                 + " to fix this issue"));
+    }
+
+    if ((not rup.defined(Register(r))) and r.rss == Register_sets::PARAMETERS) {
+        auto msg = std::ostringstream{};
+        if (rup.erased(Register(r))) {
+            msg << error_core_msg << " erased "
+                << to_string(r.rss) << " register "
+                << str::enquote(std::to_string(r.index));
+        } else {
+            msg << error_core_msg << ' '
+                << to_string(r.rss) << " register "
+                << str::enquote(std::to_string(r.index))
+                << " out of range";
+        }
+        auto error = Traced_syntax_error{}.append(
+            Invalid_syntax(r.tokens.at(0), msg.str()));
+        if (rup.erased(Register(r))) {
+            error.append(Invalid_syntax(rup.erased_where(Register(r)), "")
+                             .note("erased here:"));
+        }
+        throw error;
     }
 
     if (not rup.defined(Register(r))) {

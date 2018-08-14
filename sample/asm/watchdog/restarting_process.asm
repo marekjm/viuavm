@@ -23,26 +23,26 @@
     .name: %iota death_message
     .name: %iota exception
     .name: %iota aborted_function
-    .name: %iota parameters
+    .name: %iota params
 
-    arg %death_message local %0
+    move %death_message local %0 parameters
     structremove %exception local %death_message local (atom %exception local 'exception') local
     structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
-    structremove %parameters local %death_message local (atom %parameters local 'parameters') local
+    structremove %params local %death_message local (atom %params local 'parameters') local
 
     .name: %iota message
     echo (string %message local "[WARNING] process '") local
     echo %aborted_function local
-    echo %parameters local
+    echo %params local
     echo (string %message local "' killed by >>>") local
     echo %exception local
     print (string %message local "<<<") local
 
     .name: %iota i
-    vat %i local %parameters local (integer %iota local 1) local
+    vat %i local %params local (integer %iota local 1) local
     copy %i local *i local
-    vat %message local %parameters local (integer %iota local 0) local
-    frame ^[(param %0 *message local) (param %1 (iinc %i local) local)]
+    vat %message local %params local (integer %iota local 0) local
+    frame ^[(copy %0 arguments *message local) (copy %1 arguments (iinc %i local) local)]
     process void a_division_executing_process/2
 
     return
@@ -53,20 +53,20 @@
 
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 local 32) local)]
+    frame ^[(move %0 arguments (integer %1 local 32) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process)!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
     print (string %1 local "Hello World (from detached process) after a runaway exception!") local
 
-    frame ^[(pamv %0 (integer %1 local 512) local)]
+    frame ^[(move %0 arguments (integer %1 local 512) local)]
     call std::misc::cycle/1
 
-    frame ^[(pamv %0 (string %1 local "a_detached_concurrent_process") local)]
+    frame ^[(move %0 arguments (string %1 local "a_detached_concurrent_process") local)]
     call log_exiting_detached/1
 
     return
@@ -75,8 +75,8 @@
 .function: formatting/2
     allocate_registers %5 local
 
-    arg (.name: %iota divide_what) local %0
-    arg (.name: %iota divide_by) local %1
+    move (.name: %iota divide_what) local %0 parameters
+    move (.name: %iota divide_by) local %1 parameters
 
     text %divide_what local %divide_what local
     text %divide_by local %divide_by local
@@ -94,14 +94,14 @@
 
     watchdog watchdog_process/1
 
-    frame ^[(pamv %0 (integer %1 local 128) local)]
+    frame ^[(move %0 arguments (integer %1 local 128) local)]
     call std::misc::cycle/1
 
     .name: 1 divide_what
-    arg %divide_what local %0
+    move %divide_what local %0 parameters
 
     .name: 2 divide_by
-    arg %divide_by local %1
+    move %divide_by local %1 parameters
 
     .name: 3 zero
     izero %zero local
@@ -129,16 +129,16 @@
 .function: log_exiting_detached/1
     allocate_registers %3 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     echo (string %2 local "process [detached]: '") local
     echo %1 local
     print (string %2 local "' exiting") local
     return
 .end
-.function: log_exiting_joined/0
+.function: log_exiting_joined/1
     allocate_registers %3 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     echo (string %2 local "process [ joined ]: '") local
     echo %1 local
     print (string %2 local "' exiting") local
@@ -155,7 +155,7 @@
     frame %0
     process void a_detached_concurrent_process/0
 
-    frame ^[(param %0 (integer %1 local 42) local) (param %1 (integer %2 local 0) local)]
+    frame ^[(copy %0 arguments (integer %1 local 42) local) (copy %1 arguments (integer %2 local 0) local)]
     process void a_division_executing_process/2
 
     frame %0

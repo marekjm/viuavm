@@ -20,7 +20,7 @@
 .function: global_printer/1
     allocate_registers %3 local
 
-    send (arg %1 local %0) local (self %2 local) local
+    send (move %1 local %0 parameters) local (self %2 local) local
 
     ; wait until a message arrives
     receive %2 global 10s
@@ -38,13 +38,13 @@
 
     ; put second parameter (whatever it is) in
     ; global register 1
-    arg %1 global %1
+    move %1 global %1 parameters
 
     ; send message to printer process to trigger it to
     ; print contents of global register 1
     ; it should cause an exception
     .name: 1 printer_process_handle
-    send (arg %printer_process_handle local %0) local (izero %3 local) local
+    send (move %printer_process_handle local %0 parameters) local (izero %3 local) local
 
     return
 .end
@@ -57,7 +57,7 @@
     ; spawn printer process
     ; it immediately waits for a message to arrive
     ; first message it receives should crash it
-    frame ^[(pamv %0 (self %iota local) local)]
+    frame ^[(move %0 arguments (self %iota local) local)]
     process void global_printer/1
 
     .name: %iota printer_pid
@@ -66,11 +66,11 @@
 
     ; spawn two independent writer processes
     ; whichever triggers the printer process is not important
-    frame ^[(param %0 %printer_pid local) (pamv %1 (string %2 local "Hello World") local)]
+    frame ^[(copy %0 arguments %printer_pid local) (move %1 arguments (string %2 local "Hello World") local)]
     process void global_writer/2
 
     ; this is the second writer process
-    frame ^[(param %0 %printer_pid local) (pamv %1 (string %2 local "broken") local)]
+    frame ^[(copy %0 arguments %printer_pid local) (move %1 arguments (string %2 local "broken") local)]
     process void global_writer/2
 
     izero %0 local

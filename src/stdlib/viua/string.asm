@@ -21,14 +21,14 @@
 ; It is a part of standard Viua runtime library.
 
 .function: std::string::stringify/1
-    frame ^[(param %0 (ptr %2 (string %1 ""))) (param %1 (arg %3 %0))]
+    frame ^[(copy %0 arguments (ptr %2 (string %1 ""))) (copy %1 arguments (arg %3 %0))]
     msg void stringify/2
     move %0 %1
     return
 .end
 
 .function: std::string::represent/1
-    frame ^[(param %0 (ptr %2 (string %1 ""))) (param %1 (arg %3 %0))]
+    frame ^[(copy %0 arguments (ptr %2 (string %1 ""))) (copy %1 arguments (arg %3 %0))]
     msg void represent/2
     move %0 %1
     return

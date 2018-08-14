@@ -1,0 +1,10 @@
+Moves a value from one register (src) to another (dst).
+These registers may be in different register sets.
+
+The source register must not be empty when this instruction is issued.
+
+Any value that is present in the destination register when this instruction
+is executed is deleted before the move is performed.
+
+A special form of this instruction (where the destination register set
+is "arguments") is used to pass arguments by move to a function.

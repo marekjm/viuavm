@@ -19,7 +19,7 @@
 
 .closure: is_divisible_by/1
     .name: 2 bound_variable
-    arg %1 local %0
+    move %1 local %0 parameters
 
     .mark: loop_begin
     if (lt %3 local %1 local %bound_variable local) local loop_end loop_body
@@ -53,8 +53,8 @@
     ;   * a vector with values to be filtered,
     allocate_registers %9 local
 
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; vector for filtered values
     vector %3 local
@@ -70,7 +70,7 @@
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)] %0
+    frame ^[(copy %0 arguments *(vat %7 local %2 local %4 local) local)] %0
     call %8 local %1 local
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
@@ -109,7 +109,7 @@
     frame %0
     call %3 local is_divisible_by_2/0
 
-    frame ^[(param %0 %3 local) (pamv %1 %1 local)]
+    frame ^[(copy %0 arguments %3 local) (move %1 arguments %1 local)]
     print (call %4 local filter_closure/2) local
 
     izero %0 local

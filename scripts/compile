@@ -31,5 +31,17 @@ if [[ $JOBS == '' ]]; then
     JOBS=$(dc -e "$(cat /proc/cpuinfo | grep 'processor' | tail -n 1 | grep -Po '[0-9]+') 2 + p")
 fi
 
+# The compilation mode affects optimisations.
+if [[ $MODE == '' ]]; then
+    CXXOPTIMIZATIONFLAGS=
+elif [[ $MODE == 'uberfast' ]]; then
+    CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O0
+elif [[ $MODE == 'fast' ]]; then
+    CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O1
+elif [[ $MODE == 'normal' ]]; then
+    CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O2
+fi
+
 echo "$0: using $JOBS jobs"
-make CXX=$CXX -j $JOBS
+echo "$0: make CXX=$CXX $CXXOPTIMIZATIONFLAGS -j $JOBS"
+make CXX=$CXX $CXXOPTIMIZATIONFLAGS -j $JOBS

@@ -165,6 +165,10 @@ auto ::assembler::operands::resolve_rs_type(Token const token)
         return viua::internals::Register_sets::STATIC;
     } else if (token == "global") {
         return viua::internals::Register_sets::GLOBAL;
+    } else if (token == "arguments") {
+        return viua::internals::Register_sets::ARGUMENTS;
+    } else if (token == "parameters") {
+        return viua::internals::Register_sets::PARAMETERS;
     } else {
         throw viua::cg::lex::Invalid_syntax(
             token, "invalid register set type name: " + token.str());
@@ -428,7 +432,24 @@ auto assemble_instruction(
         assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
             program, tokens, i);
     } else if (tokens.at(i) == "move") {
-        assemble_double_register_op<&Program::opmove>(program, tokens, i);
+        Token_index target = i + 1;
+        Token_index source = target + 2;
+
+        if (tokens.at(target) == "void") {
+            --source;
+            program.opmove(::assembler::operands::getint(
+                       ::assembler::operands::resolve_register(tokens.at(target))),
+                   ::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(source)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        } else {
+            program.opmove(::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(target)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+                   ::assembler::operands::getint_with_rs_type(
+                       ::assembler::operands::resolve_register(tokens.at(source)),
+                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+        }
     } else if (tokens.at(i) == "copy") {
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);
     } else if (tokens.at(i) == "ptr") {
@@ -457,17 +478,6 @@ auto assemble_instruction(
         assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
     } else if (tokens.at(i) == "frame") {
         assemble_op_frame(program, tokens, i);
-    } else if (tokens.at(i) == "param") {
-        viua::assembler::backend::op_assemblers::assemble_parameter_op<
-            &Program::opparam>(program, tokens, i);
-    } else if (tokens.at(i) == "pamv") {
-        viua::assembler::backend::op_assemblers::assemble_parameter_op<
-            &Program::oppamv>(program, tokens, i);
-    } else if (tokens.at(i) == "arg") {
-        viua::assembler::backend::op_assemblers::assemble_op_arg(
-            program, tokens, i);
-    } else if (tokens.at(i) == "argc") {
-        assemble_single_register_op<&Program::opargc>(program, tokens, i);
     } else if (tokens.at(i) == "allocate_registers") {
         assemble_single_register_op<&Program::opallocate_registers>(
             program, tokens, i);

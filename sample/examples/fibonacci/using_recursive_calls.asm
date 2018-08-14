@@ -21,11 +21,11 @@
     allocate_registers %3 local
 
     .name: 1 current_value
-    arg %current_value local %0
+    move %current_value local %0 parameters
 
     if %current_value local +1 fibonacci/1__finished
 
-    frame ^[(pamv %0 (idec (copy %2 local %current_value local) local) local)]
+    frame ^[(move %0 arguments (idec (copy %2 local %current_value local) local) local)]
     call %2 local fibonacci/1
 
     add %current_value local %2 local
@@ -42,7 +42,7 @@
 
     integer %result local 5
 
-    frame ^[(pamv %0 %result local)]
+    frame ^[(move %0 arguments %result local)]
     call %result local fibonacci/1
 
     print %result local

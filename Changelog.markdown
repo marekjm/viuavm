@@ -85,6 +85,14 @@ There are several categories of change:
   in case a function changes the number of local registers it needs. Read about the
   new instruction at https://docs.viuavm.org/
 - fix: throw an exception in division by zero in `div` instruction
+- bic: remove support for functions with variable number of parameters
+- bic: remove `argc` instruction
+- bic: remove `param` instruction; `copy` should be used instead, with target register
+  in `arguments` register set
+- bic: remove `pamv` instruction; `move` should be used instead, with target register
+  in `arguments` register set
+- bic: remove `arg` instruction; `move` should be used instead, with source register
+  in `parameters` register set
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.

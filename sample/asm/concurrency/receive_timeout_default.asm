@@ -33,8 +33,8 @@
 
     .name: %iota times
     .name: %iota pid
-    arg %times local .iota: 0  %iota
-    arg %pid local %1
+    move %times local .iota: 0 %iota parameters
+    move %pid local %1 parameters
 
     try
     catch "Exception" pull_and_do_nothing
@@ -45,7 +45,7 @@
     return
 
     .mark: next_iteration
-    frame ^[(pamv %iota %times local) (pamv %iota %pid local)]
+    frame ^[(move %iota arguments %times local) (move %iota arguments %pid local)]
     tailcall message_sender/2
 
     return
@@ -54,7 +54,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    frame ^[(pamv %iota (integer %1 local 5) local) (pamv %iota (self %1 local) local)]
+    frame ^[(move %iota arguments (integer %1 local 5) local) (move %iota arguments (self %1 local) local)]
     process void message_sender/2
 
     print (receive %iota local) local

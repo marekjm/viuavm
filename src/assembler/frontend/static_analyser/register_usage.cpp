@@ -20,6 +20,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <viua/util/range.h>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/assembler/assembler.h>
@@ -82,6 +83,13 @@ auto map_names_to_register_indexes(
         auto index =
             static_cast<viua::internals::types::register_index>(stoul(idx));
         auto name = directive->operands.at(1);
+
+        if (str::is_register_set_name(name)) {
+            throw Invalid_syntax{directive->tokens.at(0),
+                                 "invalid register name: " + name}
+                .add(directive->tokens.at(2))
+                .note("'" + name + "' is a register set name");
+        }
 
         if (register_usage_profile.name_to_index.count(name)) {
             throw Invalid_syntax{directive->tokens.at(2),
@@ -340,12 +348,6 @@ auto check_register_usage_for_instruction_block_impl(
             case FRAME:
                 check_op_frame(register_usage_profile, *instruction);
                 break;
-            case PARAM:
-                check_op_param(register_usage_profile, *instruction);
-                break;
-            case PAMV:
-                check_op_pamv(register_usage_profile, *instruction);
-                break;
             case CALL:
                 check_op_call(register_usage_profile, *instruction);
                 break;
@@ -354,12 +356,6 @@ auto check_register_usage_for_instruction_block_impl(
                 break;
             case DEFER:
                 check_op_defer(register_usage_profile, *instruction);
-                break;
-            case ARG:
-                check_op_arg(register_usage_profile, *instruction);
-                break;
-            case ARGC:
-                check_op_argc(register_usage_profile, *instruction);
                 break;
             case ALLOCATE_REGISTERS:
                 check_op_allocate_registers(register_usage_profile,
@@ -472,6 +468,12 @@ auto check_register_usage_for_instruction_block_impl(
             case BOOL:
                 // FIXME "bool" opcode is not even implemented
                 break;
+            case ARG:
+            case PARAM:
+            case PAMV:
+                throw invalid_syntax(
+                    instruction->tokens,
+                    "instruction internal to the VM found in user code");
             default:
                 throw invalid_syntax(
                     instruction->tokens,
@@ -522,6 +524,16 @@ static auto check_register_usage_for_instruction_block(
     Register_usage_profile register_usage_profile;
     viua::assembler::frontend::static_analyser::checkers::
         map_names_to_register_indexes(register_usage_profile, ib);
+
+    // FIXME: This is ad-hoc code - move it to a utility function.
+    auto const function_arity = std::stoul(ib.name.str().substr(ib.name.str().rfind('/')+1));
+    for (auto const each : viua::util::Range(static_cast<viua::internals::types::register_index>(function_arity))) {
+        auto val = Register{};
+        val.index = each;
+        val.register_set = viua::internals::Register_sets::PARAMETERS;
+        register_usage_profile.define(val, ib.name);
+    }
+
     viua::assembler::frontend::static_analyser::checkers::
         check_register_usage_for_instruction_block_impl(
             register_usage_profile,

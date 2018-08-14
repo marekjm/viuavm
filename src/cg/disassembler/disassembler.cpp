@@ -94,6 +94,12 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::STATIC:
             oss << "static";
             break;
+        case viua::internals::Register_sets::ARGUMENTS:
+            oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
+            break;
         default:
             if (viua::support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES")
                 == "yes") {
@@ -119,6 +125,12 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::STATIC:
             oss << "static";
             break;
+        case viua::internals::Register_sets::ARGUMENTS:
+            oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
+            break;
         default:
             throw "invalid register set detected";
         }
@@ -138,6 +150,12 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             break;
         case viua::internals::Register_sets::STATIC:
             oss << "static";
+            break;
+        case viua::internals::Register_sets::ARGUMENTS:
+            oss << "arguments";
+            break;
+        case viua::internals::Register_sets::PARAMETERS:
+            oss << "parameters";
             break;
         default:
             throw "invalid register set detected";
@@ -317,7 +335,27 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     auto const op = OPCODE(*saved_ptr);
     auto opname   = std::string{};
     try {
-        opname = OP_NAMES.at(op);
+        if (op == PAMV) {
+            /*
+             * PAMV is an internal instruction, not visible to the
+             * user code.
+             */
+            opname = "move";
+        } else if (op == PARAM) {
+            /*
+             * PARAM is an internal instruction, not visible to the
+             * user code.
+             */
+            opname = "copy";
+        } else if (op == ARG) {
+            /*
+             * ARG is an internal instruction, not visible to the
+             * user code.
+             */
+            opname = "move";
+        } else {
+            opname = OP_NAMES.at(op);
+        }
         ++ptr;
     } catch (std::out_of_range const& e) {
         auto emsg = ostringstream{};
@@ -464,7 +502,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case IINC:
     case IDEC:
     case SELF:
-    case ARGC:
     case ALLOCATE_REGISTERS:
     case STRUCT:
     case WRAPINCREMENT:
@@ -492,12 +529,9 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr = disassemble_ri_operand(oss, ptr);
         break;
     case ARG:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-        ptr = disassemble_ri_operand(oss, ptr);
-        break;
     case PARAM:
     case PAMV:
-        ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         break;
     case SEND:

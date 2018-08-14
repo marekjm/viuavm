@@ -20,7 +20,7 @@
 .function: is_not_negative/1
     allocate_registers %3 local
 
-    gte %0 local (arg %1 local %0 local) local (izero %2 local) local
+    gte %0 local (move %1 local %0 parameters local) local (izero %2 local) local
     return
 .end
 
@@ -32,12 +32,12 @@
 
     import "std::vector"
 
-    frame ^[(param %0 (integer %1 local 20) local)]
+    frame ^[(copy %0 arguments (integer %1 local 20) local)]
     call %2 local std::vector::of_ints/1
 
     vpush %2 local (integer %1 local -1) local
 
-    frame ^[(param %0 %2 local) (pamv %1 (function %3 local is_not_negative/1) local)]
+    frame ^[(copy %0 arguments %2 local) (move %1 arguments (function %3 local is_not_negative/1) local)]
     call %4 local std::vector::every/2
     print %4 local
 

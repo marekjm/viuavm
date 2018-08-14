@@ -20,7 +20,7 @@
 .function: run_in_a_process/1
     allocate_registers %5 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
 
     text %2 local "spawned process "
     text %3 local %1 local
@@ -46,10 +46,10 @@
     allocate_registers %4 local
 
     .name: 1 counter
-    arg %counter local %0
+    move %counter local %0 parameters
 
     .name: 2 limit
-    arg %limit local %1
+    move %limit local %1 parameters
 
     ; if limit is N, processes IDs go from 0 to N-1
     ; this is why the counter is incremented before the
@@ -61,12 +61,12 @@
     return
 
     ; spawn a new process
-    frame ^[(param %0 %counter local)]
+    frame ^[(copy %0 arguments %counter local)]
     process void run_in_a_process/1
 
     ; take advantage of tail recursion in Viua and
     ; elegantly follow with process spawner execution
-    frame ^[(pamv %0 %counter local) (pamv %1 %limit local)]
+    frame ^[(move %0 arguments %counter local) (move %1 arguments %limit local)]
     tailcall spawn_processes/2
 .end
 
@@ -75,17 +75,17 @@
 
     echo (string %2 local "process_spawner/1: ") local
     .name: 1 limit
-    echo (arg %1 local %0) local
+    echo (move %1 local %0 parameters) local
     print (text %2 local " processs to launch") local
 
-    frame ^[(pamv %0 (izero %3 local) local) (pamv %1 %limit local)]
+    frame ^[(move %0 arguments (izero %3 local) local) (move %1 arguments %limit local)]
     tailcall spawn_processes/2
 .end
 
 .function: main/1
     allocate_registers %3 local
 
-    frame ^[(param %0 (integer %1 local 4000) local)]
+    frame ^[(copy %0 arguments (integer %1 local 4000) local)]
     process %1 local process_spawner/1
 
     join void %1 local

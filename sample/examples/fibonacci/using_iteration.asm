@@ -22,8 +22,8 @@
 
     .name: 1 current_value
     .name: 2 accumulator
-    arg %current_value local %0
-    arg %accumulator local %1
+    move %current_value local %0 parameters
+    move %accumulator local %1 parameters
 
     .mark: fibonacci/2__loop
     if %current_value local +1 fibonacci/2__finished
@@ -42,7 +42,7 @@
 
     .name: 2 accumulator
 
-    frame ^[(pamv %0 (arg %1 local %0) local) (pamv %1 (izero %accumulator local) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local) (move %1 arguments (izero %accumulator local) local)]
     call %accumulator local fibonacci/2
 
     move %0 local %accumulator local
@@ -56,7 +56,7 @@
 
     integer %result local 5
 
-    frame ^[(pamv %0 %result local)]
+    frame ^[(move %0 arguments %result local)]
     call %result local fibonacci/1
 
     print %result local

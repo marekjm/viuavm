@@ -20,7 +20,7 @@
 .function: print_me/1
     allocate_registers %2 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     print *1 local
 
     return
@@ -32,7 +32,7 @@
     text %1 local "Hello World!"
     ptr %2 local %1 local
 
-    frame ^[(pamv %0 %2 local)]
+    frame ^[(move %0 arguments %2 local)]
     defer print_me/1
 
     izero %0 local

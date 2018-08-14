@@ -760,12 +760,30 @@ auto opsaturatingudiv(viua::internals::types::byte* addr_ptr,
 
 auto opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
+    auto opcode = MOVE;
+    if (a.rs_type == viua::internals::Register_sets::ARGUMENTS) {
+        opcode = PAMV;
+    }
+    if (b.rs_type == viua::internals::Register_sets::PARAMETERS) {
+        opcode = ARG;
+    }
+
+    return insert_two_ri_instruction(
+        addr_ptr
+        , opcode
+        , a
+        , b
+    );
 }
 
 auto opcopy(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, COPY, a, b);
+    return insert_two_ri_instruction(
+        addr_ptr
+        , (a.rs_type == viua::internals::Register_sets::ARGUMENTS ? PARAM : COPY)
+        , a
+        , b
+    );
 }
 
 auto opptr(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
@@ -855,27 +873,6 @@ auto opfunction(viua::internals::types::byte* addr_ptr,
 auto opframe(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, FRAME, a, b);
-}
-
-auto opparam(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, PARAM, a, b);
-}
-
-auto oppamv(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, PAMV, a, b);
-}
-
-auto oparg(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
-    return insert_two_ri_instruction(addr_ptr, ARG, a, b);
-}
-
-auto opargc(viua::internals::types::byte* addr_ptr, int_op a)
-    -> viua::internals::types::byte* {
-    *(addr_ptr++) = ARGC;
-    return insert_ri_operand(addr_ptr, a);
 }
 
 auto opallocate_registers(viua::internals::types::byte* addr_ptr, int_op a)

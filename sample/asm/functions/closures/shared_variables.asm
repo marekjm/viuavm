@@ -24,7 +24,7 @@
 .end
 
 .closure: closure_setter/1
-    arg %1 local %0
+    move %1 local %0 parameters
 
     ;print %2 local
     ; overwrite bound value with whatever we got
@@ -70,7 +70,7 @@
     vat (.name: %iota printer_closure) local %the_closures local (izero %iota local) local
     call void *printer_closure local
 
-    frame ^[(param %0 (integer %iota local 69) local)]
+    frame ^[(copy %0 arguments (integer %iota local 69) local)]
     vat (.name: %iota setter_closure) local %the_closures local (integer %iota local 1) local
     call void *setter_closure local
 

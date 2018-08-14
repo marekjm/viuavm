@@ -20,7 +20,7 @@
 .function: boolean/1
     allocate_registers %2 local
 
-    move %0 local (not (not (arg %1 local %0 local) local) local) local
+    move %0 local (not (not (move %1 local %0 parameters local) local) local) local
     return
 .end
 
@@ -29,7 +29,7 @@
 
     izero %1 local
 
-    frame ^[(param %0 %1 local)]
+    frame ^[(copy %0 arguments %1 local)]
     call %1 local boolean/1
 
     print (not (print %1 local) local) local

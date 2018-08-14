@@ -42,7 +42,7 @@
 
     ; After we received a message, it makes sense to fetch the value
     ; with which we will respond.
-    arg %value local %0
+    move %value local %0 parameters
 
     ; Make a copy of the value and increase it by one. Each time we want
     ; to respond with a value that will be greater by one than the value
@@ -59,7 +59,7 @@
     ; to loop. It is also *much* more readable than a "normal" loop; at
     ; least when written in Viua VM assembly.
     frame %1
-    pamv %0 %next_value local
+    move %0 arguments %next_value local
     tailcall lazy_generator/1
 .end
 
@@ -71,7 +71,7 @@
 
     ; Send a request for new value to the generator.
     ; This means sending it our PID.
-    arg %generator local %0
+    move %generator local %0 parameters
     self %this_process local
     send %generator local %this_process local
     receive %0 local infinity
@@ -92,29 +92,29 @@
     ; do not share state with each other.
     integer %value local 42
     frame %1
-    pamv %0 %value local
+    move %0 arguments %value local
     process %generator local lazy_generator/1
 
     ; Then, we can request values from the generator. It will generate
     ; them on demand, performing the role of an inifinite source of ever
     ; increasing integers.
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 
     frame %1
-    param %0 %generator local
+    copy %0 arguments %generator local
     call %value local get_value/1
     print %value local
 

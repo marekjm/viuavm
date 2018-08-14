@@ -26,7 +26,7 @@
 .function: main/0
     allocate_registers %1 local
 
-    frame ^[(pamv %0 (iinc (integer)))]
+    frame ^[(move %0 arguments (iinc (integer)))]
     call dummy/1
 
     izero %0 local

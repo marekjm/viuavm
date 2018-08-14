@@ -27,7 +27,7 @@
     allocate_registers %2 local
 
     frame %3
-    param %3 (integer %1 local 1) local
+    copy %3 arguments (integer %1 local 1) local
     call void foo/3
 
     izero %0 local

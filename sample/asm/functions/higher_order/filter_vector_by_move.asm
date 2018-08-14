@@ -20,7 +20,7 @@
 .function: is_divisible_by_2/1
     allocate_registers %4 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     integer %2 local 2
 
     .mark: loop_begin
@@ -44,8 +44,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; vector for filtered values
     vector %3 local
@@ -61,7 +61,7 @@
 
     ; call filtering function to determine whether current element
     ; is a valid value...
-    frame ^[(param %0 *(vat %7 local %2 local %4 local) local)]
+    frame ^[(copy %0 arguments *(vat %7 local %2 local %4 local) local)]
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -96,7 +96,7 @@
 
     print %1 local
 
-    frame ^[(param %0 (function %3 local is_divisible_by_2/1) local) (pamv %1 %1 local)]
+    frame ^[(copy %0 arguments (function %3 local is_divisible_by_2/1) local) (move %1 arguments %1 local)]
     print (call %4 local filter/2) local
 
     izero %0 local

@@ -51,6 +51,19 @@ enum class Register_sets : types::registerset_type_marker {
     GLOBAL = 0,
     LOCAL,
     STATIC,
+    /*
+     * As described in "Programming Language Pragmatics" by Michael L. Scott:
+     *
+     *      Most subroutines are parametrized: the caller passes arguments that
+     *      influence the subroutine's behaviour, or provide it with data on which
+     *      to operate. Arguments are also called actual parameters. They are
+     *      mapped to the subroutine's formal parameters at the time a call occurs.
+     *
+     * This can be found on page 427, in the introduction to Chapter 8 "Subroutines
+     * and Control Abstraction". The ISBN for the book is 1-55860-442-1.
+     */
+    ARGUMENTS,  // actual parameters (arguments):  what is passed to a function call
+    PARAMETERS, // formal parameters (parameters): what the function body sees
 };
 }}  // namespace viua::internals
 

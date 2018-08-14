@@ -21,7 +21,7 @@
     allocate_registers %2 local
 
     echo (string %1 local "Hello ") local
-    echo (arg %1 local %0) local
+    echo (move %1 local %0 parameters) local
     print (string %1 local '!') local
     return
 .end
@@ -35,13 +35,13 @@
 
     function %1 local greetings/1
 
-    frame ^[(param %0 %1 local) (param %1 (string %2 local "World") local)]
+    frame ^[(copy %0 arguments %1 local) (copy %1 arguments (string %2 local "World") local)]
     call std::functional::apply/2
 
-    frame ^[(param %0 %1 local) (param %1 (string %2 local "Joe") local)]
+    frame ^[(copy %0 arguments %1 local) (copy %1 arguments (string %2 local "Joe") local)]
     call std::functional::apply/2
 
-    frame ^[(param %0 %1 local) (param %1 (string %2 local "Mike") local)]
+    frame ^[(copy %0 arguments %1 local) (copy %1 arguments (string %2 local "Mike") local)]
     call std::functional::apply/2
 
     izero %0 local

@@ -22,7 +22,7 @@
 .function: print_hello/1
     allocate_registers %6 local
 
-    frame ^[(pamv %0 (integer %1 local 64) local)]
+    frame ^[(move %0 arguments (integer %1 local 64) local)]
     call std::misc::cycle/1
 
     .name: %iota hello
@@ -31,7 +31,7 @@
     text %exclamation_mark local "!"
 
     .name: %iota something
-    arg %something local %0
+    move %something local %0 parameters
 
     .name: %iota textified
     text %textified local %something local
@@ -48,7 +48,7 @@
 .function: process_spawner/1
     allocate_registers %2 local
 
-    frame ^[(pamv %0 (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local)]
     process void print_hello/1
     return
 .end
@@ -57,19 +57,19 @@
     allocate_registers %2 local
 
     .name: 1 limit
-    arg %limit local %0
+    move %limit local %0 parameters
 
     ; run until "limit" hits zero
     if %limit local +1 spawn_processes/1__epilogue
 
     ; spawn a printer process with current limit value
     ; as its only parameter
-    frame ^[(param %0 %limit local)]
+    frame ^[(copy %0 arguments %limit local)]
     call process_spawner/1
     idec %limit local
 
     ; tail-recursive call to spawn more printer processes
-    frame ^[(pamv %0 %limit local)]
+    frame ^[(move %0 arguments %limit local)]
     tailcall spawn_processes/1
 
     .mark: spawn_processes/1__epilogue
@@ -94,7 +94,7 @@
 
     .name: 1 limit
     integer %limit local 64
-    frame ^[(pamv %0 %limit local)]
+    frame ^[(move %0 arguments %limit local)]
     call spawn_processes/1
 
     izero %0 local

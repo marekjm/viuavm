@@ -25,7 +25,7 @@
     allocate_registers %5 local
 
     .name: 1 limit
-    arg %limit %0
+    move %limit %0 parameters
 
     .name: 0 vec
     vector %vec %3
@@ -53,8 +53,8 @@
 
     .name: 1 limit
     .name: 2 fn
-    arg %limit local %0
-    arg %fn local %1
+    move %limit local %0 parameters
+    move %fn local %1 parameters
 
     .name: 0 vec
     vector %vec local
@@ -64,7 +64,7 @@
     izero %counter local
 
     .mark: begin_loop
-    frame ^[(pamv %0 (copy %to_push local %counter local) local)]
+    frame ^[(move %0 arguments (copy %to_push local %counter local) local)]
     vpush %vec local (call %to_push local %fn local) local
     iinc %counter local
     ; reuse 'to_push' register since it's empty
@@ -84,7 +84,7 @@
 
     .name: 1 source
     .name: 0 result
-    arg %source %0
+    move %source %0 parameters
     vector %result
 
     .name: 2 counter
@@ -108,7 +108,7 @@
     allocate_registers %5 local
 
     .name: 0 source
-    arg %source local %0
+    move %source local %0 parameters
 
     .name: 1 counter_down
     vlen %counter_down local %source local
@@ -140,8 +140,8 @@
 
     .name: 1 vec
     .name: 2 fn
-    arg %vec %0
-    arg %fn %1
+    move %vec %0 parameters
+    move %fn %1 parameters
 
     .name: 0 result
     not (izero %result)
@@ -157,7 +157,7 @@
     .mark: begin_loop
     vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 *tmp)]
+    frame ^[(copy %0 arguments *tmp local)]
     and %result (call %6 %fn) %result
 
     ; break loop if there wasn't a match
@@ -176,8 +176,8 @@
 
     .name: 1 vec
     .name: 2 fn
-    arg %vec %0
-    arg %fn %1
+    move %vec %0 parameters
+    move %fn %1 parameters
 
     .name: 0 result
     not (izero %result)
@@ -193,7 +193,7 @@
     .mark: begin_loop
     vat %tmp %vec %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 *tmp)]
+    frame ^[(copy %0 arguments *tmp local)]
     move %result (call %6 %fn)
 
     ; break the loop if there was a match
