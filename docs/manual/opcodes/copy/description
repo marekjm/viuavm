@@ -3,8 +3,22 @@ These registers may be in different register sets.
 
 The source register must not be empty when this instruction is issued.
 
-Any value that is present in the destination register when this instruction
-is executed is deleted before the move is performed.
+The copy of the value is made before the value in destination register is deleted.
+This ensures that in case of failure, the instruction will modify less state.
+
+\heading{PASSING ARGUMENTS}{noise=true}
 
 A special form of this instruction (where the destination register set
-is "arguments") is used to pass arguments by move to a function.
+is "arguments") is used to pass arguments by copy to a function:
+
+\indent{}
+\reflow{off}
+\wrap{begin}
+    text %1 local "Hello World!"
+    copy %0 arguments %1 local      ; pass the argument by copy
+\wrap{end}
+\reflow{on}
+\dedent{}
+\break
+
+The arguments register set is described in section \ref{registers:register_sets:arguments}.

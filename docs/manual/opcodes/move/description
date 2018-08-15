@@ -10,5 +10,35 @@ Being moved does not affect the value moved between registers in any way.
 Any value that is present in the destination register when this instruction
 is executed is deleted before the move is performed.
 
+\heading{PASSING ARGUMENTS}{noise=true}
+
 A special form of this instruction (where the destination register set
-is "arguments") is used to pass arguments by move to a function.
+is "arguments") is used to pass arguments by move to a function:
+
+\indent{}
+\reflow{off}
+\wrap{begin}
+    text %1 local "Hello World!"
+    move %0 arguments %1 local      ; pass the argument by move
+\wrap{end}
+\reflow{on}
+\dedent{}
+\break
+
+The arguments register set is described in section \ref{registers:register_sets:arguments}.
+
+\heading{OBTAINING PARAMETERS}{noise=true}
+
+Another special form of this instruction (where the source register set
+is "parameters") is used to extract parameters passed to a function:
+
+\indent{}
+\reflow{off}
+\wrap{begin}
+    move %1 local %0 parameters
+\wrap{end}
+\reflow{on}
+\dedent{}
+\break
+
+The parameters register set is described in section \ref{registers:register_sets:parameters}.
