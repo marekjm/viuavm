@@ -17,7 +17,7 @@ Viua has no concept of "memory" in the traditional sense (as a byte-addressable 
 This means that a value cannot be stored to, or loaded from, memory.
 
 To cover a wide range of use cases Viua provides several different register sets.
-These sets vary in lifetime and visibility, and are described in section \ref{registers.register_sets}.
+These sets vary in lifetime and visibility, and are described in section \ref{registers:register_sets}.
 With this architecture the need for explicit memory should be reduced.
 If a "store-and-load" functionality is needed it may be emulated using a combination of processes, global and
 static registers.
@@ -48,19 +48,77 @@ In Viua a register either contains a valid value, or nothing.
 %% A REGISTER
 \section{end}
 
-\heading{REGISTER SETS}{ref=registers.register_sets}
+\heading{REGISTER SETS}{ref=registers:register_sets}
 \section{begin}
 
 Registers are grouped in register sets.
-Register sets are allocated per-process.
+Register sets are allocated per-process (i.e. no two processes may ever share a register set).
 Processes do not share any registers, and can only exchange values using message passing.
 
-Register sets are divided into two main groups: direct access, and control-oriented access.
+Some register sets are of the general purpose kind:
+local (described in section \ref{registers:register_sets:local}),
+static (described in section \ref{registers:register_sets:static}), and
+global (described in section \ref{registers:register_sets:global});
+some are kinda-sorta everyday use kind:
+arguments (described in section \ref{registers:register_sets:arguments}), and
+parameters (described in section \ref{registers:register_sets:parameters});
+and some are special-purpose:
+message queue (described in section \ref{registers:register_sets:message_queue}), and
+exception register (described in section \ref{registers:register_sets:exception_register});
 
-\heading{DIRECT ACCESS REGISTER SETS}
+There are 7 different register sets available:
+
+\listed{begin}{sorted=false}
+    local
+    static
+    global
+    arguments
+    parameters
+    message-queue
+    exception-register
+\listed{end}
+
+\break
+
+Three of them contain general purpose, read-write registers.
+User processes may freely read values from them, and write values to them.
+These are:
+
+\listed{begin}{sorted=false}
+    local
+    static
+    global
+\listed{end}
+
+\break
+
+Two are used for performing function calls:
+
+\listed{begin}{sorted=false}
+    arguments
+    parameters
+\listed{end}
+
+\break
+
+One is used for interprocess communication...
+
+\listed{begin}{sorted=false}
+    message-queue
+\listed{end}
+
+\break
+
+...and one for error handling:
+
+\listed{begin}{sorted=false}
+    exception-register
+\listed{end}
+
+\heading{GENERAL PURPOSE REGISTER SETS}
 \section{begin}
 
-A register in a direct access register set can be used directly by any instruction.
+A register in a general purpose register set can be used directly by any instruction.
 An instruction can freely mix the register sets it uses for its operands.
 As an example, the following instruction will add
 an integer from local register 1
@@ -210,7 +268,7 @@ for fetching the parameters from it.
 A value placed in a control oriented register set is not directly accessible.
 It must be moved to a direct access register set before it can be used.
 
-\heading{MESSAGE QUEUE}
+\heading{MESSAGE QUEUE}{ref=registers:register_sets:message_queue}
 
 Message queue is allocated per-process.
 It is accessible from all call frames, and all stacks of a process (similarly to a global register set).
@@ -233,7 +291,7 @@ When a message is delievered to a process it is put into its message queue (or: 
 of the queue.
 When a message is received by the process it is popped from its mailbox, decreasing mailbox's size.
 
-\heading{EXCEPTION REGISTER}{ref=register_sets.exception_register}
+\heading{EXCEPTION REGISTER}{ref=registers:register_sets:exception_register}
 
 Exception register is allocated per-stack per-process.
 It is accessible from all call frames of a stack.
