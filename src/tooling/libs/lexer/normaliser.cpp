@@ -247,6 +247,25 @@ static auto normalise_ctor_target_register_access(std::vector<Token>& tokens, ve
     return 3;
 }
 
+static auto normalise_jump_target(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_decimal_integer;
+    if (auto const& token = source.at(0); is_id(token.str())) {
+        tokens.push_back(token);
+    } else if (auto const c = token.str().at(0); (c == '+' or c == '-') and is_decimal_integer(token.str().substr(1))) {
+        tokens.push_back(token);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected jump target"
+            });
+    }
+
+    return 1;
+}
+
 static auto normalise_call(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -479,6 +498,11 @@ static auto normalise_move(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
+static auto normalise_jump(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+    return normalise_jump_target(tokens, source.advance(1)) + 1;
+}
+
 static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
@@ -679,6 +703,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             ++i;
         } else if (token == "move" or token == "copy") {
             i += normalise_move(tokens, vector_view{source, i});
+        } else if (token == "jump") {
+            i += normalise_jump(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
