@@ -83,7 +83,7 @@ Valid register indexes start with zero (0) and end with K, where K is the size o
 set to be accessed minus 1.
 For example, for a local register set with size 16 valid indexes span from 0 to 15.
 
-\heading{GLOBAL REGISTER SET}
+\heading{GLOBAL REGISTER SET}{ref=registers:register_sets:global}
 \section{begin}
 
 Global register set is allocated per-process.
@@ -102,7 +102,7 @@ registers (i.e. the value in global register 1 is destructed before the value in
 %% GLOBAL REGISTER SET
 \section{end}
 
-\heading{STATIC REGISTER SET}
+\heading{STATIC REGISTER SET}{ref=registers:register_sets:static}
 \section{begin}
 
 Static register set is allocated per-function per-process.
@@ -132,7 +132,7 @@ be guarded by the \instruction{isnull} instruction (described in section
 %% STATIC REGISTER SET
 \section{end}
 
-\heading{LOCAL REGISTER SET}
+\heading{LOCAL REGISTER SET}{ref=registers:register_sets:local}
 \section{begin}
 
 A local register set is allocated whenever:
