@@ -193,6 +193,18 @@ be guarded by the \instruction{isnull} instruction (described in section
 \heading{LOCAL REGISTER SET}{ref=registers:register_sets:local}
 \section{begin}
 
+A local register set is accessible only inside a single call frame.
+This usually means that it is accessible only for the duration of a single function call, with the exception
+of local register sets allocated for closures.
+
+Since closures can be called many times their local register sets must persist between calls.
+This makes them similar to static registers, but scoped only to a single closure instance.
+
+Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
+\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
+
+\heading{LIFETIME}{noise=true}
+
 A local register set is allocated whenever:
 
 \list{begin}
@@ -210,15 +222,57 @@ a closure is created (using the \instruction{closure} instruction, described in 
 \ref{opcode:closure})
 \list{end}
 
-A local register set is accessible only inside a single call frame.
-This usually means that it is accessible only for the duration of a single function call, with the exception
-of local register sets allocated for closures.
+Local register set is deallocated before the call frame with which it is associated is dropped
+(after the \instruction{return} instruction is executed, or
+during stack unwinding as a result of an uncaught exception), but after all of scheduled deferred
+calls are executed.
+\break
+This facilitates simple implementation of deterministic, C++ style destructors.
+Consider this sample code, as an example:
 
-Since closures can be called many times their local register sets must persist between calls.
-This makes them similar to static registers, but scoped only to a single closure instance.
+\indent{}
+\reflow{off}
+\wrap{begin}
+.function: append_log_to_file/2
+    .name: iota file_name
+    .name: iota log_text
+    .name: iota file_output_stream
+    .name: iota file_output_stream_ptr
 
-Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
-\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
+    move %file_name local %0 parameters
+    move %log_text local %1 parameters
+
+    frame %1
+    move %0 arguments %file_name parameters
+    call %file_output_stream local std::posix::io::open/1
+    ptr %file_output_stream_ptr local %file_output_stream local
+
+    frame %1
+    copy %0 arguments %file_output_stream_ptr local
+    defer std::posix::io::close/1
+
+    frame %2
+    copy %0 arguments %file_output_stream_ptr local
+    move %0 arguments %log_text parameters
+    call void std::posix::io::write_newline/2
+
+    ; At this point, no instruction may access any local register set
+    ; of the append_log_to_file/2 function.
+    ; However, the deferred call to std::posix::io::close/1 may access
+    ; the *value* contained in local register named file_output_stream,
+    ; because it received the value by pointer - which means that it
+    ; does not care where the value lives as it can access it in a
+    ; different way than by direct register addressing.
+    ;
+    ; After the deferred call is executed, the frame is dropped, the
+    ; values in it are deleted, and the execution of the rest of the
+    ; program continues.
+    return
+.end
+\wrap{end}
+\reflow{on}
+\dedent{}
+\break
 
 %% LOCAL REGISTER SET
 \section{end}
