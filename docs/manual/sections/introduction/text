@@ -148,7 +148,7 @@ Global register set is allocated per-process.
 It is accessible from any call frame inside a process.
 Global register set is shared between all call stacks inside a process.
 
-\heading{LIFETIME}
+\heading{LIFETIME}{noise=true}
 
 Global register set is allocated when a process is spawned, before the process begins execution.
 
@@ -168,7 +168,7 @@ It is accessible only for the function that requested it (i.e. function f cannot
 static register set of function g).
 Static register sets are shared between all call stacks inside a process.
 
-\heading{LIFETIME}
+\heading{LIFETIME}{noise=true}
 
 Static register set is allocated when a function first requests it.
 Currently (2018-03-07), this means that it is allocated on first access to a register from the static register
@@ -180,7 +180,7 @@ registers (i.e. the value in static register 1 is destructed before the value in
 It is unspecified (as of 2018-03-07) whether static register sets are deallocated before or after the global
 register set.
 
-\heading{NOTES}
+\heading{NOTES}{noise=true}
 
 Functions are responsible for setting up their static register sets.
 Since any call to a function may be the first one, access to static registers should
@@ -226,6 +226,8 @@ Tail calls (facilitated by the \instruction{tailcall} instruction, described in 
 \heading{ARGUMENTS REGISTER SET}{ref=registers:register_sets:arguments}
 \section{begin}
 
+\heading{LIFETIME}{noise=true}
+
 Arguments register set is allocated by the \instruction{frame} instruction.
 When a function call instruction is executed, this register set is made available to
 the callee as the parameters register set (described in section \ref{registers:register_sets:parameters}),
@@ -241,6 +243,8 @@ for setting arguments for the next function call.
 
 \heading{PARAMETERS REGISTER SET}{ref=registers:register_sets:parameters}
 \section{begin}
+
+\heading{LIFETIME}{noise=true}
 
 First, the caller allocates this register set using the \instruction{frame} instruction; it is then
 available (to the caller) as the arguments register set (described in section
