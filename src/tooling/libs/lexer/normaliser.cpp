@@ -667,7 +667,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
             ++i;
-        } else if (token == "move") {
+        } else if (token == "move" or token == "copy") {
             i += normalise_move(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
