@@ -1,5 +1,6 @@
 Throw a value.
-Thrown value is moved to the exception register (described in section \ref{register_sets.exception_register}).
+Thrown value is moved to the exception register (described in
+section \ref{registers:register_sets:exception_register}).
 
 Throwing a value triggers the exception handling mechanism, and
 may result in a stack being unwound.

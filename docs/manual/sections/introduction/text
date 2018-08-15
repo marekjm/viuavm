@@ -17,7 +17,7 @@ Viua has no concept of "memory" in the traditional sense (as a byte-addressable 
 This means that a value cannot be stored to, or loaded from, memory.
 
 To cover a wide range of use cases Viua provides several different register sets.
-These sets vary in lifetime and visibility, and are described in section \ref{registers.register_sets}.
+These sets vary in lifetime and visibility, and are described in section \ref{registers:register_sets}.
 With this architecture the need for explicit memory should be reduced.
 If a "store-and-load" functionality is needed it may be emulated using a combination of processes, global and
 static registers.
@@ -48,19 +48,77 @@ In Viua a register either contains a valid value, or nothing.
 %% A REGISTER
 \section{end}
 
-\heading{REGISTER SETS}{ref=registers.register_sets}
+\heading{REGISTER SETS}{ref=registers:register_sets}
 \section{begin}
 
 Registers are grouped in register sets.
-Register sets are allocated per-process.
+Register sets are allocated per-process (i.e. no two processes may ever share a register set).
 Processes do not share any registers, and can only exchange values using message passing.
 
-Register sets are divided into two main groups: direct access, and control-oriented access.
+Some register sets are of the general purpose kind:
+local (described in section \ref{registers:register_sets:local}),
+static (described in section \ref{registers:register_sets:static}), and
+global (described in section \ref{registers:register_sets:global});
+some are kinda-sorta everyday use kind:
+arguments (described in section \ref{registers:register_sets:arguments}), and
+parameters (described in section \ref{registers:register_sets:parameters});
+and some are special-purpose:
+message queue (described in section \ref{registers:register_sets:message_queue}), and
+exception register (described in section \ref{registers:register_sets:exception_register});
 
-\heading{DIRECT ACCESS REGISTER SETS}
+There are 7 different register sets available:
+
+\listed{begin}{sorted=false}
+    local
+    static
+    global
+    arguments
+    parameters
+    message-queue
+    exception-register
+\listed{end}
+
+\break
+
+Three of them contain general purpose, read-write registers.
+User processes may freely read values from them, and write values to them.
+These are:
+
+\listed{begin}{sorted=false}
+    local
+    static
+    global
+\listed{end}
+
+\break
+
+Two are used for performing function calls:
+
+\listed{begin}{sorted=false}
+    arguments
+    parameters
+\listed{end}
+
+\break
+
+One is used for interprocess communication...
+
+\listed{begin}{sorted=false}
+    message-queue
+\listed{end}
+
+\break
+
+...and one for error handling:
+
+\listed{begin}{sorted=false}
+    exception-register
+\listed{end}
+
+\heading{GENERAL PURPOSE REGISTER SETS}
 \section{begin}
 
-A register in a direct access register set can be used directly by any instruction.
+A register in a general purpose register set can be used directly by any instruction.
 An instruction can freely mix the register sets it uses for its operands.
 As an example, the following instruction will add
 an integer from local register 1
@@ -83,14 +141,14 @@ Valid register indexes start with zero (0) and end with K, where K is the size o
 set to be accessed minus 1.
 For example, for a local register set with size 16 valid indexes span from 0 to 15.
 
-\heading{GLOBAL REGISTER SET}
+\heading{GLOBAL REGISTER SET}{ref=registers:register_sets:global}
 \section{begin}
 
 Global register set is allocated per-process.
 It is accessible from any call frame inside a process.
 Global register set is shared between all call stacks inside a process.
 
-\heading{LIFETIME}
+\heading{LIFETIME}{noise=true}
 
 Global register set is allocated when a process is spawned, before the process begins execution.
 
@@ -102,7 +160,7 @@ registers (i.e. the value in global register 1 is destructed before the value in
 %% GLOBAL REGISTER SET
 \section{end}
 
-\heading{STATIC REGISTER SET}
+\heading{STATIC REGISTER SET}{ref=registers:register_sets:static}
 \section{begin}
 
 Static register set is allocated per-function per-process.
@@ -110,7 +168,7 @@ It is accessible only for the function that requested it (i.e. function f cannot
 static register set of function g).
 Static register sets are shared between all call stacks inside a process.
 
-\heading{LIFETIME}
+\heading{LIFETIME}{noise=true}
 
 Static register set is allocated when a function first requests it.
 Currently (2018-03-07), this means that it is allocated on first access to a register from the static register
@@ -122,7 +180,7 @@ registers (i.e. the value in static register 1 is destructed before the value in
 It is unspecified (as of 2018-03-07) whether static register sets are deallocated before or after the global
 register set.
 
-\heading{NOTES}
+\heading{NOTES}{noise=true}
 
 Functions are responsible for setting up their static register sets.
 Since any call to a function may be the first one, access to static registers should
@@ -132,8 +190,20 @@ be guarded by the \instruction{isnull} instruction (described in section
 %% STATIC REGISTER SET
 \section{end}
 
-\heading{LOCAL REGISTER SET}
+\heading{LOCAL REGISTER SET}{ref=registers:register_sets:local}
 \section{begin}
+
+A local register set is accessible only inside a single call frame.
+This usually means that it is accessible only for the duration of a single function call, with the exception
+of local register sets allocated for closures.
+
+Since closures can be called many times their local register sets must persist between calls.
+This makes them similar to static registers, but scoped only to a single closure instance.
+
+Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
+\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
+
+\heading{LIFETIME}{noise=true}
 
 A local register set is allocated whenever:
 
@@ -152,21 +222,65 @@ a closure is created (using the \instruction{closure} instruction, described in 
 \ref{opcode:closure})
 \list{end}
 
-A local register set is accessible only inside a single call frame.
-This usually means that it is accessible only for the duration of a single function call, with the exception
-of local register sets allocated for closures.
+Local register set is deallocated before the call frame with which it is associated is dropped
+(after the \instruction{return} instruction is executed, or
+during stack unwinding as a result of an uncaught exception), but after all of scheduled deferred
+calls are executed.
+\break
+This facilitates simple implementation of deterministic, C++ style destructors.
+Consider this sample code, as an example:
 
-Since closures can be called many times their local register sets must persist between calls.
-This makes them similar to static registers, but scoped only to a single closure instance.
+\indent{}
+\reflow{off}
+\wrap{begin}
+.function: append_log_to_file/2
+    .name: iota file_name
+    .name: iota log_text
+    .name: iota file_output_stream
+    .name: iota file_output_stream_ptr
 
-Tail calls (facilitated by the \instruction{tailcall} instruction, described in section
-\ref{opcode:tailcall}) do not "inherit" the contents of caller's local register set.
+    move %file_name local %0 parameters
+    move %log_text local %1 parameters
+
+    frame %1
+    move %0 arguments %file_name parameters
+    call %file_output_stream local std::posix::io::open/1
+    ptr %file_output_stream_ptr local %file_output_stream local
+
+    frame %1
+    copy %0 arguments %file_output_stream_ptr local
+    defer std::posix::io::close/1
+
+    frame %2
+    copy %0 arguments %file_output_stream_ptr local
+    move %0 arguments %log_text parameters
+    call void std::posix::io::write_newline/2
+
+    ; At this point, no instruction may access any local register set
+    ; of the append_log_to_file/2 function.
+    ; However, the deferred call to std::posix::io::close/1 may access
+    ; the *value* contained in local register named file_output_stream,
+    ; because it received the value by pointer - which means that it
+    ; does not care where the value lives as it can access it in a
+    ; different way than by direct register addressing.
+    ;
+    ; After the deferred call is executed, the frame is dropped, the
+    ; values in it are deleted, and the execution of the rest of the
+    ; program continues.
+    return
+.end
+\wrap{end}
+\reflow{on}
+\dedent{}
+\break
 
 %% LOCAL REGISTER SET
 \section{end}
 
 \heading{ARGUMENTS REGISTER SET}{ref=registers:register_sets:arguments}
 \section{begin}
+
+\heading{LIFETIME}{noise=true}
 
 Arguments register set is allocated by the \instruction{frame} instruction.
 When a function call instruction is executed, this register set is made available to
@@ -183,6 +297,8 @@ for setting arguments for the next function call.
 
 \heading{PARAMETERS REGISTER SET}{ref=registers:register_sets:parameters}
 \section{begin}
+
+\heading{LIFETIME}{noise=true}
 
 First, the caller allocates this register set using the \instruction{frame} instruction; it is then
 available (to the caller) as the arguments register set (described in section
@@ -210,7 +326,7 @@ for fetching the parameters from it.
 A value placed in a control oriented register set is not directly accessible.
 It must be moved to a direct access register set before it can be used.
 
-\heading{MESSAGE QUEUE}
+\heading{MESSAGE QUEUE}{ref=registers:register_sets:message_queue}
 
 Message queue is allocated per-process.
 It is accessible from all call frames, and all stacks of a process (similarly to a global register set).
@@ -233,7 +349,7 @@ When a message is delievered to a process it is put into its message queue (or: 
 of the queue.
 When a message is received by the process it is popped from its mailbox, decreasing mailbox's size.
 
-\heading{EXCEPTION REGISTER}{ref=register_sets.exception_register}
+\heading{EXCEPTION REGISTER}{ref=registers:register_sets:exception_register}
 
 Exception register is allocated per-stack per-process.
 It is accessible from all call frames of a stack.
