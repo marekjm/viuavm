@@ -27,20 +27,29 @@ namespace static_analyser { namespace checkers {
 auto check_op_move(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void {
     auto target = get_operand<Register_index>(instruction, 0);
-    if (not target) {
+    auto source = get_operand<Register_index>(instruction, 1);
+
+    if ((not target) and (not source)) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
-    if (target->as == viua::internals::Access_specifier::REGISTER_INDIRECT) {
-        auto r = *target;
-        r.rss  = viua::internals::Register_sets::LOCAL;
-        check_use_of_register(register_usage_profile, r);
-        assert_type_of_register<viua::internals::Value_types::INTEGER>(
-            register_usage_profile, r);
+    if ((not target) and source->rss != viua::internals::Register_sets::PARAMETERS) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
     }
 
-    auto source = get_operand<Register_index>(instruction, 1);
+    if (target) {
+        if (target->as == viua::internals::Access_specifier::REGISTER_INDIRECT) {
+            auto r = *target;
+            r.rss  = viua::internals::Register_sets::LOCAL;
+            check_use_of_register(register_usage_profile, r);
+            assert_type_of_register<viua::internals::Value_types::INTEGER>(
+                register_usage_profile, r);
+        }
+    }
+
     if (not source) {
         throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
@@ -51,9 +60,11 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 
-    auto val       = Register(*target);
-    val.value_type = register_usage_profile.at(*source).second.value_type;
-    register_usage_profile.define(val, target->tokens.at(0));
+    if (target) {
+        auto val       = Register(*target);
+        val.value_type = register_usage_profile.at(*source).second.value_type;
+        register_usage_profile.define(val, target->tokens.at(0));
+    }
 
     erase_if_direct_access(register_usage_profile, source, instruction);
 }

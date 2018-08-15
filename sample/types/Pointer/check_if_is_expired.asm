@@ -22,7 +22,7 @@
 .function: isExpired/1
     allocate_registers %4 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     not %2 local (ptrlive %2 local %1 local) local
     echo (string %3 local "expired: ") local
     move %0 (print %2 local) local

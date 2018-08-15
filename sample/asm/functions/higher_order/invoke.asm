@@ -27,10 +27,10 @@
     .name: %iota c
     .name: %iota d
 
-    arg %a local %0
-    arg %b local %1
-    arg %c local %2
-    arg %d local %3
+    move %a local %0 parameters
+    move %b local %1 parameters
+    move %c local %2 parameters
+    move %d local %3 parameters
 
     add %0 local %a local %b local  ; x = a + b
     add %0 local %0 local %c local  ; x = x + c
@@ -51,8 +51,8 @@
     ; frame
     .name: %iota fn_to_call
     .name: %iota parameters_list
-    arg %fn_to_call local %0
-    arg %parameters_list local %1
+    move %fn_to_call local %0 parameters
+    move %parameters_list local %1 parameters
 
     ; take length of the vector
     .name: %iota vector_length

@@ -24,7 +24,7 @@
 .end
 
 .closure: closure_setter/1
-    arg %1 local %0
+    move %1 local %0 parameters
 
     ;print %2 local
     ; overwrite bound value with whatever we got

@@ -128,16 +128,6 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opargc(Op_address_type addr) -> Op_address_type {
-    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
-        fetch_register, addr, this);
-
-    *target = make_unique<viua::types::Integer>(
-        static_cast<int>(stack->back()->arguments->size()));
-
-    return addr;
-}
-
 auto viua::process::Process::opallocate_registers(Op_address_type addr)
     -> Op_address_type {
     auto const [addr_, register_set, no_of_registers] =

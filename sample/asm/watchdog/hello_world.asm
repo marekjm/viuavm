@@ -20,7 +20,7 @@
 .function: watchdog_process/1
     allocate_registers %5 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
 
     structremove %3 local %1 local (atom %2 local 'function') local
 

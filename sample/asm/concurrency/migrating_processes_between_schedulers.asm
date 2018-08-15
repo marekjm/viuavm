@@ -31,7 +31,7 @@
     text %exclamation_mark local "!"
 
     .name: %iota something
-    arg %something local %0
+    move %something local %0 parameters
 
     .name: %iota textified
     text %textified local %something local
@@ -48,7 +48,7 @@
 .function: process_spawner/1
     allocate_registers %2 local
 
-    frame ^[(move %0 arguments (arg %1 local %0) local)]
+    frame ^[(move %0 arguments (move %1 local %0 parameters) local)]
     process void print_hello/1
     return
 .end
@@ -57,7 +57,7 @@
     allocate_registers %2 local
 
     .name: 1 limit
-    arg %limit local %0
+    move %limit local %0 parameters
 
     ; run until "limit" hits zero
     if %limit local +1 spawn_processes/1__epilogue

@@ -25,7 +25,7 @@
     izero %counter local
     integer %limit local 4
 
-    send (arg %iota local %0) local (self %iota local) local
+    send (move %iota local %0 parameters) local (self %iota local) local
 
     .name: %iota message
     string %message local "Hello World! (from long-running detached process) "

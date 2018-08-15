@@ -22,7 +22,7 @@
 .function: return_integer/1
     allocate_registers %1 local
 
-    arg %0 local %0
+    move %0 local %0 parameters
     return
 .end
 

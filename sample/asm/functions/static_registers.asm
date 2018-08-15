@@ -33,7 +33,7 @@
     ; 1) fake taking counter from static registers (it's zero during first pass anyway)
     integer %1 local 0
     ; 2) fetch the argument
-    arg %3 local %0
+    move %3 local %0 parameters
     ; 3) jump straight to report mark
     jump report
 
@@ -42,7 +42,7 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (lt %4 local %1 static (arg %3 local %0) local) local) local finish
+    if (not (lt %4 local %1 static (move %3 local %0 parameters) local) local) local finish
 
     .mark: report
     print %1 static

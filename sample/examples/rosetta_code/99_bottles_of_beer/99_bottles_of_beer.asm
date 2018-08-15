@@ -21,7 +21,7 @@
     allocate_registers %5 local
 
     .name: %iota number_of_bottles
-    arg %number_of_bottles local %0
+    move %number_of_bottles local %0 parameters
 
     .name: %iota bottles_of_beer
     ; support for "1 bottle of beer" and "N bottles of beer"
@@ -44,7 +44,7 @@
     ;   Take one down, pass it around
     ;
     .name: %iota number_of_bottles
-    arg %number_of_bottles local %0
+    move %number_of_bottles local %0 parameters
 
     .name: %iota bottles_of_beer
     frame ^[(copy %0 arguments %number_of_bottles local)]
@@ -70,7 +70,7 @@
     ;
     ; i.e. the last line of a paragraph
     .name: %iota number_of_bottles
-    arg %number_of_bottles %0
+    move %number_of_bottles %0 parameters
 
     .name: %iota bottles_of_beer
     frame ^[(copy %0 arguments %number_of_bottles local)]
@@ -98,7 +98,7 @@
     allocate_registers %2 local
 
     .name: %iota total_number_of_bottles
-    arg %total_number_of_bottles local %0
+    move %total_number_of_bottles local %0 parameters
 
     ; display first three lines of a paragraph
     frame ^[(copy %0 arguments %total_number_of_bottles local)]

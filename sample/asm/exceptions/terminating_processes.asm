@@ -43,13 +43,13 @@
     ; run another one
     ;
     ; this is just means to have a few dummy processes running concurrently
-    frame ^[(move %0 arguments (arg %1 local %1) local)]
+    frame ^[(move %0 arguments (move %1 local %1 parameters) local)]
     call std::misc::cycle/1
 
     ; print hello to the screen to show that the process #n just finished running
     ; where #n is the "ID" assigned by the caller
     echo (string %1 local "Hello World from process ") local
-    print (arg %1 local %0) local
+    print (move %1 local %0 parameters) local
 
     return
 .end
@@ -74,7 +74,7 @@
 
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2
-    copy %1 arguments (arg %1 local %0) local
+    copy %1 arguments (move %1 local %0 parameters) local
     process void cycle_burner/2
 
     return

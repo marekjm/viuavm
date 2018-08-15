@@ -20,7 +20,7 @@
 .function: main/1
     allocate_registers %4 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
 
     iinc *1 local
 

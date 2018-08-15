@@ -19,8 +19,7 @@
 
 .function: sender/1
     allocate_registers %3 local
-
-    send (arg (.name: %iota pid) local %0) local (string %iota local "Hello World!") local
+    send (move (.name: %iota pid) local %0 parameters) local (string %iota local "Hello World!") local
     return
 .end
 

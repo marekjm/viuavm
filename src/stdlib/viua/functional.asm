@@ -31,8 +31,8 @@
     ;   * a vector with values to be filtered,
     allocate_registers %9 local
 
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; vector for filtered values
     vector %3 local
@@ -85,8 +85,8 @@
     ;
     allocate_registers %7 local
 
-    arg (.name: %iota callback) local %0
-    arg (.name: %iota list) local %1
+    move (.name: %iota callback) local %0 parameters
+    move (.name: %iota list) local %1 parameters
 
     ; setup loop counter and
     ; loop termination variable
@@ -123,8 +123,8 @@
     ; returned vector is a newly created one - this function does not modify vectors in place.
     allocate_registers %9 local
 
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; new vector to store mapped values
     vector %3 local
@@ -187,8 +187,8 @@
     .name: %2 parameter
 
     ; extract the parameters
-    arg %func local %0
-    arg %parameter local %1
+    move %func local %0 parameters
+    move %parameter local %1 parameters
 
     try
     catch "Exception" std::functional::apply::__catch
@@ -205,8 +205,8 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg %1 local %0
-    arg %2 local %1
+    move %1 local %0 parameters
+    move %2 local %1 parameters
 
     ; take length of the vector
     .name: %4 vector_length

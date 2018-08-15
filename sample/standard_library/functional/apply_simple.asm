@@ -20,7 +20,7 @@
 .function: adder/1
     allocate_registers %2 local
 
-    add %0 local (arg %0 local %0) local (integer %1 local 21) local
+    add %0 local (move %0 local %0 parameters) local (integer %1 local 21) local
     return
 .end
 

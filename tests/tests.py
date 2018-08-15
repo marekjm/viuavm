@@ -48,6 +48,8 @@ import unittest
 COMPILED_SAMPLES_PATH = './tests/compiled'
 
 VIUA_KERNEL_PATH = './build/bin/vm/kernel'
+VIUA_ASSEMBLER_PATH_DEFAULT = './build/bin/vm/asm'
+VIUA_ASSEMBLER_PATH = os.environ.get('VIUA_ASM', VIUA_ASSEMBLER_PATH_DEFAULT)
 
 
 class ViuaError(Exception):
@@ -84,7 +86,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
-    asmargs = ('./build/bin/vm/asm',) + opts
+    asmargs = (VIUA_ASSEMBLER_PATH,) + opts
     if out is not None: asmargs += ('--out', out,)
     asmargs += (asm,)
     asmargs += links
@@ -1508,9 +1510,6 @@ class FunctionTests(unittest.TestCase):
     def testLocalRegistersInFunctions(self):
         runTestReturnsIntegers(self, 'local_registers.asm', [42, 666], assembly_opts=('--no-sa',))
 
-    def testObtainingNumberOfParameters(self):
-        runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
-
     def testReturningReferences(self):
         # FIXME: disassembler must understand the .closure: directive
         # for now, the --no-sa flag and everything's gonna be find, believe me
@@ -1753,7 +1752,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def testParameterMoveEmptiesRegisters(self):
         runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm',
-                './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:34:11: error: use of erased local register "1"')
+                './sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:33:11: error: use of erased local register "1"')
 
     def testSwapWithEmptyFirstRegister(self):
         runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm',
@@ -2080,7 +2079,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'inferring_types_of_args.asm', [
             '34:22: error: invalid type of value contained in register',
             '34:22: note: expected string, got integer',
-            '25:9: note: register defined here',
+            '25:10: note: register defined here',
             '27:10: note: type inferred here',
             '                 ^ deduced type is \'integer\'',
             '20:12: error: in function main/1',
@@ -2090,7 +2089,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'inference_includes_pointered_types.asm', [
             '28:19: error: invalid type of value contained in register',
             '28:19: note: expected string, got pointer to integer',
-            '23:9: note: register defined here',
+            '23:10: note: register defined here',
             '25:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
@@ -2100,7 +2099,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'partial_pointerness_inference.asm', [
             '49:13: error: invalid type of value contained in register',
             '49:13: note: expected vector, got pointer to value',
-            '26:9: note: register defined here',
+            '26:10: note: register defined here',
             '35:11: note: type inferred here',
             '                  ^ deduced type is \'pointer to value\'',
             '20:12: error: in function main/1',
@@ -2110,7 +2109,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'two_stage_pointerness_inference.asm', [
             '52:13: error: invalid type of value contained in register',
             '52:13: note: expected vector, got integer',
-            '26:9: note: register defined here',
+            '26:10: note: register defined here',
             '44:10: note: type inferred here',
             '                 ^ deduced type is \'pointer to integer\'',
             '20:12: error: in function main/1',
@@ -2357,7 +2356,7 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         error_lines = [
             "./sample/asm/errors/more_than_one_main_function.asm: note: main/1 function found in module ./sample/asm/errors/more_than_one_main_function.asm",
-            "./sample/asm/errors/more_than_one_main_function.asm: note: main/2 function found in module ./sample/asm/errors/more_than_one_main_function.asm",
+            "./sample/asm/errors/more_than_one_main_function.asm: note: main/0 function found in module ./sample/asm/errors/more_than_one_main_function.asm",
             "./sample/asm/errors/more_than_one_main_function.asm: error: more than one candidate for main function",
         ]
         self.assertEqual(error_lines, output.strip().splitlines())
@@ -2564,12 +2563,6 @@ class KeywordDefaultTests(unittest.TestCase):
     """
     PATH = './sample/asm/keyword/default'
 
-    def testDefaultInArg(self):
-        runTestFailsToAssembleDetailed(self, 'arg.asm', [
-            '23:16: error: use of void as input register:',
-            '20:12: error: in function foo/1',
-       ])
-
     def testDefaultInCall(self):
         runTest(self, 'call.asm', '')
 
@@ -2661,7 +2654,7 @@ class MiscTests(unittest.TestCase):
         runTestSplitlines(self, name='main0_as_main_function.asm', expected_output=['Hello World!', 'received 0 arguments'])
 
     def testMain2AsMainFunction(self):
-        runTestSplitlines(self, name='main2_as_main_function.asm', expected_output=['Hello World!', 'received 2 arguments'])
+        runTest(self, 'main2_as_main_function.asm', '')
 
     def testBrokenWatchdog(self):
         runTest(self, 'broken_watchdog.asm', 'main/1 exiting')
@@ -2916,7 +2909,7 @@ class StructTests(unittest.TestCase):
     def testOverwritingAValueInAStruct(self):
         runTestSplitlines(self, 'overwriting_a_value_in_a_struct.asm', ["{'answer': 666}", "{'answer': 42}"])
 
-    def testObrainingListOfKeysInAStruct(self):
+    def testObtainingListOfKeysInAStruct(self):
         runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', "['answer', 'foo']")
 
     def testStructOfStructs(self):

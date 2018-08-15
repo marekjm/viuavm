@@ -33,8 +33,8 @@
 
     .name: %iota times
     .name: %iota pid
-    arg %times local .iota: 0  %iota
-    arg %pid local %1
+    move %times local .iota: 0 %iota parameters
+    move %pid local %1 parameters
 
     try
     catch "Exception" pull_and_do_nothing

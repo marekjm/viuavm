@@ -32,7 +32,7 @@
 .function: watchdog_process/0
     allocate_registers %3 local
 
-    arg (.name: %iota death_message) local %0
+    move (.name: %iota death_message) local %0 parameters
 
     .name: %iota exception
     structremove %exception local %death_message local (atom %exception local 'exception') local

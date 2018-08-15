@@ -22,7 +22,7 @@
 
     .name: 1 number
     .name: 2 result
-    mul %result (arg %result local %1) local (arg %number local %0) local
+    mul %result (move %result local %1 parameters) local (move %number local %0 parameters) local
     idec %number local
 
     ; if counter is equal to zero

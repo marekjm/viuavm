@@ -24,7 +24,7 @@
     .name: %iota exception
     .name: %iota aborted_function
 
-    arg %death_message local %0
+    move %death_message local %0 parameters
     structremove %exception local %death_message local (atom %exception local 'exception') local
     structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
 
@@ -85,7 +85,7 @@
 .function: log_exiting_detached/1
     allocate_registers %3 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     echo (string %2 local "process [detached]: '") local
     echo %1 local
     print (string %2 local "' exiting") local
@@ -94,7 +94,7 @@
 .function: log_exiting_joined/1
     allocate_registers %3 local
 
-    arg %1 local %0
+    move %1 local %0 parameters
     echo (string %2 local "process [ joined ]: '") local
     echo %1 local
     print (string %2 local "' exiting") local

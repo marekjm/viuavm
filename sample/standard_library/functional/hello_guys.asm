@@ -21,7 +21,7 @@
     allocate_registers %2 local
 
     echo (string %1 local "Hello ") local
-    echo (arg %1 local %0) local
+    echo (move %1 local %0 parameters) local
     print (string %1 local '!') local
     return
 .end

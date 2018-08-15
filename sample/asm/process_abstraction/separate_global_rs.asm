@@ -20,7 +20,7 @@
 .function: global_printer/1
     allocate_registers %3 local
 
-    send (arg %1 local %0) local (self %2 local) local
+    send (move %1 local %0 parameters) local (self %2 local) local
 
     ; wait until a message arrives
     receive %2 global 10s
@@ -38,13 +38,13 @@
 
     ; put second parameter (whatever it is) in
     ; global register 1
-    arg %1 global %1
+    move %1 global %1 parameters
 
     ; send message to printer process to trigger it to
     ; print contents of global register 1
     ; it should cause an exception
     .name: 1 printer_process_handle
-    send (arg %printer_process_handle local %0) local (izero %3 local) local
+    send (move %printer_process_handle local %0 parameters) local (izero %3 local) local
 
     return
 .end
