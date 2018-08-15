@@ -49,6 +49,8 @@ auto is_register_set_name(std::string const& s) -> bool {
     return (   s == "local"
             or s == "static"
             or s == "global"
+            or s == "arguments"
+            or s == "parameters"
            );
 }
 auto is_quoted_text(std::string const& s) -> bool {
