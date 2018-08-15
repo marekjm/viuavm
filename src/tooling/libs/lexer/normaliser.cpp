@@ -163,7 +163,17 @@ static auto normalise_directive_import(std::vector<Token>& tokens, vector_view<T
 }
 
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    tokens.push_back(source.at(0));
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(0); is_access_type_specifier(token.str())) {
+        tokens.push_back(token);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
 
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
     using viua::tooling::libs::lexer::classifier::is_id;    // registers may have user-defined names, so
