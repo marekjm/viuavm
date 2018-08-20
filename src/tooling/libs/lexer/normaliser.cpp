@@ -524,6 +524,29 @@ static auto normalise_jump(std::vector<Token>& tokens, vector_view<Token> const&
     return normalise_jump_target(tokens, source.advance(1)) + 1;
 }
 
+static auto normalise_frame(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    try {
+        i += normalise_register_access(tokens, source.advance(i));
+    } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+        e.errors().back().note("expected `arguments' register set");
+        throw;
+    }
+
+    if (auto const& token = source.at(i - 1); token != "arguments") {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected `arguments' register set"
+            });
+    }
+
+    return i;
+}
+
 static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
@@ -726,6 +749,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_move(tokens, vector_view{source, i});
         } else if (token == "jump") {
             i += normalise_jump(tokens, vector_view{source, i});
+        } else if (token == "frame") {
+            i += normalise_frame(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
