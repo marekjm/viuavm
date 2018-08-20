@@ -32,4 +32,8 @@ auto Error_wrapper::append(Error e) -> Error_wrapper& {
 auto Error_wrapper::errors() const -> std::vector<Error> const& {
     return fallout;
 }
+
+auto Error_wrapper::errors() -> std::vector<Error>& {
+    return fallout;
+}
 }}}}

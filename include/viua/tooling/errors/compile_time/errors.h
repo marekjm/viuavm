@@ -69,6 +69,7 @@ class Error_wrapper {
     public:
         auto append(Error) -> Error_wrapper&;
         auto errors() const -> std::vector<Error> const&;
+        auto errors() -> std::vector<Error>&;
 };
 }}}}
 
