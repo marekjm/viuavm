@@ -220,7 +220,7 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
                 viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
                 , register_set
                 , "expected register set specifier"
-            });
+            }.add(source.at(1)).aside(source.at(1), "... after this token"));
     }
 
     return 3;
