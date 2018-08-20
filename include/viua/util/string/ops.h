@@ -21,6 +21,7 @@
 #define VIUA_UTIL_STRING_OPS_H
 
 #include <string>
+#include <vector>
 
 namespace viua {
 namespace util {
@@ -28,6 +29,16 @@ namespace string {
 namespace ops {
 auto extract(std::string const&) -> std::string;
 auto strencode(std::string const&) -> std::string;
+
+using LevenshteinDistance = std::string::size_type;
+using DistancePair        = std::pair<LevenshteinDistance, std::string>;
+auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
+auto levenshtein_filter(std::string const,
+                        std::vector<std::string> const&,
+                        LevenshteinDistance const) -> std::vector<DistancePair>;
+auto levenshtein_best(std::string const,
+                      std::vector<std::string> const&,
+                      LevenshteinDistance const) -> DistancePair;
 }}}}
 
 #endif
