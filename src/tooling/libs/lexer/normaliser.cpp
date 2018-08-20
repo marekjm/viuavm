@@ -20,6 +20,7 @@
 #include <iostream>
 #include <vector>
 #include <viua/util/vector_view.h>
+#include <viua/util/string/ops.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/lexer/classifier.h>
 #include <viua/tooling/libs/lexer/normaliser.h>
@@ -215,12 +216,25 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
     if (auto const& register_set = source.at(2); is_register_set_name(register_set.str())) {
         tokens.push_back(register_set);
     } else {
+        auto e = viua::tooling::errors::compile_time::Error{
+            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+            , register_set
+            , "expected register set specifier"
+        };
+        auto const likeness_limit = viua::util::string::ops::LevenshteinDistance{4};
+        auto const best_match = viua::util::string::ops::levenshtein_best(register_set.str(), {
+            // FIXME provide a std::vector<std::string> with valid register set names
+              "local"
+            , "static"
+            , "global"
+            , "arguments"
+            , "parameters"
+        }, likeness_limit);
+        if (best_match.first <= likeness_limit) {
+            e.aside(source.at(2), "did you mean `" + best_match.second + "'?");
+        }
         throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                , register_set
-                , "expected register set specifier"
-            }.add(source.at(1)).aside(source.at(1), "... after this token"));
+            .append(e);
     }
 
     return 3;
