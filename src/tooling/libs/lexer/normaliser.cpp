@@ -332,6 +332,7 @@ static auto normalise_call(std::vector<Token>& tokens, vector_view<Token> const&
         tokens.push_back(source.at(i));    // function name
         tokens.push_back(source.at(++i));  // arity separator
         tokens.push_back(source.at(++i));  // arity
+        ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
