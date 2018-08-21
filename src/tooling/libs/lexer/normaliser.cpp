@@ -773,7 +773,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
     for (auto i = index_type{0}; i < source.size();) {
         auto const& token = source.at(i);
 
-        if (token == "call") {
+        if (token == "nop") {
+            tokens.push_back(token);
+            ++i;
+        } else if (token == "call") {
             i += normalise_call(tokens, vector_view{source, i});
         } else if (token == "allocate_registers") {
             i += normalise_allocate_registers(tokens, vector_view{source, i});
