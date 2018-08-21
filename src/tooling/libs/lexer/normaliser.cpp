@@ -596,6 +596,27 @@ static auto normalise_frame(std::vector<Token>& tokens, vector_view<Token> const
     return i;
 }
 
+static auto normalise_any_2_register_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(i));
+    i += normalise_register_access(tokens, source.advance(i));
+
+    return i;
+}
+
+static auto normalise_any_3_register_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(i));
+    i += normalise_register_access(tokens, source.advance(i));
+    i += normalise_register_access(tokens, source.advance(i));
+
+    return i;
+}
+
 static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
@@ -803,6 +824,12 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_jump(tokens, vector_view{source, i});
         } else if (token == "frame") {
             i += normalise_frame(tokens, vector_view{source, i});
+        } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
+            i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
+        } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
+                or token == "lt" or token == "lte" or token == "gt" or token == "gte"
+                or token == "eq") {
+            i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
