@@ -801,7 +801,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_call(tokens, vector_view{source, i});
         } else if (token == "allocate_registers") {
             i += normalise_allocate_registers(tokens, vector_view{source, i});
-        } else if (token == "text") {
+        } else if (token == "text" or token == "string") {
             i += normalise_text(tokens, vector_view{source, i});
         } else if (token == "print") {
             i += normalise_print(tokens, vector_view{source, i});
