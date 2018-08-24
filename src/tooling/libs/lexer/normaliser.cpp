@@ -218,17 +218,31 @@ static auto normalise_directive_name(std::vector<Token>& tokens, vector_view<Tok
     return i;
 }
 
+/*
+ * Creates an error, with appropriate type, depending on whether the
+ * token supplied is a newline or not.
+ */
+static auto make_unexpected_token_error(Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
+    return viua::tooling::errors::compile_time::Error{
+        ((token == "\n")
+         ?  viua::tooling::errors::compile_time::Compile_time_error::Unexpected_newline
+         :  viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+        )
+        , token
+        , std::move(message)
+    };
+}
+
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     if (auto const& token = source.at(0); is_access_type_specifier(token.str())) {
         tokens.push_back(token);
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                , token
+            .append(make_unexpected_token_error(
+                token
                 , "expected register access specifier"
-            });
+            ));
     }
 
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
@@ -239,22 +253,20 @@ static auto normalise_register_access(std::vector<Token>& tokens, vector_view<To
         tokens.push_back(register_index);
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                , register_index
+            .append(make_unexpected_token_error(
+                register_index
                 , "expected register index (decimal integer)"
-            });
+            ));
     }
 
     using viua::tooling::libs::lexer::classifier::is_register_set_name;
     if (auto const& register_set = source.at(2); is_register_set_name(register_set.str())) {
         tokens.push_back(register_set);
     } else {
-        auto e = viua::tooling::errors::compile_time::Error{
-            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-            , register_set
+        auto e = make_unexpected_token_error(
+            register_set
             , "expected register set specifier"
-        };
+        );
         auto const likeness_limit = viua::util::string::ops::LevenshteinDistance{4};
         auto const best_match = viua::util::string::ops::levenshtein_best(register_set.str(), {
             // FIXME provide a std::vector<std::string> with valid register set names
