@@ -32,6 +32,7 @@ enum class Compile_time_error {
     No_input_file,
     Not_a_file,
     Unexpected_token,
+    Unexpected_newline,
     Invalid_access_type_specifier,
 };
 
