@@ -849,13 +849,15 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "frame") {
             i += normalise_frame(tokens, vector_view{source, i});
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
-                or token == "textlength") {
+                or token == "textlength" or token == "vpush" or token == "vlen") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
                 or token == "eq"
                 or token == "texteq" or token == "textat" or token == "textcommonprefix"
-                or token == "textcommonsuffix" or token == "textconcat") {
+                or token == "textcommonsuffix" or token == "textconcat"
+                or token == "vector" or token == "vinsert" or token == "vpop"
+                or token == "vat") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
