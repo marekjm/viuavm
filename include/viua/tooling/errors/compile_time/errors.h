@@ -30,7 +30,7 @@ namespace tooling {
 namespace errors {
 namespace compile_time {
 // see struct Invalid_syntax
-struct Error {
+class Error {
     Compile_time_error const cause;
 
     viua::tooling::libs::lexer::Token const main_token;
@@ -41,6 +41,8 @@ struct Error {
 
     std::string aside_note;
     viua::tooling::libs::lexer::Token aside_token;
+
+  public:
 
     auto line() const -> viua::tooling::libs::lexer::Token::Position_type;
     auto character() const -> viua::tooling::libs::lexer::Token::Position_type;
