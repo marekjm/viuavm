@@ -608,6 +608,15 @@ static auto normalise_frame(std::vector<Token>& tokens, vector_view<Token> const
     return i;
 }
 
+static auto normalise_any_1_register_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(i));
+
+    return i;
+}
+
 static auto normalise_any_2_register_instruction(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -839,6 +848,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_iinc(tokens, vector_view{source, i});
         } else if (token == "idec") {
             i += normalise_idec(tokens, vector_view{source, i});
+        } else if (token == "not") {
+            i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
             ++i;
@@ -857,7 +868,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "texteq" or token == "textat" or token == "textcommonprefix"
                 or token == "textcommonsuffix" or token == "textconcat"
                 or token == "vector" or token == "vinsert" or token == "vpop"
-                or token == "vat") {
+                or token == "vat"
+                or token == "and" or token == "or") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
