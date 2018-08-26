@@ -561,6 +561,60 @@ static auto normalise_integer(std::vector<Token>& tokens, vector_view<Token> con
     return i;
 }
 
+static auto normalise_bits(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_binary_integer;
+    using viua::tooling::libs::lexer::classifier::is_octal_integer;
+    using viua::tooling::libs::lexer::classifier::is_hexadecimal_integer;
+    using viua::tooling::libs::lexer::classifier::is_default;
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); is_binary_integer(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else if (is_octal_integer(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else if (is_hexadecimal_integer(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else if (is_default(token.str())) {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "0x00"
+            , token.str()
+        });
+        ++i;
+    } else if (is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(i));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(
+                make_unexpected_token_error(token , "expected bits literal")
+                .comment("binary literal:      0b01")
+                .comment("octal literal:       0o01234567")
+                .comment("hexadeciaml literal: 0x0123456789abcdef")
+            );
+    }
+
+    return i;
+}
+
 static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_register_access(tokens, source.advance(1)) + 1;
@@ -845,6 +899,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_float(tokens, vector_view{source, i});
         } else if (token == "integer") {
             i += normalise_integer(tokens, vector_view{source, i});
+        } else if (token == "bits") {
+            i += normalise_bits(tokens, vector_view{source, i});
         } else if (token == "iinc") {
             i += normalise_iinc(tokens, vector_view{source, i});
         } else if (token == "idec") {
