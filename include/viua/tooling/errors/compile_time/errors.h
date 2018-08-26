@@ -38,6 +38,7 @@ class Error {
 
     std::string const message;
     std::vector<std::string> attached_notes;
+    std::vector<std::string> attached_comments;
 
     std::string aside_note;
     viua::tooling::libs::lexer::Token aside_token;
@@ -49,6 +50,9 @@ class Error {
 
     auto note(std::string) -> Error&;
     auto notes() const -> std::vector<std::string> const&;
+
+    auto comment(std::string) -> Error&;
+    auto comments() const -> std::vector<std::string> const&;
 
     auto add(viua::tooling::libs::lexer::Token) -> Error&;
     auto match(viua::tooling::libs::lexer::Token const) const -> bool;

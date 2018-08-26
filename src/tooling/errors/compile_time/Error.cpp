@@ -46,6 +46,15 @@ auto Error::notes() const -> std::vector<std::string> const& {
     return attached_notes;
 }
 
+auto Error::comment(std::string n) -> Error& {
+    attached_comments.emplace_back(std::move(n));
+    return *this;
+}
+
+auto Error::comments() const -> std::vector<std::string> const& {
+    return attached_comments;
+}
+
 auto Error::add(viua::tooling::libs::lexer::Token const token) -> Error& {
     tokens.push_back(token);
     return *this;
