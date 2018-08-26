@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <string>
 #include <vector>
 #include <viua/util/vector_view.h>
 #include <viua/util/string/ops.h>
@@ -230,7 +231,7 @@ static auto make_unexpected_token_error(Token const& token, std::string message)
         )
         , token
         , std::move(message)
-    };
+    }.note("got " + viua::util::string::ops::quoted((viua::util::string::ops::strencode(token.str()))));
 }
 
 static auto normalise_register_access(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
