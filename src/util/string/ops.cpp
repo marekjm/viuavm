@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <viua/util/string/ops.h>
@@ -132,6 +133,12 @@ auto strencode(std::string const& s) -> std::string {
         encoded << c;
     }
     return encoded.str();
+}
+
+auto quoted(std::string const& s) -> std::string {
+    auto o = std::ostringstream{};
+    o << std::quoted(s);
+    return o.str();
 }
 
 auto levenshtein(std::string const source, std::string const target)

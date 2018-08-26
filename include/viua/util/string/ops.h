@@ -29,6 +29,7 @@ namespace string {
 namespace ops {
 auto extract(std::string const&) -> std::string;
 auto strencode(std::string const&) -> std::string;
+auto quoted(std::string const&) -> std::string;
 
 using LevenshteinDistance = std::string::size_type;
 using DistancePair        = std::pair<LevenshteinDistance, std::string>;
