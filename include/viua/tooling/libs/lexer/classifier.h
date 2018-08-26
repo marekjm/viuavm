@@ -29,9 +29,15 @@ namespace lexer {
 namespace classifier {
 auto is_id(std::string const&) -> bool;
 auto is_scoped_id(std::string const&) -> bool;
+
+auto is_binary_integer(std::string const&) -> bool;
+auto is_octal_integer(std::string const&) -> bool;
 auto is_decimal_integer(std::string const&) -> bool;
+auto is_hexadecimal_integer(std::string const&) -> bool;
+
 auto is_access_type_specifier(std::string const&) -> bool;
 auto is_register_set_name(std::string const&) -> bool;
+
 auto is_quoted_text(std::string const&) -> bool;
 auto is_float(std::string const&) -> bool;
 auto is_default(std::string const&) -> bool;
