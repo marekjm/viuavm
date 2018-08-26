@@ -249,7 +249,16 @@ static auto underline_error_token(
         }
     }
 
-    // to separate line number from line content
+    /*
+     * To separate line number from line content, but for comments we need
+     * to preserve the indent without the pipe.
+     */
+    auto const comment_indent = indent.str()
+        + ' '
+        + viua::util::string::escape_sequences::COLOR_FG_GREEN_1
+        + '>'
+        + viua::util::string::escape_sequences::ATTR_RESET
+        + ' ';
     o << " | ";
     indent << " | ";
 
@@ -332,6 +341,14 @@ static auto underline_error_token(
         o << send_escape_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside();
         o << send_escape_seq(ATTR_RESET);
         o << '\n';
+    }
+
+    if (not error.comments().empty()) {
+        o << indent.str() << '\n';
+        for (auto const& each : error.comments()) {
+            o << comment_indent << each << '\n';
+        }
+        o << indent.str() << '\n';
     }
 }
 static auto display_error_line(
