@@ -41,6 +41,8 @@ auto is_register_set_name(std::string const&) -> bool;
 auto is_quoted_text(std::string const&) -> bool;
 auto is_float(std::string const&) -> bool;
 auto is_default(std::string const&) -> bool;
+
+auto is_boolean_literal(std::string const&) -> bool;
 }}}}}
 
 #endif
