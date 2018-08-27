@@ -615,6 +615,49 @@ static auto normalise_bits(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
+static auto normalise_bit_set(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_boolean_literal;
+    if (auto const& token = source.at(i); is_boolean_literal(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(
+                make_unexpected_token_error(token , "expected boolean literal (`true' or `false')")
+            );
+    }
+
+    return i;
+}
+
 static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_register_access(tokens, source.advance(1)) + 1;
@@ -917,7 +960,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "frame") {
             i += normalise_frame(tokens, vector_view{source, i});
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
-                or token == "textlength" or token == "vpush" or token == "vlen") {
+                or token == "textlength" or token == "vpush" or token == "vlen"
+                or token == "bitnot" or token == "bitswidth") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
@@ -926,10 +970,14 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "textcommonsuffix" or token == "textconcat"
                 or token == "vector" or token == "vinsert" or token == "vpop"
                 or token == "vat"
-                or token == "and" or token == "or") {
+                or token == "and" or token == "or"
+                or token == "bitand" or token == "bitor" or token == "bitxor"
+                or token == "bitat") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
+        } else if (token == "bitset") {
+            i += normalise_bit_set(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
