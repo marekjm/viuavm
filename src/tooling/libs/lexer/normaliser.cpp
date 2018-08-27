@@ -961,7 +961,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_frame(tokens, vector_view{source, i});
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
                 or token == "textlength" or token == "vpush" or token == "vlen"
-                or token == "bitnot" or token == "bitswidth") {
+                or token == "bitnot" or token == "bitswidth"
+                or token == "rol" or token == "ror") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
@@ -972,7 +973,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "vat"
                 or token == "and" or token == "or"
                 or token == "bitand" or token == "bitor" or token == "bitxor"
-                or token == "bitat") {
+                or token == "bitat"
+                or token == "shl" or token == "shr" or token == "ashl" or token == "ashr") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
