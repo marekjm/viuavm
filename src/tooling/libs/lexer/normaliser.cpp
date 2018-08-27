@@ -948,7 +948,12 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_iinc(tokens, vector_view{source, i});
         } else if (token == "idec") {
             i += normalise_idec(tokens, vector_view{source, i});
-        } else if (token == "not") {
+        } else if (token == "not"
+                or token == "wrapincrement" or token == "wrapdecrement"
+                or token == "checkedsincrement" or token == "checkedsdecrement"
+                or token == "checkeduincrement" or token == "checkedudecrement"
+                or token == "saturatingsincrement" or token == "checkedsdecrement"
+                or token == "saturatinguincrement" or token == "checkedudecrement") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
