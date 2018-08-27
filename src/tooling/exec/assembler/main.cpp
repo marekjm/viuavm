@@ -369,8 +369,8 @@ static auto display_error_line(
     o << send_escape_seq(COLOR_FG_RED);
     o << ">>>>";
     o << ' ';  // to separate the ">>>>" on error lines from the line number
-    o << std::setw(static_cast<int>(line_no_width));
     o << send_escape_seq(COLOR_FG_YELLOW);
+    o << std::setw(static_cast<int>(line_no_width));
     o << token_line + 1;
     o << send_escape_seq(ATTR_RESET);
     o << " | ";     // to separate line number from line content
