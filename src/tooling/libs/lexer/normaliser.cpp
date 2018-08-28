@@ -668,16 +668,6 @@ static auto normalise_idec(std::vector<Token>& tokens, vector_view<Token> const&
     return normalise_register_access(tokens, source.advance(1)) + 1;
 }
 
-static auto normalise_move(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    tokens.push_back(source.at(0));
-
-    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
-    i += normalise_register_access(tokens, source.advance(i));
-    i += normalise_register_access(tokens, source.advance(i));
-
-    return i;
-}
-
 static auto normalise_jump(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_jump_target(tokens, source.advance(1)) + 1;
@@ -953,13 +943,12 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "checkedsincrement" or token == "checkedsdecrement"
                 or token == "checkeduincrement" or token == "checkedudecrement"
                 or token == "saturatingsincrement" or token == "saturatingsdecrement"
-                or token == "saturatinguincrement" or token == "saturatingudecrement") {
+                or token == "saturatinguincrement" or token == "saturatingudecrement"
+                or token == "delete") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
             ++i;
-        } else if (token == "move" or token == "copy") {
-            i += normalise_move(tokens, vector_view{source, i});
         } else if (token == "jump") {
             i += normalise_jump(tokens, vector_view{source, i});
         } else if (token == "frame") {
@@ -967,7 +956,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
                 or token == "textlength" or token == "vpush" or token == "vlen"
                 or token == "bitnot" or token == "bitswidth"
-                or token == "rol" or token == "ror") {
+                or token == "rol" or token == "ror"
+                or token == "ptr" or token == "ptrlive"
+                or token == "move" or token == "copy" or token == "swap"
+                or token == "isnull") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
