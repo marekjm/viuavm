@@ -952,8 +952,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "wrapincrement" or token == "wrapdecrement"
                 or token == "checkedsincrement" or token == "checkedsdecrement"
                 or token == "checkeduincrement" or token == "checkedudecrement"
-                or token == "saturatingsincrement" or token == "checkedsdecrement"
-                or token == "saturatinguincrement" or token == "checkedudecrement") {
+                or token == "saturatingsincrement" or token == "saturatingsdecrement"
+                or token == "saturatinguincrement" or token == "saturatingudecrement") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
@@ -979,7 +979,24 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "and" or token == "or"
                 or token == "bitand" or token == "bitor" or token == "bitxor"
                 or token == "bitat"
-                or token == "shl" or token == "shr" or token == "ashl" or token == "ashr") {
+                or token == "shl" or token == "shr" or token == "ashl" or token == "ashr"
+                or token == "wrapadd" or token == "wrapsub" or token == "wrapmul" or token == "wrapdiv"
+                or token == "checkedsadd"
+                or token == "checkedssub"
+                or token == "checkedsmul"
+                or token == "checkedsdiv"
+                or token == "checkeduadd"
+                or token == "checkedusub"
+                or token == "checkedumul"
+                or token == "checkedudiv"
+                or token == "saturatingsadd"
+                or token == "saturatingssub"
+                or token == "saturatingsmul"
+                or token == "saturatingsdiv"
+                or token == "saturatinguadd"
+                or token == "saturatingusub"
+                or token == "saturatingumul"
+                or token == "saturatingudiv") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
