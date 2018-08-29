@@ -1023,7 +1023,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "saturatinguincrement" or token == "saturatingudecrement"
                 or token == "delete"
                 or token == "echo" or token == "print"
-                or token == "self") {
+                or token == "self"
+                or token == "throw") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
