@@ -980,7 +980,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         if (token == "nop") {
             tokens.push_back(token);
             ++i;
-        } else if (token == "call") {
+        } else if (token == "call" or token == "closure" or token == "function" or token == "process") {
             i += normalise_call(tokens, vector_view{source, i});
         } else if (token == "tailcall" or token == "defer" or token == "watchdog") {
             i += normalise_tailcall(tokens, vector_view{source, i});
