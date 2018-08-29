@@ -89,4 +89,12 @@ auto is_default(std::string const& s) -> bool {
 auto is_boolean_literal(std::string const& s) -> bool {
     return (s == "true" or s == "false");
 }
+auto is_timeout_literal(std::string const& s) -> bool {
+    if (s == "infinity") {
+        return true;
+    }
+
+    auto const timeout_literal = std::regex{"^(0|[1-9][0-9]*)m?s$"};
+    return regex_match(s, timeout_literal);
+}
 }}}}}
