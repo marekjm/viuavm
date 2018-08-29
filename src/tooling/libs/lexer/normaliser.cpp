@@ -1054,7 +1054,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "saturatinguadd"
                 or token == "saturatingusub"
                 or token == "saturatingumul"
-                or token == "saturatingudiv") {
+                or token == "saturatingudiv"
+                or token == "capture"
+                or token == "capturecopy"
+                or token == "capturemove") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
