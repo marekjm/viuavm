@@ -1010,7 +1010,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "checkeduincrement" or token == "checkedudecrement"
                 or token == "saturatingsincrement" or token == "saturatingsdecrement"
                 or token == "saturatinguincrement" or token == "saturatingudecrement"
-                or token == "delete") {
+                or token == "delete"
+                or token == "echo" or token == "print"
+                or token == "self") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
         } else if (token == "return" or token == "leave") {
             tokens.push_back(token);
@@ -1025,7 +1027,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "rol" or token == "ror"
                 or token == "ptr" or token == "ptrlive"
                 or token == "move" or token == "copy" or token == "swap"
-                or token == "isnull") {
+                or token == "isnull"
+                or token == "send") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
