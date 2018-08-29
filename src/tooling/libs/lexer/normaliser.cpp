@@ -735,6 +735,17 @@ static auto normalise_jump(std::vector<Token>& tokens, vector_view<Token> const&
     return normalise_jump_target(tokens, source.advance(1)) + 1;
 }
 
+static auto normalise_if(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+    i += normalise_register_access(tokens, source.advance(i));
+    i += normalise_jump_target(tokens, source.advance(i));
+    i += normalise_jump_target(tokens, source.advance(i));
+
+    return i;
+}
+
 static auto normalise_frame(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -1019,6 +1030,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             ++i;
         } else if (token == "jump") {
             i += normalise_jump(tokens, vector_view{source, i});
+        } else if (token == "if") {
+            i += normalise_if(tokens, vector_view{source, i});
         } else if (token == "frame") {
             i += normalise_frame(tokens, vector_view{source, i});
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
