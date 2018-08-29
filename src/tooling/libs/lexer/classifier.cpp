@@ -65,6 +65,7 @@ auto is_register_set_name(std::string const& s) -> bool {
             or s == "global"
             or s == "arguments"
             or s == "parameters"
+            or s == "closure_local"
            );
 }
 

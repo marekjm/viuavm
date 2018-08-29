@@ -51,6 +51,7 @@ enum class Register_sets : types::registerset_type_marker {
     GLOBAL = 0,
     LOCAL,
     STATIC,
+
     /*
      * As described in "Programming Language Pragmatics" by Michael L. Scott:
      *
@@ -64,6 +65,11 @@ enum class Register_sets : types::registerset_type_marker {
      */
     ARGUMENTS,  // actual parameters (arguments):  what is passed to a function call
     PARAMETERS, // formal parameters (parameters): what the function body sees
+
+    /*
+     * Used in capturing instructions.
+     */
+    CLOSURE_LOCAL,
 };
 }}  // namespace viua::internals
 
