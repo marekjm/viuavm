@@ -1168,9 +1168,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "echo" or token == "print"
                 or token == "self"
                 or token == "throw"
-                or token == "draw") {
+                or token == "draw"
+                or token == "struct") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "return" or token == "leave" or token == "try") {
+        } else if (token == "return" or token == "leave" or token == "try" or token == "halt") {
             tokens.push_back(token);
             ++i;
         } else if (token == "enter") {
@@ -1188,7 +1189,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "ptr" or token == "ptrlive"
                 or token == "move" or token == "copy" or token == "swap"
                 or token == "isnull"
-                or token == "send") {
+                or token == "send"
+                or token == "structkeys") {
             i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
                 or token == "lt" or token == "lte" or token == "gt" or token == "gte"
@@ -1220,7 +1222,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "saturatingudiv"
                 or token == "capture"
                 or token == "capturecopy"
-                or token == "capturemove") {
+                or token == "capturemove"
+                or token == "atomeq"
+                or token == "structinsert"
+                or token == "structremove") {
             i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
         } else if (token == "textsub") {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
