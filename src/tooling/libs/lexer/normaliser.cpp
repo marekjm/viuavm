@@ -585,6 +585,48 @@ static auto normalise_text(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
+static auto normalise_atom(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected register access specifier"
+            });
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_quoted_text;
+    using viua::tooling::libs::lexer::classifier::is_default;
+    if (auto const& token = source.at(i); is_quoted_text(token.str(), '\'')) {
+        tokens.push_back(token);
+        ++i;
+    } else if (is_default(token.str())) {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "''"
+            , token.str()
+        });
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "`" + token.str() + "': expected atom (single quoted text)"
+            });
+    }
+
+    return i;
+}
+
 static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -1016,6 +1058,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_allocate_registers(tokens, vector_view{source, i});
         } else if (token == "text" or token == "string") {
             i += normalise_text(tokens, vector_view{source, i});
+        } else if (token == "atom") {
+            i += normalise_atom(tokens, vector_view{source, i});
         } else if (token == "print") {
             i += normalise_print(tokens, vector_view{source, i});
         } else if (token == "izero") {
