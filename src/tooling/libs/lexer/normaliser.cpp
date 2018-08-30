@@ -912,6 +912,27 @@ static auto normalise_enter(std::vector<Token>& tokens, vector_view<Token> const
     return i;
 }
 
+static auto normalise_import(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_quoted_text;
+    using viua::tooling::libs::lexer::classifier::is_default;
+    if (auto const& token = source.at(i); is_quoted_text(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected quoted type to catch"
+            ).comment("valid catch: catch \"A_type\" block_name"));
+    }
+
+    return i;
+}
+
 static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_register_access(tokens, source.advance(1)) + 1;
@@ -1201,6 +1222,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_bit_set(tokens, vector_view{source, i});
         } else if (token == "catch") {
             i += normalise_catch(tokens, vector_view{source, i});
+        } else if (token == "import") {
+            i += normalise_import(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
