@@ -1005,7 +1005,13 @@ static auto normalise_any_3_register_instruction(std::vector<Token>& tokens, vec
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
-    i += normalise_register_access(tokens, source.advance(i));
+
+    if (auto const& token = source.at(i); token.str() == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        i += normalise_register_access(tokens, source.advance(i));
+    }
     i += normalise_register_access(tokens, source.advance(i));
     i += normalise_register_access(tokens, source.advance(i));
 
