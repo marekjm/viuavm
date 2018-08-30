@@ -143,10 +143,105 @@ static auto normalise_directive_info(std::vector<Token>& tokens, vector_view<Tok
     return ++i;
 }
 
+static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    auto i = std::remove_reference_t<decltype(source)>::size_type{0};
+
+    if (auto const& token = source.at(i); token == "[[") {
+        tokens.push_back(token);
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected attribute list opening: `[[`"
+            });
+    }
+
+    ++i;
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); token == "]]") {
+        // do nothing, we deal with it later
+    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+        // do nothing, we deal with it later
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected id, scoped id, or attribute list closing: `]]`"
+            });
+    }
+
+    /*
+     * Here we deal with the easy case of empty attribute list.
+     */
+    if (auto const& token = source.at(i); token == "]]") {
+        tokens.push_back(token);
+        return 2;
+    }
+
+    /*
+     * Here we can push without additional checks, because we are sure
+     * that what is being pushed is either an id, or a scoped id.
+     * The "we deal with it later" ifs enforced this.
+     */
+    tokens.push_back(source.at(i));
+
+    while (source.at(++i) != "]]") {
+        if (auto const& token = source.at(i); token == ",") {
+            tokens.push_back(token);
+        } else {
+            throw viua::tooling::errors::compile_time::Error_wrapper{}
+                .append(viua::tooling::errors::compile_time::Error{
+                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                    , token
+                    , "expected comma, or attribute list closing: `]]`"
+                });
+        }
+
+        if (auto const& token = source.at(++i); is_id(token.str()) or is_scoped_id(token.str())) {
+            tokens.push_back(token);
+        } else {
+            throw viua::tooling::errors::compile_time::Error_wrapper{}
+                .append(viua::tooling::errors::compile_time::Error{
+                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                    , token
+                    , "expected id, or scoped id"
+                });
+        }
+    }
+
+    /*
+     * Push the closing ']]'.
+     */
+    tokens.push_back(source.at(i));
+
+    return ++i;
+}
+
 static auto normalise_directive_import(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    if (auto const& token = source.at(i); token == "[[") {
+        i += normalise_attribute_list(tokens, source.advance(1));
+    } else {
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "[["
+            , token.str()
+        });
+        tokens.push_back(Token{
+            token.line()
+            , token.character()
+            , "]]"
+            , token.str()
+        });
+    }
 
     using viua::tooling::libs::lexer::classifier::is_id;
     using viua::tooling::libs::lexer::classifier::is_scoped_id;
@@ -809,84 +904,6 @@ static auto normalise_any_4_register_instruction(std::vector<Token>& tokens, vec
     i += normalise_register_access(tokens, source.advance(i));
 
     return i;
-}
-
-static auto normalise_attribute_list(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    auto i = std::remove_reference_t<decltype(source)>::size_type{0};
-
-    if (auto const& token = source.at(i); token == "[[") {
-        tokens.push_back(token);
-    } else {
-        throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                , token
-                , "expected attribute list opening: `[[`"
-            });
-    }
-
-    ++i;
-
-    using viua::tooling::libs::lexer::classifier::is_id;
-    using viua::tooling::libs::lexer::classifier::is_scoped_id;
-    if (auto const& token = source.at(i); token == "]]") {
-        // do nothing, we deal with it later
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
-        // do nothing, we deal with it later
-    } else {
-        throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                , token
-                , "expected id, scoped id, or attribute list closing: `]]`"
-            });
-    }
-
-    /*
-     * Here we deal with the easy case of empty attribute list.
-     */
-    if (auto const& token = source.at(i); token == "]]") {
-        tokens.push_back(token);
-        return 2;
-    }
-
-    /*
-     * Here we can push without additional checks, because we are sure
-     * that what is being pushed is either an id, or a scoped id.
-     * The "we deal with it later" ifs enforced this.
-     */
-    tokens.push_back(source.at(i));
-
-    while (source.at(++i) != "]]") {
-        if (auto const& token = source.at(i); token == ",") {
-            tokens.push_back(token);
-        } else {
-            throw viua::tooling::errors::compile_time::Error_wrapper{}
-                .append(viua::tooling::errors::compile_time::Error{
-                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                    , token
-                    , "expected comma, or attribute list closing: `]]`"
-                });
-        }
-
-        if (auto const& token = source.at(++i); is_id(token.str()) or is_scoped_id(token.str())) {
-            tokens.push_back(token);
-        } else {
-            throw viua::tooling::errors::compile_time::Error_wrapper{}
-                .append(viua::tooling::errors::compile_time::Error{
-                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                    , token
-                    , "expected id, or scoped id"
-                });
-        }
-    }
-
-    /*
-     * Push the closing ']]'.
-     */
-    tokens.push_back(source.at(i));
-
-    return ++i;
 }
 
 static auto normalise_closure_definition(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
