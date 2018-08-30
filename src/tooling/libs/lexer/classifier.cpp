@@ -69,14 +69,14 @@ auto is_register_set_name(std::string const& s) -> bool {
            );
 }
 
-auto is_quoted_text(std::string const& s) -> bool {
+auto is_quoted_text(std::string const& s, std::string::value_type const c) -> bool {
     if (s.empty()) {
         return false;
     }
     if (s.size() < 2) {
         return false;
     }
-    return (s.front() == '"' and s.back() == '"');
+    return (s.front() == c and s.back() == c);
 }
 auto is_float(std::string const& s) -> bool {
     auto const decimal_integer = std::regex{"^-?(0|[1-9][0-9]*)\\.[0-9]+$"};
