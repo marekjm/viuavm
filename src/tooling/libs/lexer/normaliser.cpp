@@ -18,8 +18,10 @@
  */
 
 #include <iostream>
+#include <optional>
 #include <string>
 #include <vector>
+#include <viua/bytecode/maps.h>
 #include <viua/util/vector_view.h>
 #include <viua/util/string/ops.h>
 #include <viua/tooling/errors/compile_time/errors.h>
@@ -627,15 +629,6 @@ static auto normalise_atom(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
-static auto normalise_print(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    tokens.push_back(source.at(0));
-
-    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
-    i += normalise_register_access(tokens, source.advance(1));
-
-    return i;
-}
-
 static auto normalise_izero(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_ctor_target_register_access(tokens, source.advance(1)) + 1;
@@ -933,16 +926,6 @@ static auto normalise_import(std::vector<Token>& tokens, vector_view<Token> cons
     return i;
 }
 
-static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    tokens.push_back(source.at(0));
-    return normalise_register_access(tokens, source.advance(1)) + 1;
-}
-
-static auto normalise_idec(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
-    tokens.push_back(source.at(0));
-    return normalise_register_access(tokens, source.advance(1)) + 1;
-}
-
 static auto normalise_jump(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_jump_target(tokens, source.advance(1)) + 1;
@@ -1123,119 +1106,232 @@ static auto normalise_block_definition(std::vector<Token>& tokens, vector_view<T
     return i;
 }
 
+static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
+    for (auto const& [ opcode, name ] : OP_NAMES) {
+        if (name == s) {
+            return opcode;
+        }
+    }
+    return {};
+}
+
 auto normalise(std::vector<Token> source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
     for (auto i = index_type{0}; i < source.size();) {
         auto const& token = source.at(i);
 
-        if (token == "nop") {
+        if (token == "\n") {
             tokens.push_back(token);
             ++i;
-        } else if (token == "call" or token == "closure" or token == "function" or token == "process") {
-            i += normalise_call(tokens, vector_view{source, i});
-        } else if (token == "tailcall" or token == "defer" or token == "watchdog") {
-            i += normalise_tailcall(tokens, vector_view{source, i});
-        } else if (token == "allocate_registers") {
-            i += normalise_allocate_registers(tokens, vector_view{source, i});
-        } else if (token == "text" or token == "string") {
-            i += normalise_text(tokens, vector_view{source, i});
-        } else if (token == "atom") {
-            i += normalise_atom(tokens, vector_view{source, i});
-        } else if (token == "print") {
-            i += normalise_print(tokens, vector_view{source, i});
-        } else if (token == "izero") {
-            i += normalise_izero(tokens, vector_view{source, i});
-        } else if (token == "float") {
-            i += normalise_float(tokens, vector_view{source, i});
-        } else if (token == "integer") {
-            i += normalise_integer(tokens, vector_view{source, i});
-        } else if (token == "bits") {
-            i += normalise_bits(tokens, vector_view{source, i});
-        } else if (token == "join" or token == "receive") {
-            i += normalise_waitable(tokens, vector_view{source, i});
-        } else if (token == "iinc") {
-            i += normalise_iinc(tokens, vector_view{source, i});
-        } else if (token == "idec") {
-            i += normalise_idec(tokens, vector_view{source, i});
-        } else if (token == "not"
-                or token == "wrapincrement" or token == "wrapdecrement"
-                or token == "checkedsincrement" or token == "checkedsdecrement"
-                or token == "checkeduincrement" or token == "checkedudecrement"
-                or token == "saturatingsincrement" or token == "saturatingsdecrement"
-                or token == "saturatinguincrement" or token == "saturatingudecrement"
-                or token == "delete"
-                or token == "echo" or token == "print"
-                or token == "self"
-                or token == "throw"
-                or token == "draw"
-                or token == "struct") {
-            i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "return" or token == "leave" or token == "try" or token == "halt") {
-            tokens.push_back(token);
-            ++i;
-        } else if (token == "enter") {
-            i += normalise_enter(tokens, vector_view{source, i});
-        } else if (token == "jump") {
-            i += normalise_jump(tokens, vector_view{source, i});
-        } else if (token == "if") {
-            i += normalise_if(tokens, vector_view{source, i});
-        } else if (token == "frame") {
-            i += normalise_frame(tokens, vector_view{source, i});
-        } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof"
-                or token == "textlength" or token == "vpush" or token == "vlen"
-                or token == "bitnot" or token == "bitswidth"
-                or token == "rol" or token == "ror"
-                or token == "ptr" or token == "ptrlive"
-                or token == "move" or token == "copy" or token == "swap"
-                or token == "isnull"
-                or token == "send"
-                or token == "structkeys") {
-            i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "add" or token == "sub" or token == "mul" or token == "div"
-                or token == "lt" or token == "lte" or token == "gt" or token == "gte"
-                or token == "eq"
-                or token == "texteq" or token == "textat" or token == "textcommonprefix"
-                or token == "textcommonsuffix" or token == "textconcat"
-                or token == "vector" or token == "vinsert" or token == "vpop"
-                or token == "vat"
-                or token == "and" or token == "or"
-                or token == "bitand" or token == "bitor" or token == "bitxor"
-                or token == "bitat"
-                or token == "shl" or token == "shr" or token == "ashl" or token == "ashr"
-                or token == "wrapadd" or token == "wrapsub" or token == "wrapmul" or token == "wrapdiv"
-                or token == "checkedsadd"
-                or token == "checkedssub"
-                or token == "checkedsmul"
-                or token == "checkedsdiv"
-                or token == "checkeduadd"
-                or token == "checkedusub"
-                or token == "checkedumul"
-                or token == "checkedudiv"
-                or token == "saturatingsadd"
-                or token == "saturatingssub"
-                or token == "saturatingsmul"
-                or token == "saturatingsdiv"
-                or token == "saturatinguadd"
-                or token == "saturatingusub"
-                or token == "saturatingumul"
-                or token == "saturatingudiv"
-                or token == "capture"
-                or token == "capturecopy"
-                or token == "capturemove"
-                or token == "atomeq"
-                or token == "structinsert"
-                or token == "structremove") {
-            i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "textsub") {
-            i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "bitset") {
-            i += normalise_bit_set(tokens, vector_view{source, i});
-        } else if (token == "catch") {
-            i += normalise_catch(tokens, vector_view{source, i});
-        } else if (token == "import") {
-            i += normalise_import(tokens, vector_view{source, i});
-        } else if (token == ".signature:") {
+            continue;
+        }
+
+        auto const opcode = string_to_opcode(token.str());
+        if (opcode.has_value()) {
+            switch (opcode.value()) {
+            case NOP:
+            case TRY:
+            case LEAVE:
+            case RETURN:
+            case HALT:
+                tokens.push_back(token);
+                ++i;
+                break;
+            case IZERO:
+            case STRUCT:
+                i += normalise_izero(tokens, vector_view{source, i});
+                break;
+            case INTEGER:
+                i += normalise_integer(tokens, vector_view{source, i});
+                break;
+            case IINC:
+            case IDEC:
+            case NOT:
+            case WRAPINCREMENT:
+            case WRAPDECREMENT:
+            case CHECKEDSINCREMENT:
+            case CHECKEDSDECREMENT:
+            case CHECKEDUINCREMENT:
+            case CHECKEDUDECREMENT:
+            case SATURATINGSINCREMENT:
+            case SATURATINGSDECREMENT:
+            case SATURATINGUINCREMENT:
+            case SATURATINGUDECREMENT:
+            case DELETE:
+            case PRINT:
+            case ECHO:
+            case SELF:
+            case THROW:
+            case DRAW:
+                i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
+                break;
+            case FLOAT:
+                i += normalise_float(tokens, vector_view{source, i});
+                break;
+            case ITOF:
+            case FTOI:
+            case STOI:
+            case STOF:
+            case TEXTLENGTH:
+            case VPUSH:
+            case VLEN:
+            case BITNOT:
+            case BITSWIDTH:
+            case ROL:
+            case ROR:
+            case MOVE:
+            case COPY:
+            case PTR:
+            case PTRLIVE:
+            case SWAP:
+            case ISNULL:
+            case SEND:
+            case STRUCTKEYS:
+                i += normalise_any_2_register_instruction(tokens, vector_view{source, i});
+                break;
+            case ADD:
+            case SUB:
+            case MUL:
+            case DIV:
+            case LT:
+            case LTE:
+            case GT:
+            case GTE:
+            case EQ:
+            case TEXTEQ:
+            case TEXTAT:
+            case TEXTCOMMONPREFIX:
+            case TEXTCOMMONSUFFIX:
+            case TEXTCONCAT:
+            case VECTOR:
+            case VINSERT:
+            case VPOP:
+            case VAT:
+            case AND:
+            case OR:
+            case BITAND:
+            case BITOR:
+            case BITXOR:
+            case BITAT:
+            case SHL:
+            case SHR:
+            case ASHL:
+            case ASHR:
+            case WRAPADD:
+            case WRAPSUB:
+            case WRAPMUL:
+            case WRAPDIV:
+            case CHECKEDSADD:
+            case CHECKEDSSUB:
+            case CHECKEDSMUL:
+            case CHECKEDSDIV:
+            case CHECKEDUADD:
+            case CHECKEDUSUB:
+            case CHECKEDUMUL:
+            case CHECKEDUDIV:
+            case SATURATINGSADD:
+            case SATURATINGSSUB:
+            case SATURATINGSMUL:
+            case SATURATINGSDIV:
+            case SATURATINGUADD:
+            case SATURATINGUSUB:
+            case SATURATINGUMUL:
+            case SATURATINGUDIV:
+            case CAPTURE:
+            case CAPTURECOPY:
+            case CAPTUREMOVE:
+            case ATOMEQ:
+            case STRUCTINSERT:
+            case STRUCTREMOVE:
+                i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
+                break;
+            case STRING:
+            case TEXT:
+                i += normalise_text(tokens, vector_view{source, i});
+                break;
+            case TEXTSUB:
+                i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
+                break;
+            case BITS:
+                i += normalise_bits(tokens, vector_view{source, i});
+                break;
+            case BITSET:
+                i += normalise_bit_set(tokens, vector_view{source, i});
+                break;
+            case CLOSURE:
+            case FUNCTION:
+            case CALL:
+            case PROCESS:
+                i += normalise_call(tokens, vector_view{source, i});
+                break;
+            case FRAME:
+                i += normalise_frame(tokens, vector_view{source, i});
+                break;
+            case TAILCALL:
+            case DEFER:
+            case WATCHDOG:
+                i += normalise_tailcall(tokens, vector_view{source, i});
+                break;
+            case ALLOCATE_REGISTERS:
+                i += normalise_allocate_registers(tokens, vector_view{source, i});
+                break;
+            case JOIN:
+            case RECEIVE:
+                i += normalise_waitable(tokens, vector_view{source, i});
+                break;
+            case JUMP:
+                i += normalise_jump(tokens, vector_view{source, i});
+                break;
+            case IF:
+                i += normalise_if(tokens, vector_view{source, i});
+                break;
+            case CATCH:
+                i += normalise_catch(tokens, vector_view{source, i});
+                break;
+            case ENTER:
+                i += normalise_enter(tokens, vector_view{source, i});
+                break;
+            case IMPORT:
+                i += normalise_import(tokens, vector_view{source, i});
+                break;
+            case ATOM:
+                i += normalise_atom(tokens, vector_view{source, i});
+                break;
+            case STREQ:
+            case BOOL:
+            case BITSEQ:
+            case BITSLT:
+            case BITSLTE:
+            case BITSGT:
+            case BITSGTE:
+            case BITAEQ:
+            case BITALT:
+            case BITALTE:
+            case BITAGT:
+            case BITAGTE:
+                throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                        , token
+                        , "unimplemented or deprecated instruction found in user code"
+                    });
+            case PARAM:
+            case PAMV:
+            case ARG:
+            default:
+                throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                        , token
+                        , "internal instruction found in user code"
+                    });
+            }
+
+            continue;
+        }
+
+        if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
             i += normalise_directive_bsignature(tokens, vector_view{source, i});
@@ -1256,9 +1352,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_directive_mark(tokens, vector_view{source, i});
         } else if (token == ".name:") {
             i += normalise_directive_name(tokens, vector_view{source, i});
-        } else if (token == "\n") {
-            tokens.push_back(token);
-            ++i;
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(viua::tooling::errors::compile_time::Error{
