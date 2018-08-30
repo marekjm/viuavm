@@ -857,6 +857,61 @@ static auto normalise_bit_set(std::vector<Token>& tokens, vector_view<Token> con
     return i;
 }
 
+static auto normalise_catch(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_quoted_text;
+    using viua::tooling::libs::lexer::classifier::is_default;
+    if (auto const& token = source.at(i); is_quoted_text(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected quoted type to catch"
+            ).comment("valid catch: catch \"A_type\" block_name"));
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected block name (id, or scoped id)"
+            ));
+    }
+
+    return i;
+}
+
+static auto normalise_enter(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = source.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected block name (id, or scoped id)"
+            ));
+    }
+
+    return i;
+}
+
 static auto normalise_iinc(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
     return normalise_register_access(tokens, source.advance(1)) + 1;
@@ -1085,11 +1140,14 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 or token == "delete"
                 or token == "echo" or token == "print"
                 or token == "self"
-                or token == "throw") {
+                or token == "throw"
+                or token == "draw") {
             i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
-        } else if (token == "return" or token == "leave") {
+        } else if (token == "return" or token == "leave" or token == "try") {
             tokens.push_back(token);
             ++i;
+        } else if (token == "enter") {
+            i += normalise_enter(tokens, vector_view{source, i});
         } else if (token == "jump") {
             i += normalise_jump(tokens, vector_view{source, i});
         } else if (token == "if") {
@@ -1141,6 +1199,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             i += normalise_any_4_register_instruction(tokens, vector_view{source, i});
         } else if (token == "bitset") {
             i += normalise_bit_set(tokens, vector_view{source, i});
+        } else if (token == "catch") {
+            i += normalise_catch(tokens, vector_view{source, i});
         } else if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
         } else if (token == ".bsignature:") {
