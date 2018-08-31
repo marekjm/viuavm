@@ -1334,6 +1334,15 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                     });
             }
 
+            if (i < source.size() and source.at(i) != "\n") {
+                throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                        , source.at(i)
+                        , "expected newline before"
+                    });
+            }
+
             continue;
         }
 
