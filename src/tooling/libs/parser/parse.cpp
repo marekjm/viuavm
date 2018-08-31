@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 #include <viua/util/vector_view.h>
@@ -56,6 +57,13 @@ Block_signature_directive::Block_signature_directive(std::string bn):
     , block_name{std::move(bn)}
 {}
 
+Closure_head::Closure_head(std::string fn, uint64_t const a, std::set<std::string> attrs):
+    Fragment{Fragment_type::Closure_head}
+    , function_name{std::move(fn)}
+    , arity{a}
+    , attributes{std::move(attrs)}
+{}
+
 static auto parse_signature_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto frag = std::make_unique<Signature_directive>(
         tokens.at(1).str()
@@ -85,6 +93,44 @@ static auto parse_bsignature_directive(std::vector<std::unique_ptr<Fragment>>& f
     return 2;
 }
 
+static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    ++i;    // .function: or .closure:
+
+    auto attributes = std::set<std::string>{};
+    ++i;    // opening of the attribute list "[["
+
+    if (tokens.at(i) != "]]") {
+        // first attribute
+        attributes.insert(tokens.at(i++).str());
+
+        // all the rest
+        while (tokens.at(i) != "]]") {
+            // the "," between attributes
+            ++i;
+
+            // the attribute
+            attributes.insert(tokens.at(i++).str());
+        }
+    }
+
+    ++i;    // closing of the attribute list "]]"
+
+    auto frag = std::make_unique<Closure_head>(
+        tokens.at(i).str()                      // name
+        , std::stoull(tokens.at(i + 2).str())   // arity
+        , std::move(attributes)
+    );
+    for (auto j = index_type{0}; j < (i + 2); ++j) {
+        frag->add(tokens.at(j));
+    }
+
+    fragments.push_back(std::move(frag));
+
+    return i + 3;
+}
+
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n")
@@ -106,6 +152,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_signature_directive(fragments, vector_view{tokens, i});
         } else if (token == ".bsignature:") {
             i += parse_bsignature_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".closure:") {
+            i += parse_function_head(fragments, vector_view{tokens, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token

@@ -33,6 +33,7 @@ namespace parser {
 enum class Fragment_type {
     Signature_directive,
     Block_signature_directive,
+    Closure_head,
 };
 
 /*
@@ -62,6 +63,14 @@ struct Block_signature_directive : public Fragment {
     std::string const block_name;
 
     Block_signature_directive(std::string);
+};
+
+struct Closure_head : public Fragment {
+    std::string const function_name;
+    uint64_t const arity;
+    std::set<std::string> const attributes;
+
+    Closure_head(std::string, uint64_t const, std::set<std::string>);
 };
 
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const&) -> std::vector<std::unique_ptr<Fragment>>;
