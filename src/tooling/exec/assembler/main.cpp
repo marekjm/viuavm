@@ -33,6 +33,7 @@
 #include <viua/util/string/escape_sequences.h>
 #include <viua/util/string/ops.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
+#include <viua/tooling/libs/parser/parser.h>
 
 std::string const OPTION_HELP_LONG = "--help";
 std::string const OPTION_HELP_SHORT = "-h";
@@ -543,6 +544,15 @@ auto main(int argc, char* argv[]) -> int {
     std::cerr << tokens.size() << std::endl;
     std::cerr << to_json(tokens) << std::endl;
 #endif
+
+    auto const fragments = [&raw_tokens, &tokens, &parsed_args]() -> auto {
+        try {
+            return viua::tooling::libs::parser::parse(tokens);
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+            display_error_in_context(raw_tokens, e, parsed_args.input_file);
+            exit(1);
+        }
+    }();
 
     return 0;
 }
