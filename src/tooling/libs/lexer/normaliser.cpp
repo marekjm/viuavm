@@ -1122,7 +1122,13 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         auto const& token = source.at(i);
 
         if (token == "\n") {
-            tokens.push_back(token);
+            /*
+             * Push at most one newline at a time. This simplifies later
+             * stages of the assembler.
+             */
+            if (tokens.empty() or tokens.back() != "\n") {
+                tokens.push_back(token);
+            }
             ++i;
             continue;
         }
