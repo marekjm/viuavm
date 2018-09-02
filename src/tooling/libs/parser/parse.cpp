@@ -64,6 +64,34 @@ Closure_head::Closure_head(std::string fn, uint64_t const a, std::set<std::strin
     , attributes{std::move(attrs)}
 {}
 
+auto Operand::type() const -> Operand_type {
+    return operand_type;
+}
+
+auto Operand::add(viua::tooling::libs::lexer::Token t) -> void {
+    tokens.push_back(t);
+}
+
+Operand::Operand(Operand_type const o):
+    operand_type{o}
+{}
+
+Register_address::Register_address(
+    viua::internals::types::register_index const ri
+    , viua::internals::Register_sets const rs
+    , viua::internals::Access_specifier const as
+):
+    Operand{Operand_type::Register_address}
+    , index{ri}
+    , register_set{rs}
+    , access{as}
+{}
+
+Instruction::Instruction(OPCODE const o):
+    Fragment{Fragment_type::Instruction}
+    , opcode{o}
+{}
+
 static auto parse_signature_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto frag = std::make_unique<Signature_directive>(
         tokens.at(1).str()

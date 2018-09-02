@@ -23,6 +23,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <viua/bytecode/operand_types.h>
+#include <viua/bytecode/bytetypedef.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 namespace viua {
@@ -34,6 +36,7 @@ enum class Fragment_type {
     Signature_directive,
     Block_signature_directive,
     Closure_head,
+    Instruction,
 };
 
 /*
@@ -71,6 +74,40 @@ struct Closure_head : public Fragment {
     std::set<std::string> const attributes;
 
     Closure_head(std::string, uint64_t const, std::set<std::string>);
+};
+
+enum class Operand_type {
+    Register_address,
+};
+
+class Operand {
+    std::vector<viua::tooling::libs::lexer::Token> tokens;
+    Operand_type const operand_type;
+
+  public:
+    auto type() const -> Operand_type;
+    auto add(viua::tooling::libs::lexer::Token) -> void;
+
+    Operand(Operand_type const);
+};
+
+struct Register_address : public Operand {
+    viua::internals::types::register_index const index;
+    viua::internals::Register_sets const register_set;
+    viua::internals::Access_specifier const access;
+
+    Register_address(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , viua::internals::Access_specifier const
+    );
+};
+
+struct Instruction : public Fragment {
+    OPCODE const opcode;
+    std::vector<std::unique_ptr<Operand>> operands;
+
+    Instruction(OPCODE const);
 };
 
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const&) -> std::vector<std::unique_ptr<Fragment>>;
