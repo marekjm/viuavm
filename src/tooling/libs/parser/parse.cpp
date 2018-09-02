@@ -21,6 +21,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <viua/bytecode/maps.h>
 #include <viua/util/vector_view.h>
 #include <viua/util/string/ops.h>
 #include <viua/tooling/errors/compile_time/errors.h>
@@ -159,6 +160,7 @@ static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragment
     return i + 3;
 }
 
+// FIXME this is duplicated code
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n")
