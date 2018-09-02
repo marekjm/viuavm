@@ -193,6 +193,32 @@ static auto string_to_access_type(std::string const& s) -> viua::internals::Acce
     return mapping.at(s);
 }
 
+static auto parse_any_1_register_instruction(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+
+    auto const index = static_cast<viua::internals::types::register_index>(
+        std::stoul(tokens.at(i + 1).str())
+    );
+    auto const register_set = string_to_register_set(tokens.at(i + 2).str());
+    auto access = string_to_access_type(tokens.at(i).str());
+
+    auto operand = std::make_unique<Register_address>(
+        index
+        , register_set
+        , access
+    );
+    operand->add(tokens.at(i++));
+    operand->add(tokens.at(i++));
+    operand->add(tokens.at(i++));
+    frag->operands.push_back(std::move(operand));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
 // FIXME this is duplicated code
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
