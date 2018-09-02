@@ -813,6 +813,8 @@ build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 
 #######################################################################
 # TOOLING
+tooling: build/tooling/exec/assembler.bin
+
 build/tooling/libs/lexer/tokenise.o: build/tooling/libs/lexer/normaliser.o
 build/tooling/exec/assembler.bin: \
 	build/tooling/exec/assembler/main.o \
