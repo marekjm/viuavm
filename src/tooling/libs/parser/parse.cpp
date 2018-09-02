@@ -183,6 +183,16 @@ static auto string_to_register_set(std::string const& s) -> viua::internals::Reg
     return mapping.at(s);
 }
 
+static auto string_to_access_type(std::string const& s) -> viua::internals::Access_specifier {
+    using viua::internals::Access_specifier;
+    static auto const mapping = std::map<std::string, Access_specifier>{
+        { "%", Access_specifier::DIRECT, },
+        { "@", Access_specifier::REGISTER_INDIRECT, },
+        { "*", Access_specifier::POINTER_DEREFERENCE, },
+    };
+    return mapping.at(s);
+}
+
 // FIXME this is duplicated code
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
