@@ -234,7 +234,11 @@ static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const&
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std::vector<std::unique_ptr<Fragment>> {
     auto fragments = std::vector<std::unique_ptr<Fragment>>{};
 
-    for (auto i = index_type{0}; i < tokens.size();) {
+    /*
+     * Skip the newline after every fragment. Newline characters act
+     * as fragment terminators.
+     */
+    for (auto i = index_type{0}; i < tokens.size(); ++i) {
         auto const& token = tokens.at(i);
 
         if (token == ".signature:") {
@@ -249,12 +253,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                     , "expected a directive or an instruction"
                 ));
         }
-
-        /*
-         * Skip the newline after every fragment. Newline characters act
-         * as fragment terminators.
-         */
-        ++i;
     }
 
     return fragments;
