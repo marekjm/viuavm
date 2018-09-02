@@ -170,6 +170,19 @@ static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
     return {};
 }
 
+static auto string_to_register_set(std::string const& s) -> viua::internals::Register_sets {
+    using viua::internals::Register_sets;
+    static auto const mapping = std::map<std::string, Register_sets>{
+        { "local", Register_sets::LOCAL, },
+        { "static", Register_sets::STATIC, },
+        { "global", Register_sets::GLOBAL, },
+        { "arguments", Register_sets::ARGUMENTS, },
+        { "parameters", Register_sets::PARAMETERS, },
+        { "closure_local", Register_sets::CLOSURE_LOCAL, },
+    };
+    return mapping.at(s);
+}
+
 // FIXME this is duplicated code
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
