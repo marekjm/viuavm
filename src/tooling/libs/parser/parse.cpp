@@ -161,6 +161,16 @@ static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragment
 }
 
 // FIXME this is duplicated code
+static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
+    for (auto const& [ opcode, name ] : OP_NAMES) {
+        if (name == s) {
+            return opcode;
+        }
+    }
+    return {};
+}
+
+// FIXME this is duplicated code
 static auto make_unexpected_token_error(viua::tooling::libs::lexer::Token const& token, std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n")
