@@ -241,6 +241,25 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
     for (auto i = index_type{0}; i < tokens.size(); ++i) {
         auto const& token = tokens.at(i);
 
+        auto const opcode = string_to_opcode(token.str());
+        if (opcode.has_value()) {
+            if (opcode.value() == PRINT) {
+                i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
+            } else {
+                throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                        , token
+                        , ("reduction for `"
+                            + token.str()
+                            + "' instruction is not implemented"
+                        )
+                    });
+            }
+
+            continue;
+        }
+
         if (token == ".signature:") {
             i += parse_signature_directive(fragments, vector_view{tokens, i});
         } else if (token == ".bsignature:") {
