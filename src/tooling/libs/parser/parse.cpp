@@ -250,7 +250,7 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token
-                    , "expected a directive or an instruction"
+                    , "cannot be reduced by any rule"
                 ));
         }
     }
