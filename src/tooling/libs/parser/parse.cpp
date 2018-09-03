@@ -88,6 +88,71 @@ Register_address::Register_address(
     , access{as}
 {}
 
+Integer_literal::Integer_literal(viua::types::Integer::underlying_type const x):
+    Operand{Operand_type::Integer_literal}
+    , n{x}
+{}
+
+Float_literal::Float_literal(viua::types::Float::underlying_type const x):
+    Operand{Operand_type::Float_literal}
+    , n{x}
+{}
+
+Text_literal::Text_literal(std::string s):
+    Operand{Operand_type::Text_literal}
+    , text{std::move(s)}
+{}
+
+Atom_literal::Atom_literal(std::string s):
+    Operand{Operand_type::Atom_literal}
+    , text{std::move(s)}
+{}
+
+Bits_literal::Bits_literal(std::string s):
+    Operand{Operand_type::Bits_literal}
+    , text{std::move(s)}
+{}
+
+Boolean_literal::Boolean_literal(bool const v):
+    Operand{Operand_type::Boolean_literal}
+    , value{v}
+{}
+
+Void::Void():
+    Operand{Operand_type::Void}
+{}
+
+Function_name::Function_name(std::string fn, uint64_t const a):
+    Operand{Operand_type::Function_name}
+    , function_name{std::move(fn)}
+    , arity{a}
+{}
+
+Block_name::Block_name(std::string bn):
+    Operand{Operand_type::Block_name}
+    , name{std::move(bn)}
+{}
+
+Module_name::Module_name(std::string bn):
+    Operand{Operand_type::Module_name}
+    , name{std::move(bn)}
+{}
+
+Timeout_literal::Timeout_literal(std::string s):
+    Operand{Operand_type::Timeout_literal}
+    , value{std::move(s)}
+{}
+
+Jump_offset::Jump_offset(std::string s):
+    Operand{Operand_type::Jump_offset}
+    , value{std::move(s)}
+{}
+
+Jump_label::Jump_label(std::string s):
+    Operand{Operand_type::Jump_label}
+    , value{std::move(s)}
+{}
+
 Instruction::Instruction(OPCODE const o):
     Fragment{Fragment_type::Instruction}
     , opcode{o}
