@@ -772,7 +772,53 @@ static auto normalise_bits(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
-static auto normalise_waitable(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_join(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    using viua::tooling::libs::lexer::classifier::is_void;
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else if (is_void(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected register address or void"
+            ));
+    }
+
+    if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(i));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected register address"
+            ));
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_timeout_literal;
+    using viua::tooling::libs::lexer::classifier::is_default;
+    if (auto const& token = source.at(i); is_timeout_literal(token.str()) or is_default(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(make_unexpected_token_error(
+                token
+                , "expected timeout literal"
+            ).comment("example timeout duration: `1s', `2500ms'"));
+    }
+
+    return i;
+}
+
+static auto normalise_receive(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1283,8 +1329,10 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 i += normalise_allocate_registers(tokens, vector_view{source, i});
                 break;
             case JOIN:
+                i += normalise_join(tokens, vector_view{source, i});
+                break;
             case RECEIVE:
-                i += normalise_waitable(tokens, vector_view{source, i});
+                i += normalise_receive(tokens, vector_view{source, i});
                 break;
             case JUMP:
                 i += normalise_jump(tokens, vector_view{source, i});
