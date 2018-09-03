@@ -85,6 +85,9 @@ auto is_float(std::string const& s) -> bool {
 auto is_default(std::string const& s) -> bool {
     return (s == "default");
 }
+auto is_void(std::string const& s) -> bool {
+    return (s == "void");
+}
 
 auto is_boolean_literal(std::string const& s) -> bool {
     return (s == "true" or s == "false");
