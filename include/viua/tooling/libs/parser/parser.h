@@ -25,6 +25,8 @@
 #include <vector>
 #include <viua/bytecode/operand_types.h>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/types/integer.h>
+#include <viua/types/float.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 namespace viua {
@@ -78,6 +80,19 @@ struct Closure_head : public Fragment {
 
 enum class Operand_type {
     Register_address,
+    Integer_literal,
+    Float_literal,
+    Text_literal,
+    Atom_literal,
+    Bits_literal,
+    Boolean_literal,
+    Timeout_literal,
+    Void,
+    Function_name,
+    Block_name,
+    Module_name,
+    Jump_offset,
+    Jump_label,
 };
 
 class Operand {
@@ -101,6 +116,83 @@ struct Register_address : public Operand {
         , viua::internals::Register_sets const
         , viua::internals::Access_specifier const
     );
+};
+
+struct Integer_literal : public Operand {
+    viua::types::Integer::underlying_type const n;
+
+    Integer_literal(viua::types::Integer::underlying_type const);
+};
+
+struct Float_literal : public Operand {
+    viua::types::Float::underlying_type const n;
+
+    Float_literal(viua::types::Float::underlying_type const);
+};
+
+struct Text_literal : public Operand {
+    std::string const text;
+
+    Text_literal(std::string);
+};
+
+struct Atom_literal : public Operand {
+    std::string const text;
+
+    Atom_literal(std::string);
+};
+
+struct Bits_literal : public Operand {
+    std::string const text;
+
+    Bits_literal(std::string);
+};
+
+struct Boolean_literal : public Operand {
+    bool const value;
+
+    Boolean_literal(bool const);
+};
+
+struct Void : public Operand {
+    Void();
+};
+
+struct Function_name : public Operand {
+    std::string const function_name;
+    uint64_t const arity;
+
+    Function_name(std::string, uint64_t const);
+};
+
+struct Block_name : public Operand {
+    std::string const name;
+
+    Block_name(std::string);
+};
+
+struct Module_name : public Operand {
+    std::string const name;
+
+    Module_name(std::string);
+};
+
+struct Timeout_literal : public Operand {
+    std::string const value;
+
+    Timeout_literal(std::string);
+};
+
+struct Jump_offset : public Operand {
+    std::string const value;
+
+    Jump_offset(std::string);
+};
+
+struct Jump_label : public Operand {
+    std::string const value;
+
+    Jump_label(std::string);
 };
 
 struct Instruction : public Fragment {
