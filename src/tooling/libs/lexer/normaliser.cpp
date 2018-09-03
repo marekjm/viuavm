@@ -509,7 +509,7 @@ static auto normalise_tailcall(std::vector<Token>& tokens, vector_view<Token> co
             .append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
                 , token
-                , "expected register access specifier, `void`, or function name"
+                , "expected register address, or function name"
             });
     }
 
