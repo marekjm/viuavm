@@ -37,6 +37,7 @@ namespace parser {
 enum class Fragment_type {
     Signature_directive,
     Block_signature_directive,
+    End_directive,
     Closure_head,
     Instruction,
 };
@@ -68,6 +69,10 @@ struct Block_signature_directive : public Fragment {
     std::string const block_name;
 
     Block_signature_directive(std::string);
+};
+
+struct End_directive : public Fragment {
+    End_directive();
 };
 
 struct Closure_head : public Fragment {

@@ -60,6 +60,10 @@ Block_signature_directive::Block_signature_directive(std::string bn):
     , block_name{std::move(bn)}
 {}
 
+End_directive::End_directive():
+    Fragment{Fragment_type::End_directive}
+{}
+
 Closure_head::Closure_head(std::string fn, uint64_t const a, std::set<std::string> attrs):
     Fragment{Fragment_type::Closure_head}
     , function_name{std::move(fn)}
@@ -897,6 +901,9 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_bsignature_directive(fragments, vector_view{tokens, i});
         } else if (token == ".closure:") {
             i += parse_function_head(fragments, vector_view{tokens, i});
+        } else if (token == ".end") {
+            fragments.push_back(std::make_unique<End_directive>());
+            fragments.back()->add(tokens.at(i++));
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token
