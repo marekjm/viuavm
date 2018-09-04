@@ -103,11 +103,13 @@ Operand::Operand(Operand_type const o):
 
 Register_address::Register_address(
     viua::internals::types::register_index const ri
+    , bool const i
     , viua::internals::Register_sets const rs
     , viua::internals::Access_specifier const as
 ):
     Operand{Operand_type::Register_address}
     , index{ri}
+    , iota{i}
     , register_set{rs}
     , access{as}
 {}
@@ -382,14 +384,16 @@ static auto parse_any_no_input_instruction(std::vector<std::unique_ptr<Fragment>
 }
 
 static auto parse_register_address(Instruction& instruction, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto const is_iota = (tokens.at(1) == "iota");
     auto const index = static_cast<viua::internals::types::register_index>(
-        std::stoul(tokens.at(1).str())
+        is_iota ? 0 : std::stoul(tokens.at(1).str())
     );
     auto const register_set = string_to_register_set(tokens.at(2).str());
     auto access = string_to_access_type(tokens.at(0).str());
 
     auto operand = std::make_unique<Register_address>(
         index
+        , is_iota
         , register_set
         , access
     );
