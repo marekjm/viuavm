@@ -42,6 +42,7 @@ enum class Fragment_type {
     Block_head,
     Instruction,
     Info_directive,
+    Import_directive,
 };
 
 /*
@@ -97,6 +98,13 @@ struct Info_directive : public Fragment {
     std::string const value;
 
     Info_directive(std::string, std::string);
+};
+
+struct Import_directive : public Fragment {
+    std::string const module_name;
+    std::set<std::string> const attributes;
+
+    Import_directive(std::string, std::set<std::string>);
 };
 
 enum class Operand_type {

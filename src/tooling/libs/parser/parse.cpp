@@ -77,6 +77,12 @@ Block_head::Block_head(std::string bn, std::set<std::string> attrs):
     , attributes{std::move(attrs)}
 {}
 
+Import_directive::Import_directive(std::string bn, std::set<std::string> attrs):
+    Fragment{Fragment_type::Import_directive}
+    , module_name{std::move(bn)}
+    , attributes{std::move(attrs)}
+{}
+
 Info_directive::Info_directive(std::string k, std::string v):
     Fragment{Fragment_type::Info_directive}
     , key{std::move(k)}
@@ -289,6 +295,43 @@ static auto parse_info_directive(std::vector<std::unique_ptr<Fragment>>& fragmen
     frag->add(tokens.at(i++));  // .info:
     frag->add(tokens.at(i++));  // <key>
     frag->add(tokens.at(i++));  // <value>
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
+// FIXME the code is the same as for .block:
+static auto parse_import_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    ++i;    // .import:
+
+    auto attributes = std::set<std::string>{};
+    ++i;    // opening of the attribute list "[["
+
+    if (tokens.at(i) != "]]") {
+        // first attribute
+        attributes.insert(tokens.at(i++).str());
+
+        // all the rest
+        while (tokens.at(i) != "]]") {
+            // the "," between attributes
+            ++i;
+
+            // the attribute
+            attributes.insert(tokens.at(i++).str());
+        }
+    }
+
+    ++i;    // closing of the attribute list "]]"
+
+    auto frag = std::make_unique<Import_directive>(
+        tokens.at(i).str()                      // name
+        , std::move(attributes)
+    );
+    frag->add(tokens.at(0));
+    frag->add(tokens.at(i++));
 
     fragments.push_back(std::move(frag));
 
@@ -972,6 +1015,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             fragments.back()->add(tokens.at(i++));
         } else if (token == ".info:") {
             i += parse_info_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".import:") {
+            i += parse_import_directive(fragments, vector_view{tokens, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token
