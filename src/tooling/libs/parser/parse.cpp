@@ -77,6 +77,12 @@ Block_head::Block_head(std::string bn, std::set<std::string> attrs):
     , attributes{std::move(attrs)}
 {}
 
+Info_directive::Info_directive(std::string k, std::string v):
+    Fragment{Fragment_type::Info_directive}
+    , key{std::move(k)}
+    , value{std::move(v)}
+{}
+
 auto Operand::type() const -> Operand_type {
     return operand_type;
 }
@@ -267,6 +273,22 @@ static auto parse_block_head(std::vector<std::unique_ptr<Fragment>>& fragments, 
     );
     frag->add(tokens.at(0));
     frag->add(tokens.at(i++));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
+static auto parse_info_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Info_directive>(
+        tokens.at(1).str()
+        , tokens.at(2).str()
+    );
+    frag->add(tokens.at(i++));  // .info:
+    frag->add(tokens.at(i++));  // <key>
+    frag->add(tokens.at(i++));  // <value>
 
     fragments.push_back(std::move(frag));
 
@@ -948,6 +970,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
         } else if (token == ".end") {
             fragments.push_back(std::make_unique<End_directive>());
             fragments.back()->add(tokens.at(i++));
+        } else if (token == ".info:") {
+            i += parse_info_directive(fragments, vector_view{tokens, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token

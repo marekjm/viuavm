@@ -41,6 +41,7 @@ enum class Fragment_type {
     Closure_head,
     Block_head,
     Instruction,
+    Info_directive,
 };
 
 /*
@@ -89,6 +90,13 @@ struct Block_head : public Fragment {
     std::set<std::string> const attributes;
 
     Block_head(std::string, std::set<std::string>);
+};
+
+struct Info_directive : public Fragment {
+    std::string const key;
+    std::string const value;
+
+    Info_directive(std::string, std::string);
 };
 
 enum class Operand_type {
