@@ -71,6 +71,12 @@ Closure_head::Closure_head(std::string fn, uint64_t const a, std::set<std::strin
     , attributes{std::move(attrs)}
 {}
 
+Block_head::Block_head(std::string bn, std::set<std::string> attrs):
+    Fragment{Fragment_type::Block_head}
+    , name{std::move(bn)}
+    , attributes{std::move(attrs)}
+{}
+
 auto Operand::type() const -> Operand_type {
     return operand_type;
 }
@@ -229,6 +235,42 @@ static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragment
     fragments.push_back(std::move(frag));
 
     return i + 3;
+}
+
+static auto parse_block_head(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    ++i;    // .block:
+
+    auto attributes = std::set<std::string>{};
+    ++i;    // opening of the attribute list "[["
+
+    if (tokens.at(i) != "]]") {
+        // first attribute
+        attributes.insert(tokens.at(i++).str());
+
+        // all the rest
+        while (tokens.at(i) != "]]") {
+            // the "," between attributes
+            ++i;
+
+            // the attribute
+            attributes.insert(tokens.at(i++).str());
+        }
+    }
+
+    ++i;    // closing of the attribute list "]]"
+
+    auto frag = std::make_unique<Block_head>(
+        tokens.at(i).str()                      // name
+        , std::move(attributes)
+    );
+    frag->add(tokens.at(0));
+    frag->add(tokens.at(i++));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
 }
 
 // FIXME this is duplicated code
@@ -901,6 +943,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_bsignature_directive(fragments, vector_view{tokens, i});
         } else if (token == ".closure:") {
             i += parse_function_head(fragments, vector_view{tokens, i});
+        } else if (token == ".block:") {
+            i += parse_block_head(fragments, vector_view{tokens, i});
         } else if (token == ".end") {
             fragments.push_back(std::make_unique<End_directive>());
             fragments.back()->add(tokens.at(i++));
