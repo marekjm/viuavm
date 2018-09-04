@@ -38,6 +38,7 @@ enum class Fragment_type {
     Signature_directive,
     Block_signature_directive,
     End_directive,
+    Function_head,
     Closure_head,
     Block_head,
     Instruction,
@@ -78,6 +79,16 @@ struct End_directive : public Fragment {
     End_directive();
 };
 
+struct Function_head : public Fragment {
+    std::string const function_name;
+    uint64_t const arity;
+    std::set<std::string> const attributes;
+
+    Function_head(std::string, uint64_t const, std::set<std::string>);
+};
+
+// FIXME Closure_head is *exactly* the same as function head, they differ only
+// in fragment type
 struct Closure_head : public Fragment {
     std::string const function_name;
     uint64_t const arity;

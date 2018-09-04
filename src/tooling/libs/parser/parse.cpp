@@ -64,6 +64,13 @@ End_directive::End_directive():
     Fragment{Fragment_type::End_directive}
 {}
 
+Function_head::Function_head(std::string fn, uint64_t const a, std::set<std::string> attrs):
+    Fragment{Fragment_type::Function_head}
+    , function_name{std::move(fn)}
+    , arity{a}
+    , attributes{std::move(attrs)}
+{}
+
 Closure_head::Closure_head(std::string fn, uint64_t const a, std::set<std::string> attrs):
     Fragment{Fragment_type::Closure_head}
     , function_name{std::move(fn)}
@@ -213,7 +220,8 @@ static auto parse_bsignature_directive(std::vector<std::unique_ptr<Fragment>>& f
     return 2;
 }
 
-static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+template<typename T>
+auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto i = index_type{0};
 
     ++i;    // .function: or .closure:
@@ -237,7 +245,7 @@ static auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragment
 
     ++i;    // closing of the attribute list "]]"
 
-    auto frag = std::make_unique<Closure_head>(
+    auto frag = std::make_unique<T>(
         tokens.at(i).str()                      // name
         , std::stoull(tokens.at(i + 2).str())   // arity
         , std::move(attributes)
@@ -1010,8 +1018,10 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_signature_directive(fragments, vector_view{tokens, i});
         } else if (token == ".bsignature:") {
             i += parse_bsignature_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".function:") {
+            i += parse_function_head<Function_head>(fragments, vector_view{tokens, i});
         } else if (token == ".closure:") {
-            i += parse_function_head(fragments, vector_view{tokens, i});
+            i += parse_function_head<Closure_head>(fragments, vector_view{tokens, i});
         } else if (token == ".block:") {
             i += parse_block_head(fragments, vector_view{tokens, i});
         } else if (token == ".end") {
