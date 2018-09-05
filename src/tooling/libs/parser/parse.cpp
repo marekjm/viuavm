@@ -659,13 +659,36 @@ static auto parse_op_call(std::vector<std::unique_ptr<Fragment>>& fragments, vec
         i += parse_register_address(*frag, tokens.advance(i));
     } else if (is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(i));
-        ++i;
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
                 , token
                 , "expected register address, or function name"
+            });
+    }
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
+static auto parse_op_function(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    i += parse_register_address(*frag, tokens.advance(i));
+
+    using viua::tooling::libs::lexer::classifier::is_id;
+    using viua::tooling::libs::lexer::classifier::is_scoped_id;
+    if (auto const& token = tokens.at(i); is_id(token.str()) or is_scoped_id(token.str())) {
+        i += parse_function_name(*frag, tokens.advance(i));
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected function name"
             });
     }
 
@@ -985,6 +1008,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                     break;
                 case CLOSURE:
                 case FUNCTION:
+                    i += parse_op_function(fragments, vector_view{tokens, i});
+                    break;
                 case CALL:
                 case PROCESS:
                     i += parse_op_call(fragments, vector_view{tokens, i});
