@@ -158,11 +158,13 @@ class Operand {
 struct Register_address : public Operand {
     viua::internals::types::register_index const index;
     bool const iota;
+    bool const name;
     viua::internals::Register_sets const register_set;
     viua::internals::Access_specifier const access;
 
     Register_address(
         viua::internals::types::register_index const
+        , bool const
         , bool const
         , viua::internals::Register_sets const
         , viua::internals::Access_specifier const
