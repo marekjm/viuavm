@@ -44,6 +44,7 @@ enum class Fragment_type {
     Instruction,
     Info_directive,
     Import_directive,
+    Name_directive,
 };
 
 /*
@@ -109,6 +110,14 @@ struct Info_directive : public Fragment {
     std::string const value;
 
     Info_directive(std::string, std::string);
+};
+
+struct Name_directive : public Fragment {
+    viua::internals::types::register_index const register_index;
+    bool const iota;
+    std::string const name;
+
+    Name_directive(viua::internals::types::register_index const, bool const, std::string);
 };
 
 struct Import_directive : public Fragment {

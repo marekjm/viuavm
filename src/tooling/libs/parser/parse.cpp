@@ -96,6 +96,13 @@ Info_directive::Info_directive(std::string k, std::string v):
     , value{std::move(v)}
 {}
 
+Name_directive::Name_directive(viua::internals::types::register_index const ri, bool const i, std::string n):
+    Fragment{Fragment_type::Name_directive}
+    , register_index{ri}
+    , iota{i}
+    , name{std::move(n)}
+{}
+
 auto Operand::type() const -> Operand_type {
     return operand_type;
 }
@@ -289,6 +296,28 @@ static auto parse_block_head(std::vector<std::unique_ptr<Fragment>>& fragments, 
     );
     frag->add(tokens.at(0));
     frag->add(tokens.at(i++));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
+static auto parse_name_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto const is_iota = (tokens.at(1) == "iota");
+    auto const index = static_cast<viua::internals::types::register_index>(
+        is_iota ? 0 : std::stoul(tokens.at(1).str())
+    );
+
+    auto frag = std::make_unique<Name_directive>(
+        index
+        , is_iota
+        , tokens.at(2).str()
+    );
+    frag->add(tokens.at(i++));  // .name:
+    frag->add(tokens.at(i++));  // index
+    frag->add(tokens.at(i++));  // token
 
     fragments.push_back(std::move(frag));
 
@@ -1031,6 +1060,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_info_directive(fragments, vector_view{tokens, i});
         } else if (token == ".import:") {
             i += parse_import_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".name:") {
+            i += parse_name_directive(fragments, vector_view{tokens, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token
