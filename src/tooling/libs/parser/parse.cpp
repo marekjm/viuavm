@@ -599,9 +599,14 @@ static auto parse_op_bits(std::vector<std::unique_ptr<Fragment>>& fragments, vec
 
     i += parse_register_address(*frag, tokens.advance(1));
 
-    auto lit = std::make_unique<Bits_literal>(tokens.at(i).str());
-    lit->add(tokens.at(i++));
-    frag->operands.push_back(std::move(lit));
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = tokens.at(i); is_access_type_specifier(token.str())) {
+        i += parse_register_address(*frag, tokens.advance(i));
+    } else {
+        auto lit = std::make_unique<Bits_literal>(tokens.at(i).str());
+        lit->add(tokens.at(i++));
+        frag->operands.push_back(std::move(lit));
+    }
 
     fragments.push_back(std::move(frag));
 
