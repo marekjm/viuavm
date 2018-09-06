@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <viua/bytecode/maps.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/integer.h>
