@@ -38,6 +38,7 @@
 std::string const OPTION_HELP_LONG = "--help";
 std::string const OPTION_HELP_SHORT = "-h";
 std::string const OPTION_VERSION = "--version";
+std::string const OPTION_LEX = "--lex";
 
 static auto usage(std::vector<std::string> const& args) -> bool {
     auto help_screen = (args.size() == 1);
@@ -81,6 +82,8 @@ static auto usage(std::vector<std::string> const& args) -> bool {
         std::cout << "    -C, --verify      - perform static analysis, but do not output bytecode\n";
         std::cout << "        --no-sa       - disable static analysis (useful in case of false positives"
                      " being thrown by the SA engine)\n";
+        std::cout << "        --lex         - perform just the lexical analysis, and return results as a"
+                     "                        JSON list\n";
 
         std::cout << '\n';
 
@@ -105,6 +108,7 @@ struct Parsed_args {
     bool enabled_sa = true;
     bool sa_only = false;
     bool linkable_module = false;
+    bool lex_only = false;
 
     std::string output_file = "a.out";
     std::string input_file;
@@ -137,6 +141,8 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
             // do nothing
         } else if (arg == "--version") {
             // do nothing
+        } else if (arg == OPTION_LEX) {
+            parsed.lex_only = true;
         } else if (arg == "--") {
             ++i;
             break;
@@ -478,8 +484,6 @@ static auto display_error_in_context(
     std::cerr << o.str();
 }
 
-#define JSON_TOKEN_DUMP
-#ifdef JSON_TOKEN_DUMP
 static auto to_json(viua::tooling::libs::lexer::Token const& token) -> std::string {
     auto o = std::ostringstream{};
 
@@ -507,7 +511,6 @@ static auto to_json(std::vector<viua::tooling::libs::lexer::Token> const& tokens
 
     return o.str();
 }
-#endif
 
 auto main(int argc, char* argv[]) -> int {
     auto const args = make_args(argc, argv);
@@ -540,10 +543,10 @@ auto main(int argc, char* argv[]) -> int {
         }
     }();
 
-#ifdef JSON_TOKEN_DUMP
-    std::cerr << tokens.size() << std::endl;
-    std::cerr << to_json(tokens) << std::endl;
-#endif
+    if (parsed_args.lex_only) {
+        std::cerr << to_json(tokens) << std::endl;
+        exit(0);
+    }
 
     auto const fragments = [&raw_tokens, &tokens, &parsed_args]() -> auto {
         try {
