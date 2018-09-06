@@ -45,6 +45,7 @@ enum class Fragment_type {
     Info_directive,
     Import_directive,
     Name_directive,
+    Mark_directive,
 };
 
 /*
@@ -125,6 +126,12 @@ struct Import_directive : public Fragment {
     std::set<std::string> const attributes;
 
     Import_directive(std::string, std::set<std::string>);
+};
+
+struct Mark_directive : public Fragment {
+    std::string const mark;
+
+    Mark_directive(std::string);
 };
 
 enum class Operand_type {

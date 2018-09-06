@@ -96,6 +96,11 @@ Info_directive::Info_directive(std::string k, std::string v):
     , value{std::move(v)}
 {}
 
+Mark_directive::Mark_directive(std::string m):
+    Fragment{Fragment_type::Mark_directive}
+    , mark{std::move(m)}
+{}
+
 Name_directive::Name_directive(viua::internals::types::register_index const ri, bool const i, std::string n):
     Fragment{Fragment_type::Name_directive}
     , register_index{ri}
@@ -373,6 +378,20 @@ static auto parse_import_directive(std::vector<std::unique_ptr<Fragment>>& fragm
     );
     frag->add(tokens.at(0));
     frag->add(tokens.at(i++));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
+static auto parse_mark_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Mark_directive>(
+        tokens.at(1).str()
+    );
+    frag->add(tokens.at(i++));  // .mark:
+    frag->add(tokens.at(i++));  // <key>
 
     fragments.push_back(std::move(frag));
 
@@ -1098,6 +1117,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
             i += parse_import_directive(fragments, vector_view{tokens, i});
         } else if (token == ".name:") {
             i += parse_name_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".mark:") {
+            i += parse_mark_directive(fragments, vector_view{tokens, i});
         } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}
                 .append(make_unexpected_token_error(token
