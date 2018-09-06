@@ -532,6 +532,25 @@ static auto parse_any_3_register_instruction(std::vector<std::unique_ptr<Fragmen
     return i;
 }
 
+static auto parse_any_3_register_with_void_target_instruction(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+
+    using viua::tooling::libs::lexer::classifier::is_void;
+    if (auto const& token = tokens.at(i); is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    } else {
+        i += parse_register_address(*frag, tokens.advance(i));
+    }
+    i += parse_register_address(*frag, tokens.advance(i));
+    i += parse_register_address(*frag, tokens.advance(i));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
 static auto parse_any_4_register_instruction(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto i = index_type{0};
 
@@ -1000,8 +1019,10 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case CAPTUREMOVE:
                 case ATOMEQ:
                 case STRUCTINSERT:
-                case STRUCTREMOVE:
                     i += parse_any_3_register_instruction(fragments, vector_view{tokens, i});
+                    break;
+                case STRUCTREMOVE:
+                    i += parse_any_3_register_with_void_target_instruction(fragments, vector_view{tokens, i});
                     break;
                 case TEXTSUB:
                     i += parse_any_4_register_instruction(fragments, vector_view{tokens, i});
