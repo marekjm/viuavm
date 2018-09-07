@@ -1163,6 +1163,18 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
             auto t = std::unique_ptr<Info_directive>{};
             t.reset(static_cast<Info_directive*>(each.release()));
             cooked.info_fragments.push_back(std::move(t));
+        } else if (each->type() == Fragment_type::Import_directive) {
+            auto t = std::unique_ptr<Import_directive>{};
+            t.reset(static_cast<Import_directive*>(each.release()));
+            cooked.import_fragments.push_back(std::move(t));
+        } else if (each->type() == Fragment_type::Signature_directive) {
+            auto t = std::unique_ptr<Signature_directive>{};
+            t.reset(static_cast<Signature_directive*>(each.release()));
+            cooked.signature_fragments.push_back(std::move(t));
+        } else if (each->type() == Fragment_type::Block_signature_directive) {
+            auto t = std::unique_ptr<Block_signature_directive>{};
+            t.reset(static_cast<Block_signature_directive*>(each.release()));
+            cooked.block_signature_fragments.push_back(std::move(t));
         }
     }
 

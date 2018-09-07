@@ -560,5 +560,51 @@ auto main(int argc, char* argv[]) -> int {
         }
     }();
 
+    for (auto const& each : cooked_fragments.info_fragments) {
+        std::cout << "information:     " << each->key << " = " << each->value << std::endl;
+    }
+    for (auto const& each : cooked_fragments.signature_fragments) {
+        std::cout << "extern function: " << each->function_name << '/' << each->arity << std::endl;
+    }
+    for (auto const& each : cooked_fragments.block_signature_fragments) {
+        std::cout << "extern block:    " << each->block_name << std::endl;
+    }
+    for (auto const& each : cooked_fragments.import_fragments) {
+        std::cout << "imported module: " << each->module_name;
+        if (not each->attributes.empty()) {
+            std::cout << " (";
+            for (auto const& attr : each->attributes) {
+                std::cout << ' ' << attr;
+            }
+            std::cout << " )";
+        }
+        std::cout << std::endl;
+    }
+    for (auto const& each : cooked_fragments.function_fragments) {
+        auto const& fn = *static_cast<viua::tooling::libs::parser::Function_head const*>(each.second.lines.at(0).get());
+        std::cout << "function:        " << fn.function_name << '/' << fn.arity;
+        if (not fn.attributes.empty()) {
+            std::cout << " [[";
+            for (auto const& attr : fn.attributes) {
+                std::cout << ' ' << attr;
+            }
+            std::cout << " ]]";
+        }
+        std::cout << std::endl;
+    }
+    for (auto const& each : cooked_fragments.closure_fragments) {
+        auto const& fn = *static_cast<viua::tooling::libs::parser::Closure_head const*>(each.second.lines.at(0).get());
+        std::cout << "closure:         " << fn.function_name << '/' << fn.arity;
+        if (not fn.attributes.empty()) {
+            std::cout << " [[";
+            for (auto const& attr : fn.attributes) {
+                std::cout << ' ' << attr;
+            }
+            std::cout << " ]]";
+        }
+        std::cout << std::endl;
+    }
+    // FIXME list blocks
+
     return 0;
 }
