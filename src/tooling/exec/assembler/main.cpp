@@ -548,9 +548,12 @@ auto main(int argc, char* argv[]) -> int {
         exit(0);
     }
 
-    auto const fragments = [&raw_tokens, &tokens, &parsed_args]() -> auto {
+    auto const cooked_fragments = [&raw_tokens, &tokens, &parsed_args]() -> auto {
         try {
-            return viua::tooling::libs::parser::parse(tokens);
+            return viua::tooling::libs::parser::cook(
+                parsed_args.input_file
+                , viua::tooling::libs::parser::parse(tokens)
+            );
         } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);

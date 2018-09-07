@@ -1151,4 +1151,22 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
     return fragments;
 }
 
+Cooked_fragments::Cooked_fragments(std::string f_n):
+    file_name{std::move(f_n)}
+{}
+
+auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragments) -> Cooked_fragments {
+    auto cooked = Cooked_fragments { std::move(file_name) };
+
+    for (auto& each : fragments) {
+        if (each->type() == Fragment_type::Info_directive) {
+            auto t = std::unique_ptr<Info_directive>{};
+            t.reset(static_cast<Info_directive*>(each.release()));
+            cooked.info_fragments.push_back(std::move(t));
+        }
+    }
+
+    return cooked;
+}
+
 }}}}

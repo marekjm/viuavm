@@ -263,7 +263,37 @@ struct Instruction : public Fragment {
     Instruction(OPCODE const);
 };
 
+struct Cooked_function {
+    std::vector<std::unique_ptr<Fragment>> lines;
+};
+struct Cooked_block {
+    std::vector<std::unique_ptr<Fragment>> lines;
+};
+struct Cooked_closure {
+    std::vector<std::unique_ptr<Fragment>> lines;
+};
+
+struct Cooked_fragments {
+    std::string file_name;
+
+    std::vector<std::unique_ptr<Signature_directive>> signature_fragments;
+    std::vector<std::unique_ptr<Block_signature_directive>> block_signature_fragments;
+    std::vector<std::unique_ptr<Info_directive>> info_fragments;
+    std::vector<std::unique_ptr<Import_directive>> import_fragments;
+
+    std::map<std::string, Cooked_function> function_fragments;
+    std::map<std::string, Cooked_block> block_fragments;
+    std::map<std::string, Cooked_closure> closure_fragments;
+
+    Cooked_fragments(std::string);
+    Cooked_fragments(Cooked_fragments const&) = delete;
+    Cooked_fragments(Cooked_fragments&&) = default;
+    auto operator=(Cooked_fragments const&) -> Cooked_fragments& = delete;
+    auto operator=(Cooked_fragments&&) -> Cooked_fragments& = default;
+};
+
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const&) -> std::vector<std::unique_ptr<Fragment>>;
+auto cook(std::string, std::vector<std::unique_ptr<Fragment>>) -> Cooked_fragments;
 
 }}}}
 
