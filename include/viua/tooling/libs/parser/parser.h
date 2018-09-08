@@ -269,6 +269,12 @@ struct Instruction : public Fragment {
 
 struct Cooked_function {
     std::vector<std::unique_ptr<Fragment>> lines;
+
+    Cooked_function() = default;
+    Cooked_function(Cooked_function const&) = delete;
+    Cooked_function(Cooked_function&&) = delete;
+    auto operator=(Cooked_function const&) -> Cooked_function& = delete;
+    auto operator=(Cooked_function&&) -> Cooked_function& = default;
 };
 struct Cooked_block {
     std::vector<std::unique_ptr<Fragment>> lines;
