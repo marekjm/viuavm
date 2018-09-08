@@ -1187,23 +1187,136 @@ Cooked_fragments::Cooked_fragments(std::string f_n):
 auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragments) -> Cooked_fragments {
     auto cooked = Cooked_fragments { std::move(file_name) };
 
+    auto function = std::unique_ptr<Cooked_function>{};
+    auto closure = std::unique_ptr<Cooked_closure>{};
+    auto block = std::unique_ptr<Cooked_block>{};
+
     for (auto& each : fragments) {
-        if (each->type() == Fragment_type::Info_directive) {
-            auto t = std::unique_ptr<Info_directive>{};
-            t.reset(static_cast<Info_directive*>(each.release()));
-            cooked.info_fragments.push_back(std::move(t));
-        } else if (each->type() == Fragment_type::Import_directive) {
-            auto t = std::unique_ptr<Import_directive>{};
-            t.reset(static_cast<Import_directive*>(each.release()));
-            cooked.import_fragments.push_back(std::move(t));
-        } else if (each->type() == Fragment_type::Signature_directive) {
-            auto t = std::unique_ptr<Signature_directive>{};
-            t.reset(static_cast<Signature_directive*>(each.release()));
-            cooked.signature_fragments.push_back(std::move(t));
-        } else if (each->type() == Fragment_type::Block_signature_directive) {
-            auto t = std::unique_ptr<Block_signature_directive>{};
-            t.reset(static_cast<Block_signature_directive*>(each.release()));
-            cooked.block_signature_fragments.push_back(std::move(t));
+        switch (each->type()) {
+            case Fragment_type::Signature_directive: {
+                auto t = std::unique_ptr<Signature_directive>{};
+                t.reset(static_cast<Signature_directive*>(each.release()));
+                cooked.signature_fragments.push_back(std::move(t));
+                break;
+            } case Fragment_type::Block_signature_directive: {
+                auto t = std::unique_ptr<Block_signature_directive>{};
+                t.reset(static_cast<Block_signature_directive*>(each.release()));
+                cooked.block_signature_fragments.push_back(std::move(t));
+                break;
+            } case Fragment_type::Info_directive: {
+                auto t = std::unique_ptr<Info_directive>{};
+                t.reset(static_cast<Info_directive*>(each.release()));
+                cooked.info_fragments.push_back(std::move(t));
+                break;
+            } case Fragment_type::Import_directive: {
+                auto t = std::unique_ptr<Import_directive>{};
+                t.reset(static_cast<Import_directive*>(each.release()));
+                cooked.import_fragments.push_back(std::move(t));
+                break;
+            } case Fragment_type::End_directive: {
+                if (function) {
+                    auto const& fn = *static_cast<Function_head*>(function->lines.at(0).get());
+                    cooked.function_fragments[
+                        fn.function_name + '/' + std::to_string(fn.arity)
+                    ] = std::move(*function);
+                    function = nullptr;
+                } else if (closure) {
+                } else if (block) {
+                } else {
+                    // do nothing
+                }
+                break;
+            } case Fragment_type::Function_head: {
+                if (function) {
+                    // FIXME Use some better error, maybe Unended_function?
+                    auto const& fn = *static_cast<Function_head*>(function->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "function not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (closure) {
+                    // FIXME Use some better error, maybe Unended_closure?
+                    auto const& fn = *static_cast<Closure_head*>(closure->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "closure not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (block) {
+                    // FIXME Use some better error, maybe Unended_block?
+                    auto const& fn = *static_cast<Function_head*>(block->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "block not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else {
+                    function = std::make_unique<Cooked_function>();
+                    function->lines.push_back(std::move(each));
+                }
+                break;
+            } case Fragment_type::Closure_head: {
+                break;
+            } case Fragment_type::Block_head: {
+                break;
+            } case Fragment_type::Instruction: {
+            } case Fragment_type::Name_directive: {
+            } case Fragment_type::Mark_directive: {
+                if (function) {
+                    function->lines.push_back(std::move(each));
+                } else if (closure) {
+                    closure->lines.push_back(std::move(each));
+                } else if (block) {
+                    block->lines.push_back(std::move(each));
+                } else {
+                    // FIXME Use some better error, maybe `Orphaned_instruction` for
+                    // instructions outside of blocks and `Out_of_context_directive` for
+                    // names and marks?
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(make_unexpected_token_error(each->token(0)
+                            , "orphaned instruction or out-of-context directive"
+                        ));
+                }
+                break;
+            } default: {
+                // FIXME Use some better error, maybe Unexpected_fragment?
+                throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(make_unexpected_token_error(each->token(0)
+                        , "could not be parsed"
+                    ));
+            }
         }
     }
 
