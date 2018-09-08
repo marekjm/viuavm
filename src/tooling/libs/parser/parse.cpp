@@ -1221,7 +1221,15 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                     ] = std::move(*function);
                     function = nullptr;
                 } else if (closure) {
+                    auto const& fn = *static_cast<Closure_head*>(closure->lines.at(0).get());
+                    cooked.closure_fragments[
+                        fn.function_name + '/' + std::to_string(fn.arity)
+                    ] = std::move(*closure);
+                    closure = nullptr;
                 } else if (block) {
+                    auto const& bl = *static_cast<Block_head*>(block->lines.at(0).get());
+                    cooked.block_fragments[bl.name] = std::move(*block);
+                    block = nullptr;
                 } else {
                     // do nothing
                 }
