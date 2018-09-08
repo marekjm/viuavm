@@ -55,12 +55,16 @@ enum class Fragment_type {
  * Raw tokens are reduced to fragments.
  */
 class Fragment {
-    std::vector<viua::tooling::libs::lexer::Token> tokens;
+    std::vector<viua::tooling::libs::lexer::Token> fragment_tokens;
     Fragment_type const fragment_type;
 
   public:
+    using Tokens_size_type = decltype(fragment_tokens)::size_type;
+
     auto type() const -> Fragment_type;
     auto add(viua::tooling::libs::lexer::Token) -> void;
+    auto tokens() const -> decltype(fragment_tokens) const&;
+    auto token(Tokens_size_type const) const -> viua::tooling::libs::lexer::Token const&;
 
     Fragment(Fragment_type const);
 };

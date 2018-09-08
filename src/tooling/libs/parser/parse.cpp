@@ -42,7 +42,15 @@ auto Fragment::type() const -> Fragment_type {
 }
 
 auto Fragment::add(viua::tooling::libs::lexer::Token tok) -> void {
-    tokens.push_back(std::move(tok));
+    fragment_tokens.push_back(std::move(tok));
+}
+
+auto Fragment::tokens() const -> decltype(fragment_tokens) const& {
+    return fragment_tokens;
+}
+
+auto Fragment::token(Tokens_size_type const n) const -> viua::tooling::libs::lexer::Token const& {
+    return fragment_tokens.at(n);
 }
 
 Fragment::Fragment(Fragment_type t):
