@@ -63,8 +63,8 @@ Signature_directive::Signature_directive(std::string fn, uint64_t const a):
     , arity{a}
 {}
 
-Block_signature_directive::Block_signature_directive(std::string bn):
-    Fragment{Fragment_type::Block_signature_directive}
+Extern_block::Extern_block(std::string bn):
+    Fragment{Fragment_type::Extern_block}
     , block_name{std::move(bn)}
 {}
 
@@ -229,12 +229,12 @@ static auto parse_signature_directive(std::vector<std::unique_ptr<Fragment>>& fr
     return 4;
 }
 
-static auto parse_bsignature_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
-    auto frag = std::make_unique<Block_signature_directive>(
+static auto parse_extern_block_directive(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto frag = std::make_unique<Extern_block>(
         tokens.at(1).str()
     );
 
-    frag->add(tokens.at(0));    // .bsignature:
+    frag->add(tokens.at(0));    // .extern_block:
     frag->add(tokens.at(1));    // name
 
     fragments.push_back(std::move(frag));
@@ -1150,8 +1150,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
 
         if (token == ".signature:") {
             i += parse_signature_directive(fragments, vector_view{tokens, i});
-        } else if (token == ".bsignature:") {
-            i += parse_bsignature_directive(fragments, vector_view{tokens, i});
+        } else if (token == ".extern_block:") {
+            i += parse_extern_block_directive(fragments, vector_view{tokens, i});
         } else if (token == ".function:") {
             i += parse_function_head<Function_head>(fragments, vector_view{tokens, i});
         } else if (token == ".closure:") {
@@ -1198,9 +1198,9 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                 t.reset(static_cast<Signature_directive*>(each.release()));
                 cooked.signature_fragments.push_back(std::move(t));
                 break;
-            } case Fragment_type::Block_signature_directive: {
-                auto t = std::unique_ptr<Block_signature_directive>{};
-                t.reset(static_cast<Block_signature_directive*>(each.release()));
+            } case Fragment_type::Extern_block: {
+                auto t = std::unique_ptr<Extern_block>{};
+                t.reset(static_cast<Extern_block*>(each.release()));
                 cooked.block_signature_fragments.push_back(std::move(t));
                 break;
             } case Fragment_type::Info_directive: {

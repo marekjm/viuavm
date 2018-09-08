@@ -91,7 +91,7 @@ static auto normalise_directive_signature(std::vector<Token>& tokens, vector_vie
     return normalise_function_signature(tokens, source.advance(1)) + 1;
 }
 
-static auto normalise_directive_bsignature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_directive_extern_block(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1396,8 +1396,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
 
         if (token == ".signature:") {
             i += normalise_directive_signature(tokens, vector_view{source, i});
-        } else if (token == ".bsignature:") {
-            i += normalise_directive_bsignature(tokens, vector_view{source, i});
+        } else if (token == ".extern_block:") {
+            i += normalise_directive_extern_block(tokens, vector_view{source, i});
         } else if (token == ".closure:") {
             i += normalise_closure_definition(tokens, vector_view{source, i});
         } else if (token == ".function:") {
