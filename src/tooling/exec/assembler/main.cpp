@@ -563,7 +563,7 @@ auto main(int argc, char* argv[]) -> int {
     for (auto const& each : cooked_fragments.info_fragments) {
         std::cout << "information:     " << each->key << " = " << each->value << std::endl;
     }
-    for (auto const& each : cooked_fragments.signature_fragments) {
+    for (auto const& each : cooked_fragments.extern_function_fragments) {
         std::cout << "extern function: " << each->function_name << '/' << each->arity << std::endl;
     }
     for (auto const& each : cooked_fragments.extern_block_fragments) {

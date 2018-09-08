@@ -36,7 +36,7 @@ namespace libs {
 namespace parser {
 
 enum class Fragment_type {
-    Signature_directive,
+    Extern_function,
     Extern_block,
     End_directive,
     Function_head,
@@ -69,11 +69,11 @@ class Fragment {
     Fragment(Fragment_type const);
 };
 
-struct Signature_directive : public Fragment {
+struct Extern_function : public Fragment {
     std::string const function_name;
     uint64_t const arity;
 
-    Signature_directive(std::string, uint64_t const);
+    Extern_function(std::string, uint64_t const);
 };
 
 struct Extern_block : public Fragment {
@@ -286,7 +286,7 @@ struct Cooked_closure {
 struct Cooked_fragments {
     std::string file_name;
 
-    std::vector<std::unique_ptr<Signature_directive>> signature_fragments;
+    std::vector<std::unique_ptr<Extern_function>> extern_function_fragments;
     std::vector<std::unique_ptr<Extern_block>> extern_block_fragments;
     std::vector<std::unique_ptr<Info_directive>> info_fragments;
     std::vector<std::unique_ptr<Import_directive>> import_fragments;

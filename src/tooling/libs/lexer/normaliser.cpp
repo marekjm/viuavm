@@ -44,7 +44,7 @@ using index_type = std::vector<Token>::size_type;
  *      i += normalise_fn(...);
  *
  */
-static auto normalise_function_signature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_function_extern_function(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
     using viua::tooling::libs::lexer::classifier::is_id;
@@ -86,9 +86,9 @@ static auto normalise_function_signature(std::vector<Token>& tokens, vector_view
     return ++i;
 }
 
-static auto normalise_directive_signature(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+static auto normalise_directive_extern_function(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
-    return normalise_function_signature(tokens, source.advance(1)) + 1;
+    return normalise_function_extern_function(tokens, source.advance(1)) + 1;
 }
 
 static auto normalise_directive_extern_block(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
@@ -1081,7 +1081,7 @@ static auto normalise_closure_definition(std::vector<Token>& tokens, vector_view
         });
     }
 
-    i += normalise_function_signature(tokens, vector_view{source, i});
+    i += normalise_function_extern_function(tokens, vector_view{source, i});
 
     return i;
 }
@@ -1108,7 +1108,7 @@ static auto normalise_function_definition(std::vector<Token>& tokens, vector_vie
         });
     }
 
-    i += normalise_function_signature(tokens, vector_view{source, i});
+    i += normalise_function_extern_function(tokens, vector_view{source, i});
 
     return i;
 }
@@ -1394,8 +1394,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             continue;
         }
 
-        if (token == ".signature:") {
-            i += normalise_directive_signature(tokens, vector_view{source, i});
+        if (token == ".extern_function:") {
+            i += normalise_directive_extern_function(tokens, vector_view{source, i});
         } else if (token == ".extern_block:") {
             i += normalise_directive_extern_block(tokens, vector_view{source, i});
         } else if (token == ".closure:") {
