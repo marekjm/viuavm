@@ -604,7 +604,18 @@ auto main(int argc, char* argv[]) -> int {
         }
         std::cout << std::endl;
     }
-    // FIXME list blocks
+    for (auto const& each : cooked_fragments.block_fragments) {
+        auto const& bl = *static_cast<viua::tooling::libs::parser::Block_head const*>(each.second.lines.at(0).get());
+        std::cout << "block:           " << bl.name;
+        if (not bl.attributes.empty()) {
+            std::cout << " [[";
+            for (auto const& attr : bl.attributes) {
+                std::cout << ' ' << attr;
+            }
+            std::cout << " ]]";
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
