@@ -1296,8 +1296,126 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                 }
                 break;
             } case Fragment_type::Closure_head: {
+                if (function) {
+                    // FIXME Use some better error, maybe Unended_function?
+                    auto const& fn = *static_cast<Function_head*>(function->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "function not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (closure) {
+                    // FIXME Use some better error, maybe Unended_closure?
+                    auto const& fn = *static_cast<Closure_head*>(closure->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "closure not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (block) {
+                    // FIXME Use some better error, maybe Unended_block?
+                    auto const& fn = *static_cast<Function_head*>(block->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "block not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else {
+                    closure = std::make_unique<Cooked_closure>();
+                    closure->lines.push_back(std::move(each));
+                }
                 break;
             } case Fragment_type::Block_head: {
+                if (function) {
+                    // FIXME Use some better error, maybe Unended_function?
+                    auto const& fn = *static_cast<Function_head*>(function->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "function not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (closure) {
+                    // FIXME Use some better error, maybe Unended_closure?
+                    auto const& fn = *static_cast<Closure_head*>(closure->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "closure not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 3))
+                            .add(fn.token(fn.tokens().size() - 2))
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else if (block) {
+                    // FIXME Use some better error, maybe Unended_block?
+                    auto const& fn = *static_cast<Function_head*>(block->lines.at(0).get());
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(
+                            make_unexpected_token_error(
+                                fn.token(0)
+                                , "block not ended"
+                            )
+                            .add(fn.token(fn.tokens().size() - 1))
+                        )
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , each->token(0)
+                            , "expected `.end' here:"
+                        })
+                        ;
+                } else {
+                    block = std::make_unique<Cooked_block>();
+                    block->lines.push_back(std::move(each));
+                }
                 break;
             } case Fragment_type::Instruction: {
             } case Fragment_type::Name_directive: {
