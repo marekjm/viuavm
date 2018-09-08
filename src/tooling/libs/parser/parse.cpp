@@ -442,7 +442,8 @@ static auto string_to_access_type(std::string const& s) -> viua::internals::Acce
 static auto parse_any_no_input_instruction(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto i = index_type{0};
 
-    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i).str()).value());
+    frag->add(tokens.at(i++));
 
     fragments.push_back(std::move(frag));
 
@@ -508,6 +509,10 @@ static auto parse_any_1_register_instruction(std::vector<std::unique_ptr<Fragmen
 
     i += parse_register_address(*frag, tokens.advance(1));
 
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
+
     fragments.push_back(std::move(frag));
 
     return i;
@@ -520,6 +525,10 @@ static auto parse_any_2_register_instruction(std::vector<std::unique_ptr<Fragmen
 
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
+
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
 
     fragments.push_back(std::move(frag));
 
@@ -534,6 +543,10 @@ static auto parse_any_3_register_instruction(std::vector<std::unique_ptr<Fragmen
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
+
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
 
     fragments.push_back(std::move(frag));
 
@@ -554,6 +567,10 @@ static auto parse_any_3_register_with_void_target_instruction(std::vector<std::u
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
 
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
+
     fragments.push_back(std::move(frag));
 
     return i;
@@ -568,6 +585,10 @@ static auto parse_any_4_register_instruction(std::vector<std::unique_ptr<Fragmen
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
+
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
 
     fragments.push_back(std::move(frag));
 
