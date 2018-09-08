@@ -287,7 +287,7 @@ struct Cooked_fragments {
     std::string file_name;
 
     std::vector<std::unique_ptr<Signature_directive>> signature_fragments;
-    std::vector<std::unique_ptr<Extern_block>> block_signature_fragments;
+    std::vector<std::unique_ptr<Extern_block>> extern_block_fragments;
     std::vector<std::unique_ptr<Info_directive>> info_fragments;
     std::vector<std::unique_ptr<Import_directive>> import_fragments;
 
