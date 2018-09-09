@@ -1254,7 +1254,7 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
             } case Fragment_type::Function_head: {
                 if (function) {
                     // FIXME Use some better error, maybe Unended_function?
-                    auto const& fn = *static_cast<Function_head*>(function->lines.at(0).get());
+                    auto const& fn = function->head();
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(
                             make_unexpected_token_error(
