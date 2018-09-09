@@ -34,6 +34,7 @@
 #include <viua/util/string/ops.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 #include <viua/tooling/libs/parser/parser.h>
+#include <viua/tooling/libs/static_analyser/static_analyser.h>
 
 std::string const OPTION_HELP_LONG = "--help";
 std::string const OPTION_HELP_SHORT = "-h";
@@ -615,6 +616,13 @@ auto main(int argc, char* argv[]) -> int {
             std::cout << " ]]";
         }
         std::cout << std::endl;
+    }
+
+    try {
+        viua::tooling::libs::static_analyser::analyse(cooked_fragments);
+    } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        display_error_in_context(raw_tokens, e, parsed_args.input_file);
+        exit(1);
     }
 
     return 0;
