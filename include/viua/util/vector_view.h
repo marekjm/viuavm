@@ -28,8 +28,8 @@ namespace viua { namespace util {
 template<typename T> class vector_view {
   public:
     using container_type = std::vector<T>;
-    using size_type =
-        typename std::remove_reference_t<container_type>::size_type;
+    using size_type = typename container_type::size_type;
+    using difference_type = typename container_type::difference_type;
 
   private:
     container_type const& vec;
@@ -56,7 +56,7 @@ template<typename T> class vector_view {
     }
 
     auto begin() const -> decltype(vec.begin()) {
-        return vec.begin() + offset;
+        return vec.begin() + static_cast<difference_type>(offset);
     }
     auto end() const -> decltype(vec.end()) {
         return vec.end();
