@@ -1256,14 +1256,12 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                     // FIXME Use some better error, maybe Unended_function?
                     auto const& fn = function->head();
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
-                        .append(
-                            make_unexpected_token_error(
-                                fn.token(0)
-                                , "function not ended"
-                            )
-                            .add(fn.token(fn.tokens().size() - 3))
-                            .add(fn.token(fn.tokens().size() - 2))
-                            .add(fn.token(fn.tokens().size() - 1))
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                            , fn.token(fn.tokens().size() - 3)
+                            , "function not ended"
+                        }.add(fn.token(fn.tokens().size() - 2))
+                        .add(fn.token(fn.tokens().size() - 1))
                         )
                         .append(viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
@@ -1277,10 +1275,9 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(
                             make_unexpected_token_error(
-                                fn.token(0)
+                                fn.token(fn.tokens().size() - 3)
                                 , "closure not ended"
                             )
-                            .add(fn.token(fn.tokens().size() - 3))
                             .add(fn.token(fn.tokens().size() - 2))
                             .add(fn.token(fn.tokens().size() - 1))
                         )
@@ -1296,10 +1293,9 @@ auto cook(std::string file_name, std::vector<std::unique_ptr<Fragment>> fragment
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(
                             make_unexpected_token_error(
-                                fn.token(0)
+                                fn.token(fn.tokens().size() - 1)
                                 , "block not ended"
                             )
-                            .add(fn.token(fn.tokens().size() - 1))
                         )
                         .append(viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
