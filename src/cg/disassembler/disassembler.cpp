@@ -100,6 +100,9 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::PARAMETERS:
             oss << "parameters";
             break;
+        case viua::internals::Register_sets::CLOSURE_LOCAL:
+            oss << "closure_local";
+            break;
         default:
             if (viua::support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES")
                 == "yes") {
@@ -131,6 +134,9 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         case viua::internals::Register_sets::PARAMETERS:
             oss << "parameters";
             break;
+        case viua::internals::Register_sets::CLOSURE_LOCAL:
+            oss << "closure_local";
+            break;
         default:
             throw "invalid register set detected";
         }
@@ -156,6 +162,9 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             break;
         case viua::internals::Register_sets::PARAMETERS:
             oss << "parameters";
+            break;
+        case viua::internals::Register_sets::CLOSURE_LOCAL:
+            oss << "closure_local";
             break;
         default:
             throw "invalid register set detected";
