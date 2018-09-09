@@ -35,6 +35,7 @@ enum class Compile_time_error {
     Unexpected_token,
     Unexpected_newline,
     Invalid_access_type_specifier,
+    Must_allocate_registers_first,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
