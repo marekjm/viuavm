@@ -1190,7 +1190,7 @@ auto Cooked_function::head() const -> Function_head const& {
 auto Cooked_function::body() const -> std::vector<Fragment const*> {
     auto v = std::vector<Fragment const*>{};
 
-    for (auto each = lines.begin() + 1; each != lines.end() - 1; ++each) {
+    for (auto each = lines.begin() + 1; each != lines.end(); ++each) {
         v.push_back(each->get());
     }
 
