@@ -270,6 +270,9 @@ struct Instruction : public Fragment {
 struct Cooked_function {
     std::vector<std::unique_ptr<Fragment>> lines;
 
+    auto head() const -> Function_head const&;
+    auto body() const -> std::vector<Fragment const*>;
+
     Cooked_function() = default;
     Cooked_function(Cooked_function const&) = delete;
     Cooked_function(Cooked_function&&) = delete;

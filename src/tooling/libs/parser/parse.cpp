@@ -1180,6 +1180,20 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
     return fragments;
 }
 
+auto Cooked_function::head() const -> Function_head const& {
+    return *static_cast<Function_head*>(lines.at(0).get());
+}
+
+auto Cooked_function::body() const -> std::vector<Fragment const*> {
+    auto v = std::vector<Fragment const*>{};
+
+    for (auto each = lines.begin() + 1; each != lines.end() - 1; ++each) {
+        v.push_back(each->get());
+    }
+
+    return v;
+}
+
 Cooked_fragments::Cooked_fragments(std::string f_n):
     file_name{std::move(f_n)}
 {}
