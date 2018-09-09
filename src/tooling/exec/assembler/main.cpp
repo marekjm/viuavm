@@ -201,7 +201,7 @@ static auto display_error_header(
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::send_escape_seq;
 
-    if (not error.str().empty()) {
+    if (not error.empty()) {
         o << send_escape_seq(COLOR_FG_WHITE) << filename << send_escape_seq(ATTR_RESET);
         o << ':';
         o << send_escape_seq(COLOR_FG_WHITE) << error.line() + 1 << send_escape_seq(ATTR_RESET);

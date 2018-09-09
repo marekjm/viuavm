@@ -28,6 +28,7 @@ namespace errors {
 namespace compile_time {
 enum class Compile_time_error {
     Unknown_error,
+    Empty_error,
     Unknown_option,
     No_input_file,
     Not_a_file,

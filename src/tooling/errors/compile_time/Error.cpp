@@ -109,7 +109,15 @@ auto Error::str() const -> std::string {
     return message;
 }
 auto Error::what() const -> std::string {
-    return viua::tooling::errors::compile_time::display_error(cause) + ": " + message;
+    if (auto s = viua::tooling::errors::compile_time::display_error(cause); s.empty()) {
+        return message;
+    } else {
+        return s + (message.empty() ? "" : (": " + message));
+    }
+}
+
+auto Error::empty() const -> bool {
+    return (cause == Compile_time_error::Empty_error) and message.empty();
 }
 }
 }

@@ -32,6 +32,7 @@ namespace compile_time {
 
 std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Unknown_error, "unknown error" },
+    { Compile_time_error::Empty_error, "" },
     { Compile_time_error::Unknown_option, "unknown option" },
     { Compile_time_error::No_input_file, "no input file" },
     { Compile_time_error::Not_a_file, "not a file" },
@@ -41,6 +42,10 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {
+    if (error_code == Compile_time_error::Empty_error) {
+        return "";
+    }
+
     using viua::util::string::escape_sequences::COLOR_FG_RED;
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::send_escape_seq;

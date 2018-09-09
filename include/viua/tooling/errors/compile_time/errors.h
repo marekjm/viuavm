@@ -66,6 +66,8 @@ class Error {
     auto what() const -> std::string;
     auto error_type() const -> Compile_time_error;
 
+    auto empty() const -> bool;
+
     Error(Compile_time_error const, viua::tooling::libs::lexer::Token, std::string = "");
 };
 
