@@ -22,6 +22,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace viua { namespace util {
 template<typename T> class vector_view {
