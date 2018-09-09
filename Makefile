@@ -826,6 +826,7 @@ build/tooling/exec/assembler.bin: \
 	build/tooling/libs/lexer/classifier.o \
 	build/tooling/libs/lexer/normaliser.o \
 	build/tooling/libs/parser/parse.o \
+	build/tooling/libs/static_analyser/static_analyser.o \
 	build/tooling/errors/compile_time/Error.o \
 	build/tooling/errors/compile_time/Error_wrapper.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
