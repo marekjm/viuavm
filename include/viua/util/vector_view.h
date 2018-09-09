@@ -55,6 +55,13 @@ template<typename T> class vector_view {
         return vector_view<T>{vec, offset + n};
     }
 
+    auto begin() const -> decltype(vec.begin()) {
+        return vec.begin() + offset;
+    }
+    auto end() const -> decltype(vec.end()) {
+        return vec.end();
+    }
+
     vector_view(container_type const& v, size_type const o)
             : vec{v}, offset{o} {
         check_offset();
