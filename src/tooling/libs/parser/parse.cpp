@@ -272,13 +272,16 @@ auto parse_function_head(std::vector<std::unique_ptr<Fragment>>& fragments, vect
         , std::stoull(tokens.at(i + 2).str())   // arity
         , std::move(attributes)
     );
-    for (auto j = index_type{0}; j < (i + 2); ++j) {
+    for (auto j = index_type{0}; j < i; ++j) {
         frag->add(tokens.at(j));
     }
+    frag->add(tokens.at(i++));  // name
+    frag->add(tokens.at(i++));  // arity separator (/)
+    frag->add(tokens.at(i++));  // arity
 
     fragments.push_back(std::move(frag));
 
-    return i + 3;
+    return i;
 }
 
 static auto parse_block_head(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
