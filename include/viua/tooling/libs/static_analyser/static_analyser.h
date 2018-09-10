@@ -42,6 +42,9 @@ struct Analyser_state {
     std::set<std::string> functions_called;
 };
 
+class Function_state {
+};
+
 auto analyse(viua::tooling::libs::parser::Cooked_fragments const&) -> void;
 
 }}}}

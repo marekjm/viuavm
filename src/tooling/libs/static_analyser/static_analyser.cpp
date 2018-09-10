@@ -40,6 +40,8 @@ static auto analyse_single_function(
                 , l.token(0)
             }.note("the first instruction of every function must be `allocate_registers'"));
     }
+
+    auto function_state[[maybe_unused]] = Function_state{};
 }
 
 static auto analyse_functions(
