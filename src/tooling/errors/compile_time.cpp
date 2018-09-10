@@ -42,6 +42,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Must_allocate_registers_first, "must allocate registers first" },
     { Compile_time_error::Iota_outside_of_allocated_range, "iota creates address outside of allocated range" },
     { Compile_time_error::Register_index_outside_of_allocated_range, "register index creates address outside of allocated range" },
+    { Compile_time_error::Renaming_already_named_register, "renaming already named register" }
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

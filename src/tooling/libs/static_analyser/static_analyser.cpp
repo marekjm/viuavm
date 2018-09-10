@@ -46,6 +46,22 @@ auto Function_state::rename_register(
             .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error"))
             ;
     }
+    if (register_renames.count(index)) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Renaming_already_named_register
+                , directive.token(2)
+            }.add(directive.token(1))
+            .aside("previous name was `" + register_index_to_name.at(index) + "'")
+            )
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , register_renames.at(index).token(1)
+            }
+            .add(register_renames.at(index).token(2))
+            .note("register " + std::to_string(index) + " already named here"))
+            ;
+    }
 
     register_renames.emplace(index, directive);
     register_name_to_index[name] = index;
