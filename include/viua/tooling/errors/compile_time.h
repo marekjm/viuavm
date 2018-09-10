@@ -36,6 +36,7 @@ enum class Compile_time_error {
     Unexpected_newline,
     Invalid_access_type_specifier,
     Must_allocate_registers_first,
+    Iota_outside_of_allocated_range,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

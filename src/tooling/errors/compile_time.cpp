@@ -40,6 +40,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Unexpected_newline, "unexpected newline" },
     { Compile_time_error::Invalid_access_type_specifier, "invalid access type specifier" },
     { Compile_time_error::Must_allocate_registers_first, "must allocate registers first" },
+    { Compile_time_error::Iota_outside_of_allocated_range, "iota creates address outside of allocated range" },
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {
