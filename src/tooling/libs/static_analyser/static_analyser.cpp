@@ -105,6 +105,26 @@ static auto analyse_single_function(
         )->index
         , body.at(0)->tokens()
     };
+
+    using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
+    for (auto i = body_size_type{1}; i < body.size(); ++i) {
+        auto const line = body.at(i);
+        if (line->type() == Fragment_type::Name_directive) {
+            using viua::tooling::libs::parser::Name_directive;
+            auto const& directive = *static_cast<Name_directive const*>(line);
+            auto const index = (
+                directive.iota
+                ? function_state.iota(directive.token(1))
+                : directive.register_index
+            );
+
+            function_state.rename_register(
+                index
+                , directive.name
+                , directive
+            );
+        }
+    }
 }
 
 static auto analyse_functions(
