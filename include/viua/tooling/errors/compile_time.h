@@ -39,6 +39,7 @@ enum class Compile_time_error {
     Iota_outside_of_allocated_range,
     Register_index_outside_of_allocated_range,
     Renaming_already_named_register,
+    Reusing_register_name,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

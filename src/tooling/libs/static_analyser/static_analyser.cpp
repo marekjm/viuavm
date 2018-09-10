@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
 
@@ -46,7 +47,7 @@ auto Function_state::rename_register(
             .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error"))
             ;
     }
-    if (register_renames.count(index)) {
+    if (register_index_to_name.count(index)) {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Renaming_already_named_register
@@ -60,6 +61,22 @@ auto Function_state::rename_register(
             }
             .add(register_renames.at(index).token(2))
             .note("register " + std::to_string(index) + " already named here"))
+            ;
+    }
+    if (register_name_to_index.count(name)) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Reusing_register_name
+                , directive.token(2)
+            }.add(directive.token(1))
+            .aside("previous index was " + std::to_string(register_name_to_index.at(name)))
+            )
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , register_renames.at(register_name_to_index.at(name)).token(1)
+            }
+            .add(register_renames.at(register_name_to_index.at(name)).token(2))
+            .note("name `" + name + "' already used here"))
             ;
     }
 
