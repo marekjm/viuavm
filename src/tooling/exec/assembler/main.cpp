@@ -435,7 +435,7 @@ static auto display_error_location(
     auto const context_lines = size_t{2};
     auto const context_before = ((error.line() >= context_lines) ? (error.line() - context_lines) : 0);
     auto const context_after = (error.line() + context_lines);
-    auto const line_no_width = std::to_string(context_after).size();
+    auto const line_no_width = std::to_string(context_after + 1).size();
 
     auto lines_displayed = std::set<Token::Position_type>{};
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{0}; i < tokens.size(); ++i) {
