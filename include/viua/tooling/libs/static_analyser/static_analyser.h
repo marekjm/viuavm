@@ -46,7 +46,24 @@ class Function_state {
     viua::internals::types::register_index const local_registers_allocated = 0;
     std::vector<viua::tooling::libs::lexer::Token> local_registers_allocated_where;
 
+    std::map<viua::internals::types::register_index, viua::tooling::libs::parser::Name_directive>
+        register_renames;
+    std::map<std::string, viua::internals::types::register_index>
+        register_name_to_index;
+    std::map<viua::internals::types::register_index, std::string>
+        register_index_to_name;
+
+    viua::internals::types::register_index iota_value = 1;
+
   public:
+    auto rename_register(
+        viua::internals::types::register_index const
+        , std::string
+        , viua::tooling::libs::parser::Name_directive
+    ) -> void;
+
+    auto iota(viua::tooling::libs::lexer::Token) -> viua::internals::types::register_index;
+
     Function_state(
             viua::internals::types::register_index const
             , std::vector<viua::tooling::libs::lexer::Token>

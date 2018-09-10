@@ -25,6 +25,54 @@ namespace tooling {
 namespace libs {
 namespace static_analyser {
 
+auto Function_state::rename_register(
+    viua::internals::types::register_index const index
+    , std::string name
+    , viua::tooling::libs::parser::Name_directive directive
+) -> void {
+    if (index >= local_registers_allocated) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Register_index_outside_of_allocated_range
+                , directive.token(1)
+                , std::to_string(iota_value)
+            })
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , local_registers_allocated_where.at(2)
+            }
+            .add(local_registers_allocated_where.at(0))
+            .note(std::to_string(local_registers_allocated) + " local register(s) allocated here")
+            .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error"))
+            ;
+    }
+
+    register_renames.emplace(index, directive);
+    register_name_to_index[name] = index;
+    register_index_to_name[index] = name;
+}
+
+auto Function_state::iota(viua::tooling::libs::lexer::Token token) -> viua::internals::types::register_index {
+    if (iota_value >= local_registers_allocated) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Iota_outside_of_allocated_range
+                , token
+                , std::to_string(iota_value)
+            })
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , local_registers_allocated_where.at(2)
+            }
+            .add(local_registers_allocated_where.at(0))
+            .note(std::to_string(local_registers_allocated) + " local register(s) allocated here")
+            .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error"))
+            ;
+    }
+
+    return iota_value++;
+}
+
 Function_state::Function_state(
     viua::internals::types::register_index const limit
     , std::vector<viua::tooling::libs::lexer::Token> location
