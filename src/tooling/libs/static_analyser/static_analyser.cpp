@@ -25,6 +25,14 @@ namespace tooling {
 namespace libs {
 namespace static_analyser {
 
+Function_state::Function_state(
+    viua::internals::types::register_index const limit
+    , std::vector<viua::tooling::libs::lexer::Token> location
+):
+    local_registers_allocated{limit}
+    , local_registers_allocated_where{std::move(location)}
+{}
+
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const&
@@ -41,7 +49,14 @@ static auto analyse_single_function(
             }.note("the first instruction of every function must be `allocate_registers'"));
     }
 
-    auto function_state[[maybe_unused]] = Function_state{};
+    auto const& body = fn.body();
+    using viua::tooling::libs::parser::Register_address;
+    auto function_state[[maybe_unused]] = Function_state{
+        static_cast<Register_address const*>(
+            static_cast<Instruction const*>(body.at(0))->operands.at(0).get()
+        )->index
+        , body.at(0)->tokens()
+    };
 }
 
 static auto analyse_functions(

@@ -43,6 +43,14 @@ struct Analyser_state {
 };
 
 class Function_state {
+    viua::internals::types::register_index const local_registers_allocated = 0;
+    std::vector<viua::tooling::libs::lexer::Token> local_registers_allocated_where;
+
+  public:
+    Function_state(
+            viua::internals::types::register_index const
+            , std::vector<viua::tooling::libs::lexer::Token>
+    );
 };
 
 auto analyse(viua::tooling::libs::parser::Cooked_fragments const&) -> void;
