@@ -36,6 +36,20 @@ auto Value::type() const -> Value_type {
 }
 
 Integer::Integer(): Value{Value_type::Integer} {}
+
+Vector::Vector(std::unique_ptr<Value> v):
+    Value{Value_type::Vector}
+    , contained_type{std::move(v)}
+{}
+
+auto Vector::of() const -> std::unique_ptr<Value> const& {
+    return contained_type;
+}
+auto Vector::of(std::unique_ptr<Value> v) -> void {
+    contained_type = std::move(v);
+}
+
+String::String(): Value{Value_type::String} {}
 }
 
 auto Function_state::rename_register(

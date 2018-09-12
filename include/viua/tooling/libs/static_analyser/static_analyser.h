@@ -45,6 +45,8 @@ struct Analyser_state {
 namespace values {
     enum class Value_type {
         Integer,
+        Vector,
+        String,
     };
 
     class Value {
@@ -58,6 +60,20 @@ namespace values {
     class Integer : public Value {
       public:
         Integer();
+    };
+
+    class Vector : public Value {
+        std::unique_ptr<Value> contained_type;
+      public:
+        auto of() const -> std::unique_ptr<Value> const&;
+        auto of(std::unique_ptr<Value>) -> void;
+
+        Vector(std::unique_ptr<Value>);
+    };
+
+    class String : public Value {
+      public:
+        String();
     };
 }
 
