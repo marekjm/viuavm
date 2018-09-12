@@ -187,6 +187,38 @@ static auto analyse_single_function(
         , body.at(0)->tokens()
     };
 
+    if (fn.head().function_name == "main") {
+        if (fn.head().arity == 0) {
+            // no arguments passed
+        } else if (fn.head().arity == 1) {
+            function_state.define_register(
+                0
+                , viua::internals::Register_sets::PARAMETERS
+                , std::make_unique<values::Vector>(
+                    std::make_unique<values::String>()
+                )
+                , fn.head().tokens()
+            );
+        } else if (fn.head().arity == 2) {
+            function_state.define_register(
+                0
+                , viua::internals::Register_sets::PARAMETERS
+                , std::make_unique<values::String>()
+                , fn.head().tokens()
+            );
+            function_state.define_register(
+                1
+                , viua::internals::Register_sets::PARAMETERS
+                , std::make_unique<values::Vector>(
+                    std::make_unique<values::String>()
+                )
+                , fn.head().tokens()
+            );
+        } else {
+            // FIXME arity not supported
+        }
+    }
+
     using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
     for (auto i = body_size_type{1}; i < body.size(); ++i) {
         auto const line = body.at(i);
