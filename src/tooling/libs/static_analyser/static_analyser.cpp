@@ -26,6 +26,18 @@ namespace tooling {
 namespace libs {
 namespace static_analyser {
 
+namespace values {
+Value::Value(Value_type const t):
+    type_of_value{t}
+{}
+
+auto Value::type() const -> Value_type {
+    return type_of_value;
+}
+
+Integer::Integer(): Value{Value_type::Integer} {}
+}
+
 auto Function_state::rename_register(
     viua::internals::types::register_index const index
     , std::string name

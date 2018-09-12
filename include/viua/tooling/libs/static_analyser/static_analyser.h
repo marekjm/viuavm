@@ -42,6 +42,25 @@ struct Analyser_state {
     std::set<std::string> functions_called;
 };
 
+namespace values {
+    enum class Value_type {
+        Integer,
+    };
+
+    class Value {
+            Value_type const type_of_value;
+      public:
+            auto type() const -> Value_type;
+
+            Value(Value_type const);
+    };
+
+    class Integer : public Value {
+      public:
+        Integer();
+    };
+}
+
 class Function_state {
     viua::internals::types::register_index const local_registers_allocated = 0;
     std::vector<viua::tooling::libs::lexer::Token> local_registers_allocated_where;
