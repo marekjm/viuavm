@@ -118,6 +118,28 @@ auto Function_state::iota(viua::tooling::libs::lexer::Token token) -> viua::inte
     return iota_value++;
 }
 
+auto Function_state::define_register(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+    , std::unique_ptr<values::Value> value
+    , std::vector<viua::tooling::libs::lexer::Token> location
+) -> void {
+    auto const address = std::make_pair(index, register_set);
+    defined_registers.emplace(address, std::move(value));
+    defined_where.emplace(address, std::move(location));
+}
+
+auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address const& address)
+    -> viua::internals::types::register_index {
+    if (address.iota) {
+        return iota(address.tokens().at(1));
+    }
+    if (address.name) {
+        return register_name_to_index.at(address.tokens().at(1).str());
+    }
+    return address.index;
+}
+
 Function_state::Function_state(
     viua::internals::types::register_index const limit
     , std::vector<viua::tooling::libs::lexer::Token> location
@@ -169,6 +191,31 @@ static auto analyse_single_function(
                 , directive
             );
         }
+
+        if (line->type() == Fragment_type::Instruction) {
+            auto const& instruction = *static_cast<Instruction const*>(line);
+
+            if (instruction.opcode == INTEGER) {
+                auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+
+                std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                using viua::tooling::libs::parser::Integer_literal;
+                function_state.define_register(
+                    function_state.resolve_index(dest)
+                    , dest.register_set
+                    , std::make_unique<values::Integer>(
+                        /* static_cast<Integer_literal const*>(instruction.operands.at(1).get())->n */
+                    )
+                    , std::move(defining_tokens)
+                );
+            }
+        }
+
+        function_state.dump(std::cout);
     }
 }
 

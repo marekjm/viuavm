@@ -74,6 +74,11 @@ class Function_state {
 
     viua::internals::types::register_index iota_value = 1;
 
+    using Register_address_type =
+        std::pair<viua::internals::types::register_index, viua::internals::Register_sets>;
+    std::map<Register_address_type, std::unique_ptr<values::Value>> defined_registers;
+    std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> defined_where;
+
   public:
     auto rename_register(
         viua::internals::types::register_index const
@@ -81,7 +86,17 @@ class Function_state {
         , viua::tooling::libs::parser::Name_directive
     ) -> void;
 
+    auto define_register(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , std::unique_ptr<values::Value>
+        , std::vector<viua::tooling::libs::lexer::Token>
+    ) -> void;
+
     auto iota(viua::tooling::libs::lexer::Token) -> viua::internals::types::register_index;
+
+    auto resolve_index(viua::tooling::libs::parser::Register_address const&)
+        -> viua::internals::types::register_index;
 
     Function_state(
             viua::internals::types::register_index const
