@@ -157,12 +157,13 @@ enum class Operand_type {
 };
 
 class Operand {
-    std::vector<viua::tooling::libs::lexer::Token> tokens;
+    std::vector<viua::tooling::libs::lexer::Token> operand_tokens;
     Operand_type const operand_type;
 
   public:
     auto type() const -> Operand_type;
     auto add(viua::tooling::libs::lexer::Token) -> void;
+    auto tokens() const -> decltype(operand_tokens) const&;
 
     Operand(Operand_type const);
 };

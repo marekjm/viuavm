@@ -121,7 +121,11 @@ auto Operand::type() const -> Operand_type {
 }
 
 auto Operand::add(viua::tooling::libs::lexer::Token t) -> void {
-    tokens.push_back(t);
+    operand_tokens.push_back(t);
+}
+
+auto Operand::tokens() const -> decltype(operand_tokens) const& {
+    return operand_tokens;
 }
 
 Operand::Operand(Operand_type const o):
