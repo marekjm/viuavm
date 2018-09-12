@@ -481,6 +481,10 @@ static auto parse_register_address(Instruction& instruction, vector_view<viua::t
 
     instruction.operands.push_back(std::move(operand));
 
+    instruction.add(tokens.at(0));
+    instruction.add(tokens.at(1));
+    instruction.add(tokens.at(2));
+
     return 3;
 }
 
@@ -513,6 +517,7 @@ static auto parse_any_1_register_instruction(std::vector<std::unique_ptr<Fragmen
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     i += parse_register_address(*frag, tokens.advance(1));
 
@@ -606,12 +611,15 @@ static auto parse_op_integer(std::vector<std::unique_ptr<Fragment>>& fragments, 
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     i += parse_register_address(*frag, tokens.advance(1));
 
     auto lit = std::make_unique<Integer_literal>(std::stoll(tokens.at(i).str()));
-    lit->add(tokens.at(i++));
+    lit->add(tokens.at(i));
+
     frag->operands.push_back(std::move(lit));
+    frag->add(tokens.at(i++));
 
     fragments.push_back(std::move(frag));
 
