@@ -534,6 +534,7 @@ static auto parse_any_2_register_instruction(std::vector<std::unique_ptr<Fragmen
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
@@ -551,6 +552,7 @@ static auto parse_any_3_register_instruction(std::vector<std::unique_ptr<Fragmen
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
@@ -569,6 +571,7 @@ static auto parse_any_3_register_with_void_target_instruction(std::vector<std::u
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
@@ -592,6 +595,7 @@ static auto parse_any_4_register_instruction(std::vector<std::unique_ptr<Fragmen
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     i += parse_register_address(*frag, tokens.advance(i));
     i += parse_register_address(*frag, tokens.advance(i));
