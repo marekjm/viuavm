@@ -40,6 +40,7 @@ enum class Compile_time_error {
     Register_index_outside_of_allocated_range,
     Renaming_already_named_register,
     Reusing_register_name,
+    Access_to_empty_register,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
