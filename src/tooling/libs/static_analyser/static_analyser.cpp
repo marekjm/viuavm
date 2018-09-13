@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <string>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
@@ -187,6 +188,50 @@ auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address
     return address.index;
 }
 
+static auto to_string(viua::internals::Register_sets const rs) -> std::string {
+    using viua::internals::Register_sets;
+    switch (rs) {
+        case Register_sets::GLOBAL:
+            return "global";
+        case Register_sets::LOCAL:
+            return "local";
+        case Register_sets::STATIC:
+            return "static";
+        case Register_sets::ARGUMENTS:
+            return "arguments";
+        case Register_sets::PARAMETERS:
+            return "parameters";
+        case Register_sets::CLOSURE_LOCAL:
+            return "closure_local";
+        default:
+            return "<unknown>";
+    }
+}
+
+static auto to_string(values::Value const& value) -> std::string {
+    switch (value.type()) {
+        case values::Value_type::Integer:
+            return "integer";
+        case values::Value_type::Vector:
+            return "vector of " + to_string(*static_cast<values::Vector const&>(value).of());
+        case values::Value_type::String:
+            return "string";
+        default:
+            return "value";
+    }
+}
+
+auto Function_state::dump(std::ostream& o) const -> void {
+    o << "  local registers allocated: " << local_registers_allocated << std::endl;
+    for (auto const& each : register_index_to_name) {
+        std::cout << "  register " << each.first << " named `" << each.second << "'" << std::endl;
+    }
+    for (auto const& each : defined_registers) {
+        std::cout << "  " << to_string(each.first.second) << " register " << each.first.first << ": contains "
+            << to_string(each.second.value()) << std::endl;
+    }
+}
+
 Function_state::Function_state(
     viua::internals::types::register_index const limit
     , std::vector<viua::tooling::libs::lexer::Token> location
@@ -219,6 +264,10 @@ static auto analyse_single_function(
         )->index
         , body.at(0)->tokens()
     };
+
+    std::cout << "analyse_single_function(): " << fn.head().function_name;
+    std::cout << " (" << fn.body().size() << " lines)";
+    std::cout << std::endl;
 
     if (fn.head().function_name == "main") {
         if (fn.head().arity == 0) {
@@ -255,6 +304,9 @@ static auto analyse_single_function(
     using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
     for (auto i = body_size_type{1}; i < body.size(); ++i) {
         auto const line = body.at(i);
+
+        std::cout << "analysing: " << line->token(0).str() << std::endl;
+
         if (line->type() == Fragment_type::Name_directive) {
             using viua::tooling::libs::parser::Name_directive;
             auto const& directive = *static_cast<Name_directive const*>(line);

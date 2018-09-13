@@ -147,6 +147,8 @@ class Function_state {
     auto resolve_index(viua::tooling::libs::parser::Register_address const&)
         -> viua::internals::types::register_index;
 
+    auto dump(std::ostream&) const -> void;
+
     Function_state(
             viua::internals::types::register_index const
             , std::vector<viua::tooling::libs::lexer::Token>
