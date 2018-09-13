@@ -78,6 +78,29 @@ namespace values {
 }
 
 class Function_state {
+  public:
+    class Value_wrapper {
+      public:
+        using map_type = std::vector<std::unique_ptr<values::Value>>;
+        using index_type = map_type::size_type;
+
+      private:
+        index_type const i;
+        map_type const& values;
+
+      public:
+        auto value() const -> values::Value&;
+
+        Value_wrapper(index_type const, map_type const&);
+        Value_wrapper(Value_wrapper const&);
+        Value_wrapper(Value_wrapper&&) = delete;
+        auto operator=(Value_wrapper const&) -> Value_wrapper& = delete;
+        auto operator=(Value_wrapper&&) -> Value_wrapper& = delete;
+    };
+
+    auto make_wrapper(std::unique_ptr<values::Value>) -> Value_wrapper;
+
+  private:
     viua::internals::types::register_index const local_registers_allocated = 0;
     std::vector<viua::tooling::libs::lexer::Token> local_registers_allocated_where;
 
@@ -90,9 +113,11 @@ class Function_state {
 
     viua::internals::types::register_index iota_value = 1;
 
+    std::vector<std::unique_ptr<values::Value>> assigned_values;
+
     using Register_address_type =
         std::pair<viua::internals::types::register_index, viua::internals::Register_sets>;
-    std::map<Register_address_type, std::unique_ptr<values::Value>> defined_registers;
+    std::map<Register_address_type, Value_wrapper> defined_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> defined_where;
 
   public:
@@ -105,7 +130,7 @@ class Function_state {
     auto define_register(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
-        , std::unique_ptr<values::Value>
+        , Value_wrapper
         , std::vector<viua::tooling::libs::lexer::Token>
     ) -> void;
     auto defined(

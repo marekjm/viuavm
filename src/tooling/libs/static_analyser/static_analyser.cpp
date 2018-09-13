@@ -52,6 +52,25 @@ auto Vector::of(std::unique_ptr<Value> v) -> void {
 String::String(): Value{Value_type::String} {}
 }
 
+Function_state::Value_wrapper::Value_wrapper(index_type const v, map_type const& m):
+    i{v}
+    , values{m}
+{}
+
+Function_state::Value_wrapper::Value_wrapper(Value_wrapper const& that):
+    i{that.i}
+    , values{that.values}
+{}
+
+auto Function_state::Value_wrapper::Value_wrapper::value() const -> values::Value& {
+    return *values.at(i);
+}
+
+auto Function_state::make_wrapper(std::unique_ptr<values::Value> v) -> Value_wrapper {
+    assigned_values.push_back(std::move(v));
+    return Value_wrapper{assigned_values.size() - 1, assigned_values};
+}
+
 auto Function_state::rename_register(
     viua::internals::types::register_index const index
     , std::string name
@@ -135,11 +154,11 @@ auto Function_state::iota(viua::tooling::libs::lexer::Token token) -> viua::inte
 auto Function_state::define_register(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set
-    , std::unique_ptr<values::Value> value
+    , Value_wrapper value
     , std::vector<viua::tooling::libs::lexer::Token> location
 ) -> void {
     auto const address = std::make_pair(index, register_set);
-    defined_registers.emplace(address, std::move(value));
+    defined_registers.emplace(address, value);
     defined_where.emplace(address, std::move(location));
 }
 
@@ -201,24 +220,24 @@ static auto analyse_single_function(
             function_state.define_register(
                 0
                 , viua::internals::Register_sets::PARAMETERS
-                , std::make_unique<values::Vector>(
+                , function_state.make_wrapper(std::make_unique<values::Vector>(
                     std::make_unique<values::String>()
-                )
+                ))
                 , fn.head().tokens()
             );
         } else if (fn.head().arity == 2) {
             function_state.define_register(
                 0
                 , viua::internals::Register_sets::PARAMETERS
-                , std::make_unique<values::String>()
+                , function_state.make_wrapper(std::make_unique<values::String>())
                 , fn.head().tokens()
             );
             function_state.define_register(
                 1
                 , viua::internals::Register_sets::PARAMETERS
-                , std::make_unique<values::Vector>(
+                , function_state.make_wrapper(std::make_unique<values::Vector>(
                     std::make_unique<values::String>()
-                )
+                ))
                 , fn.head().tokens()
             );
         } else {
@@ -260,9 +279,9 @@ static auto analyse_single_function(
                 function_state.define_register(
                     function_state.resolve_index(dest)
                     , dest.register_set
-                    , std::make_unique<values::Integer>(
+                    , function_state.make_wrapper(std::make_unique<values::Integer>(
                         /* static_cast<Integer_literal const*>(instruction.operands.at(1).get())->n */
-                    )
+                    ))
                     , std::move(defining_tokens)
                 );
             }
