@@ -137,6 +137,10 @@ class Function_state {
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
     ) const -> bool;
+    auto type_of(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> Value_wrapper;
 
     auto iota(viua::tooling::libs::lexer::Token) -> viua::internals::types::register_index;
 

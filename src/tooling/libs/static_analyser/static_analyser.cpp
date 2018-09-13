@@ -169,6 +169,13 @@ auto Function_state::defined(
     return defined_registers.count(std::make_pair(index, register_set));
 }
 
+auto Function_state::type_of(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> Value_wrapper {
+    return defined_registers.at(std::make_pair(index, register_set));
+}
+
 auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address const& address)
     -> viua::internals::types::register_index {
     if (address.iota) {
@@ -282,6 +289,31 @@ static auto analyse_single_function(
                     , function_state.make_wrapper(std::make_unique<values::Integer>(
                         /* static_cast<Integer_literal const*>(instruction.operands.at(1).get())->n */
                     ))
+                    , std::move(defining_tokens)
+                );
+            } else if (instruction.opcode == MOVE) {
+                auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
+
+                auto const source_index = function_state.resolve_index(source);
+                if (not function_state.defined(source_index, source.register_set)) {
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                            , source.tokens().at(1)
+                        });
+                }
+
+                auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+                std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                auto const dest_index = function_state.resolve_index(dest);
+                function_state.define_register(
+                    dest_index
+                    , dest.register_set
+                    , function_state.type_of(source_index, source.register_set)
                     , std::move(defining_tokens)
                 );
             }
