@@ -143,6 +143,13 @@ auto Function_state::define_register(
     defined_where.emplace(address, std::move(location));
 }
 
+auto Function_state::defined(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> bool {
+    return defined_registers.count(std::make_pair(index, register_set));
+}
+
 auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address const& address)
     -> viua::internals::types::register_index {
     if (address.iota) {

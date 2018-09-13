@@ -108,6 +108,10 @@ class Function_state {
         , std::unique_ptr<values::Value>
         , std::vector<viua::tooling::libs::lexer::Token>
     ) -> void;
+    auto defined(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> bool;
 
     auto iota(viua::tooling::libs::lexer::Token) -> viua::internals::types::register_index;
 
