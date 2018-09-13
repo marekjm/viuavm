@@ -258,7 +258,7 @@ static auto analyse_single_function(
 
     auto const& body = fn.body();
     using viua::tooling::libs::parser::Register_address;
-    auto function_state[[maybe_unused]] = Function_state{
+    auto function_state = Function_state{
         static_cast<Register_address const*>(
             static_cast<Instruction const*>(body.at(0))->operands.at(0).get()
         )->index
