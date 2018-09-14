@@ -119,6 +119,8 @@ class Function_state {
         std::pair<viua::internals::types::register_index, viua::internals::Register_sets>;
     std::map<Register_address_type, Value_wrapper> defined_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> defined_where;
+    std::map<Register_address_type, Value_wrapper> erased_registers;
+    std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> erased_where;
 
   public:
     auto rename_register(
@@ -141,6 +143,19 @@ class Function_state {
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
     ) const -> Value_wrapper;
+    auto erase_register(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , std::vector<viua::tooling::libs::lexer::Token>
+    ) -> void;
+    auto erased(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> bool;
+    auto erased_at(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> std::vector<viua::tooling::libs::lexer::Token> const&;
 
     auto iota(viua::tooling::libs::lexer::Token) -> viua::internals::types::register_index;
 

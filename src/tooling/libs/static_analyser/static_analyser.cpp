@@ -177,6 +177,31 @@ auto Function_state::type_of(
     return defined_registers.at(std::make_pair(index, register_set));
 }
 
+auto Function_state::erase_register(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+    , std::vector<viua::tooling::libs::lexer::Token> location
+) -> void {
+    auto const address = std::make_pair(index, register_set);
+    erased_registers.emplace(address, defined_registers.at(address));
+    defined_registers.erase(defined_registers.find(address));
+    erased_where.emplace(address, std::move(location));
+}
+
+auto Function_state::erased(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> bool {
+    return erased_registers.count(std::make_pair(index, register_set));
+}
+
+auto Function_state::erased_at(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> std::vector<viua::tooling::libs::lexer::Token> const& {
+    return erased_where.at(std::make_pair(index, register_set));
+}
+
 auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address const& address)
     -> viua::internals::types::register_index {
     if (address.iota) {
