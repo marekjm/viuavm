@@ -373,11 +373,24 @@ static auto analyse_single_function(
 
                 auto const source_index = function_state.resolve_index(source);
                 if (not function_state.defined(source_index, source.register_set)) {
-                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
                             , source.tokens().at(1)
-                        });
+                        }.add(source.tokens().at(2)));
+                    if (function_state.erased(source_index, source.register_set)) {
+                        auto const& erased_location =
+                            function_state.erased_at(source_index, source.register_set);
+                        auto partial = viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , erased_location.at(0)
+                        }.note("erased here");
+                        for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                            partial.add(*each);
+                        }
+                        error.append(partial);
+                    }
+                    throw error;
                 }
 
                 auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
@@ -392,6 +405,16 @@ static auto analyse_single_function(
                     , dest.register_set
                     , function_state.type_of(source_index, source.register_set)
                     , std::move(defining_tokens)
+                );
+                function_state.erase_register(
+                    source_index
+                    , source.register_set
+                    , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                        auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                        tokens.push_back(instruction.tokens().at(0));
+                        std::copy(source.tokens().begin(), source.tokens().end(), std::back_inserter(tokens));
+                        return tokens;
+                    }()
                 );
             }
         }
