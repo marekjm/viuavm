@@ -51,6 +51,8 @@ auto Vector::of(std::unique_ptr<Value> v) -> void {
 }
 
 String::String(): Value{Value_type::String} {}
+
+Text::Text(): Value{Value_type::Text} {}
 }
 
 Function_state::Value_wrapper::Value_wrapper(index_type const v, map_type const& m):
@@ -241,6 +243,8 @@ static auto to_string(values::Value const& value) -> std::string {
             return "vector of " + to_string(*static_cast<values::Vector const&>(value).of());
         case values::Value_type::String:
             return "string";
+        case values::Value_type::Text:
+            return "text";
         default:
             return "value";
     }

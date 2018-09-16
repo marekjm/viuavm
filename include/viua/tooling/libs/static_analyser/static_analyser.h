@@ -37,6 +37,7 @@ namespace values {
         Integer,
         Vector,
         String,
+        Text,
     };
 
     class Value {
@@ -64,6 +65,11 @@ namespace values {
     class String : public Value {
       public:
         String();
+    };
+
+    class Text : public Value {
+      public:
+        Text();
     };
 }
 
