@@ -41,6 +41,7 @@ enum class Compile_time_error {
     Renaming_already_named_register,
     Reusing_register_name,
     Access_to_empty_register,
+    Type_mismatch,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

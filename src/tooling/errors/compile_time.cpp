@@ -45,6 +45,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Renaming_already_named_register, "renaming already named register" },
     { Compile_time_error::Reusing_register_name, "reusing register name" },
     { Compile_time_error::Access_to_empty_register, "accessing empty register" },
+    { Compile_time_error::Type_mismatch, "mismatched types" },
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {
