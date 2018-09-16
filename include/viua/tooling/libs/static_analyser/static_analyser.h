@@ -145,6 +145,10 @@ class Function_state {
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
     ) const -> bool;
+    auto defined_at(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> std::vector<viua::tooling::libs::lexer::Token> const&;
     auto type_of(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const

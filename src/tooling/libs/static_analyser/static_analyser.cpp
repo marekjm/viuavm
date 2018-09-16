@@ -208,6 +208,13 @@ auto Function_state::defined(
     return defined_registers.count(std::make_pair(index, register_set));
 }
 
+auto Function_state::defined_at(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> std::vector<viua::tooling::libs::lexer::Token> const& {
+    return defined_where.at(std::make_pair(index, register_set));
+}
+
 auto Function_state::type_of(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set
