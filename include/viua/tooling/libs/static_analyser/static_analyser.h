@@ -28,16 +28,6 @@ namespace tooling {
 namespace libs {
 namespace static_analyser {
 
-/* struct Register_index { */
-/* }; */
-
-/* struct Register_information { */
-/* }; */
-
-/* struct Register_usage { */
-/*     std::map<Register_index, Register_information> current_state; */
-/* }; */
-
 struct Analyser_state {
     std::set<std::string> functions_called;
 };
