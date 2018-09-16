@@ -291,14 +291,39 @@ static auto to_string(values::Value const& value) -> std::string {
         case values::Value_type::Integer:
             return "integer";
         case values::Value_type::Vector:
-            return "vector of " + to_string(*static_cast<values::Vector const&>(value).of());
+            return "vector of " + to_string(static_cast<values::Vector const&>(value).of().value());
         case values::Value_type::String:
             return "string";
         case values::Value_type::Text:
             return "text";
+        case values::Value_type::Pointer:
+            return "pointer to " + to_string(static_cast<values::Pointer const&>(value).of().value());
         default:
             return "value";
     }
+}
+
+static auto to_string(
+    std::vector<values::Value_type> const& value
+    , std::vector<values::Value_type>::size_type const i
+) -> std::string {
+    switch (value.at(i)) {
+        case values::Value_type::Integer:
+            return "integer";
+        case values::Value_type::Vector:
+            return "vector of " + to_string(value, i + 1);
+        case values::Value_type::String:
+            return "string";
+        case values::Value_type::Text:
+            return "text";
+        case values::Value_type::Pointer:
+            return "pointer to " + to_string(value, i + 1);
+        default:
+            return "value";
+    }
+}
+static auto to_string(std::vector<values::Value_type> const& value) -> std::string {
+    return to_string(value, 0);
 }
 
 auto Function_state::dump(std::ostream& o) const -> void {
