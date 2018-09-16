@@ -382,7 +382,7 @@ static auto analyse_single_function(
                 0
                 , viua::internals::Register_sets::PARAMETERS
                 , function_state.make_wrapper(std::make_unique<values::Vector>(
-                    std::make_unique<values::String>()
+                    function_state.make_wrapper(std::make_unique<values::String>())
                 ))
                 , fn.head().tokens()
             );
@@ -397,7 +397,7 @@ static auto analyse_single_function(
                 1
                 , viua::internals::Register_sets::PARAMETERS
                 , function_state.make_wrapper(std::make_unique<values::Vector>(
-                    std::make_unique<values::String>()
+                    function_state.make_wrapper(std::make_unique<values::String>())
                 ))
                 , fn.head().tokens()
             );
