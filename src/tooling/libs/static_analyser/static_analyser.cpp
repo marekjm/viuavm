@@ -38,19 +38,19 @@ auto Value::type() const -> Value_type {
 
 Integer::Integer(): Value{Value_type::Integer} {}
 
-Vector::Vector(std::unique_ptr<Value> v):
+Vector::Vector(Value_wrapper v):
     Value{Value_type::Vector}
-    , contained_type{std::move(v)}
+    , contained_type{v}
 {}
 
-auto Vector::of() const -> std::unique_ptr<Value> const& {
+auto Vector::of() const -> Value_wrapper const& {
     return contained_type;
 }
-auto Vector::of(std::unique_ptr<Value> v) -> void {
-    contained_type = std::move(v);
+auto Vector::of(Value_wrapper v) -> void {
+    contained_type = v;
 }
 
-Pointer::Pointer(std::unique_ptr<Value> v):
+Pointer::Pointer(Value_wrapper v):
     Value{Value_type::Pointer}
     , contained_type{v}
 {}
@@ -58,32 +58,56 @@ Pointer::Pointer(std::unique_ptr<Value> v):
 auto Pointer::of() const -> Value_wrapper const& {
     return contained_type;
 }
-auto Pointer::of(std::unique_ptr<Value> v) -> void {
-    contained_type = std::move(v);
+auto Pointer::of(Value_wrapper v) -> void {
+    contained_type = v;
 }
 
 String::String(): Value{Value_type::String} {}
 
 Text::Text(): Value{Value_type::Text} {}
-}
 
-Function_state::Value_wrapper::Value_wrapper(index_type const v, map_type const& m):
+Value_wrapper::Value_wrapper(index_type const v, map_type const& m):
     i{v}
-    , values{m}
+    , values{&m}
 {}
 
-Function_state::Value_wrapper::Value_wrapper(Value_wrapper const& that):
+Value_wrapper::Value_wrapper(Value_wrapper const& that):
     i{that.i}
     , values{that.values}
 {}
 
-auto Function_state::Value_wrapper::Value_wrapper::value() const -> values::Value& {
-    return *values.at(i);
+auto Value_wrapper::operator=(Value_wrapper const& that) -> Value_wrapper& {
+    i = that.i;
+    values = that.values;
+    return *this;
 }
 
-auto Function_state::make_wrapper(std::unique_ptr<values::Value> v) -> Value_wrapper {
+Value_wrapper::~Value_wrapper() {}
+
+auto Value_wrapper::Value_wrapper::value() const -> Value& {
+    return *(values->at(i));
+}
+
+auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
+    auto wrappers = std::vector<Value_wrapper const*>{ this };
+
+    while (wrappers.back()->value().type() == Value_type::Vector) {
+        wrappers.push_back(&static_cast<Vector const&>(wrappers.back()->value()).of());
+    }
+
+    auto simple = std::vector<Value_type>{};
+
+    for (auto const each : wrappers) {
+        simple.push_back(each->value().type());
+    }
+
+    return simple;
+}
+}
+
+auto Function_state::make_wrapper(std::unique_ptr<values::Value> v) -> values::Value_wrapper {
     assigned_values.push_back(std::move(v));
-    return Value_wrapper{assigned_values.size() - 1, assigned_values};
+    return values::Value_wrapper{assigned_values.size() - 1, assigned_values};
 }
 
 auto Function_state::rename_register(
@@ -169,7 +193,7 @@ auto Function_state::iota(viua::tooling::libs::lexer::Token token) -> viua::inte
 auto Function_state::define_register(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set
-    , Value_wrapper value
+    , values::Value_wrapper value
     , std::vector<viua::tooling::libs::lexer::Token> location
 ) -> void {
     auto const address = std::make_pair(index, register_set);
@@ -187,7 +211,7 @@ auto Function_state::defined(
 auto Function_state::type_of(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set
-) const -> Value_wrapper {
+) const -> values::Value_wrapper {
     return defined_registers.at(std::make_pair(index, register_set));
 }
 

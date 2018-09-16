@@ -49,18 +49,39 @@ namespace values {
         Value(Value_type const);
     };
 
+    class Value_wrapper {
+      public:
+        using map_type = std::vector<std::unique_ptr<values::Value>>;
+        using index_type = map_type::size_type;
+
+      private:
+        index_type i;
+        map_type const* values;
+
+      public:
+        auto value() const -> values::Value&;
+        virtual auto to_simple() const -> std::vector<values::Value_type>;
+
+        Value_wrapper(index_type const, map_type const&);
+        Value_wrapper(Value_wrapper const&);
+        Value_wrapper(Value_wrapper&&) = default;
+        auto operator=(Value_wrapper const&) -> Value_wrapper&;
+        auto operator=(Value_wrapper&&) -> Value_wrapper& = delete;
+        virtual ~Value_wrapper();
+    };
+
     class Integer : public Value {
       public:
         Integer();
     };
 
     class Vector : public Value {
-        std::unique_ptr<Value> contained_type;
+        Value_wrapper contained_type;
       public:
-        auto of() const -> std::unique_ptr<Value> const&;
-        auto of(std::unique_ptr<Value>) -> void;
+        auto of() const -> Value_wrapper const&;
+        auto of(Value_wrapper) -> void;
 
-        Vector(std::unique_ptr<Value>);
+        Vector(Value_wrapper);
     };
 
     class String : public Value {
@@ -84,29 +105,6 @@ namespace values {
 }
 
 class Function_state {
-  public:
-    class Value_wrapper {
-      public:
-        using map_type = std::vector<std::unique_ptr<values::Value>>;
-        using index_type = map_type::size_type;
-
-      private:
-        index_type const i;
-        map_type const& values;
-
-      public:
-        auto value() const -> values::Value&;
-
-        Value_wrapper(index_type const, map_type const&);
-        Value_wrapper(Value_wrapper const&);
-        Value_wrapper(Value_wrapper&&) = delete;
-        auto operator=(Value_wrapper const&) -> Value_wrapper& = delete;
-        auto operator=(Value_wrapper&&) -> Value_wrapper& = delete;
-    };
-
-    auto make_wrapper(std::unique_ptr<values::Value>) -> Value_wrapper;
-
-  private:
     viua::internals::types::register_index const local_registers_allocated = 0;
     std::vector<viua::tooling::libs::lexer::Token> local_registers_allocated_where;
 
@@ -123,12 +121,14 @@ class Function_state {
 
     using Register_address_type =
         std::pair<viua::internals::types::register_index, viua::internals::Register_sets>;
-    std::map<Register_address_type, Value_wrapper> defined_registers;
+    std::map<Register_address_type, values::Value_wrapper> defined_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> defined_where;
-    std::map<Register_address_type, Value_wrapper> erased_registers;
+    std::map<Register_address_type, values::Value_wrapper> erased_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> erased_where;
 
   public:
+    auto make_wrapper(std::unique_ptr<values::Value>) -> values::Value_wrapper;
+
     auto rename_register(
         viua::internals::types::register_index const
         , std::string
@@ -138,7 +138,7 @@ class Function_state {
     auto define_register(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
-        , Value_wrapper
+        , values::Value_wrapper
         , std::vector<viua::tooling::libs::lexer::Token>
     ) -> void;
     auto defined(
@@ -148,7 +148,7 @@ class Function_state {
     auto type_of(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
-    ) const -> Value_wrapper;
+    ) const -> values::Value_wrapper;
     auto erase_register(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
