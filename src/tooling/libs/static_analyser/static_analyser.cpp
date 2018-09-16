@@ -258,6 +258,14 @@ auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address
     return address.index;
 }
 
+auto Function_state::type_matches(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+    , std::vector<values::Value_type> const type_signature
+) const -> bool {
+    return type_of(index, register_set).to_simple() == type_signature;
+}
+
 static auto to_string(viua::internals::Register_sets const rs) -> std::string {
     using viua::internals::Register_sets;
     switch (rs) {

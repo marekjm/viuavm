@@ -172,6 +172,12 @@ class Function_state {
     auto resolve_index(viua::tooling::libs::parser::Register_address const&)
         -> viua::internals::types::register_index;
 
+    auto type_matches(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , std::vector<values::Value_type> const
+    ) const -> bool;
+
     auto dump(std::ostream&) const -> void;
 
     Function_state(
