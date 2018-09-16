@@ -42,11 +42,11 @@ namespace values {
     };
 
     class Value {
-            Value_type const type_of_value;
+        Value_type const type_of_value;
       public:
-            auto type() const -> Value_type;
+        auto type() const -> Value_type;
 
-            Value(Value_type const);
+        Value(Value_type const);
     };
 
     class Integer : public Value {
