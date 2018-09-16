@@ -38,6 +38,7 @@ namespace values {
         Vector,
         String,
         Text,
+        Pointer,
     };
 
     class Value {
@@ -70,6 +71,15 @@ namespace values {
     class Text : public Value {
       public:
         Text();
+    };
+
+    class Pointer : public Value {
+        Value_wrapper contained_type;
+      public:
+        auto of() const -> Value_wrapper const&;
+        auto of(Value_wrapper) -> void;
+
+        Pointer(Value_wrapper);
     };
 }
 

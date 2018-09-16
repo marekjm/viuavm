@@ -50,6 +50,18 @@ auto Vector::of(std::unique_ptr<Value> v) -> void {
     contained_type = std::move(v);
 }
 
+Pointer::Pointer(std::unique_ptr<Value> v):
+    Value{Value_type::Pointer}
+    , contained_type{v}
+{}
+
+auto Pointer::of() const -> Value_wrapper const& {
+    return contained_type;
+}
+auto Pointer::of(std::unique_ptr<Value> v) -> void {
+    contained_type = std::move(v);
+}
+
 String::String(): Value{Value_type::String} {}
 
 Text::Text(): Value{Value_type::Text} {}
