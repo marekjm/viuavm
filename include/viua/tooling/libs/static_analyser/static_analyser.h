@@ -34,6 +34,7 @@ struct Analyser_state {
 
 namespace values {
     enum class Value_type {
+        Value,
         Integer,
         Vector,
         String,
