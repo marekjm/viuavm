@@ -57,17 +57,18 @@ namespace values {
 
       private:
         index_type i;
-        map_type const* values;
+        map_type* values;
 
       public:
         auto value() const -> values::Value&;
+        auto value(std::unique_ptr<values::Value>) -> void;
         virtual auto to_simple() const -> std::vector<values::Value_type>;
 
-        Value_wrapper(index_type const, map_type const&);
+        Value_wrapper(index_type const, map_type&);
         Value_wrapper(Value_wrapper const&);
         Value_wrapper(Value_wrapper&&) = default;
         auto operator=(Value_wrapper const&) -> Value_wrapper&;
-        auto operator=(Value_wrapper&&) -> Value_wrapper& = delete;
+        auto operator=(Value_wrapper&&) -> Value_wrapper&;
         virtual ~Value_wrapper();
     };
 

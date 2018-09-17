@@ -66,7 +66,7 @@ String::String(): Value{Value_type::String} {}
 
 Text::Text(): Value{Value_type::Text} {}
 
-Value_wrapper::Value_wrapper(index_type const v, map_type const& m):
+Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}
 {}
@@ -81,11 +81,20 @@ auto Value_wrapper::operator=(Value_wrapper const& that) -> Value_wrapper& {
     values = that.values;
     return *this;
 }
+auto Value_wrapper::operator=(Value_wrapper&& that) -> Value_wrapper& {
+    i = that.i;
+    values = that.values;
+    return *this;
+}
 
 Value_wrapper::~Value_wrapper() {}
 
 auto Value_wrapper::Value_wrapper::value() const -> Value& {
     return *(values->at(i));
+}
+
+auto Value_wrapper::Value_wrapper::value(std::unique_ptr<Value> v) -> void {
+    values->at(i) = std::move(v);
 }
 
 auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
