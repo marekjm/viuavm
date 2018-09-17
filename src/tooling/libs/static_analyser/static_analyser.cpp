@@ -672,6 +672,58 @@ static auto analyse_single_function(
                     , function_state.make_wrapper(std::make_unique<values::Text>())
                     , std::move(defining_tokens)
                 );
+            } else if (instruction.opcode == IINC) {
+                auto const& target = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                auto const target_index = function_state.resolve_index(target);
+                if (not function_state.defined(target_index, target.register_set)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                            , target.tokens().at(1)
+                        }.add(target.tokens().at(2)));
+                    if (function_state.erased(target_index, target.register_set)) {
+                        auto const& erased_location =
+                            function_state.erased_at(target_index, target.register_set);
+                        auto partial = viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , erased_location.at(0)
+                        }.note("erased here");
+                        for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                            partial.add(*each);
+                        }
+                        error.append(partial);
+                    }
+                    throw error;
+                }
+
+                auto const target_access = target.access;
+                auto const target_type_signature =
+                    (target_access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
+                    ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Integer }
+                    : std::vector<values::Value_type>{ values::Value_type::Integer }
+                ;
+                if (not function_state.assume_type(target_index, target.register_set, target_type_signature)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                            , target.tokens().at(0)
+                            , "expected `" + to_string(target_type_signature) + "'..."
+                        }.add(target.tokens().at(0)));
+
+                    auto const& definition_location = function_state.defined_at(
+                        target_index
+                        , target.register_set
+                    );
+                    error.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                        , definition_location.at(0)
+                        , ("...got `"
+                           + to_string(function_state.type_of(target_index, target.register_set).to_simple())
+                           + "'")
+                    }.note("defined here"));
+                    throw error;
+                }
             }
         }
 
