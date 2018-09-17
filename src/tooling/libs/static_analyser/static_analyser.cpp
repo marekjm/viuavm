@@ -380,8 +380,6 @@ auto Function_state::assume_type(
             return true;
         }
         if (wrapper.value().type() != type_signature.at(i)) {
-            std::cout << "wtf: " << to_string(wrapper.value().type()) << " != "
-                << to_string(type_signature.at(i)) << std::endl;
             return false;
         }
         if (wrapper.value().type() == Value_type::Vector) {
