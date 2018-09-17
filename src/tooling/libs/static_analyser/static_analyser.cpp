@@ -38,6 +38,8 @@ auto Value::type() const -> Value_type {
 
 Integer::Integer(): Value{Value_type::Integer} {}
 
+Float::Float(): Value{Value_type::Float} {}
+
 Vector::Vector(Value_wrapper v):
     Value{Value_type::Vector}
     , contained_type{v}
@@ -145,6 +147,8 @@ static auto to_string(values::Value const& value) -> std::string {
             return "value";
         case values::Value_type::Integer:
             return "integer";
+        case values::Value_type::Float:
+            return "float";
         case values::Value_type::Vector:
             return "vector of " + to_string(static_cast<values::Vector const&>(value).of().value());
         case values::Value_type::String:
@@ -167,6 +171,8 @@ static auto to_string(
             return "value";
         case values::Value_type::Integer:
             return "integer";
+        case values::Value_type::Float:
+            return "float";
         case values::Value_type::Vector:
             return "vector of " + to_string(value, i + 1);
         case values::Value_type::String:
@@ -186,6 +192,8 @@ static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string
     switch (v) {
         case values::Value_type::Integer:
             return "integer";
+        case values::Value_type::Float:
+            return "float";
         case values::Value_type::Vector:
             return "vector of ...";
         case values::Value_type::String:
@@ -402,6 +410,9 @@ auto Function_state::assume_type(
         switch (type_signature.at(i)) {
             case Value_type::Integer:
                 wrapper.value(std::make_unique<values::Integer>());
+                break;
+            case Value_type::Float:
+                wrapper.value(std::make_unique<values::Float>());
                 break;
             case Value_type::Vector:
                 break;

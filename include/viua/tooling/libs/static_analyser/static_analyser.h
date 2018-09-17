@@ -36,6 +36,7 @@ namespace values {
     enum class Value_type {
         Value,
         Integer,
+        Float,
         Vector,
         String,
         Text,
@@ -75,6 +76,11 @@ namespace values {
     class Integer : public Value {
       public:
         Integer();
+    };
+
+    class Float : public Value {
+      public:
+        Float();
     };
 
     class Vector : public Value {
