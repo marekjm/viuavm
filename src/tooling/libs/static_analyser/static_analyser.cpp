@@ -590,7 +590,6 @@ static auto analyse_single_function(
                     }()
                 );
             } else if (instruction.opcode == VAT) {
-                /* auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get()); */
                 auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
                 auto const& index = *static_cast<Register_address const*>(instruction.operands.at(2).get());
 
