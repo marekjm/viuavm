@@ -117,6 +117,87 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
 
     return simple;
 }
+} // namespace values
+
+static auto to_string(viua::internals::Register_sets const rs) -> std::string {
+    using viua::internals::Register_sets;
+    switch (rs) {
+        case Register_sets::GLOBAL:
+            return "global";
+        case Register_sets::LOCAL:
+            return "local";
+        case Register_sets::STATIC:
+            return "static";
+        case Register_sets::ARGUMENTS:
+            return "arguments";
+        case Register_sets::PARAMETERS:
+            return "parameters";
+        case Register_sets::CLOSURE_LOCAL:
+            return "closure_local";
+        default:
+            return "<unknown>";
+    }
+}
+
+static auto to_string(values::Value const& value) -> std::string {
+    switch (value.type()) {
+        case values::Value_type::Value:
+            return "value";
+        case values::Value_type::Integer:
+            return "integer";
+        case values::Value_type::Vector:
+            return "vector of " + to_string(static_cast<values::Vector const&>(value).of().value());
+        case values::Value_type::String:
+            return "string";
+        case values::Value_type::Text:
+            return "text";
+        case values::Value_type::Pointer:
+            return "pointer to " + to_string(static_cast<values::Pointer const&>(value).of().value());
+        default:
+            return "value";
+    }
+}
+
+static auto to_string(
+    std::vector<values::Value_type> const& value
+    , std::vector<values::Value_type>::size_type const i
+) -> std::string {
+    switch (value.at(i)) {
+        case values::Value_type::Value:
+            return "value";
+        case values::Value_type::Integer:
+            return "integer";
+        case values::Value_type::Vector:
+            return "vector of " + to_string(value, i + 1);
+        case values::Value_type::String:
+            return "string";
+        case values::Value_type::Text:
+            return "text";
+        case values::Value_type::Pointer:
+            return "pointer to " + to_string(value, i + 1);
+        default:
+            return "value";
+    }
+}
+static auto to_string(std::vector<values::Value_type> const& value) -> std::string {
+    return to_string(value, 0);
+}
+static auto to_string(values::Value_type const v) -> std::string {
+    switch (v) {
+        case values::Value_type::Integer:
+            return "integer";
+        case values::Value_type::Vector:
+            return "vector of ...";
+        case values::Value_type::String:
+            return "string";
+        case values::Value_type::Text:
+            return "text";
+        case values::Value_type::Pointer:
+            return "pointer to ...";
+        case values::Value_type::Value:
+        default:
+            return "value";
+    }
 }
 
 auto Function_state::make_wrapper(std::unique_ptr<values::Value> v) -> values::Value_wrapper {
@@ -280,65 +361,6 @@ auto Function_state::type_matches(
     return type_of(index, register_set).to_simple() == type_signature;
 }
 
-static auto to_string(viua::internals::Register_sets const rs) -> std::string {
-    using viua::internals::Register_sets;
-    switch (rs) {
-        case Register_sets::GLOBAL:
-            return "global";
-        case Register_sets::LOCAL:
-            return "local";
-        case Register_sets::STATIC:
-            return "static";
-        case Register_sets::ARGUMENTS:
-            return "arguments";
-        case Register_sets::PARAMETERS:
-            return "parameters";
-        case Register_sets::CLOSURE_LOCAL:
-            return "closure_local";
-        default:
-            return "<unknown>";
-    }
-}
-
-static auto to_string(values::Value const& value) -> std::string {
-    switch (value.type()) {
-        case values::Value_type::Integer:
-            return "integer";
-        case values::Value_type::Vector:
-            return "vector of " + to_string(static_cast<values::Vector const&>(value).of().value());
-        case values::Value_type::String:
-            return "string";
-        case values::Value_type::Text:
-            return "text";
-        case values::Value_type::Pointer:
-            return "pointer to " + to_string(static_cast<values::Pointer const&>(value).of().value());
-        default:
-            return "value";
-    }
-}
-
-static auto to_string(
-    std::vector<values::Value_type> const& value
-    , std::vector<values::Value_type>::size_type const i
-) -> std::string {
-    switch (value.at(i)) {
-        case values::Value_type::Integer:
-            return "integer";
-        case values::Value_type::Vector:
-            return "vector of " + to_string(value, i + 1);
-        case values::Value_type::String:
-            return "string";
-        case values::Value_type::Text:
-            return "text";
-        case values::Value_type::Pointer:
-            return "pointer to " + to_string(value, i + 1);
-        default:
-            return "value";
-    }
-}
-static auto to_string(std::vector<values::Value_type> const& value) -> std::string {
-    return to_string(value, 0);
-}
 
 auto Function_state::dump(std::ostream& o) const -> void {
     o << "  local registers allocated: " << local_registers_allocated << std::endl;
