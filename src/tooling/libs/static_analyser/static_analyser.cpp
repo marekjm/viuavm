@@ -100,8 +100,13 @@ auto Value_wrapper::Value_wrapper::value(std::unique_ptr<Value> v) -> void {
 auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
     auto wrappers = std::vector<Value_wrapper const*>{ this };
 
-    while (wrappers.back()->value().type() == Value_type::Vector) {
-        wrappers.push_back(&static_cast<Vector const&>(wrappers.back()->value()).of());
+    while ((wrappers.back()->value().type() == Value_type::Vector)
+           or (wrappers.back()->value().type() == Value_type::Pointer)) {
+        if (wrappers.back()->value().type() == Value_type::Vector) {
+            wrappers.push_back(&static_cast<Vector const&>(wrappers.back()->value()).of());
+        } else {
+            wrappers.push_back(&static_cast<Pointer const&>(wrappers.back()->value()).of());
+        }
     }
 
     auto simple = std::vector<Value_type>{};
