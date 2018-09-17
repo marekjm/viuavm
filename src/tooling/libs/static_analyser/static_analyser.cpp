@@ -727,7 +727,7 @@ static auto analyse_single_function(
                     , function_state.make_wrapper(std::make_unique<values::Text>())
                     , std::move(defining_tokens)
                 );
-            } else if (instruction.opcode == IINC) {
+            } else if (instruction.opcode == IINC or instruction.opcode == IDEC) {
                 auto const& target = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
                 auto const target_index = function_state.resolve_index(target);
