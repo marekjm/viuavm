@@ -361,6 +361,63 @@ auto Function_state::type_matches(
     return type_of(index, register_set).to_simple() == type_signature;
 }
 
+auto Function_state::assume_type(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+    , std::vector<values::Value_type> const type_signature
+) -> bool {
+    values::Value_wrapper wrapper = type_of(index, register_set);
+
+    using values::Value_type;
+
+    if ((wrapper.value().type() != Value_type::Vector) and (wrapper.value().type() != Value_type::Pointer)) {
+        return wrapper.value().type() == type_signature.at(0);
+    }
+
+    auto i = decltype(type_signature)::size_type{0};
+    while ((wrapper.value().type() != Value_type::Value) and (i < type_signature.size())) {
+        if (wrapper.value().type() != type_signature.at(i)) {
+            std::cout << "wtf: " << to_string(wrapper.value().type()) << " != "
+                << to_string(type_signature.at(i)) << std::endl;
+            return false;
+        }
+        if (wrapper.value().type() == Value_type::Vector) {
+            wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
+        } else if (wrapper.value().type() == Value_type::Pointer) {
+            wrapper = static_cast<values::Pointer const&>(wrapper.value()).of();
+        }
+        ++i;
+    }
+
+    if (i == type_signature.size()) {
+        return true;
+    }
+
+    if ((i < type_signature.size()) and (wrapper.value().type() != Value_type::Value)) {
+        return false;
+    }
+
+    for (;i < type_signature.size(); ++i) {
+        switch (type_signature.at(i)) {
+            case Value_type::Integer:
+                wrapper.value(std::make_unique<values::Integer>());
+                break;
+            case Value_type::Vector:
+                break;
+            case Value_type::String:
+                break;
+            case Value_type::Text:
+                break;
+            case Value_type::Pointer:
+                break;
+            case Value_type::Value:
+            default:
+                return true;
+        }
+    }
+
+    return true;
+}
 
 auto Function_state::dump(std::ostream& o) const -> void {
     o << "  local registers allocated: " << local_registers_allocated << std::endl;

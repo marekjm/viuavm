@@ -179,6 +179,11 @@ class Function_state {
         , viua::internals::Register_sets const
         , std::vector<values::Value_type> const
     ) const -> bool;
+    auto assume_type(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , std::vector<values::Value_type> const
+    ) -> bool;
 
     auto dump(std::ostream&) const -> void;
 
