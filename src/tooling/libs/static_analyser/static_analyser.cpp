@@ -616,6 +616,32 @@ static auto analyse_single_function(
                     throw error;
                 }
 
+                auto const source_type_signature = std::vector<values::Value_type>{
+                    values::Value_type::Vector
+                    , values::Value_type::Value
+                };
+                if (not function_state.assume_type(source_index, source.register_set, source_type_signature)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                            , source.tokens().at(1)
+                            , "expected `" + to_string(source_type_signature) + "'..."
+                        }.add(source.tokens().at(2)));
+
+                    auto const& definition_location = function_state.defined_at(
+                        source_index
+                        , source.register_set
+                    );
+                    error.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                        , definition_location.at(0)
+                        , ("...got `"
+                           + to_string(function_state.type_of(source_index, source.register_set).to_simple())
+                           + "'")
+                    }.note("defined here"));
+                    throw error;
+                }
+
                 auto const index_index = function_state.resolve_index(index);
                 auto const index_type_signature = std::vector<values::Value_type>{
                     values::Value_type::Integer
