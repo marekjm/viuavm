@@ -182,7 +182,7 @@ static auto to_string(
 static auto to_string(std::vector<values::Value_type> const& value) -> std::string {
     return to_string(value, 0);
 }
-static auto to_string(values::Value_type const v) -> std::string {
+static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string {
     switch (v) {
         case values::Value_type::Integer:
             return "integer";
