@@ -355,10 +355,31 @@ auto Function_state::resolve_index(viua::tooling::libs::parser::Register_address
     if (address.iota) {
         return iota(address.tokens().at(1));
     }
-    if (address.name) {
-        return register_name_to_index.at(address.tokens().at(1).str());
+
+    auto const index = (address.name
+        ? register_name_to_index.at(address.tokens().at(1).str())
+        : address.index
+    );
+
+    if (index >= local_registers_allocated) {
+        // FIXME inside ::iota() there is exactly the same code
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Register_index_outside_of_allocated_range
+                , address.tokens().at(1)
+                , std::to_string(index)
+            })
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , local_registers_allocated_where.at(2)
+            }
+            .add(local_registers_allocated_where.at(0))
+            .note(std::to_string(local_registers_allocated) + " local register(s) allocated here")
+            .aside("increase this value to " + std::to_string(index + 1) + " to fix this error"))
+            ;
     }
-    return address.index;
+
+    return index;
 }
 
 auto Function_state::type_matches(
