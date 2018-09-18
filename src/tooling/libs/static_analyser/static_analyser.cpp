@@ -556,7 +556,9 @@ static auto analyse_single_function(
         if (line->type() == Fragment_type::Instruction) {
             auto const& instruction = *static_cast<Instruction const*>(line);
 
-            if (instruction.opcode == INTEGER) {
+            if (instruction.opcode == NOP) {
+                // do nothing
+            } else if (instruction.opcode == INTEGER) {
                 auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
                 auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
