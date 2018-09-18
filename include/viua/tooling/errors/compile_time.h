@@ -42,6 +42,7 @@ enum class Compile_time_error {
     Reusing_register_name,
     Access_to_empty_register,
     Type_mismatch,
+    Empty_function_body,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

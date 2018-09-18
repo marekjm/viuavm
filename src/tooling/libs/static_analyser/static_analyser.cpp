@@ -455,6 +455,22 @@ static auto analyse_single_function(
     , viua::tooling::libs::parser::Cooked_fragments const&
     , Analyser_state&
 ) -> void {
+    if (fn.body().size() == 0) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_function_body
+                , fn.head().token(fn.head().tokens().size() - 3)
+                , "of " + fn.head().function_name
+            })
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , fn.head().token(fn.head().tokens().size() - 3)
+            }.note("a function body must be composed of at least two instructions:")
+             .comment("    allocate_registers %0 local")
+             .comment("    return")
+            );
+    }
+
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
     if (auto const& l = *fn.body().at(0); not (l.type() == Fragment_type::Instruction
