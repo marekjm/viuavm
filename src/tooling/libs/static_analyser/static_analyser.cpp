@@ -415,6 +415,10 @@ auto Function_state::assume_type(
                 wrapper.value(std::make_unique<values::Float>());
                 break;
             case Value_type::Vector:
+                wrapper.value(std::make_unique<values::Vector>(
+                    make_wrapper(std::make_unique<values::Value>(Value_type::Value))
+                ));
+                wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
                 break;
             case Value_type::String:
                 break;
