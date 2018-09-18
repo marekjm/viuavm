@@ -558,6 +558,22 @@ static auto analyse_single_function(
 
             if (instruction.opcode == NOP) {
                 // do nothing
+            } else if (instruction.opcode == IZERO) {
+                auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+
+                std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                function_state.define_register(
+                    function_state.resolve_index(dest)
+                    , dest.register_set
+                    , function_state.make_wrapper(std::make_unique<values::Integer>(
+                        /* 0 */ // FIXME save the value in the integer
+                    ))
+                    , std::move(defining_tokens)
+                );
             } else if (instruction.opcode == INTEGER) {
                 auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
