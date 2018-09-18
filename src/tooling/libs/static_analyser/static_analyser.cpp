@@ -629,6 +629,119 @@ static auto analyse_single_function(
                     ))
                     , std::move(defining_tokens)
                 );
+            } else if (instruction.opcode == ADD or instruction.opcode == SUB
+                       or instruction.opcode == MUL or instruction.opcode == DIV) {
+                auto const& lhs = *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                auto const& rhs = *static_cast<Register_address const*>(instruction.operands.at(2).get());
+
+                auto const lhs_index = function_state.resolve_index(lhs);
+                if (not function_state.defined(lhs_index, lhs.register_set)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                            , lhs.tokens().at(1)
+                        }.add(lhs.tokens().at(2)));
+                    if (function_state.erased(lhs_index, lhs.register_set)) {
+                        auto const& erased_location =
+                            function_state.erased_at(lhs_index, lhs.register_set);
+                        auto partial = viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , erased_location.at(0)
+                        }.note("erased here");
+                        for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                            partial.add(*each);
+                        }
+                        error.append(partial);
+                    }
+                    throw error;
+                }
+                auto const lhs_type_signature =
+                    (lhs.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
+                    ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Integer }
+                    : std::vector<values::Value_type>{ values::Value_type::Integer }
+                ;
+                if (not function_state.assume_type(lhs_index, lhs.register_set, lhs_type_signature)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                            , lhs.tokens().at(0)
+                            , "expected `" + to_string(lhs_type_signature) + "'..."
+                        }.add(lhs.tokens().at(0)));
+
+                    auto const& definition_location = function_state.defined_at(
+                        lhs_index
+                        , lhs.register_set
+                    );
+                    error.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                        , definition_location.at(0)
+                        , ("...got `"
+                           + to_string(function_state.type_of(lhs_index, lhs.register_set).to_simple())
+                           + "'")
+                    }.note("defined here"));
+                    throw error;
+                }
+
+                auto const rhs_index = function_state.resolve_index(rhs);
+                if (not function_state.defined(rhs_index, rhs.register_set)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                            , rhs.tokens().at(1)
+                        }.add(rhs.tokens().at(2)));
+                    if (function_state.erased(rhs_index, rhs.register_set)) {
+                        auto const& erased_location =
+                            function_state.erased_at(rhs_index, rhs.register_set);
+                        auto partial = viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , erased_location.at(0)
+                        }.note("erased here");
+                        for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                            partial.add(*each);
+                        }
+                        error.append(partial);
+                    }
+                    throw error;
+                }
+                auto const rhs_type_signature =
+                    (rhs.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
+                    ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Integer }
+                    : std::vector<values::Value_type>{ values::Value_type::Integer }
+                ;
+                if (not function_state.assume_type(rhs_index, rhs.register_set, rhs_type_signature)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                            , rhs.tokens().at(0)
+                            , "expected `" + to_string(rhs_type_signature) + "'..."
+                        }.add(rhs.tokens().at(0)));
+
+                    auto const& definition_location = function_state.defined_at(
+                        rhs_index
+                        , rhs.register_set
+                    );
+                    error.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                        , definition_location.at(0)
+                        , ("...got `"
+                           + to_string(function_state.type_of(rhs_index, rhs.register_set).to_simple())
+                           + "'")
+                    }.note("defined here"));
+                    throw error;
+                }
+
+                auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+                std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                auto const dest_index = function_state.resolve_index(dest);
+                function_state.define_register(
+                    dest_index
+                    , dest.register_set
+                    , function_state.make_wrapper(std::make_unique<values::Integer>())
+                    , std::move(defining_tokens)
+                );
             } else if (instruction.opcode == MOVE) {
                 auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
 
