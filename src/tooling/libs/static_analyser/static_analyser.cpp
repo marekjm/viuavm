@@ -550,6 +550,16 @@ static auto analyse_single_function(
         } else {
             // FIXME arity not supported
         }
+    } else {
+        using arity_type = viua::internals::types::register_index;
+        for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
+            function_state.define_register(
+                i
+                , viua::internals::Register_sets::PARAMETERS
+                , function_state.make_wrapper(std::make_unique<values::Value>(values::Value_type::Value))
+                , fn.head().tokens()
+            );
+        }
     }
 
     using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
