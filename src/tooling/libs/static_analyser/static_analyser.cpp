@@ -818,16 +818,18 @@ static auto analyse_single_function(
                     , strip_pointer(function_state.type_of(source_index, source.register_set))
                     , std::move(defining_tokens)
                 );
-                function_state.erase_register(
-                    source_index
-                    , source.register_set
-                    , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
-                        auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
-                        tokens.push_back(instruction.tokens().at(0));
-                        std::copy(source.tokens().begin(), source.tokens().end(), std::back_inserter(tokens));
-                        return tokens;
-                    }()
-                );
+                if (source.access != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                    function_state.erase_register(
+                        source_index
+                        , source.register_set
+                        , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            std::copy(source.tokens().begin(), source.tokens().end(), std::back_inserter(tokens));
+                            return tokens;
+                        }()
+                    );
+                }
             } else if (instruction.opcode == VAT) {
                 auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
                 auto const& index = *static_cast<Register_address const*>(instruction.operands.at(2).get());
