@@ -185,6 +185,13 @@ class Function_state {
         , viua::internals::Register_sets const
         , std::vector<values::Value_type> const
     ) const -> bool;
+  private:
+    auto fill_type(
+        values::Value_wrapper
+        , std::vector<values::Value_type> const&
+        , std::vector<values::Value_type>::size_type const
+    ) -> void;
+  public:
     auto assume_type(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const

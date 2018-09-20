@@ -390,6 +390,45 @@ auto Function_state::type_matches(
     return type_of(index, register_set).to_simple() == type_signature;
 }
 
+auto Function_state::fill_type(
+    values::Value_wrapper wrapper
+    , std::vector<values::Value_type> const& type_signature
+    , std::vector<values::Value_type>::size_type const from
+) -> void {
+    for (auto i = from; i < type_signature.size(); ++i) {
+        using values::Value_type;
+        switch (type_signature.at(i)) {
+            case Value_type::Integer:
+                wrapper.value(std::make_unique<values::Integer>());
+                break;
+            case Value_type::Float:
+                wrapper.value(std::make_unique<values::Float>());
+                break;
+            case Value_type::Vector:
+                wrapper.value(std::make_unique<values::Vector>(
+                    make_wrapper(std::make_unique<values::Value>(Value_type::Value))
+                ));
+                wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
+                break;
+            case Value_type::String:
+                wrapper = make_wrapper(std::make_unique<values::String>());
+                break;
+            case Value_type::Text:
+                wrapper = make_wrapper(std::make_unique<values::Text>());
+                break;
+            case Value_type::Pointer:
+                wrapper.value(std::make_unique<values::Pointer>(
+                    make_wrapper(std::make_unique<values::Value>(Value_type::Value))
+                ));
+                wrapper = static_cast<values::Pointer const&>(wrapper.value()).of();
+                break;
+            case Value_type::Value:
+            default:
+                // do nothing
+                break;
+        }
+    }
+}
 auto Function_state::assume_type(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set
@@ -427,31 +466,7 @@ auto Function_state::assume_type(
         return false;
     }
 
-    for (;i < type_signature.size(); ++i) {
-        switch (type_signature.at(i)) {
-            case Value_type::Integer:
-                wrapper.value(std::make_unique<values::Integer>());
-                break;
-            case Value_type::Float:
-                wrapper.value(std::make_unique<values::Float>());
-                break;
-            case Value_type::Vector:
-                wrapper.value(std::make_unique<values::Vector>(
-                    make_wrapper(std::make_unique<values::Value>(Value_type::Value))
-                ));
-                wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
-                break;
-            case Value_type::String:
-                break;
-            case Value_type::Text:
-                break;
-            case Value_type::Pointer:
-                break;
-            case Value_type::Value:
-            default:
-                return true;
-        }
-    }
+    fill_type(wrapper, type_signature, i);
 
     return true;
 }
