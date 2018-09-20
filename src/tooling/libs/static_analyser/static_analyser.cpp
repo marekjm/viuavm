@@ -438,6 +438,11 @@ auto Function_state::assume_type(
 
     using values::Value_type;
 
+    if (wrapper.value().type() == Value_type::Value) {
+        fill_type(wrapper, type_signature, 0);
+        return true;
+    }
+
     if ((wrapper.value().type() != Value_type::Vector) and (wrapper.value().type() != Value_type::Pointer)) {
         return wrapper.value().type() == type_signature.at(0);
     }
