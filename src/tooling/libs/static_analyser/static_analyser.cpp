@@ -796,6 +796,32 @@ static auto analyse_single_function(
                     }
                     throw error;
                 }
+                auto const source_type_signature =
+                    (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
+                    ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Value }
+                    : std::vector<values::Value_type>{ values::Value_type::Value }
+                ;
+                if (not function_state.assume_type(source_index, source.register_set, source_type_signature)) {
+                    auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                            , source.tokens().at(0)
+                            , "expected `" + to_string(source_type_signature) + "'..."
+                        }.add(source.tokens().at(0)));
+
+                    auto const& definition_location = function_state.defined_at(
+                        source_index
+                        , source.register_set
+                    );
+                    error.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                        , definition_location.at(0)
+                        , ("...got `"
+                           + to_string(function_state.type_of(source_index, source.register_set).to_simple())
+                           + "'")
+                    }.note("defined here"));
+                    throw error;
+                }
 
                 auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
