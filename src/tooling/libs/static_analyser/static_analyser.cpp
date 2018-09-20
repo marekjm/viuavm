@@ -783,11 +783,19 @@ static auto analyse_single_function(
                 defining_tokens.push_back(line->token(0));
                 std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
 
+                auto const strip_pointer = [](values::Value_wrapper wrapper) -> values::Value_wrapper {
+                        if (wrapper.value().type() == values::Value_type::Pointer) {
+                            return static_cast<values::Pointer const&>(wrapper.value()).of();
+                        } else {
+                            return wrapper;
+                        }
+                };
+
                 auto const dest_index = function_state.resolve_index(dest);
                 function_state.define_register(
                     dest_index
                     , dest.register_set
-                    , function_state.type_of(source_index, source.register_set)
+                    , strip_pointer(function_state.type_of(source_index, source.register_set))
                     , std::move(defining_tokens)
                 );
                 function_state.erase_register(
