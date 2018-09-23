@@ -41,6 +41,7 @@ namespace values {
         String,
         Text,
         Pointer,
+        Boolean,
     };
 
     class Value {
@@ -109,6 +110,11 @@ namespace values {
         auto of(Value_wrapper) -> void;
 
         Pointer(Value_wrapper);
+    };
+
+    class Boolean : public Value {
+      public:
+        Boolean();
     };
 }
 

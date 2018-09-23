@@ -68,6 +68,8 @@ String::String(): Value{Value_type::String} {}
 
 Text::Text(): Value{Value_type::Text} {}
 
+Boolean::Boolean(): Value{Value_type::Boolean} {}
+
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}
@@ -157,6 +159,8 @@ static auto to_string(values::Value const& value) -> std::string {
             return "text";
         case values::Value_type::Pointer:
             return "pointer to " + to_string(static_cast<values::Pointer const&>(value).of().value());
+        case values::Value_type::Boolean:
+            return "boolean";
         default:
             return "value";
     }
@@ -181,6 +185,8 @@ static auto to_string(
             return "text";
         case values::Value_type::Pointer:
             return "pointer to " + to_string(value, i + 1);
+        case values::Value_type::Boolean:
+            return "boolean";
         default:
             return "value";
     }
@@ -202,6 +208,8 @@ static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string
             return "text";
         case values::Value_type::Pointer:
             return "pointer to ...";
+        case values::Value_type::Boolean:
+            return "boolean";
         case values::Value_type::Value:
         default:
             return "value";
@@ -421,6 +429,9 @@ auto Function_state::fill_type(
                     make_wrapper(std::make_unique<values::Value>(Value_type::Value))
                 ));
                 wrapper = static_cast<values::Pointer const&>(wrapper.value()).of();
+                break;
+            case Value_type::Boolean:
+                wrapper = make_wrapper(std::make_unique<values::Boolean>());
                 break;
             case Value_type::Value:
             default:
