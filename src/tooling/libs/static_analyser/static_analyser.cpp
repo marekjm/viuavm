@@ -300,8 +300,8 @@ auto Function_state::define_register(
     , std::vector<viua::tooling::libs::lexer::Token> location
 ) -> void {
     auto const address = std::make_pair(index, register_set);
-    defined_registers.emplace(address, value);
-    defined_where.emplace(address, std::move(location));
+    defined_registers.insert_or_assign(address, value);
+    defined_where.insert_or_assign(address, std::move(location));
 }
 
 auto Function_state::defined(
