@@ -929,7 +929,7 @@ static auto analyse_single_function(
                     auto const index_type_signature = std::vector<values::Value_type>{
                         values::Value_type::Integer
                     };
-                    if (not function_state.type_matches(index_index, index.register_set, index_type_signature)) {
+                    if (not function_state.assume_type(index_index, index.register_set, index_type_signature)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
                                 viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
