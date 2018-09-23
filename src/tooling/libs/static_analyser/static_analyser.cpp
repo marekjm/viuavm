@@ -663,7 +663,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(target_index, target.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , target.tokens().at(1)
                             }.add(target.tokens().at(2)));
                         if (function_state.erased(target_index, target.register_set)) {
@@ -739,8 +739,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(source_index, source.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::
-                                    Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , source.tokens().at(1)
                             }.add(source.tokens().at(2)));
                         if (function_state.erased(source_index, source.register_set)) {
@@ -825,7 +824,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(lhs_index, lhs.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , lhs.tokens().at(1)
                             }.add(lhs.tokens().at(2)));
                         if (function_state.erased(lhs_index, lhs.register_set)) {
@@ -873,7 +872,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(rhs_index, rhs.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , rhs.tokens().at(1)
                             }.add(rhs.tokens().at(2)));
                         if (function_state.erased(rhs_index, rhs.register_set)) {
@@ -956,7 +955,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(source_index, source.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , source.tokens().at(1)
                             }.add(source.tokens().at(2)));
                         if (function_state.erased(source_index, source.register_set)) {
@@ -1051,7 +1050,7 @@ static auto analyse_single_function(
                     if (not function_state.defined(source_index, source.register_set)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Access_to_empty_register
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
                                 , source.tokens().at(1)
                             }.add(source.tokens().at(2)));
                         if (function_state.erased(source_index, source.register_set)) {
