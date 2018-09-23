@@ -1029,7 +1029,7 @@ static auto analyse_single_function(
                     function_state.define_register(
                         destination_index
                         , destination.register_set
-                        , function_state.make_wrapper(std::make_unique<values::Integer>())
+                        , function_state.make_wrapper(std::make_unique<values::Float>())
                         , std::move(defining_tokens)
                     );
 
