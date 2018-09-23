@@ -44,7 +44,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Register_index_outside_of_allocated_range, "register index creates address outside of allocated range" },
     { Compile_time_error::Renaming_already_named_register, "renaming already named register" },
     { Compile_time_error::Reusing_register_name, "reusing register name" },
-    { Compile_time_error::Access_to_empty_register, "accessing empty register" },
+    { Compile_time_error::Read_from_empty_register, "read from empty register" },
     { Compile_time_error::Type_mismatch, "mismatched types" },
     { Compile_time_error::Empty_function_body, "empty function body" },
 };

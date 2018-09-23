@@ -40,7 +40,7 @@ enum class Compile_time_error {
     Register_index_outside_of_allocated_range,
     Renaming_already_named_register,
     Reusing_register_name,
-    Access_to_empty_register,
+    Read_from_empty_register,
     Type_mismatch,
     Empty_function_body,
 };
