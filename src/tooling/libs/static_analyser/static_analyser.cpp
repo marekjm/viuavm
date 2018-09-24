@@ -763,6 +763,31 @@ static auto analyse_single_function(
                         throw error;
                     }
 
+                    using values::Integer;
+                    auto& target_operand = static_cast<Integer&>(
+                        function_state.type_of(target_index, target.register_set).value()
+                    );
+                    if (target_operand.known()) {
+                        if (instruction.opcode == IINC) {
+                            target_operand.of(target_operand.of() + 1);
+                        } else {
+                            target_operand.of(target_operand.of() - 1);
+                        }
+                    }
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    std::copy(
+                        target.tokens().begin()
+                        , target.tokens().end()
+                        , std::back_inserter(defining_tokens)
+                    );
+                    function_state.mutate_register(
+                        target_index
+                        , target.register_set
+                        , std::move(defining_tokens)
+                    );
+
                     break;
                 }
                 case FLOAT: {
