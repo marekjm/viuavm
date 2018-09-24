@@ -38,6 +38,22 @@ auto Value::type() const -> Value_type {
 
 Integer::Integer(): Value{Value_type::Integer} {}
 
+Integer::Integer(int const x):
+    Value{Value_type::Integer}
+    , n{x}
+{}
+
+auto Integer::known() const -> bool {
+    return n.has_value();
+}
+
+auto Integer::of() const -> int {
+    return n.value();
+}
+auto Integer::of(int const x) -> void {
+    n = x;
+}
+
 Float::Float(): Value{Value_type::Float} {}
 
 Vector::Vector(Value_wrapper v):
@@ -639,7 +655,7 @@ static auto analyse_single_function(
                         function_state.resolve_index(dest)
                         , dest.register_set
                         , function_state.make_wrapper(std::make_unique<values::Integer>(
-                            /* 0 */ // FIXME save the value in the integer
+                            0
                         ))
                         , std::move(defining_tokens)
                     );
@@ -659,7 +675,7 @@ static auto analyse_single_function(
                         function_state.resolve_index(dest)
                         , dest.register_set
                         , function_state.make_wrapper(std::make_unique<values::Integer>(
-                            /* static_cast<Integer_literal const*>(instruction.operands.at(1).get())->n */
+                            static_cast<Integer_literal const*>(instruction.operands.at(1).get())->n
                         ))
                         , std::move(defining_tokens)
                     );

@@ -75,8 +75,14 @@ namespace values {
     };
 
     class Integer : public Value {
+        std::optional<int> n;
       public:
+        auto known() const -> bool;
+        auto of() const -> int;
+        auto of(int const) -> void;
+
         Integer();
+        Integer(int const);
     };
 
     class Float : public Value {
