@@ -1431,6 +1431,10 @@ static auto analyse_single_function(
 
                     break;
                 } case LT: {
+                } case LTE: {
+                } case GT: {
+                } case GTE: {
+                } case EQ: {
                     auto const& lhs = *static_cast<Register_address const*>(instruction.operands.at(1).get());
                     auto const& rhs = *static_cast<Register_address const*>(instruction.operands.at(2).get());
 
@@ -1530,6 +1534,71 @@ static auto analyse_single_function(
                         throw error;
                     }
 
+                    using values::Integer;
+                    auto const& lhs_operand = static_cast<Integer&>(
+                        function_state.type_of(lhs_index, lhs.register_set).value()
+                    );
+                    auto const& rhs_operand = static_cast<Integer&>(
+                        function_state.type_of(rhs_index, rhs.register_set).value()
+                    );
+                    if (lhs_operand.known() and rhs_operand.known()) {
+                        auto msg = std::ostringstream{};
+                        msg << "left-hand side will always be ";
+                        auto const l = lhs_operand.of();
+                        auto const r = rhs_operand.of();
+                        if (l < r) {
+                            msg << "less than";
+                        } else if (l > r) {
+                            msg << "greater than";
+                        } else {
+                            msg << "equal to";
+                        }
+                        msg << " right-hand side";
+
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Useless_comparison
+                                , line->tokens().at(0)
+                                , msg.str()
+                            });
+
+                        {
+                            auto const& definition_location = function_state.defined_at(
+                                lhs_index
+                                , lhs.register_set
+                            );
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , definition_location.at(0)
+                            }.note("left-hand side defined here:"));
+                        }
+                        {
+                            auto const& definition_location = function_state.defined_at(
+                                rhs_index
+                                , rhs.register_set
+                            );
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , definition_location.at(0)
+                            }.note("right-hand side defined here:"));
+                            if (function_state.mutated(rhs_index, rhs.register_set)) {
+                                for (auto const& each :
+                                        function_state.mutated_at(rhs_index, rhs.register_set)) {
+                                    auto e = viua::tooling::errors::compile_time::Error{
+                                        viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                        , each.at(0)
+                                    };
+                                    for (auto it = each.begin() + 1; it != each.end(); ++it) {
+                                        e.add(*it);
+                                    }
+                                    error.append(e.note("right-hand side mutated here:"));
+                                }
+                            }
+                        }
+
+                        throw error;
+                    }
+
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
@@ -1543,12 +1612,6 @@ static auto analyse_single_function(
                         , std::move(defining_tokens)
                     );
 
-                    break;
-                } case LTE: {
-                } case GT: {
-                } case GTE: {
-                } case EQ: {
-                    // FIXME
                     break;
                 } case STRING: {
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
