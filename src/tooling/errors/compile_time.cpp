@@ -47,6 +47,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Read_from_empty_register, "read from empty register" },
     { Compile_time_error::Type_mismatch, "mismatched types" },
     { Compile_time_error::Empty_function_body, "empty function body" },
+    { Compile_time_error::Useless_comparison, "useless comparison" },
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

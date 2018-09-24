@@ -43,6 +43,7 @@ enum class Compile_time_error {
     Read_from_empty_register,
     Type_mismatch,
     Empty_function_body,
+    Useless_comparison,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
