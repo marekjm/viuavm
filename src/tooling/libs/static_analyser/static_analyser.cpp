@@ -349,6 +349,33 @@ auto Function_state::type_of(
     return defined_registers.at(std::make_pair(index, register_set));
 }
 
+auto Function_state::mutate_register(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+    , std::vector<viua::tooling::libs::lexer::Token> location
+) -> void {
+    auto const address = std::make_pair(index, register_set);
+    auto& mut_locations = mutated_where.emplace(
+        address
+        , decltype(mutated_where)::mapped_type{}
+    ).first->second;
+    mut_locations.push_back(std::move(location));
+}
+
+auto Function_state::mutated(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> bool {
+    return mutated_where.count(std::make_pair(index, register_set));
+}
+
+auto Function_state::mutated_at(
+    viua::internals::types::register_index const index
+    , viua::internals::Register_sets const register_set
+) const -> decltype(mutated_where)::mapped_type const& {
+    return mutated_where.at(std::make_pair(index, register_set));
+}
+
 auto Function_state::erase_register(
     viua::internals::types::register_index const index
     , viua::internals::Register_sets const register_set

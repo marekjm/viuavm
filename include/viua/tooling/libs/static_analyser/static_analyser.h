@@ -143,6 +143,7 @@ class Function_state {
         std::pair<viua::internals::types::register_index, viua::internals::Register_sets>;
     std::map<Register_address_type, values::Value_wrapper> defined_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> defined_where;
+    std::map<Register_address_type, std::vector<std::vector<viua::tooling::libs::lexer::Token>>> mutated_where;
     std::map<Register_address_type, values::Value_wrapper> erased_registers;
     std::map<Register_address_type, std::vector<viua::tooling::libs::lexer::Token>> erased_where;
 
@@ -173,6 +174,19 @@ class Function_state {
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
     ) const -> values::Value_wrapper;
+    auto mutate_register(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+        , std::vector<viua::tooling::libs::lexer::Token>
+    ) -> void;
+    auto mutated(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> bool;
+    auto mutated_at(
+        viua::internals::types::register_index const
+        , viua::internals::Register_sets const
+    ) const -> decltype(mutated_where)::mapped_type const&;
     auto erase_register(
         viua::internals::types::register_index const
         , viua::internals::Register_sets const
