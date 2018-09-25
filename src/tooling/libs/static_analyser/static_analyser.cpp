@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <initializer_list>
 #include <iostream>
 #include <string>
 #include <viua/tooling/errors/compile_time/errors.h>
@@ -548,6 +549,18 @@ Function_state::Function_state(
     local_registers_allocated{limit}
     , local_registers_allocated_where{std::move(location)}
 {}
+
+static auto maybe_with_pointer(
+    viua::internals::Access_specifier const access
+    , std::initializer_list<values::Value_type> const base
+) -> std::vector<values::Value_type> {
+    auto signature = (access == viua::internals::Access_specifier::POINTER_DEREFERENCE
+        ? std::vector<values::Value_type>{ values::Value_type::Pointer }
+        : std::vector<values::Value_type>{}
+    );
+    std::copy(base.begin(), base.end(), std::back_inserter(signature));
+    return signature;
+}
 
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
@@ -1459,11 +1472,9 @@ static auto analyse_single_function(
                         }
                         throw error;
                     }
-                    auto const lhs_type_signature =
-                        (lhs.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
-                        ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Integer }
-                        : std::vector<values::Value_type>{ values::Value_type::Integer }
-                    ;
+                    auto const lhs_type_signature = maybe_with_pointer(lhs.access, {
+                        values::Value_type::Integer
+                    });
                     if (not function_state.assume_type(lhs_index, lhs.register_set, lhs_type_signature)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
@@ -1507,11 +1518,9 @@ static auto analyse_single_function(
                         }
                         throw error;
                     }
-                    auto const rhs_type_signature =
-                        (rhs.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
-                        ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Integer }
-                        : std::vector<values::Value_type>{ values::Value_type::Integer }
-                    ;
+                    auto const rhs_type_signature = maybe_with_pointer(rhs.access, {
+                        values::Value_type::Integer
+                    });
                     if (not function_state.assume_type(rhs_index, rhs.register_set, rhs_type_signature)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
