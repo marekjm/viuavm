@@ -1750,6 +1750,96 @@ static auto analyse_single_function(
 
                     break;
                 } case TEXTAT: {
+                    auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& index = *static_cast<Register_address const*>(instruction.operands.at(2).get());
+
+                    auto const source_index = function_state.resolve_index(source);
+                    if (not function_state.defined(source_index, source.register_set)) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
+                                , source.tokens().at(1)
+                            }.add(source.tokens().at(2)));
+                        if (function_state.erased(source_index, source.register_set)) {
+                            auto const& erased_location =
+                                function_state.erased_at(source_index, source.register_set);
+                            auto partial = viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , erased_location.at(0)
+                            }.note("erased here");
+                            for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                                partial.add(*each);
+                            }
+                            error.append(partial);
+                        }
+                        throw error;
+                    }
+
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Text
+                    });
+                    if (not function_state.assume_type(source_index, source.register_set, source_type_signature)) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                                , source.tokens().at(1)
+                                , "expected `" + to_string(source_type_signature) + "'..."
+                            }.add(source.tokens().at(2)));
+
+                        auto const& definition_location = function_state.defined_at(
+                            source_index
+                            , source.register_set
+                        );
+                        error.append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , definition_location.at(0)
+                            , ("...got `"
+                               + to_string(function_state.type_of(source_index, source.register_set).to_simple())
+                               + "'")
+                        }.note("defined here"));
+                        throw error;
+                    }
+
+                    auto const index_index = function_state.resolve_index(index);
+                    auto const index_type_signature = std::vector<values::Value_type>{
+                        values::Value_type::Integer
+                    };
+                    if (not function_state.assume_type(index_index, index.register_set, index_type_signature)) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                                , index.tokens().at(1)
+                                , "expected `" + to_string(index_type_signature) + "'..."
+                            }.add(index.tokens().at(2)));
+
+                        auto const& definition_location = function_state.defined_at(
+                            index_index
+                            , index.register_set
+                        );
+                        error.append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , definition_location.at(0)
+                            , ("...got `"
+                               + to_string(function_state.type_of(index_index, index.register_set).to_simple())
+                               + "'")
+                        }.note("defined here"));
+                        throw error;
+                    }
+
+                    auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                    auto const dest_index = function_state.resolve_index(dest);
+                    function_state.define_register(
+                        dest_index
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Text>())
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case TEXTSUB: {
                 } case TEXTLENGTH: {
                 } case TEXTCOMMONPREFIX: {
