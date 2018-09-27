@@ -466,7 +466,7 @@ auto Function_state::fill_type(
                 wrapper = make_wrapper(std::make_unique<values::String>());
                 break;
             case Value_type::Text:
-                wrapper = make_wrapper(std::make_unique<values::Text>());
+                wrapper.value(std::make_unique<values::Text>());
                 break;
             case Value_type::Pointer:
                 wrapper.value(std::make_unique<values::Pointer>(
