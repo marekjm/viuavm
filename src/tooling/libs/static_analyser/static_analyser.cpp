@@ -563,6 +563,63 @@ static auto maybe_with_pointer(
     return signature;
 }
 
+static auto throw_if_empty(
+    Function_state& function_state
+    , viua::tooling::libs::parser::Register_address const& address
+) -> viua::internals::types::register_index {
+    auto const address_index = function_state.resolve_index(address);
+    if (not function_state.defined(address_index, address.register_set)) {
+        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
+                , address.tokens().at(1)
+            }.add(address.tokens().at(2)));
+        if (function_state.erased(address_index, address.register_set)) {
+            auto const& erased_location =
+                function_state.erased_at(address_index, address.register_set);
+            auto partial = viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                , erased_location.at(0)
+            }.note("erased here");
+            for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
+                partial.add(*each);
+            }
+            error.append(partial);
+        }
+        throw error;
+    }
+    return address_index;
+}
+
+static auto throw_if_invalid_type(
+    Function_state& function_state
+    , viua::tooling::libs::parser::Register_address const& address
+    , viua::internals::types::register_index const index
+    , std::vector<values::Value_type> const type_signature
+) -> void {
+    if (not function_state.assume_type(index, address.register_set, type_signature)) {
+        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                , address.tokens().at(0)
+                , "expected `" + to_string(type_signature) + "'..."
+            }.add(address.tokens().at(0)));
+
+        auto const& definition_location = function_state.defined_at(
+            index
+            , address.register_set
+        );
+        error.append(viua::tooling::errors::compile_time::Error{
+            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+            , definition_location.at(0)
+            , ("...got `"
+               + to_string(function_state.type_of(index, address.register_set).to_simple())
+               + "'")
+        }.note("defined here"));
+        throw error;
+    }
+}
+
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const&
@@ -1842,6 +1899,33 @@ static auto analyse_single_function(
 
                     break;
                 } case TEXTSUB: {
+                    auto const& dest[[maybe_unused]] =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& from =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                    auto const& to =
+                        *static_cast<Register_address const*>(instruction.operands.at(3).get());
+
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Text
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    auto const from_index = throw_if_empty(function_state, from);
+                    auto const from_type_signature = maybe_with_pointer(from.access, {
+                        values::Value_type::Integer
+                    });
+                    throw_if_invalid_type(function_state, from, from_index, from_type_signature);
+
+                    auto const to_index = throw_if_empty(function_state, to);
+                    auto const to_type_signature = maybe_with_pointer(to.access, {
+                        values::Value_type::Integer
+                    });
+                    throw_if_invalid_type(function_state, to, to_index, to_type_signature);
+
                     break;
                 } case TEXTLENGTH: {
                     auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
