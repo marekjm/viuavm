@@ -1439,11 +1439,9 @@ static auto analyse_single_function(
                         }
                         throw error;
                     }
-                    auto const source_type_signature =
-                        (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE)
-                        ? std::vector<values::Value_type>{ values::Value_type::Pointer, values::Value_type::Value }
-                        : std::vector<values::Value_type>{ values::Value_type::Value }
-                    ;
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Value
+                    });
                     if (not function_state.assume_type(source_index, source.register_set, source_type_signature)) {
                         auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
