@@ -499,7 +499,8 @@ auto Function_state::assume_type(
     }
 
     if ((wrapper.value().type() != Value_type::Vector) and (wrapper.value().type() != Value_type::Pointer)) {
-        return wrapper.value().type() == type_signature.at(0);
+        return (wrapper.value().type() == type_signature.at(0))
+            or (type_signature.at(0) == Value_type::Value);
     }
 
     auto i = decltype(type_signature)::size_type{0};
