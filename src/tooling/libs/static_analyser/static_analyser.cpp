@@ -1422,51 +1422,11 @@ static auto analyse_single_function(
                 } case TEXTLENGTH: {
                     auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
 
-                    auto const source_index = function_state.resolve_index(source);
-                    if (not function_state.defined(source_index, source.register_set)) {
-                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
-                            .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Read_from_empty_register
-                                , source.tokens().at(1)
-                            }.add(source.tokens().at(2)));
-                        if (function_state.erased(source_index, source.register_set)) {
-                            auto const& erased_location =
-                                function_state.erased_at(source_index, source.register_set);
-                            auto partial = viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
-                                , erased_location.at(0)
-                            }.note("erased here");
-                            for (auto each = erased_location.begin() + 1; each != erased_location.end(); ++each) {
-                                partial.add(*each);
-                            }
-                            error.append(partial);
-                        }
-                        throw error;
-                    }
+                    auto const source_index = throw_if_empty(function_state, source);
                     auto const source_type_signature = maybe_with_pointer(source.access, {
                         values::Value_type::Text
                     });
-                    if (not function_state.assume_type(source_index, source.register_set, source_type_signature)) {
-                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
-                            .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
-                                , source.tokens().at(0)
-                                , "expected `" + to_string(source_type_signature) + "'..."
-                            }.add(source.tokens().at(0)));
-
-                        auto const& definition_location = function_state.defined_at(
-                            source_index
-                            , source.register_set
-                        );
-                        error.append(viua::tooling::errors::compile_time::Error{
-                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
-                            , definition_location.at(0)
-                            , ("...got `"
-                               + to_string(function_state.type_of(source_index, source.register_set).to_simple())
-                               + "'")
-                        }.note("defined here"));
-                        throw error;
-                    }
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
 
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
