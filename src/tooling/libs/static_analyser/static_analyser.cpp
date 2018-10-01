@@ -1521,6 +1521,20 @@ static auto analyse_single_function(
                 } case PTRLIVE: {
                 } case SWAP: {
                 } case DELETE: {
+                    auto const& target =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto const target_index = throw_if_empty(function_state, target);
+                    auto erasing_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    erasing_tokens.push_back(instruction.tokens().at(0));
+                    std::copy(
+                        target.tokens().begin()
+                        , target.tokens().end()
+                        , std::back_inserter(erasing_tokens)
+                    );
+                    function_state.erase_register(target_index, target.register_set, erasing_tokens);
+
+                    break;
                 } case ISNULL: {
                 } case PRINT: {
                 } case ECHO: {
