@@ -1391,8 +1391,6 @@ static auto analyse_single_function(
 
                     break;
                 } case TEXTSUB: {
-                    auto const& dest[[maybe_unused]] =
-                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto const& source =
                         *static_cast<Register_address const*>(instruction.operands.at(1).get());
                     auto const& from =
@@ -1417,6 +1415,22 @@ static auto analyse_single_function(
                         values::Value_type::Integer
                     });
                     throw_if_invalid_type(function_state, to, to_index, to_type_signature);
+
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Integer>(
+                            // FIXME use length of the text
+                        ))
+                        , std::move(defining_tokens)
+                    );
 
                     break;
                 } case TEXTLENGTH: {
