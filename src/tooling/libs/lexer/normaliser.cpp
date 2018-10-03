@@ -772,6 +772,28 @@ static auto normalise_bits(std::vector<Token>& tokens, vector_view<Token> const&
     return i;
 }
 
+static auto normalise_vector(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    i += normalise_register_access(tokens, source.advance(i));
+    if (auto const& token = source.at(i); token.str() == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        i += normalise_register_access(tokens, source.advance(i));
+    }
+    if (auto const& token = source.at(i); token.str() == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        i += normalise_register_access(tokens, source.advance(i));
+    }
+
+    return i;
+}
+
 static auto normalise_join(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -1256,7 +1278,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case TEXTCOMMONPREFIX:
             case TEXTCOMMONSUFFIX:
             case TEXTCONCAT:
-            case VECTOR:
             case VINSERT:
             case VPOP:
             case VAT:
@@ -1307,6 +1328,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 break;
             case BITS:
                 i += normalise_bits(tokens, vector_view{source, i});
+                break;
+            case VECTOR:
+                i += normalise_vector(tokens, vector_view{source, i});
                 break;
             case BITSET:
                 i += normalise_bit_set(tokens, vector_view{source, i});

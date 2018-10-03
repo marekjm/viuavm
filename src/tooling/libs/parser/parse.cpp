@@ -700,6 +700,37 @@ static auto parse_op_bits(std::vector<std::unique_ptr<Fragment>>& fragments, vec
     return i;
 }
 
+static auto parse_op_vector(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
+    i += parse_register_address(*frag, tokens.advance(i));
+
+    using viua::tooling::libs::lexer::classifier::is_void;
+    if (auto const& token = tokens.at(i); is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    } else {
+        i += parse_register_address(*frag, tokens.advance(i));
+    }
+
+    using viua::tooling::libs::lexer::classifier::is_void;
+    if (auto const& token = tokens.at(i); is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    } else {
+        i += parse_register_address(*frag, tokens.advance(i));
+    }
+
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
 static auto string_to_boolean(std::string const& s) -> bool {
     if (s == "true") {
         return true;
@@ -1029,7 +1060,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case TEXTCOMMONPREFIX:
                 case TEXTCOMMONSUFFIX:
                 case TEXTCONCAT:
-                case VECTOR:
                 case VINSERT:
                 case VPOP:
                 case VAT:
@@ -1091,6 +1121,9 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                     break;
                 case BITS:
                     i += parse_op_bits(fragments, vector_view{tokens, i});
+                    break;
+                case VECTOR:
+                    i += parse_op_vector(fragments, vector_view{tokens, i});
                     break;
                 case BITSET:
                     i += parse_op_bitset(fragments, vector_view{tokens, i});
