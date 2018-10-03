@@ -1502,6 +1502,82 @@ static auto analyse_single_function(
                 } case VECTOR: {
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
+                    using viua::tooling::libs::parser::Operand_type;
+                    if (instruction.operands.at(1)->type() == Operand_type::Void
+                        and instruction.operands.at(2)->type() != Operand_type::Void) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(0)
+                                , "begin-packing operand cannot be void if the end-packing operand is not"
+                            })
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(2)->tokens().at(0)
+                            }.note("end-packing operand is here")
+                            .add(instruction.operands.at(2)->tokens().at(1))
+                            .add(instruction.operands.at(2)->tokens().at(2)))
+                            /* .add(local_registers_allocated_where.at(0)) */
+                            /* .note(std::to_string(local_registers_allocated) + " local register(s) allocated here") */
+                            /* .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error")) */
+                            ;
+                    }
+
+                    if (instruction.operands.at(1)->type() == Operand_type::Void) {
+                        auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                        defining_tokens.push_back(line->token(0));
+                        std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                        auto const dest_index = function_state.resolve_index(dest);
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , function_state.make_wrapper(std::make_unique<values::Vector>(
+                                function_state.make_wrapper(std::make_unique<values::Value>(
+                                    values::Value_type::Value
+                                ))
+                            ))
+                            , std::move(defining_tokens)
+                        );
+
+                        break;
+                    }
+
+                    auto const& begin_pack =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& end_pack =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+
+                    if (begin_pack.iota) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(1)
+                                , "begin-packing register index must not be iota"
+                            });
+                    }
+                    if (end_pack.iota) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(2)->tokens().at(1)
+                                , "end-packing register index must not be iota"
+                            });
+                    }
+
+                    auto const& first_packed = function_state.resolve_index(begin_pack);
+                    auto const& last_packed = function_state.resolve_index(end_pack);
+
+                    if (first_packed > last_packed) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(1)
+                                , "begin-packing register index must be less than or equal to the end-packing register index"
+                            }.add(instruction.operands.at(2)->tokens().at(1)))
+                            ;
+                    }
+
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
                     std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
