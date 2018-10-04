@@ -1565,6 +1565,15 @@ static auto analyse_single_function(
                             });
                     }
 
+                    if (begin_pack.register_set != end_pack.register_set) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(2)
+                                , "begin-packing and end-packing registers must be in the same set"
+                            }.add(instruction.operands.at(2)->tokens().at(2)));
+                    }
+
                     auto const& first_packed = function_state.resolve_index(begin_pack);
                     auto const& last_packed = function_state.resolve_index(end_pack);
 
