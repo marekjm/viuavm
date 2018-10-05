@@ -543,6 +543,10 @@ auto Function_state::dump(std::ostream& o) const -> void {
     }
 }
 
+auto Function_state::local_capacity() const -> viua::internals::types::register_index {
+    return local_registers_allocated;
+}
+
 Function_state::Function_state(
     viua::internals::types::register_index const limit
     , std::vector<viua::tooling::libs::lexer::Token> location
@@ -563,6 +567,7 @@ static auto maybe_with_pointer(
     return signature;
 }
 
+static auto make_
 static auto throw_if_empty(
     Function_state& function_state
     , viua::tooling::libs::parser::Register_address const& address
@@ -706,6 +711,8 @@ static auto analyse_single_function(
             );
         }
     }
+
+    function_state.dump(std::cout);
 
     using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
     for (auto i = body_size_type{1}; i < body.size(); ++i) {
@@ -1590,6 +1597,18 @@ static auto analyse_single_function(
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
                     std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                    for (auto check_pack = first_packed; check_pack < last_packed; ++check_pack) {
+                        if (not function_state.defined(check_pack, viua::internals::Register_sets::LOCAL)) {
+                            throw viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                    , instruction.operands.at(1)->tokens().at(1)
+                                    , "begin-packing register index must be less than or equal to the end-packing register index"
+                                }.add(instruction.operands.at(2)->tokens().at(1)))
+                                ;
+                        }
+                    }
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
