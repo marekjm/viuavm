@@ -1613,6 +1613,39 @@ static auto analyse_single_function(
                                 ;
                         }
 
+                        auto const first_type = function_state.type_of(
+                            first_packed
+                            , begin_pack.register_set
+                        ).to_simple();
+                        if (not function_state.assume_type(check_pack, begin_pack.register_set, first_type)) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
+                                    , instruction.token(0)
+                                    , ("expected `"
+                                       + to_string(first_type)
+                                       + "' in "
+                                       + to_string(begin_pack.register_set)
+                                       + " register "
+                                       + std::to_string(check_pack)
+                                       + "...")
+                                });
+
+                            auto const& definition_location = function_state.defined_at(
+                                check_pack
+                                , begin_pack.register_set
+                            );
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , definition_location.at(0)
+                                , ("...got `"
+                                   + to_string(function_state.type_of(check_pack, begin_pack.register_set).to_simple())
+                                   + "'")
+                            }.note("defined here"));
+                            throw error;
+                        }
+                    }
+
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
                         dest_index
