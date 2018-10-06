@@ -1595,6 +1595,24 @@ static auto analyse_single_function(
                     defining_tokens.push_back(line->token(0));
                     std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
 
+                    for (auto check_pack = first_packed; check_pack < last_packed; ++check_pack) {
+                        if (not function_state.defined(check_pack, begin_pack.register_set)) {
+                            throw viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                    , instruction.token(0)
+                                    , ("packing empty "
+                                       + to_string(begin_pack.register_set)
+                                       + " register "
+                                       + std::to_string(check_pack))
+                                }
+                                .add(instruction.operands.at(1)->tokens().at(1))
+                                .add(instruction.operands.at(1)->tokens().at(2))
+                                .add(instruction.operands.at(2)->tokens().at(1))
+                                .add(instruction.operands.at(2)->tokens().at(2)))
+                                ;
+                        }
+
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
                         dest_index
