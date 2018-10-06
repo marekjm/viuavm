@@ -226,6 +226,8 @@ class Function_state {
 
     auto dump(std::ostream&) const -> void;
 
+    auto local_capacity() const -> viua::internals::types::register_index;
+
     Function_state(
             viua::internals::types::register_index const
             , std::vector<viua::tooling::libs::lexer::Token>

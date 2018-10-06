@@ -543,6 +543,10 @@ auto Function_state::dump(std::ostream& o) const -> void {
     }
 }
 
+auto Function_state::local_capacity() const -> viua::internals::types::register_index {
+    return local_registers_allocated;
+}
+
 Function_state::Function_state(
     viua::internals::types::register_index const limit
     , std::vector<viua::tooling::libs::lexer::Token> location
