@@ -567,7 +567,6 @@ static auto maybe_with_pointer(
     return signature;
 }
 
-static auto make_
 static auto throw_if_empty(
     Function_state& function_state
     , viua::tooling::libs::parser::Register_address const& address
