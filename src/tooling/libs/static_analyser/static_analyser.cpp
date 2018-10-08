@@ -1523,9 +1523,6 @@ static auto analyse_single_function(
                             }.note("end-packing operand is here")
                             .add(instruction.operands.at(2)->tokens().at(1))
                             .add(instruction.operands.at(2)->tokens().at(2)))
-                            /* .add(local_registers_allocated_where.at(0)) */
-                            /* .note(std::to_string(local_registers_allocated) + " local register(s) allocated here") */
-                            /* .aside("increase this value to " + std::to_string(iota_value + 1) + " to fix this error")) */
                             ;
                     }
 
@@ -1597,7 +1594,11 @@ static auto analyse_single_function(
                     defining_tokens.push_back(line->token(0));
                     std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
 
-                    for (auto check_pack = first_packed; check_pack < last_packed; ++check_pack) {
+                    auto const first_type = function_state.type_of(
+                        first_packed
+                        , begin_pack.register_set
+                    ).to_simple();
+                    for (auto check_pack = first_packed; check_pack <= last_packed; ++check_pack) {
                         if (not function_state.defined(check_pack, begin_pack.register_set)) {
                             throw viua::tooling::errors::compile_time::Error_wrapper{}
                                 .append(viua::tooling::errors::compile_time::Error{
@@ -1615,22 +1616,12 @@ static auto analyse_single_function(
                                 ;
                         }
 
-                        auto const first_type = function_state.type_of(
-                            first_packed
-                            , begin_pack.register_set
-                        ).to_simple();
                         if (not function_state.assume_type(check_pack, begin_pack.register_set, first_type)) {
                             auto error = viua::tooling::errors::compile_time::Error_wrapper{}
                                 .append(viua::tooling::errors::compile_time::Error{
                                     viua::tooling::errors::compile_time::Compile_time_error::Type_mismatch
                                     , instruction.token(0)
-                                    , ("expected `"
-                                       + to_string(first_type)
-                                       + "' in "
-                                       + to_string(begin_pack.register_set)
-                                       + " register "
-                                       + std::to_string(check_pack)
-                                       + "...")
+                                    , "values packed into a vector must be of the same type"
                                 });
 
                             auto const& definition_location = function_state.defined_at(
@@ -1640,10 +1631,21 @@ static auto analyse_single_function(
                             error.append(viua::tooling::errors::compile_time::Error{
                                 viua::tooling::errors::compile_time::Compile_time_error::Empty_error
                                 , definition_location.at(0)
-                                , ("...got `"
+                                , ("expected `"
+                                   + to_string(first_type)
+                                   + "' got `"
                                    + to_string(function_state.type_of(check_pack, begin_pack.register_set).to_simple())
                                    + "'")
                             }.note("defined here"));
+
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , function_state.defined_at(
+                                    first_packed
+                                    , begin_pack.register_set
+                                ).at(0)
+                            }.note("first packed value was defined here"));
+
                             throw error;
                         }
                     }
@@ -1653,12 +1655,19 @@ static auto analyse_single_function(
                         dest_index
                         , dest.register_set
                         , function_state.make_wrapper(std::make_unique<values::Vector>(
-                            function_state.make_wrapper(std::make_unique<values::Value>(
-                                values::Value_type::Value
-                            ))
+                            function_state.type_of(first_packed, begin_pack.register_set)
                         ))
                         , std::move(defining_tokens)
                     );
+
+                    for (auto check_pack = first_packed; check_pack <= last_packed; ++check_pack) {
+                        function_state.erase_register(
+                            check_pack
+                            , begin_pack.register_set
+                            , std::vector<viua::tooling::libs::lexer::Token>{
+                                line->token(0)
+                            });
+                    }
 
                     break;
                 } case VINSERT: {
