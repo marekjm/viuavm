@@ -566,6 +566,17 @@ static auto maybe_with_pointer(
     std::copy(base.begin(), base.end(), std::back_inserter(signature));
     return signature;
 }
+static auto maybe_with_pointer(
+    viua::internals::Access_specifier const access
+    , std::vector<values::Value_type> const base
+) -> std::vector<values::Value_type> {
+    auto signature = (access == viua::internals::Access_specifier::POINTER_DEREFERENCE
+        ? std::vector<values::Value_type>{ values::Value_type::Pointer }
+        : std::vector<values::Value_type>{}
+    );
+    std::copy(base.begin(), base.end(), std::back_inserter(signature));
+    return signature;
+}
 
 static auto throw_if_empty(
     Function_state& function_state
@@ -622,6 +633,17 @@ static auto throw_if_invalid_type(
         }.note("defined here"));
         throw error;
     }
+}
+
+template<typename T>
+static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
+    auto v = std::vector<T>{};
+
+    v.reserve(seq.size() + 1);
+    v.push_back(element);
+    std::copy(seq.begin(), seq.end(), std::back_inserter(v));
+
+    return v;
 }
 
 static auto analyse_single_function(
@@ -1671,6 +1693,31 @@ static auto analyse_single_function(
 
                     break;
                 } case VINSERT: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(
+                        source.access
+                        , function_state.type_of(source_index, source.register_set).to_simple()
+                    );
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const dest_index = throw_if_empty(function_state, dest);
+                    auto const dest_type_signature = maybe_with_pointer(dest.access, prepend(
+                        values::Value_type::Vector
+                        , function_state.type_of(source_index, source.register_set).to_simple()));
+                    throw_if_invalid_type(function_state, dest, dest_index, dest_type_signature);
+
+                    function_state.erase_register(
+                        source_index
+                        , source.register_set
+                        , std::vector<viua::tooling::libs::lexer::Token>{
+                            line->token(0)
+                        });
+
+                    break;
                 } case VPUSH: {
                 } case VPOP: {
                 } case VLEN: {
