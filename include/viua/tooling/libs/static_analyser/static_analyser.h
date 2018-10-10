@@ -66,6 +66,8 @@ namespace values {
         auto value(std::unique_ptr<values::Value>) -> void;
         virtual auto to_simple() const -> std::vector<values::Value_type>;
 
+        auto index() const -> index_type;
+
         Value_wrapper(index_type const, map_type&);
         Value_wrapper(Value_wrapper const&);
         Value_wrapper(Value_wrapper&&) = default;

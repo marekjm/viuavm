@@ -138,6 +138,10 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
 
     return simple;
 }
+
+auto Value_wrapper::index() const -> index_type {
+    return i;
+}
 } // namespace values
 
 static auto to_string(viua::internals::Register_sets const rs) -> std::string {
@@ -180,6 +184,28 @@ static auto to_string(values::Value const& value) -> std::string {
             return "boolean";
         default:
             return "value";
+    }
+}
+static auto to_string(values::Value_wrapper const& value) -> std::string {
+    switch (value.value().type()) {
+        case values::Value_type::Value:
+            return "value#" + std::to_string(value.index());
+        case values::Value_type::Integer:
+            return "integer#" + std::to_string(value.index());
+        case values::Value_type::Float:
+            return "float#" + std::to_string(value.index());
+        case values::Value_type::Vector:
+            return "vector#" + std::to_string(value.index()) + " of " + to_string(static_cast<values::Vector const&>(value.value()).of());
+        case values::Value_type::String:
+            return "string#" + std::to_string(value.index());
+        case values::Value_type::Text:
+            return "text#" + std::to_string(value.index());
+        case values::Value_type::Pointer:
+            return "pointer#" + std::to_string(value.index()) + " to " + to_string(static_cast<values::Pointer const&>(value.value()).of());
+        case values::Value_type::Boolean:
+            return "boolean#" + std::to_string(value.index());
+        default:
+            return "value#" + std::to_string(value.index());
     }
 }
 
@@ -538,8 +564,12 @@ auto Function_state::dump(std::ostream& o) const -> void {
         std::cout << "  register " << each.first << " named `" << each.second << "'" << std::endl;
     }
     for (auto const& each : defined_registers) {
-        std::cout << "  " << to_string(each.first.second) << " register " << each.first.first << ": contains "
-            << to_string(each.second.value()) << std::endl;
+        std::cout
+            << "  "
+            << to_string(each.first.second) << " register " << each.first.first
+            << ": contains "
+            << to_string(each.second);
+        std::cout << std::endl;
     }
 }
 
