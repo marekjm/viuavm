@@ -1740,19 +1740,13 @@ static auto analyse_single_function(
                         , function_state.type_of(source_index, source.register_set).to_simple()));
                     throw_if_invalid_type(function_state, dest, dest_index, dest_type_signature);
 
-                    if (dest_type_signature.front() == values::Value_type::Pointer) {
-                        auto& wrapper = static_cast<values::Vector&>(static_cast<values::Pointer&>(
-                            function_state.type_of(dest_index, dest.register_set).value()
-                        ).of().value());
-                        if (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
-                            wrapper.of(static_cast<values::Pointer&>(function_state.type_of(source_index, source.register_set).value()).of());
-                        } else {
-                            wrapper.of(function_state.type_of(source_index, source.register_set));
-                        }
-                    } else {
-                        auto& wrapper = static_cast<values::Vector&>(
-                            function_state.type_of(dest_index, dest.register_set).value()
-                        );
+                    {
+                        auto& wrapper = (dest_type_signature.front() == values::Value_type::Pointer)
+                            ? static_cast<values::Vector&>(static_cast<values::Pointer&>(
+                                    function_state.type_of(dest_index, dest.register_set).value()
+                                ).of().value())
+                            : static_cast<values::Vector&>(
+                                    function_state.type_of(dest_index, dest.register_set).value());
                         if (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
                             wrapper.of(static_cast<values::Pointer&>(function_state.type_of(source_index, source.register_set).value()).of());
                         } else {
