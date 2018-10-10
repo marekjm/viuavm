@@ -1740,12 +1740,14 @@ static auto analyse_single_function(
                         , function_state.type_of(source_index, source.register_set).to_simple()));
                     throw_if_invalid_type(function_state, dest, dest_index, dest_type_signature);
 
-                    function_state.erase_register(
-                        source_index
-                        , source.register_set
-                        , std::vector<viua::tooling::libs::lexer::Token>{
-                            line->token(0)
-                        });
+                    if (source.access != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        function_state.erase_register(
+                            source_index
+                            , source.register_set
+                            , std::vector<viua::tooling::libs::lexer::Token>{
+                                line->token(0)
+                            });
+                    }
 
                     break;
                 } case VPUSH: {
