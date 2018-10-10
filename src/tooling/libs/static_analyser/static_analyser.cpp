@@ -486,7 +486,7 @@ auto Function_state::fill_type(
                 wrapper.value(std::make_unique<values::Vector>(
                     make_wrapper(std::make_unique<values::Value>(Value_type::Value))
                 ));
-                wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
+                wrapper = static_cast<values::Vector&>(wrapper.value()).of();
                 break;
             case Value_type::String:
                 wrapper = make_wrapper(std::make_unique<values::String>());
@@ -498,7 +498,7 @@ auto Function_state::fill_type(
                 wrapper.value(std::make_unique<values::Pointer>(
                     make_wrapper(std::make_unique<values::Value>(Value_type::Value))
                 ));
-                wrapper = static_cast<values::Pointer const&>(wrapper.value()).of();
+                wrapper = static_cast<values::Pointer&>(wrapper.value()).of();
                 break;
             case Value_type::Boolean:
                 wrapper = make_wrapper(std::make_unique<values::Boolean>());
