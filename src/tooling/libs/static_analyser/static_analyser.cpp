@@ -1740,6 +1740,17 @@ static auto analyse_single_function(
                         , function_state.type_of(source_index, source.register_set).to_simple()));
                     throw_if_invalid_type(function_state, dest, dest_index, dest_type_signature);
 
+                    auto const& index =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                    auto const index_index = throw_if_empty(function_state, index);
+                    auto const index_type_signature = maybe_with_pointer(
+                        index.access
+                        , std::vector<values::Value_type>{
+                            values::Value_type::Integer
+                        }
+                    );
+                    throw_if_invalid_type(function_state, index, index_index, index_type_signature);
+
                     {
                         auto& wrapper = (dest_type_signature.front() == values::Value_type::Pointer)
                             ? static_cast<values::Vector&>(static_cast<values::Pointer&>(
