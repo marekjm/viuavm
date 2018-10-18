@@ -636,6 +636,37 @@ static auto parse_op_vinsert(std::vector<std::unique_ptr<Fragment>>& fragments, 
     return i;
 }
 
+static auto parse_op_vpop(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
+    using viua::tooling::libs::lexer::classifier::is_void;
+
+    if (auto const& token = tokens.at(i); is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    } else {
+        i += parse_register_address(*frag, tokens.advance(i));
+    }
+
+    i += parse_register_address(*frag, tokens.advance(i));
+
+    if (auto const& token = tokens.at(i); is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    } else {
+        i += parse_register_address(*frag, tokens.advance(i));
+    }
+
+    for (auto j = index_type{0}; j < i; ++j) {
+        frag->add(tokens.at(j));
+    }
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
 static auto parse_op_integer(std::vector<std::unique_ptr<Fragment>>& fragments, vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type {
     auto i = index_type{0};
 
@@ -1074,6 +1105,9 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case VINSERT:
                     i += parse_op_vinsert(fragments, vector_view{tokens, i});
                     break;
+                case VPOP:
+                    i += parse_op_vpop(fragments, vector_view{tokens, i});
+                    break;
                 case ADD:
                 case SUB:
                 case MUL:
@@ -1088,7 +1122,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case TEXTCOMMONPREFIX:
                 case TEXTCOMMONSUFFIX:
                 case TEXTCONCAT:
-                case VPOP:
                 case VAT:
                 case AND:
                 case OR:

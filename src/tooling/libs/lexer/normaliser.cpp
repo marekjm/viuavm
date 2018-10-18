@@ -1098,6 +1098,30 @@ static auto normalise_vinsert(std::vector<Token>& tokens, vector_view<Token> con
     return i;
 }
 
+static auto normalise_vpop(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    if (auto const& token = source.at(i); token.str() == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        i += normalise_register_access(tokens, source.advance(i));
+    }
+
+    i += normalise_register_access(tokens, source.advance(i));
+
+    if (auto const& token = source.at(i); token.str() == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        i += normalise_register_access(tokens, source.advance(i));
+    }
+
+    return i;
+}
+
 static auto normalise_closure_definition(std::vector<Token>& tokens, vector_view<Token> const& source) -> index_type {
     tokens.push_back(source.at(0));
 
@@ -1284,6 +1308,9 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case VINSERT:
                 i += normalise_vinsert(tokens, vector_view{source, i});
                 break;
+            case VPOP:
+                i += normalise_vpop(tokens, vector_view{source, i});
+                break;
             case ADD:
             case SUB:
             case MUL:
@@ -1298,7 +1325,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case TEXTCOMMONPREFIX:
             case TEXTCOMMONSUFFIX:
             case TEXTCONCAT:
-            case VPOP:
             case VAT:
             case AND:
             case OR:
