@@ -87,6 +87,8 @@ Text::Text(): Value{Value_type::Text} {}
 
 Boolean::Boolean(): Value{Value_type::Boolean} {}
 
+Bits::Bits(): Value{Value_type::Bits} {}
+
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}
@@ -182,6 +184,8 @@ static auto to_string(values::Value const& value) -> std::string {
             return "pointer to " + to_string(static_cast<values::Pointer const&>(value).of().value());
         case values::Value_type::Boolean:
             return "boolean";
+        case values::Value_type::Bits:
+            return "boolean";
         default:
             return "value";
     }
@@ -204,6 +208,8 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "pointer#" + std::to_string(value.index()) + " to " + to_string(static_cast<values::Pointer const&>(value.value()).of());
         case values::Value_type::Boolean:
             return "boolean#" + std::to_string(value.index());
+        case values::Value_type::Bits:
+            return "bits#" + std::to_string(value.index());
         default:
             return "value#" + std::to_string(value.index());
     }
@@ -230,6 +236,8 @@ static auto to_string(
             return "pointer to " + to_string(value, i + 1);
         case values::Value_type::Boolean:
             return "boolean";
+        case values::Value_type::Bits:
+            return "bits";
         default:
             return "value";
     }
@@ -253,6 +261,8 @@ static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string
             return "pointer to ...";
         case values::Value_type::Boolean:
             return "boolean";
+        case values::Value_type::Bits:
+            return "bits";
         case values::Value_type::Value:
         default:
             return "value";
@@ -502,6 +512,9 @@ auto Function_state::fill_type(
                 break;
             case Value_type::Boolean:
                 wrapper = make_wrapper(std::make_unique<values::Boolean>());
+                break;
+            case Value_type::Bits:
+                wrapper = make_wrapper(std::make_unique<values::Bits>());
                 break;
             case Value_type::Value:
             default:

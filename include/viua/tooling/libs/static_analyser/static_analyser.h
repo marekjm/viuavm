@@ -42,6 +42,7 @@ namespace values {
         Text,
         Pointer,
         Boolean,
+        Bits,
     };
 
     class Value {
@@ -123,6 +124,11 @@ namespace values {
     class Boolean : public Value {
       public:
         Boolean();
+    };
+
+    class Bits : public Value {
+      public:
+        Bits();
     };
 }
 
