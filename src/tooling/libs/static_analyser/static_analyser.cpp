@@ -2011,7 +2011,7 @@ static auto analyse_single_function(
                     function_state.define_register(
                         dest_index
                         , dest.register_set
-                        , function_state.make_wrapper(std::make_unique<values::Boolean>())
+                        , function_state.make_wrapper(std::make_unique<values::Bits>())
                         , std::move(defining_tokens)
                     );
 
