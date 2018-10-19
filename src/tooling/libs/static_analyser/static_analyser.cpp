@@ -1818,6 +1818,57 @@ static auto analyse_single_function(
 
                     break;
                 } case VPOP: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                          values::Value_type::Vector
+                        , values::Value_type::Value
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    if (instruction.operands.at(2)->type() == parser::Operand_type::Register_address) {
+                        auto const& index =
+                            *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                        auto const index_index = throw_if_empty(function_state, index);
+                        auto const index_type_signature = maybe_with_pointer(index.access, {
+                              values::Value_type::Integer
+                        });
+                        throw_if_invalid_type(function_state, index, index_index, index_type_signature);
+                    } else if (instruction.operands.at(2)->type() == parser::Operand_type::Void) {
+                        // do nothing
+                    } else {
+                        // do nothing, errors should be handled in earlier stages
+                    }
+
+                    if (instruction.operands.at(0)->type() == parser::Operand_type::Register_address) {
+                        auto const& dest =
+                            *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                        auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                        defining_tokens.push_back(line->token(0));
+                        std::copy(
+                            dest.tokens().begin()
+                            , dest.tokens().end()
+                            , std::back_inserter(defining_tokens)
+                        );
+
+                        auto const dest_index = function_state.resolve_index(dest);
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , static_cast<values::Vector const&>(
+                                function_state.type_of(source_index, source.register_set).value()
+                            ).of()
+                            , std::move(defining_tokens)
+                        );
+                    } else if (instruction.operands.at(0)->type() == parser::Operand_type::Void) {
+                        // do nothing
+                    } else {
+                        // do nothing, errors should be handled in earlier stages
+                    }
+
+                    break;
                 } case VLEN: {
                 } case BOOL: {
                 } case NOT: {
