@@ -1971,6 +1971,22 @@ static auto analyse_single_function(
 
                     break;
                 } case BITS: {
+                    auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+
+                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+
+                    using viua::tooling::libs::parser::Bits_literal;
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Bits>())
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case BITAND: {
                 } case BITOR: {
                 } case BITNOT: {
