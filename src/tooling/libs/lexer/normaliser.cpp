@@ -1262,7 +1262,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 break;
             case IINC:
             case IDEC:
-            case NOT:
             case WRAPINCREMENT:
             case WRAPDECREMENT:
             case CHECKEDSINCREMENT:
@@ -1284,6 +1283,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case FLOAT:
                 i += normalise_float(tokens, vector_view{source, i});
                 break;
+            case NOT:
             case ITOF:
             case FTOI:
             case STOI:

@@ -1059,7 +1059,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case IZERO:
                 case IINC:
                 case IDEC:
-                case NOT:
                 case WRAPINCREMENT:
                 case WRAPDECREMENT:
                 case CHECKEDSINCREMENT:
@@ -1081,6 +1080,7 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std:
                 case STRUCT:
                     i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
                     break;
+                case NOT:
                 case ITOF:
                 case FTOI:
                 case STOI:
