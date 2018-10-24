@@ -2125,6 +2125,39 @@ static auto analyse_single_function(
 
                     break;
                 } case BITSET: {
+                    auto const& target =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const target_index = throw_if_empty(function_state, target);
+                    auto const target_type_signature = maybe_with_pointer(target.access, {
+                          values::Value_type::Bits
+                    });
+                    throw_if_invalid_type(
+                        function_state
+                        , target
+                        , target_index
+                        , target_type_signature
+                    );
+
+                    auto const& index =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+
+                    auto const index_index = throw_if_empty(function_state, index);
+                    auto const index_type_signature = maybe_with_pointer(index.access, {
+                        values::Value_type::Integer
+                    });
+                    throw_if_invalid_type(
+                        function_state
+                        , index
+                        , index_index
+                        , index_type_signature
+                    );
+
+                    /*
+                     * Type checking for the third operand is not needed since it was performed by
+                     * the earlier stages.
+                     */
+
+                    break;
                 } case SHL: {
                 } case SHR: {
                 } case ASHL: {
