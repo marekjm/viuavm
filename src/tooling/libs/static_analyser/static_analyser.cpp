@@ -598,6 +598,11 @@ Function_state::Function_state(
     , local_registers_allocated_where{std::move(location)}
 {}
 
+template<typename Container, typename Appender>
+auto copy_whole(Container const& source, Appender const& appender) -> void {
+    std::copy(source.begin(), source.end(), appender);
+}
+
 static auto maybe_with_pointer(
     viua::internals::Access_specifier const access
     , std::initializer_list<values::Value_type> const base
@@ -606,7 +611,7 @@ static auto maybe_with_pointer(
         ? std::vector<values::Value_type>{ values::Value_type::Pointer }
         : std::vector<values::Value_type>{}
     );
-    std::copy(base.begin(), base.end(), std::back_inserter(signature));
+    copy_whole(base, std::back_inserter(signature));
     return signature;
 }
 static auto maybe_with_pointer(
@@ -617,7 +622,7 @@ static auto maybe_with_pointer(
         ? std::vector<values::Value_type>{ values::Value_type::Pointer }
         : std::vector<values::Value_type>{}
     );
-    std::copy(base.begin(), base.end(), std::back_inserter(signature));
+    copy_whole(base, std::back_inserter(signature));
     return signature;
 }
 
@@ -684,7 +689,7 @@ static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
 
     v.reserve(seq.size() + 1);
     v.push_back(element);
-    std::copy(seq.begin(), seq.end(), std::back_inserter(v));
+    copy_whole(seq, std::back_inserter(v));
 
     return v;
 }
@@ -813,12 +818,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     function_state.define_register(
                         function_state.resolve_index(dest)
@@ -836,8 +836,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     using viua::tooling::libs::parser::Integer_literal;
                     function_state.define_register(
@@ -899,11 +898,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        target.tokens().begin()
-                        , target.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(target.tokens(), std::back_inserter(defining_tokens));
                     function_state.mutate_register(
                         target_index
                         , target.register_set
@@ -917,8 +912,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     using viua::tooling::libs::parser::Integer_literal;
                     function_state.define_register(
@@ -971,11 +965,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        destination.tokens().begin()
-                        , destination.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(destination.tokens(), std::back_inserter(defining_tokens));
 
                     auto const destination_index = function_state.resolve_index(destination);
                     function_state.define_register(
@@ -1026,11 +1016,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        destination.tokens().begin()
-                        , destination.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(destination.tokens(), std::back_inserter(defining_tokens));
 
                     auto const destination_index = function_state.resolve_index(destination);
                     function_state.define_register(
@@ -1081,11 +1067,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        destination.tokens().begin()
-                        , destination.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(destination.tokens(), std::back_inserter(defining_tokens));
 
                     auto const destination_index = function_state.resolve_index(destination);
                     function_state.define_register(
@@ -1136,11 +1118,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        destination.tokens().begin()
-                        , destination.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(destination.tokens(), std::back_inserter(defining_tokens));
 
                     auto const destination_index = function_state.resolve_index(destination);
                     function_state.define_register(
@@ -1178,7 +1156,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1194,8 +1172,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     using viua::tooling::libs::parser::Integer_literal;
                     function_state.define_register(
@@ -1219,7 +1196,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const strip_pointer = [](values::Value_wrapper wrapper) -> values::Value_wrapper {
                             if (wrapper.value().type() == values::Value_type::Pointer) {
@@ -1243,7 +1220,7 @@ static auto analyse_single_function(
                             , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
                                 auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                                 tokens.push_back(instruction.tokens().at(0));
-                                std::copy(source.tokens().begin(), source.tokens().end(), std::back_inserter(tokens));
+                                copy_whole(source.tokens(), std::back_inserter(tokens));
                                 return tokens;
                             }()
                         );
@@ -1338,7 +1315,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1355,7 +1332,7 @@ static auto analyse_single_function(
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
 
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     function_state.define_register(
                         function_state.resolve_index(dest)
@@ -1385,7 +1362,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1415,7 +1392,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1457,7 +1434,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     function_state.define_register(
                         function_state.resolve_index(dest)
@@ -1482,7 +1459,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1522,7 +1499,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1559,7 +1536,7 @@ static auto analyse_single_function(
                     if (instruction.operands.at(1)->type() == Operand_type::Void) {
                         auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                         defining_tokens.push_back(line->token(0));
-                        std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                        copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                         auto const dest_index = function_state.resolve_index(dest);
                         function_state.define_register(
@@ -1622,7 +1599,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const first_type = function_state.type_of(
                         first_packed
@@ -1825,11 +1802,7 @@ static auto analyse_single_function(
 
                         auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                         defining_tokens.push_back(line->token(0));
-                        std::copy(
-                            dest.tokens().begin()
-                            , dest.tokens().end()
-                            , std::back_inserter(defining_tokens)
-                        );
+                        copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                         auto const dest_index = function_state.resolve_index(dest);
                         function_state.define_register(
@@ -1867,7 +1840,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1897,11 +1870,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1925,11 +1894,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1955,11 +1920,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -1975,8 +1936,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     using viua::tooling::libs::parser::Bits_literal;
                     function_state.define_register(
@@ -2001,11 +1961,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -2050,11 +2006,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -2079,11 +2031,7 @@ static auto analyse_single_function(
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(
-                        dest.tokens().begin()
-                        , dest.tokens().end()
-                        , std::back_inserter(defining_tokens)
-                    );
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -2113,7 +2061,7 @@ static auto analyse_single_function(
                     auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    std::copy(dest.tokens().begin(), dest.tokens().end(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
                     function_state.define_register(
@@ -2220,11 +2168,8 @@ static auto analyse_single_function(
                     auto const target_index = throw_if_empty(function_state, target);
                     auto erasing_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     erasing_tokens.push_back(instruction.tokens().at(0));
-                    std::copy(
-                        target.tokens().begin()
-                        , target.tokens().end()
-                        , std::back_inserter(erasing_tokens)
-                    );
+                    copy_whole(target.tokens(), std::back_inserter(erasing_tokens));
+
                     function_state.erase_register(target_index, target.register_set, erasing_tokens);
 
                     break;
