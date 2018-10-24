@@ -801,9 +801,10 @@ static auto parse_op_bitset(std::vector<std::unique_ptr<Fragment>>& fragments, v
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
-    i += parse_register_address(*frag, tokens.advance(1));
-    i += parse_register_address(*frag, tokens.advance(1));
+    i += parse_register_address(*frag, tokens.advance(i));
+    i += parse_register_address(*frag, tokens.advance(i));
 
     auto lit = std::make_unique<Boolean_literal>(string_to_boolean(tokens.at(i).str()));
     lit->add(tokens.at(i++));
