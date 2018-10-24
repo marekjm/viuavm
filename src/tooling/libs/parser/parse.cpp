@@ -818,6 +818,8 @@ static auto parse_op_call(std::vector<std::unique_ptr<Fragment>>& fragments, vec
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_access_type_specifier(token.str())) {
