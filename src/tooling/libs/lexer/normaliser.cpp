@@ -882,7 +882,7 @@ static auto normalise_bit_set(std::vector<Token>& tokens, vector_view<Token> con
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
-        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+        i += normalise_ctor_target_register_access(tokens, source.advance(i));
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
@@ -894,7 +894,7 @@ static auto normalise_bit_set(std::vector<Token>& tokens, vector_view<Token> con
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     if (auto const& token = source.at(i); is_access_type_specifier(token.str())) {
-        i += normalise_ctor_target_register_access(tokens, source.advance(1));
+        i += normalise_ctor_target_register_access(tokens, source.advance(i));
     } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
