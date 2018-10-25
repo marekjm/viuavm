@@ -2172,6 +2172,35 @@ static auto analyse_single_function(
                 } case BITALTE: {
                 } case BITAGT: {
                 } case BITAGTE: {
+                    auto const& lhs = *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& rhs = *static_cast<Register_address const*>(instruction.operands.at(2).get());
+
+                    auto const lhs_index = throw_if_empty(function_state, lhs);
+                    auto const lhs_type_signature = maybe_with_pointer(lhs.access, {
+                        values::Value_type::Bits
+                    });
+                    throw_if_invalid_type(function_state, lhs, lhs_index, lhs_type_signature);
+
+                    auto const rhs_index = throw_if_empty(function_state, rhs);
+                    auto const rhs_type_signature = maybe_with_pointer(rhs.access, {
+                        values::Value_type::Bits
+                    });
+                    throw_if_invalid_type(function_state, rhs, rhs_index, rhs_type_signature);
+
+                    auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    auto const dest_index = function_state.resolve_index(dest);
+                    function_state.define_register(
+                        dest_index
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Boolean>())
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 // wrapped
                 } case WRAPINCREMENT: {
                 } case WRAPDECREMENT: {
