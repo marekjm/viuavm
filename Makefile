@@ -59,7 +59,6 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Wunused-const-variable=2 \
 				 -Wduplicated-branches \
 				 -Wduplicated-cond \
-				 -Wconversion \
 				 -Wsign-conversion \
 				 -Wrestrict \
 				 -Wstack-protector \
