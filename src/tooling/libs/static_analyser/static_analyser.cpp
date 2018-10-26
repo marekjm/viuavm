@@ -2345,6 +2345,32 @@ static auto analyse_single_function(
 
                     break;
                 } case PTRLIVE: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Pointer
+                        , values::Value_type::Value
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    auto const dest_index = function_state.resolve_index(dest);
+                    function_state.define_register(
+                        dest_index
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Boolean>())
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case SWAP: {
                 } case DELETE: {
                     auto const& target =
