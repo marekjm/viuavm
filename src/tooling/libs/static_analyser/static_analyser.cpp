@@ -2201,37 +2201,55 @@ static auto analyse_single_function(
                     );
 
                     break;
-                // wrapped
                 } case WRAPINCREMENT: {
                 } case WRAPDECREMENT: {
+                } case CHECKEDSINCREMENT: {
+                } case CHECKEDSDECREMENT: {
+                } case CHECKEDUINCREMENT: {
+                } case CHECKEDUDECREMENT: {
+                } case SATURATINGSINCREMENT: {
+                } case SATURATINGSDECREMENT: {
+                } case SATURATINGUINCREMENT: {
+                } case SATURATINGUDECREMENT: {
+                    auto const& target =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto const target_index = throw_if_empty(function_state, target);
+                    auto const target_type_signature = maybe_with_pointer(target.access, {
+                        values::Value_type::Bits
+                    });
+                    throw_if_invalid_type(function_state, target, target_index, target_type_signature);
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(target.tokens(), std::back_inserter(defining_tokens));
+                    function_state.mutate_register(
+                        target_index
+                        , target.register_set
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case WRAPADD: {
                 } case WRAPSUB: {
                 } case WRAPMUL: {
                 } case WRAPDIV: {
                 // checked signed
-                } case CHECKEDSINCREMENT: {
-                } case CHECKEDSDECREMENT: {
                 } case CHECKEDSADD: {
                 } case CHECKEDSSUB: {
                 } case CHECKEDSMUL: {
                 } case CHECKEDSDIV: {
                 // checked unsigned
-                } case CHECKEDUINCREMENT: {
-                } case CHECKEDUDECREMENT: {
                 } case CHECKEDUADD: {
                 } case CHECKEDUSUB: {
                 } case CHECKEDUMUL: {
                 } case CHECKEDUDIV: {
                 // saturating signed
-                } case SATURATINGSINCREMENT: {
-                } case SATURATINGSDECREMENT: {
                 } case SATURATINGSADD: {
                 } case SATURATINGSSUB: {
                 } case SATURATINGSMUL: {
                 } case SATURATINGSDIV: {
                 // saturating unsigned
-                } case SATURATINGUINCREMENT: {
-                } case SATURATINGUDECREMENT: {
                 } case SATURATINGUADD: {
                 } case SATURATINGUSUB: {
                 } case SATURATINGUMUL: {
