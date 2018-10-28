@@ -2372,6 +2372,80 @@ static auto analyse_single_function(
 
                     break;
                 } case SWAP: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const source_index = throw_if_empty(function_state, source);
+                    if (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , source.tokens().at(0)
+                                , "only direct access allowed for `swap' instruction"
+                            });
+                        throw error;
+                    }
+
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const dest_index = throw_if_empty(function_state, dest);
+                    if (dest.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , dest.tokens().at(0)
+                                , "only direct access allowed for `swap' instruction"
+                            });
+                        throw error;
+                    }
+
+                    auto source_type = function_state.type_of(source_index, source.register_set);
+                    auto dest_type = function_state.type_of(dest_index, dest.register_set);
+
+                    function_state.erase_register(
+                        source_index
+                        , source.register_set
+                        , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            copy_whole(source.tokens(), std::back_inserter(tokens));
+                            return tokens;
+                        }()
+                    );
+                    function_state.erase_register(
+                        dest_index
+                        , dest.register_set
+                        , [&instruction, &dest]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            copy_whole(dest.tokens(), std::back_inserter(tokens));
+                            return tokens;
+                        }()
+                    );
+
+                    function_state.define_register(
+                        source_index
+                        , source.register_set
+                        , dest_type
+                        , [&instruction, &source]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            copy_whole(source.tokens(), std::back_inserter(tokens));
+                            return tokens;
+                        }()
+                    );
+                    function_state.define_register(
+                        dest_index
+                        , dest.register_set
+                        , source_type
+                        , [&instruction, &dest]() -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            copy_whole(dest.tokens(), std::back_inserter(tokens));
+                            return tokens;
+                        }()
+                    );
+
+                    break;
                 } case DELETE: {
                     auto const& target =
                         *static_cast<Register_address const*>(instruction.operands.at(0).get());
