@@ -421,7 +421,7 @@ auto Function_state::erase_register(
     auto const address = std::make_pair(index, register_set);
     erased_registers.emplace(address, defined_registers.at(address));
     defined_registers.erase(defined_registers.find(address));
-    erased_where.emplace(address, std::move(location));
+    erased_where.insert_or_assign(address, std::move(location));
 }
 
 auto Function_state::erased(
