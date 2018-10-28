@@ -2464,6 +2464,16 @@ static auto analyse_single_function(
                     break;
                 } case PRINT: {
                 } case ECHO: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Value
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    break;
                 } case CAPTURE: {
                 } case CAPTURECOPY: {
                 } case CAPTUREMOVE: {
