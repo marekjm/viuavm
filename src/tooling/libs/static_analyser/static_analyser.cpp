@@ -2508,8 +2508,13 @@ static auto analyse_single_function(
                 } case STRUCTINSERT: {
                 } case STRUCTREMOVE: {
                 } case STRUCTKEYS: {
+                    break;
                 } case RETURN: {
                 } case HALT: {
+                    /*
+                     * These instructions do not access registers.
+                     */
+                    break;
                 } default: {
                     // FIXME do nothing, but later add a warning that such-and-such instruction
                     // is not covered by static analyser
