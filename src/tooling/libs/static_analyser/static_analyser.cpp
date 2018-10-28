@@ -2459,6 +2459,9 @@ static auto analyse_single_function(
 
                     break;
                 } case ISNULL: {
+                    // FIXME do nothing, but later add a warning that such-and-such instruction
+                    // is not covered by static analyser
+                    break;
                 } case PRINT: {
                 } case ECHO: {
                 } case CAPTURE: {
