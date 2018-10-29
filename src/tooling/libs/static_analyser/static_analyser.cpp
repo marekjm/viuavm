@@ -2451,6 +2451,16 @@ static auto analyse_single_function(
                         *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
                     auto const target_index = throw_if_empty(function_state, target);
+                    if (target.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                                , target.tokens().at(0)
+                                , "only direct access allowed for `delete' instruction"
+                            });
+                        throw error;
+                    }
+
                     auto erasing_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     erasing_tokens.push_back(instruction.tokens().at(0));
                     copy_whole(target.tokens(), std::back_inserter(erasing_tokens));
