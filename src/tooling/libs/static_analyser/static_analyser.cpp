@@ -2506,6 +2506,24 @@ static auto analyse_single_function(
                 } case JUMP: {
                 } case IF: {
                 } case THROW: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    throw_if_empty(function_state, source);
+                    if (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Invalid_access_type_specifier
+                                , source.tokens().at(0)
+                                , "only direct access allowed for `throw' instruction"
+                            });
+                        throw error;
+                    }
+
+                    /*
+                     * Return from the function as throwing aborts the normal flow.
+                     */
+                    return;
                 } case CATCH: {
                 } case DRAW: {
                 } case TRY: {
