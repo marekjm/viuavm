@@ -854,6 +854,7 @@ static auto parse_op_function(std::vector<std::unique_ptr<Fragment>>& fragments,
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
     i += parse_register_address(*frag, tokens.advance(i));
 
     using viua::tooling::libs::lexer::classifier::is_id;
