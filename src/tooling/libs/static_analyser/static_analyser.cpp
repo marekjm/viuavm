@@ -2556,7 +2556,7 @@ static auto analyse_single_function(
                         function_state.resolve_index(dest)
                         , dest.register_set
                         , function_state.make_wrapper(std::make_unique<values::Closure>(
-                            instruction.operands.at(1)->tokens().at(0).str()
+                            closure_name
                         ))
                         , std::move(defining_tokens)
                     );
