@@ -89,6 +89,24 @@ Boolean::Boolean(): Value{Value_type::Boolean} {}
 
 Bits::Bits(): Value{Value_type::Bits} {}
 
+Closure::Closure(std::string n):
+    Value{Value_type::Closure}
+    , name{n}
+{}
+
+auto Closure::of() const -> std::string {
+    return name;
+}
+
+Function::Function(std::string n):
+    Value{Value_type::Function}
+    , name{n}
+{}
+
+auto Function::of() const -> std::string {
+    return name;
+}
+
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}
@@ -186,6 +204,10 @@ static auto to_string(values::Value const& value) -> std::string {
             return "boolean";
         case values::Value_type::Bits:
             return "boolean";
+        case values::Value_type::Closure:
+            return "closure";
+        case values::Value_type::Function:
+            return "function";
         default:
             return "value";
     }
@@ -210,6 +232,10 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "boolean#" + std::to_string(value.index());
         case values::Value_type::Bits:
             return "bits#" + std::to_string(value.index());
+        case values::Value_type::Closure:
+            return "closure#" + std::to_string(value.index()) + " of " + static_cast<values::Closure const&>(value.value()).of();
+        case values::Value_type::Function:
+            return "function#" + std::to_string(value.index()) + " of " + static_cast<values::Function const&>(value.value()).of();
         default:
             return "value#" + std::to_string(value.index());
     }
@@ -238,6 +264,10 @@ static auto to_string(
             return "boolean";
         case values::Value_type::Bits:
             return "bits";
+        case values::Value_type::Closure:
+            return "closure";
+        case values::Value_type::Function:
+            return "function";
         default:
             return "value";
     }
@@ -263,6 +293,10 @@ static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string
             return "boolean";
         case values::Value_type::Bits:
             return "bits";
+        case values::Value_type::Closure:
+            return "closure";
+        case values::Value_type::Function:
+            return "function";
         case values::Value_type::Value:
         default:
             return "value";
@@ -515,6 +549,12 @@ auto Function_state::fill_type(
                 break;
             case Value_type::Bits:
                 wrapper = make_wrapper(std::make_unique<values::Bits>());
+                break;
+            case Value_type::Closure:
+                wrapper = make_wrapper(std::make_unique<values::Closure>());
+                break;
+            case Value_type::Function:
+                wrapper = make_wrapper(std::make_unique<values::Function>());
                 break;
             case Value_type::Value:
             default:

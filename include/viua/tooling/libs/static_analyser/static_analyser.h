@@ -43,6 +43,8 @@ namespace values {
         Pointer,
         Boolean,
         Bits,
+        Closure,
+        Function,
     };
 
     class Value {
@@ -129,6 +131,22 @@ namespace values {
     class Bits : public Value {
       public:
         Bits();
+    };
+
+    class Closure : public Value {
+        std::string name;
+      public:
+        auto of() const -> std::string;
+
+        Closure(std::string name = "");
+    };
+
+    class Function : public Value {
+        std::string name;
+      public:
+        auto of() const -> std::string;
+
+        Function(std::string name = "");
     };
 }
 
