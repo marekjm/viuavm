@@ -736,7 +736,7 @@ static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
 
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
-    , viua::tooling::libs::parser::Cooked_fragments const&
+    , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state&
 ) -> void {
     if (fn.body().size() == 0) {
@@ -2527,8 +2527,76 @@ static auto analyse_single_function(
                 } case CAPTURE: {
                 } case CAPTURECOPY: {
                 } case CAPTUREMOVE: {
+                    break;
                 } case CLOSURE: {
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto const closure_name = (
+                        instruction.operands.at(1)->tokens().at(0).str()
+                        + '/'
+                        + instruction.operands.at(1)->tokens().at(2).str()
+                    );
+                    if (fragments.closure_fragments.count(closure_name) == 0) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(0)
+                                , "no closure named `" + closure_name + "'"
+                            }.add(instruction.operands.at(1)->tokens().at(1))
+                            .add(instruction.operands.at(1)->tokens().at(2)));
+                        throw error;
+                    }
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Closure>(
+                            instruction.operands.at(1)->tokens().at(0).str()
+                        ))
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case FUNCTION: {
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto const function_name = (
+                        instruction.operands.at(1)->tokens().at(0).str()
+                        + '/'
+                        + instruction.operands.at(1)->tokens().at(2).str()
+                    );
+
+                    if (fragments.function_fragments.count(function_name) == 0) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , instruction.operands.at(1)->tokens().at(0)
+                                , "no function named `" + function_name + "'"
+                            }.add(instruction.operands.at(1)->tokens().at(1))
+                            .add(instruction.operands.at(1)->tokens().at(2)));
+                        throw error;
+                    }
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Function>(
+                            function_name
+                        ))
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case FRAME: {
                 } case PARAM: {
                 } case PAMV: {
@@ -2545,6 +2613,7 @@ static auto analyse_single_function(
                 } case WATCHDOG: {
                 } case JUMP: {
                 } case IF: {
+                    break;
                 } case THROW: {
                     auto const& source =
                         *static_cast<Register_address const*>(instruction.operands.at(0).get());
