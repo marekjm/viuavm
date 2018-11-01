@@ -203,7 +203,7 @@ static auto to_string(values::Value const& value) -> std::string {
         case values::Value_type::Boolean:
             return "boolean";
         case values::Value_type::Bits:
-            return "boolean";
+            return "bits";
         case values::Value_type::Closure:
             return "closure";
         case values::Value_type::Function:
