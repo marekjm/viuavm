@@ -2593,12 +2593,19 @@ static auto analyse_single_function(
 
                     break;
                 } case FRAME: {
+                    // FIXME TODO
+                    break;
                 } case PARAM: {
                 } case PAMV: {
+                } case ARG: {
+                    /*
+                     * These instructions are not available to user
+                     * code. Instead, `move` and `copy` are used.
+                     */
+                    break;
                 } case CALL: {
                 } case TAILCALL: {
                 } case DEFER: {
-                } case ARG: {
                 } case ALLOCATE_REGISTERS: {
                 } case PROCESS: {
                 } case SELF: {
@@ -2633,7 +2640,12 @@ static auto analyse_single_function(
                 } case TRY: {
                 } case ENTER: {
                 } case LEAVE: {
+                    break;
                 } case IMPORT: {
+                    /*
+                     * This instruction does not touch any registers.
+                     */
+                    break;
                 } case ATOM: {
                 } case ATOMEQ: {
                 } case STRUCT: {
