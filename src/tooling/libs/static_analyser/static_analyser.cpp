@@ -245,9 +245,9 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
         case values::Value_type::Function:
             return "function#" + std::to_string(value.index()) + " of " + static_cast<values::Function const&>(value.value()).of();
         case values::Value_type::Atom:
-            return "atom" + std::to_string(value.index());
+            return "atom#" + std::to_string(value.index());
         case values::Value_type::Struct:
-            return "struct" + std::to_string(value.index());
+            return "struct#" + std::to_string(value.index());
         default:
             return "value#" + std::to_string(value.index());
     }
