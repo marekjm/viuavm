@@ -107,6 +107,10 @@ auto Function::of() const -> std::string {
     return name;
 }
 
+Atom::Atom(): Value{Value_type::Atom} {}
+
+Struct::Struct(): Value{Value_type::Struct} {}
+
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}
@@ -208,6 +212,10 @@ static auto to_string(values::Value const& value) -> std::string {
             return "closure";
         case values::Value_type::Function:
             return "function";
+        case values::Value_type::Atom:
+            return "atom";
+        case values::Value_type::Struct:
+            return "struct";
         default:
             return "value";
     }
@@ -236,6 +244,10 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "closure#" + std::to_string(value.index()) + " of " + static_cast<values::Closure const&>(value.value()).of();
         case values::Value_type::Function:
             return "function#" + std::to_string(value.index()) + " of " + static_cast<values::Function const&>(value.value()).of();
+        case values::Value_type::Atom:
+            return "atom" + std::to_string(value.index());
+        case values::Value_type::Struct:
+            return "struct" + std::to_string(value.index());
         default:
             return "value#" + std::to_string(value.index());
     }
@@ -268,39 +280,16 @@ static auto to_string(
             return "closure";
         case values::Value_type::Function:
             return "function";
+        case values::Value_type::Atom:
+            return "atom";
+        case values::Value_type::Struct:
+            return "struct";
         default:
             return "value";
     }
 }
 static auto to_string(std::vector<values::Value_type> const& value) -> std::string {
     return to_string(value, 0);
-}
-static auto to_string[[maybe_unused]](values::Value_type const v) -> std::string {
-    switch (v) {
-        case values::Value_type::Integer:
-            return "integer";
-        case values::Value_type::Float:
-            return "float";
-        case values::Value_type::Vector:
-            return "vector of ...";
-        case values::Value_type::String:
-            return "string";
-        case values::Value_type::Text:
-            return "text";
-        case values::Value_type::Pointer:
-            return "pointer to ...";
-        case values::Value_type::Boolean:
-            return "boolean";
-        case values::Value_type::Bits:
-            return "bits";
-        case values::Value_type::Closure:
-            return "closure";
-        case values::Value_type::Function:
-            return "function";
-        case values::Value_type::Value:
-        default:
-            return "value";
-    }
 }
 
 auto Function_state::make_wrapper(std::unique_ptr<values::Value> v) -> values::Value_wrapper {
@@ -555,6 +544,12 @@ auto Function_state::fill_type(
                 break;
             case Value_type::Function:
                 wrapper = make_wrapper(std::make_unique<values::Function>());
+                break;
+            case Value_type::Atom:
+                wrapper = make_wrapper(std::make_unique<values::Atom>());
+                break;
+            case Value_type::Struct:
+                wrapper = make_wrapper(std::make_unique<values::Struct>());
                 break;
             case Value_type::Value:
             default:

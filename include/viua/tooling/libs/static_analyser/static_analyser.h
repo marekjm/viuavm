@@ -45,6 +45,8 @@ namespace values {
         Bits,
         Closure,
         Function,
+        Atom,
+        Struct,
     };
 
     class Value {
@@ -147,6 +149,16 @@ namespace values {
         auto of() const -> std::string;
 
         Function(std::string name = "");
+    };
+
+    class Atom : public Value {
+      public:
+        Atom();
+    };
+
+    class Struct : public Value {
+      public:
+        Struct();
     };
 }
 
