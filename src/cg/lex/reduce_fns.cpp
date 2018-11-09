@@ -757,6 +757,10 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
         }
 
         if (token == "iota") {
+            if (iotas.empty()) {
+                throw viua::cg::lex::Invalid_syntax(
+                    token, (token.str() + " used outside of iota scope"));
+            }
             tokens.emplace_back(token.line(),
                                 token.character(),
                                 str::stringify(iotas.back()++, false));
@@ -764,6 +768,10 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
         } else if ((token.str().at(0) == '%' or token.str().at(0) == '@'
                     or token.str().at(0) == '*')
                    and token.str().substr(1) == "iota") {
+            if (iotas.empty()) {
+                throw viua::cg::lex::Invalid_syntax(
+                    token, (token.str() + " used outside of iota scope"));
+            }
             tokens.emplace_back(
                 token.line(),
                 token.character(),

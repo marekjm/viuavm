@@ -26,6 +26,37 @@
 using namespace std;
 
 namespace viua { namespace cg { namespace lex {
+static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {
+    using size_type = std::remove_reference_t<decltype(tokens)>::size_type;
+    for (auto i = size_type{0}; i < tokens.size(); ++i) {
+        if (tokens.at(i) != ".") {
+            continue;
+        }
+
+        auto const need_colon = std::set<std::string>{
+            "function"
+            , "closure"
+            , "block"
+            , "signature"
+            , "bsignature"
+            , "info"
+            , "name"
+            , "import"
+            , "mark"
+            , "iota"
+        };
+        if (need_colon.count(tokens.at(i + 1)) == 0) {
+            continue;
+        }
+
+        if (tokens.at(i + 2) != ":") {
+            throw viua::cg::lex::Invalid_syntax(
+                tokens.at(i + 1),
+                ("missing ':' after `" + tokens.at(i + 1).str() + "'")).add(tokens.at(i));
+        }
+    }
+}
+
 auto cook(std::vector<Token> tokens, bool const with_replaced_names)
     -> std::vector<Token> {
     /*
@@ -61,6 +92,8 @@ auto cook(std::vector<Token> tokens, bool const with_replaced_names)
     tokens = reduce_import_directive(tokens);
     tokens = reduce_mark_directive(tokens);
     tokens = reduce_iota_directive(tokens);
+
+    check_for_missing_colons(tokens);
 
     /*
      * Reduce directive-looking strings.
