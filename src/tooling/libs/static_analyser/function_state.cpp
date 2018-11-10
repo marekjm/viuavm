@@ -286,6 +286,9 @@ auto Function_state::fill_type(
             case Value_type::Struct:
                 wrapper = make_wrapper(std::make_unique<values::Struct>());
                 break;
+            case Value_type::Pid:
+                wrapper = make_wrapper(std::make_unique<values::Pid>());
+                break;
             case Value_type::Value:
             default:
                 // do nothing
@@ -388,6 +391,8 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "atom#" + std::to_string(value.index());
         case values::Value_type::Struct:
             return "struct#" + std::to_string(value.index());
+        case values::Value_type::Pid:
+            return "pid#" + std::to_string(value.index());
         default:
             return "value#" + std::to_string(value.index());
     }

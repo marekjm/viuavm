@@ -111,6 +111,8 @@ Atom::Atom(): Value{Value_type::Atom} {}
 
 Struct::Struct(): Value{Value_type::Struct} {}
 
+Pid::Pid(): Value{Value_type::Pid} {}
+
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):
     i{v}
     , values{&m}

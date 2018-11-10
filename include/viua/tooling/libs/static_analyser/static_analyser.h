@@ -47,6 +47,7 @@ namespace values {
         Function,
         Atom,
         Struct,
+        Pid,
     };
 
     class Value {
@@ -159,6 +160,11 @@ namespace values {
     class Struct : public Value {
       public:
         Struct();
+    };
+
+    class Pid : public Value {
+      public:
+        Pid();
     };
 }
 

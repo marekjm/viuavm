@@ -76,6 +76,8 @@ static auto to_string(values::Value const& value) -> std::string {
             return "atom";
         case values::Value_type::Struct:
             return "struct";
+        case values::Value_type::Pid:
+            return "pid";
         default:
             return "value";
     }
@@ -108,6 +110,8 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "atom#" + std::to_string(value.index());
         case values::Value_type::Struct:
             return "struct#" + std::to_string(value.index());
+        case values::Value_type::Pid:
+            return "pid#" + std::to_string(value.index());
         default:
             return "value#" + std::to_string(value.index());
     }
@@ -144,6 +148,8 @@ static auto to_string(
             return "atom";
         case values::Value_type::Struct:
             return "struct";
+        case values::Value_type::Pid:
+            return "pid";
         default:
             return "value";
     }
