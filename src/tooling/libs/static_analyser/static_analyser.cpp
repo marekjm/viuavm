@@ -2047,6 +2047,7 @@ static auto analyse_single_function(
                 } case CAPTURE: {
                 } case CAPTURECOPY: {
                 } case CAPTUREMOVE: {
+                    // FIXME TODO
                     break;
                 } case CLOSURE: {
                     auto const& dest =
@@ -2133,13 +2134,20 @@ static auto analyse_single_function(
                 } case DEFER: {
                 } case ALLOCATE_REGISTERS: {
                 } case PROCESS: {
+                    // FIXME TODO
+                    break;
                 } case SELF: {
                 } case JOIN: {
                 } case SEND: {
                 } case RECEIVE: {
                 } case WATCHDOG: {
+                    // FIXME TODO
+                    break;
                 } case JUMP: {
+                    // FIXME TODO
+                    break;
                 } case IF: {
+                    // FIXME TODO
                     break;
                 } case THROW: {
                     auto const& source =
