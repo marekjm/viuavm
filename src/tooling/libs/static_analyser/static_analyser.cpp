@@ -2219,6 +2219,8 @@ static auto analyse_single_function(
 
                     break;
                 } case ATOMEQ: {
+                    // FIXME TODO
+                    break;
                 } case STRUCT: {
                 } case STRUCTINSERT: {
                 } case STRUCTREMOVE: {
