@@ -2222,6 +2222,21 @@ static auto analyse_single_function(
                     // FIXME TODO
                     break;
                 } case STRUCT: {
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Struct>())
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case STRUCTINSERT: {
                 } case STRUCTREMOVE: {
                 } case STRUCTKEYS: {
