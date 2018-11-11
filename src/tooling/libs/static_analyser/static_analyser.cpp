@@ -2238,7 +2238,72 @@ static auto analyse_single_function(
 
                     break;
                 } case STRUCTINSERT: {
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const dest_index = throw_if_empty(function_state, dest);
+                    auto const dest_type_signature = maybe_with_pointer(dest.access, {
+                        values::Value_type::Struct
+                    });
+                    throw_if_invalid_type(function_state, dest, dest_index, dest_type_signature);
+
+                    auto const& key =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const key_index = throw_if_empty(function_state, key);
+                    auto const key_type_signature = maybe_with_pointer(key.access, {
+                        values::Value_type::Atom
+                    });
+                    throw_if_invalid_type(function_state, key, key_index, key_type_signature);
+
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Value
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    if (source.access != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        function_state.erase_register(
+                            source_index
+                            , source.register_set
+                            , std::vector<viua::tooling::libs::lexer::Token>{
+                                line->token(0)
+                            });
+                    }
+
+                    break;
                 } case STRUCTREMOVE: {
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const source_index = throw_if_empty(function_state, source);
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
+                        values::Value_type::Struct
+                    });
+                    throw_if_invalid_type(function_state, source, source_index, source_type_signature);
+
+                    auto const& key =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                    auto const key_index = throw_if_empty(function_state, key);
+                    auto const key_type_signature = maybe_with_pointer(key.access, {
+                        values::Value_type::Atom
+                    });
+                    throw_if_invalid_type(function_state, key, key_index, key_type_signature);
+
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
+
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    function_state.define_register(
+                        function_state.resolve_index(dest)
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Value>(values::Value_type::Value))
+                        , std::move(defining_tokens)
+                    );
+
+                    break;
                 } case STRUCTKEYS: {
                     break;
                 } case RETURN: {
