@@ -2219,7 +2219,86 @@ static auto analyse_single_function(
 
                     break;
                 } case ATOMEQ: {
-                    // FIXME TODO
+                    auto const& lhs =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& rhs =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
+
+                    auto const lhs_index = throw_if_empty(function_state, lhs);
+                    auto const lhs_type_signature = maybe_with_pointer(lhs.access, {
+                        values::Value_type::Atom
+                    });
+                    throw_if_invalid_type(function_state, lhs, lhs_index, lhs_type_signature);
+
+                    auto const rhs_index = throw_if_empty(function_state, rhs);
+                    auto const rhs_type_signature = maybe_with_pointer(rhs.access, {
+                        values::Value_type::Atom
+                    });
+                    throw_if_invalid_type(function_state, rhs, rhs_index, rhs_type_signature);
+
+                    using values::Atom;
+                    auto const& lhs_operand = static_cast<Atom const&>(
+                        function_state.type_of(lhs_index, lhs.register_set).value()
+                    );
+                    auto const& rhs_operand = static_cast<Atom const&>(
+                        function_state.type_of(rhs_index, rhs.register_set).value()
+                    );
+                    if (lhs_operand.known() and rhs_operand.known()) {
+                        auto msg = std::ostringstream{};
+                        msg << "left-hand side will ";
+                        auto const l = lhs_operand.content();
+                        auto const r = rhs_operand.content();
+                        if (l == r) {
+                            msg << "always";
+                        } else {
+                            msg << "never";
+                        }
+                        msg << " be equal to the right-hand side";
+
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Useless_comparison
+                                , line->tokens().at(0)
+                                , msg.str()
+                            });
+
+                        {
+                            auto const& definition_location = function_state.defined_at(
+                                lhs_index
+                                , lhs.register_set
+                            );
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , definition_location.at(0)
+                            }.note("left-hand side defined here:"));
+                        }
+                        {
+                            auto const& definition_location = function_state.defined_at(
+                                rhs_index
+                                , rhs.register_set
+                            );
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , definition_location.at(0)
+                            }.note("right-hand side defined here:"));
+                        }
+
+                        throw error;
+                    }
+
+                    auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
+                    defining_tokens.push_back(line->token(0));
+                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                    auto const dest_index = function_state.resolve_index(dest);
+                    function_state.define_register(
+                        dest_index
+                        , dest.register_set
+                        , function_state.make_wrapper(std::make_unique<values::Boolean>())
+                        , std::move(defining_tokens)
+                    );
+
                     break;
                 } case STRUCT: {
                     auto const& dest =
