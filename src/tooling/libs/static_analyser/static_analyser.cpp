@@ -2211,7 +2211,9 @@ static auto analyse_single_function(
                     function_state.define_register(
                         function_state.resolve_index(dest)
                         , dest.register_set
-                        , function_state.make_wrapper(std::make_unique<values::Atom>())
+                        , function_state.make_wrapper(std::make_unique<values::Atom>(
+                            instruction.operands.at(1)->tokens().at(0).str()
+                        ))
                         , std::move(defining_tokens)
                     );
 
