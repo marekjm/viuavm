@@ -257,7 +257,7 @@ auto Function_state::fill_type(
                 wrapper = static_cast<values::Vector&>(wrapper.value()).of();
                 break;
             case Value_type::String:
-                wrapper = make_wrapper(std::make_unique<values::String>());
+                wrapper.value(std::make_unique<values::String>());
                 break;
             case Value_type::Text:
                 wrapper.value(std::make_unique<values::Text>());
@@ -269,25 +269,25 @@ auto Function_state::fill_type(
                 wrapper = static_cast<values::Pointer&>(wrapper.value()).of();
                 break;
             case Value_type::Boolean:
-                wrapper = make_wrapper(std::make_unique<values::Boolean>());
+                wrapper.value(std::make_unique<values::Boolean>());
                 break;
             case Value_type::Bits:
-                wrapper = make_wrapper(std::make_unique<values::Bits>());
+                wrapper.value(std::make_unique<values::Bits>());
                 break;
             case Value_type::Closure:
-                wrapper = make_wrapper(std::make_unique<values::Closure>());
+                wrapper.value(std::make_unique<values::Closure>());
                 break;
             case Value_type::Function:
-                wrapper = make_wrapper(std::make_unique<values::Function>());
+                wrapper.value(std::make_unique<values::Function>());
                 break;
             case Value_type::Atom:
-                wrapper = make_wrapper(std::make_unique<values::Atom>());
+                wrapper.value(std::make_unique<values::Atom>());
                 break;
             case Value_type::Struct:
-                wrapper = make_wrapper(std::make_unique<values::Struct>());
+                wrapper.value(std::make_unique<values::Struct>());
                 break;
             case Value_type::Pid:
-                wrapper = make_wrapper(std::make_unique<values::Pid>());
+                wrapper.value(std::make_unique<values::Pid>());
                 break;
             case Value_type::Value:
             default:
