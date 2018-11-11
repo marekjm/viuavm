@@ -153,8 +153,13 @@ namespace values {
     };
 
     class Atom : public Value {
+        std::optional<std::string> value;
       public:
         Atom();
+        Atom(std::string);
+
+        auto known() const -> bool;
+        auto content() const -> std::string;
     };
 
     class Struct : public Value {

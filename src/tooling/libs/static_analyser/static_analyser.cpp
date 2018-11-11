@@ -106,9 +106,15 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "closure#" + std::to_string(value.index()) + " of " + static_cast<values::Closure const&>(value.value()).of();
         case values::Value_type::Function:
             return "function#" + std::to_string(value.index()) + " of " + static_cast<values::Function const&>(value.value()).of();
-        case values::Value_type::Atom:
-            return "atom#" + std::to_string(value.index());
-        case values::Value_type::Struct:
+        case values::Value_type::Atom: {
+            auto const& atom = static_cast<values::Atom const&>(value.value());
+            return "atom#"
+                + std::to_string(value.index())
+                + (atom.known()
+                    ? (" of " + atom.content())
+                    : ""
+                  );
+       } case values::Value_type::Struct:
             return "struct#" + std::to_string(value.index());
         case values::Value_type::Pid:
             return "pid#" + std::to_string(value.index());

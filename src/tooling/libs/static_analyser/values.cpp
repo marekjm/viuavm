@@ -109,6 +109,19 @@ auto Function::of() const -> std::string {
 
 Atom::Atom(): Value{Value_type::Atom} {}
 
+Atom::Atom(std::string s):
+    Value{Value_type::Atom}
+    , value{s}
+{}
+
+auto Atom::known() const -> bool {
+    return value.has_value();
+}
+
+auto Atom::content() const -> std::string {
+    return value.value();
+}
+
 Struct::Struct(): Value{Value_type::Struct} {}
 
 Pid::Pid(): Value{Value_type::Pid} {}
