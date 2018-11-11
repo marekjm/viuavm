@@ -124,6 +124,21 @@ auto Atom::content() const -> std::string {
 
 Struct::Struct(): Value{Value_type::Struct} {}
 
+auto Struct::fields() const -> decltype(known_fields) const& {
+    return known_fields;
+}
+
+auto Struct::field(std::string const& key) const -> std::optional<Value_wrapper> {
+    if (known_fields.count(key)) {
+        return { known_fields.at(key) };
+    }
+    return {};
+}
+
+auto Struct::field(std::string key, Value_wrapper value) -> void {
+    known_fields.insert_or_assign(std::move(key), value);
+}
+
 Pid::Pid(): Value{Value_type::Pid} {}
 
 Value_wrapper::Value_wrapper(index_type const v, map_type& m):

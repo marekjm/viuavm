@@ -163,8 +163,13 @@ namespace values {
     };
 
     class Struct : public Value {
+        std::map<std::string, Value_wrapper> known_fields;
       public:
         Struct();
+
+        auto fields() const -> decltype(known_fields) const&;
+        auto field(std::string const&) const -> std::optional<Value_wrapper>;
+        auto field(std::string, Value_wrapper) -> void;
     };
 
     class Pid : public Value {

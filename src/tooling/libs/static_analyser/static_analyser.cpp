@@ -2262,6 +2262,25 @@ static auto analyse_single_function(
                     });
                     throw_if_invalid_type(function_state, source, source_index, source_type_signature);
 
+                    {
+                        using values::Atom;
+                        using values::Struct;
+
+                        auto const& key_value = static_cast<const Atom&>(
+                            function_state.type_of(key_index, key.register_set).value()
+                        );
+                        auto& struct_value = static_cast<Struct&>(
+                            function_state.type_of(dest_index, dest.register_set).value()
+                        );
+
+                        if (key_value.known()) {
+                            struct_value.field(
+                                key_value.content()
+                                , function_state.type_of(source_index, source.register_set)
+                            );
+                        }
+                    }
+
                     if (source.access != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
                         function_state.erase_register(
                             source_index
@@ -2296,12 +2315,32 @@ static auto analyse_single_function(
                     defining_tokens.push_back(line->token(0));
                     copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
-                    function_state.define_register(
-                        function_state.resolve_index(dest)
-                        , dest.register_set
-                        , function_state.make_wrapper(std::make_unique<values::Value>(values::Value_type::Value))
-                        , std::move(defining_tokens)
+                    using values::Atom;
+                    using values::Struct;
+
+                    auto const& key_value = static_cast<const Atom&>(
+                        function_state.type_of(key_index, key.register_set).value()
                     );
+                    auto& struct_value = static_cast<Struct&>(
+                        function_state.type_of(source_index, source.register_set).value()
+                    );
+                    if (key_value.known() and struct_value.field(key_value.content()).has_value()) {
+                        function_state.define_register(
+                            function_state.resolve_index(dest)
+                            , dest.register_set
+                            , struct_value.field(key_value.content()).value()
+                            , std::move(defining_tokens)
+                        );
+                    } else {
+                        function_state.define_register(
+                            function_state.resolve_index(dest)
+                            , dest.register_set
+                            , function_state.make_wrapper(
+                                std::make_unique<values::Value>(values::Value_type::Value)
+                            )
+                            , std::move(defining_tokens)
+                        );
+                    }
 
                     break;
                 } case STRUCTKEYS: {
