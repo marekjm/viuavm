@@ -1387,8 +1387,10 @@ static auto analyse_single_function(
 
                     break;
                 } case VAT: {
-                    auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
-                    auto const& index = *static_cast<Register_address const*>(instruction.operands.at(2).get());
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& index =
+                        *static_cast<Register_address const*>(instruction.operands.at(2).get());
 
                     auto const source_index = throw_if_empty(function_state, source);
                     auto const source_type_signature = maybe_with_pointer(source.access, {
