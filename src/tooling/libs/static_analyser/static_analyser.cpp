@@ -1391,10 +1391,10 @@ static auto analyse_single_function(
                     auto const& index = *static_cast<Register_address const*>(instruction.operands.at(2).get());
 
                     auto const source_index = throw_if_empty(function_state, source);
-                    auto const source_type_signature = std::vector<values::Value_type>{
+                    auto const source_type_signature = maybe_with_pointer(source.access, {
                         values::Value_type::Vector
                         , values::Value_type::Value
-                    };
+                    });
                     throw_if_invalid_type(function_state, source, source_index, source_type_signature);
 
                     auto const index_index = throw_if_empty(function_state, index);
