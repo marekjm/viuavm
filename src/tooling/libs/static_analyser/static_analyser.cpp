@@ -292,12 +292,12 @@ static auto analyse_single_function(
     if (fn.body().size() == 0) {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Empty_function_body
+                Compile_time_error::Empty_function_body
                 , fn.head().token(fn.head().tokens().size() - 3)
                 , "of " + fn.head().function_name
             })
             .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                Compile_time_error::Empty_error
                 , fn.head().token(fn.head().tokens().size() - 3)
             }.note("a function body must be composed of at least two instructions:")
              .comment("    allocate_registers %0 local")
@@ -311,7 +311,7 @@ static auto analyse_single_function(
                 and static_cast<Instruction const&>(l).opcode == ALLOCATE_REGISTERS)) {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
-                viua::tooling::errors::compile_time::Compile_time_error::Must_allocate_registers_first
+                Compile_time_error::Must_allocate_registers_first
                 , l.token(0)
             }.note("the first instruction of every function must be `allocate_registers'"));
     }
@@ -777,7 +777,8 @@ static auto analyse_single_function(
 
                     break;
                 } case MOVE: {
-                    auto const& source = *static_cast<Register_address const*>(instruction.operands.at(1).get());
+                    auto const& source =
+                        *static_cast<Register_address const*>(instruction.operands.at(1).get());
 
                     auto const source_index = throw_if_empty(function_state, source);
                     auto const source_type_signature = maybe_with_pointer(source.access, {
@@ -785,7 +786,8 @@ static auto analyse_single_function(
                     });
                     throw_if_invalid_type(function_state, source, source_index, source_type_signature);
 
-                    auto const& dest = *static_cast<Register_address const*>(instruction.operands.at(0).get());
+                    auto const& dest =
+                        *static_cast<Register_address const*>(instruction.operands.at(0).get());
 
                     auto defining_tokens = std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
@@ -800,12 +802,27 @@ static auto analyse_single_function(
                     };
 
                     auto const dest_index = function_state.resolve_index(dest);
-                    function_state.define_register(
-                        dest_index
-                        , dest.register_set
-                        , strip_pointer(function_state.type_of(source_index, source.register_set))
-                        , std::move(defining_tokens)
-                    );
+
+                    if (dest.register_set == viua::internals::Register_sets::ARGUMENTS) {
+                        if (not spawned_frame) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Argument_pass_without_a_frame
+                                    , instruction.token(0)
+                                }.add(dest.tokens().at(2))
+                                 .comment("`arguments' register set is only valid when there "
+                                          "is an unused frame available"));
+                            throw error;
+                        }
+                    } else {
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , strip_pointer(function_state.type_of(source_index, source.register_set))
+                            , std::move(defining_tokens)
+                        );
+                    }
+
                     if (source.access != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
                         function_state.erase_register(
                             source_index
@@ -1918,6 +1935,27 @@ static auto analyse_single_function(
                     };
 
                     auto const dest_index = function_state.resolve_index(dest);
+
+                    if (dest.register_set == viua::internals::Register_sets::ARGUMENTS) {
+                        if (not spawned_frame) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Argument_pass_without_a_frame
+                                    , instruction.token(0)
+                                }.add(dest.tokens().at(2))
+                                 .comment("`arguments' register set is only valid when there "
+                                          "is an unused frame available"));
+                            throw error;
+                        }
+                    } else {
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , strip_pointer(function_state.type_of(source_index, source.register_set))
+                            , std::move(defining_tokens)
+                        );
+                    }
+
                     function_state.define_register(
                         dest_index
                         , dest.register_set
