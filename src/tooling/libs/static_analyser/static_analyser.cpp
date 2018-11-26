@@ -260,6 +260,18 @@ static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
     return v;
 }
 
+template<typename T>
+auto int_range(T const n) -> std::vector<T> {
+    auto v = std::vector<T>{};
+    v.reserve(n);
+
+    for (auto i = typename decltype(v)::size_type{0}; i < n; ++i) {
+        v.emplace_back(i);
+    }
+
+    return v;
+}
+
 struct Frame_representation {
     viua::internals::types::register_index const allocated_parameters;
     std::set<viua::internals::types::register_index> filled_parameters;
@@ -275,6 +287,8 @@ static auto analyse_single_function(
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state&
 ) -> void {
+    using viua::tooling::errors::compile_time::Compile_time_error;
+
     if (fn.body().size() == 0) {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
             .append(viua::tooling::errors::compile_time::Error{
@@ -2187,7 +2201,21 @@ static auto analyse_single_function(
                 } case DEFER: {
                 } case ALLOCATE_REGISTERS: {
                 } case PROCESS: {
-                    // FIXME TODO
+                    for (auto const each : int_range(spawned_frame->allocated_parameters)) {
+                        if (not spawned_frame->filled_parameters.count(each)) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Call_with_empty_slot
+                                    , instruction.token(0)
+                                    , "slot " + std::to_string(each)
+                                })
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Empty_error
+                                    , spawned_frame_where
+                                }.note("frame spawned here"));
+                            throw error;
+                        }
+                    }
                     break;
                 } case SELF: {
                     auto const& dest =

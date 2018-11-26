@@ -45,6 +45,7 @@ enum class Compile_time_error {
     Empty_function_body,
     Useless_comparison,
     Overwrite_of_unused_frame,
+    Call_with_empty_slot,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
