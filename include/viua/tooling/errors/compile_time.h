@@ -44,6 +44,7 @@ enum class Compile_time_error {
     Type_mismatch,
     Empty_function_body,
     Useless_comparison,
+    Overwrite_of_unused_frame,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

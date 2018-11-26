@@ -260,6 +260,16 @@ static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
     return v;
 }
 
+struct Frame_representation {
+    viua::internals::types::register_index const allocated_parameters;
+    std::set<viua::internals::types::register_index> filled_parameters;
+
+    Frame_representation(viua::internals::types::register_index const);
+};
+Frame_representation::Frame_representation(viua::internals::types::register_index const size):
+    allocated_parameters{size}
+{}
+
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
@@ -304,6 +314,9 @@ static auto analyse_single_function(
     std::cout << "analyse_single_function(): " << fn.head().function_name;
     std::cout << " (" << fn.body().size() << " lines)";
     std::cout << std::endl;
+
+    auto spawned_frame = std::unique_ptr<Frame_representation>();
+    auto spawned_frame_where = viua::tooling::libs::lexer::Token{};
 
     if (fn.head().function_name == "main") {
         if (fn.head().arity == 0) {
@@ -2142,7 +2155,24 @@ static auto analyse_single_function(
 
                     break;
                 } case FRAME: {
-                    // FIXME TODO
+                    if (spawned_frame) {
+                        auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Overwrite_of_unused_frame
+                                , instruction.token(0)
+                            })
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                                , spawned_frame_where
+                            }.note("unused frame spawned here"));
+                        throw error;
+                    }
+
+                    auto const no_of_allocated_params =
+                        static_cast<Register_address const*>(instruction.operands.at(0).get())->index;
+                    spawned_frame = std::make_unique<Frame_representation>(no_of_allocated_params);
+                    spawned_frame_where = instruction.token(0);
+
                     break;
                 } case PARAM: {
                 } case PAMV: {
