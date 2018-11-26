@@ -31,6 +31,7 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 #	-Wfloat-equal       -- maybe, floating-point comparison is a tricky subject
 #	-Winline			-- fails if GCC tries to inline calls that are unlikely and
 #							the code size would grow
+# 	-Wdisabled-optimization	-- some source files are too big
 GENERIC_CXXFLAGS=-Wall \
 				 -Wextra \
 				 -Wctor-dtor-privacy \
@@ -39,7 +40,6 @@ GENERIC_CXXFLAGS=-Wall \
 				 -Woverloaded-virtual \
 				 -Wundef \
 				 -Wstrict-overflow=2 \
-				 -Wdisabled-optimization \
 				 -Winit-self \
 				 -Wzero-as-null-pointer-constant \
 				 -Wuseless-cast \
