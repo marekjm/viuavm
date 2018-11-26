@@ -1411,16 +1411,31 @@ static auto analyse_single_function(
                     copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
 
                     auto const dest_index = function_state.resolve_index(dest);
-                    function_state.define_register(
-                        dest_index
-                        , dest.register_set
-                        , function_state.make_wrapper(std::make_unique<values::Pointer>(
-                            static_cast<values::Vector const&>(
-                                function_state.type_of(source_index, source.register_set).value()
-                            ).of()
-                        ))
-                        , std::move(defining_tokens)
-                    );
+                    if (source.access == viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , function_state.make_wrapper(std::make_unique<values::Pointer>(
+                                static_cast<values::Vector const&>(
+                                    static_cast<values::Pointer const&>(
+                                        function_state.type_of(source_index, source.register_set).value()
+                                    ).of().value()
+                                ).of()
+                            ))
+                            , std::move(defining_tokens)
+                        );
+                    } else {
+                        function_state.define_register(
+                            dest_index
+                            , dest.register_set
+                            , function_state.make_wrapper(std::make_unique<values::Pointer>(
+                                static_cast<values::Vector const&>(
+                                    function_state.type_of(source_index, source.register_set).value()
+                                ).of()
+                            ))
+                            , std::move(defining_tokens)
+                        );
+                    }
 
                     break;
                 } case VLEN: {
