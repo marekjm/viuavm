@@ -47,6 +47,7 @@ enum class Compile_time_error {
     Overwrite_of_unused_frame,
     Call_with_empty_slot,
     Argument_pass_without_a_frame,
+    Argument_pass_overwrites,
 };
 
 auto display_error(Compile_time_error const) -> std::string;

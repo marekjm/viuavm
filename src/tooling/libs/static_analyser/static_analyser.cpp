@@ -274,7 +274,10 @@ auto int_range(T const n) -> std::vector<T> {
 
 struct Frame_representation {
     viua::internals::types::register_index const allocated_parameters;
-    std::set<viua::internals::types::register_index> filled_parameters;
+    std::map<
+        viua::internals::types::register_index
+        , viua::tooling::libs::lexer::Token
+    > filled_parameters;
 
     Frame_representation(viua::internals::types::register_index const);
 };
@@ -814,6 +817,19 @@ static auto analyse_single_function(
                                           "is an unused frame available"));
                             throw error;
                         }
+                        if (spawned_frame->filled_parameters.count(dest.index)) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Argument_pass_overwrites
+                                    , instruction.token(0)
+                                }.add(dest.tokens().at(2)))
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Empty_error
+                                    , spawned_frame->filled_parameters.at(dest.index)
+                                }.note("argument previously passed here"));
+                            throw error;
+                        }
+                        spawned_frame->filled_parameters.emplace(dest.index, instruction.token(0));
                     } else {
                         function_state.define_register(
                             dest_index
@@ -1947,6 +1963,19 @@ static auto analyse_single_function(
                                           "is an unused frame available"));
                             throw error;
                         }
+                        if (spawned_frame->filled_parameters.count(dest.index)) {
+                            auto error = viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Argument_pass_overwrites
+                                    , instruction.token(0)
+                                }.add(dest.tokens().at(2)))
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::Empty_error
+                                    , spawned_frame->filled_parameters.at(dest.index)
+                                }.note("argument previously passed here"));
+                            throw error;
+                        }
+                        spawned_frame->filled_parameters.emplace(dest.index, instruction.token(0));
                     } else {
                         function_state.define_register(
                             dest_index
@@ -1955,13 +1984,6 @@ static auto analyse_single_function(
                             , std::move(defining_tokens)
                         );
                     }
-
-                    function_state.define_register(
-                        dest_index
-                        , dest.register_set
-                        , strip_pointer(function_state.type_of(source_index, source.register_set))
-                        , std::move(defining_tokens)
-                    );
 
                     break;
                 } case PTR: {

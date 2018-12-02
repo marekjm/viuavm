@@ -51,6 +51,7 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     { Compile_time_error::Overwrite_of_unused_frame, "overwrite of unused frame" },
     { Compile_time_error::Call_with_empty_slot, "an argument slot is left empty" },
     { Compile_time_error::Argument_pass_without_a_frame, "argument pass without a frame" },
+    { Compile_time_error::Argument_pass_overwrites, "argument pass overwrites a previous value" },
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {
