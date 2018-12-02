@@ -2256,10 +2256,24 @@ static auto analyse_single_function(
                      * code. Instead, `move` and `copy` are used.
                      */
                     break;
+                } case ALLOCATE_REGISTERS: {
+                    /*
+                     * Register allocation is handled before the analyser begins
+                     * its work so it is not checked here.
+                     * However, if this instruction is found inside the function
+                     * it is an error since registers cannot be reallocted while
+                     * the function is running.
+                     */
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            Compile_time_error::Empty_error
+                            , line->token(0)
+                            , "cannot reallocate register set"
+                        });
+                    break;
                 } case CALL: {
                 } case TAILCALL: {
                 } case DEFER: {
-                } case ALLOCATE_REGISTERS: {
                 } case PROCESS: {
                     for (auto const each : int_range(spawned_frame->allocated_parameters)) {
                         if (not spawned_frame->filled_parameters.count(each)) {
