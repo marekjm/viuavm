@@ -493,6 +493,7 @@ static auto parse_void(Instruction& instruction, vector_view<viua::tooling::libs
     operand->add(tokens.at(0));
 
     instruction.operands.push_back(std::move(operand));
+    instruction.add(tokens.at(0));
 
     return 1;
 }

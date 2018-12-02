@@ -289,6 +289,7 @@ static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state&
+    , bool const after_conditional_branch
 ) -> void {
     using viua::tooling::errors::compile_time::Compile_time_error;
 
@@ -328,7 +329,9 @@ static auto analyse_single_function(
         , body.at(0)->tokens()
     };
 
-    std::cout << "analyse_single_function(): " << fn.head().function_name;
+    auto const analysed_function_name = fn.head().function_name + '/' + std::to_string(fn.head().arity);
+
+    std::cout << "analyse_single_function(): " << analysed_function_name;
     std::cout << " (" << fn.body().size() << " lines)";
     std::cout << std::endl;
 
@@ -2290,6 +2293,25 @@ static auto analyse_single_function(
                             throw error;
                         }
                     }
+                    auto const called_function_name = [&instruction]() -> std::string {
+                        if (instruction.opcode == CALL or instruction.opcode == PROCESS) {
+                            auto const& oper = instruction.operands.at(1);
+                            return oper->tokens().at(0).str()
+                                + oper->tokens().at(1).str()
+                                + oper->tokens().at(2).str();
+                        }
+                        return "";
+                    }();
+                    std::cerr << "  calling: " << called_function_name
+                        << " from " << analysed_function_name << '\n';
+                    if ((analysed_function_name == called_function_name) and not after_conditional_branch) {
+                        throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                Compile_time_error::Empty_error // FIXME add custom error type
+                                , line->token(0)
+                                , "endless recursion detected"
+                            }.note("this function calls itself on a path with no conditional branches"));
+                    }
                     break;
                 } case SELF: {
                     auto const& dest =
@@ -2624,7 +2646,7 @@ static auto analyse_functions(
 
     for (auto const& [ name, fn ] : functions) {
         try {
-            analyse_single_function(fn, fragments, analyser_state);
+            analyse_single_function(fn, fragments, analyser_state, false);
         } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Empty_error
