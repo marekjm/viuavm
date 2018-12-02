@@ -295,6 +295,10 @@ struct Body_line {
         source_line{s}
         , instruction{i}
     {}
+    Body_line(Body_line const&) = default;
+    Body_line(Body_line&&) = default;
+    auto operator=(Body_line const&) -> Body_line& = delete;
+    auto operator=(Body_line&&) -> Body_line& = delete;
 };
 
 static auto annotate_body(viua::tooling::libs::parser::Cooked_function::body_type body)
@@ -320,18 +324,38 @@ static auto annotate_body(viua::tooling::libs::parser::Cooked_function::body_typ
     return annotated_body;
 }
 
+static auto create_label_map(
+    viua::tooling::libs::parser::Cooked_function::body_type const& body
+    , std::vector<Body_line> const& annotated_body) -> std::map<std::string, Body_line> {
+    auto mapping = std::map<std::string, Body_line>{};
+
+    for (auto i = Body_line::size_type{0}; i < body.size(); ++i) {
+        using viua::tooling::libs::parser::Fragment_type;
+
+        auto const line = body.at(i);
+
+        if (line->type() == Fragment_type::Mark_directive) {
+            mapping.emplace(line->tokens().at(1).str(), annotated_body.at(i));
+        }
+    }
+
+    return mapping;
+}
+
 static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state&
     , Function_state& function_state
     , bool const after_conditional_branch
-    , std::vector<Body_line> annotated_body
+    , std::vector<Body_line> const& annotated_body
+    , std::map<std::string, Body_line> const& label_map
     , viua::tooling::libs::parser::Cooked_function::body_type::size_type i
 ) -> void {
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
     using viua::tooling::libs::parser::Register_address;
+    using viua::tooling::libs::parser::Operand_type;
     using viua::tooling::errors::compile_time::Compile_time_error;
 
     auto const analysed_function_name = fn.head().function_name + '/' + std::to_string(fn.head().arity);
@@ -366,7 +390,7 @@ static auto analyse_single_arm(
             );
         }
 
-        if (line->type() == Fragment_type::Instruction) {
+        if (line->type() == Fragment_type::Instruction and annotated_body.at(i).instruction) {
             auto const& instruction = *static_cast<Instruction const*>(line);
 
             switch (instruction.opcode) {
@@ -2298,7 +2322,31 @@ static auto analyse_single_arm(
                     // FIXME TODO
                     break;
                 } case JUMP: {
-                    // FIXME TODO
+                    if (instruction.operands.at(0)->type() == Operand_type::Jump_offset) {
+                        using viua::tooling::libs::parser::Jump_offset;
+
+                        auto const& jump_offset =
+                            *static_cast<Jump_offset const*>(instruction.operands.at(0).get());
+                        std::cerr << "  jumping to (offset): " << jump_offset.value
+                            << " (instruction "
+                            << ((jump_offset.value.at(0) == '+')
+                                ? std::stol(jump_offset.value.substr(1))
+                                : std::stol(jump_offset.value)
+                               )
+                            << ')'
+                            << '\n';
+                    } else if (instruction.operands.at(0)->type() == Operand_type::Jump_label) {
+                        using viua::tooling::libs::parser::Jump_label;
+
+                        auto const& jump_label =
+                            *static_cast<Jump_label const*>(instruction.operands.at(0).get());
+                        std::cerr << "  jumping to (label): " << jump_label.value
+                            << " (instruction " << label_map.at(jump_label.value).instruction << ')'
+                            << '\n';
+
+                        // we need this -1 here because the counter will be incremented
+                        i = (label_map.at(jump_label.value).source_line - 1);
+                    }
                     break;
                 } case IF: {
                     // FIXME TODO
@@ -2694,6 +2742,7 @@ static auto analyse_single_function(
     function_state.dump(std::cout);
 
     auto const annotated_body = annotate_body(body);
+    auto const label_map = create_label_map(body, annotated_body);
 
     analyse_single_arm(
         fn
@@ -2702,6 +2751,7 @@ static auto analyse_single_function(
         , function_state
         , false
         , annotated_body
+        , label_map
         , 0
     );
 }
