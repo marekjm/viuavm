@@ -285,106 +285,68 @@ Frame_representation::Frame_representation(viua::internals::types::register_inde
     allocated_parameters{size}
 {}
 
-static auto analyse_single_function(
+struct Body_line {
+    using size_type = decltype(viua::tooling::libs::parser::Cooked_function::lines)::size_type;
+
+    size_type const source_line {0};
+    size_type const instruction {0};
+
+    Body_line(size_type const s, size_type const i):
+        source_line{s}
+        , instruction{i}
+    {}
+};
+
+static auto annotate_body(viua::tooling::libs::parser::Cooked_function::body_type body)
+    -> std::vector<Body_line> {
+    auto annotated_body = std::vector<Body_line>{};
+
+    auto source_line = Body_line::size_type{0};
+    auto instruction = Body_line::size_type{0};
+
+    for (auto const& each : body) {
+        annotated_body.emplace_back(Body_line{
+            source_line
+            , instruction
+        });
+
+        using viua::tooling::libs::parser::Fragment_type;
+        if (each->type() == Fragment_type::Instruction) {
+            ++instruction;
+        }
+        ++source_line;
+    }
+
+    return annotated_body;
+}
+
+static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state&
+    , Function_state& function_state
     , bool const after_conditional_branch
+    , std::vector<Body_line> annotated_body
+    , viua::tooling::libs::parser::Cooked_function::body_type::size_type i
 ) -> void {
-    using viua::tooling::errors::compile_time::Compile_time_error;
-
-    if (fn.body().size() == 0) {
-        throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                Compile_time_error::Empty_function_body
-                , fn.head().token(fn.head().tokens().size() - 3)
-                , "of " + fn.head().function_name
-            })
-            .append(viua::tooling::errors::compile_time::Error{
-                Compile_time_error::Empty_error
-                , fn.head().token(fn.head().tokens().size() - 3)
-            }.note("a function body must be composed of at least two instructions:")
-             .comment("    allocate_registers %0 local")
-             .comment("    return")
-            );
-    }
-
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
-    if (auto const& l = *fn.body().at(0); not (l.type() == Fragment_type::Instruction
-                and static_cast<Instruction const&>(l).opcode == ALLOCATE_REGISTERS)) {
-        throw viua::tooling::errors::compile_time::Error_wrapper{}
-            .append(viua::tooling::errors::compile_time::Error{
-                Compile_time_error::Must_allocate_registers_first
-                , l.token(0)
-            }.note("the first instruction of every function must be `allocate_registers'"));
-    }
-
-    auto const& body = fn.body();
     using viua::tooling::libs::parser::Register_address;
-    auto function_state = Function_state{
-        static_cast<Register_address const*>(
-            static_cast<Instruction const*>(body.at(0))->operands.at(0).get()
-        )->index
-        , body.at(0)->tokens()
-    };
+    using viua::tooling::errors::compile_time::Compile_time_error;
 
     auto const analysed_function_name = fn.head().function_name + '/' + std::to_string(fn.head().arity);
 
-    std::cout << "analyse_single_function(): " << analysed_function_name;
-    std::cout << " (" << fn.body().size() << " lines)";
-    std::cout << std::endl;
-
+    /*
+     * There may be no branches between a frame spawn point and the call
+     * instruction that follows it. The only allowed instructions
+     * between these two points are `move` and `copy` instructions that
+     * have the arguments register set as destination.
+     */
     auto spawned_frame = std::unique_ptr<Frame_representation>();
     auto spawned_frame_where = viua::tooling::libs::lexer::Token{};
 
-    if (fn.head().function_name == "main") {
-        if (fn.head().arity == 0) {
-            // no arguments passed
-        } else if (fn.head().arity == 1) {
-            function_state.define_register(
-                0
-                , viua::internals::Register_sets::PARAMETERS
-                , function_state.make_wrapper(std::make_unique<values::Vector>(
-                    function_state.make_wrapper(std::make_unique<values::String>())
-                ))
-                , fn.head().tokens()
-            );
-        } else if (fn.head().arity == 2) {
-            function_state.define_register(
-                0
-                , viua::internals::Register_sets::PARAMETERS
-                , function_state.make_wrapper(std::make_unique<values::String>())
-                , fn.head().tokens()
-            );
-            function_state.define_register(
-                1
-                , viua::internals::Register_sets::PARAMETERS
-                , function_state.make_wrapper(std::make_unique<values::Vector>(
-                    function_state.make_wrapper(std::make_unique<values::String>())
-                ))
-                , fn.head().tokens()
-            );
-        } else {
-            // FIXME arity not supported
-        }
-    } else {
-        using arity_type = viua::internals::types::register_index;
-        for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
-            function_state.define_register(
-                i
-                , viua::internals::Register_sets::PARAMETERS
-                , function_state.make_wrapper(std::make_unique<values::Value>(values::Value_type::Value))
-                , fn.head().tokens()
-            );
-        }
-    }
-
-    function_state.dump(std::cout);
-
-    using body_size_type = std::remove_reference_t<decltype(body)>::size_type;
-    for (auto i = body_size_type{1}; i < body.size(); ++i) {
-        auto const line = body.at(i);
+    for (; i < annotated_body.size(); ++i) {
+        auto const line = fn.body().at(annotated_body.at(i).source_line);
 
         std::cout << "analysing: " << line->token(0).str() << std::endl;
 
@@ -2638,6 +2600,112 @@ static auto analyse_single_function(
     }
 }
 
+static auto analyse_single_function(
+    viua::tooling::libs::parser::Cooked_function const& fn
+    , viua::tooling::libs::parser::Cooked_fragments const& fragments
+    , Analyser_state& as
+) -> void {
+    using viua::tooling::errors::compile_time::Compile_time_error;
+
+    if (fn.body().size() == 0) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                Compile_time_error::Empty_function_body
+                , fn.head().token(fn.head().tokens().size() - 3)
+                , "of " + fn.head().function_name
+            })
+            .append(viua::tooling::errors::compile_time::Error{
+                Compile_time_error::Empty_error
+                , fn.head().token(fn.head().tokens().size() - 3)
+            }.note("a function body must be composed of at least two instructions:")
+             .comment("    allocate_registers %0 local")
+             .comment("    return")
+            );
+    }
+
+    using viua::tooling::libs::parser::Fragment_type;
+    using viua::tooling::libs::parser::Instruction;
+    if (auto const& l = *fn.body().at(0); not (l.type() == Fragment_type::Instruction
+                and static_cast<Instruction const&>(l).opcode == ALLOCATE_REGISTERS)) {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}
+            .append(viua::tooling::errors::compile_time::Error{
+                Compile_time_error::Must_allocate_registers_first
+                , l.token(0)
+            }.note("the first instruction of every function must be `allocate_registers'"));
+    }
+
+    auto const& body = fn.body();
+    using viua::tooling::libs::parser::Register_address;
+    auto function_state = Function_state{
+        static_cast<Register_address const*>(
+            static_cast<Instruction const*>(body.at(0))->operands.at(0).get()
+        )->index
+        , body.at(0)->tokens()
+    };
+
+    auto const analysed_function_name = fn.head().function_name + '/' + std::to_string(fn.head().arity);
+
+    std::cout << "analyse_single_function(): " << analysed_function_name;
+    std::cout << " (" << fn.body().size() << " lines)";
+    std::cout << std::endl;
+
+    if (fn.head().function_name == "main") {
+        if (fn.head().arity == 0) {
+            // no arguments passed
+        } else if (fn.head().arity == 1) {
+            function_state.define_register(
+                0
+                , viua::internals::Register_sets::PARAMETERS
+                , function_state.make_wrapper(std::make_unique<values::Vector>(
+                    function_state.make_wrapper(std::make_unique<values::String>())
+                ))
+                , fn.head().tokens()
+            );
+        } else if (fn.head().arity == 2) {
+            function_state.define_register(
+                0
+                , viua::internals::Register_sets::PARAMETERS
+                , function_state.make_wrapper(std::make_unique<values::String>())
+                , fn.head().tokens()
+            );
+            function_state.define_register(
+                1
+                , viua::internals::Register_sets::PARAMETERS
+                , function_state.make_wrapper(std::make_unique<values::Vector>(
+                    function_state.make_wrapper(std::make_unique<values::String>())
+                ))
+                , fn.head().tokens()
+            );
+        } else {
+            // FIXME arity not supported
+        }
+    } else {
+        using arity_type = viua::internals::types::register_index;
+        for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
+            function_state.define_register(
+                i
+                , viua::internals::Register_sets::PARAMETERS
+                , function_state.make_wrapper(std::make_unique<values::Value>(values::Value_type::Value))
+                , fn.head().tokens()
+            );
+        }
+    }
+
+    function_state.dump(std::cout);
+
+    auto const annotated_body = annotate_body(body);
+
+    analyse_single_arm(
+        fn
+        , fragments
+        , as
+        , function_state
+        , false
+        , annotated_body
+        , 0
+    );
+}
+
 static auto analyse_functions(
     viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state& analyser_state
@@ -2646,7 +2714,7 @@ static auto analyse_functions(
 
     for (auto const& [ name, fn ] : functions) {
         try {
-            analyse_single_function(fn, fragments, analyser_state, false);
+            analyse_single_function(fn, fragments, analyser_state);
         } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::Empty_error
