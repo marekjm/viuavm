@@ -1485,12 +1485,31 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         } else if (token == ".name:") {
             i += normalise_directive_name(tokens, vector_view{source, i});
         } else {
-            throw viua::tooling::errors::compile_time::Error_wrapper{}
-                .append(viua::tooling::errors::compile_time::Error{
-                    viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
-                    , token
-                    , "expected a directive or an instruction"
-                });
+            auto e = viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::Unexpected_token
+                , token
+                , "expected a directive or an instruction"
+            };
+
+            {
+                auto valid_expected_tokens = std::vector<std::string>{};
+                for (auto const& each : OP_NAMES) {
+                    valid_expected_tokens.push_back(each.second);
+                }
+
+                auto const likeness_limit = viua::util::string::ops::LevenshteinDistance{4};
+                auto const best_match = viua::util::string::ops::levenshtein_best(
+                    token.str()
+                    , valid_expected_tokens
+                    , likeness_limit
+                );
+
+                if (best_match.first <= likeness_limit) {
+                    e.aside(token, "did you mean `" + best_match.second + "'?");
+                }
+            }
+
+            throw viua::tooling::errors::compile_time::Error_wrapper{}.append(e);
         }
     }
 
