@@ -345,7 +345,7 @@ static auto create_label_map(
 static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
-    , Analyser_state&
+    , Analyser_state& analyser_state
     , Function_state& function_state
     , bool const after_conditional_branch
     , std::vector<Body_line> const& annotated_body
@@ -2344,8 +2344,17 @@ static auto analyse_single_arm(
                             << " (instruction " << label_map.at(jump_label.value).instruction << ')'
                             << '\n';
 
-                        // we need this -1 here because the counter will be incremented
-                        i = (label_map.at(jump_label.value).source_line - 1);
+                        analyse_single_arm(
+                            fn
+                            , fragments
+                            , analyser_state
+                            , function_state
+                            , after_conditional_branch
+                            , annotated_body
+                            , label_map
+                            , label_map.at(jump_label.value).source_line
+                        );
+                        return;
                     }
                     break;
                 } case IF: {
