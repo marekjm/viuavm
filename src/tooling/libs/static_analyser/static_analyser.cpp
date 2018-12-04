@@ -2327,14 +2327,28 @@ static auto analyse_single_arm(
 
                         auto const& jump_offset =
                             *static_cast<Jump_offset const*>(instruction.operands.at(0).get());
+                        auto const target = (
+                            (jump_offset.value.at(0) == '+')
+                            ? (i + std::stoul(jump_offset.value.substr(1)))
+                            : (i - std::stoul(jump_offset.value.substr(1)))
+                        );
                         std::cerr << "  jumping to (offset): " << jump_offset.value
                             << " (instruction "
-                            << ((jump_offset.value.at(0) == '+')
-                                ? std::stol(jump_offset.value.substr(1))
-                                : std::stol(jump_offset.value)
-                               )
+                            << target
                             << ')'
                             << '\n';
+
+                        analyse_single_arm(
+                            fn
+                            , fragments
+                            , analyser_state
+                            , function_state
+                            , after_conditional_branch
+                            , annotated_body
+                            , label_map
+                            , target
+                        );
+                        return;
                     } else if (instruction.operands.at(0)->type() == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
