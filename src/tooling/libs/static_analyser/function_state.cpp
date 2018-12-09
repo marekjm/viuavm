@@ -419,6 +419,35 @@ auto Function_state::dump(std::ostream& o) const -> void {
     }
 }
 
+auto Function_state::clone() const -> Function_state {
+    auto function_state = Function_state{
+        local_registers_allocated
+        , local_registers_allocated_where
+    };
+
+    function_state.register_renames = register_renames;
+    function_state.register_name_to_index = register_name_to_index;
+    function_state.register_index_to_name = register_index_to_name;
+
+    function_state.iota_value = iota_value;
+
+    function_state.assigned_values.reserve(assigned_values.size());
+    for (auto const& each : assigned_values) {
+        function_state.assigned_values.emplace_back(values::Value::clone(
+            *each
+            , function_state.assigned_values
+        ));
+    }
+
+    function_state.defined_registers = defined_registers;
+    function_state.defined_where = defined_where;
+    function_state.mutated_where = mutated_where;
+    function_state.erased_registers = erased_registers;
+    function_state.erased_where = erased_where;
+
+    return function_state;
+}
+
 auto Function_state::local_capacity() const -> viua::internals::types::register_index {
     return local_registers_allocated;
 }

@@ -284,6 +284,7 @@ class Function_state {
     ) -> bool;
 
     auto dump(std::ostream&) const -> void;
+    auto clone() const -> Function_state;
 
     auto local_capacity() const -> viua::internals::types::register_index;
 
