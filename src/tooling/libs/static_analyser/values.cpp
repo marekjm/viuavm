@@ -118,7 +118,7 @@ auto Atom::known() const -> bool {
     return value.has_value();
 }
 
-auto Atom::content() const -> std::string {
+auto Atom::of() const -> std::string {
     return value.value();
 }
 

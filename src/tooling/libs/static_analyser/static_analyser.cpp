@@ -111,7 +111,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "atom#"
                 + std::to_string(value.index())
                 + (atom.known()
-                    ? (" of " + atom.content())
+                    ? (" of " + atom.of())
                     : ""
                   );
        } case values::Value_type::Struct:
@@ -2563,8 +2563,8 @@ static auto analyse_single_arm(
                     if (lhs_operand.known() and rhs_operand.known()) {
                         auto msg = std::ostringstream{};
                         msg << "left-hand side will ";
-                        auto const l = lhs_operand.content();
-                        auto const r = rhs_operand.content();
+                        auto const l = lhs_operand.of();
+                        auto const r = rhs_operand.of();
                         if (l == r) {
                             msg << "always";
                         } else {
@@ -2671,7 +2671,7 @@ static auto analyse_single_arm(
 
                         if (key_value.known()) {
                             struct_value.field(
-                                key_value.content()
+                                key_value.of()
                                 , function_state.type_of(source_index, source.register_set)
                             );
                         }
@@ -2720,11 +2720,11 @@ static auto analyse_single_arm(
                     auto& struct_value = static_cast<Struct&>(
                         function_state.type_of(source_index, source.register_set).value()
                     );
-                    if (key_value.known() and struct_value.field(key_value.content()).has_value()) {
+                    if (key_value.known() and struct_value.field(key_value.of()).has_value()) {
                         function_state.define_register(
                             function_state.resolve_index(dest)
                             , dest.register_set
-                            , struct_value.field(key_value.content()).value()
+                            , struct_value.field(key_value.of()).value()
                             , std::move(defining_tokens)
                         );
                     } else {

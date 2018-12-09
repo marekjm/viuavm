@@ -392,7 +392,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
             return "atom#"
                 + std::to_string(value.index())
                 + (atom.known()
-                    ? (" of " + atom.content())
+                    ? (" of " + atom.of())
                     : ""
                   );
        } case values::Value_type::Struct:

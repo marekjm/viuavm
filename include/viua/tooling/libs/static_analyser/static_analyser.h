@@ -159,7 +159,7 @@ namespace values {
         Atom(std::string);
 
         auto known() const -> bool;
-        auto content() const -> std::string;
+        auto of() const -> std::string;
     };
 
     class Struct : public Value {
