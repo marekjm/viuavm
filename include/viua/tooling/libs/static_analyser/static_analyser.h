@@ -74,6 +74,8 @@ namespace values {
 
         auto index() const -> index_type;
 
+        auto rebind(map_type&) const -> Value_wrapper;
+
         Value_wrapper(index_type const, map_type&);
         Value_wrapper(Value_wrapper const&);
         Value_wrapper(Value_wrapper&&) = default;

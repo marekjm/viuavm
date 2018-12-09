@@ -196,5 +196,9 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
 auto Value_wrapper::index() const -> index_type {
     return i;
 }
+
+auto Value_wrapper::rebind(map_type& to) const -> Value_wrapper {
+    return Value_wrapper{i, to};
+}
 } // namespace values
 }}}}
