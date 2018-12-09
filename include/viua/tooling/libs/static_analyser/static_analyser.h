@@ -292,6 +292,10 @@ class Function_state {
             viua::internals::types::register_index const
             , std::vector<viua::tooling::libs::lexer::Token>
     );
+    Function_state(Function_state const&) = delete;
+    Function_state(Function_state&&);
+    auto operator=(Function_state const&) = delete;
+    auto operator=(Function_state&&) = delete;
 };
 
 auto analyse(viua::tooling::libs::parser::Cooked_fragments const&) -> void;

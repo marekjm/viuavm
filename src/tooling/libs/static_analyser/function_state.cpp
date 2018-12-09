@@ -459,4 +459,27 @@ Function_state::Function_state(
     local_registers_allocated{limit}
     , local_registers_allocated_where{std::move(location)}
 {}
+
+Function_state::Function_state(Function_state&& that)
+    : local_registers_allocated{std::move(that.local_registers_allocated)}
+    , local_registers_allocated_where{std::move(that.local_registers_allocated_where)}
+    , register_renames{std::move(that.register_renames)}
+    , register_name_to_index{std::move(that.register_name_to_index)}
+    , register_index_to_name{std::move(that.register_index_to_name)}
+    , iota_value{std::move(that.iota_value)}
+    , assigned_values{}
+    , defined_registers{std::move(that.defined_registers)}
+    , defined_where{std::move(that.defined_where)}
+    , mutated_where{std::move(that.mutated_where)}
+    , erased_registers{std::move(that.erased_registers)}
+    , erased_where{std::move(that.erased_where)}
+{
+    assigned_values.reserve(assigned_values.size());
+    for (auto const& each : that.assigned_values) {
+        assigned_values.emplace_back(values::Value::clone(
+            *each
+            , assigned_values
+        ));
+    }
+}
 }}}}

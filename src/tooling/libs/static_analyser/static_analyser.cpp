@@ -346,7 +346,7 @@ static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
     , Analyser_state& analyser_state
-    , Function_state& function_state
+    , Function_state function_state
     , bool const after_conditional_branch
     , std::vector<Body_line> const& annotated_body
     , std::map<std::string, Body_line> const& label_map
@@ -2322,12 +2322,14 @@ static auto analyse_single_arm(
                     // FIXME TODO
                     break;
                 } case JUMP: {
+                    auto target = decltype(i){0};
+
                     if (instruction.operands.at(0)->type() == Operand_type::Jump_offset) {
                         using viua::tooling::libs::parser::Jump_offset;
 
                         auto const& jump_offset =
                             *static_cast<Jump_offset const*>(instruction.operands.at(0).get());
-                        auto const target = (
+                        target = (
                             (jump_offset.value.at(0) == '+')
                             ? (i + std::stoul(jump_offset.value.substr(1)))
                             : (i - std::stoul(jump_offset.value.substr(1)))
@@ -2337,48 +2339,59 @@ static auto analyse_single_arm(
                             << target
                             << ')'
                             << '\n';
-
-                        analyse_single_arm(
-                            fn
-                            , fragments
-                            , analyser_state
-                            , function_state
-                            , after_conditional_branch
-                            , annotated_body
-                            , label_map
-                            , target
-                        );
-                        return;
                     } else if (instruction.operands.at(0)->type() == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
                         auto const& jump_label =
                             *static_cast<Jump_label const*>(instruction.operands.at(0).get());
+                        target = label_map.at(jump_label.value).source_line;
                         std::cerr << "  jumping to (label): " << jump_label.value
                             << " (instruction " << label_map.at(jump_label.value).instruction << ')'
                             << '\n';
+                    }
 
+                    try {
                         analyse_single_arm(
                             fn
                             , fragments
                             , analyser_state
-                            , function_state
+                            , std::move(function_state)
                             , after_conditional_branch
                             , annotated_body
                             , label_map
-                            , label_map.at(jump_label.value).source_line
+                            , target
                         );
-                        return;
+                    } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                        e.append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , instruction.tokens().at(0)
+                            , "after taking a branch"
+                        });
+                        throw;
                     }
-                    break;
+
+                    /*
+                     * Return instead of break because all the analysis
+                     * that would normally be performed at exit (after
+                     * the final function state and all of its side
+                     * effects (e.g. closure instantiations, function
+                     * calls) are known) will be performed by the nested
+                     * call to analyse_single_arm().
+                     *
+                     * JUMP affects the control flow directrly, and this
+                     * is reflected in the way the analyser operates.
+                     */
+                    return;
                 } case IF: {
                     try {
+                        auto target = decltype(i){0};
+
                         if (instruction.operands.at(1)->type() == Operand_type::Jump_offset) {
                             using viua::tooling::libs::parser::Jump_offset;
 
                             auto const& jump_offset =
                                 *static_cast<Jump_offset const*>(instruction.operands.at(1).get());
-                            auto const target = (
+                            target = (
                                 (jump_offset.value.at(0) == '+')
                                 ? (i + std::stoul(jump_offset.value.substr(1)))
                                 : (i - std::stoul(jump_offset.value.substr(1)))
@@ -2388,37 +2401,27 @@ static auto analyse_single_arm(
                                 << target
                                 << ')'
                                 << '\n';
-
-                            analyse_single_arm(
-                                fn
-                                , fragments
-                                , analyser_state
-                                , function_state
-                                , after_conditional_branch
-                                , annotated_body
-                                , label_map
-                                , target
-                            );
                         } else if (instruction.operands.at(1)->type() == Operand_type::Jump_label) {
                             using viua::tooling::libs::parser::Jump_label;
 
                             auto const& jump_label =
                                 *static_cast<Jump_label const*>(instruction.operands.at(1).get());
+                            target = label_map.at(jump_label.value).source_line;
                             std::cerr << "  jumping to (label): " << jump_label.value
                                 << " (instruction " << label_map.at(jump_label.value).instruction << ')'
                                 << '\n';
-
-                            analyse_single_arm(
-                                fn
-                                , fragments
-                                , analyser_state
-                                , function_state
-                                , after_conditional_branch
-                                , annotated_body
-                                , label_map
-                                , label_map.at(jump_label.value).source_line
-                            );
                         }
+
+                        analyse_single_arm(
+                            fn
+                            , fragments
+                            , analyser_state
+                            , function_state.clone()
+                            , after_conditional_branch
+                            , annotated_body
+                            , label_map
+                            , target
+                        );
                     } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                         e.append(viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::Compile_time_error::Empty_error
@@ -2428,15 +2431,15 @@ static auto analyse_single_arm(
                         throw;
                     }
 
-                    std::cerr << "WOOHOO!\n";
-
                     try {
+                        auto target = decltype(i){0};
+
                         if (instruction.operands.at(2)->type() == Operand_type::Jump_offset) {
                             using viua::tooling::libs::parser::Jump_offset;
 
                             auto const& jump_offset =
                                 *static_cast<Jump_offset const*>(instruction.operands.at(2).get());
-                            auto const target = (
+                            target = (
                                 (jump_offset.value.at(0) == '+')
                                 ? (i + std::stoul(jump_offset.value.substr(1)))
                                 : (i - std::stoul(jump_offset.value.substr(1)))
@@ -2446,37 +2449,27 @@ static auto analyse_single_arm(
                                 << target
                                 << ')'
                                 << '\n';
-
-                            analyse_single_arm(
-                                fn
-                                , fragments
-                                , analyser_state
-                                , function_state
-                                , after_conditional_branch
-                                , annotated_body
-                                , label_map
-                                , target
-                            );
                         } else if (instruction.operands.at(2)->type() == Operand_type::Jump_label) {
                             using viua::tooling::libs::parser::Jump_label;
 
                             auto const& jump_label =
                                 *static_cast<Jump_label const*>(instruction.operands.at(2).get());
+                            target = label_map.at(jump_label.value).source_line;
                             std::cerr << "  jumping to (label): " << jump_label.value
                                 << " (instruction " << label_map.at(jump_label.value).instruction << ')'
                                 << '\n';
-
-                            analyse_single_arm(
-                                fn
-                                , fragments
-                                , analyser_state
-                                , function_state
-                                , after_conditional_branch
-                                , annotated_body
-                                , label_map
-                                , label_map.at(jump_label.value).source_line
-                            );
                         }
+
+                        analyse_single_arm(
+                            fn
+                            , fragments
+                            , analyser_state
+                            , function_state.clone()
+                            , after_conditional_branch
+                            , annotated_body
+                            , label_map
+                            , target
+                        );
                     } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                         e.append(viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::Compile_time_error::Empty_error
@@ -2884,7 +2877,7 @@ static auto analyse_single_function(
         fn
         , fragments
         , as
-        , function_state
+        , std::move(function_state)
         , false
         , annotated_body
         , label_map
