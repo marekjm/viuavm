@@ -37,6 +37,87 @@ auto Value::type() const -> Value_type {
     return type_of_value;
 }
 
+auto Value::clone(Value const& value, Value_wrapper::map_type& values) -> std::unique_ptr<Value> {
+    auto cloned = std::unique_ptr<Value>{};
+
+    switch (value.type()) {
+    case Value_type::Integer: {
+        auto x = static_cast<Integer const&>(value);
+        if (x.known()) {
+            cloned = std::make_unique<Integer>(x.of());
+        } else {
+            cloned = std::make_unique<Integer>();
+        }
+        break;
+    }
+    case Value_type::Float: {
+        cloned = std::make_unique<Float>();
+        break;
+    }
+    case Value_type::Vector: {
+        cloned = std::make_unique<Vector>(static_cast<Vector const&>(value).of().rebind(values));
+        break;
+    }
+    case Value_type::String: {
+        cloned = std::make_unique<String>();
+        break;
+    }
+    case Value_type::Text: {
+        cloned = std::make_unique<Text>();
+        break;
+    }
+    case Value_type::Pointer: {
+        cloned = std::make_unique<Pointer>(static_cast<Pointer const&>(value).of().rebind(values));
+        break;
+    }
+    case Value_type::Boolean: {
+        cloned = std::make_unique<Boolean>();
+        break;
+    }
+    case Value_type::Bits: {
+        cloned = std::make_unique<Bits>();
+        break;
+    }
+    case Value_type::Closure: {
+        cloned = std::make_unique<Closure>(static_cast<Closure const&>(value).of());
+        break;
+    }
+    case Value_type::Function: {
+        cloned = std::make_unique<Function>(static_cast<Function const&>(value).of());
+        break;
+    }
+    case Value_type::Atom: {
+        auto x = static_cast<Atom const&>(value);
+        if (x.known()) {
+            cloned = std::make_unique<Atom>(x.of());
+        } else {
+            cloned = std::make_unique<Atom>();
+        }
+        break;
+    }
+    case Value_type::Struct: {
+        auto cloned_struct = std::make_unique<Struct>();
+        auto x = static_cast<Struct const&>(value);
+        for (auto const& each : x.fields()) {
+            cloned_struct->field(each.first, each.second.rebind(values));
+        }
+        break;
+    }
+    case Value_type::Pid: {
+        cloned = std::make_unique<Pid>();
+        break;
+    }
+    case Value_type::Value: {
+        cloned = std::make_unique<Value>(Value_type::Value);
+        break;
+    }
+    default:
+        throw std::logic_error{"unhandled case"};
+    }
+
+    return cloned;
+}
+
 Integer::Integer(): Value{Value_type::Integer} {}
 
 Integer::Integer(int const x):

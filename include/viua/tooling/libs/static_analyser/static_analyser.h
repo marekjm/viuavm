@@ -55,6 +55,9 @@ namespace values {
       public:
         auto type() const -> Value_type;
 
+        static auto clone(Value const&, std::vector<std::unique_ptr<Value>>&)
+            -> std::unique_ptr<Value>;
+
         Value(Value_type const);
     };
 
