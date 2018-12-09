@@ -2372,8 +2372,121 @@ static auto analyse_single_arm(
                     }
                     break;
                 } case IF: {
-                    // FIXME TODO
-                    break;
+                    try {
+                        if (instruction.operands.at(1)->type() == Operand_type::Jump_offset) {
+                            using viua::tooling::libs::parser::Jump_offset;
+
+                            auto const& jump_offset =
+                                *static_cast<Jump_offset const*>(instruction.operands.at(1).get());
+                            auto const target = (
+                                (jump_offset.value.at(0) == '+')
+                                ? (i + std::stoul(jump_offset.value.substr(1)))
+                                : (i - std::stoul(jump_offset.value.substr(1)))
+                            );
+                            std::cerr << "  jumping to (offset): " << jump_offset.value
+                                << " (instruction "
+                                << target
+                                << ')'
+                                << '\n';
+
+                            analyse_single_arm(
+                                fn
+                                , fragments
+                                , analyser_state
+                                , function_state
+                                , after_conditional_branch
+                                , annotated_body
+                                , label_map
+                                , target
+                            );
+                        } else if (instruction.operands.at(1)->type() == Operand_type::Jump_label) {
+                            using viua::tooling::libs::parser::Jump_label;
+
+                            auto const& jump_label =
+                                *static_cast<Jump_label const*>(instruction.operands.at(1).get());
+                            std::cerr << "  jumping to (label): " << jump_label.value
+                                << " (instruction " << label_map.at(jump_label.value).instruction << ')'
+                                << '\n';
+
+                            analyse_single_arm(
+                                fn
+                                , fragments
+                                , analyser_state
+                                , function_state
+                                , after_conditional_branch
+                                , annotated_body
+                                , label_map
+                                , label_map.at(jump_label.value).source_line
+                            );
+                        }
+                    } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                        e.append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , instruction.tokens().at(0)
+                            , "after taking true branch"
+                        }.add(instruction.operands.at(1)->tokens().at(0)));
+                        throw;
+                    }
+
+                    std::cerr << "WOOHOO!\n";
+
+                    try {
+                        if (instruction.operands.at(2)->type() == Operand_type::Jump_offset) {
+                            using viua::tooling::libs::parser::Jump_offset;
+
+                            auto const& jump_offset =
+                                *static_cast<Jump_offset const*>(instruction.operands.at(2).get());
+                            auto const target = (
+                                (jump_offset.value.at(0) == '+')
+                                ? (i + std::stoul(jump_offset.value.substr(1)))
+                                : (i - std::stoul(jump_offset.value.substr(1)))
+                            );
+                            std::cerr << "  jumping to (offset): " << jump_offset.value
+                                << " (instruction "
+                                << target
+                                << ')'
+                                << '\n';
+
+                            analyse_single_arm(
+                                fn
+                                , fragments
+                                , analyser_state
+                                , function_state
+                                , after_conditional_branch
+                                , annotated_body
+                                , label_map
+                                , target
+                            );
+                        } else if (instruction.operands.at(2)->type() == Operand_type::Jump_label) {
+                            using viua::tooling::libs::parser::Jump_label;
+
+                            auto const& jump_label =
+                                *static_cast<Jump_label const*>(instruction.operands.at(2).get());
+                            std::cerr << "  jumping to (label): " << jump_label.value
+                                << " (instruction " << label_map.at(jump_label.value).instruction << ')'
+                                << '\n';
+
+                            analyse_single_arm(
+                                fn
+                                , fragments
+                                , analyser_state
+                                , function_state
+                                , after_conditional_branch
+                                , annotated_body
+                                , label_map
+                                , label_map.at(jump_label.value).source_line
+                            );
+                        }
+                    } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                        e.append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::Compile_time_error::Empty_error
+                            , instruction.tokens().at(0)
+                            , "after taking false branch"
+                        }.add(instruction.operands.at(2)->tokens().at(0)));
+                        throw;
+                    }
+
+                    return;
                 } case THROW: {
                     auto const& source =
                         *static_cast<Register_address const*>(instruction.operands.at(0).get());
