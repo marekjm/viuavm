@@ -2470,15 +2470,6 @@ static auto analyse_single_arm(
                                 << '\n';
                         }
 
-                        {
-                            std::cerr << "true arm considered lines:";
-                            for (auto const each : true_arm_result.analysed_lines) {
-                                std::cerr << ' ' << each;
-                            }
-                            std::cerr << '\n';
-                            std::cerr << "target of the false arm is: " << target << '\n';
-                        }
-
                         analyse_single_arm(
                             fn
                             , fragments
@@ -2486,7 +2477,9 @@ static auto analyse_single_arm(
                             , function_state.clone()
                               /*
                                * False arm is only conditionally executed if the true
-                               * arm did not enter the same path as it.
+                               * arm did not enter the same path as it. Otherwise, we
+                               * assume that it is executed unconditionally because it
+                               * was executed by both branches of the if instruction.
                                */
                             , (true_arm_result.analysed_lines.count(target) == 0)
                             , annotated_body
