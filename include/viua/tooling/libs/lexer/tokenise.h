@@ -23,10 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace viua {
-namespace tooling {
-namespace libs {
-namespace lexer {
+namespace viua { namespace tooling { namespace libs { namespace lexer {
 class Token {
     std::string content, original_content;
 
@@ -54,7 +51,10 @@ class Token {
 
     explicit operator std::string() const;
 
-    Token(Position_type const, Position_type const, std::string, std::string = "");
+    Token(Position_type const,
+          Position_type const,
+          std::string,
+          std::string = "");
     Token();
     auto operator=(Token const&) -> Token&;
 };
@@ -65,6 +65,6 @@ auto cook(std::vector<Token> const&) -> std::vector<Token>;
 auto strip_spaces(std::vector<Token>) -> std::vector<Token>;
 auto strip_comments(std::vector<Token>) -> std::vector<Token>;
 
-}}}}
+}}}}  // namespace viua::tooling::libs::lexer
 
 #endif

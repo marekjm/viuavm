@@ -23,12 +23,9 @@
 #include <vector>
 #include <viua/tooling/libs/lexer/tokenise.h>
 
-namespace viua {
-namespace tooling {
-namespace libs {
-namespace lexer {
+namespace viua { namespace tooling { namespace libs { namespace lexer {
 namespace normaliser {
 auto normalise(std::vector<Token>) -> std::vector<Token>;
-}}}}}
+}}}}}  // namespace viua::tooling::libs::lexer::normaliser
 
 #endif

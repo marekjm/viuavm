@@ -22,10 +22,7 @@
 
 #include <string>
 
-namespace viua {
-namespace tooling {
-namespace errors {
-namespace compile_time {
+namespace viua { namespace tooling { namespace errors { namespace compile_time {
 enum class Compile_time_error {
     Unknown_error,
     Empty_error,
@@ -52,10 +49,8 @@ enum class Compile_time_error {
 
 auto display_error(Compile_time_error const) -> std::string;
 auto display_error_and_exit(Compile_time_error const) -> void;
-auto display_error_and_exit(Compile_time_error const, std::string const) -> void;
-}
-}
-}
-}
+auto display_error_and_exit(Compile_time_error const, std::string const)
+    -> void;
+}}}}  // namespace viua::tooling::errors::compile_time
 
 #endif

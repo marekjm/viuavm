@@ -345,9 +345,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
-                        or opcode == FRAME or opcode == PARAM
-                        or opcode == PAMV or opcode == MOVE
-                        or opcode == COPY)) {
+                        or opcode == FRAME or opcode == PARAM or opcode == PAMV
+                        or opcode == MOVE or opcode == COPY)) {
                     continue;
                 }
 
@@ -423,7 +422,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                     if (instruction->operands.at(0)->tokens.at(0) == "void") {
                         continue;
                     }
-                    if (instruction->operands.at(0)->tokens.at(1) != "arguments") {
+                    if (instruction->operands.at(0)->tokens.at(1)
+                        != "arguments") {
                         continue;
                     }
 

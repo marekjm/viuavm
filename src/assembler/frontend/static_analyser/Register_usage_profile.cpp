@@ -35,14 +35,13 @@ auto Register_usage_profile::defresh() -> void {
 }
 auto Register_usage_profile::erase_arguments(Token const t) -> void {
     auto args_regs = std::vector<Register>{};
-    std::copy_if(
-        fresh_registers.begin()
-        , fresh_registers.end()
-        , std::back_inserter(args_regs)
-        , [](Register const& r) -> bool {
-            return r.register_set == viua::internals::Register_sets::ARGUMENTS;
-        }
-    );
+    std::copy_if(fresh_registers.begin(),
+                 fresh_registers.end(),
+                 std::back_inserter(args_regs),
+                 [](Register const& r) -> bool {
+                     return r.register_set
+                            == viua::internals::Register_sets::ARGUMENTS;
+                 });
     for (auto const& each : args_regs) {
         erase(each, t);
         fresh_registers.erase(fresh_registers.find(each));
@@ -56,8 +55,7 @@ auto Register_usage_profile::define(Register const r,
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
               or r.register_set == Register_sets::STATIC
-              or r.register_set == Register_sets::PARAMETERS
-              )) {
+              or r.register_set == Register_sets::PARAMETERS)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -92,8 +90,7 @@ auto Register_usage_profile::define(Register const r,
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
               or r.register_set == Register_sets::STATIC
-              or r.register_set == Register_sets::PARAMETERS
-              )) {
+              or r.register_set == Register_sets::PARAMETERS)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such

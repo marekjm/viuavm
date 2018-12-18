@@ -22,12 +22,12 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <viua/assembler/frontend/parser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tokenizer.h>
 #include <viua/cg/tools.h>
-#include <viua/assembler/frontend/parser.h>
 #include <viua/front/asm.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
@@ -659,7 +659,7 @@ auto generate(std::vector<Token> const& tokens,
 
         auto fn_names = loader.get_functions();
 
-        auto lib_jumps = loader.get_jumps();
+        auto lib_jumps              = loader.get_jumps();
         linked_libs_jumptables[lnk] = lib_jumps;
 
         auto fn_addresses = loader.get_function_addresses();
@@ -889,7 +889,8 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////////
     // WRITE META-INFORMATION MAP
-    auto meta_information_map = viua::assembler::frontend::gather_meta_information(tokens);
+    auto meta_information_map =
+        viua::assembler::frontend::gather_meta_information(tokens);
     viua::internals::types::bytecode_size meta_information_map_size = 0;
     for (auto each : meta_information_map) {
         meta_information_map_size +=

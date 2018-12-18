@@ -17,22 +17,20 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <regex>
-#include <viua/util/string/ops.h>
+#include <string>
 #include <viua/tooling/libs/lexer/classifier.h>
+#include <viua/util/string/ops.h>
 
-namespace viua {
-namespace tooling {
-namespace libs {
-namespace lexer {
+namespace viua { namespace tooling { namespace libs { namespace lexer {
 namespace classifier {
 auto is_id(std::string const& s) -> bool {
     static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*$"};
     return regex_match(s, identifier);
 }
 auto is_scoped_id(std::string const& s) -> bool {
-    static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$"};
+    static auto const identifier =
+        std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$"};
     return regex_match(s, identifier);
 }
 
@@ -54,22 +52,18 @@ auto is_hexadecimal_integer(std::string const& s) -> bool {
 }
 
 auto is_access_type_specifier(std::string const& s) -> bool {
-    return (   s == "%"  // direct access
+    return (s == "%"     // direct access
             or s == "@"  // register indirect access
             or s == "*"  // pointer dereference access
-           );
+    );
 }
 auto is_register_set_name(std::string const& s) -> bool {
-    return (   s == "local"
-            or s == "static"
-            or s == "global"
-            or s == "arguments"
-            or s == "parameters"
-            or s == "closure_local"
-           );
+    return (s == "local" or s == "static" or s == "global" or s == "arguments"
+            or s == "parameters" or s == "closure_local");
 }
 
-auto is_quoted_text(std::string const& s, std::string::value_type const c) -> bool {
+auto is_quoted_text(std::string const& s, std::string::value_type const c)
+    -> bool {
     if (s.empty()) {
         return false;
     }
@@ -100,4 +94,4 @@ auto is_timeout_literal(std::string const& s) -> bool {
     auto const timeout_literal = std::regex{"^(0|[1-9][0-9]*)m?s$"};
     return regex_match(s, timeout_literal);
 }
-}}}}}
+}}}}}  // namespace viua::tooling::libs::lexer::classifier

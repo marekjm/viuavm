@@ -42,7 +42,8 @@ static auto size_of_register_index_operand_with_rs_type(
         or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    } else if (auto const sigil = tokens.at(i).str().at(0); (sigil == '%' or sigil == '@' or sigil == '*')
+    } else if (auto const sigil = tokens.at(i).str().at(0);
+               (sigil == '%' or sigil == '@' or sigil == '*')
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::Register_sets);
@@ -71,7 +72,8 @@ static auto size_of_register_index_operand(TokenVector const& tokens,
         or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    } else if (auto const sigil = tokens.at(i).str().at(0); (sigil == '%' or sigil == '@' or sigil == '*')
+    } else if (auto const sigil = tokens.at(i).str().at(0);
+               (sigil == '%' or sigil == '@' or sigil == '*')
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::Register_sets);
@@ -295,8 +297,9 @@ static auto size_of_hexadecimal_literal_operand(TokenVector const& tokens,
     return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
 }
 
-static auto const size_of_nop   = size_of_instruction_with_no_operands;
-static auto const size_of_izero = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto const size_of_nop = size_of_instruction_with_no_operands;
+static auto const size_of_izero =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto size_of_istore(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
@@ -309,8 +312,10 @@ static auto size_of_istore(TokenVector const& tokens, TokenVector::size_type i)
 
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
-static auto const size_of_iinc = size_of_instruction_with_one_ri_operand_with_rs_type;
-static auto const size_of_idec = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto const size_of_iinc =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto const size_of_idec =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto size_of_fstore(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size =
@@ -459,7 +464,8 @@ static auto const size_of_vat =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto const size_of_vlen =
     size_of_instruction_with_two_ri_operands_with_rs_types;
-static auto const size_of_bool = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto const size_of_bool =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto const size_of_not =
     size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto const size_of_ptrlive =
@@ -591,11 +597,13 @@ static auto const size_of_ptr =
     size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto const size_of_swap =
     size_of_instruction_with_two_ri_operands_with_rs_types;
-static auto const size_of_delete = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto const size_of_delete =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto const size_of_isnull =
     size_of_instruction_with_two_ri_operands_with_rs_types;
-static auto size_of_print = size_of_instruction_with_one_ri_operand_with_rs_type;
-static auto size_of_echo  = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto size_of_print =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto size_of_echo = size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto size_of_capture(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
@@ -931,7 +939,8 @@ static auto size_of_atom(TokenVector const& tokens, TokenVector::size_type i)
 }
 static auto size_of_atomeq =
     size_of_instruction_with_three_ri_operands_with_rs_types;
-static auto size_of_struct = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto size_of_struct =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto size_of_structinsert =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_structremove =

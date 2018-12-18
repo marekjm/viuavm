@@ -768,22 +768,16 @@ auto opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
         opcode = ARG;
     }
 
-    return insert_two_ri_instruction(
-        addr_ptr
-        , opcode
-        , a
-        , b
-    );
+    return insert_two_ri_instruction(addr_ptr, opcode, a, b);
 }
 
 auto opcopy(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
     -> viua::internals::types::byte* {
     return insert_two_ri_instruction(
-        addr_ptr
-        , (a.rs_type == viua::internals::Register_sets::ARGUMENTS ? PARAM : COPY)
-        , a
-        , b
-    );
+        addr_ptr,
+        (a.rs_type == viua::internals::Register_sets::ARGUMENTS ? PARAM : COPY),
+        a,
+        b);
 }
 
 auto opptr(viua::internals::types::byte* addr_ptr, int_op a, int_op b)

@@ -23,10 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace viua {
-namespace util {
-namespace string {
-namespace ops {
+namespace viua { namespace util { namespace string { namespace ops {
 auto extract(std::string const&) -> std::string;
 auto strencode(std::string const&) -> std::string;
 auto quoted(std::string const&) -> std::string;
@@ -40,6 +37,6 @@ auto levenshtein_filter(std::string const,
 auto levenshtein_best(std::string const,
                       std::vector<std::string> const&,
                       LevenshteinDistance const) -> DistancePair;
-}}}}
+}}}}  // namespace viua::util::string::ops
 
 #endif

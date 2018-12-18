@@ -17,14 +17,14 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unistd.h>
 #include <string>
+#include <unistd.h>
 #include <viua/util/string/escape_sequences.h>
 
 namespace viua {
-namespace util {
-namespace string {
-namespace escape_sequences {
+    namespace util {
+        namespace string {
+            namespace escape_sequences {
 
 auto send_escape_seq(std::string const& seq) -> std::string {
     auto is_terminal = isatty(1);
@@ -48,7 +48,4 @@ auto send_escape_seq(std::string const& seq) -> std::string {
     }
     return "";
 }
-}
-}
-}
-}
+}}}}  // namespace viua::util::string::escape_sequences

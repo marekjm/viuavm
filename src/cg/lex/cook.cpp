@@ -33,18 +33,16 @@ static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {
             continue;
         }
 
-        auto const need_colon = std::set<std::string>{
-            "function"
-            , "closure"
-            , "block"
-            , "signature"
-            , "bsignature"
-            , "info"
-            , "name"
-            , "import"
-            , "mark"
-            , "iota"
-        };
+        auto const need_colon = std::set<std::string>{"function",
+                                                      "closure",
+                                                      "block",
+                                                      "signature",
+                                                      "bsignature",
+                                                      "info",
+                                                      "name",
+                                                      "import",
+                                                      "mark",
+                                                      "iota"};
         if (need_colon.count(tokens.at(i + 1)) == 0) {
             continue;
         }
@@ -52,7 +50,8 @@ static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {
         if (tokens.at(i + 2) != ":") {
             throw viua::cg::lex::Invalid_syntax(
                 tokens.at(i + 1),
-                ("missing ':' after `" + tokens.at(i + 1).str() + "'")).add(tokens.at(i));
+                ("missing ':' after `" + tokens.at(i + 1).str() + "'"))
+                .add(tokens.at(i));
         }
     }
 }

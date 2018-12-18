@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -41,7 +41,8 @@ auto Program::bytecode() const
     return tmp;
 }
 
-auto Program::fill(std::unique_ptr<viua::internals::types::byte[]> code) -> Program& {
+auto Program::fill(std::unique_ptr<viua::internals::types::byte[]> code)
+    -> Program& {
     program  = std::move(code);
     addr_ptr = program.get();
     return (*this);
@@ -56,7 +57,6 @@ using Token = viua::cg::lex::Token;
 auto Program::calculate_jumps(
     std::vector<tuple<uint64_t, uint64_t>> const jump_positions,
     std::vector<Token> const& tokens) -> Program& {
-
     for (auto jmp : jump_positions) {
         auto const [position, offset] = jmp;
 

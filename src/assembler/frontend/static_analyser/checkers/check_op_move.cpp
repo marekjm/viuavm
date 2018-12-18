@@ -34,14 +34,16 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
                              "invalid operand")
             .note("expected register index");
     }
-    if ((not target) and source->rss != viua::internals::Register_sets::PARAMETERS) {
+    if ((not target)
+        and source->rss != viua::internals::Register_sets::PARAMETERS) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
 
     if (target) {
-        if (target->as == viua::internals::Access_specifier::REGISTER_INDIRECT) {
+        if (target->as
+            == viua::internals::Access_specifier::REGISTER_INDIRECT) {
             auto r = *target;
             r.rss  = viua::internals::Register_sets::LOCAL;
             check_use_of_register(register_usage_profile, r);
@@ -56,7 +58,8 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
             .note("expected register index");
     }
 
-    check_use_of_register(register_usage_profile, *source, "move from", false, true);
+    check_use_of_register(
+        register_usage_profile, *source, "move from", false, true);
     assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 

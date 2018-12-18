@@ -20,9 +20,9 @@
 #include <string>
 
 namespace viua {
-namespace util {
-namespace string {
-namespace escape_sequences {
+    namespace util {
+        namespace string {
+            namespace escape_sequences {
 const auto COLOR_FG_RED          = std::string{"\x1b[38;5;1m"};
 const auto COLOR_FG_YELLOW       = std::string{"\x1b[38;5;3m"};
 const auto COLOR_FG_CYAN         = std::string{"\x1b[38;5;6m"};
@@ -35,7 +35,4 @@ const auto COLOR_FG_ORANGE_RED_1 = std::string{"\x1b[38;5;202m"};
 const auto ATTR_RESET            = std::string{"\x1b[0m"};
 
 auto send_escape_seq(std::string const&) -> std::string;
-}
-}
-}
-}
+}}}}  // namespace viua::util::string::escape_sequences

@@ -18,10 +18,10 @@
  */
 
 #include <iostream>
+#include <viua/assembler/frontend/parser.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
 #include <viua/support/string.h>
-#include <viua/assembler/frontend/parser.h>
 using namespace std;
 
 
@@ -82,4 +82,4 @@ auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
 
     return meta_information;
 }
-}}}
+}}}  // namespace viua::assembler::frontend

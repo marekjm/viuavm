@@ -66,7 +66,8 @@ class Program {
     auto opiinc(int_op const) -> Program&;
     auto opidec(int_op const) -> Program&;
 
-    auto opfloat(int_op const, viua::internals::types::plain_float const) -> Program&;
+    auto opfloat(int_op const, viua::internals::types::plain_float const)
+        -> Program&;
 
     auto opitof(int_op const, int_op const) -> Program&;
     auto opftoi(int_op const, int_op const) -> Program&;
@@ -90,10 +91,13 @@ class Program {
     auto optext(int_op const, int_op const) -> Program&;
     auto optexteq(int_op const, int_op const, int_op const) -> Program&;
     auto optextat(int_op const, int_op const, int_op const) -> Program&;
-    auto optextsub(int_op const, int_op const, int_op const, int_op const) -> Program&;
+    auto optextsub(int_op const, int_op const, int_op const, int_op const)
+        -> Program&;
     auto optextlength(int_op const, int_op const) -> Program&;
-    auto optextcommonprefix(int_op const, int_op const, int_op const) -> Program&;
-    auto optextcommonsuffix(int_op const, int_op const, int_op const) -> Program&;
+    auto optextcommonprefix(int_op const, int_op const, int_op const)
+        -> Program&;
+    auto optextcommonsuffix(int_op const, int_op const, int_op const)
+        -> Program&;
     auto optextconcat(int_op const, int_op const, int_op const) -> Program&;
 
     auto opvector(int_op const, int_op const, int_op const) -> Program&;
@@ -192,8 +196,13 @@ class Program {
     auto opsend(int_op const, int_op const) -> Program&;
     auto opreceive(int_op const, timeout_op) -> Program&;
     auto opwatchdog(std::string const&) -> Program&;
-    auto opjump(viua::internals::types::bytecode_size const, enum JUMPTYPE const) -> Program&;
-    auto opif(int_op const, viua::internals::types::bytecode_size const, enum JUMPTYPE const, viua::internals::types::bytecode_size const, enum JUMPTYPE const) -> Program&;
+    auto opjump(viua::internals::types::bytecode_size const,
+                enum JUMPTYPE const) -> Program&;
+    auto opif(int_op const,
+              viua::internals::types::bytecode_size const,
+              enum JUMPTYPE const,
+              viua::internals::types::bytecode_size const,
+              enum JUMPTYPE const) -> Program&;
 
     auto optry() -> Program&;
     auto opcatch(std::string const, std::string const) -> Program&;
@@ -235,7 +244,7 @@ class Program {
     Program(Program const& that);
     Program(Program&&) = delete;
     auto operator=(Program const&) -> Program& = delete;
-    auto operator=(Program&&) -> Program& = delete;
+    auto operator=(Program &&) -> Program& = delete;
 };
 
 

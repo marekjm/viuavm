@@ -188,20 +188,21 @@ auto check_use_of_register(Register_usage_profile& rup,
         return;
     }
     if ((r.rss == Register_sets::ARGUMENTS) and not allow_arguments) {
-        throw Traced_syntax_error{}
-            .append(Invalid_syntax{
-                r.tokens.at(0),
-                "invalid use of arguments register set"}
-                        .add(r.tokens.at(1))
-                        .note("arguments register set may only be used in target register of `copy` and `move` instructions when a frame is allocated"));
+        throw Traced_syntax_error{}.append(
+            Invalid_syntax{r.tokens.at(0),
+                           "invalid use of arguments register set"}
+                .add(r.tokens.at(1))
+                .note("arguments register set may only be used in target "
+                      "register of `copy` and `move` instructions when a frame "
+                      "is allocated"));
     }
     if ((r.rss == Register_sets::PARAMETERS) and not allow_parameters) {
-        throw Traced_syntax_error{}
-            .append(Invalid_syntax{
-                r.tokens.at(0),
-                "invalid use of parameters register set"}
-                        .add(r.tokens.at(1))
-                        .note("parameters register set may only be used in source register of `copy` and `move` instructions"));
+        throw Traced_syntax_error{}.append(
+            Invalid_syntax{r.tokens.at(0),
+                           "invalid use of parameters register set"}
+                .add(r.tokens.at(1))
+                .note("parameters register set may only be used in source "
+                      "register of `copy` and `move` instructions"));
     }
 
     if ((not rup.in_bounds(r)) and r.rss != Register_sets::PARAMETERS) {
@@ -220,14 +221,11 @@ auto check_use_of_register(Register_usage_profile& rup,
     if ((not rup.defined(Register(r))) and r.rss == Register_sets::PARAMETERS) {
         auto msg = std::ostringstream{};
         if (rup.erased(Register(r))) {
-            msg << error_core_msg << " erased "
-                << to_string(r.rss) << " register "
-                << str::enquote(std::to_string(r.index));
+            msg << error_core_msg << " erased " << to_string(r.rss)
+                << " register " << str::enquote(std::to_string(r.index));
         } else {
-            msg << error_core_msg << ' '
-                << to_string(r.rss) << " register "
-                << str::enquote(std::to_string(r.index))
-                << " out of range";
+            msg << error_core_msg << ' ' << to_string(r.rss) << " register "
+                << str::enquote(std::to_string(r.index)) << " out of range";
         }
         auto error = Traced_syntax_error{}.append(
             Invalid_syntax(r.tokens.at(0), msg.str()));

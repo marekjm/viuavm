@@ -341,8 +341,8 @@ enum OPCODE : viua::internals::types::byte {
     TAILCALL,  // perform a tail call to a function
     DEFER,  // call a function just after the frame it was called in is popped
             // off the stack
-    ARG,   // move an object from argument register to a normal register (inside
-           // a function call),
+    ARG,  // move an object from argument register to a normal register (inside
+          // a function call),
     ALLOCATE_REGISTERS,  // allocates specified number of registers
 
     PROCESS,   // spawn a process (call a function and run it in a different

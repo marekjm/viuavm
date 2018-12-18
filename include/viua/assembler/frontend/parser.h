@@ -27,15 +27,18 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
-#include <viua/front/asm.h>
 #include <viua/cg/lex.h>
+#include <viua/front/asm.h>
 
 
 namespace viua { namespace assembler { namespace frontend {
 
-auto gather_functions(std::vector<viua::cg::lex::Token> const&) -> viua::front::assembler::Invocables;
-auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens) -> viua::front::assembler::Invocables;
-auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens) -> std::map<std::string, std::string>;
+auto gather_functions(std::vector<viua::cg::lex::Token> const&)
+    -> viua::front::assembler::Invocables;
+auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
+    -> viua::front::assembler::Invocables;
+auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
+    -> std::map<std::string, std::string>;
 
 namespace parser {
 struct Operand {
@@ -177,7 +180,8 @@ auto parse_closure(const vector_view<viua::cg::lex::Token> tokens,
 auto parse_block(const vector_view<viua::cg::lex::Token> tokens,
                  Instructions_block&) -> decltype(tokens)::size_type;
 auto parse(std::vector<viua::cg::lex::Token> const&) -> Parsed_source;
-}}}}  // namespace viua::assembler::frontend::parser
+}  // namespace parser
+}}}  // namespace viua::assembler::frontend
 
 
 #endif

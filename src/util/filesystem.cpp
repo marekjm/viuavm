@@ -17,13 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sys/stat.h>
 #include <string>
+#include <sys/stat.h>
 #include <viua/util/filesystem.h>
 
-namespace viua {
-namespace util {
-namespace filesystem {
+namespace viua { namespace util { namespace filesystem {
 auto is_file(std::string const& path) -> bool {
     struct stat sf;
 
@@ -39,6 +37,4 @@ auto is_file(std::string const& path) -> bool {
     // file otherwise
     return true;
 }
-}
-}
-}
+}}}  // namespace viua::util::filesystem

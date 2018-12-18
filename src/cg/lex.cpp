@@ -362,7 +362,8 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
 }
 
 auto is_register_set_name(string const& s) -> bool {
-    return (s == "local" or s == "static" or s == "global" or s == "arguments" or s == "parameters");
+    return (s == "local" or s == "static" or s == "global" or s == "arguments"
+            or s == "parameters");
 }
 static auto is_register_index(std::string const s) -> bool {
     auto const p = s.at(0);
@@ -1116,8 +1117,8 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "copy" or token == "swap"
-                   or token == "ptr" or token == "isnull" or token == "send"
+        } else if (token == "copy" or token == "swap" or token == "ptr"
+                   or token == "isnull" or token == "send"
                    or token == "textlength" or token == "structkeys"
                    or token == "bits" or token == "bitset"
                    or token == "bitat") {
@@ -1153,10 +1154,10 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print"
-                   or token == "echo" or token == "delete" or token == "draw"
-                   or token == "throw" or token == "iinc" or token == "idec"
-                   or token == "self" or token == "struct") {
+        } else if (token == "izero" or token == "print" or token == "echo"
+                   or token == "delete" or token == "draw" or token == "throw"
+                   or token == "iinc" or token == "idec" or token == "self"
+                   or token == "struct") {
             tokens.push_back(token);                 // mnemonic
             tokens.push_back(input_tokens.at(++i));  // target register
             if (input_tokens.at(i + 1) == "\n") {
@@ -1880,8 +1881,8 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "copy" or token == "swap"
-                   or token == "ptr" or token == "isnull" or token == "send"
+        } else if (token == "copy" or token == "swap" or token == "ptr"
+                   or token == "isnull" or token == "send"
                    or token == "textlength" or token == "structkeys"
                    or token == "bitset" or token == "bitat") {
             if (input_tokens.at(i + 1) == "[[") {  // FIXME attributes
@@ -1932,11 +1933,11 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "izero" or token == "print"
-                   or token == "echo" or token == "delete" or token == "draw"
-                   or token == "throw" or token == "iinc" or token == "idec"
-                   or token == "self" or token == "struct"
-                   or token == "wrapincrement" or token == "wrapdecrement") {
+        } else if (token == "izero" or token == "print" or token == "echo"
+                   or token == "delete" or token == "draw" or token == "throw"
+                   or token == "iinc" or token == "idec" or token == "self"
+                   or token == "struct" or token == "wrapincrement"
+                   or token == "wrapdecrement") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (input_tokens.at(i + 1) == "\n") {
                 tokens.emplace_back(input_tokens.at(i + 1).line(),

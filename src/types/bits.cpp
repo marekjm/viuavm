@@ -263,8 +263,8 @@ static auto binary_lte(std::vector<bool> lhs, std::vector<bool> rhs) -> bool {
     // equal to each other
     return true;
 }
-static auto binary_lt[[maybe_unused]](std::vector<bool> lhs,
-                                      std::vector<bool> rhs) -> bool {
+static auto binary_lt
+    [[maybe_unused]] (std::vector<bool> lhs, std::vector<bool> rhs) -> bool {
     lhs = binary_expand(lhs, std::max(lhs.size(), rhs.size()));
     rhs = binary_expand(rhs, std::max(lhs.size(), rhs.size()));
 

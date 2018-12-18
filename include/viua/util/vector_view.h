@@ -27,8 +27,8 @@
 namespace viua { namespace util {
 template<typename T> class vector_view {
   public:
-    using container_type = std::vector<T>;
-    using size_type = typename container_type::size_type;
+    using container_type  = std::vector<T>;
+    using size_type       = typename container_type::size_type;
     using difference_type = typename container_type::difference_type;
 
   private:

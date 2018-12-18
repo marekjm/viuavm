@@ -26,6 +26,7 @@
 namespace viua { namespace util {
 template<typename T> class Range {
     std::vector<T> v;
+
   public:
     Range(T const upper) {
         v.reserve(upper);

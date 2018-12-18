@@ -80,10 +80,10 @@ class Register_usage_profile {
     /*
      * Registers are "fresh" until they either 1/ cross the boundary of an "if"
      * instruction, or 2/ are used. After that they are no longer fresh.
-     * Registers in `arguments` register set are fresh until a calling instruction
-     * is executed (e.g. `call`, or `process`).
-     * Overwriting a fresh register is an error because it means that the
-     * previously defined value is never used.
+     * Registers in `arguments` register set are fresh until a calling
+     * instruction is executed (e.g. `call`, or `process`). Overwriting a fresh
+     * register is an error because it means that the previously defined value
+     * is never used.
      */
     std::set<Register> fresh_registers;
 
@@ -196,8 +196,8 @@ auto check_if_name_resolved(Register_usage_profile const& rup,
                             Register_index const r) -> void;
 auto check_use_of_register(Register_usage_profile&,
                            viua::assembler::frontend::parser::Register_index,
-                           std::string const = "use of",
-                           bool const allow_arguments = false,
+                           std::string const           = "use of",
+                           bool const allow_arguments  = false,
                            bool const allow_parameters = false) -> void;
 
 

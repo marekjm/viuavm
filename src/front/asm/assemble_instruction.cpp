@@ -437,18 +437,23 @@ auto assemble_instruction(
 
         if (tokens.at(target) == "void") {
             --source;
-            program.opmove(::assembler::operands::getint(
-                       ::assembler::operands::resolve_register(tokens.at(target))),
-                   ::assembler::operands::getint_with_rs_type(
-                       ::assembler::operands::resolve_register(tokens.at(source)),
-                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+            program.opmove(
+                ::assembler::operands::getint(
+                    ::assembler::operands::resolve_register(tokens.at(target))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(source)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(source + 1))));
         } else {
-            program.opmove(::assembler::operands::getint_with_rs_type(
-                       ::assembler::operands::resolve_register(tokens.at(target)),
-                       ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-                   ::assembler::operands::getint_with_rs_type(
-                       ::assembler::operands::resolve_register(tokens.at(source)),
-                       ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+            program.opmove(
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(target)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(target + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(source)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(source + 1))));
         }
     } else if (tokens.at(i) == "copy") {
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);

@@ -58,8 +58,8 @@ auto check_op_process(Register_usage_profile& register_usage_profile,
     }
 
     /*
-     * Arguments are "consumed" by the callee, so from the static analyser's point
-     * of view they are erased (no longer available in the current scope).
+     * Arguments are "consumed" by the callee, so from the static analyser's
+     * point of view they are erased (no longer available in the current scope).
      */
     register_usage_profile.erase_arguments(instruction.tokens.at(0));
 

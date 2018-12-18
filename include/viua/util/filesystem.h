@@ -19,10 +19,6 @@
 
 #include <string>
 
-namespace viua {
-namespace util {
-namespace filesystem {
+namespace viua { namespace util { namespace filesystem {
 auto is_file(std::string const&) -> bool;
-}
-}
-}
+}}}  // namespace viua::util::filesystem

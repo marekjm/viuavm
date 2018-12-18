@@ -22,10 +22,7 @@
 
 #include <string>
 
-namespace viua {
-namespace tooling {
-namespace libs {
-namespace lexer {
+namespace viua { namespace tooling { namespace libs { namespace lexer {
 namespace classifier {
 auto is_id(std::string const&) -> bool;
 auto is_scoped_id(std::string const&) -> bool;
@@ -38,13 +35,14 @@ auto is_hexadecimal_integer(std::string const&) -> bool;
 auto is_access_type_specifier(std::string const&) -> bool;
 auto is_register_set_name(std::string const&) -> bool;
 
-auto is_quoted_text(std::string const&, std::string::value_type const = '"') -> bool;
+auto is_quoted_text(std::string const&, std::string::value_type const = '"')
+    -> bool;
 auto is_float(std::string const&) -> bool;
 auto is_default(std::string const&) -> bool;
 auto is_void(std::string const&) -> bool;
 
 auto is_boolean_literal(std::string const&) -> bool;
 auto is_timeout_literal(std::string const&) -> bool;
-}}}}}
+}}}}}  // namespace viua::tooling::libs::lexer::classifier
 
 #endif

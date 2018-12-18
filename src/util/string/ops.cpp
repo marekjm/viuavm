@@ -22,10 +22,7 @@
 #include <string>
 #include <viua/util/string/ops.h>
 
-namespace viua {
-namespace util {
-namespace string {
-namespace ops {
+namespace viua { namespace util { namespace string { namespace ops {
 auto extract(std::string const& s) -> std::string {
     /** Extracts *enquoted chunk*.
      *
@@ -217,4 +214,4 @@ auto levenshtein_best(std::string const source,
 
     return best;
 }
-}}}}
+}}}}  // namespace viua::util::string::ops

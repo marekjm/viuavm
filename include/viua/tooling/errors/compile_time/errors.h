@@ -22,13 +22,10 @@
 
 #include <memory>
 #include <string>
-#include <viua/tooling/libs/lexer/tokenise.h>
 #include <viua/tooling/errors/compile_time.h>
+#include <viua/tooling/libs/lexer/tokenise.h>
 
-namespace viua {
-namespace tooling {
-namespace errors {
-namespace compile_time {
+namespace viua { namespace tooling { namespace errors { namespace compile_time {
 // see struct Invalid_syntax
 class Error {
     Compile_time_error const cause;
@@ -44,7 +41,6 @@ class Error {
     viua::tooling::libs::lexer::Token aside_token;
 
   public:
-
     auto line() const -> viua::tooling::libs::lexer::Token::Position_type;
     auto character() const -> viua::tooling::libs::lexer::Token::Position_type;
 
@@ -68,17 +64,19 @@ class Error {
 
     auto empty() const -> bool;
 
-    Error(Compile_time_error const, viua::tooling::libs::lexer::Token, std::string = "");
+    Error(Compile_time_error const,
+          viua::tooling::libs::lexer::Token,
+          std::string = "");
 };
 
 class Error_wrapper {
-        std::vector<Error> fallout;
+    std::vector<Error> fallout;
 
-    public:
-        auto append(Error) -> Error_wrapper&;
-        auto errors() const -> std::vector<Error> const&;
-        auto errors() -> std::vector<Error>&;
+  public:
+    auto append(Error) -> Error_wrapper&;
+    auto errors() const -> std::vector<Error> const&;
+    auto errors() -> std::vector<Error>&;
 };
-}}}}
+}}}}  // namespace viua::tooling::errors::compile_time
 
 #endif

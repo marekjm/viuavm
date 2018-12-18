@@ -20,20 +20,17 @@
 #include <viua/tooling/errors/compile_time.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 
-namespace viua {
-namespace tooling {
-namespace errors {
-namespace compile_time {
-Error::Error(Compile_time_error const e, viua::tooling::libs::lexer::Token t, std::string m):
-    cause{e}
-    , main_token{t}
-    , message{m} {
-}
+namespace viua { namespace tooling { namespace errors { namespace compile_time {
+Error::Error(Compile_time_error const e,
+             viua::tooling::libs::lexer::Token t,
+             std::string m)
+        : cause{e}, main_token{t}, message{m} {}
 
 auto Error::line() const -> viua::tooling::libs::lexer::Token::Position_type {
     return main_token.line();
 }
-auto Error::character() const -> viua::tooling::libs::lexer::Token::Position_type {
+auto Error::character() const
+    -> viua::tooling::libs::lexer::Token::Position_type {
     return main_token.character();
 }
 
@@ -78,11 +75,12 @@ auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool {
 }
 
 auto Error::aside(std::string a) -> Error& {
-    aside_note = a;
+    aside_note  = a;
     aside_token = main_token;
     return *this;
 }
-auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a) -> Error& {
+auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a)
+    -> Error& {
     aside_note  = a;
     aside_token = t;
     return *this;
@@ -109,7 +107,8 @@ auto Error::str() const -> std::string {
     return message;
 }
 auto Error::what() const -> std::string {
-    if (auto s = viua::tooling::errors::compile_time::display_error(cause); s.empty()) {
+    if (auto s = viua::tooling::errors::compile_time::display_error(cause);
+        s.empty()) {
         return message;
     } else {
         return s + (message.empty() ? "" : (": " + message));
@@ -119,7 +118,4 @@ auto Error::what() const -> std::string {
 auto Error::empty() const -> bool {
     return (cause == Compile_time_error::Empty_error) and message.empty();
 }
-}
-}
-}
-}
+}}}}  // namespace viua::tooling::errors::compile_time
