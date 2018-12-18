@@ -2391,6 +2391,8 @@ static auto analyse_single_arm(
                      */
                     return arm_result;
                 } case IF: {
+                    auto true_arm_result = Arm_result{};
+
                     try {
                         auto target = decltype(i){0};
 
@@ -2420,7 +2422,7 @@ static auto analyse_single_arm(
                                 << '\n';
                         }
 
-                        analyse_single_arm(
+                        true_arm_result = analyse_single_arm(
                             fn
                             , fragments
                             , analyser_state
@@ -2468,12 +2470,25 @@ static auto analyse_single_arm(
                                 << '\n';
                         }
 
+                        {
+                            std::cerr << "true arm considered lines:";
+                            for (auto const each : true_arm_result.analysed_lines) {
+                                std::cerr << ' ' << each;
+                            }
+                            std::cerr << '\n';
+                            std::cerr << "target of the false arm is: " << target << '\n';
+                        }
+
                         analyse_single_arm(
                             fn
                             , fragments
                             , analyser_state
                             , function_state.clone()
-                            , true
+                              /*
+                               * False arm is only conditionally executed if the true
+                               * arm did not enter the same path as it.
+                               */
+                            , (true_arm_result.analysed_lines.count(target) == 0)
                             , annotated_body
                             , label_map
                             , target
