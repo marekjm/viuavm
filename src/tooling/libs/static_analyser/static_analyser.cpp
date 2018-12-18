@@ -342,6 +342,11 @@ static auto create_label_map(
     return mapping;
 }
 
+struct Arm_result {
+    Body_line::size_type last_instruction {0};
+    std::set<Body_line::size_type> analysed_lines;
+};
+
 static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn
     , viua::tooling::libs::parser::Cooked_fragments const& fragments
@@ -351,7 +356,7 @@ static auto analyse_single_arm(
     , std::vector<Body_line> const& annotated_body
     , std::map<std::string, Body_line> const& label_map
     , viua::tooling::libs::parser::Cooked_function::body_type::size_type i
-) -> void {
+) -> Arm_result {
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
     using viua::tooling::libs::parser::Register_address;
@@ -359,6 +364,8 @@ static auto analyse_single_arm(
     using viua::tooling::errors::compile_time::Compile_time_error;
 
     auto const analysed_function_name = fn.head().function_name + '/' + std::to_string(fn.head().arity);
+
+    auto arm_result = Arm_result{};
 
     /*
      * There may be no branches between a frame spawn point and the call
@@ -370,6 +377,7 @@ static auto analyse_single_arm(
     auto spawned_frame_where = viua::tooling::libs::lexer::Token{};
 
     for (; i < annotated_body.size(); ++i) {
+        arm_result.analysed_lines.insert(i);
         auto const line = fn.body().at(annotated_body.at(i).source_line);
 
         std::cout << "analysing: " << line->token(0).str() << std::endl;
@@ -2381,7 +2389,7 @@ static auto analyse_single_arm(
                      * JUMP affects the control flow directrly, and this
                      * is reflected in the way the analyser operates.
                      */
-                    return;
+                    return arm_result;
                 } case IF: {
                     try {
                         auto target = decltype(i){0};
@@ -2479,7 +2487,7 @@ static auto analyse_single_arm(
                         throw;
                     }
 
-                    return;
+                    return arm_result;
                 } case THROW: {
                     auto const& source =
                         *static_cast<Register_address const*>(instruction.operands.at(0).get());
@@ -2498,7 +2506,7 @@ static auto analyse_single_arm(
                     /*
                      * Return from the function as throwing aborts the normal flow.
                      */
-                    return;
+                    return arm_result;
                 } case CATCH: {
                 } case DRAW: {
                 } case TRY: {
@@ -2762,9 +2770,10 @@ static auto analyse_single_arm(
                 } case RETURN: {
                 } case HALT: {
                     /*
-                     * These instructions do not access registers.
+                     * These instructions just cause the analysis to stop as they
+                     * halt function's execution.
                      */
-                    break;
+                    return arm_result;
                 } default: {
                     // FIXME do nothing, but later add a warning that such-and-such instruction
                     // is not covered by static analyser
@@ -2775,6 +2784,8 @@ static auto analyse_single_arm(
 
         function_state.dump(std::cout);
     }
+
+    return arm_result;
 }
 
 static auto analyse_single_function(
