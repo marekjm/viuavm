@@ -2417,7 +2417,7 @@ static auto analyse_single_arm(
                             , fragments
                             , analyser_state
                             , function_state.clone()
-                            , after_conditional_branch
+                            , true
                             , annotated_body
                             , label_map
                             , target
@@ -2465,7 +2465,7 @@ static auto analyse_single_arm(
                             , fragments
                             , analyser_state
                             , function_state.clone()
-                            , after_conditional_branch
+                            , true
                             , annotated_body
                             , label_map
                             , target
