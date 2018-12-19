@@ -69,39 +69,45 @@ static bool usage(const char* program,
     if (show_help) {
         cout << "\nUSAGE:\n";
         cout << "    " << program
-             << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n"
-             << endl;
-        cout << "OPTIONS:\n";
+             << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n";
+
+        std::cout << "\nOPTIONS:\n";
 
         // generic options
-        cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
+        std::cout << "    "
+                  << "-V, --version        - show version\n"
+                  << "    "
+                  << "-h, --help           - display this message\n"
 
-             // logging options
-             << "    "
-             << "-v, --verbose            - show verbose output\n"
-             << "    "
+                  // logging options
+                  << "    "
+                  << "-v, --verbose        - show verbose output\n"
 
-             // compilation options
-             << "    "
-             << "-o, --out <file>         - specify output file\n"
-             << "    "
-             << "-c, --lib                - assemble as a library\n"
-             << "    "
-             << "-C, --verify             - verify source code correctness "
-                "without actually compiling it\n"
-             << "    "
-             << "    --size               - calculate and report final "
-                "bytecode size\n"
-             << "    "
-             << "    --meta               - display information embedded in "
-                "source code and exit\n"
-             << "    "
-             << "    --no-sa              - disable static checking of "
-                "register accesses (use in case of "
-                "false positives)\n";
+                  // compilation options
+                  << "    "
+                  << "-o, --out <file>     - specify output file\n"
+                  << "    "
+                  << "-c, --lib            - assemble as a library\n"
+                  << "    "
+                  << "-C, --verify         - verify source code correctness "
+                     "without actually compiling it\n"
+                  << '\n'
+                  << "    "
+                  << "--size               - calculate and report final "
+                     "bytecode size\n"
+                  << '\n'
+                  << "    "
+                  << "--meta               - display information embedded in "
+                     "source code and exit\n";
+
+        std::cout << "\nWARNING OPTIONS:\n";
+        std::cout << "    Warning options should only be used in case of false "
+                     "positives.\n";
+        std::cout
+            << '\n'
+            << "    "
+            << "--no-sa              - disable static checking of register "
+               "accesses\n";
     }
 
     return (show_help or show_version);
