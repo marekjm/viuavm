@@ -27,6 +27,10 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void {
+    if (allowed_error(Reportable_error::Unused_register)) {
+        return;
+    }
+
     const auto& limit = register_usage_profile.allocated_registers();
     if (not limit) {
         return;
