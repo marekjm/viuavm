@@ -650,3 +650,29 @@ auto viua::assembler::frontend::static_analyser::verify(
     verify_frames_have_no_gaps(source);
     verify_jumps_are_in_range(source);
 }
+
+
+static std::set<viua::assembler::frontend::static_analyser::Reportable_error>
+    allowed_errors;
+auto viua::assembler::frontend::static_analyser::allowed_error(
+    Reportable_error const error) -> bool {
+    return (allowed_errors.count(error) != 0);
+}
+
+auto viua::assembler::frontend::static_analyser::allow_error(
+    Reportable_error const error,
+    bool const allow) -> void {
+    if (allow) {
+        allowed_errors.insert(error);
+    } else {
+        allowed_errors.erase(allowed_errors.find(error));
+    }
+}
+
+auto viua::assembler::frontend::static_analyser::to_reportable_error(
+    std::string_view const s) -> std::optional<Reportable_error> {
+    if (s == "-Wunused-register") {
+        return Reportable_error::Unused_register;
+    }
+    return {};
+}

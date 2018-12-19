@@ -167,6 +167,14 @@ class Register_usage_profile {
     auto end() const -> decltype(defined_registers.end());
 };
 
+enum class Reportable_error {
+    Unused_register,
+};
+auto to_reportable_error(std::string_view const)
+    -> std::optional<Reportable_error>;
+auto allowed_error(Reportable_error const) -> bool;
+auto allow_error(Reportable_error const, bool const = true) -> void;
+
 namespace checkers {
 using viua::assembler::frontend::parser::Instruction;
 using viua::assembler::frontend::parser::Instructions_block;

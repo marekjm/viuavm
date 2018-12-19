@@ -166,6 +166,23 @@ int main(int argc, char* argv[]) {
         } else if (option == "--no-sa") {
             PERFORM_STATIC_ANALYSIS = false;
             continue;
+        } else if (option.find("-W") != std::string::npos) {
+            using viua::assembler::frontend::static_analyser::allow_error;
+            using viua::assembler::frontend::static_analyser::
+                to_reportable_error;
+
+            if (auto e = to_reportable_error(option); e.has_value()) {
+                allow_error(e.value());
+            } else {
+                cerr << send_control_seq(COLOR_FG_RED) << "error"
+                     << send_control_seq(ATTR_RESET);
+                cerr << ": unknown option: ";
+                cerr << send_control_seq(COLOR_FG_WHITE) << option
+                     << send_control_seq(ATTR_RESET);
+                cerr << endl;
+                return 1;
+            }
+            continue;
         } else if (str::startswith(option, "-")) {
             cerr << send_control_seq(COLOR_FG_RED) << "error"
                  << send_control_seq(ATTR_RESET);
