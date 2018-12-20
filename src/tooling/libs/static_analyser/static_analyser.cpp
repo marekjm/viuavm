@@ -960,14 +960,10 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case LT: {
-            }
-            case LTE: {
-            }
-            case GT: {
-            }
-            case GTE: {
-            }
+            case LT:
+            case LTE:
+            case GT:
+            case GTE:
             case EQ: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -1094,8 +1090,7 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STREQ: {
-            }
+            case STREQ:
             case TEXTEQ: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -1828,8 +1823,7 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case AND: {
-            }
+            case AND:
             case OR: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -1906,10 +1900,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITAND: {
-            }
-            case BITOR: {
-            }
+            case BITAND:
+            case BITOR:
             case BITXOR: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -2042,12 +2034,9 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case SHL: {
-            }
-            case SHR: {
-            }
-            case ASHL: {
-            }
+            case SHL:
+            case SHR:
+            case ASHL:
             case ASHR: {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -2089,8 +2078,7 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case ROL: {
-            }
+            case ROL:
             case ROR: {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
@@ -2117,24 +2105,15 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITSEQ: {
-            }
-            case BITSLT: {
-            }
-            case BITSLTE: {
-            }
-            case BITSGT: {
-            }
-            case BITSGTE: {
-            }
-            case BITAEQ: {
-            }
-            case BITALT: {
-            }
-            case BITALTE: {
-            }
-            case BITAGT: {
-            }
+            case BITSEQ:
+            case BITSLT:
+            case BITSLTE:
+            case BITSGT:
+            case BITSGTE:
+            case BITAEQ:
+            case BITALT:
+            case BITALTE:
+            case BITAGT:
             case BITAGTE: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -2170,24 +2149,15 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case WRAPINCREMENT: {
-            }
-            case WRAPDECREMENT: {
-            }
-            case CHECKEDSINCREMENT: {
-            }
-            case CHECKEDSDECREMENT: {
-            }
-            case CHECKEDUINCREMENT: {
-            }
-            case CHECKEDUDECREMENT: {
-            }
-            case SATURATINGSINCREMENT: {
-            }
-            case SATURATINGSDECREMENT: {
-            }
-            case SATURATINGUINCREMENT: {
-            }
+            case WRAPINCREMENT:
+            case WRAPDECREMENT:
+            case CHECKEDSINCREMENT:
+            case CHECKEDSDECREMENT:
+            case CHECKEDUINCREMENT:
+            case CHECKEDUDECREMENT:
+            case SATURATINGSINCREMENT:
+            case SATURATINGSDECREMENT:
+            case SATURATINGUINCREMENT:
             case SATURATINGUDECREMENT: {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
@@ -2212,44 +2182,25 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case WRAPADD: {
-            }
-            case WRAPSUB: {
-            }
-            case WRAPMUL: {
-            }
-            case WRAPDIV: {
-            }
-            case CHECKEDSADD: {
-            }
-            case CHECKEDSSUB: {
-            }
-            case CHECKEDSMUL: {
-            }
-            case CHECKEDSDIV: {
-            }
-            case CHECKEDUADD: {
-            }
-            case CHECKEDUSUB: {
-            }
-            case CHECKEDUMUL: {
-            }
-            case CHECKEDUDIV: {
-            }
-            case SATURATINGSADD: {
-            }
-            case SATURATINGSSUB: {
-            }
-            case SATURATINGSMUL: {
-            }
-            case SATURATINGSDIV: {
-            }
-            case SATURATINGUADD: {
-            }
-            case SATURATINGUSUB: {
-            }
-            case SATURATINGUMUL: {
-            }
+            case WRAPADD:
+            case WRAPSUB:
+            case WRAPMUL:
+            case WRAPDIV:
+            case CHECKEDSADD:
+            case CHECKEDSSUB:
+            case CHECKEDSMUL:
+            case CHECKEDSDIV:
+            case CHECKEDUADD:
+            case CHECKEDUSUB:
+            case CHECKEDUMUL:
+            case CHECKEDUDIV:
+            case SATURATINGSADD:
+            case SATURATINGSSUB:
+            case SATURATINGSMUL:
+            case SATURATINGSDIV:
+            case SATURATINGUADD:
+            case SATURATINGUSUB:
+            case SATURATINGUMUL:
             case SATURATINGUDIV: {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
@@ -2579,10 +2530,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case CAPTURE: {
-            }
-            case CAPTURECOPY: {
-            }
+            case CAPTURE:
+            case CAPTURECOPY:
             case CAPTUREMOVE: {
                 // FIXME TODO
                 break;
@@ -2693,10 +2642,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case PARAM: {
-            }
-            case PAMV: {
-            }
+            case PARAM:
+            case PAMV:
             case ARG: {
                 /*
                  * These instructions are not available to user
@@ -3289,8 +3236,7 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case RETURN: {
-            }
+            case RETURN:
             case HALT: {
                 /*
                  * These instructions just cause the analysis to stop as they
