@@ -2513,8 +2513,7 @@ static auto analyse_single_arm(
                 // instruction is not covered by static analyser
                 break;
             }
-            case PRINT: {
-            }
+            case PRINT:
             case ECHO: {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
