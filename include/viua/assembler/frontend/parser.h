@@ -128,6 +128,8 @@ struct Parsed_source {
     std::vector<Instructions_block> blocks;
     std::vector<viua::cg::lex::Token> block_signatures;
 
+    std::map<std::string, std::map<std::string, std::string>> imports;
+
     bool as_library = false;
 
     auto block(std::string const) const -> Instructions_block const&;

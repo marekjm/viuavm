@@ -552,7 +552,6 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    auto links = ::assembler::ce::getlinks(tokens);
     auto linked_libs_bytecode =
         std::vector<tuple<std::string,
                           viua::internals::types::bytecode_size,
@@ -569,6 +568,7 @@ auto generate(std::vector<Token> const& tokens,
         symbol_sources[f] = filename;
     }
 
+    auto links = std::vector<std::string>{};
     for (auto const& lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
@@ -877,7 +877,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
-    ofstream out(compilename, ios::out | ios::binary);
+    auto out = std::ofstream{compilename, ios::out | ios::binary};
 
     out.write(VIUA_MAGIC_NUMBER, sizeof(char) * 5);
     if (flags.as_lib) {
@@ -969,7 +969,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
-    for (std::string name : blocks.names) {
+    for (auto const& name : blocks.names) {
         // linked blocks are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
@@ -990,7 +990,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ///////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
-    for (std::string name : functions.names) {
+    for (auto const& name : functions.names) {
         // linked functions are to be inserted later
         if (find(linked_function_names.begin(),
                  linked_function_names.end(),

@@ -69,8 +69,6 @@ namespace ce {
 auto getmarks(std::vector<viua::cg::lex::Token> const& tokens)
     -> std::map<std::string,
                 std::remove_reference<decltype(tokens)>::type::size_type>;
-auto getlinks(std::vector<viua::cg::lex::Token> const&)
-    -> std::vector<std::string>;
 
 auto get_function_names(std::vector<viua::cg::lex::Token> const&)
     -> std::vector<std::string>;

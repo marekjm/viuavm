@@ -68,26 +68,6 @@ auto assembler::ce::getmarks(std::vector<viua::cg::lex::Token> const& tokens)
     return marks;
 }
 
-auto assembler::ce::getlinks(std::vector<viua::cg::lex::Token> const& tokens)
-    -> std::vector<std::string> {
-    /** This function will pass over all instructions and
-     * gather .import: assembler instructions.
-     */
-    auto links = std::vector<std::string>{};
-    for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
-        if (tokens.at(i) == ".import:") {
-            ++i;  // skip '.import:' token
-            if (tokens.at(i) == "\n") {
-                throw viua::cg::lex::Invalid_syntax(
-                    tokens.at(i), "missing module name in import directive");
-            }
-            links.emplace_back(tokens.at(i));
-            ++i;  // skip module name token
-        }
-    }
-    return links;
-}
-
 static auto looks_like_name_definition(Token const t) -> bool {
     return (t == ".function:" or t == ".closure:" or t == ".block:"
             or t == ".signature:" or t == ".bsignature:");

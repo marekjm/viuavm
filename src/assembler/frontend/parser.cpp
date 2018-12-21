@@ -322,6 +322,7 @@ static auto get_directives() -> std::vector<std::string> {
         ".mark:",
         ".name:",
         ".unused:",
+        ".import:",
     };
 }
 auto viua::assembler::frontend::parser::parse_instruction(
@@ -630,6 +631,19 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
             // FIXME add meta information to parsed source
             // for now just skip key and value
             i += 2;
+        } else if (tokens.at(i) == ".import:") {
+            ++i;
+
+            auto attributes = std::map<std::string, std::string>{};
+            i += parse_attributes(vector_view<Token>(tokens, i), attributes);
+
+            auto name = tokens.at(i);
+            ++i;
+
+            if (not parsed.imports.emplace(name.str(), attributes).second) {
+                throw Invalid_syntax(tokens.at(i), "double import")
+                    .note("module " + name.str() + " was already imported");
+            }
         } else if (tokens.at(i).str().at(0) == '.') {
             throw Invalid_syntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
