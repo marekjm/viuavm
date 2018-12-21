@@ -309,6 +309,8 @@ int main(int argc, char* argv[]) {
 
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
+    auto parsed_imports =
+        std::map<std::string, std::map<std::string, std::string>>{};
     try {
         auto parsed_source =
             viua::assembler::frontend::parser::parse(normalised_tokens);
@@ -318,6 +320,7 @@ int main(int argc, char* argv[]) {
             viua::assembler::frontend::static_analyser::check_register_usage(
                 parsed_source);
         }
+        parsed_imports = parsed_source.imports;
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
@@ -329,8 +332,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (REPORT_BYTECODE_SIZE) {
-        cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens)
-             << endl;
+        std::cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens)
+                  << std::endl;
         return 0;
     }
 
@@ -342,10 +345,68 @@ int main(int argc, char* argv[]) {
         auto meta =
             viua::assembler::frontend::gather_meta_information(cooked_tokens);
         for (auto each : meta) {
-            cout << each.first << " = "
-                 << str::enquote(str::strencode(each.second)) << endl;
+            std::cout << each.first << " = "
+                      << str::enquote(str::strencode(each.second)) << std::endl;
         }
         return 0;
+    }
+
+    auto static_linked_parsed_imports = std::vector<std::string>{};
+    if (not parsed_imports.empty()) {
+        if (flags.verbose) {
+            std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                      << send_control_seq(ATTR_RESET) << ": ";
+            std::cout << "processing imports: " << parsed_imports.size()
+                      << " module(s)\n";
+        }
+
+        auto const VIUA_LIBRARY_PATH =
+            viua::support::env::get_paths("VIUA_LIBRARY_PATH");
+        auto const module_sep = std::regex{"::"};
+
+        for (auto const& [name, attrs] : parsed_imports) {
+            auto module_file =
+                std::regex_replace(name, module_sep, "/") + ".module";
+
+            if (flags.verbose) {
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << "  module: " << name << '\n';
+            }
+
+            auto found          = false;
+            auto candidate_path = std::string{};
+            for (auto const& each : VIUA_LIBRARY_PATH) {
+                candidate_path = each + '/' + module_file;
+                if ((found = viua::support::env::is_file(candidate_path))) {
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE)
+                                  << filename << send_control_seq(ATTR_RESET)
+                                  << ": "
+                                     "    found: "
+                                  << candidate_path << '\n';
+                    }
+                    break;
+                }
+            }
+            if (not found) {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ':'
+                          << send_control_seq(COLOR_FG_RED) << "error"
+                          << send_control_seq(ATTR_RESET)
+                          << ": did not find module \""
+                          << send_control_seq(COLOR_FG_WHITE) << name
+                          << send_control_seq(ATTR_RESET) << "\"\n";
+                return 1;
+            }
+
+            if (attrs.count("static")) {
+                // FIXME Modules specified on command line are also to be
+                // statically linked. These two ways should probably be merged.
+                static_linked_parsed_imports.push_back(candidate_path);
+                commandline_given_links.push_back(candidate_path);
+            }
+        }
     }
 
     int ret_code = 0;
