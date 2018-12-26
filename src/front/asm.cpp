@@ -37,6 +37,7 @@ using viua::assembler::util::pretty_printer::ATTR_RESET;
 using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
 using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
+using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
@@ -352,6 +353,7 @@ int main(int argc, char* argv[]) {
     }
 
     auto static_linked_parsed_imports = std::vector<std::string>{};
+    auto dynamic_linked_imports = std::vector<std::string>{};
     if (not parsed_imports.empty()) {
         if (flags.verbose) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -363,6 +365,9 @@ int main(int argc, char* argv[]) {
         auto const VIUA_LIBRARY_PATH =
             viua::support::env::get_paths("VIUA_LIBRARY_PATH");
         auto const module_sep = std::regex{"::"};
+
+        auto const STATIC_IMPORT_TAG = std::string{"static"};
+        auto const DYNAMIC_IMPORT_TAG = std::string{"dynamic"};
 
         for (auto const& [name, attrs] : parsed_imports) {
             auto module_file =
@@ -400,11 +405,32 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
 
-            if (attrs.count("static")) {
+            if (attrs.count(STATIC_IMPORT_TAG)) {
                 // FIXME Modules specified on command line are also to be
                 // statically linked. These two ways should probably be merged.
                 static_linked_parsed_imports.push_back(candidate_path);
                 commandline_given_links.push_back(candidate_path);
+            } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
+                dynamic_linked_imports.push_back(name);
+            } else {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ':'
+                          << send_control_seq(COLOR_FG_RED) << "error"
+                          << send_control_seq(ATTR_RESET)
+                          << ": link mode not specified for module \""
+                          << send_control_seq(COLOR_FG_WHITE) << name
+                          << send_control_seq(ATTR_RESET) << "\"\n";
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ':'
+                          << send_control_seq(COLOR_FG_CYAN) << "note"
+                          << send_control_seq(ATTR_RESET)
+                          << ": expected either \""
+                          << send_control_seq(COLOR_FG_WHITE) << "static"
+                          << send_control_seq(ATTR_RESET) << '"'
+                          << " or \""
+                          << send_control_seq(COLOR_FG_WHITE) << "dynamic"
+                          << send_control_seq(ATTR_RESET) << "\"\n";
+                return 1;
             }
         }
     }
