@@ -62,6 +62,7 @@ auto generate(std::vector<viua::cg::lex::Token> const&,
               std::string const&,
               std::string&,
               std::vector<std::string> const&,
+              std::vector<std::pair<std::string, std::string>> const&,
               Compilation_flags const&) -> void;
 }}}  // namespace viua::front::assembler
 

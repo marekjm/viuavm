@@ -173,14 +173,14 @@ int main(int argc, char* argv[]) {
     try {
         // try preloading dynamic libraries specified by environment
         viua::front::vm::preload_libraries(&kernel);
-    } catch (const viua::types::Exception* e) {
+    } catch (std::unique_ptr<viua::types::Exception> const& e) {
         cout << "fatal: preload: " << e->what() << endl;
         return 1;
     }
 
     try {
         kernel.run();
-    } catch (const viua::types::Exception* e) {
+    } catch (std::unique_ptr<viua::types::Exception> const& e) {
         cout << "VM error: an irrecoverable VM exception occured: " << e->what()
              << endl;
         return 1;

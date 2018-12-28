@@ -355,7 +355,7 @@ int main(int argc, char* argv[]) {
     }
 
     auto static_linked_parsed_imports = std::vector<std::string>{};
-    auto dynamic_linked_imports = std::vector<std::string>{};
+    auto dynamic_linked_imports = std::vector<std::pair<std::string, std::string>>{};
     if (not parsed_imports.empty()) {
         if (flags.verbose) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -413,7 +413,7 @@ int main(int argc, char* argv[]) {
                 static_linked_parsed_imports.push_back(candidate_path);
                 commandline_given_links.push_back(candidate_path);
             } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
-                dynamic_linked_imports.push_back(name);
+                dynamic_linked_imports.push_back({ name, candidate_path });
             } else {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'
@@ -445,6 +445,7 @@ int main(int argc, char* argv[]) {
                  filename,
                  compilename,
                  commandline_given_links,
+                 dynamic_linked_imports,
                  flags);
     } catch (std::string const& e) {
         ret_code = 1;

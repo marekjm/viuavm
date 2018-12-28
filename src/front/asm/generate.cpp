@@ -41,6 +41,7 @@ using viua::util::memory::aligned_read;
 using viua::util::memory::aligned_write;
 
 using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
 using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
@@ -476,7 +477,8 @@ auto generate(std::vector<Token> const& tokens,
               viua::front::assembler::Invocables& blocks,
               std::string const& filename,
               std::string& compilename,
-              std::vector<std::string> const& commandline_given_links,
+              std::vector<std::string> const& static_imports,
+              std::vector<std::pair<std::string, std::string>> const& dynamic_imports,
               viua::front::assembler::Compilation_flags const& flags) -> void {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -553,10 +555,12 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     auto linked_libs_bytecode =
-        std::vector<tuple<std::string,
+        std::vector<std::tuple<std::string,
                           viua::internals::types::bytecode_size,
                           std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto linked_function_names = std::vector<std::string>{};
+    auto static_linked_function_names = std::vector<std::string>{};
+    auto visible_function_names = std::vector<std::string>{};
     auto linked_block_names    = std::vector<std::string>{};
     auto linked_libs_jumptables =
         std::map<std::string,
@@ -566,15 +570,21 @@ auto generate(std::vector<Token> const& tokens,
     auto symbol_sources = std::map<std::string, std::string>{};
     for (auto const& f : functions.names) {
         symbol_sources[f] = filename;
+        visible_function_names.push_back(f);
     }
 
     auto links = std::vector<std::string>{};
-    for (auto const& lnk : commandline_given_links) {
+    for (auto const& lnk : static_imports) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
         } else {
             throw("requested to link module '" + lnk + "' more than once");
         }
+    }
+    for (auto const& lnk : dynamic_imports) {
+        std::cerr
+            << "error: dynamic link of module \""
+            << lnk.first << "\" requested, but dynamic links are not yet implemented\n";
     }
 
     // gather all linked function names
@@ -583,7 +593,7 @@ auto generate(std::vector<Token> const& tokens,
         loader.load();
 
         auto fn_names = loader.get_functions();
-        for (auto fn : fn_names) {
+        for (auto const& fn : fn_names) {
             if (function_addresses.count(fn)) {
                 throw("duplicate symbol '" + fn + "' found when linking '" + lnk
                       + "' (previously found in '" + symbol_sources.at(fn)
@@ -597,6 +607,40 @@ auto generate(std::vector<Token> const& tokens,
                                          // available functions
             symbol_sources[fn] = lnk;
             linked_function_names.emplace_back(fn);
+            static_linked_function_names.emplace_back(fn);
+            visible_function_names.push_back(fn);
+        }
+    }
+    for (auto const& lnk : dynamic_imports) {
+        auto loader = Loader{lnk.second};
+        loader.load();
+
+        auto fn_names = loader.get_functions();
+        for (auto fn : fn_names) {
+            /*
+             * For functions found in current module, and in statically
+             * imported modules.
+             */
+            if (function_addresses.count(fn)) {
+                throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
+                      + "' (previously found in '" + symbol_sources.at(fn)
+                      + "')");
+            }
+
+            /*
+             * For functions found dynamically imported modules.
+             */
+            if (std::find(linked_function_names.begin(), linked_function_names.end(), fn) != linked_function_names.end()) {
+                throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
+                      + "' (previously found in '" + symbol_sources.at(fn)
+                      + "')");
+            }
+        }
+
+        for (auto const& fn : fn_names) {
+            symbol_sources[fn] = lnk.first;
+            linked_function_names.emplace_back(fn);
+            visible_function_names.push_back(fn);
         }
     }
 
@@ -604,7 +648,7 @@ auto generate(std::vector<Token> const& tokens,
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     auto local_function_names = functions.names;
-    for (auto const& name : linked_function_names) {
+    for (auto const& name : static_linked_function_names) {
         functions.names.emplace_back(name);
     }
 
@@ -672,14 +716,35 @@ auto generate(std::vector<Token> const& tokens,
         bytes += loader.get_bytecode_size();
     }
 
+    {
+        std::map<viua::internals::types::bytecode_size, std::string> address_of_fn;
+        for (auto const [ name, addr ] : function_addresses) {
+            if (not address_of_fn.insert({addr, name}).second) {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                     << send_control_seq(ATTR_RESET);
+                std::cerr << ": ";
+                std::cerr << send_control_seq(COLOR_FG_RED) << "error"
+                     << send_control_seq(ATTR_RESET);
+                std::cerr << ": function \"";
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << name
+                     << send_control_seq(ATTR_RESET)
+                     << "\" loaded at the same address as \"";
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << address_of_fn.at(addr)
+                    << '"'
+                     << send_control_seq(ATTR_RESET)
+                     << '\n';
+                exit(1);
+            }
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
     ::assembler::verify::function_calls_are_defined(
-        tokens, functions.names, functions.signatures);
+        tokens, visible_function_names, functions.signatures);
     ::assembler::verify::callable_creations(
-        tokens, functions.names, functions.signatures);
+        tokens, visible_function_names, functions.signatures);
 
 
     /////////////////////////////
@@ -950,8 +1015,8 @@ auto generate(std::vector<Token> const& tokens,
     viua::internals::types::bytecode_size functions_size_so_far =
         write_code_blocks_section(out, blocks, linked_block_names);
     write_code_blocks_section(
-        out, functions, linked_function_names, functions_size_so_far);
-    for (auto const& name : linked_function_names) {
+        out, functions, static_linked_function_names, functions_size_so_far);
+    for (auto const& name : static_linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
         viua::internals::types::bytecode_size address =
@@ -992,10 +1057,10 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
     for (auto const& name : functions.names) {
         // linked functions are to be inserted later
-        if (find(linked_function_names.begin(),
-                 linked_function_names.end(),
+        if (find(static_linked_function_names.begin(),
+                 static_linked_function_names.end(),
                  name)
-            != linked_function_names.end()) {
+            != static_linked_function_names.end()) {
             continue;
         }
 
