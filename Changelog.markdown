@@ -93,6 +93,7 @@ There are several categories of change:
   in `arguments` register set
 - bic: remove `arg` instruction; `move` should be used instead, with source register
   in `parameters` register set
+- bic: change default module extension from `.vlib` to `.module`
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.

@@ -17,10 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
-#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fstream>
+#include <iostream>
+#include <locale>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/cg/assembler/assembler.h>
@@ -133,7 +134,7 @@ int main(int argc, char* argv[]) {
     auto args   = std::vector<std::string>{};
     auto option = std::string{};
 
-    std::string filename(""), compilename("");
+    std::string filename, compilename;
 
     for (int i = 1; i < argc; ++i) {
         option = std::string(argv[i]);
@@ -238,7 +239,8 @@ int main(int argc, char* argv[]) {
 
     if (compilename == "") {
         if (AS_LIB) {
-            compilename = (filename + ".vlib");
+            compilename = std::toupper(filename.at(0), std::locale("C"))
+                + (filename.substr(1, filename.rfind('.')) + "module");
         } else {
             compilename = "a.out";
         }

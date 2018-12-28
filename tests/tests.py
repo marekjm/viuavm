@@ -1678,7 +1678,7 @@ class StaticLinkingTests(unittest.TestCase):
     def testLinkingMainFunction(self):
         lib_name = 'main_main.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
-        compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.vlib'))
+        compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.module'))
         assemble(assembly_lib_path, compiled_lib_path, opts=('--lib',))
         bin_name = 'main_link.asm'
         assembly_bin_path = os.path.join(self.PATH, bin_name)
@@ -2580,14 +2580,14 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
 
     def testRejectingDuplicateSymbolsInLinkedFiles(self):
-        lib_a_path = os.path.join(self.PATH, 'libA.vlib')
-        lib_b_path = os.path.join(self.PATH, 'libB.vlib')
+        lib_a_path = os.path.join(self.PATH, 'libA.module')
+        lib_b_path = os.path.join(self.PATH, 'libB.module')
         assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_a_path, opts=('--lib',))
         assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_b_path, opts=('--lib',))
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_b_path))
 
     def testRejectingDuplicateLinksOnCommandline(self):
-        lib_a_path = os.path.join(self.PATH, 'libA.vlib')
+        lib_a_path = os.path.join(self.PATH, 'libA.module')
         assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_a_path, opts=('--lib',))
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
@@ -2632,7 +2632,7 @@ class MiscExceptionTests(unittest.TestCase):
     def testCatchingExceptionThrownInDifferentModule(self):
         # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
-        lib_path = 'test_module.vlib'
+        lib_path = 'test_module.module'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',),)
         runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0', assembly_opts =
         ('--no-sa',),)
@@ -2803,7 +2803,7 @@ class ConcurrencyTests(unittest.TestCase):
     @unittest.skip('triggers a memory leak from a path that only allocates stack memory...?')
     def testProcessFromDynamicallyLinkedFunction(self):
         source_lib = 'process_from_linked_fun.asm'
-        lib_path = 'test_module.vlib'
+        lib_path = 'test_module.module'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
         runTest(self, 'process_from_linked_base.asm', 'Hello World!')
 

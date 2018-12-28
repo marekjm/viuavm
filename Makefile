@@ -296,7 +296,7 @@ clean: clean-test-compiles
 	find . -name '*.o' | xargs -n 1 $(RM)
 	find . -name '*.so' | xargs -n 1 $(RM)
 	find . -name '*.bin' | xargs -n 1 $(RM)
-	find . -name '*.vlib' | xargs -n 1 $(RM)
+	find . -name '*.module' | xargs -n 1 $(RM)
 
 clean-test-compiles:
 	find ./tests/compiled -name '*.asm' | xargs -n 1 $(RM)
@@ -319,7 +319,7 @@ libinstall: stdlib
 	mkdir -p $(LIB_PATH)/std
 	mkdir -p $(LIB_PATH)/site
 	cp ./build/stdlib/*.so $(LIB_PATH)/std
-	cp ./build/stdlib/std/*.vlib $(LIB_PATH)/std
+	cp ./build/stdlib/std/*.module $(LIB_PATH)/std
 
 installdevel: platform
 	mkdir -p $(LIB_PATH)/platform
@@ -448,7 +448,7 @@ build/scheduler/%.o: src/scheduler/%.cpp
 build/kernel/%.o: src/kernel/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/stdlib/std/%.vlib: src/stdlib/viua/%.asm build/bin/vm/asm
+build/stdlib/std/%.module: src/stdlib/viua/%.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/std/%.o: src/stdlib/%.cpp
@@ -750,9 +750,9 @@ build/kernel/frame.o: src/kernel/frame.cpp \
 ############################################################
 # STANDARD LIBRARY
 standardlibrary: build/bin/vm/asm \
-	build/stdlib/std/vector.vlib \
-	build/stdlib/std/functional.vlib \
-	build/stdlib/std/misc.vlib
+	build/stdlib/std/vector.module \
+	build/stdlib/std/functional.module \
+	build/stdlib/std/misc.module
 
 stdlib: build/bin/vm/asm \
 	standardlibrary \
