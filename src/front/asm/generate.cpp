@@ -571,6 +571,23 @@ auto generate(std::vector<Token> const& tokens,
     for (auto const& f : functions.names) {
         symbol_sources[f] = filename;
         visible_function_names.push_back(f);
+        if (flags.verbose) {
+            std::cout
+                << send_control_seq(COLOR_FG_WHITE)
+                << filename
+                << send_control_seq(ATTR_RESET)
+                << ": "
+                << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                << send_control_seq(ATTR_RESET)
+                << ": "
+                << "marking function \""
+                << send_control_seq(COLOR_FG_WHITE) << f
+                << send_control_seq(ATTR_RESET)
+                << "\" (from \""
+                << send_control_seq(COLOR_FG_WHITE) << filename
+                << send_control_seq(ATTR_RESET)
+                << "\") as visible" << std::endl;
+        }
     }
 
     auto links = std::vector<std::string>{};
@@ -604,6 +621,24 @@ auto generate(std::vector<Token> const& tokens,
             linked_function_names.emplace_back(fn);
             static_linked_function_names.emplace_back(fn);
             visible_function_names.push_back(fn);
+
+            if (flags.verbose) {
+                std::cout
+                    << send_control_seq(COLOR_FG_WHITE)
+                    << filename
+                    << send_control_seq(ATTR_RESET)
+                    << ": "
+                    << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                    << send_control_seq(ATTR_RESET)
+                    << ": "
+                    << "marking function \""
+                    << send_control_seq(COLOR_FG_WHITE) << fn
+                    << send_control_seq(ATTR_RESET)
+                    << "\" (from \""
+                    << send_control_seq(COLOR_FG_WHITE) << lnk
+                    << send_control_seq(ATTR_RESET)
+                    << "\") as visible" << std::endl;
+            }
         }
     }
     for (auto const& lnk : dynamic_imports) {
@@ -636,6 +671,25 @@ auto generate(std::vector<Token> const& tokens,
             symbol_sources[fn] = lnk.first;
             linked_function_names.emplace_back(fn);
             visible_function_names.push_back(fn);
+
+            if (flags.verbose) {
+                std::cout
+                    << send_control_seq(COLOR_FG_WHITE)
+                    << filename
+                    << send_control_seq(ATTR_RESET)
+                    << ": "
+                    << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                    << send_control_seq(ATTR_RESET)
+                    << ": "
+                    << "marking function \""
+                    << send_control_seq(COLOR_FG_WHITE) << fn
+                    << send_control_seq(ATTR_RESET)
+                    << "\" (from \""
+                    << send_control_seq(COLOR_FG_WHITE)
+                    << lnk.first
+                    << send_control_seq(ATTR_RESET)
+                    << "\") as visible" << std::endl;
+            }
         }
     }
 
