@@ -28,6 +28,10 @@ void viua::front::vm::initialise(viua::kernel::Kernel& kernel,
     auto loader = Loader{program};
     loader.executable();
 
+    for (auto const& each : loader.dynamic_imports()) {
+        kernel.load_native_library(each);
+    }
+
     auto const bytes = loader.get_bytecode_size();
     auto bytecode    = loader.get_bytecode();
 
