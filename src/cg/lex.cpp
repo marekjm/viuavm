@@ -1947,7 +1947,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             }
             continue;
         } else if (token == ".function:" or token == ".closure:"
-                   or token == ".block:") {
+                   or token == ".block:" or token == ".import:") {
             if (input_tokens.at(i + 1) != "[[") {
                 tokens.emplace_back(
                     tokens.back().line(), tokens.back().character(), "[[");

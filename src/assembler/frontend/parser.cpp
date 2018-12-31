@@ -632,10 +632,15 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
             // for now just skip key and value
             i += 2;
         } else if (tokens.at(i) == ".import:") {
+            auto const saved_i = i;
             ++i;
 
             auto attributes = std::map<std::string, std::string>{};
             i += parse_attributes(vector_view<Token>(tokens, i), attributes);
+
+            if (tokens.at(i) == "\n") {
+                throw Invalid_syntax(tokens.at(saved_i), "missing module name in import directive");
+            }
 
             auto name = tokens.at(i);
             ++i;
