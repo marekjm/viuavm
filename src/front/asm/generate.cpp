@@ -488,7 +488,7 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////
     // GET MAIN FUNCTION NAME
     auto main_function = get_main_function(functions.names);
-    if (((VERBOSE and main_function != "main/1" and main_function != ""))
+    if (((flags.verbose and main_function != "main/1" and main_function != ""))
         and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
@@ -514,7 +514,7 @@ auto generate(std::vector<Token> const& tokens,
     if (not flags.as_lib and main_is_defined) {
         check_main_function(main_function, functions.tokens.at(main_function));
     }
-    if (not main_is_defined and VERBOSE and not flags.as_lib) {
+    if (not main_is_defined and flags.verbose and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -749,7 +749,7 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////
     // REPORT TOTAL BYTECODE SIZE
-    if (VERBOSE and linked_function_names.size() != 0) {
+    if (flags.verbose and linked_function_names.size() != 0) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -762,7 +762,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
-    if (VERBOSE and not flags.as_lib) {
+    if (flags.verbose and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -805,7 +805,7 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        if (VERBOSE) {
+        if (flags.verbose) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
             cout << ": ";
@@ -821,7 +821,7 @@ auto generate(std::vector<Token> const& tokens,
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size2(
                 blocks.tokens.at(name));
-            if (VERBOSE) {
+            if (flags.verbose) {
                 cout << " (" << fun_bytes << " bytes at byte "
                      << block_bodies_section_size << ')' << endl;
             }
@@ -1083,7 +1083,7 @@ auto generate(std::vector<Token> const& tokens,
         viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 
-        if (VERBOSE) {
+        if (flags.verbose) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
             cout << ": ";
