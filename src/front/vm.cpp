@@ -22,7 +22,7 @@
 using namespace std;
 
 
-void viua::front::vm::initialise(viua::kernel::Kernel* kernel,
+void viua::front::vm::initialise(viua::kernel::Kernel& kernel,
                                  std::string const& program,
                                  std::vector<std::string> args) {
     auto loader = Loader{program};
@@ -33,27 +33,27 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel,
 
     auto const function_address_mapping = loader.get_function_addresses();
     for (auto const& p : function_address_mapping) {
-        kernel->mapfunction(p.first, p.second);
+        kernel.mapfunction(p.first, p.second);
     }
     for (auto const& p : loader.get_block_addresses()) {
-        kernel->mapblock(p.first, p.second);
+        kernel.mapblock(p.first, p.second);
     }
 
-    kernel->commandline_arguments = args;
+    kernel.commandline_arguments = args;
 
-    kernel->load(std::move(bytecode)).bytes(bytes);
+    kernel.load(std::move(bytecode)).bytes(bytes);
 }
 
-void viua::front::vm::preload_libraries(viua::kernel::Kernel* kernel) {
+void viua::front::vm::preload_libraries(viua::kernel::Kernel& kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
     auto const preload_native = support::env::get_paths("VIUAPRELINK");
     for (auto const& each : preload_native) {
-        kernel->load_native_library(each);
+        kernel.load_native_library(each);
     }
 
     auto const preload_foreign = support::env::get_paths("VIUAPREIMPORT");
     for (auto const& each : preload_foreign) {
-        kernel->load_foreign_library(each);
+        kernel.load_foreign_library(each);
     }
 }

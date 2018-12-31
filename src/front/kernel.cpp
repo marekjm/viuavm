@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
     viua::kernel::Kernel kernel;
 
     try {
-        viua::front::vm::initialise(&kernel, filename, args);
+        viua::front::vm::initialise(kernel, filename, args);
     } catch (const char* e) {
         cout << "error: " << e << endl;
         return 1;
@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
 
     try {
         // try preloading dynamic libraries specified by environment
-        viua::front::vm::preload_libraries(&kernel);
+        viua::front::vm::preload_libraries(kernel);
     } catch (std::unique_ptr<viua::types::Exception> const& e) {
         cout << "fatal: preload: " << e->what() << endl;
         return 1;
