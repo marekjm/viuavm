@@ -869,7 +869,7 @@ auto generate(std::vector<Token> const& tokens,
 
     for (auto const& name : functions.names) {
         // do not generate bytecode for functions that were linked
-        if (find(linked_function_names.begin(),
+        if (std::find(linked_function_names.begin(),
                  linked_function_names.end(),
                  name)
             != linked_function_names.end()) {
@@ -981,51 +981,57 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL FUNCTION SIGNATURES
-    viua::internals::types::bytecode_size signatures_section_size = 0;
-    for (auto const& each : functions.signatures) {
-        signatures_section_size += (each.size() + 1);  // +1 for null byte after
-                                                       // each signature
-    }
-    bwrite(out, signatures_section_size);
-    for (auto const& each : functions.signatures) {
-        strwrite(out, each);
+    {
+        viua::internals::types::bytecode_size signatures_section_size = 0;
+        for (auto const& each : functions.signatures) {
+            signatures_section_size += (each.size() + 1);  // +1 for null byte after
+                                                           // each signature
+        }
+        bwrite(out, signatures_section_size);
+        for (auto const& each : functions.signatures) {
+            strwrite(out, each);
+        }
     }
 
 
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL BLOCK SIGNATURES
-    signatures_section_size = 0;
-    for (auto const& each : blocks.signatures) {
-        signatures_section_size += (each.size() + 1);  // +1 for null byte after
-                                                       // each signature
-    }
-    bwrite(out, signatures_section_size);
-    for (auto const& each : blocks.signatures) {
-        strwrite(out, each);
+    {
+        viua::internals::types::bytecode_size signatures_section_size = 0;
+        for (auto const& each : blocks.signatures) {
+            signatures_section_size += (each.size() + 1);  // +1 for null byte after
+                                                           // each signature
+        }
+        bwrite(out, signatures_section_size);
+        for (auto const& each : blocks.signatures) {
+            strwrite(out, each);
+        }
     }
 
 
     /////////////////////////////////////////////////////////////
     // WRITE DYNAMIC IMPORTS SECTION
-    auto dynamic_imports_section_size = viua::internals::types::bytecode_size{0};
-    for (auto const& [ module_name, file_name ] : dynamic_imports) {
-        dynamic_imports_section_size += (module_name.size() + 1);  // +1 for null byte after
-    }
-    bwrite(out, dynamic_imports_section_size);
-    for (auto const& [ module_name, file_name ] : dynamic_imports) {
-        strwrite(out, module_name);
+    {
+        auto dynamic_imports_section_size = viua::internals::types::bytecode_size{0};
+        for (auto const& [ module_name, file_name ] : dynamic_imports) {
+            dynamic_imports_section_size += (module_name.size() + 1);  // +1 for null byte after
+        }
+        bwrite(out, dynamic_imports_section_size);
+        for (auto const& [ module_name, file_name ] : dynamic_imports) {
+            strwrite(out, module_name);
 
-        if (flags.verbose) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "dynamically linked module \"";
-            cout << send_control_seq(COLOR_FG_WHITE) << module_name
-                 << send_control_seq(ATTR_RESET);
-            cout << "\" scheduled for loading at startup" << endl;
+            if (flags.verbose) {
+                cout << send_control_seq(COLOR_FG_WHITE) << filename
+                     << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                     << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "dynamically linked module \"";
+                cout << send_control_seq(COLOR_FG_WHITE) << module_name
+                     << send_control_seq(ATTR_RESET);
+                cout << "\" scheduled for loading at startup" << endl;
+            }
         }
     }
 
