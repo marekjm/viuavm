@@ -94,6 +94,8 @@ There are several categories of change:
 - bic: remove `arg` instruction; `move` should be used instead, with source register
   in `parameters` register set
 - bic: change default module extension from `.vlib` to `.module`
+- bic: change `.import:` directive to work on modules, not files; imports may be
+  either static (using `static` attribute) or dynamic (using `dynamic` attribute)
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
