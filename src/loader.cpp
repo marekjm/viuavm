@@ -157,6 +157,9 @@ void Loader::load_external_signatures(ifstream& in) {
 void Loader::load_external_block_signatures(ifstream& in) {
     external_signatures_block = load_string_list(in);
 }
+auto Loader::load_dynamic_imports_section(ifstream& in) -> void {
+    dynamic_linked_modules = load_string_list(in);
+}
 
 void Loader::load_jump_table(ifstream& in) {
     // load jump table
@@ -231,6 +234,7 @@ Loader& Loader::load() {
 
     load_external_signatures(in);
     load_external_block_signatures(in);
+    load_dynamic_imports_section(in);
     load_blocks_map(in);
     load_functions_map(in);
     load_bytecode(in);
@@ -252,6 +256,7 @@ Loader& Loader::executable() {
 
     load_external_signatures(in);
     load_external_block_signatures(in);
+    load_dynamic_imports_section(in);
     load_blocks_map(in);
     load_functions_map(in);
     load_bytecode(in);
@@ -302,4 +307,8 @@ map<std::string, uint64_t> Loader::get_block_addresses() {
 }
 std::vector<std::string> Loader::get_blocks() {
     return blocks;
+}
+
+auto Loader::dynamic_imports() const -> std::vector<std::string> {
+    return dynamic_linked_modules;
 }

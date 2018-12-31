@@ -54,6 +54,8 @@ class Loader {
     std::vector<std::string> external_signatures;
     std::vector<std::string> external_signatures_block;
 
+    std::vector<std::string> dynamic_linked_modules;
+
     std::map<std::string, viua::internals::types::bytecode_size>
         function_addresses;
     std::map<std::string, viua::internals::types::bytecode_size> function_sizes;
@@ -73,6 +75,7 @@ class Loader {
 
     void load_external_signatures(std::ifstream&);
     void load_external_block_signatures(std::ifstream&);
+    auto load_dynamic_imports_section(std::ifstream&) -> void;
     void load_jump_table(std::ifstream&);
     void load_functions_map(std::ifstream&);
     void load_blocks_map(std::ifstream&);
@@ -101,6 +104,8 @@ class Loader {
     std::map<std::string, viua::internals::types::bytecode_size>
     get_block_addresses();
     std::vector<std::string> get_blocks();
+
+    auto dynamic_imports() const -> std::vector<std::string>;
 
     Loader(std::string pth) : path(pth), size(0), bytecode(nullptr) {}
     ~Loader() {}

@@ -581,11 +581,6 @@ auto generate(std::vector<Token> const& tokens,
             throw("requested to link module '" + lnk + "' more than once");
         }
     }
-    for (auto const& lnk : dynamic_imports) {
-        std::cerr
-            << "error: dynamic link of module \""
-            << lnk.first << "\" requested, but dynamic links are not yet implemented\n";
-    }
 
     // gather all linked function names
     for (auto const& lnk : links) {
@@ -1007,6 +1002,31 @@ auto generate(std::vector<Token> const& tokens,
     bwrite(out, signatures_section_size);
     for (auto const& each : blocks.signatures) {
         strwrite(out, each);
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    // WRITE DYNAMIC IMPORTS SECTION
+    auto dynamic_imports_section_size = viua::internals::types::bytecode_size{0};
+    for (auto const& [ module_name, file_name ] : dynamic_imports) {
+        dynamic_imports_section_size += (module_name.size() + 1);  // +1 for null byte after
+    }
+    bwrite(out, dynamic_imports_section_size);
+    for (auto const& [ module_name, file_name ] : dynamic_imports) {
+        strwrite(out, module_name);
+
+        if (flags.verbose) {
+            cout << send_control_seq(COLOR_FG_WHITE) << filename
+                 << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                 << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "dynamically linked module \"";
+            cout << send_control_seq(COLOR_FG_WHITE) << module_name
+                 << send_control_seq(ATTR_RESET);
+            cout << "\" scheduled for loading at startup" << endl;
+        }
     }
 
 
