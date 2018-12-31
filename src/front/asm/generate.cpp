@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
 #include <viua/assembler/frontend/parser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
@@ -478,7 +479,7 @@ auto generate(std::vector<Token> const& tokens,
               std::string const& filename,
               std::string& compilename,
               std::vector<std::string> const& static_imports,
-              std::vector<std::pair<std::string, std::string>> const& dynamic_imports,
+              std::vector<std::pair<std::string, std::string>> const& dynamic_imports_toplevel,
               viua::front::assembler::Compilation_flags const& flags) -> void {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -641,36 +642,56 @@ auto generate(std::vector<Token> const& tokens,
             }
         }
     }
-    for (auto const& lnk : dynamic_imports) {
-        auto loader = Loader{lnk.second};
-        loader.load();
 
-        auto fn_names = loader.get_functions();
-        for (auto fn : fn_names) {
-            /*
-             * For functions found in current module, and in statically
-             * imported modules.
-             */
-            if (function_addresses.count(fn)) {
-                throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
-                      + "' (previously found in '" + symbol_sources.at(fn)
-                      + "')");
+    auto dynamic_imports = std::vector<std::pair<std::string, std::string>>{};
+    {
+        auto already_imported = std::set<std::string>{};
+        auto to_import = std::queue<std::pair<std::string, std::string>>{};
+
+        /*
+         * Populate the queue with modules that are dynamically imported by
+         * modules that are direct imports of the current module.
+         */
+        {
+            for (auto const& lnk : static_imports) {
+                auto loader = Loader{lnk};
+                loader.load();
+
+                for (auto const& each : loader.dynamic_imports()) {
+                    to_import.push({ each, lnk });
+                }
             }
-
-            /*
-             * For functions found dynamically imported modules.
-             */
-            if (std::find(linked_function_names.begin(), linked_function_names.end(), fn) != linked_function_names.end()) {
-                throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
-                      + "' (previously found in '" + symbol_sources.at(fn)
-                      + "')");
+            for (auto const& lnk : dynamic_imports_toplevel) {
+                to_import.push({ lnk.first, filename });
             }
         }
 
-        for (auto const& fn : fn_names) {
-            symbol_sources[fn] = lnk.first;
-            linked_function_names.emplace_back(fn);
-            visible_function_names.push_back(fn);
+        while (not to_import.empty()) {
+            auto const [ module_name, dependency_of ] = std::move(to_import.front());
+            to_import.pop();
+
+            if (already_imported.count(module_name)) {
+                if (flags.verbose) {
+                    std::cout
+                        << send_control_seq(COLOR_FG_WHITE)
+                        << filename
+                        << send_control_seq(ATTR_RESET)
+                        << ": "
+                        << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                        << send_control_seq(ATTR_RESET)
+                        << ": "
+                        << "dynamic imports of \""
+                        << send_control_seq(COLOR_FG_WHITE) << module_name
+                        << send_control_seq(ATTR_RESET)
+                        << "\" (dependency of \""
+                        << send_control_seq(COLOR_FG_WHITE) << dependency_of
+                        << send_control_seq(ATTR_RESET)
+                        << "\") were already gathered"
+                        << std::endl;
+                }
+
+                continue;
+            }
 
             if (flags.verbose) {
                 std::cout
@@ -681,14 +702,113 @@ auto generate(std::vector<Token> const& tokens,
                     << send_control_seq(COLOR_FG_YELLOW) << "debug"
                     << send_control_seq(ATTR_RESET)
                     << ": "
-                    << "marking function \""
-                    << send_control_seq(COLOR_FG_WHITE) << fn
+                    << "gathering dynamic imports of \""
+                    << send_control_seq(COLOR_FG_WHITE) << module_name
                     << send_control_seq(ATTR_RESET)
-                    << "\" (from \""
-                    << send_control_seq(COLOR_FG_WHITE)
-                    << lnk.first
+                    << "\" (dependency of \""
+                    << send_control_seq(COLOR_FG_WHITE) << dependency_of
                     << send_control_seq(ATTR_RESET)
-                    << "\") as visible" << std::endl;
+                    << "\")"
+                    << std::endl;
+            }
+
+            auto const VIUA_LIBRARY_PATH =
+                viua::support::env::get_paths("VIUA_LIBRARY_PATH");
+            auto const module_sep = std::regex{"::"};
+
+            auto module_file =
+                std::regex_replace(module_name, module_sep, "/") + ".module";
+
+            auto found          = false;
+            auto candidate_path = std::string{};
+            for (auto const& each : VIUA_LIBRARY_PATH) {
+                candidate_path = each + '/' + module_file;
+                if ((found = viua::support::env::is_file(candidate_path))) {
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE)
+                                  << filename << send_control_seq(ATTR_RESET)
+                                  << ": "
+                                     "    found module "
+                                  << module_name
+                                  << " in: "
+                                  << candidate_path << '\n';
+                    }
+                    break;
+                }
+            }
+            if (not found) {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ':'
+                          << send_control_seq(COLOR_FG_RED) << "error"
+                          << send_control_seq(ATTR_RESET)
+                          << ": did not find module \""
+                          << send_control_seq(COLOR_FG_WHITE) << module_name
+                          << send_control_seq(ATTR_RESET) << "\"\n";
+                exit(1);
+            }
+
+            already_imported.insert(module_name);
+            dynamic_imports.push_back({ module_name, candidate_path });
+
+            auto loaded_module = Loader{candidate_path};
+            loaded_module.load();
+
+            for (auto const& each : loaded_module.dynamic_imports()) {
+                if (not already_imported.count(each)) {
+                    to_import.push({ each, module_name });
+                }
+            }
+        }
+
+        for (auto const& lnk : dynamic_imports) {
+            auto loader = Loader{lnk.second};
+            loader.load();
+
+            auto fn_names = loader.get_functions();
+            for (auto fn : fn_names) {
+                /*
+                 * For functions found in current module, and in statically
+                 * imported modules.
+                 */
+                if (function_addresses.count(fn)) {
+                    throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
+                          + "' (previously found in '" + symbol_sources.at(fn)
+                          + "')");
+                }
+
+                /*
+                 * For functions found dynamically imported modules.
+                 */
+                if (std::find(linked_function_names.begin(), linked_function_names.end(), fn) != linked_function_names.end()) {
+                    throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
+                          + "' (previously found in '" + symbol_sources.at(fn)
+                          + "')");
+                }
+            }
+
+            for (auto const& fn : fn_names) {
+                symbol_sources[fn] = lnk.first;
+                linked_function_names.emplace_back(fn);
+                visible_function_names.push_back(fn);
+
+                if (flags.verbose) {
+                    std::cout
+                        << send_control_seq(COLOR_FG_WHITE)
+                        << filename
+                        << send_control_seq(ATTR_RESET)
+                        << ": "
+                        << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                        << send_control_seq(ATTR_RESET)
+                        << ": "
+                        << "marking function \""
+                        << send_control_seq(COLOR_FG_WHITE) << fn
+                        << send_control_seq(ATTR_RESET)
+                        << "\" (from \""
+                        << send_control_seq(COLOR_FG_WHITE)
+                        << lnk.first
+                        << send_control_seq(ATTR_RESET)
+                        << "\") as visible" << std::endl;
+                }
             }
         }
     }
