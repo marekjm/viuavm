@@ -16,11 +16,11 @@
 ;   You should have received a copy of the GNU General Public License
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
+.import:
 
 .function: main/0
     allocate_registers %1 local
 
-    .import:
     izero %0 local
     return
 .end
