@@ -21,8 +21,8 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <queue>
+#include <sstream>
 #include <viua/assembler/frontend/parser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
@@ -42,9 +42,9 @@ using viua::util::memory::aligned_read;
 using viua::util::memory::aligned_write;
 
 using viua::assembler::util::pretty_printer::ATTR_RESET;
-using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
 using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
+using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
 using viua::assembler::util::pretty_printer::COLOR_FG_YELLOW;
 using viua::assembler::util::pretty_printer::send_control_seq;
@@ -479,7 +479,8 @@ auto generate(std::vector<Token> const& tokens,
               std::string const& filename,
               std::string& compilename,
               std::vector<std::string> const& static_imports,
-              std::vector<std::pair<std::string, std::string>> const& dynamic_imports_toplevel,
+              std::vector<std::pair<std::string, std::string>> const&
+                  dynamic_imports_toplevel,
               viua::front::assembler::Compilation_flags const& flags) -> void {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -555,14 +556,14 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    auto linked_libs_bytecode =
-        std::vector<std::tuple<std::string,
-                          viua::internals::types::bytecode_size,
-                          std::unique_ptr<viua::internals::types::byte[]>>>{};
-    auto linked_function_names = std::vector<std::string>{};
+    auto linked_libs_bytecode = std::vector<
+        std::tuple<std::string,
+                   viua::internals::types::bytecode_size,
+                   std::unique_ptr<viua::internals::types::byte[]>>>{};
+    auto linked_function_names        = std::vector<std::string>{};
     auto static_linked_function_names = std::vector<std::string>{};
-    auto visible_function_names = std::vector<std::string>{};
-    auto linked_block_names    = std::vector<std::string>{};
+    auto visible_function_names       = std::vector<std::string>{};
+    auto linked_block_names           = std::vector<std::string>{};
     auto linked_libs_jumptables =
         std::map<std::string,
                  std::vector<viua::internals::types::bytecode_size>>{};
@@ -573,21 +574,16 @@ auto generate(std::vector<Token> const& tokens,
         symbol_sources[f] = filename;
         visible_function_names.push_back(f);
         if (flags.verbose) {
-            std::cout
-                << send_control_seq(COLOR_FG_WHITE)
-                << filename
-                << send_control_seq(ATTR_RESET)
-                << ": "
-                << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                << send_control_seq(ATTR_RESET)
-                << ": "
-                << "marking function \""
-                << send_control_seq(COLOR_FG_WHITE) << f
-                << send_control_seq(ATTR_RESET)
-                << "\" (from \""
-                << send_control_seq(COLOR_FG_WHITE) << filename
-                << send_control_seq(ATTR_RESET)
-                << "\") as visible" << std::endl;
+            std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                      << send_control_seq(ATTR_RESET) << ": "
+                      << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                      << send_control_seq(ATTR_RESET) << ": "
+                      << "marking function \""
+                      << send_control_seq(COLOR_FG_WHITE) << f
+                      << send_control_seq(ATTR_RESET) << "\" (from \""
+                      << send_control_seq(COLOR_FG_WHITE) << filename
+                      << send_control_seq(ATTR_RESET) << "\") as visible"
+                      << std::endl;
         }
     }
 
@@ -624,21 +620,16 @@ auto generate(std::vector<Token> const& tokens,
             visible_function_names.push_back(fn);
 
             if (flags.verbose) {
-                std::cout
-                    << send_control_seq(COLOR_FG_WHITE)
-                    << filename
-                    << send_control_seq(ATTR_RESET)
-                    << ": "
-                    << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                    << send_control_seq(ATTR_RESET)
-                    << ": "
-                    << "marking function \""
-                    << send_control_seq(COLOR_FG_WHITE) << fn
-                    << send_control_seq(ATTR_RESET)
-                    << "\" (from \""
-                    << send_control_seq(COLOR_FG_WHITE) << lnk
-                    << send_control_seq(ATTR_RESET)
-                    << "\") as visible" << std::endl;
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << "marking function \""
+                          << send_control_seq(COLOR_FG_WHITE) << fn
+                          << send_control_seq(ATTR_RESET) << "\" (from \""
+                          << send_control_seq(COLOR_FG_WHITE) << lnk
+                          << send_control_seq(ATTR_RESET) << "\") as visible"
+                          << std::endl;
             }
         }
     }
@@ -658,58 +649,48 @@ auto generate(std::vector<Token> const& tokens,
                 loader.load();
 
                 for (auto const& each : loader.dynamic_imports()) {
-                    to_import.push({ each, lnk });
+                    to_import.push({each, lnk});
                 }
             }
             for (auto const& lnk : dynamic_imports_toplevel) {
-                to_import.push({ lnk.first, filename });
+                to_import.push({lnk.first, filename});
             }
         }
 
         while (not to_import.empty()) {
-            auto const [ module_name, dependency_of ] = std::move(to_import.front());
+            auto const [module_name, dependency_of] =
+                std::move(to_import.front());
             to_import.pop();
 
             if (already_imported.count(module_name)) {
                 if (flags.verbose) {
-                    std::cout
-                        << send_control_seq(COLOR_FG_WHITE)
-                        << filename
-                        << send_control_seq(ATTR_RESET)
-                        << ": "
-                        << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                        << send_control_seq(ATTR_RESET)
-                        << ": "
-                        << "dynamic imports of \""
-                        << send_control_seq(COLOR_FG_WHITE) << module_name
-                        << send_control_seq(ATTR_RESET)
-                        << "\" (dependency of \""
-                        << send_control_seq(COLOR_FG_WHITE) << dependency_of
-                        << send_control_seq(ATTR_RESET)
-                        << "\") were already gathered"
-                        << std::endl;
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << "dynamic imports of \""
+                              << send_control_seq(COLOR_FG_WHITE) << module_name
+                              << send_control_seq(ATTR_RESET)
+                              << "\" (dependency of \""
+                              << send_control_seq(COLOR_FG_WHITE)
+                              << dependency_of << send_control_seq(ATTR_RESET)
+                              << "\") were already gathered" << std::endl;
                 }
 
                 continue;
             }
 
             if (flags.verbose) {
-                std::cout
-                    << send_control_seq(COLOR_FG_WHITE)
-                    << filename
-                    << send_control_seq(ATTR_RESET)
-                    << ": "
-                    << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                    << send_control_seq(ATTR_RESET)
-                    << ": "
-                    << "gathering dynamic imports of \""
-                    << send_control_seq(COLOR_FG_WHITE) << module_name
-                    << send_control_seq(ATTR_RESET)
-                    << "\" (dependency of \""
-                    << send_control_seq(COLOR_FG_WHITE) << dependency_of
-                    << send_control_seq(ATTR_RESET)
-                    << "\")"
-                    << std::endl;
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << "gathering dynamic imports of \""
+                          << send_control_seq(COLOR_FG_WHITE) << module_name
+                          << send_control_seq(ATTR_RESET)
+                          << "\" (dependency of \""
+                          << send_control_seq(COLOR_FG_WHITE) << dependency_of
+                          << send_control_seq(ATTR_RESET) << "\")" << std::endl;
             }
 
             auto const VIUA_LIBRARY_PATH =
@@ -729,9 +710,8 @@ auto generate(std::vector<Token> const& tokens,
                                   << filename << send_control_seq(ATTR_RESET)
                                   << ": "
                                      "    found module "
-                                  << module_name
-                                  << " in: "
-                                  << candidate_path << '\n';
+                                  << module_name << " in: " << candidate_path
+                                  << '\n';
                     }
                     break;
                 }
@@ -748,14 +728,14 @@ auto generate(std::vector<Token> const& tokens,
             }
 
             already_imported.insert(module_name);
-            dynamic_imports.push_back({ module_name, candidate_path });
+            dynamic_imports.push_back({module_name, candidate_path});
 
             auto loaded_module = Loader{candidate_path};
             loaded_module.load();
 
             for (auto const& each : loaded_module.dynamic_imports()) {
                 if (not already_imported.count(each)) {
-                    to_import.push({ each, module_name });
+                    to_import.push({each, module_name});
                 }
             }
         }
@@ -771,18 +751,21 @@ auto generate(std::vector<Token> const& tokens,
                  * imported modules.
                  */
                 if (function_addresses.count(fn)) {
-                    throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
-                          + "' (previously found in '" + symbol_sources.at(fn)
-                          + "')");
+                    throw("duplicate symbol '" + fn + "' found when linking '"
+                          + lnk.first + "' (previously found in '"
+                          + symbol_sources.at(fn) + "')");
                 }
 
                 /*
                  * For functions found dynamically imported modules.
                  */
-                if (std::find(linked_function_names.begin(), linked_function_names.end(), fn) != linked_function_names.end()) {
-                    throw("duplicate symbol '" + fn + "' found when linking '" + lnk.first
-                          + "' (previously found in '" + symbol_sources.at(fn)
-                          + "')");
+                if (std::find(linked_function_names.begin(),
+                              linked_function_names.end(),
+                              fn)
+                    != linked_function_names.end()) {
+                    throw("duplicate symbol '" + fn + "' found when linking '"
+                          + lnk.first + "' (previously found in '"
+                          + symbol_sources.at(fn) + "')");
                 }
             }
 
@@ -792,22 +775,16 @@ auto generate(std::vector<Token> const& tokens,
                 visible_function_names.push_back(fn);
 
                 if (flags.verbose) {
-                    std::cout
-                        << send_control_seq(COLOR_FG_WHITE)
-                        << filename
-                        << send_control_seq(ATTR_RESET)
-                        << ": "
-                        << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                        << send_control_seq(ATTR_RESET)
-                        << ": "
-                        << "marking function \""
-                        << send_control_seq(COLOR_FG_WHITE) << fn
-                        << send_control_seq(ATTR_RESET)
-                        << "\" (from \""
-                        << send_control_seq(COLOR_FG_WHITE)
-                        << lnk.first
-                        << send_control_seq(ATTR_RESET)
-                        << "\") as visible" << std::endl;
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << "marking function \""
+                              << send_control_seq(COLOR_FG_WHITE) << fn
+                              << send_control_seq(ATTR_RESET) << "\" (from \""
+                              << send_control_seq(COLOR_FG_WHITE) << lnk.first
+                              << send_control_seq(ATTR_RESET)
+                              << "\") as visible" << std::endl;
                 }
             }
         }
@@ -886,22 +863,22 @@ auto generate(std::vector<Token> const& tokens,
     }
 
     {
-        std::map<viua::internals::types::bytecode_size, std::string> address_of_fn;
-        for (auto const [ name, addr ] : function_addresses) {
+        std::map<viua::internals::types::bytecode_size, std::string>
+            address_of_fn;
+        for (auto const [name, addr] : function_addresses) {
             if (not address_of_fn.insert({addr, name}).second) {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cerr << ": ";
                 std::cerr << send_control_seq(COLOR_FG_RED) << "error"
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cerr << ": function \"";
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << name
-                     << send_control_seq(ATTR_RESET)
-                     << "\" loaded at the same address as \"";
-                std::cerr << send_control_seq(COLOR_FG_WHITE) << address_of_fn.at(addr)
-                    << '"'
-                     << send_control_seq(ATTR_RESET)
-                     << '\n';
+                          << send_control_seq(ATTR_RESET)
+                          << "\" loaded at the same address as \"";
+                std::cerr << send_control_seq(COLOR_FG_WHITE)
+                          << address_of_fn.at(addr) << '"'
+                          << send_control_seq(ATTR_RESET) << '\n';
                 exit(1);
             }
         }
@@ -1044,8 +1021,8 @@ auto generate(std::vector<Token> const& tokens,
     for (auto const& name : functions.names) {
         // do not generate bytecode for functions that were linked
         if (std::find(linked_function_names.begin(),
-                 linked_function_names.end(),
-                 name)
+                      linked_function_names.end(),
+                      name)
             != linked_function_names.end()) {
             continue;
         }
@@ -1158,8 +1135,9 @@ auto generate(std::vector<Token> const& tokens,
     {
         viua::internals::types::bytecode_size signatures_section_size = 0;
         for (auto const& each : functions.signatures) {
-            signatures_section_size += (each.size() + 1);  // +1 for null byte after
-                                                           // each signature
+            signatures_section_size += (each.size() + 1);  // +1 for null byte
+                                                           // after each
+                                                           // signature
         }
         bwrite(out, signatures_section_size);
         for (auto const& each : functions.signatures) {
@@ -1173,8 +1151,9 @@ auto generate(std::vector<Token> const& tokens,
     {
         viua::internals::types::bytecode_size signatures_section_size = 0;
         for (auto const& each : blocks.signatures) {
-            signatures_section_size += (each.size() + 1);  // +1 for null byte after
-                                                           // each signature
+            signatures_section_size += (each.size() + 1);  // +1 for null byte
+                                                           // after each
+                                                           // signature
         }
         bwrite(out, signatures_section_size);
         for (auto const& each : blocks.signatures) {
@@ -1186,12 +1165,14 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////////////////////////////////////
     // WRITE DYNAMIC IMPORTS SECTION
     {
-        auto dynamic_imports_section_size = viua::internals::types::bytecode_size{0};
-        for (auto const& [ module_name, file_name ] : dynamic_imports) {
-            dynamic_imports_section_size += (module_name.size() + 1);  // +1 for null byte after
+        auto dynamic_imports_section_size =
+            viua::internals::types::bytecode_size{0};
+        for (auto const& [module_name, file_name] : dynamic_imports) {
+            dynamic_imports_section_size +=
+                (module_name.size() + 1);  // +1 for null byte after
         }
         bwrite(out, dynamic_imports_section_size);
-        for (auto const& [ module_name, file_name ] : dynamic_imports) {
+        for (auto const& [module_name, file_name] : dynamic_imports) {
             strwrite(out, module_name);
 
             if (flags.verbose) {

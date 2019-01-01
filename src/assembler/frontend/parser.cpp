@@ -639,7 +639,8 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
             i += parse_attributes(vector_view<Token>(tokens, i), attributes);
 
             if (tokens.at(i) == "\n") {
-                throw Invalid_syntax(tokens.at(saved_i), "missing module name in import directive");
+                throw Invalid_syntax(tokens.at(saved_i),
+                                     "missing module name in import directive");
             }
 
             auto name = tokens.at(i);

@@ -17,11 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <unistd.h>
 #include <fstream>
 #include <iostream>
 #include <locale>
+#include <stdlib.h>
+#include <unistd.h>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/cg/assembler/assembler.h>
@@ -35,10 +35,10 @@ using namespace std;
 
 
 using viua::assembler::util::pretty_printer::ATTR_RESET;
+using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
 using viua::assembler::util::pretty_printer::COLOR_FG_LIGHT_GREEN;
 using viua::assembler::util::pretty_printer::COLOR_FG_RED;
 using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
-using viua::assembler::util::pretty_printer::COLOR_FG_CYAN;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
@@ -239,7 +239,8 @@ int main(int argc, char* argv[]) {
 
     if (compilename == "") {
         if (AS_LIB) {
-            compilename = std::toupper(filename.at(0), std::locale("C"))
+            compilename =
+                std::toupper(filename.at(0), std::locale("C"))
                 + (filename.substr(1, filename.rfind('.')) + "module");
         } else {
             compilename = "a.out";
@@ -355,7 +356,8 @@ int main(int argc, char* argv[]) {
     }
 
     auto static_linked_parsed_imports = std::vector<std::string>{};
-    auto dynamic_linked_imports = std::vector<std::pair<std::string, std::string>>{};
+    auto dynamic_linked_imports =
+        std::vector<std::pair<std::string, std::string>>{};
     if (not parsed_imports.empty()) {
         if (flags.verbose) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -368,7 +370,7 @@ int main(int argc, char* argv[]) {
             viua::support::env::get_paths("VIUA_LIBRARY_PATH");
         auto const module_sep = std::regex{"::"};
 
-        auto const STATIC_IMPORT_TAG = std::string{"static"};
+        auto const STATIC_IMPORT_TAG  = std::string{"static"};
         auto const DYNAMIC_IMPORT_TAG = std::string{"dynamic"};
 
         for (auto const& [name, attrs] : parsed_imports) {
@@ -413,7 +415,7 @@ int main(int argc, char* argv[]) {
                 static_linked_parsed_imports.push_back(candidate_path);
                 commandline_given_links.push_back(candidate_path);
             } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
-                dynamic_linked_imports.push_back({ name, candidate_path });
+                dynamic_linked_imports.push_back({name, candidate_path});
             } else {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'
@@ -428,8 +430,7 @@ int main(int argc, char* argv[]) {
                           << send_control_seq(ATTR_RESET)
                           << ": expected either \""
                           << send_control_seq(COLOR_FG_WHITE) << "static"
-                          << send_control_seq(ATTR_RESET) << '"'
-                          << " or \""
+                          << send_control_seq(ATTR_RESET) << '"' << " or \""
                           << send_control_seq(COLOR_FG_WHITE) << "dynamic"
                           << send_control_seq(ATTR_RESET) << "\"\n";
                 return 1;

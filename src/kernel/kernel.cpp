@@ -214,8 +214,8 @@ void viua::kernel::Kernel::load_native_library(std::string const& module) {
     auto path            = viua::support::env::viua::get_mod_path(
         try_path, "module", viua::support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path =
-            viua::support::env::viua::get_mod_path(try_path, "module", VIUAPATH);
+        path = viua::support::env::viua::get_mod_path(
+            try_path, "module", VIUAPATH);
     }
     if (path.size() == 0) {
         path = viua::support::env::viua::get_mod_path(
