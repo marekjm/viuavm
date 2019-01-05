@@ -40,17 +40,18 @@ class Struct : public Value {
   public:
     static std::string const type_name;
 
-    std::string type() const override;
-    bool boolean() const override;
+    auto type() const -> std::string override;
+    auto boolean() const -> bool override;
 
-    std::string str() const override;
-    std::string repr() const override;
+    auto str() const -> std::string override;
+    auto repr() const -> std::string override;
 
-    virtual void insert(std::string const& key, std::unique_ptr<Value> value);
-    virtual std::unique_ptr<Value> remove(std::string const& key);
-    virtual std::vector<std::string> keys() const;
+    virtual auto insert(std::string const& key, std::unique_ptr<Value> value) -> void;
+    virtual auto remove(std::string const& key) -> std::unique_ptr<Value>;
+    virtual auto at(std::string const& key) -> Value*;
+    virtual auto keys() const -> std::vector<std::string>;
 
-    std::unique_ptr<Value> copy() const override;
+    auto copy() const -> std::unique_ptr<Value> override;
 
     ~Struct() override = default;
 };

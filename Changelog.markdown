@@ -96,6 +96,8 @@ There are several categories of change:
 - bic: change default module extension from `.vlib` to `.module`
 - bic: change `.import:` directive to work on modules, not files; imports may be
   either static (using `static` attribute) or dynamic (using `dynamic` attribute)
+- feature: add new `structat` instruction for fetching values of fields in a struct
+  without removing them from said struct
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.

@@ -355,6 +355,8 @@ auto opstructinsert(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opstructremove(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
+auto opstructat(viua::internals::types::byte*, int_op, int_op, int_op)
+    -> viua::internals::types::byte*;
 auto opstructkeys(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 

@@ -66,6 +66,12 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     return value;
 }
 
+auto viua::types::Struct::at(
+    std::string const& key) -> viua::types::Value* {
+    auto& value = attributes.at(key);
+    return value.get();
+}
+
 std::vector<std::string> viua::types::Struct::keys() const {
     auto ks = std::vector<std::string>{};
     for (auto const& each : attributes) {

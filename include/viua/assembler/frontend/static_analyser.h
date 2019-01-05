@@ -486,6 +486,8 @@ auto check_op_structinsert(Register_usage_profile& register_usage_profile,
                            Instruction const& instruction) -> void;
 auto check_op_structremove(Register_usage_profile& register_usage_profile,
                            Instruction const& instruction) -> void;
+auto check_op_structat(Register_usage_profile& register_usage_profile,
+                           Instruction const& instruction) -> void;
 auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
 

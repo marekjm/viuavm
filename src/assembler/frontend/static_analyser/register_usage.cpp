@@ -453,6 +453,9 @@ auto check_register_usage_for_instruction_block_impl(
             case STRUCTREMOVE:
                 check_op_structremove(register_usage_profile, *instruction);
                 break;
+            case STRUCTAT:
+                check_op_structat(register_usage_profile, *instruction);
+                break;
             case STRUCTKEYS:
                 check_op_structkeys(register_usage_profile, *instruction);
                 break;

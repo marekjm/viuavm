@@ -1389,6 +1389,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case ATOMEQ:
             case STRUCTINSERT:
             case STRUCTREMOVE:
+            case STRUCTAT:
                 i += normalise_any_3_register_instruction(
                     tokens, vector_view{source, i});
                 break;

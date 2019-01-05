@@ -1298,6 +1298,10 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
                 i += parse_any_3_register_with_void_target_instruction(
                     fragments, vector_view{tokens, i});
                 break;
+            case STRUCTAT:
+                i += parse_any_3_register_with_void_target_instruction(
+                    fragments, vector_view{tokens, i});
+                break;
             case TEXTSUB:
                 i += parse_any_4_register_instruction(fragments,
                                                       vector_view{tokens, i});

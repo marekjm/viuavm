@@ -582,6 +582,7 @@ OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_receive.o \
 	build/assembler/backend/op_assemblers/assemble_op_string.o \
 	build/assembler/backend/op_assemblers/assemble_op_structremove.o \
+	build/assembler/backend/op_assemblers/assemble_op_structat.o \
 	build/assembler/backend/op_assemblers/assemble_op_join.o \
 	build/assembler/backend/op_assemblers/assemble_op_text.o \
 	build/assembler/backend/op_assemblers/assemble_op_vector.o \
@@ -672,6 +673,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structkeys.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structremove.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_swap.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_tailcall.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textat.o \

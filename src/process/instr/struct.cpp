@@ -22,6 +22,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/process.h>
 #include <viua/types/atom.h>
+#include <viua/types/pointer.h>
 #include <viua/types/struct.h>
 #include <viua/types/vector.h>
 using namespace std;
@@ -90,6 +91,35 @@ auto viua::process::Process::opstructremove(Op_address_type addr)
     std::unique_ptr<viua::types::Value> result{struct_operand->remove(*key)};
     if (not void_target) {
         *target = std::move(result);
+    }
+
+    return addr;
+}
+
+auto viua::process::Process::opstructat(Op_address_type addr)
+    -> Op_address_type {
+    bool void_target = viua::bytecode::decoder::operands::is_void(addr);
+    viua::kernel::Register* target = nullptr;
+
+    if (not void_target) {
+        tie(addr, target) =
+            viua::bytecode::decoder::operands::fetch_register(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    viua::types::Struct* struct_operand = nullptr;
+    tie(addr, struct_operand) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
+            addr, this);
+
+    viua::types::Atom* key = nullptr;
+    tie(addr, key) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
+            addr, this);
+
+    if (not void_target) {
+        *target = struct_operand->at(*key)->pointer(this);
     }
 
     return addr;

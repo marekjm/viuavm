@@ -218,6 +218,7 @@ using viua::assembler::backend::op_assemblers::assemble_op_jump;
 using viua::assembler::backend::op_assemblers::assemble_op_msg;
 using viua::assembler::backend::op_assemblers::assemble_op_remove;
 using viua::assembler::backend::op_assemblers::assemble_op_structremove;
+using viua::assembler::backend::op_assemblers::assemble_op_structat;
 using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
 using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 
@@ -540,6 +541,8 @@ auto assemble_instruction(
             program, tokens, i);
     } else if (tokens.at(i) == "structremove") {
         assemble_op_structremove(program, tokens, i);
+    } else if (tokens.at(i) == "structat") {
+        assemble_op_structat(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
     } else if (tokens.at(i) == "return") {

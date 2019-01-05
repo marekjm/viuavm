@@ -408,6 +408,7 @@ class Process {
     auto opstruct(Op_address_type) -> Op_address_type;
     auto opstructinsert(Op_address_type) -> Op_address_type;
     auto opstructremove(Op_address_type) -> Op_address_type;
+    auto opstructat(Op_address_type) -> Op_address_type;
     auto opstructkeys(Op_address_type) -> Op_address_type;
 
     auto opimport(Op_address_type) -> Op_address_type;

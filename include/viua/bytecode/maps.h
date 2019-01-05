@@ -193,6 +193,7 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {STRUCT, "struct"},
     {STRUCTINSERT, "structinsert"},
     {STRUCTREMOVE, "structremove"},
+    {STRUCTAT, "structat"},
     {STRUCTKEYS, "structkeys"},
 
     {RETURN, "return"},

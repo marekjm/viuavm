@@ -3203,6 +3203,68 @@ static auto analyse_single_arm(
 
                 break;
             }
+            case STRUCTAT: {
+                auto const& source = *static_cast<Register_address const*>(
+                    instruction.operands.at(1).get());
+                auto const source_index =
+                    throw_if_empty(function_state, source);
+                auto const source_type_signature = maybe_with_pointer(
+                    source.access, {values::Value_type::Struct});
+                throw_if_invalid_type(function_state,
+                                      source,
+                                      source_index,
+                                      source_type_signature);
+
+                auto const& key = *static_cast<Register_address const*>(
+                    instruction.operands.at(2).get());
+                auto const key_index = throw_if_empty(function_state, key);
+                auto const key_type_signature =
+                    maybe_with_pointer(key.access, {values::Value_type::Atom});
+                throw_if_invalid_type(
+                    function_state, key, key_index, key_type_signature);
+
+                auto const& dest = *static_cast<Register_address const*>(
+                    instruction.operands.at(0).get());
+
+                auto defining_tokens =
+                    std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+                copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                using values::Atom;
+                using values::Struct;
+
+                auto const& key_value = static_cast<const Atom&>(
+                    function_state.type_of(key_index, key.register_set)
+                        .value());
+                auto& struct_value = static_cast<Struct&>(
+                    function_state.type_of(source_index, source.register_set)
+                        .value());
+                if (key_value.known()
+                    and struct_value.field(key_value.of()).has_value()) {
+                    function_state.define_register(
+                        function_state.resolve_index(dest),
+                        dest.register_set,
+                        function_state.make_wrapper(
+                            std::make_unique<values::Pointer>(
+                                struct_value.field(key_value.of()).value()
+                            )),
+                        std::move(defining_tokens));
+                } else {
+                    function_state.define_register(
+                        function_state.resolve_index(dest),
+                        dest.register_set,
+                        function_state.make_wrapper(
+                            std::make_unique<values::Pointer>(
+                                function_state.make_wrapper(
+                                    std::make_unique<values::Value>(
+                                        values::Value_type::Value)
+                                    ))),
+                        std::move(defining_tokens));
+                }
+
+                break;
+            }
             case STRUCTKEYS: {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());

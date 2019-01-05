@@ -663,7 +663,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "remove" or token == "structremove") {
+        } else if (token == "remove" or token == "structremove" or token == "structat") {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register
@@ -1458,7 +1458,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "structremove") {
+        } else if (token == "structremove" or token == "structat") {
             tokens.push_back(input_tokens.at(++i));  // target register
             if (tokens.back() != "void") {
                 if (not is_register_set_name(input_tokens.at(i + 1))) {

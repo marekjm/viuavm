@@ -219,6 +219,7 @@ class Program {
     auto opstruct(int_op const) -> Program&;
     auto opstructinsert(int_op const, int_op const, int_op const) -> Program&;
     auto opstructremove(int_op const, int_op const, int_op const) -> Program&;
+    auto opstructat(int_op const, int_op const, int_op const) -> Program&;
     auto opstructkeys(int_op const, int_op const) -> Program&;
 
     auto opreturn() -> Program&;

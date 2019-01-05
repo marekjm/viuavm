@@ -417,6 +417,15 @@ enum OPCODE : viua::internals::types::byte {
     STRUCTREMOVE,
 
     /*
+     *  Access a value at a given key from a struct, and return pointer to the
+     *  value.
+     *  Throws an exception if the struct does not have requested key.
+     *
+     *  structat {result-register} {source-struct-register} {key-register}
+     */
+    STRUCTAT,
+
+    /*
      *  Get a vector with keys of a struct.
      *
      *  structkeys {result} {source-struct-register}

@@ -665,6 +665,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case ATOMEQ:
     case STRUCTINSERT:
     case STRUCTREMOVE:
+    case STRUCTAT:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

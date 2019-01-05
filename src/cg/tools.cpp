@@ -945,6 +945,8 @@ static auto size_of_structinsert =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_structremove =
     size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_structat =
+    size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_structkeys =
     size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto size_of_insert =
@@ -1377,6 +1379,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "structremove") {
             ++i;
             tie(increase, i) = size_of_structremove(tokens, i);
+        } else if (tokens.at(i) == "structat") {
+            ++i;
+            tie(increase, i) = size_of_structat(tokens, i);
         } else if (tokens.at(i) == "structkeys") {
             ++i;
             tie(increase, i) = size_of_structkeys(tokens, i);

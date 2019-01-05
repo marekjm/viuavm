@@ -451,6 +451,9 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case STRUCTREMOVE:
         addr = opstructremove(addr + 1);
         break;
+    case STRUCTAT:
+        addr = opstructat(addr + 1);
+        break;
     case STRUCTKEYS:
         addr = opstructkeys(addr + 1);
         break;

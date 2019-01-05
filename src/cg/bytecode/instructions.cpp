@@ -1106,6 +1106,14 @@ auto opstructremove(viua::internals::types::byte* addr_ptr,
         addr_ptr, STRUCTREMOVE, rega, regb, regr);
 }
 
+auto opstructat(viua::internals::types::byte* addr_ptr,
+                    int_op rega,
+                    int_op regb,
+                    int_op regr) -> viua::internals::types::byte* {
+    return insert_three_ri_instruction(
+        addr_ptr, STRUCTAT, rega, regb, regr);
+}
+
 auto opstructkeys(viua::internals::types::byte* addr_ptr,
                   int_op target,
                   int_op source) -> viua::internals::types::byte* {
