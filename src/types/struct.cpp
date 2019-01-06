@@ -18,9 +18,9 @@
  */
 
 #include <sstream>
+#include <viua/exceptions.h>
 #include <viua/support/string.h>
 #include <viua/types/struct.h>
-#include <viua/exceptions.h>
 #include <viua/util/exceptions.h>
 using namespace std;
 
@@ -65,7 +65,8 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     std::string const& key) {
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
-        throw make_unique_exception<viua::runtime::exceptions::Invalid_field_access>();
+        throw make_unique_exception<
+            viua::runtime::exceptions::Invalid_field_access>();
     }
 
     auto value = std::move(attributes.at(key));
@@ -73,11 +74,11 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     return value;
 }
 
-auto viua::types::Struct::at(
-    std::string const& key) -> viua::types::Value* {
+auto viua::types::Struct::at(std::string const& key) -> viua::types::Value* {
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
-        throw make_unique_exception<viua::runtime::exceptions::Invalid_field_access>();
+        throw make_unique_exception<
+            viua::runtime::exceptions::Invalid_field_access>();
     }
 
     auto& value = attributes.at(key);

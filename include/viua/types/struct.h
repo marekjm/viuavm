@@ -46,7 +46,8 @@ class Struct : public Value {
     auto str() const -> std::string override;
     auto repr() const -> std::string override;
 
-    virtual auto insert(std::string const& key, std::unique_ptr<Value> value) -> void;
+    virtual auto insert(std::string const& key, std::unique_ptr<Value> value)
+        -> void;
     virtual auto remove(std::string const& key) -> std::unique_ptr<Value>;
     virtual auto at(std::string const& key) -> Value*;
     virtual auto keys() const -> std::vector<std::string>;

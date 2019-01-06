@@ -663,7 +663,8 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             } else {
                 tokens.push_back(input_tokens.at(++i));
             }
-        } else if (token == "remove" or token == "structremove" or token == "structat") {
+        } else if (token == "remove" or token == "structremove"
+                   or token == "structat") {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register

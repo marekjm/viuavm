@@ -3247,8 +3247,7 @@ static auto analyse_single_arm(
                         dest.register_set,
                         function_state.make_wrapper(
                             std::make_unique<values::Pointer>(
-                                struct_value.field(key_value.of()).value()
-                            )),
+                                struct_value.field(key_value.of()).value())),
                         std::move(defining_tokens));
                 } else {
                     function_state.define_register(
@@ -3258,8 +3257,7 @@ static auto analyse_single_arm(
                             std::make_unique<values::Pointer>(
                                 function_state.make_wrapper(
                                     std::make_unique<values::Value>(
-                                        values::Value_type::Value)
-                                    ))),
+                                        values::Value_type::Value)))),
                         std::move(defining_tokens));
                 }
 

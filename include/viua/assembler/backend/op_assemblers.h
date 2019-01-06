@@ -265,8 +265,8 @@ auto assemble_op_structremove(Program&,
                               std::vector<Token> const&,
                               Token_index const) -> void;
 auto assemble_op_structat(Program&,
-                              std::vector<Token> const&,
-                              Token_index const) -> void;
+                          std::vector<Token> const&,
+                          Token_index const) -> void;
 auto assemble_op_msg(Program&, std::vector<Token> const&, Token_index const)
     -> void;
 auto assemble_op_remove(Program&, std::vector<Token> const&, Token_index const)

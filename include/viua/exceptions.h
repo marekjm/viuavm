@@ -179,7 +179,8 @@ class Invalid_field_access : public viua::types::Exception {
     }
 
     std::unique_ptr<Value> copy() const override {
-        return viua::util::exceptions::make_unique_exception<Invalid_field_access>();
+        return viua::util::exceptions::make_unique_exception<
+            Invalid_field_access>();
     }
 
     std::string what() const override {

@@ -775,8 +775,8 @@ auto Program::opstructremove(int_op const target,
 }
 
 auto Program::opstructat(int_op const target,
-                             int_op const key,
-                             int_op const source) -> Program& {
+                         int_op const key,
+                         int_op const source) -> Program& {
     addr_ptr = cg::bytecode::opstructat(addr_ptr, target, key, source);
     return (*this);
 }

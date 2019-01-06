@@ -138,10 +138,8 @@ auto viua::process::Process::opclosure(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
     auto rs = make_unique<viua::kernel::Register_set>(
-        std::max(
-            stack->back()->local_register_set->size()
-            , viua::internals::types::register_index{16}
-        ));
+        std::max(stack->back()->local_register_set->size(),
+                 viua::internals::types::register_index{16}));
     auto closure =
         make_unique<viua::types::Closure>(function_name, std::move(rs));
 

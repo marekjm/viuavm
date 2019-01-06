@@ -217,8 +217,8 @@ using viua::assembler::backend::op_assemblers::assemble_op_integer;
 using viua::assembler::backend::op_assemblers::assemble_op_jump;
 using viua::assembler::backend::op_assemblers::assemble_op_msg;
 using viua::assembler::backend::op_assemblers::assemble_op_remove;
-using viua::assembler::backend::op_assemblers::assemble_op_structremove;
 using viua::assembler::backend::op_assemblers::assemble_op_structat;
+using viua::assembler::backend::op_assemblers::assemble_op_structremove;
 using viua::assembler::backend::op_assemblers::assemble_op_vinsert;
 using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 
