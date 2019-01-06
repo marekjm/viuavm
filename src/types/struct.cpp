@@ -20,6 +20,8 @@
 #include <sstream>
 #include <viua/support/string.h>
 #include <viua/types/struct.h>
+#include <viua/exceptions.h>
+#include <viua/util/exceptions.h>
 using namespace std;
 
 std::string const viua::types::Struct::type_name = "Struct";
@@ -61,13 +63,23 @@ void viua::types::Struct::insert(std::string const& key,
 
 std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     std::string const& key) {
-    std::unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
+    if (attributes.count(key) == 0) {
+        using viua::util::exceptions::make_unique_exception;
+        throw make_unique_exception<viua::runtime::exceptions::Invalid_field_access>();
+    }
+
+    auto value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;
 }
 
 auto viua::types::Struct::at(
     std::string const& key) -> viua::types::Value* {
+    if (attributes.count(key) == 0) {
+        using viua::util::exceptions::make_unique_exception;
+        throw make_unique_exception<viua::runtime::exceptions::Invalid_field_access>();
+    }
+
     auto& value = attributes.at(key);
     return value.get();
 }

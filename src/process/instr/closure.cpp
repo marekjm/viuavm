@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
@@ -137,7 +138,10 @@ auto viua::process::Process::opclosure(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
     auto rs = make_unique<viua::kernel::Register_set>(
-        stack->back()->local_register_set->size());
+        std::max(
+            stack->back()->local_register_set->size()
+            , viua::internals::types::register_index{16}
+        ));
     auto closure =
         make_unique<viua::types::Closure>(function_name, std::move(rs));
 

@@ -167,6 +167,25 @@ class Zero_division : public viua::types::Exception {
         return str();
     }
 };
+
+class Invalid_field_access : public viua::types::Exception {
+  public:
+    std::string type() const override {
+        return "Invalid_field_access";
+    }
+
+    std::string str() const override {
+        return "invalid field access";
+    }
+
+    std::unique_ptr<Value> copy() const override {
+        return viua::util::exceptions::make_unique_exception<Invalid_field_access>();
+    }
+
+    std::string what() const override {
+        return str();
+    }
+};
 }}}  // namespace viua::runtime::exceptions
 
 #endif
