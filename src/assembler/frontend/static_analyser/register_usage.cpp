@@ -117,7 +117,7 @@ auto check_register_usage_for_instruction_block_impl(
 
     std::map<Register, Closure> created_closures;
 
-    for (; i < ib.body.size(); ++i) {
+    for (auto stop = false; (not stop) and (i < ib.body.size()); ++i) {
         auto const& line = ib.body.at(i);
         auto const instruction =
             dynamic_cast<viua::assembler::frontend::parser::Instruction*>(
@@ -353,6 +353,16 @@ auto check_register_usage_for_instruction_block_impl(
                 break;
             case TAILCALL:
                 check_op_tailcall(register_usage_profile, *instruction);
+
+                /*
+                 * Stop analysis after a tailcall because at this point the
+                 * frame does no longer belong to the currently analysed
+                 * function but to some other one. This sudden control transfer
+                 * makes it pointless to continue analysing the current control
+                 * flow - it is similar to a return of throw instruction in this
+                 * regard.
+                 */
+                stop = true;
                 break;
             case DEFER:
                 check_op_defer(register_usage_profile, *instruction);
