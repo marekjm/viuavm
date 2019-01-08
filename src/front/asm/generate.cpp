@@ -843,6 +843,7 @@ auto generate(std::vector<Token> const& tokens,
 
 
     auto current_link_offset = bytes;
+    auto linked_module_offsets = std::map<std::string, viua::internals::types::bytecode_size>{};
     for (auto lnk : links) {
         auto loader = Loader{lnk};
         loader.load();
@@ -859,7 +860,9 @@ auto generate(std::vector<Token> const& tokens,
 
         linked_libs_bytecode.emplace_back(
             lnk, loader.get_bytecode_size(), loader.get_bytecode());
+        linked_module_offsets.insert({ lnk, current_link_offset });
         bytes += loader.get_bytecode_size();
+        current_link_offset += loader.get_bytecode_size();
     }
 
     {
@@ -1258,11 +1261,12 @@ auto generate(std::vector<Token> const& tokens,
 
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
-    viua::internals::types::bytecode_size bytes_offset = current_link_offset;
     for (auto& lnk : linked_libs_bytecode) {
         std::string lib_name                              = get<0>(lnk);
         viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
+
+        auto const bytes_offset = linked_module_offsets.at(lib_name);
 
         if (flags.verbose) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename
