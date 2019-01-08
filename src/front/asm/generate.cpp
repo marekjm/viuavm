@@ -1262,9 +1262,9 @@ auto generate(std::vector<Token> const& tokens,
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     for (auto& lnk : linked_libs_bytecode) {
-        std::string lib_name                              = get<0>(lnk);
-        viua::internals::types::byte* linked_bytecode     = get<2>(lnk).get();
-        viua::internals::types::bytecode_size linked_size = get<1>(lnk);
+        auto const lib_name        = get<0>(lnk);
+        auto const linked_bytecode = get<2>(lnk).get();
+        auto const linked_size     = get<1>(lnk);
 
         auto const bytes_offset = linked_module_offsets.at(lib_name);
 
@@ -1299,7 +1299,7 @@ auto generate(std::vector<Token> const& tokens,
             aligned_write(linked_bytecode + jmp) += bytes_offset;
         }
 
-        for (decltype(linked_size) i = 0; i < linked_size; ++i) {
+        for (auto i = decltype(linked_size){0}; i < linked_size; ++i) {
             program_bytecode[program_bytecode_used + i] = linked_bytecode[i];
         }
         program_bytecode_used += linked_size;
