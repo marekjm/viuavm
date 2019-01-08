@@ -98,6 +98,10 @@ There are several categories of change:
   either static (using `static` attribute) or dynamic (using `dynamic` attribute)
 - feature: add new `structat` instruction for fetching values of fields in a struct
   without removing them from said struct
+- fix: static analyser correctly stops analysing a control flow path after encountering
+  a tail call
+- fix: the linker correctly handles static linking of more than one module in a single
+  run (previously it would calculate bytecode offsets of the modules incorrectly)
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
