@@ -596,6 +596,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/front/asm/decode.o \
 	build/program.o \
 	build/programinstructions.o \
+	build/runtime/imports.o \
 	build/cg/tokenizer/tokenize.o \
 	build/cg/assembler/operands.o \
 	build/cg/assembler/codeextract.o \

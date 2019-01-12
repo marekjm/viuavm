@@ -30,6 +30,7 @@
 #include <viua/front/asm.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
+#include <viua/runtime/imports.h>
 #include <viua/version.h>
 using namespace std;
 
@@ -366,53 +367,18 @@ int main(int argc, char* argv[]) {
                       << " module(s)\n";
         }
 
-        auto const VIUA_LIBRARY_PATH =
-            viua::support::env::get_paths("VIUA_LIBRARY_PATH");
-        auto const module_sep = std::regex{"::"};
-
         auto const STATIC_IMPORT_TAG  = std::string{"static"};
         auto const DYNAMIC_IMPORT_TAG = std::string{"dynamic"};
 
         for (auto const& [name, attrs] : parsed_imports) {
-            auto module_file =
-                std::regex_replace(name, module_sep, "/") + ".module";
-            auto ffi_module_file =
-                std::regex_replace(name, module_sep, "/") + ".so";
-
             if (flags.verbose) {
                 std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ": "
                           << "  module: " << name << '\n';
             }
 
-            auto found          = false;
-            auto candidate_path = std::string{};
-            for (auto const& each : VIUA_LIBRARY_PATH) {
-                candidate_path = each + '/' + module_file;
-                if ((found = viua::support::env::is_file(candidate_path))) {
-                    if (flags.verbose) {
-                        std::cout << send_control_seq(COLOR_FG_WHITE)
-                                  << filename << send_control_seq(ATTR_RESET)
-                                  << ": "
-                                     "    found: "
-                                  << candidate_path << '\n';
-                    }
-                    break;
-                }
-
-                candidate_path = each + '/' + ffi_module_file;
-                if ((found = viua::support::env::is_file(candidate_path))) {
-                    if (flags.verbose) {
-                        std::cout << send_control_seq(COLOR_FG_WHITE)
-                                  << filename << send_control_seq(ATTR_RESET)
-                                  << ": "
-                                     "    found: "
-                                  << candidate_path << '\n';
-                    }
-                    break;
-                }
-            }
-            if (not found) {
+            auto const module_path = viua::runtime::imports::find_module(name);
+            if (not module_path.has_value()) {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'
                           << send_control_seq(COLOR_FG_RED) << "error"
@@ -423,13 +389,23 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
 
-            if (attrs.count(STATIC_IMPORT_TAG)) {
+            using viua::runtime::imports::Module_type;
+            if (attrs.count(STATIC_IMPORT_TAG) and module_path->first != Module_type::Bytecode) {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ':'
+                          << send_control_seq(COLOR_FG_RED) << "error"
+                          << send_control_seq(ATTR_RESET)
+                          << ": only bytecode modules may be statically imported \""
+                          << send_control_seq(COLOR_FG_WHITE) << name
+                          << send_control_seq(ATTR_RESET) << "\"\n";
+                return 1;
+            } else if (attrs.count(STATIC_IMPORT_TAG) and module_path->first == Module_type::Bytecode) {
                 // FIXME Modules specified on command line are also to be
                 // statically linked. These two ways should probably be merged.
-                static_linked_parsed_imports.push_back(candidate_path);
-                commandline_given_links.push_back(candidate_path);
+                static_linked_parsed_imports.push_back(module_path->second);
+                commandline_given_links.push_back(module_path->second);
             } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
-                dynamic_linked_imports.push_back({name, candidate_path});
+                dynamic_linked_imports.push_back({name, module_path->second});
             } else {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'

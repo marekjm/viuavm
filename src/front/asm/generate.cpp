@@ -33,6 +33,7 @@
 #include <viua/loader.h>
 #include <viua/machine.h>
 #include <viua/program.h>
+#include <viua/runtime/imports.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
 #include <viua/util/memory.h>
@@ -693,45 +694,8 @@ auto generate(std::vector<Token> const& tokens,
                           << send_control_seq(ATTR_RESET) << "\")" << std::endl;
             }
 
-            auto const VIUA_LIBRARY_PATH =
-                viua::support::env::get_paths("VIUA_LIBRARY_PATH");
-            auto const module_sep = std::regex{"::"};
-
-            auto const module_file =
-                std::regex_replace(module_name, module_sep, "/") + ".module";
-            auto const ffi_module_file =
-                std::regex_replace(module_name, module_sep, "/") + ".so";
-
-            auto found          = false;
-            auto candidate_path = std::string{};
-            for (auto const& each : VIUA_LIBRARY_PATH) {
-                candidate_path = each + '/' + module_file;
-                if ((found = viua::support::env::is_file(candidate_path))) {
-                    if (flags.verbose) {
-                        std::cout << send_control_seq(COLOR_FG_WHITE)
-                                  << filename << send_control_seq(ATTR_RESET)
-                                  << ": "
-                                     "    found module "
-                                  << module_name << " in: " << candidate_path
-                                  << '\n';
-                    }
-                    break;
-                }
-
-                candidate_path = each + '/' + ffi_module_file;
-                if ((found = viua::support::env::is_file(candidate_path))) {
-                    if (flags.verbose) {
-                        std::cout << send_control_seq(COLOR_FG_WHITE)
-                                  << filename << send_control_seq(ATTR_RESET)
-                                  << ": "
-                                     "    found module "
-                                  << module_name << " in: " << candidate_path
-                                  << '\n';
-                    }
-                    break;
-                }
-            }
-            if (not found) {
+            auto const module_path = viua::runtime::imports::find_module(module_name);
+            if (not module_path.has_value()) {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'
                           << send_control_seq(COLOR_FG_RED) << "error"
@@ -743,9 +707,10 @@ auto generate(std::vector<Token> const& tokens,
             }
 
             already_imported.insert(module_name);
-            dynamic_imports.push_back({module_name, candidate_path});
+            dynamic_imports.push_back({module_name, module_path->second});
 
-            if (candidate_path.substr(candidate_path.size() - 3) == ".so") {
+            using viua::runtime::imports::Module_type;
+            if (module_path->first == Module_type::Native) {
                 if (flags.verbose) {
                     std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                               << send_control_seq(ATTR_RESET) << ": ";
@@ -753,12 +718,12 @@ auto generate(std::vector<Token> const& tokens,
                         << send_control_seq(COLOR_FG_WHITE)
                         << module_name
                         << send_control_seq(ATTR_RESET) << "\" (found in \""
-                        << candidate_path << "\"\n";
+                        << module_path->second << "\"\n";
                 }
                 continue;
             }
 
-            auto loaded_module = Loader{candidate_path};
+            auto loaded_module = Loader{module_path->second};
             loaded_module.load();
 
             for (auto const& each : loaded_module.dynamic_imports()) {
