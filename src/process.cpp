@@ -125,12 +125,6 @@ auto viua::process::Process::call_foreign(
     std::string const& call_name,
     viua::kernel::Register* return_register,
     std::string const&) -> Op_address_type {
-    if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>(
-            "external function call without a frame: use `frame 0' in source "
-            "code if the function takes no parameters");
-    }
-
     stack->frame_new->function_name   = call_name;
     stack->frame_new->return_address  = return_address;
     stack->frame_new->return_register = return_register;
