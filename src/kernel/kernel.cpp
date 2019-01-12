@@ -263,14 +263,19 @@ void viua::kernel::Kernel::load_native_library(std::string const& module) {
 }
 void viua::kernel::Kernel::load_foreign_library(std::string const& module) {
     auto const module_sep = std::regex{"::"};
+    auto const mod_file = std::regex_replace(module, module_sep, "/");
     auto path = support::env::viua::get_mod_path(
-        std::regex_replace(module, module_sep, "/"), "so", support::env::get_paths("VIUAPATH"));
+        mod_file, "so", support::env::get_paths("VIUAPATH"));
     if (path.size() == 0) {
-        path = support::env::viua::get_mod_path(module, "so", VIUAPATH);
+        path = support::env::viua::get_mod_path(mod_file, "so", VIUAPATH);
     }
     if (path.size() == 0) {
         path = support::env::viua::get_mod_path(
-            module, "so", support::env::get_paths("VIUAAFTERPATH"));
+            mod_file, "so", support::env::get_paths("VIUAAFTERPATH"));
+    }
+    if (path.size() == 0) {
+        path = viua::support::env::viua::get_mod_path(
+            mod_file, "so", viua::support::env::get_paths("VIUA_LIBRARY_PATH"));
     }
 
     if (path.size() == 0) {
