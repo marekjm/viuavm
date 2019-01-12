@@ -188,7 +188,6 @@ static auto is_foreign_module(std::string const& module) -> bool {
     auto const module_sep = std::regex{"::"};
     auto const module_base_name =
         std::regex_replace(module, module_sep, "/");
-    std::cout << module_base_name << std::endl;
 
     auto path = viua::support::env::viua::get_mod_path(
         module_base_name, "so", viua::support::env::get_paths("VIUAPATH"));
