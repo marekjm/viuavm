@@ -376,6 +376,8 @@ int main(int argc, char* argv[]) {
         for (auto const& [name, attrs] : parsed_imports) {
             auto module_file =
                 std::regex_replace(name, module_sep, "/") + ".module";
+            auto ffi_module_file =
+                std::regex_replace(name, module_sep, "/") + ".so";
 
             if (flags.verbose) {
                 std::cout << send_control_seq(COLOR_FG_WHITE) << filename
@@ -387,6 +389,18 @@ int main(int argc, char* argv[]) {
             auto candidate_path = std::string{};
             for (auto const& each : VIUA_LIBRARY_PATH) {
                 candidate_path = each + '/' + module_file;
+                if ((found = viua::support::env::is_file(candidate_path))) {
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE)
+                                  << filename << send_control_seq(ATTR_RESET)
+                                  << ": "
+                                     "    found: "
+                                  << candidate_path << '\n';
+                    }
+                    break;
+                }
+
+                candidate_path = each + '/' + ffi_module_file;
                 if ((found = viua::support::env::is_file(candidate_path))) {
                     if (flags.verbose) {
                         std::cout << send_control_seq(COLOR_FG_WHITE)

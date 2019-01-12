@@ -697,13 +697,28 @@ auto generate(std::vector<Token> const& tokens,
                 viua::support::env::get_paths("VIUA_LIBRARY_PATH");
             auto const module_sep = std::regex{"::"};
 
-            auto module_file =
+            auto const module_file =
                 std::regex_replace(module_name, module_sep, "/") + ".module";
+            auto const ffi_module_file =
+                std::regex_replace(module_name, module_sep, "/") + ".so";
 
             auto found          = false;
             auto candidate_path = std::string{};
             for (auto const& each : VIUA_LIBRARY_PATH) {
                 candidate_path = each + '/' + module_file;
+                if ((found = viua::support::env::is_file(candidate_path))) {
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE)
+                                  << filename << send_control_seq(ATTR_RESET)
+                                  << ": "
+                                     "    found module "
+                                  << module_name << " in: " << candidate_path
+                                  << '\n';
+                    }
+                    break;
+                }
+
+                candidate_path = each + '/' + ffi_module_file;
                 if ((found = viua::support::env::is_file(candidate_path))) {
                     if (flags.verbose) {
                         std::cout << send_control_seq(COLOR_FG_WHITE)
@@ -730,6 +745,19 @@ auto generate(std::vector<Token> const& tokens,
             already_imported.insert(module_name);
             dynamic_imports.push_back({module_name, candidate_path});
 
+            if (candidate_path.substr(candidate_path.size() - 3) == ".so") {
+                if (flags.verbose) {
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": ";
+                    std::cout << "import of FFI module: \""
+                        << send_control_seq(COLOR_FG_WHITE)
+                        << module_name
+                        << send_control_seq(ATTR_RESET) << "\" (found in \""
+                        << candidate_path << "\"\n";
+                }
+                continue;
+            }
+
             auto loaded_module = Loader{candidate_path};
             loaded_module.load();
 
@@ -741,6 +769,19 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         for (auto const& lnk : dynamic_imports) {
+            if (lnk.second.substr(lnk.second.size() - 3) == ".so") {
+                if (flags.verbose) {
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": ";
+                    std::cout << "import of FFI module: \""
+                        << send_control_seq(COLOR_FG_WHITE)
+                        << lnk.first
+                        << send_control_seq(ATTR_RESET) << "\" (found in \""
+                        << lnk.second << "\"\n";
+                }
+                continue;
+            }
+
             auto loader = Loader{lnk.second};
             loader.load();
 
