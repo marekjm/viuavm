@@ -47,7 +47,7 @@ auto viua::process::Process::register_at(
     } else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
     } else {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "unsupported register set type");
     }
 }

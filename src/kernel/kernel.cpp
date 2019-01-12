@@ -373,9 +373,9 @@ auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
 void viua::kernel::Kernel::request_foreign_function_call(
     Frame* frame,
     viua::process::Process* requesting_process) {
-    unique_lock<mutex> lock(foreign_call_queue_mutex);
+    std::unique_lock<std::mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(
-        make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
+        std::make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
             frame, requesting_process, this));
 
     // unlock before calling notify_one() to avoid waking the worker thread when
