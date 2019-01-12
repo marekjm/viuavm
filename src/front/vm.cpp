@@ -51,13 +51,8 @@ void viua::front::vm::initialise(viua::kernel::Kernel& kernel,
 void viua::front::vm::preload_libraries(viua::kernel::Kernel& kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
-    auto const preload_native = support::env::get_paths("VIUAPRELINK");
-    for (auto const& each : preload_native) {
-        kernel.load_native_library(each);
-    }
-
-    auto const preload_foreign = support::env::get_paths("VIUAPREIMPORT");
-    for (auto const& each : preload_foreign) {
-        kernel.load_foreign_library(each);
+    auto const module_to_preload = support::env::get_paths("VIUA_IMPORT");
+    for (auto const& each : module_to_preload) {
+        kernel.load_module(each);
     }
 }

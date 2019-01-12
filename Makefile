@@ -518,6 +518,7 @@ build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/kernel.o \
 	build/scheduler/vps.o \
 	build/front/vm.o \
+	build/runtime/imports.o \
 	build/assert.o \
 	build/process.o \
 	build/process/stack.o \
@@ -594,6 +595,7 @@ build/bin/vm/asm: build/front/asm.o \
 	$(OP_ASSEMBLERS) \
 	build/front/asm/assemble_instruction.o \
 	build/front/asm/decode.o \
+	build/runtime/imports.o \
 	build/program.o \
 	build/programinstructions.o \
 	build/runtime/imports.o \

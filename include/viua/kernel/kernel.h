@@ -34,6 +34,7 @@
 #include <queue>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <unordered_set>
@@ -215,8 +216,8 @@ class Kernel {
     /*  Methods dealing with dynamic library loading.
      */
     void load_module(std::string);
-    void load_native_library(std::string const&);
-    void load_foreign_library(std::string const&);
+    void load_native_module(std::string_view const, std::string const&);
+    void load_bytecode_module(std::string_view const, std::string const&);
 
     // debug and error reporting flags
     bool debug, errors;

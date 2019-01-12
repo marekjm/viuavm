@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <chrono>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -32,6 +33,7 @@
 #include <viua/kernel/kernel.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
+#include <viua/runtime/imports.h>
 #include <viua/scheduler/ffi.h>
 #include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
@@ -166,137 +168,67 @@ viua::kernel::Kernel& viua::kernel::Kernel::register_external_function(
 }
 
 
-static auto is_native_module(std::string module) -> bool {
-    auto double_colon = regex{"::"};
-    auto oss          = ostringstream{};
-    oss << regex_replace(module, double_colon, "/");
-
-    auto const try_path = oss.str();
-    auto path           = viua::support::env::viua::get_mod_path(
-        try_path, "vlib", viua::support::env::get_paths("VIUAPATH"));
-    if (path.size() == 0) {
-        path =
-            viua::support::env::viua::get_mod_path(try_path, "vlib", VIUAPATH);
-    }
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            try_path, "vlib", viua::support::env::get_paths("VIUAAFTERPATH"));
-    }
-    return (path.size() > 0);
-}
-static auto is_foreign_module(std::string const& module) -> bool {
-    auto const module_sep = std::regex{"::"};
-    auto const module_base_name =
-        std::regex_replace(module, module_sep, "/");
-
-    auto path = viua::support::env::viua::get_mod_path(
-        module_base_name, "so", viua::support::env::get_paths("VIUAPATH"));
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(module_base_name, "so", VIUAPATH);
-    }
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            module_base_name, "so", viua::support::env::get_paths("VIUAAFTERPATH"));
-    }
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            module_base_name, "so", viua::support::env::get_paths("VIUA_LIBRARY_PATH"));
-    }
-    return (path.size() > 0);
-}
 void viua::kernel::Kernel::load_module(std::string module) {
-    if (is_native_module(module)) {
-        load_native_library(module);
-    } else if (is_foreign_module(module)) {
-        load_foreign_library(module);
-    } else {
-        throw make_unique<viua::types::Exception>(
-            "LinkException", ("failed to link library: " + module));
-    }
-}
-void viua::kernel::Kernel::load_native_library(std::string const& module) {
-    std::regex double_colon("::");
-    std::ostringstream oss;
-    oss << std::regex_replace(module, double_colon, "/");
-    std::string try_path = oss.str();
-    auto path            = viua::support::env::viua::get_mod_path(
-        try_path, "module", viua::support::env::get_paths("VIUAPATH"));
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            try_path, "module", VIUAPATH);
-    }
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            try_path, "module", viua::support::env::get_paths("VIUAAFTERPATH"));
-    }
-
-    if (path.size()) {
-        Loader loader(path);
-        loader.load();
-
-        std::unique_ptr<viua::internals::types::byte[]> lnk_btcd{
-            loader.get_bytecode()};
-
-        auto const fn_names = loader.get_functions();
-        auto const fn_addrs = loader.get_function_addresses();
-        for (auto const& fn_linkname : fn_names) {
-            linked_functions[fn_linkname] =
-                pair<std::string, viua::internals::types::byte*>(
-                    module, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
-        }
-
-        auto const bl_names = loader.get_blocks();
-        auto const bl_addrs = loader.get_block_addresses();
-        for (auto const& bl_linkname : bl_names) {
-            linked_blocks[bl_linkname] =
-                pair<std::string, viua::internals::types::byte*>(
-                    module, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
-        }
-
-        linked_modules[module] =
-            pair<viua::internals::types::bytecode_size,
-                 std::unique_ptr<viua::internals::types::byte[]>>(
-                loader.get_bytecode_size(), std::move(lnk_btcd));
-    } else {
-        throw make_unique<viua::types::Exception>("failed to link: " + module);
-    }
-}
-void viua::kernel::Kernel::load_foreign_library(std::string const& module) {
-    auto const module_sep = std::regex{"::"};
-    auto const mod_file = std::regex_replace(module, module_sep, "/");
-    auto path = support::env::viua::get_mod_path(
-        mod_file, "so", support::env::get_paths("VIUAPATH"));
-    if (path.size() == 0) {
-        path = support::env::viua::get_mod_path(mod_file, "so", VIUAPATH);
-    }
-    if (path.size() == 0) {
-        path = support::env::viua::get_mod_path(
-            mod_file, "so", support::env::get_paths("VIUAAFTERPATH"));
-    }
-    if (path.size() == 0) {
-        path = viua::support::env::viua::get_mod_path(
-            mod_file, "so", viua::support::env::get_paths("VIUA_LIBRARY_PATH"));
-    }
-
-    if (path.size() == 0) {
+    auto const module_path = viua::runtime::imports::find_module(module);
+    if (not module_path.has_value()) {
         throw make_unique<viua::types::Exception>(
             "LinkException", ("failed to link library: " + module));
     }
 
-    void* handle = dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
+    switch (module_path->first) {
+    case viua::runtime::imports::Module_type::Native:
+        load_native_module(module, module_path->second);
+        break;
+    case viua::runtime::imports::Module_type::Bytecode:
+        load_bytecode_module(module, module_path->second);
+        break;
+    default:
+        assert(false);
+    }
+}
+void viua::kernel::Kernel::load_bytecode_module(std::string_view const module_name, std::string const& module_path) {
+    Loader loader(module_path);
+    loader.load();
+
+    std::unique_ptr<viua::internals::types::byte[]> lnk_btcd{
+        loader.get_bytecode()};
+
+    auto const fn_names = loader.get_functions();
+    auto const fn_addrs = loader.get_function_addresses();
+    for (auto const& fn_linkname : fn_names) {
+        linked_functions[fn_linkname] =
+            std::pair<std::string, viua::internals::types::byte*>(
+                module_name, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
+    }
+
+    auto const bl_names = loader.get_blocks();
+    auto const bl_addrs = loader.get_block_addresses();
+    for (auto const& bl_linkname : bl_names) {
+        linked_blocks[bl_linkname] =
+            std::pair<std::string, viua::internals::types::byte*>(
+                module_name, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
+    }
+
+    linked_modules[std::string{module_name}] =
+        std::pair<viua::internals::types::bytecode_size,
+             std::unique_ptr<viua::internals::types::byte[]>>(
+            loader.get_bytecode_size(), std::move(lnk_btcd));
+}
+void viua::kernel::Kernel::load_native_module(std::string_view const module_name, std::string const& module_path) {
+    void* handle = dlopen(module_path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 
     if (handle == nullptr) {
         throw make_unique<viua::types::Exception>(
             "LinkException",
-            ("failed to open handle: " + module + ": " + dlerror()));
+            ("failed to open handle: " + std::string{module_name} + ": " + dlerror()));
     }
 
     using ExporterFunction   = const Foreign_function_spec* (*)();
     ExporterFunction exports = nullptr;
     if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports")))
         == nullptr) {
-        throw make_unique<viua::types::Exception>(
-            "failed to extract interface from module: " + module);
+        throw std::make_unique<viua::types::Exception>(
+            "failed to extract interface from module: " + std::string{module_name});
     }
 
     const Foreign_function_spec* exported = (*exports)();

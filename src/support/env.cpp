@@ -64,31 +64,4 @@ auto is_file(std::string const& path) -> bool {
     // file otherwise
     return true;
 }
-
-namespace viua {
-auto get_mod_path(std::string const& module,
-                  std::string const& extension,
-                  std::vector<std::string> const& paths) -> std::string {
-    auto path  = std::string{""};
-    auto found = false;
-
-    auto oss = std::ostringstream{};
-    for (auto const& each : paths) {
-        oss.str("");
-        oss << each << '/' << module << '.' << extension;
-        path = oss.str();
-        if (path[0] == '~') {
-            oss.str("");
-            oss << getenv("HOME") << path.substr(1);
-            path = oss.str();
-        }
-
-        if ((found = support::env::is_file(path))) {
-            break;
-        }
-    }
-
-    return (found ? path : "");
-}
-}  // namespace viua
 }}}  // namespace viua::support::env
