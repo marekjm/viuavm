@@ -756,12 +756,26 @@ standardlibrary: build/bin/vm/asm \
 	build/stdlib/std/functional.module \
 	build/stdlib/std/misc.module
 
+build/stdlib/Std/Os.so: build/stdlib/std/os.so
+	mkdir -p build/stdlib/Std
+	cp -v $^ $@
+
+build/stdlib/Std/Io.so: build/stdlib/std/io.so
+	mkdir -p build/stdlib/Std
+	cp -v $^ $@
+
+build/stdlib/Std/Random.so: build/stdlib/std/random.so
+	mkdir -p build/stdlib/Std
+	cp -v $^ $@
+
 stdlib: build/bin/vm/asm \
 	standardlibrary \
 	build/stdlib/std/typesystem.so \
 	build/stdlib/std/os.so \
+	build/stdlib/Std/Os.so \
 	build/stdlib/std/io.so \
-	build/stdlib/std/random.so \
+	build/stdlib/Std/Io.so \
+	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
 ####
