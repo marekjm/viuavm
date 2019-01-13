@@ -38,15 +38,15 @@ using namespace std;
 
 static auto print_stack_trace_default(viua::process::Process* process) -> void {
     auto trace = process->trace();
-    cerr << "stack trace: from entry point, most recent call last...\n";
+    std::cerr << "stack trace: from entry point, most recent call last...\n";
     decltype(trace)::size_type i = 0;
     if (viua::support::env::get_var("VIUA_STACK_TRACES") != "full") {
         i = (trace.size() and trace[0]->function_name == "__entry");
     }
     for (; i < trace.size(); ++i) {
-        cerr << "  " << stringify_function_invocation(trace[i]) << "\n";
+        std::cerr << "  " << stringify_function_invocation(trace[i]) << "\n";
     }
-    cerr << "\n";
+    std::cerr << "\n";
 
     std::unique_ptr<viua::types::Value> thrown_object(
         process->transfer_active_exception());
@@ -55,11 +55,11 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
 
     // cerr << "failed instruction: " <<
     // get<0>(disassembler::instruction(process->execution_at())) << endl;
-    cerr << "uncaught object: " << ex_type << " = "
+    std::cerr << "uncaught object: " << ex_type << " = "
          << (ex ? ex->what() : thrown_object->str()) << endl;
-    cerr << "\n";
+    std::cerr << "\n";
 
-    cerr << "frame details:\n";
+    std::cerr << "frame details:\n";
 
     if (trace.size()) {
         Frame* last = trace.back();
@@ -73,27 +73,27 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
                     ++non_empty;
                 }
             }
-            cerr << "  non-empty registers: " << non_empty << '/'
+            std::cerr << "  non-empty registers: " << non_empty << '/'
                  << last->local_register_set->size();
-            cerr << (non_empty ? ":\n" : "\n");
+            std::cerr << (non_empty ? ":\n" : "\n");
             for (decltype(last->local_register_set->size()) r = 0;
                  r < last->local_register_set->size();
                  ++r) {
                 if (last->local_register_set->at(r) == nullptr) {
                     continue;
                 }
-                cerr << "    registers[" << r << "]: ";
-                cerr << '<' << last->local_register_set->get(r)->type() << "> "
+                std::cerr << "    registers[" << r << "]: ";
+                std::cerr << '<' << last->local_register_set->get(r)->type() << "> "
                      << last->local_register_set->get(r)->str() << endl;
             }
         } else if (not last->local_register_set.owns()) {
-            cerr << "  this frame did not own its registers" << endl;
+            std::cerr << "  this frame did not own its registers" << endl;
         } else {
-            cerr << "  no registers were allocated for this frame" << endl;
+            std::cerr << "  no registers were allocated for this frame" << endl;
         }
 
         if (last->arguments->size()) {
-            cerr << "  non-empty arguments (out of " << last->arguments->size()
+            std::cerr << "  non-empty arguments (out of " << last->arguments->size()
                  << "):" << endl;
             for (decltype(last->arguments->size()) r = 0;
                  r < last->arguments->size();
@@ -101,7 +101,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
                 if (last->arguments->at(r) == nullptr) {
                     continue;
                 }
-                cerr << "    arguments[" << r << "]: ";
+                std::cerr << "    arguments[" << r << "]: ";
                 if (last->arguments->isflagged(r, MOVED)) {
                     cerr << "[moved] ";
                 }
@@ -497,7 +497,7 @@ bool viua::scheduler::Virtual_process_scheduler::burst() {
 
                 auto trace = th->trace();
 
-                ostringstream errss;
+                std::ostringstream errss;
 #if VIUA_VM_DEBUG_LOG
                 viua_err(errss,
                          "process ",
@@ -528,7 +528,7 @@ bool viua::scheduler::Virtual_process_scheduler::burst() {
 #if VIUA_VM_DEBUG_LOG
                 viua_err(errss, " has terminated");
 #endif
-                cerr << (errss.str() + '\n');
+                std::cerr << (errss.str() + '\n');
 
                 print_stack_trace(th);
 

@@ -29,7 +29,6 @@
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 
 auto viua::process::Process::opprocess(Op_address_type addr)
@@ -39,7 +38,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
         viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
@@ -49,13 +48,13 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     auto const ot  = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
         auto fn = viua::util::memory::dumb_ptr<viua::types::Function>{nullptr};
-        tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Function>(addr, this);
 
         call_name = fn->name();
 
         if (fn->type() == "Closure") {
-            throw make_unique<viua::types::Exception>(
+            throw std::make_unique<viua::types::Exception>(
                 "cannot spawn a process from closure");
         }
     } else {
@@ -67,7 +66,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>("call to undefined function: "
+        throw std::make_unique<viua::types::Exception>("call to undefined function: "
                                                   + call_name);
     }
 
@@ -76,7 +75,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     auto spawned_process =
         scheduler->spawn(std::move(stack->frame_new), this, target_is_void);
     if (not target_is_void) {
-        *target = make_unique<viua::types::Process>(spawned_process);
+        *target = std::make_unique<viua::types::Process>(spawned_process);
     }
 
     return addr;
@@ -94,22 +93,22 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     auto thrd = viua::util::memory::dumb_ptr<viua::types::Process>{nullptr};
-    tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<
+    std::tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Process>(addr, this);
 
     viua::internals::types::timeout timeout = 0;
-    tie(addr, timeout) =
+    std::tie(addr, timeout) =
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (not scheduler->is_joinable(thrd->pid())) {
-        throw make_unique<viua::types::Exception>("process cannot be joined");
+        throw std::make_unique<viua::types::Exception>("process cannot be joined");
     }
 
     if (timeout and not timeout_active) {
@@ -136,7 +135,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
         timeout_active      = false;
         wait_until_infinity = false;
         stack->thrown =
-            make_unique<viua::types::Exception>("process did not join");
+            std::make_unique<viua::types::Exception>("process did not join");
         return_addr = addr;
     }
 
@@ -147,15 +146,15 @@ auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
      */
     auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (auto const thrd = dynamic_cast<viua::types::Process*>(target->get())) {
         scheduler->send(thrd->pid(), source->give());
     } else {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "invalid type: expected viua::process::Process");
     }
 
@@ -175,14 +174,14 @@ auto viua::process::Process::opreceive(Op_address_type addr)
         viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     viua::internals::types::timeout timeout = 0;
-    tie(addr, timeout) =
+    std::tie(addr, timeout) =
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (timeout and not timeout_active) {
@@ -215,7 +214,7 @@ auto viua::process::Process::opreceive(Op_address_type addr)
             timeout_active      = false;
             wait_until_infinity = false;
             stack->thrown =
-                make_unique<viua::types::Exception>("no message received");
+                std::make_unique<viua::types::Exception>("no message received");
             return_addr = addr;
         }
     }
@@ -225,24 +224,24 @@ auto viua::process::Process::opreceive(Op_address_type addr)
 auto viua::process::Process::opwatchdog(Op_address_type addr)
     -> Op_address_type {
     auto call_name = std::string{};
-    tie(addr, call_name) =
+    std::tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     auto const is_native  = scheduler->is_native_function(call_name);
     auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "watchdog process must be a native function, used foreign "
             + call_name);
     }
 
     if (not watchdog_function.empty()) {
-        throw make_unique<viua::types::Exception>("watchdog already set");
+        throw std::make_unique<viua::types::Exception>("watchdog already set");
     }
 
     watchdog_function = call_name;
@@ -253,10 +252,10 @@ auto viua::process::Process::opself(Op_address_type addr) -> Op_address_type {
     /*  Run process instruction.
      */
     auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = make_unique<viua::types::Process>(this);
+    *target = std::make_unique<viua::types::Process>(this);
 
     return addr;
 }
