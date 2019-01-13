@@ -355,8 +355,10 @@ viua::process::Process* viua::scheduler::Virtual_process_scheduler::spawn(
      * processes in the "N bottles of beer" bechmark: 16384 bottles, 8
      * schedulers, on a CPU with 4 physical cores.
      */
-    if (processes.size()
-        > ((total_processes / running_schedulers) / 100 * 140)) {
+    auto const calculated_current_load =
+        ((static_cast<double>(total_processes) / static_cast<double>(running_schedulers)) * 1.4);
+    auto const is_overburdened = (static_cast<double>(processes.size()) > calculated_current_load);
+    if ((running_schedulers > 1) and is_overburdened) {
 #if VIUA_VM_DEBUG_LOG
         viua_err("[scheduler:vps:",
                  this,
