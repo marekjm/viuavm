@@ -563,7 +563,9 @@ auto generate(std::vector<Token> const& tokens,
                    std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto linked_function_names        = std::vector<std::string>{};
     auto static_linked_function_names = std::vector<std::string>{};
+    auto static_linked_block_names = std::vector<std::string>{};
     auto visible_function_names       = std::vector<std::string>{};
+    auto visible_block_names       = std::vector<std::string>{};
     auto linked_block_names           = std::vector<std::string>{};
     auto linked_libs_jumptables =
         std::map<std::string,
@@ -602,35 +604,66 @@ auto generate(std::vector<Token> const& tokens,
         auto loader = Loader{lnk};
         loader.load();
 
-        auto fn_names = loader.get_functions();
-        for (auto const& fn : fn_names) {
-            if (function_addresses.count(fn)) {
-                throw("duplicate symbol '" + fn + "' found when linking '" + lnk
-                      + "' (previously found in '" + symbol_sources.at(fn)
-                      + "')");
+        {
+            auto fn_names = loader.get_functions();
+            for (auto const& fn : fn_names) {
+                if (function_addresses.count(fn)) {
+                    throw("duplicate symbol '" + fn + "' found when linking '" + lnk
+                          + "' (previously found in '" + symbol_sources.at(fn)
+                          + "')");
+                }
+            }
+            for (auto const& fn : fn_names) {
+                function_addresses[fn] = 0;  // for now we just build a list of all
+                                             // available functions
+                symbol_sources[fn] = lnk;
+                linked_function_names.emplace_back(fn);
+                static_linked_function_names.emplace_back(fn);
+                visible_function_names.push_back(fn);
+
+                if (flags.verbose) {
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << "marking function \""
+                              << send_control_seq(COLOR_FG_WHITE) << fn
+                              << send_control_seq(ATTR_RESET) << "\" (from \""
+                              << send_control_seq(COLOR_FG_WHITE) << lnk
+                              << send_control_seq(ATTR_RESET) << "\") as visible"
+                              << std::endl;
+                }
             }
         }
+        {
+            auto bl_names = loader.get_blocks();
+            for (auto const& bl : bl_names) {
+                if (block_addresses.count(bl)) {
+                    throw("duplicate symbol '" + bl + "' found when linking '" + lnk
+                          + "' (previously found in '" + symbol_sources.at(bl)
+                          + "')");
+                }
+            }
+            for (auto const& bl : bl_names) {
+                block_addresses[bl] = 0;  // for now we just build a list of all
+                                          // available functions
+                symbol_sources[bl] = lnk;
+                linked_block_names.emplace_back(bl);
+                static_linked_block_names.emplace_back(bl);
+                visible_block_names.push_back(bl);
 
-        auto fn_addresses = loader.get_function_addresses();
-        for (auto const& fn : fn_names) {
-            function_addresses[fn] = 0;  // for now we just build a list of all
-                                         // available functions
-            symbol_sources[fn] = lnk;
-            linked_function_names.emplace_back(fn);
-            static_linked_function_names.emplace_back(fn);
-            visible_function_names.push_back(fn);
-
-            if (flags.verbose) {
-                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                          << send_control_seq(ATTR_RESET) << ": "
-                          << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                          << send_control_seq(ATTR_RESET) << ": "
-                          << "marking function \""
-                          << send_control_seq(COLOR_FG_WHITE) << fn
-                          << send_control_seq(ATTR_RESET) << "\" (from \""
-                          << send_control_seq(COLOR_FG_WHITE) << lnk
-                          << send_control_seq(ATTR_RESET) << "\") as visible"
-                          << std::endl;
+                if (flags.verbose) {
+                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                              << send_control_seq(ATTR_RESET) << ": "
+                              << "marking block \""
+                              << send_control_seq(COLOR_FG_WHITE) << bl
+                              << send_control_seq(ATTR_RESET) << "\" (from \""
+                              << send_control_seq(COLOR_FG_WHITE) << lnk
+                              << send_control_seq(ATTR_RESET) << "\") as visible"
+                              << std::endl;
+                }
             }
         }
     }
@@ -750,47 +783,92 @@ auto generate(std::vector<Token> const& tokens,
             auto loader = Loader{lnk.second};
             loader.load();
 
-            auto fn_names = loader.get_functions();
-            for (auto fn : fn_names) {
-                /*
-                 * For functions found in current module, and in statically
-                 * imported modules.
-                 */
-                if (function_addresses.count(fn)) {
-                    throw("duplicate symbol '" + fn + "' found when linking '"
-                          + lnk.first + "' (previously found in '"
-                          + symbol_sources.at(fn) + "')");
-                }
+            {
+                auto fn_names = loader.get_functions();
+                for (auto fn : fn_names) {
+                    /*
+                     * For functions found in current module, and in statically
+                     * imported modules.
+                     */
+                    if (function_addresses.count(fn)) {
+                        throw("duplicate symbol '" + fn + "' found when linking '"
+                              + lnk.first + "' (previously found in '"
+                              + symbol_sources.at(fn) + "')");
+                    }
 
-                /*
-                 * For functions found dynamically imported modules.
-                 */
-                if (std::find(linked_function_names.begin(),
-                              linked_function_names.end(),
-                              fn)
-                    != linked_function_names.end()) {
-                    throw("duplicate symbol '" + fn + "' found when linking '"
-                          + lnk.first + "' (previously found in '"
-                          + symbol_sources.at(fn) + "')");
+                    /*
+                     * For functions found dynamically imported modules.
+                     */
+                    if (std::find(linked_function_names.begin(),
+                                  linked_function_names.end(),
+                                  fn)
+                        != linked_function_names.end()) {
+                        throw("duplicate symbol '" + fn + "' found when linking '"
+                              + lnk.first + "' (previously found in '"
+                              + symbol_sources.at(fn) + "')");
+                    }
+                }
+                for (auto const& fn : fn_names) {
+                    symbol_sources[fn] = lnk.first;
+                    linked_function_names.emplace_back(fn);
+                    visible_function_names.push_back(fn);
+
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                                  << send_control_seq(ATTR_RESET) << ": "
+                                  << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                                  << send_control_seq(ATTR_RESET) << ": "
+                                  << "marking function \""
+                                  << send_control_seq(COLOR_FG_WHITE) << fn
+                                  << send_control_seq(ATTR_RESET) << "\" (from \""
+                                  << send_control_seq(COLOR_FG_WHITE) << lnk.first
+                                  << send_control_seq(ATTR_RESET)
+                                  << "\") as visible" << std::endl;
+                    }
                 }
             }
+            {
+                auto bl_names = loader.get_blocks();
+                for (auto bl : bl_names) {
+                    /*
+                     * For blocks found in current module, and in statically
+                     * imported modules.
+                     */
+                    if (block_addresses.count(bl)) {
+                        throw("duplicate symbol '" + bl + "' found when linking '"
+                              + lnk.first + "' (previously found in '"
+                              + symbol_sources.at(bl) + "')");
+                    }
 
-            for (auto const& fn : fn_names) {
-                symbol_sources[fn] = lnk.first;
-                linked_function_names.emplace_back(fn);
-                visible_function_names.push_back(fn);
+                    /*
+                     * For blocks found dynamically imported modules.
+                     */
+                    if (std::find(linked_block_names.begin(),
+                                  linked_block_names.end(),
+                                  bl)
+                        != linked_block_names.end()) {
+                        throw("duplicate symbol '" + bl + "' found when linking '"
+                              + lnk.first + "' (previously found in '"
+                              + symbol_sources.at(bl) + "')");
+                    }
+                }
+                for (auto const& bl : bl_names) {
+                    symbol_sources[bl] = lnk.first;
+                    linked_block_names.emplace_back(bl);
+                    visible_block_names.push_back(bl);
 
-                if (flags.verbose) {
-                    std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                              << send_control_seq(ATTR_RESET) << ": "
-                              << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                              << send_control_seq(ATTR_RESET) << ": "
-                              << "marking function \""
-                              << send_control_seq(COLOR_FG_WHITE) << fn
-                              << send_control_seq(ATTR_RESET) << "\" (from \""
-                              << send_control_seq(COLOR_FG_WHITE) << lnk.first
-                              << send_control_seq(ATTR_RESET)
-                              << "\") as visible" << std::endl;
+                    if (flags.verbose) {
+                        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                                  << send_control_seq(ATTR_RESET) << ": "
+                                  << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                                  << send_control_seq(ATTR_RESET) << ": "
+                                  << "marking block \""
+                                  << send_control_seq(COLOR_FG_WHITE) << bl
+                                  << send_control_seq(ATTR_RESET) << "\" (from \""
+                                  << send_control_seq(COLOR_FG_WHITE) << lnk.first
+                                  << send_control_seq(ATTR_RESET)
+                                  << "\") as visible" << std::endl;
+                    }
                 }
             }
         }
@@ -803,11 +881,17 @@ auto generate(std::vector<Token> const& tokens,
     for (auto const& name : static_linked_function_names) {
         functions.names.emplace_back(name);
     }
+    auto local_block_names = blocks.names;
+    for (auto const& name : static_linked_block_names) {
+        blocks.names.emplace_back(name);
+    }
 
 
     if (not flags.as_lib) {
-        // check if our initial guess for main function is correct and
-        // detect some main-function-related errors
+        /*
+         * Check if our initial guess for main function is correct and
+         * detect some main-function-related errors
+         */
         auto main_function_found = std::vector<std::string>{};
         for (auto f : functions.names) {
             if (f == "main/0" or f == "main/1" or f == "main/2") {
@@ -854,14 +938,22 @@ auto generate(std::vector<Token> const& tokens,
         auto loader = Loader{lnk};
         loader.load();
 
-        auto fn_names = loader.get_functions();
-
         auto lib_jumps              = loader.get_jumps();
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        auto fn_addresses = loader.get_function_addresses();
-        for (auto const& fn : fn_names) {
-            function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
+        {
+            auto fn_names = loader.get_functions();
+            auto fn_addresses = loader.get_function_addresses();
+            for (auto const& fn : fn_names) {
+                function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
+            }
+        }
+        {
+            auto bl_names = loader.get_blocks();
+            auto bl_addresses = loader.get_block_addresses();
+            for (auto const& bl : bl_names) {
+                block_addresses[bl] = bl_addresses.at(bl) + current_link_offset;
+            }
         }
 
         linked_libs_bytecode.emplace_back(
@@ -887,6 +979,27 @@ auto generate(std::vector<Token> const& tokens,
                           << "\" loaded at the same address as \"";
                 std::cerr << send_control_seq(COLOR_FG_WHITE)
                           << address_of_fn.at(addr) << '"'
+                          << send_control_seq(ATTR_RESET) << '\n';
+                exit(1);
+            }
+        }
+    }
+    {
+        std::map<viua::internals::types::bytecode_size, std::string>
+            address_of_bl;
+        for (auto const [name, addr] : block_addresses) {
+            if (not address_of_bl.insert({addr, name}).second) {
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET);
+                std::cerr << ": ";
+                std::cerr << send_control_seq(COLOR_FG_RED) << "error"
+                          << send_control_seq(ATTR_RESET);
+                std::cerr << ": block \"";
+                std::cerr << send_control_seq(COLOR_FG_WHITE) << name
+                          << send_control_seq(ATTR_RESET)
+                          << "\" loaded at the same address as \"";
+                std::cerr << send_control_seq(COLOR_FG_WHITE)
+                          << address_of_bl.at(addr) << '"'
                           << send_control_seq(ATTR_RESET) << '\n';
                 exit(1);
             }
@@ -986,9 +1099,9 @@ auto generate(std::vector<Token> const& tokens,
             throw("in block '" + name + "': " + e.what());
         }
 
-        auto func = Program{fun_bytes};
+        auto blok = Program{fun_bytes};
         try {
-            assemble(func, strip_attributes(blocks.tokens.at(name)));
+            assemble(blok, strip_attributes(blocks.tokens.at(name)));
         } catch (std::string const& e) {
             throw("in block '" + name + "': " + e);
         } catch (const char*& e) {
@@ -997,7 +1110,7 @@ auto generate(std::vector<Token> const& tokens,
             throw("in block '" + name + "': " + e.what());
         }
 
-        auto jumps = func.jumps();
+        auto jumps = blok.jumps();
 
         auto local_jumps =
             std::vector<tuple<viua::internals::types::bytecode_size,
@@ -1005,15 +1118,15 @@ auto generate(std::vector<Token> const& tokens,
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
-        func.calculate_jumps(local_jumps, blocks.tokens.at(name));
+        blok.calculate_jumps(local_jumps, blocks.tokens.at(name));
 
-        auto btcode = func.bytecode();
+        auto btcode = blok.bytecode();
 
         // store generated bytecode fragment for future use (we must not yet
         // write it to the file to conform to bytecode format)
         block_bodies_bytecode[name] =
-            tuple<viua::internals::types::bytecode_size, decltype(btcode)>(
-                func.size(), std::move(btcode));
+            std::tuple<viua::internals::types::bytecode_size, decltype(btcode)>(
+                blok.size(), std::move(btcode));
 
         // extend jump table with jumps from current block
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
@@ -1021,7 +1134,7 @@ auto generate(std::vector<Token> const& tokens,
             jump_table.emplace_back(jmp + block_bodies_section_size);
         }
 
-        block_bodies_section_size += func.size();
+        block_bodies_section_size += blok.size();
     }
 
     // functions section size, must be offset by the size of block section
@@ -1204,6 +1317,14 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     viua::internals::types::bytecode_size functions_size_so_far =
         write_code_blocks_section(out, blocks, linked_block_names);
+    for (auto const& name : static_linked_block_names) {
+        strwrite(out, name);
+        // mapped address must come after name
+        viua::internals::types::bytecode_size address =
+            block_addresses[name];
+        bwrite(out, address);
+    }
+
     write_code_blocks_section(
         out, functions, static_linked_function_names, functions_size_so_far);
     for (auto const& name : static_linked_function_names) {
