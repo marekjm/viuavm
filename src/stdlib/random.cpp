@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -37,9 +37,9 @@ static auto getrandom() -> long double {
      *
      *  This is a utility function exposed to Viua.
      */
-    ifstream in("/dev/urandom");
+    std::ifstream in("/dev/urandom");
     if (!in) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "failed to open random device: /dev/urandom");
     }
     unsigned long long int rullint = 0;
@@ -97,8 +97,9 @@ static auto random_random(Frame* frame,
                           viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
      */
+    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, make_unique<viua::types::Float>(getrandom()));
+        0, std::make_unique<viua::types::Float>(getrandom()));
 }
 
 static auto random_randint(Frame* frame,
@@ -116,6 +117,8 @@ static auto random_randint(Frame* frame,
     auto upper_bound =
         static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
     auto modifer = ((upper_bound - lower_bound) * getrandom());
+
+    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
         0, make_unique<viua::types::Integer>(lower_bound + modifer));
 }
