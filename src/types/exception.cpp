@@ -41,7 +41,7 @@ std::string viua::types::Exception::etype() const {
 }
 
 std::string viua::types::Exception::type() const {
-    return "Exception";
+    return detailed_type;
 }
 std::string viua::types::Exception::str() const {
     return cause;

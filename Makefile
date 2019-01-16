@@ -767,6 +767,10 @@ build/stdlib/Std/Io.so: build/stdlib/std/io.so
 	mkdir -p build/stdlib/Std
 	cp -v $^ $@
 
+build/stdlib/Std/Posix/Network.so: build/stdlib/std/posix/network.so
+	mkdir -p build/stdlib/Std/Posix
+	cp -v $^ $@
+
 build/stdlib/Std/Random.so: build/stdlib/std/random.so
 	mkdir -p build/stdlib/Std
 	cp -v $^ $@
@@ -778,6 +782,8 @@ stdlib: build/bin/vm/asm \
 	build/stdlib/Std/Os.so \
 	build/stdlib/std/io.so \
 	build/stdlib/Std/Io.so \
+	build/stdlib/std/posix/network.so \
+	build/stdlib/Std/Posix/Network.so \
 	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
@@ -809,6 +815,8 @@ build/stdlib/std/typesystem.so: build/stdlib/std/typesystem.o
 build/stdlib/std/os.so: build/stdlib/std/os.o
 
 build/stdlib/std/io.so: build/stdlib/std/io.o
+
+build/stdlib/std/posix/network.so: build/stdlib/std/posix/network.o
 
 build/stdlib/std/random.so: build/stdlib/std/random.o
 
