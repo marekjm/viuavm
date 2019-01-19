@@ -673,6 +673,8 @@ auto viua::assembler::frontend::static_analyser::to_reportable_error(
     std::string_view const s) -> std::optional<Reportable_error> {
     if (s == "-Wunused-register") {
         return Reportable_error::Unused_register;
+    } else if (s == "-Wunused-value") {
+        return Reportable_error::Unused_value;
     }
     return {};
 }

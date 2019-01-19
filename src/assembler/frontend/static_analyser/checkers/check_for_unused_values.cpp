@@ -28,6 +28,10 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_for_unused_values(
     Register_usage_profile const& register_usage_profile) -> void {
+    if (allowed_error(Reportable_error::Unused_value)) {
+        return;
+    }
+
     for (auto const& each : register_usage_profile) {
         if (not each.first.index) {
             /*

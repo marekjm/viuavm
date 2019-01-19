@@ -169,6 +169,7 @@ class Register_usage_profile {
 
 enum class Reportable_error {
     Unused_register,
+    Unused_value,
 };
 auto to_reportable_error(std::string_view const)
     -> std::optional<Reportable_error>;

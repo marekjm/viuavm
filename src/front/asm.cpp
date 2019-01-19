@@ -112,7 +112,8 @@ static bool usage(const char* program,
             << "--no-sa              - disable static checking of register "
                "accesses\n"
             << "    "
-            << "-Wunused-register    - disable unused register warnings\n";
+            << "-Wunused-register    - disable unused register warnings\n"
+            << "-Wunused-value       - disable unused value warnings\n";
     }
 
     return (show_help or show_version);
