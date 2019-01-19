@@ -73,7 +73,7 @@ static auto socket(Frame* frame,
             { ENOBUFS, "ENOBUFS", },
             { ENOMEM, "ENOMEM", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -102,33 +102,33 @@ static auto connect(Frame* frame,
     if (::connect(static_cast<int>(sock), reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -154,33 +154,33 @@ static auto bind(Frame* frame,
     if (::bind(static_cast<int>(sock), reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -201,33 +201,33 @@ static auto listen(Frame* frame,
     if (::listen(static_cast<int>(sock), static_cast<int>(backlog)) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -246,34 +246,34 @@ static auto accept(Frame* frame,
     if (incoming == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
-            throw std::make_unique<viua::types::Exception>("Unknown_errno");
+        if (not known_errors.count(error_number)) {
+            throw std::make_unique<viua::types::Exception>("accept(3): Unknown_errno: " + std::to_string(error_number));
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
     }
@@ -297,33 +297,33 @@ static auto write(Frame* frame,
     if (written == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -352,33 +352,33 @@ static auto read(Frame* frame,
     if (n_bytes == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -408,38 +408,44 @@ static auto recv(Frame* frame,
     if (n_bytes == 0) {
         throw std::make_unique<viua::types::Exception>("Eof", "end of file reached");
     }
-
     if (n_bytes == -1) {
         auto const error_number = errno;
+        if (error_number == EAGAIN) {
+            throw std::make_unique<viua::types::Exception>("Eagain", "try again");
+        }
+        if (error_number == EWOULDBLOCK) {
+            throw std::make_unique<viua::types::Exception>("Ewouldblock", "would block");
+        }
+
         auto const known_errors = std::map<decltype(error_number), std::string>{
-            { EADDRNOTAVAIL, "E", },
-            { EAFNOSUPPORT, "E", },
-            { EALREADY, "E", },
-            { EBADF, "E", },
-            { ECONNREFUSED, "E", },
-            { EINPROGRESS, "E", },
-            { EINTR, "E", },
-            { EISCONN, "E", },
-            { ENETUNREACH, "E", },
-            { ENOTSOCK, "E", },
-            { EPROTOTYPE, "E", },
-            { ETIMEDOUT, "E", },
-            { EIO, "E", },
-            { ELOOP, "E", },
-            { ENAMETOOLONG, "E", },
-            { ENOENT, "E", },
-            { ENOTDIR, "E", },
-            { EACCES, "E", },
-            { EADDRINUSE, "E", },
-            { ECONNRESET, "E", },
-            { EHOSTUNREACH, "E", },
-            { EINVAL, "E", },
-            { ENETDOWN, "E", },
-            { ENOBUFS, "E", },
-            { EOPNOTSUPP, "E", },
+            { EADDRNOTAVAIL, "EADDRNOTAVAIL", },
+            { EAFNOSUPPORT, "EAFNOSUPPORT", },
+            { EALREADY, "EALREADY", },
+            { EBADF, "EBADF", },
+            { ECONNREFUSED, "ECONNREFUSED", },
+            { EINPROGRESS, "EINPROGRESS", },
+            { EINTR, "EINTR", },
+            { EISCONN, "EISCONN", },
+            { ENETUNREACH, "ENETUNREACH", },
+            { ENOTSOCK, "ENOTSOCK", },
+            { EPROTOTYPE, "EPROTOTYPE", },
+            { ETIMEDOUT, "ETIMEDOUT", },
+            { EIO, "EIO", },
+            { ELOOP, "ELOOP", },
+            { ENAMETOOLONG, "ENAMETOOLONG", },
+            { ENOENT, "ENOENT", },
+            { ENOTDIR, "ENOTDIR", },
+            { EACCES, "EACCES", },
+            { EADDRINUSE, "EADDRINUSE", },
+            { ECONNRESET, "ECONNRESET", },
+            { EHOSTUNREACH, "EHOSTUNREACH", },
+            { EINVAL, "EINVAL", },
+            { ENETDOWN, "ENETDOWN", },
+            { ENOBUFS, "ENOBUFS", },
+            { EOPNOTSUPP, "EOPNOTSUPP", },
         };
-        if (known_errors.count(error_number)) {
-            throw std::make_unique<viua::types::Exception>("Unknown_errno");
+        if (not known_errors.count(error_number)) {
+            throw std::make_unique<viua::types::Exception>("recv(3): Unknown_errno: " + std::to_string(error_number));
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
     }
@@ -466,7 +472,7 @@ static auto shutdown(Frame* frame,
             { ENOTSOCK, "ENOTSOCK", },
             { ENOBUFS, "ENOBUFS", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
@@ -486,7 +492,7 @@ static auto close(Frame* frame,
             { EINTR, "EINTR", },
             { EIO, "EIO", },
         };
-        if (known_errors.count(error_number)) {
+        if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>("Unknown_errno");
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
