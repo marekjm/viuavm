@@ -84,6 +84,33 @@ static auto socket(Frame* frame,
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
     }
+    {
+        auto const val = 1;
+        auto const res = ::setsockopt(
+              sock
+            , SOL_SOCKET
+            , SO_REUSEADDR
+            , reinterpret_cast<void const*>(&val)
+            , sizeof(val)
+        );
+        if (res == -1) {
+            auto const error_number = errno;
+            auto const known_errors = std::map<decltype(error_number), std::string>{
+                { EBADF, "EAFNOSUPPORT", },
+                { EDOM, "EDOM", },
+                { EINVAL, "EINVAL", },
+                { EISCONN, "EISCONN", },
+                { ENOPROTOOPT, "ENOPROTOOPT", },
+                { ENOTSOCK, "ENOTSOCK", },
+                { ENOMEM, "ENOMEM", },
+                { ENOBUFS, "ENOBUFS", },
+            };
+            if (not known_errors.count(error_number)) {
+                throw std::make_unique<viua::types::Exception>("setsockopt(3): Unknown_errno: " + std::to_string(error_number));
+            }
+            throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
+        }
+    }
 
     frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(sock));
