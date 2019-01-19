@@ -19,7 +19,7 @@
 
 #include <arpa/inet.h>  // for inet_pton(3), htons(3)
 #include <string.h>     // for memset(3)
-#include <sys/socket.h> // for socket(3), connect(3), listen(3), accept(3), shutdown(3)
+#include <sys/socket.h> // for socket(3), connect(3), listen(3), accept(3), shutdown(3), recv(3)
 #include <unistd.h>     // for close(3), write(3), read(3)
 
 #include <iostream>
@@ -390,6 +390,66 @@ static auto read(Frame* frame,
     ));
 }
 
+static auto recv(Frame* frame,
+                 viua::kernel::Register_set*,
+                 viua::kernel::Register_set*,
+                 viua::process::Process*,
+                 viua::kernel::Kernel*) -> void {
+    auto const sock = static_cast<int>(
+        static_cast<viua::types::Integer*>(
+            frame->arguments->get(0))->as_integer());
+    auto const buffer_length = static_cast<size_t>(
+        static_cast<viua::types::Integer*>(
+            frame->arguments->get(0))->as_integer());
+
+    auto buffer = std::vector<char>(buffer_length, '\0');
+    auto const n_bytes = ::recv(sock, buffer.data(), buffer.size(), 0);
+
+    if (n_bytes == 0) {
+        throw std::make_unique<viua::types::Exception>("Eof", "end of file reached");
+    }
+
+    if (n_bytes == -1) {
+        auto const error_number = errno;
+        auto const known_errors = std::map<decltype(error_number), std::string>{
+            { EADDRNOTAVAIL, "E", },
+            { EAFNOSUPPORT, "E", },
+            { EALREADY, "E", },
+            { EBADF, "E", },
+            { ECONNREFUSED, "E", },
+            { EINPROGRESS, "E", },
+            { EINTR, "E", },
+            { EISCONN, "E", },
+            { ENETUNREACH, "E", },
+            { ENOTSOCK, "E", },
+            { EPROTOTYPE, "E", },
+            { ETIMEDOUT, "E", },
+            { EIO, "E", },
+            { ELOOP, "E", },
+            { ENAMETOOLONG, "E", },
+            { ENOENT, "E", },
+            { ENOTDIR, "E", },
+            { EACCES, "E", },
+            { EADDRINUSE, "E", },
+            { ECONNRESET, "E", },
+            { EHOSTUNREACH, "E", },
+            { EINVAL, "E", },
+            { ENETDOWN, "E", },
+            { ENOBUFS, "E", },
+            { EOPNOTSUPP, "E", },
+        };
+        if (known_errors.count(error_number)) {
+            throw std::make_unique<viua::types::Exception>("Unknown_errno");
+        }
+        throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
+    }
+
+    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0, std::make_unique<viua::types::String>(
+        std::string{buffer.data(), static_cast<std::string::size_type>(n_bytes)}
+    ));
+}
+
 static auto shutdown(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
@@ -442,6 +502,7 @@ const Foreign_function_spec functions[] = {
     {"std::posix::network::accept/1", &viua::stdlib::posix::network::accept},
     {"std::posix::network::write/2", &viua::stdlib::posix::network::write},
     {"std::posix::network::read/1", &viua::stdlib::posix::network::read},
+    {"std::posix::network::recv/2", &viua::stdlib::posix::network::recv},
     {"std::posix::network::shutdown/1", &viua::stdlib::posix::network::shutdown},
     {"std::posix::network::close/1", &viua::stdlib::posix::network::close},
     {nullptr, nullptr},
