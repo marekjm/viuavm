@@ -19,7 +19,13 @@
 
 #include <arpa/inet.h>  // for inet_pton(3), htons(3)
 #include <string.h>     // for memset(3)
-#include <sys/socket.h> // for socket(3), connect(3), listen(3), accept(3), shutdown(3), recv(3)
+#include <sys/socket.h> // for socket(3)
+                        //   , connect(3)
+                        //   , listen(3)
+                        //   , accept(3)
+                        //   , shutdown(3)
+                        //   , recv(3)
+                        //   , setsockopt(3)
 #include <unistd.h>     // for close(3), write(3), read(3)
 
 #include <iostream>
@@ -276,6 +282,35 @@ static auto accept(Frame* frame,
             throw std::make_unique<viua::types::Exception>("accept(3): Unknown_errno: " + std::to_string(error_number));
         }
         throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
+    }
+    {
+        timeval timeout_length;
+        memset(timeout_length, 0);
+        timeout_length.tv_usec = 500000;  // 500ms
+        auto const res = ::setsockopt(
+              incoming
+            , SOL_SOCKET
+            , SO_RCVTIMEO
+            , reinterpret_cast<void const*>(&timeout_length)
+            , sizeof(timeout_length)
+        );
+        if (res == -1) {
+            auto const error_number = errno;
+            auto const known_errors = std::map<decltype(error_number), std::string>{
+                { EBADF, "EAFNOSUPPORT", },
+                { EDOM, "EDOM", },
+                { EINVAL, "EINVAL", },
+                { EISCONN, "EISCONN", },
+                { ENOPROTOOPT, "ENOPROTOOPT", },
+                { ENOTSOCK, "ENOTSOCK", },
+                { ENOMEM, "ENOMEM", },
+                { ENOBUFS, "ENOBUFS", },
+            };
+            if (not known_errors.count(error_number)) {
+                throw std::make_unique<viua::types::Exception>("setsockopt(3): Unknown_errno: " + std::to_string(error_number));
+            }
+            throw std::make_unique<viua::types::Exception>(known_errors.at(error_number));
+        }
     }
 
     frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
