@@ -29,7 +29,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    import "std::vector"
+    import std::vector
 
     frame ^[(move %0 arguments (integer %1 local 8) local) (move %1 arguments (function %1 local return_integer/1) local)]
     call %1 local std::vector::of/2

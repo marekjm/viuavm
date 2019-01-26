@@ -31,7 +31,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    import "std::functional"
+    import std::functional
 
     function %1 local greetings/1
 

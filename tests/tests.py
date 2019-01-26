@@ -416,8 +416,10 @@ def extractExceptionsThrown(output):
 def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
-def runTestThrowsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_error=expected_output, expected_exit_code=1, error_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
+def runTestThrowsException(self, name, expected_output, assembly_opts=None, expected_exit_code = 1, test_disasm = True):
+    runTest(self, name, expected_error=expected_output, expected_exit_code=expected_exit_code,
+            error_processing_function=extractFirstException, valgrind_enable=False,
+            assembly_opts=assembly_opts, test_disasm = test_disasm)
 
 def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
     was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
@@ -1323,13 +1325,6 @@ class VectorInstructionsTests(unittest.TestCase):
         # pass --no-sa because we want to test runtime exception
         runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vector: cannot pack null register',), assembly_opts=('--no-sa',))
 
-    @unittest.skip('conflicts with runtime-error test')
-    def testPackingVecRefusesToPackNullRegisterCompileTime(self):
-        # pass --no-sa because we want to test runtime exception
-        runTestFailsToAssembleDetailed(self, 'vec_packing_null.asm', [
-            '20:12: error: in function main/0',
-        ])
-
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
 
@@ -1533,10 +1528,6 @@ class HigherOrderFunctionTests(unittest.TestCase):
 
     def testApplyByMove(self):
         runTest(self, 'apply_by_move.asm', '25')
-
-    @unittest.skip('frame instruction needs to have register-indirect access mode implemented')
-    def testInvoke(self):
-        runTestSplitlines(self, 'invoke.asm', ['42', '42'])
 
     def testMap(self):
         runTest(self, 'map.asm', [[1, 2, 3, 4, 5], [1, 4, 9, 16, 25]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
@@ -1786,13 +1777,13 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'branch_depends_on_empty_register.asm',
                 './sample/asm/static_analysis_errors/branch_depends_on_empty_register.asm:23:8: error: branch depends on empty local register "1"')
 
-    @unittest.skip('FIXME TODO SA for vector instructions not impemented yet')
-    def testPackingVecEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm', './sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:26:11: error: use of empty local register "1"')
+    def testPackingVecErasesRegisters(self):
+        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm',
+            './sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:28:11: error: use of erased local register "1"')
 
-    @unittest.skip('FIXME TODO SA for vector instructions not impemented yet')
     def testPackingEmptyRegister(self):
-        runTestFailsToAssemble(self, 'packing_empty_register.asm', './sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty local register "1"')
+        runTestFailsToAssemble(self, 'packing_empty_register.asm',
+            './sample/asm/static_analysis_errors/packing_empty_register.asm:25:21: error: pack of empty local register 4')
 
     def testUseOfEmptyFirstRegisterInAnd(self):
         runTestFailsToAssemble(self, 'and_use_of_empty_register_1st.asm',
@@ -1834,9 +1825,9 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm',
                 './sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:23:19: error: use of empty local register "1"')
 
-    @unittest.skip('requires Valgrind suppression')
     def testVinsertEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm', './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:23:11: error: use of empty local register "1"')
+        runTestFailsToAssemble(self, 'vinsert_empties_registers.asm',
+                './sample/asm/static_analysis_errors/vinsert_empties_registers.asm:25:11: error: use of erased local register "1"')
 
     def testVinsertOfEmptyRegister(self):
         runTestFailsToAssemble(self, 'vinsert_of_empty_register.asm',
@@ -1902,7 +1893,7 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
         runTestFailsToAssemble(self, 'register_name_already_taken.asm',
                 './sample/asm/static_analysis_errors/register_name_already_taken.asm:24:14: error: register name already taken: named_register')
 
-    @unittest.skip('FIXME TODO skip this test for now')
+    @unittest.skip('FIXME SA gives an error, but an incorrect one')
     def testRegisterUsedBeforeBeingNamed(self):
         runTestFailsToAssemble(self, 'register_defined_before_being_named.asm',
                 './sample/asm/static_analysis_errors/register_defined_before_being_named.asm:24:12: error: register defined before being named: 1 = named_register')
@@ -2601,7 +2592,6 @@ class ExceptionMechanismTests(unittest.TestCase):
 class MiscExceptionTests(unittest.TestCase):
     PATH = './sample/asm/exceptions'
 
-    @unittest.skip('watchdog does not play nice with new scheduling model')
     def testTerminatingProcessDoesNotBreakOtherProcesses(self):
         expected_output = [
             'Hello World from process 5',
@@ -2609,12 +2599,15 @@ class MiscExceptionTests(unittest.TestCase):
             'Hello World from process 4',
             'Hello World from process 6',
             'Hello World from process 2',
-            'uncaught object: Integer = 42',
             'Hello World from process 3',
             'Hello World from process 0',
         ]
         # FIXME: SA needs basic support for static register set
-        runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())), assembly_opts=('--no-sa',))
+        runTest(
+            self,
+            'terminating_processes.asm',
+            sorted(expected_output),
+            output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())), assembly_opts=('--no-sa',))
 
     def testCatchingMachineThrownException(self):
         # pass --no-sa flag; we want to check runtime exception
@@ -2629,11 +2622,10 @@ class MiscExceptionTests(unittest.TestCase):
             assembly_opts = ('--no-sa',),
         )
 
-    @unittest.skip('due to imports being reworked')
     def testCatchingExceptionThrownInDifferentModule(self):
         # FIXME remove --no-sa when SA for blocks (try and enter) is implemented
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
-        lib_path = 'test_module.module'
+        lib_path = './build/test/test_module.module'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',),)
         runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0', assembly_opts =
         ('--no-sa',),)
@@ -2801,14 +2793,12 @@ class ConcurrencyTests(unittest.TestCase):
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_process.asm', '42')
 
-    @unittest.skip('triggers a memory leak from a path that only allocates stack memory...?')
     def testProcessFromDynamicallyLinkedFunction(self):
         source_lib = 'process_from_linked_fun.asm'
-        lib_path = 'test_module.module'
+        lib_path = './build/test/test_module.module'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
         runTest(self, 'process_from_linked_base.asm', 'Hello World!')
 
-    @unittest.skip('due to imports being reworked')
     def testMigratingProcessesBetweenSchedulers(self):
         # sorted because the order is semi-random due to OS scheduling of
         # VP scheduler threads
@@ -2871,11 +2861,15 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogMustBeANativeFunction(self):
         runTestThrowsException(self, 'must_be_a_native_function.asm', ('Exception', 'watchdog process must be a native function, used foreign World::print_hello/0',))
 
-    @unittest.skip('if watchdog dies, process enters infinite loop')
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
-        runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
+        runTestThrowsException(
+            self,
+            'terminated_watchdog.asm',
+            ('Function', 'Function: broken_process/0',),
+            expected_exit_code = 0,
+            test_disasm = False,
+        )
 
-    @unittest.skip('due to imports being reworked')
     def testServicingRunawayExceptionWhileOtherProcessesAreRunning(self):
         runTestReturnsUnorderedLines(self, 'death_message.asm', [
             "Hello World (from detached process)!",
@@ -2886,7 +2880,6 @@ class WatchdogTests(unittest.TestCase):
             "process [detached]: 'a_detached_concurrent_process' exiting",
         ])
 
-    @unittest.skip('due to imports being reworked')
     def testRestartingProcessesAfterAbortedByRunawayException(self):
         runTestReturnsUnorderedLines(self, 'restarting_process.asm', [
             "process [  main  ]: 'main' exiting",
@@ -3032,7 +3025,6 @@ class DeferredCallsTests(unittest.TestCase):
         )
 
 
-@unittest.skip('due to imports being reworked')
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
 
@@ -3061,7 +3053,6 @@ class StandardRuntimeLibraryModuleVector(unittest.TestCase):
         runTest(self, 'any_returns_false.asm', 'false')
 
 
-@unittest.skip('FIXME frame, param, pamv must have register-indirect access implemented')
 class StandardRuntimeLibraryModuleFunctional(unittest.TestCase):
     PATH = './sample/standard_library/functional'
 

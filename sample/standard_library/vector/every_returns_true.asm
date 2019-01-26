@@ -30,7 +30,7 @@
 .function: main/1
     allocate_registers %5 local
 
-    import "std::vector"
+    import std::vector
 
     frame ^[(copy %0 arguments (integer %1 local 20) local)]
     call %2 local std::vector::of_ints/1

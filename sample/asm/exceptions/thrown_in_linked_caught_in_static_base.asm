@@ -42,7 +42,7 @@
 .function: main/0
     allocate_registers %3 local
 
-    import "test_module"
+    import test_module
 
     try
     catch "Integer" handle_Integer

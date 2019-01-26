@@ -29,7 +29,7 @@
 .function: main/1
     allocate_registers %5 local
 
-    import "std::vector"
+    import std::vector
 
     vpush (vpush (vpush (vector %2 local) local (integer %1 local -1) local) local (integer %1 local -2) local) local (integer %1 local -3) local
 

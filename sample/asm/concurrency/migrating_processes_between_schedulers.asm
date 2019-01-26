@@ -90,7 +90,7 @@
     ;
     ; so what this program does is saturate the schedulers
 
-    import "std::misc"
+    import std::misc
 
     .name: 1 limit
     integer %limit local 64

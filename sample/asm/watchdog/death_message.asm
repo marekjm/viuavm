@@ -106,7 +106,7 @@
 .function: main/1
     allocate_registers %2 local
 
-    import "std::misc"
+    import std::misc
 
     watchdog watchdog_process/1
 

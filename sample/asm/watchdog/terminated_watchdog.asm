@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/0
+.function: [[no_sa]] watchdog_process/0
     allocate_registers %5 local
 
     .mark: watchdog_start

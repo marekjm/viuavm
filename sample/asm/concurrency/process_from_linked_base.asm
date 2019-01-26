@@ -22,7 +22,7 @@
 .function: main/0
     allocate_registers %2 local
 
-    import "test_module"
+    import test_module
 
     frame %0
     process %1 local test_module::test_function/0

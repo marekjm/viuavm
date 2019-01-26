@@ -84,7 +84,7 @@
     allocate_registers %2 local
 
     ; required for std::misc::cycle/1
-    import "std::misc"
+    import std::misc
 
     ; spawn process that will crash
     frame %0

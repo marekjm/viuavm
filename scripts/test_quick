@@ -32,4 +32,4 @@ fi
 
 export VIUA_LIBRARY_PATH=./build/test:./build/stdlib
 
-VIUA_TEST_SUITE_VALGRIND_CHECKS=0 VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast "$@"
+VIUA_TEST_SUITE_VALGRIND_CHECKS=0 python3 ./tests/tests.py --verbose --catch --failfast "$@"

@@ -183,6 +183,8 @@
     ;
     ; this function is type agnostic
     ; it just passes the parameter without additional processing
+    allocate_registers %5 local
+
     .name: %1 func
     .name: %2 parameter
 
@@ -205,6 +207,8 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
+    allocate_registers %9 local
+
     move %1 local %0 parameters
     move %2 local %1 parameters
 
