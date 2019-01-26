@@ -172,7 +172,7 @@ void viua::kernel::Kernel::load_module(std::string module) {
     auto const module_path = viua::runtime::imports::find_module(module);
     if (not module_path.has_value()) {
         throw make_unique<viua::types::Exception>(
-            "LinkException", ("failed to link library: " + module));
+            "LinkException", ("failed to locate module: " + module));
     }
 
     switch (module_path->first) {

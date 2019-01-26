@@ -45,7 +45,7 @@
     allocate_registers %2 local
 
     ; import "foreign printer module"
-    import "build/test/printer"
+    import printer
 
     ; Spawn several processes, each printing a different "Hello {who}!"
     ; the hellos do not have to appear in the order their functions are

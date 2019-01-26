@@ -399,7 +399,7 @@ test: build/bin/vm/asm \
 	compile-test \
 	stdlib \
 	standardlibrary
-	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
+	VIUA_LIBRARY_PATH=./build/stdlib:./build/test python3 ./tests/tests.py --verbose --catch --failfast
 
 
 ############################################################

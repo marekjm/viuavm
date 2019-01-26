@@ -61,8 +61,8 @@
     allocate_registers %2 local
 
     ; import "foreign printer module"
-    import "build/test/printer"
-    import "build/test/sleeper"
+    import printer
+    import sleeper
 
     frame %0
     call void lazy_print_spawner/0

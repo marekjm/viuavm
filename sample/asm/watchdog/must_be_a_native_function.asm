@@ -22,7 +22,7 @@
 .function: main/1
     allocate_registers %1 local
 
-    import "build/test/World"
+    import World
 
     watchdog World::print_hello/0
 

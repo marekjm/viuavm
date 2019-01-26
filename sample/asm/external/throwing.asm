@@ -46,7 +46,7 @@
 
     watchdog watchdog_process/0
 
-    import "build/test/throwing"
+    import throwing
 
     try
     catch "ExceptionX" __catch_Exception

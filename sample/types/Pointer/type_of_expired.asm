@@ -26,7 +26,7 @@
     ptr %2 local %1 local
     delete %1 local
 
-    import "std/typesystem"
+    import std::typesystem
 
     frame ^[(copy %0 arguments (ptr %3 local %2 local) local)]
     call %3 local std::typesystem::typeof/1

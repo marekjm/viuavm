@@ -22,12 +22,11 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 static auto hello(Frame*, viua::kernel::Register_set*, viua::kernel::Register_set*, viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
-    cout << "Hello World!" << endl;
+    std::cout << "Hello World!" << std::endl;
 }
 
 

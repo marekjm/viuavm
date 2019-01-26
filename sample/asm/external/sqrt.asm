@@ -22,7 +22,7 @@
 .function: main/1
     allocate_registers %3 local
 
-    import "build/test/math"
+    import math
 
     frame ^[(copy %0 arguments (float %1 local 3.0) local)]
     call %2 local math::sqrt/1

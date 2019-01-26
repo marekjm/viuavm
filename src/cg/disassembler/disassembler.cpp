@@ -446,7 +446,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     } else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
         oss << ' ';
         auto const s = std::string{reinterpret_cast<char*>(ptr)};
-        oss << (op == IMPORT ? str::enquote(s) : s);
+        oss << s;
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
