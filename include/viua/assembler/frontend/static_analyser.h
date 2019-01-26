@@ -227,7 +227,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
     using viua::cg::lex::Traced_syntax_error;
     using viua::internals::Value_types;
 
-    if (register_index.rss == viua::internals::Register_sets::GLOBAL) {
+    if (register_index.rss == viua::internals::Register_sets::GLOBAL
+            or register_index.rss == viua::internals::Register_sets::STATIC) {
         return expected_type;
     }
 
