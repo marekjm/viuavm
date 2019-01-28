@@ -56,7 +56,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
     // cerr << "failed instruction: " <<
     // get<0>(disassembler::instruction(process->execution_at())) << endl;
     std::cerr << "uncaught object: " << ex_type << " = "
-         << (ex ? ex->what() : thrown_object->str()) << endl;
+              << (ex ? ex->what() : thrown_object->str()) << endl;
     std::cerr << "\n";
 
     std::cerr << "frame details:\n";
@@ -74,7 +74,7 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
                 }
             }
             std::cerr << "  non-empty registers: " << non_empty << '/'
-                 << last->local_register_set->size();
+                      << last->local_register_set->size();
             std::cerr << (non_empty ? ":\n" : "\n");
             for (decltype(last->local_register_set->size()) r = 0;
                  r < last->local_register_set->size();
@@ -83,8 +83,9 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
                     continue;
                 }
                 std::cerr << "    registers[" << r << "]: ";
-                std::cerr << '<' << last->local_register_set->get(r)->type() << "> "
-                     << last->local_register_set->get(r)->str() << endl;
+                std::cerr << '<' << last->local_register_set->get(r)->type()
+                          << "> " << last->local_register_set->get(r)->str()
+                          << endl;
             }
         } else if (not last->local_register_set.owns()) {
             std::cerr << "  this frame did not own its registers" << endl;
@@ -93,8 +94,8 @@ static auto print_stack_trace_default(viua::process::Process* process) -> void {
         }
 
         if (last->arguments->size()) {
-            std::cerr << "  non-empty arguments (out of " << last->arguments->size()
-                 << "):" << endl;
+            std::cerr << "  non-empty arguments (out of "
+                      << last->arguments->size() << "):" << endl;
             for (decltype(last->arguments->size()) r = 0;
                  r < last->arguments->size();
                  ++r) {
@@ -356,8 +357,11 @@ viua::process::Process* viua::scheduler::Virtual_process_scheduler::spawn(
      * schedulers, on a CPU with 4 physical cores.
      */
     auto const calculated_current_load =
-        ((static_cast<double>(total_processes) / static_cast<double>(running_schedulers)) * 1.4);
-    auto const is_overburdened = (static_cast<double>(processes.size()) > calculated_current_load);
+        ((static_cast<double>(total_processes)
+          / static_cast<double>(running_schedulers))
+         * 1.4);
+    auto const is_overburdened =
+        (static_cast<double>(processes.size()) > calculated_current_load);
     if ((running_schedulers > 1) and is_overburdened) {
 #if VIUA_VM_DEBUG_LOG
         viua_err("[scheduler:vps:",

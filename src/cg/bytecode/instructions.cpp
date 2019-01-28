@@ -1066,8 +1066,7 @@ auto opleave(viua::internals::types::byte* addr_ptr)
 auto opimport(viua::internals::types::byte* addr_ptr,
               std::string const& module_name) -> viua::internals::types::byte* {
     *(addr_ptr++) = IMPORT;
-    return insert_string(addr_ptr,
-                         module_name);
+    return insert_string(addr_ptr, module_name);
 }
 
 auto opatom(viua::internals::types::byte* addr_ptr, int_op reg, std::string s)

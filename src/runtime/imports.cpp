@@ -19,9 +19,8 @@
 
 #include <regex>
 #include <sstream>
-
-#include <viua/support/env.h>
 #include <viua/runtime/imports.h>
+#include <viua/support/env.h>
 
 namespace viua { namespace runtime { namespace imports {
 constexpr char const* VIUA_LIBRARY_PATH = "VIUA_LIBRARY_PATH";
@@ -30,20 +29,26 @@ auto read_viua_library_path() -> std::vector<std::string> {
     return viua::support::env::get_paths(VIUA_LIBRARY_PATH);
 }
 
-auto find_module(std::string const& module_name) -> std::optional<std::pair<Module_type, std::string>> {
+auto find_module(std::string const& module_name)
+    -> std::optional<std::pair<Module_type, std::string>> {
     auto const module_sep = std::regex{"::"};
-    auto bytecode_file = std::regex_replace(module_name, module_sep, "/") + ".module";
+    auto bytecode_file =
+        std::regex_replace(module_name, module_sep, "/") + ".module";
     auto native_file = std::regex_replace(module_name, module_sep, "/") + ".so";
 
     for (auto const& each : read_viua_library_path()) {
         using viua::support::env::is_file;
-        if (auto const candidate_path = each + '/' + bytecode_file; is_file(candidate_path)) {
-            return std::pair<Module_type, std::string>{ Module_type::Bytecode, candidate_path};
+        if (auto const candidate_path = each + '/' + bytecode_file;
+            is_file(candidate_path)) {
+            return std::pair<Module_type, std::string>{Module_type::Bytecode,
+                                                       candidate_path};
         }
-        if (auto const candidate_path = each + '/' + native_file; is_file(candidate_path)) {
-            return std::pair<Module_type, std::string>{ Module_type::Native, candidate_path };
+        if (auto const candidate_path = each + '/' + native_file;
+            is_file(candidate_path)) {
+            return std::pair<Module_type, std::string>{Module_type::Native,
+                                                       candidate_path};
         }
     }
     return {};
 }
-}}}
+}}}  // namespace viua::runtime::imports

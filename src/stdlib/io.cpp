@@ -80,8 +80,10 @@ static auto io_stdin_getline(Frame* frame,
     auto line = std::string{};
     getline(cin, line);
 
-    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
-    frame->local_register_set->set(0, std::make_unique<viua::types::String>(line));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0,
+                                   std::make_unique<viua::types::String>(line));
 }
 
 static auto io_stdout_write(Frame* frame,

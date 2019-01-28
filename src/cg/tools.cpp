@@ -912,7 +912,8 @@ static auto size_of_import(TokenVector const& tokens, TokenVector::size_type i)
     auto calculated_size =
         bytecode_size_type{sizeof(viua::internals::types::byte)};
 
-    calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null terminator
+    calculated_size += tokens.at(i++).str().size() + 1;  // +1 for null
+                                                         // terminator
 
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }

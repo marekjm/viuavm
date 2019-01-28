@@ -66,8 +66,8 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     auto const is_foreign = scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw std::make_unique<viua::types::Exception>("call to undefined function: "
-                                                  + call_name);
+        throw std::make_unique<viua::types::Exception>(
+            "call to undefined function: " + call_name);
     }
 
     stack->frame_new->function_name = call_name;
@@ -108,7 +108,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (not scheduler->is_joinable(thrd->pid())) {
-        throw std::make_unique<viua::types::Exception>("process cannot be joined");
+        throw std::make_unique<viua::types::Exception>(
+            "process cannot be joined");
     }
 
     if (timeout and not timeout_active) {

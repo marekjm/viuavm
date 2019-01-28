@@ -97,7 +97,8 @@ static auto random_random(Frame* frame,
                           viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
      */
-    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
         0, std::make_unique<viua::types::Float>(getrandom()));
 }
@@ -118,7 +119,8 @@ static auto random_randint(Frame* frame,
         static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
     auto modifer = ((upper_bound - lower_bound) * getrandom());
 
-    frame->set_local_register_set(std::make_unique<viua::kernel::Register_set>(1));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
         0, make_unique<viua::types::Integer>(lower_bound + modifer));
 }

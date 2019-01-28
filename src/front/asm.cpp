@@ -28,9 +28,9 @@
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
 #include <viua/front/asm.h>
+#include <viua/runtime/imports.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
-#include <viua/runtime/imports.h>
 #include <viua/version.h>
 using namespace std;
 
@@ -391,16 +391,19 @@ int main(int argc, char* argv[]) {
             }
 
             using viua::runtime::imports::Module_type;
-            if (attrs.count(STATIC_IMPORT_TAG) and module_path->first != Module_type::Bytecode) {
-                std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
-                          << send_control_seq(ATTR_RESET) << ':'
-                          << send_control_seq(COLOR_FG_RED) << "error"
-                          << send_control_seq(ATTR_RESET)
-                          << ": only bytecode modules may be statically imported \""
-                          << send_control_seq(COLOR_FG_WHITE) << name
-                          << send_control_seq(ATTR_RESET) << "\"\n";
+            if (attrs.count(STATIC_IMPORT_TAG)
+                and module_path->first != Module_type::Bytecode) {
+                std::cerr
+                    << send_control_seq(COLOR_FG_WHITE) << filename
+                    << send_control_seq(ATTR_RESET) << ':'
+                    << send_control_seq(COLOR_FG_RED) << "error"
+                    << send_control_seq(ATTR_RESET)
+                    << ": only bytecode modules may be statically imported \""
+                    << send_control_seq(COLOR_FG_WHITE) << name
+                    << send_control_seq(ATTR_RESET) << "\"\n";
                 return 1;
-            } else if (attrs.count(STATIC_IMPORT_TAG) and module_path->first == Module_type::Bytecode) {
+            } else if (attrs.count(STATIC_IMPORT_TAG)
+                       and module_path->first == Module_type::Bytecode) {
                 // FIXME Modules specified on command line are also to be
                 // statically linked. These two ways should probably be merged.
                 static_linked_parsed_imports.push_back(module_path->second);

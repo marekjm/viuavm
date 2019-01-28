@@ -186,7 +186,9 @@ void viua::kernel::Kernel::load_module(std::string module) {
         assert(false);
     }
 }
-void viua::kernel::Kernel::load_bytecode_module(std::string_view const module_name, std::string const& module_path) {
+void viua::kernel::Kernel::load_bytecode_module(
+    std::string_view const module_name,
+    std::string const& module_path) {
     Loader loader(module_path);
     loader.load();
 
@@ -211,16 +213,19 @@ void viua::kernel::Kernel::load_bytecode_module(std::string_view const module_na
 
     linked_modules[std::string{module_name}] =
         std::pair<viua::internals::types::bytecode_size,
-             std::unique_ptr<viua::internals::types::byte[]>>(
+                  std::unique_ptr<viua::internals::types::byte[]>>(
             loader.get_bytecode_size(), std::move(lnk_btcd));
 }
-void viua::kernel::Kernel::load_native_module(std::string_view const module_name, std::string const& module_path) {
+void viua::kernel::Kernel::load_native_module(
+    std::string_view const module_name,
+    std::string const& module_path) {
     void* handle = dlopen(module_path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 
     if (handle == nullptr) {
         throw make_unique<viua::types::Exception>(
             "LinkException",
-            ("failed to open handle: " + std::string{module_name} + ": " + dlerror()));
+            ("failed to open handle: " + std::string{module_name} + ": "
+             + dlerror()));
     }
 
     using ExporterFunction   = const Foreign_function_spec* (*)();
@@ -228,7 +233,8 @@ void viua::kernel::Kernel::load_native_module(std::string_view const module_name
     if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports")))
         == nullptr) {
         throw std::make_unique<viua::types::Exception>(
-            "failed to extract interface from module: " + std::string{module_name});
+            "failed to extract interface from module: "
+            + std::string{module_name});
     }
 
     const Foreign_function_spec* exported = (*exports)();

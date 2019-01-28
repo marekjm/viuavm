@@ -27,19 +27,20 @@
 
 namespace viua { namespace runtime { namespace imports {
 enum class Module_type {
-    Native,     /*
-                 * Calls to functions defined by native modules are handled by
-                 * the FFI scheduler. They are not preemptible and thus have to
-                 * be run on a separate thread.
-                 */
-    Bytecode,   /*
-                 * Calls to functions defined by bytecode modules are handled by
-                 * the virtual process scheduler, and are preemptible.
-                 */
+    Native,   /*
+               * Calls to functions defined by native modules are handled by
+               * the FFI scheduler. They are not preemptible and thus have to
+               * be run on a separate thread.
+               */
+    Bytecode, /*
+               * Calls to functions defined by bytecode modules are handled by
+               * the virtual process scheduler, and are preemptible.
+               */
 };
 
 auto read_viua_library_path() -> std::vector<std::string>;
-auto find_module(std::string const&) -> std::optional<std::pair<Module_type, std::string>>;
-}}}
+auto find_module(std::string const&)
+    -> std::optional<std::pair<Module_type, std::string>>;
+}}}  // namespace viua::runtime::imports
 
 #endif

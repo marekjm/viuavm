@@ -60,8 +60,7 @@ auto check_op_vector(Register_usage_profile& register_usage_profile,
             throw Invalid_syntax{pack_range_start->tokens.at(0),
                                  "pack of empty "
                                      + to_string(pack_range_start->rss)
-                                     + " register "
-                                     + std::to_string(j)};
+                                     + " register " + std::to_string(j)};
         }
         register_usage_profile.erase(checker, instruction.tokens.at(0));
         register_usage_profile.use(checker, instruction.tokens.at(0));

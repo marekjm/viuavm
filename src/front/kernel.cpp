@@ -163,7 +163,8 @@ int main(int argc, char* argv[]) {
     try {
         viua::front::vm::initialise(kernel, filename, args);
     } catch (std::unique_ptr<viua::types::Exception> const& e) {
-        std::cerr << "fatal: kernel initialisation fault: " << e->what() << '\n';
+        std::cerr << "fatal: kernel initialisation fault: " << e->what()
+                  << '\n';
         return 1;
     } catch (const char* e) {
         cout << "error: " << e << endl;
