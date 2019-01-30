@@ -383,20 +383,24 @@ static auto normalise_register_access(std::vector<Token>& tokens,
     } else {
         auto e = make_unexpected_token_error(register_set,
                                              "expected register set specifier");
-        auto const likeness_limit =
-            viua::util::string::ops::LevenshteinDistance{4};
-        auto const best_match = viua::util::string::ops::levenshtein_best(
-            register_set.str(),
-            {// FIXME provide a std::vector<std::string> with valid register set
-             // names
-             "local",
-             "static",
-             "global",
-             "arguments",
-             "parameters"},
-            likeness_limit);
-        if (best_match.first <= likeness_limit) {
-            e.aside(source.at(2), "did you mean `" + best_match.second + "'?");
+        if (register_set.str().empty() or (register_set.str().at(0) == '\n')) {
+            e.aside(source.at(2), "register set specifier missing here");
+        } else {
+            auto const likeness_limit =
+                viua::util::string::ops::LevenshteinDistance{4};
+            auto const best_match = viua::util::string::ops::levenshtein_best(
+                register_set.str(),
+                {// FIXME provide a std::vector<std::string> with valid register set
+                 // names
+                 "local",
+                 "static",
+                 "global",
+                 "arguments",
+                 "parameters"},
+                likeness_limit);
+            if (best_match.first <= likeness_limit) {
+                e.aside(source.at(2), "did you mean `" + best_match.second + "'?");
+            }
         }
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(e);
     }
