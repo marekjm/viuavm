@@ -1,12 +1,10 @@
 *.o
 *.so
-
+*.module
 *.bin
 *.out
 
 *.pdf
-
-*.vlib
 
 *~
 *\#
