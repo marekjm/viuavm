@@ -826,6 +826,56 @@ static auto analyse_single_arm(
                 throw_if_invalid_type(
                     function_state, rhs, rhs_index, rhs_type_signature);
 
+                {
+                    using values::Integer;
+                    auto const& rhs_operand = static_cast<Integer&>(
+                        function_state.type_of(rhs_index, rhs.register_set)
+                            .value());
+                    if (rhs_operand.known() and rhs_operand.of() == 0) {
+                        auto msg = std::ostringstream{};
+                        msg << "right-hand side will always be 0, triggering a division by zero";
+
+                        auto error =
+                            viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::
+                                        Compile_time_error::Empty_error,
+                                    line->tokens().at(0),
+                                    msg.str()});
+
+                        {
+                            auto const& definition_location =
+                                function_state.defined_at(rhs_index,
+                                                          rhs.register_set);
+                            error.append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::
+                                    Compile_time_error::Empty_error,
+                                definition_location.at(0)}
+                                             .note("right-hand side defined here:"));
+                            if (function_state.mutated(rhs_index,
+                                                       rhs.register_set)) {
+                                for (auto const& each : function_state.mutated_at(
+                                         rhs_index, rhs.register_set)) {
+                                    auto e =
+                                        viua::tooling::errors::compile_time::Error{
+                                            viua::tooling::errors::compile_time::
+                                                Compile_time_error::Empty_error,
+                                            each.at(0)};
+                                    for (auto it = each.begin() + 1;
+                                         it != each.end();
+                                         ++it) {
+                                        e.add(*it);
+                                    }
+                                    error.append(
+                                        e.note("right-hand side mutated here:"));
+                                }
+                            }
+                        }
+
+                        throw error;
+                    }
+                }
+
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
                 auto defining_tokens =
