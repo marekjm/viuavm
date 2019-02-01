@@ -58,6 +58,8 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
      "argument pass without a frame"},
     {Compile_time_error::Argument_pass_overwrites,
      "argument pass overwrites a previous value"},
+    {Compile_time_error::No_main_function_defined,
+     "no main function defined"},
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

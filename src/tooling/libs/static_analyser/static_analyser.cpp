@@ -3500,6 +3500,20 @@ static auto analyse_functions(
     Analyser_state& analyser_state) -> void {
     auto const& functions = fragments.function_fragments;
 
+    if (not (functions.count("main/0") or functions.count("main/1") or functions.count("main/2"))) {
+        using viua::tooling::errors::compile_time::Compile_time_error;
+        auto error =
+            viua::tooling::errors::compile_time::Error_wrapper{}
+                .append(
+                    viua::tooling::errors::compile_time::Error{
+                        Compile_time_error::
+                            No_main_function_defined,
+                        viua::tooling::libs::lexer::Token()}
+                        .note(
+                            "one of the `main/0', `main/1', or `main/2' functions must be defined"));
+        throw error;
+    }
+
     for (auto const& [name, fn] : functions) {
         try {
             analyse_single_function(fn, fragments, analyser_state);

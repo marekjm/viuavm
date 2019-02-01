@@ -45,6 +45,7 @@ enum class Compile_time_error {
     Call_with_empty_slot,
     Argument_pass_without_a_frame,
     Argument_pass_overwrites,
+    No_main_function_defined,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
