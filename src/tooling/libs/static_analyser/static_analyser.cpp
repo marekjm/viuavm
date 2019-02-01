@@ -362,7 +362,7 @@ static auto analyse_single_arm(
     viua::tooling::libs::parser::Cooked_function const& fn,
     viua::tooling::libs::parser::Cooked_fragments const& fragments,
     Analyser_state& analyser_state,
-    Function_state function_state,
+    Function_state& function_state,
     bool const after_conditional_branch,
     std::vector<Body_line> const& annotated_body,
     std::map<std::string, Body_line> const& label_map,
@@ -2854,7 +2854,7 @@ static auto analyse_single_arm(
                     analyse_single_arm(fn,
                                        fragments,
                                        analyser_state,
-                                       std::move(function_state),
+                                       function_state,
                                        after_conditional_branch,
                                        annotated_body,
                                        label_map,
@@ -2918,10 +2918,11 @@ static auto analyse_single_arm(
                             << '\n';
                     }
 
+                    auto cloned = function_state.clone();
                     true_arm_result = analyse_single_arm(fn,
                                                          fragments,
                                                          analyser_state,
-                                                         function_state.clone(),
+                                                         cloned,
                                                          true,
                                                          annotated_body,
                                                          label_map,
@@ -2971,18 +2972,18 @@ static auto analyse_single_arm(
                             << '\n';
                     }
 
+                    auto cloned = function_state.clone();
                     analyse_single_arm(
                         fn,
                         fragments,
                         analyser_state,
-                        function_state.clone()
+                        cloned,
                         /*
                          * False arm is only conditionally executed if the true
                          * arm did not enter the same path as it. Otherwise, we
                          * assume that it is executed unconditionally because it
                          * was executed by both branches of the if instruction.
                          */
-                        ,
                         (true_arm_result.analysed_lines.count(target) == 0),
                         annotated_body,
                         label_map,
@@ -3489,7 +3490,7 @@ static auto analyse_single_function(
     analyse_single_arm(fn,
                        fragments,
                        as,
-                       std::move(function_state),
+                       function_state,
                        false,
                        annotated_body,
                        label_map,
