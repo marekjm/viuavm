@@ -3506,6 +3506,69 @@ static auto analyse_single_function(
                        annotated_body,
                        label_map,
                        0);
+
+    if (fn.head().function_name == "main") {
+        auto target = Register_address{
+            0
+            , false
+            , false
+            , viua::internals::Register_sets::LOCAL
+            , viua::internals::Access_specifier::DIRECT
+        };
+        target.add(fn.head().tokens().at(0));
+        target.add(fn.head().tokens().at(0));
+        target.add(fn.head().tokens().at(0));
+
+        try {
+            auto const target_index =
+                throw_if_empty(function_state, target);
+
+            auto const target_access = target.access;
+            auto const target_type_signature =
+                (target_access
+                 == viua::internals::Access_specifier::POINTER_DEREFERENCE)
+                    ? std::vector<
+                          values::Value_type>{values::Value_type::Pointer,
+                                              values::Value_type::Integer}
+                    : std::vector<values::Value_type>{
+                          values::Value_type::Integer};
+            if (not function_state.assume_type(target_index,
+                                               target.register_set,
+                                               target_type_signature)) {
+                auto error =
+                    viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::
+                                Compile_time_error::Type_mismatch,
+                            target.tokens().at(0),
+                            "expected `" + to_string(target_type_signature)
+                                + "'..."}
+                                    .add(target.tokens().at(0)));
+
+                auto const& definition_location = function_state.defined_at(
+                    target_index, target.register_set);
+                error.append(viua::tooling::errors::compile_time::Error{
+                    viua::tooling::errors::compile_time::
+                        Compile_time_error::Empty_error,
+                    definition_location.at(0),
+                    ("...got `"
+                     + to_string(
+                           function_state
+                               .type_of(target_index, target.register_set)
+                               .to_simple())
+                     + "'")}
+                                 .note("defined here"));
+                throw error;
+            }
+        } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+            e.append(viua::tooling::errors::compile_time::Error{
+                viua::tooling::errors::compile_time::Compile_time_error::
+                    Empty_error,
+                fn.head().token(0),
+                "when checking return value of main function"});
+            throw;
+        }
+    }
 }
 
 static auto analyse_functions(
