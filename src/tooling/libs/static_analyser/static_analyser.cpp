@@ -3468,7 +3468,18 @@ static auto analyse_single_function(
                         std::make_unique<values::String>()))),
                 fn.head().tokens());
         } else {
-            // FIXME arity not supported
+            using viua::tooling::errors::compile_time::Compile_time_error;
+            auto error =
+                viua::tooling::errors::compile_time::Error_wrapper{}
+                    .append(
+                        viua::tooling::errors::compile_time::Error{
+                            Compile_time_error::
+                                Empty_error,
+                            fn.head().tokens().at(0),
+                            "arity " + std::to_string(fn.head().arity)
+                            + " is not value for the main function"}
+                            .note("only arities 0, 1, and 2 are valid for main function"));
+            throw error;
         }
     } else {
         using arity_type = viua::internals::types::register_index;
