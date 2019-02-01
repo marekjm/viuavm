@@ -2766,6 +2766,13 @@ static auto analyse_single_arm(
                                     .note("this function calls itself on a "
                                           "path with no conditional branches"));
                 }
+
+                /*
+                 * Calling a function (it does not matter in what way) consumes
+                 * the frame.
+                 */
+                spawned_frame.reset(nullptr);
+
                 break;
             }
             case SELF: {
