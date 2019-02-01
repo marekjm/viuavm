@@ -209,7 +209,8 @@ static auto throw_if_empty(
                 viua::tooling::errors::compile_time::Error{
                     viua::tooling::errors::compile_time::Compile_time_error::
                         Read_from_empty_register,
-                    address.tokens().at(1)}
+                    address.tokens().at(1),
+                    std::to_string(address_index)}
                     .add(address.tokens().at(2)));
         if (function_state.erased(address_index, address.register_set)) {
             auto const& erased_location =
