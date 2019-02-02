@@ -6,7 +6,6 @@
 ;       | x -> (fib (x - 1)) + (fib (x - 2))
 ;
 
-
 .function: fib/1
     allocate_registers %6 local
 
@@ -51,5 +50,11 @@
 
     .mark: after_if
 
+    return
+.end
+
+.function: main/0
+    allocate_registers %1 local
+    izero %0 local
     return
 .end
