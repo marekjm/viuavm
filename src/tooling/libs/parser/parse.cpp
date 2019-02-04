@@ -962,6 +962,7 @@ static auto parse_op_tailcall(
 
     auto frag = std::make_unique<Instruction>(
         string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_id;
@@ -986,6 +987,8 @@ static auto parse_join(
 
     auto frag = std::make_unique<Instruction>(
         string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i);
@@ -1014,6 +1017,8 @@ static auto parse_receive(
 
     auto frag = std::make_unique<Instruction>(
         string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i);
