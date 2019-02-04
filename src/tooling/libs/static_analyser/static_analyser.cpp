@@ -2899,7 +2899,49 @@ static auto analyse_single_arm(
                 break;
             }
             case WATCHDOG: {
-                // FIXME TODO
+                auto const called_function_name =
+                             instruction.operands.at(0)->tokens().at(0).str()
+                           + instruction.operands.at(0)->tokens().at(1).str()
+                           + instruction.operands.at(0)->tokens().at(2).str();
+                std::cerr << "  setting: " << called_function_name << " as watchdog from "
+                          << analysed_function_name << '\n';
+
+                if (not spawned_frame) {
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(
+                                viua::tooling::errors::compile_time::Error{
+                                    Compile_time_error::
+                                        Call_without_a_frame,
+                                    instruction.operands.at(0)->tokens().at(0),
+                                    called_function_name});
+                }
+
+                for (auto const each :
+                     int_range(spawned_frame->allocated_parameters)) {
+                    if (not spawned_frame->filled_parameters.count(each)) {
+                        auto error =
+                            viua::tooling::errors::compile_time::Error_wrapper{}
+                                .append(
+                                    viua::tooling::errors::compile_time::Error{
+                                        Compile_time_error::
+                                            Call_with_empty_slot,
+                                        instruction.token(0),
+                                        "slot " + std::to_string(each)})
+                                .append(
+                                    viua::tooling::errors::compile_time::Error{
+                                        Compile_time_error::Empty_error,
+                                        spawned_frame_where}
+                                        .note("frame spawned here"));
+                        throw error;
+                    }
+                }
+
+                /*
+                 * Calling a function (it does not matter in what way) consumes
+                 * the frame.
+                 */
+                spawned_frame.reset(nullptr);
+
                 break;
             }
             case JUMP: {

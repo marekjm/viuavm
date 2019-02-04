@@ -46,6 +46,7 @@ enum class Compile_time_error {
     Argument_pass_without_a_frame,
     Argument_pass_overwrites,
     No_main_function_defined,
+    Call_without_a_frame,
 };
 
 auto display_error(Compile_time_error const) -> std::string;
