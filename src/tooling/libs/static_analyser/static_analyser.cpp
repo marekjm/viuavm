@@ -2844,6 +2844,40 @@ static auto analyse_single_arm(
                 break;
             }
             case SEND: {
+                auto const& target = *static_cast<Register_address const*>(
+                    instruction.operands.at(0).get());
+
+                auto const target_index =
+                    throw_if_empty(function_state, target);
+                auto const target_type_signature = maybe_with_pointer(
+                    target.access, {values::Value_type::Pid});
+                throw_if_invalid_type(function_state,
+                                      target,
+                                      target_index,
+                                      target_type_signature);
+
+                auto const& source = *static_cast<Register_address const*>(
+                    instruction.operands.at(1).get());
+                auto const source_index =
+                    throw_if_empty(function_state, source);
+
+                if (source.access
+                    != viua::internals::Access_specifier::POINTER_DEREFERENCE) {
+                    function_state.erase_register(
+                        source_index,
+                        source.register_set,
+                        [&instruction, &source]()
+                            -> std::vector<viua::tooling::libs::lexer::Token> {
+                            auto tokens = std::vector<
+                                viua::tooling::libs::lexer::Token>{};
+                            tokens.push_back(instruction.tokens().at(0));
+                            copy_whole(source.tokens(),
+                                       std::back_inserter(tokens));
+                            return tokens;
+                        }());
+                }
+
+                break;
             }
             case RECEIVE: {
             }
