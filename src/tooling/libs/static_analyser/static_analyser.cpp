@@ -3168,8 +3168,30 @@ static auto analyse_single_arm(
             case DRAW: {
             }
             case TRY: {
+                if (spawned_catch_frame) {
+                    auto error =
+                        viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::
+                                    Compile_time_error::
+                                        Overwrite_of_unused_frame,
+                                instruction.token(0)})
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::
+                                    Compile_time_error::Empty_error,
+                                spawned_frame_where}
+                                        .note("unused catch frame spawned here"));
+                    throw error;
+                }
+
+                spawned_catch_frame = true;
+                spawned_catch_frame_where = instruction.token(0);
+
+                break;
             }
             case ENTER: {
+                spawned_catch_frame = false;
+                break;
             }
             case LEAVE: {
                 break;
