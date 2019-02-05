@@ -62,6 +62,8 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
      "no main function defined"},
     {Compile_time_error::Call_without_a_frame,
      "call without a frame"},
+    {Compile_time_error::Catch_without_a_catch_frame,
+        "catch without a catch frame"},
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

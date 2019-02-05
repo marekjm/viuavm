@@ -388,6 +388,9 @@ static auto analyse_single_arm(
     auto spawned_frame       = std::unique_ptr<Frame_representation>();
     auto spawned_frame_where = viua::tooling::libs::lexer::Token{};
 
+    auto spawned_catch_frame       = false;
+    auto spawned_catch_frame_where = viua::tooling::libs::lexer::Token{};
+
     for (; i < annotated_body.size(); ++i) {
         arm_result.analysed_lines.insert(i);
         auto const line = fn.body().at(annotated_body.at(i).source_line);
@@ -3149,6 +3152,18 @@ static auto analyse_single_arm(
                 return arm_result;
             }
             case CATCH: {
+                if (not spawned_catch_frame) {
+                    auto const name_of_the_block = instruction.operands.at(1)->tokens().at(0);
+                    auto error =
+                        viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::
+                                    Compile_time_error::
+                                        Catch_without_a_catch_frame,
+                                instruction.token(0)});
+                    throw error;
+                }
+                break;
             }
             case DRAW: {
             }

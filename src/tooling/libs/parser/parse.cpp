@@ -1104,6 +1104,7 @@ static auto parse_op_catch(
 
     auto frag = std::make_unique<Instruction>(
         string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     auto type_name = std::make_unique<Text_literal>(tokens.at(i).str());
     type_name->add(tokens.at(i++));
