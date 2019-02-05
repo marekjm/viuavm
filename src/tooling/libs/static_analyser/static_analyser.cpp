@@ -3166,6 +3166,23 @@ static auto analyse_single_arm(
                 break;
             }
             case DRAW: {
+                auto const& dest = *static_cast<Register_address const*>(
+                    instruction.operands.at(0).get());
+
+                auto defining_tokens =
+                    std::vector<viua::tooling::libs::lexer::Token>{};
+                defining_tokens.push_back(line->token(0));
+                copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+
+                function_state.define_register(
+                    function_state.resolve_index(dest),
+                    dest.register_set,
+                    function_state.make_wrapper(
+                        // FIXME maybe use an exception type after exceptions are fully specified
+                        std::make_unique<values::Value>(values::Value_type::Value)),
+                    std::move(defining_tokens));
+
+                break;
             }
             case TRY: {
                 if (spawned_catch_frame) {
