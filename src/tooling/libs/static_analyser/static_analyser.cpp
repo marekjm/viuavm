@@ -3194,7 +3194,7 @@ static auto analyse_single_arm(
                 break;
             }
             case LEAVE: {
-                break;
+                return arm_result;
             }
             case IMPORT: {
                 /*
