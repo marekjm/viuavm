@@ -19,6 +19,7 @@
 
 #include <initializer_list>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
@@ -359,7 +360,8 @@ struct Arm_result {
 };
 
 static auto analyse_single_arm(
-    viua::tooling::libs::parser::Cooked_function const& fn,
+    std::optional<std::reference_wrapper<viua::tooling::libs::parser::Cooked_function const>> fn,
+    std::optional<std::reference_wrapper<viua::tooling::libs::parser::Cooked_block const>> bl,
     viua::tooling::libs::parser::Cooked_fragments const& fragments,
     Analyser_state& analyser_state,
     Function_state& function_state,
@@ -374,8 +376,12 @@ static auto analyse_single_arm(
     using viua::tooling::libs::parser::Operand_type;
     using viua::tooling::libs::parser::Register_address;
 
-    auto const analysed_function_name =
-        fn.head().function_name + '/' + std::to_string(fn.head().arity);
+    /* auto const analysed_function_name = */
+    /*     fn.head().function_name + '/' + std::to_string(fn.head().arity); */
+
+    auto const analysed_region_name = (fn.has_value()
+        ? (fn.value().get().head().function_name + '/' + std::to_string(fn.value().get().head().arity))
+        : bl.value().get().body().at(0)->tokens().at(0).str());
 
     auto arm_result = Arm_result{};
 
@@ -393,7 +399,10 @@ static auto analyse_single_arm(
 
     for (; i < annotated_body.size(); ++i) {
         arm_result.analysed_lines.insert(i);
-        auto const line = fn.body().at(annotated_body.at(i).source_line);
+        auto const line = (fn.has_value()
+            ? fn.value().get().body().at(annotated_body.at(i).source_line)
+            : bl.value().get().body().at(annotated_body.at(i).source_line)
+        );
 
         std::cout << "analysing: " << line->token(0).str() << std::endl;
 
@@ -2757,8 +2766,10 @@ static auto analyse_single_arm(
                     return "";
                 }();
                 std::cerr << "  calling: " << called_function_name << " from "
-                          << analysed_function_name << '\n';
-                if ((analysed_function_name == called_function_name)
+                          << analysed_region_name << '\n';
+                // FIXME we have to check "history" of block enters because a
+                // function may call itself from inside a block
+                if ((analysed_region_name == called_function_name)
                     and not after_conditional_branch) {
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(viua::tooling::errors::compile_time::Error{
@@ -2907,7 +2918,7 @@ static auto analyse_single_arm(
                            + instruction.operands.at(0)->tokens().at(1).str()
                            + instruction.operands.at(0)->tokens().at(2).str();
                 std::cerr << "  setting: " << called_function_name << " as watchdog from "
-                          << analysed_function_name << '\n';
+                          << analysed_region_name << '\n';
 
                 if (not spawned_frame) {
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
@@ -2977,6 +2988,7 @@ static auto analyse_single_arm(
 
                 try {
                     analyse_single_arm(fn,
+                                       bl,
                                        fragments,
                                        analyser_state,
                                        function_state,
@@ -3045,6 +3057,7 @@ static auto analyse_single_arm(
 
                     auto cloned = function_state.clone();
                     true_arm_result = analyse_single_arm(fn,
+                                                         bl,
                                                          fragments,
                                                          analyser_state,
                                                          cloned,
@@ -3100,6 +3113,7 @@ static auto analyse_single_arm(
                     auto cloned = function_state.clone();
                     analyse_single_arm(
                         fn,
+                        bl,
                         fragments,
                         analyser_state,
                         cloned,
@@ -3208,7 +3222,36 @@ static auto analyse_single_arm(
             }
             case ENTER: {
                 spawned_catch_frame = false;
-                break;
+
+                auto const& block_name_token = instruction.operands.at(0)->tokens().at(0);
+                auto const block_name = block_name_token.str();
+
+                try {
+                    auto const& block = fragments.block_fragments.at(block_name);
+                    auto const block_body = block.body();
+                    auto const block_annotated_body = annotate_body(block_body);
+                    auto const block_label_map      = create_label_map(block_body, block_annotated_body);
+
+                    return analyse_single_arm(fn,
+                                             block,
+                                             fragments,
+                                             analyser_state,
+                                             function_state,
+                                             false,
+                                             block_annotated_body,
+                                             block_label_map,
+                                             0);
+                } catch (
+                    viua::tooling::errors::compile_time::Error_wrapper& e) {
+                    e.append(
+                        viua::tooling::errors::compile_time::Error{
+                            viua::tooling::errors::compile_time::
+                                Compile_time_error::Empty_error,
+                            instruction.tokens().at(0),
+                            "after entering block " + block_name}
+                            .add(block_name_token));
+                    throw;
+                }
             }
             case LEAVE: {
                 return arm_result;
@@ -3675,6 +3718,7 @@ static auto analyse_single_function(
     auto const label_map      = create_label_map(body, annotated_body);
 
     analyse_single_arm(fn,
+                       std::nullopt,
                        fragments,
                        as,
                        function_state,

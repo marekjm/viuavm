@@ -281,6 +281,9 @@ struct Cooked_function {
 };
 struct Cooked_block {
     std::vector<std::unique_ptr<Fragment>> lines;
+
+    using body_type = std::vector<Fragment const*>;
+    auto body() const -> body_type;
 };
 struct Cooked_closure {
     std::vector<std::unique_ptr<Fragment>> lines;
