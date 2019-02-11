@@ -195,6 +195,9 @@ A typical session is shown below (assuming current working directory is the loca
 Please read [CONTRIBUTING.markdown](./CONTRIBUTING.markdown) for details on development setup, and
 the process for submitting pull requests, bug reports, and feature suggestions.
 
+The code can be cloned either from [Savannah](http://git.savannah.nongnu.org/cgit/viuavm.git) or
+from [Sr.ht](https://git.sr.ht/~maelkum/viuavm).
+
 
 ----
 
