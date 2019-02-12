@@ -3226,6 +3226,17 @@ static auto analyse_single_arm(
                 auto const& block_name_token = instruction.operands.at(0)->tokens().at(0);
                 auto const block_name = block_name_token.str();
 
+                if (not fragments.block_fragments.count(block_name)) {
+                    auto error =
+                        viua::tooling::errors::compile_time::Error_wrapper{}
+                            .append(viua::tooling::errors::compile_time::Error{
+                                viua::tooling::errors::compile_time::
+                                    Compile_time_error::Reference_to_undefined_block,
+                                block_name_token,
+                                block_name});
+                    throw error;
+                }
+
                 try {
                     auto const& block = fragments.block_fragments.at(block_name);
                     auto const block_body = block.body();

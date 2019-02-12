@@ -1127,6 +1127,7 @@ static auto parse_op_enter(
 
     auto frag = std::make_unique<Instruction>(
         string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
 
     auto block_name = std::make_unique<Block_name>(tokens.at(i).str());
     block_name->add(tokens.at(i++));

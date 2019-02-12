@@ -64,6 +64,8 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
      "call without a frame"},
     {Compile_time_error::Catch_without_a_catch_frame,
         "catch without a catch frame"},
+    {Compile_time_error::Reference_to_undefined_block,
+        "reference to undefined block"},
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {
