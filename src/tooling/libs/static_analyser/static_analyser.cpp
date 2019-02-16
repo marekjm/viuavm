@@ -379,9 +379,6 @@ static auto analyse_single_arm(
     using viua::tooling::libs::parser::Operand_type;
     using viua::tooling::libs::parser::Register_address;
 
-    /* auto const analysed_function_name = */
-    /*     fn.head().function_name + '/' + std::to_string(fn.head().arity); */
-
     auto const analysed_region_name =
         (fn.has_value() ? (fn.value().get().head().function_name + '/'
                            + std::to_string(fn.value().get().head().arity))
