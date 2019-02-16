@@ -58,14 +58,12 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
      "argument pass without a frame"},
     {Compile_time_error::Argument_pass_overwrites,
      "argument pass overwrites a previous value"},
-    {Compile_time_error::No_main_function_defined,
-     "no main function defined"},
-    {Compile_time_error::Call_without_a_frame,
-     "call without a frame"},
+    {Compile_time_error::No_main_function_defined, "no main function defined"},
+    {Compile_time_error::Call_without_a_frame, "call without a frame"},
     {Compile_time_error::Catch_without_a_catch_frame,
-        "catch without a catch frame"},
+     "catch without a catch frame"},
     {Compile_time_error::Reference_to_undefined_block,
-        "reference to undefined block"},
+     "reference to undefined block"},
 };
 
 auto display_error(Compile_time_error const error_code) -> std::string {

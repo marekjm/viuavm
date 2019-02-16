@@ -360,8 +360,11 @@ struct Arm_result {
 };
 
 static auto analyse_single_arm(
-    std::optional<std::reference_wrapper<viua::tooling::libs::parser::Cooked_function const>> fn,
-    std::optional<std::reference_wrapper<viua::tooling::libs::parser::Cooked_block const>> bl,
+    std::optional<std::reference_wrapper<
+        viua::tooling::libs::parser::Cooked_function const>> fn,
+    std::optional<
+        std::reference_wrapper<viua::tooling::libs::parser::Cooked_block const>>
+        bl,
     viua::tooling::libs::parser::Cooked_fragments const& fragments,
     Analyser_state& analyser_state,
     Function_state& function_state,
@@ -379,9 +382,10 @@ static auto analyse_single_arm(
     /* auto const analysed_function_name = */
     /*     fn.head().function_name + '/' + std::to_string(fn.head().arity); */
 
-    auto const analysed_region_name = (fn.has_value()
-        ? (fn.value().get().head().function_name + '/' + std::to_string(fn.value().get().head().arity))
-        : bl.value().get().body().at(0)->tokens().at(0).str());
+    auto const analysed_region_name =
+        (fn.has_value() ? (fn.value().get().head().function_name + '/'
+                           + std::to_string(fn.value().get().head().arity))
+                        : bl.value().get().body().at(0)->tokens().at(0).str());
 
     auto arm_result = Arm_result{};
 
@@ -399,10 +403,11 @@ static auto analyse_single_arm(
 
     for (; i < annotated_body.size(); ++i) {
         arm_result.analysed_lines.insert(i);
-        auto const line = (fn.has_value()
-            ? fn.value().get().body().at(annotated_body.at(i).source_line)
-            : bl.value().get().body().at(annotated_body.at(i).source_line)
-        );
+        auto const line =
+            (fn.has_value()
+                 ? fn.value().get().body().at(annotated_body.at(i).source_line)
+                 : bl.value().get().body().at(
+                       annotated_body.at(i).source_line));
 
         std::cout << "analysing: " << line->token(0).str() << std::endl;
 
@@ -846,41 +851,47 @@ static auto analyse_single_arm(
                             .value());
                     if (rhs_operand.known() and rhs_operand.of() == 0) {
                         auto msg = std::ostringstream{};
-                        msg << "right-hand side will always be 0, triggering a division by zero";
+                        msg << "right-hand side will always be 0, triggering a "
+                               "division by zero";
 
                         auto error =
                             viua::tooling::errors::compile_time::Error_wrapper{}
-                                .append(viua::tooling::errors::compile_time::Error{
-                                    viua::tooling::errors::compile_time::
-                                        Compile_time_error::Empty_error,
-                                    line->tokens().at(0),
-                                    msg.str()});
+                                .append(
+                                    viua::tooling::errors::compile_time::Error{
+                                        viua::tooling::errors::compile_time::
+                                            Compile_time_error::Empty_error,
+                                        line->tokens().at(0),
+                                        msg.str()});
 
                         {
                             auto const& definition_location =
                                 function_state.defined_at(rhs_index,
                                                           rhs.register_set);
-                            error.append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::
-                                    Compile_time_error::Empty_error,
-                                definition_location.at(0)}
-                                             .note("right-hand side defined here:"));
+                            error.append(
+                                viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::
+                                        Compile_time_error::Empty_error,
+                                    definition_location.at(0)}
+                                    .note("right-hand side defined here:"));
                             if (function_state.mutated(rhs_index,
                                                        rhs.register_set)) {
-                                for (auto const& each : function_state.mutated_at(
+                                for (auto const& each :
+                                     function_state.mutated_at(
                                          rhs_index, rhs.register_set)) {
                                     auto e =
-                                        viua::tooling::errors::compile_time::Error{
-                                            viua::tooling::errors::compile_time::
-                                                Compile_time_error::Empty_error,
-                                            each.at(0)};
+                                        viua::tooling::errors::compile_time::
+                                            Error{viua::tooling::errors::
+                                                      compile_time::
+                                                          Compile_time_error::
+                                                              Empty_error,
+                                                  each.at(0)};
                                     for (auto it = each.begin() + 1;
                                          it != each.end();
                                          ++it) {
                                         e.add(*it);
                                     }
-                                    error.append(
-                                        e.note("right-hand side mutated here:"));
+                                    error.append(e.note(
+                                        "right-hand side mutated here:"));
                                 }
                             }
                         }
@@ -2788,21 +2799,25 @@ static auto analyse_single_arm(
                  */
                 spawned_frame.reset(nullptr);
 
-                if (instruction.operands.at(0).get()->type() == Operand_type::Register_address and
-                    (instruction.opcode == CALL or instruction.opcode == PROCESS)) {
+                if (instruction.operands.at(0).get()->type()
+                        == Operand_type::Register_address
+                    and (instruction.opcode == CALL
+                         or instruction.opcode == PROCESS)) {
                     auto const& dest = *static_cast<Register_address const*>(
                         instruction.operands.at(0).get());
 
                     auto defining_tokens =
                         std::vector<viua::tooling::libs::lexer::Token>{};
                     defining_tokens.push_back(line->token(0));
-                    copy_whole(dest.tokens(), std::back_inserter(defining_tokens));
+                    copy_whole(dest.tokens(),
+                               std::back_inserter(defining_tokens));
 
                     function_state.define_register(
                         function_state.resolve_index(dest),
                         dest.register_set,
                         function_state.make_wrapper(
-                            std::make_unique<values::Value>(values::Value_type::Value)),
+                            std::make_unique<values::Value>(
+                                values::Value_type::Value)),
                         std::move(defining_tokens));
                 }
 
@@ -2851,8 +2866,8 @@ static auto analyse_single_arm(
                 function_state.define_register(
                     dest_index,
                     dest.register_set,
-                    function_state.make_wrapper(
-                        std::make_unique<values::Value>(values::Value_type::Value)),
+                    function_state.make_wrapper(std::make_unique<values::Value>(
+                        values::Value_type::Value)),
                     std::move(defining_tokens));
 
                 break;
@@ -2906,28 +2921,27 @@ static auto analyse_single_arm(
                 function_state.define_register(
                     dest_index,
                     dest.register_set,
-                    function_state.make_wrapper(
-                        std::make_unique<values::Value>(values::Value_type::Value)),
+                    function_state.make_wrapper(std::make_unique<values::Value>(
+                        values::Value_type::Value)),
                     std::move(defining_tokens));
 
                 break;
             }
             case WATCHDOG: {
                 auto const called_function_name =
-                             instruction.operands.at(0)->tokens().at(0).str()
-                           + instruction.operands.at(0)->tokens().at(1).str()
-                           + instruction.operands.at(0)->tokens().at(2).str();
-                std::cerr << "  setting: " << called_function_name << " as watchdog from "
-                          << analysed_region_name << '\n';
+                    instruction.operands.at(0)->tokens().at(0).str()
+                    + instruction.operands.at(0)->tokens().at(1).str()
+                    + instruction.operands.at(0)->tokens().at(2).str();
+                std::cerr << "  setting: " << called_function_name
+                          << " as watchdog from " << analysed_region_name
+                          << '\n';
 
                 if (not spawned_frame) {
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
-                            .append(
-                                viua::tooling::errors::compile_time::Error{
-                                    Compile_time_error::
-                                        Call_without_a_frame,
-                                    instruction.operands.at(0)->tokens().at(0),
-                                    called_function_name});
+                        .append(viua::tooling::errors::compile_time::Error{
+                            Compile_time_error::Call_without_a_frame,
+                            instruction.operands.at(0)->tokens().at(0),
+                            called_function_name});
                 }
 
                 for (auto const each :
@@ -3055,7 +3069,7 @@ static auto analyse_single_arm(
                             << '\n';
                     }
 
-                    auto cloned = function_state.clone();
+                    auto cloned     = function_state.clone();
                     true_arm_result = analyse_single_arm(fn,
                                                          bl,
                                                          fragments,
@@ -3167,7 +3181,8 @@ static auto analyse_single_arm(
             }
             case CATCH: {
                 if (not spawned_catch_frame) {
-                    auto const name_of_the_block = instruction.operands.at(1)->tokens().at(0);
+                    auto const name_of_the_block =
+                        instruction.operands.at(1)->tokens().at(0);
                     auto error =
                         viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
@@ -3192,8 +3207,10 @@ static auto analyse_single_arm(
                     function_state.resolve_index(dest),
                     dest.register_set,
                     function_state.make_wrapper(
-                        // FIXME maybe use an exception type after exceptions are fully specified
-                        std::make_unique<values::Value>(values::Value_type::Value)),
+                        // FIXME maybe use an exception type after exceptions
+                        // are fully specified
+                        std::make_unique<values::Value>(
+                            values::Value_type::Value)),
                     std::move(defining_tokens));
 
                 break;
@@ -3207,15 +3224,16 @@ static auto analyse_single_arm(
                                     Compile_time_error::
                                         Overwrite_of_unused_frame,
                                 instruction.token(0)})
-                            .append(viua::tooling::errors::compile_time::Error{
-                                viua::tooling::errors::compile_time::
-                                    Compile_time_error::Empty_error,
-                                spawned_frame_where}
-                                        .note("unused catch frame spawned here"));
+                            .append(
+                                viua::tooling::errors::compile_time::Error{
+                                    viua::tooling::errors::compile_time::
+                                        Compile_time_error::Empty_error,
+                                    spawned_frame_where}
+                                    .note("unused catch frame spawned here"));
                     throw error;
                 }
 
-                spawned_catch_frame = true;
+                spawned_catch_frame       = true;
                 spawned_catch_frame_where = instruction.token(0);
 
                 break;
@@ -3223,7 +3241,8 @@ static auto analyse_single_arm(
             case ENTER: {
                 spawned_catch_frame = false;
 
-                auto const& block_name_token = instruction.operands.at(0)->tokens().at(0);
+                auto const& block_name_token =
+                    instruction.operands.at(0)->tokens().at(0);
                 auto const block_name = block_name_token.str();
 
                 if (not fragments.block_fragments.count(block_name)) {
@@ -3231,36 +3250,38 @@ static auto analyse_single_arm(
                         viua::tooling::errors::compile_time::Error_wrapper{}
                             .append(viua::tooling::errors::compile_time::Error{
                                 viua::tooling::errors::compile_time::
-                                    Compile_time_error::Reference_to_undefined_block,
+                                    Compile_time_error::
+                                        Reference_to_undefined_block,
                                 block_name_token,
                                 block_name});
                     throw error;
                 }
 
                 try {
-                    auto const& block = fragments.block_fragments.at(block_name);
-                    auto const block_body = block.body();
+                    auto const& block =
+                        fragments.block_fragments.at(block_name);
+                    auto const block_body           = block.body();
                     auto const block_annotated_body = annotate_body(block_body);
-                    auto const block_label_map      = create_label_map(block_body, block_annotated_body);
+                    auto const block_label_map =
+                        create_label_map(block_body, block_annotated_body);
 
                     return analyse_single_arm(fn,
-                                             block,
-                                             fragments,
-                                             analyser_state,
-                                             function_state,
-                                             false,
-                                             block_annotated_body,
-                                             block_label_map,
-                                             0);
+                                              block,
+                                              fragments,
+                                              analyser_state,
+                                              function_state,
+                                              false,
+                                              block_annotated_body,
+                                              block_label_map,
+                                              0);
                 } catch (
                     viua::tooling::errors::compile_time::Error_wrapper& e) {
-                    e.append(
-                        viua::tooling::errors::compile_time::Error{
-                            viua::tooling::errors::compile_time::
-                                Compile_time_error::Empty_error,
-                            instruction.tokens().at(0),
-                            "after entering block " + block_name}
-                            .add(block_name_token));
+                    e.append(viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::
+                            Compile_time_error::Empty_error,
+                        instruction.tokens().at(0),
+                        "after entering block " + block_name}
+                                 .add(block_name_token));
                     throw;
                 }
             }
@@ -3700,15 +3721,14 @@ static auto analyse_single_function(
         } else {
             using viua::tooling::errors::compile_time::Compile_time_error;
             auto error =
-                viua::tooling::errors::compile_time::Error_wrapper{}
-                    .append(
-                        viua::tooling::errors::compile_time::Error{
-                            Compile_time_error::
-                                Empty_error,
-                            fn.head().tokens().at(0),
-                            "arity " + std::to_string(fn.head().arity)
+                viua::tooling::errors::compile_time::Error_wrapper{}.append(
+                    viua::tooling::errors::compile_time::Error{
+                        Compile_time_error::Empty_error,
+                        fn.head().tokens().at(0),
+                        "arity " + std::to_string(fn.head().arity)
                             + " is not value for the main function"}
-                            .note("only arities 0, 1, and 2 are valid for main function"));
+                        .note("only arities 0, 1, and 2 are valid for main "
+                              "function"));
             throw error;
         }
     } else {
@@ -3739,20 +3759,18 @@ static auto analyse_single_function(
                        0);
 
     if (fn.head().function_name == "main") {
-        auto target = Register_address{
-            0
-            , false
-            , false
-            , viua::internals::Register_sets::LOCAL
-            , viua::internals::Access_specifier::DIRECT
-        };
+        auto target =
+            Register_address{0,
+                             false,
+                             false,
+                             viua::internals::Register_sets::LOCAL,
+                             viua::internals::Access_specifier::DIRECT};
         target.add(fn.head().tokens().at(0));
         target.add(fn.head().tokens().at(0));
         target.add(fn.head().tokens().at(0));
 
         try {
-            auto const target_index =
-                throw_if_empty(function_state, target);
+            auto const target_index = throw_if_empty(function_state, target);
 
             auto const target_access = target.access;
             auto const target_type_signature =
@@ -3763,30 +3781,28 @@ static auto analyse_single_function(
                                               values::Value_type::Integer}
                     : std::vector<values::Value_type>{
                           values::Value_type::Integer};
-            if (not function_state.assume_type(target_index,
-                                               target.register_set,
-                                               target_type_signature)) {
+            if (not function_state.assume_type(
+                    target_index, target.register_set, target_type_signature)) {
                 auto error =
-                    viua::tooling::errors::compile_time::Error_wrapper{}
-                        .append(viua::tooling::errors::compile_time::Error{
+                    viua::tooling::errors::compile_time::Error_wrapper{}.append(
+                        viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::
                                 Compile_time_error::Type_mismatch,
                             target.tokens().at(0),
                             "expected `" + to_string(target_type_signature)
                                 + "'..."}
-                                    .add(target.tokens().at(0)));
+                            .add(target.tokens().at(0)));
 
                 auto const& definition_location = function_state.defined_at(
                     target_index, target.register_set);
                 error.append(viua::tooling::errors::compile_time::Error{
-                    viua::tooling::errors::compile_time::
-                        Compile_time_error::Empty_error,
+                    viua::tooling::errors::compile_time::Compile_time_error::
+                        Empty_error,
                     definition_location.at(0),
                     ("...got `"
-                     + to_string(
-                           function_state
-                               .type_of(target_index, target.register_set)
-                               .to_simple())
+                     + to_string(function_state
+                                     .type_of(target_index, target.register_set)
+                                     .to_simple())
                      + "'")}
                                  .note("defined here"));
                 throw error;
@@ -3807,17 +3823,16 @@ static auto analyse_functions(
     Analyser_state& analyser_state) -> void {
     auto const& functions = fragments.function_fragments;
 
-    if (not (functions.count("main/0") or functions.count("main/1") or functions.count("main/2"))) {
+    if (not(functions.count("main/0") or functions.count("main/1")
+            or functions.count("main/2"))) {
         using viua::tooling::errors::compile_time::Compile_time_error;
         auto error =
-            viua::tooling::errors::compile_time::Error_wrapper{}
-                .append(
-                    viua::tooling::errors::compile_time::Error{
-                        Compile_time_error::
-                            No_main_function_defined,
-                        viua::tooling::libs::lexer::Token()}
-                        .note(
-                            "one of the `main/0', `main/1', or `main/2' functions must be defined"));
+            viua::tooling::errors::compile_time::Error_wrapper{}.append(
+                viua::tooling::errors::compile_time::Error{
+                    Compile_time_error::No_main_function_defined,
+                    viua::tooling::libs::lexer::Token()}
+                    .note("one of the `main/0', `main/1', or `main/2' "
+                          "functions must be defined"));
         throw error;
     }
 

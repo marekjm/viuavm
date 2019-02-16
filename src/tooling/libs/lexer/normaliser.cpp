@@ -390,8 +390,8 @@ static auto normalise_register_access(std::vector<Token>& tokens,
                 viua::util::string::ops::LevenshteinDistance{4};
             auto const best_match = viua::util::string::ops::levenshtein_best(
                 register_set.str(),
-                {// FIXME provide a std::vector<std::string> with valid register set
-                 // names
+                {// FIXME provide a std::vector<std::string> with valid register
+                 // set names
                  "local",
                  "static",
                  "global",
@@ -399,7 +399,8 @@ static auto normalise_register_access(std::vector<Token>& tokens,
                  "parameters"},
                 likeness_limit);
             if (best_match.first <= likeness_limit) {
-                e.aside(source.at(2), "did you mean `" + best_match.second + "'?");
+                e.aside(source.at(2),
+                        "did you mean `" + best_match.second + "'?");
             }
         }
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(e);
