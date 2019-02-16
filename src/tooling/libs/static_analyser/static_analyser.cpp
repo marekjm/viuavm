@@ -404,9 +404,9 @@ static auto analyse_single_arm(
     for (; i < annotated_body.size(); ++i) {
         arm_result.analysed_lines.insert(i);
         auto const line =
-            (fn.has_value()
-                 ? fn.value().get().body().at(annotated_body.at(i).source_line)
-                 : bl.value().get().body().at(
+            (bl.has_value()
+                 ? bl.value().get().body().at(annotated_body.at(i).source_line)
+                 : fn.value().get().body().at(
                        annotated_body.at(i).source_line));
 
         std::cout << "analysing: " << line->token(0).str() << std::endl;
