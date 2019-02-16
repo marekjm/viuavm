@@ -1460,8 +1460,8 @@ auto Cooked_function::body() const -> body_type {
 auto Cooked_block::body() const -> body_type {
     auto v = body_type{};
 
-    for (auto const& each : lines) {
-        v.push_back(each.get());
+    for (auto each = lines.begin() + 1; each != lines.end(); ++each) {
+        v.push_back(each->get());
     }
 
     return v;
