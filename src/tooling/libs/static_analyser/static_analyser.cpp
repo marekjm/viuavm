@@ -371,8 +371,8 @@ static auto analyse_single_arm(
     bool const after_conditional_branch,
     std::vector<Body_line> const& annotated_body,
     std::map<std::string, Body_line> const& label_map,
-    viua::tooling::libs::parser::Cooked_function::body_type::size_type i)
-    -> Arm_result {
+    viua::tooling::libs::parser::Cooked_function::body_type::size_type i,
+    bool const analyse_all = true) -> Arm_result {
     using viua::tooling::errors::compile_time::Compile_time_error;
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
@@ -424,7 +424,7 @@ static auto analyse_single_arm(
         }
 
         if (line->type() == Fragment_type::Instruction
-            and annotated_body.at(i).instruction) {
+            and (annotated_body.at(i).instruction or analyse_all)) {
             auto const& instruction = *static_cast<Instruction const*>(line);
 
             switch (instruction.opcode) {
@@ -3758,7 +3758,8 @@ static auto analyse_single_function(
                        false,
                        annotated_body,
                        label_map,
-                       0);
+                       0,
+                       false);
 
     if (fn.head().function_name == "main") {
         auto target =
