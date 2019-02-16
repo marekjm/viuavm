@@ -3267,15 +3267,19 @@ static auto analyse_single_arm(
                     auto const block_label_map =
                         create_label_map(block_body, block_annotated_body);
 
-                    return analyse_single_arm(fn,
-                                              block,
-                                              fragments,
-                                              analyser_state,
-                                              function_state,
-                                              false,
-                                              block_annotated_body,
-                                              block_label_map,
-                                              0);
+                    std::cerr << "entering block: " << block_name << '\n';
+
+                    analyse_single_arm(fn,
+                                       block,
+                                       fragments,
+                                       analyser_state,
+                                       function_state,
+                                       false,
+                                       block_annotated_body,
+                                       block_label_map,
+                                       0);
+
+                    std::cerr << "left block:     " << block_name << '\n';
                 } catch (
                     viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(viua::tooling::errors::compile_time::Error{
@@ -3286,6 +3290,7 @@ static auto analyse_single_arm(
                                  .add(block_name_token));
                     throw;
                 }
+                break;
             }
             case LEAVE: {
                 return arm_result;
