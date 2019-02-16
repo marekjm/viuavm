@@ -1,0 +1,1 @@
+{"author.name": "Marek Marecki", "author.email": "marejm@ozro.pw", "message": "Closure instantiation checks are left to be implemented\n\nThe only feature (I think) that is left to be implemented in the new\nanalyser are closure instantiations.", "timestamp": 1550352511.585779}
