@@ -409,7 +409,9 @@ static auto analyse_single_arm(
                  : fn.value().get().body().at(
                        annotated_body.at(i).source_line));
 
-        std::cout << "analysing: " << line->token(0).str() << std::endl;
+        std::cout << "analysing: " << line->token(0).str() << " (" << i
+                  << " of " << (annotated_body.size() - 1) << " lines)"
+                  << std::endl;
 
         if (line->type() == Fragment_type::Name_directive) {
             using viua::tooling::libs::parser::Name_directive;
