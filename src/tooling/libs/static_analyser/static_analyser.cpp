@@ -3854,6 +3854,18 @@ auto analyse(viua::tooling::libs::parser::Cooked_fragments const& fragments)
     -> void {
     auto analyser_state = Analyser_state{};
 
+    for (auto const& [name, block] : fragments.block_fragments) {
+        if (not block.body().size()) {
+            auto error =
+                viua::tooling::errors::compile_time::Error_wrapper{}.append(
+                    viua::tooling::errors::compile_time::Error{
+                        viua::tooling::errors::compile_time::
+                            Compile_time_error::Empty_block_body,
+                        block.lines.at(0)->tokens().at(1)});
+            throw error;
+        }
+    }
+
     analyse_functions(fragments, analyser_state);
 
     /* analyse_closure_instantiations(fragments); */
