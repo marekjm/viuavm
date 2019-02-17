@@ -513,7 +513,7 @@ static auto normalise_call(std::vector<Token>& tokens,
 
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
-        i += normalise_register_access(tokens, source.advance(1));
+        i += normalise_register_access(tokens, source.advance(i));
     } else if (is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));    // function name
         tokens.push_back(source.at(++i));  // arity separator
