@@ -2745,6 +2745,13 @@ static auto analyse_single_arm(
             case DEFER: {
             }
             case PROCESS: {
+                if (not spawned_frame) {
+                    throw viua::tooling::errors::compile_time::Error_wrapper{}
+                        .append(viua::tooling::errors::compile_time::Error{
+                            Compile_time_error::Call_without_a_frame,
+                            instruction.tokens().at(0)});
+                }
+
                 for (auto const each :
                      int_range(spawned_frame->allocated_parameters)) {
                     if (not spawned_frame->filled_parameters.count(each)) {
