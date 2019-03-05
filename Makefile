@@ -345,6 +345,8 @@ platform: build/platform/types/exception.o \
 	build/platform/types/bits.o \
 	build/platform/types/float.o \
 	build/platform/types/string.o \
+	build/platform/types/atom.o \
+	build/platform/types/struct.o \
 	build/platform/types/text.o \
 	build/platform/types/vector.o \
 	build/platform/types/reference.o \
