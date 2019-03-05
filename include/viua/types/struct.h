@@ -50,6 +50,7 @@ class Struct : public Value {
         -> void;
     virtual auto remove(std::string const& key) -> std::unique_ptr<Value>;
     virtual auto at(std::string const& key) -> Value*;
+    virtual auto at(std::string const& key) const -> Value const*;
     virtual auto keys() const -> std::vector<std::string>;
 
     auto copy() const -> std::unique_ptr<Value> override;

@@ -162,6 +162,10 @@ std::vector<std::unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
     return internal_object;
 }
 
+std::vector<std::unique_ptr<viua::types::Value>> const& viua::types::Vector::value() const {
+    return internal_object;
+}
+
 viua::types::Vector::Vector() {}
 viua::types::Vector::Vector(const std::vector<viua::types::Value*>& v) {
     for (unsigned i = 0; i < v.size(); ++i) {

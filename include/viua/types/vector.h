@@ -42,6 +42,7 @@ class Vector : public Value {
     std::unique_ptr<Value> copy() const override;
 
     std::vector<std::unique_ptr<Value>>& value();
+    std::vector<std::unique_ptr<Value>> const& value() const;
 
     void insert(long int, std::unique_ptr<Value>);
     void push(std::unique_ptr<Value>);
