@@ -59,3 +59,8 @@ Most instructions try hard to be atomic, so that if an error occurs during any
 phase of an execution the state of registers is not modified. This is not always
 possible. The guarantees provided by each instruction are listed in that
 instruction's specification.
+
+Long running instructions (e.g. call to a foreign function, receiving a message,
+waiting for I/O operation to complete) can be interrupted while "in-flight"
+during their "execute" phase. This must be allowed to make it possible to kill
+a process that gets stuck (similarly to what SIGKILL does).
