@@ -1297,12 +1297,14 @@ auto generate(std::vector<Token> const& tokens,
     {
         auto dynamic_imports_section_size =
             viua::internals::types::bytecode_size{0};
-        for (auto const& [module_name, file_name] : dynamic_imports) {
+        for (auto const& each : dynamic_imports) {
+            auto const& module_name = each.first;
             dynamic_imports_section_size +=
                 (module_name.size() + 1);  // +1 for null byte after
         }
         bwrite(out, dynamic_imports_section_size);
-        for (auto const& [module_name, file_name] : dynamic_imports) {
+        for (auto const& each : dynamic_imports) {
+            auto const& module_name = each.first;
             strwrite(out, module_name);
 
             if (flags.verbose) {
