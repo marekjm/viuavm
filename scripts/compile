@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/env sh
 
 #
 #   Copyright (C) 2015, 2016 Marek Marecki
