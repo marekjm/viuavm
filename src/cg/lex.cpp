@@ -461,7 +461,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.push_back(token);
             tokens.push_back(input_tokens.at(++i));
 
-            auto target_register_index = std::string{tokens.back()};
+            auto target_register_index = tokens.back().str();
             auto target_register_set   = std::string{"local"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
@@ -746,7 +746,7 @@ auto standardise(std::vector<Token> input_tokens) -> std::vector<Token> {
             tokens.push_back(token);  // mnemonic
 
             tokens.push_back(input_tokens.at(++i));  // target register
-            auto target_register_index = std::string{tokens.back()};
+            auto target_register_index = tokens.back().str();
             auto target_register_set   = std::string{"local"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
@@ -1269,7 +1269,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
         } else if (token == "vector") {
             tokens.push_back(input_tokens.at(++i));
 
-            auto target_register_index = std::string{tokens.back()};
+            auto target_register_index = tokens.back().str();
             auto target_register_set   = std::string{"local"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),
@@ -1535,7 +1535,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
                    or token == "gt" or token == "gte" or token == "eq"
                    or token == "wrapadd" or token == "wrapmul") {
             tokens.push_back(input_tokens.at(++i));  // target register
-            auto target_register_index = std::string{tokens.back()};
+            auto target_register_index = tokens.back().str();
             auto target_register_set   = std::string{"local"};
             if (not is_register_set_name(input_tokens.at(i + 1))) {
                 tokens.emplace_back(tokens.back().line(),

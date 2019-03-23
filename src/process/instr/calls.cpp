@@ -133,6 +133,7 @@ auto viua::process::Process::opallocate_registers(Op_address_type addr)
     auto const [addr_, register_set, no_of_registers] =
         viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
                                                                          this);
+    static_cast<void>(register_set);
 
     auto allocated =
         std::make_unique<viua::kernel::Register_set>(no_of_registers);
