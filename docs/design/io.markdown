@@ -73,8 +73,13 @@ is this:
 
 - `io_read`: read data through the I/O handle
 - `io_write`: write data through the I/O handle
-- `io_seek`: move the data pointer through the I/O handle
+- `io_seek`: move the data pointer of the I/O handle
 - `io_close`: closes an I/O handle
+
+A set of supporting I/O instructions presented by Viua VM is this:
+
+- `io_cancel`: cancel a scheduled I/O operation
+- `io_await`: wait for an I/O operation to complete
 
 There is also the generic instruction that is able to schedule any of the basic
 operations, while also being able to schedule any *extension* operations:
@@ -91,3 +96,22 @@ pass additional information and data to the operation, such as:
 
 The specification may also contain any other data, as deemed necessary by the
 designer of that particular I/O handle type.
+
+--------------------------------------------------------------------------------
+
+## Basic set of I/O primitives
+
+This section lists the basic I/O primitives that should be provided by an I/O
+system to allow it to emulate POSIX I/O API.
+
+### Input primitives
+
+#### Read
+
+This is similar to `read(3)`. Read at most n bytes from I/O handle, and move the
+position marker forward by the amount of bytes actually read (which may be less
+than n).
+
+#### Receive
+
+This is similar to `recv(3)`.
