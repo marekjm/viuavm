@@ -102,6 +102,8 @@ There are several categories of change:
   a tail call
 - fix: the linker correctly handles static linking of more than one module in a single
   run (previously it would calculate bytecode offsets of the modules incorrectly)
+- bic, feature: `watchdog` requires a frame, but allows passing additional information
+  to watchdog functions
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
