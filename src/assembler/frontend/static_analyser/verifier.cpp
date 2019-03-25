@@ -186,14 +186,14 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == TAILCALL or opcode == DEFER
-                        or opcode == PROCESS or opcode == FRAME
+                        or opcode == PROCESS or opcode == WATCHDOG or opcode == FRAME
                         or opcode == RETURN or opcode == LEAVE
                         or opcode == THROW)) {
                     continue;
                 }
 
                 if (opcode == CALL or opcode == TAILCALL or opcode == DEFER
-                    or opcode == PROCESS) {
+                    or opcode == PROCESS or opcode == WATCHDOG) {
                     --balance;
                 } else if (opcode == FRAME) {
                     ++balance;

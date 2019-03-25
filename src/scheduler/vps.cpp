@@ -587,7 +587,7 @@ bool viua::scheduler::Virtual_process_scheduler::burst() {
                 death_message->insert("exception", std::move(exc));
                 death_message->insert("parameters", std::move(parameters));
 
-                auto death_frame = make_unique<Frame>(nullptr, 1);
+                auto death_frame = std::move(th->frame_for_watchdog());
                 death_frame->arguments->set(0, std::move(death_message));
 #if VIUA_VM_DEBUG_LOG
                 viua_err("[scheduler:vps:",

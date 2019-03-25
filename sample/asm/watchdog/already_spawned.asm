@@ -80,8 +80,10 @@
 .function: main/1
     allocate_registers %1 local
 
+    frame %1
     watchdog watchdog_process/1
 
+    frame %1
     watchdog watchdog_process/1
 
     frame %0

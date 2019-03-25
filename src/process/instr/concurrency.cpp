@@ -246,6 +246,7 @@ auto viua::process::Process::opwatchdog(Op_address_type addr)
     }
 
     watchdog_function = call_name;
+    watchdog_frame = std::move(stack->frame_new);
 
     return addr;
 }

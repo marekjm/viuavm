@@ -201,6 +201,7 @@ class Process {
     viua::process::Process* parent_process;
 
     std::string watchdog_function{""};
+    std::unique_ptr<Frame> watchdog_frame;
     bool watchdog_failed{false};
 
     std::unique_ptr<viua::kernel::Register_set> global_register_set;
@@ -450,6 +451,8 @@ class Process {
 
     bool watchdogged() const;
     std::string watchdog() const;
+    auto frame_for_watchdog() -> std::unique_ptr<Frame>;
+
     auto become(std::string const&, std::unique_ptr<Frame>) -> Op_address_type;
 
     auto begin() -> Op_address_type;

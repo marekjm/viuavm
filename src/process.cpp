@@ -348,6 +348,10 @@ bool viua::process::Process::watchdogged() const {
 std::string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
+auto viua::process::Process::frame_for_watchdog() -> std::unique_ptr<Frame> {
+    return std::move(watchdog_frame);
+}
+
 auto viua::process::Process::become(std::string const& function_name,
                                     std::unique_ptr<Frame> frame_to_use)
     -> Op_address_type {

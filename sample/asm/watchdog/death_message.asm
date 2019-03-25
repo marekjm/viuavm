@@ -108,6 +108,7 @@
 
     import std::misc
 
+    frame %1
     watchdog watchdog_process/1
 
     frame %0

@@ -31,7 +31,8 @@ static auto hello(Frame*, viua::kernel::Register_set*, viua::kernel::Register_se
 
 
 const Foreign_function_spec functions[] = {
-    {"World::print_hello/0", &hello}, {nullptr, nullptr},
+    {"World::print_hello/0", &hello},
+    {"World::print_hello/1", &hello}, {nullptr, nullptr},
 };
 
 extern "C" const Foreign_function_spec* exports() { return functions; }

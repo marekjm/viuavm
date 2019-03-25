@@ -29,7 +29,7 @@
     leave
 .end
 
-.function: watchdog_process/0
+.function: watchdog_process/1
     allocate_registers %3 local
 
     move (.name: %iota death_message) local %0 parameters
@@ -44,7 +44,8 @@
 .function: main/1
     allocate_registers %2 local
 
-    watchdog watchdog_process/0
+    frame %1
+    watchdog watchdog_process/1
 
     import throwing
 

@@ -57,12 +57,13 @@
     return
 .end
 
-.signature: undefined_function/0
+.signature: undefined_function/1
 
 .function: main/1
     allocate_registers %1 local
 
-    watchdog undefined_function/0
+    frame %1
+    watchdog undefined_function/1
 
     frame %0
     process void broken_process/0

@@ -2847,19 +2847,25 @@ class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
 
     def testHelloWorldExample(self):
-        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process/0> died')
+        runTestSplitlines(self, 'hello_world.asm', [
+            'process spawned with <Function: broken_process/0> died',
+            'some extra information',
+        ])
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:63:14: error: watchdog from undefined function undefined_function/0')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:64:14: error: watchdog from undefined function undefined_function/1')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
-        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', ('Exception', 'watchdog process from undefined function: undefined_function/0',))
+        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', ('Exception', 'watchdog process from undefined function: undefined_function/1',))
 
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
         runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> killed by >>>watchdog already set<<<')
 
     def testWatchdogMustBeANativeFunction(self):
-        runTestThrowsException(self, 'must_be_a_native_function.asm', ('Exception', 'watchdog process must be a native function, used foreign World::print_hello/0',))
+        runTestThrowsException(self, 'must_be_a_native_function.asm', (
+            'Exception',
+            'watchdog process must be a native function, used foreign World::print_hello/1',
+        ))
 
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
         runTestThrowsException(

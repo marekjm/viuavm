@@ -17,14 +17,15 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.signature: World::print_hello/0
+.signature: World::print_hello/1
 
 .function: main/1
     allocate_registers %1 local
 
     import World
 
-    watchdog World::print_hello/0
+    frame %1
+    watchdog World::print_hello/1
 
     izero %0 local
     return

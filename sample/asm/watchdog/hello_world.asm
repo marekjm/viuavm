@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/1
+.function: watchdog_process/2
     allocate_registers %5 local
 
     move %1 local %0 parameters
@@ -28,13 +28,20 @@
     echo %3 local
     print (string %4 local "> died") local
 
+    move %2 local %1 parameters
+    print %2 local
+
     return
 .end
 
 .function: broken_process/0
     allocate_registers %2 local
 
-    watchdog watchdog_process/1
+    text %1 local "some extra information"
+
+    frame %2
+    move %1 arguments %1 local
+    watchdog watchdog_process/2
 
     nop
     nop
@@ -75,9 +82,6 @@
 
 .function: main/1
     allocate_registers %1 local
-
-    ;frame %0
-    ;watchdog watchdog_process/0
 
     frame %0
     process void broken_process/0

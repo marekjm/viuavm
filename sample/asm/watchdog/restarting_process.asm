@@ -51,6 +51,7 @@
 .function: a_detached_concurrent_process/0
     allocate_registers %2 local
 
+    frame %1
     watchdog watchdog_process/1
 
     frame ^[(move %0 arguments (integer %1 local 32) local)]
@@ -92,6 +93,7 @@
 .function: a_division_executing_process/2
     allocate_registers %5 local
 
+    frame %1
     watchdog watchdog_process/1
 
     frame ^[(move %0 arguments (integer %1 local 128) local)]

@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: supervisor_function/0
+.function: supervisor_function/1
     allocate_registers %0 local
 
     ; uncomment the `receive 1` and
@@ -77,7 +77,8 @@
 .function: main/1
     allocate_registers %2 local
 
-    watchdog supervisor_function/0
+    frame %1
+    watchdog supervisor_function/1
 
     print (string %1 local "main/1 exiting") local
     izero %0 local
