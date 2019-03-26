@@ -2756,6 +2756,9 @@ class ConcurrencyTests(unittest.TestCase):
     def testHelloWorldExample(self):
         runTestReturnsUnorderedLines(self, 'hello_world.asm', ['Hello concurrent World! (2)', 'Hello concurrent World! (1)'], 0)
 
+    def test_pideq(self):
+        runTestSplitlines(self, 'pideq.asm', ['true', 'false'], 0)
+
     def testJoiningProcess(self):
         runTestSplitlines(self, 'joining_a_process.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 

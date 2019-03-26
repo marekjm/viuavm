@@ -798,6 +798,8 @@ static auto size_of_process(TokenVector const& tokens, TokenVector::size_type i)
     return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 static auto size_of_self = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto size_of_pideq =
+    size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
@@ -1324,6 +1326,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "self") {
             ++i;
             tie(increase, i) = size_of_self(tokens, i);
+        } else if (tokens.at(i) == "pideq") {
+            ++i;
+            tie(increase, i) = size_of_pideq(tokens, i);
         } else if (tokens.at(i) == "join") {
             ++i;
             tie(increase, i) = size_of_join(tokens, i);

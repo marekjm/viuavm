@@ -348,6 +348,7 @@ enum OPCODE : viua::internals::types::byte {
     PROCESS,   // spawn a process (call a function and run it in a different
                // process)
     SELF,      // store a PID of the running process in a register
+    PIDEQ,     // compare two PIDs for equality
     JOIN,      // join a process
     SEND,      // send a message to a process
     RECEIVE,   // receive passed message, block until one arrives

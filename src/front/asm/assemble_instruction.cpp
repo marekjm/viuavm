@@ -502,6 +502,8 @@ auto assemble_instruction(
             program, tokens, i);
     } else if (tokens.at(i) == "self") {
         assemble_single_register_op<&Program::opself>(program, tokens, i);
+    } else if (tokens.at(i) == "pideq") {
+        assemble_three_register_op<&Program::oppideq>(program, tokens, i);
     } else if (tokens.at(i) == "join") {
         viua::assembler::backend::op_assemblers::assemble_op_join(
             program, tokens, i);

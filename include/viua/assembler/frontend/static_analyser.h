@@ -449,6 +449,8 @@ auto check_op_process(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_self(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
+auto check_op_pideq(Register_usage_profile& register_usage_profile,
+                     Instruction const& instruction) -> void;
 auto check_op_join(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_send(Register_usage_profile& register_usage_profile,

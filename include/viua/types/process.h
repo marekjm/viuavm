@@ -64,6 +64,8 @@ class Process : public Value {
     viua::process::PID pid() const;
 
     Process(viua::process::Process*);
+
+    auto operator==(Process const&) const -> bool;
 };
 }}  // namespace viua::types
 

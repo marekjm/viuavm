@@ -931,6 +931,13 @@ auto opself(viua::internals::types::byte* addr_ptr, int_op target)
     return insert_ri_operand(addr_ptr, target);
 }
 
+auto oppideq(viua::internals::types::byte* addr_ptr,
+              int_op target,
+              int_op lhs,
+              int_op rhs) -> viua::internals::types::byte* {
+    return insert_three_ri_instruction(addr_ptr, PIDEQ, target, lhs, rhs);
+}
+
 auto opjoin(viua::internals::types::byte* addr_ptr,
             int_op target,
             int_op source,

@@ -387,6 +387,7 @@ class Process {
     auto opdefer(Op_address_type) -> Op_address_type;
     auto opprocess(Op_address_type) -> Op_address_type;
     auto opself(Op_address_type) -> Op_address_type;
+    auto oppideq(Op_address_type) -> Op_address_type;
     auto opjoin(Op_address_type) -> Op_address_type;
     auto opsend(Op_address_type) -> Op_address_type;
     auto opreceive(Op_address_type) -> Op_address_type;

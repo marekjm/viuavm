@@ -300,6 +300,8 @@ auto opprocess(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opself(viua::internals::types::byte*, int_op)
     -> viua::internals::types::byte*;
+auto oppideq(viua::internals::types::byte*, int_op, int_op, int_op)
+    -> viua::internals::types::byte*;
 auto opjoin(viua::internals::types::byte*, int_op, int_op, timeout_op)
     -> viua::internals::types::byte*;
 auto opsend(viua::internals::types::byte*, int_op, int_op)

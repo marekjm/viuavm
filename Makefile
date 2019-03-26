@@ -669,6 +669,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ptrlive.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_receive.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_self.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_pideq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_send.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stoi.o \

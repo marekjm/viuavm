@@ -663,6 +663,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case VINSERT:
     case VPOP:
     case ATOMEQ:
+    case PIDEQ:
     case STRUCTINSERT:
     case STRUCTREMOVE:
     case STRUCTAT:

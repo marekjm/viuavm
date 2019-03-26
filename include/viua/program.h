@@ -192,6 +192,7 @@ class Program {
     auto opprocess(int_op const, std::string const&) -> Program&;
     auto opprocess(int_op const, int_op const) -> Program&;
     auto opself(int_op const) -> Program&;
+    auto oppideq(int_op const, int_op const, int_op const) -> Program&;
     auto opjoin(int_op const, int_op const, timeout_op) -> Program&;
     auto opsend(int_op const, int_op const) -> Program&;
     auto opreceive(int_op const, timeout_op) -> Program&;

@@ -261,3 +261,18 @@ auto viua::process::Process::opself(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
+auto viua::process::Process::oppideq(Op_address_type addr) -> Op_address_type {
+    viua::kernel::Register* target = nullptr;
+    std::tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Process *first = nullptr, *second = nullptr;
+    std::tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(first)>::type>(addr, this);
+    std::tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(second)>::type>(addr, this);
+
+    *target = std::make_unique<viua::types::Boolean>(*first == *second);
+
+    return addr;
+}

@@ -377,6 +377,9 @@ auto check_register_usage_for_instruction_block_impl(
             case SELF:
                 check_op_self(register_usage_profile, *instruction);
                 break;
+            case PIDEQ:
+                check_op_pideq(register_usage_profile, *instruction);
+                break;
             case JOIN:
                 check_op_join(register_usage_profile, *instruction);
                 break;

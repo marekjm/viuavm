@@ -104,6 +104,7 @@ There are several categories of change:
   run (previously it would calculate bytecode offsets of the modules incorrectly)
 - bic, feature: `watchdog` requires a frame, but allows passing additional information
   to watchdog functions
+- feature: add `pideq` instruction to compare PIDs for equality
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.

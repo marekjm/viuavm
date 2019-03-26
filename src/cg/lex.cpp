@@ -195,7 +195,7 @@ auto is_mnemonic(std::string const& s) -> bool {
     return is_it;
 }
 auto is_reserved_keyword(std::string const& s) -> bool {
-    static set<std::string> const reserved_keywords{
+    static std::set<std::string> const reserved_keywords{
         /*
          * Used for timeouts in 'join' and 'receive' instructions
          */

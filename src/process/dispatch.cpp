@@ -394,6 +394,9 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case SELF:
         addr = opself(addr + 1);
         break;
+    case PIDEQ:
+        addr = oppideq(addr + 1);
+        break;
     case JOIN:
         addr = opjoin(addr + 1);
         break;

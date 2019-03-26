@@ -647,6 +647,12 @@ auto Program::opself(int_op const target) -> Program& {
     return (*this);
 }
 
+auto Program::oppideq(int_op const target, int_op const lhs, int_op const rhs)
+    -> Program& {
+    addr_ptr = cg::bytecode::oppideq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 auto Program::opjoin(int_op const target,
                      int_op const source,
                      timeout_op const timeout) -> Program& {
