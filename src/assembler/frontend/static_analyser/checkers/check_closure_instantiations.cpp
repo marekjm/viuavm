@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+#include <viua/util/range.h>
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::cg::lex::Invalid_syntax;
@@ -40,6 +41,18 @@ auto check_closure_instantiations(
         for (auto& captured_value : each.second.defined_registers) {
             closure_register_usage_profile.define(captured_value.second.second,
                                                   captured_value.second.first);
+        }
+
+        // FIXME: This is ad-hoc code - move it to a utility function.
+        auto const function_arity =
+            std::stoul(fn.name.str().substr(fn.name.str().rfind('/') + 1));
+        for (auto const i :
+             viua::util::Range(static_cast<viua::internals::types::register_index>(
+                 function_arity))) {
+            auto val         = Register{};
+            val.index        = i;
+            val.register_set = viua::internals::Register_sets::PARAMETERS;
+            closure_register_usage_profile.define(val, fn.name);
         }
 
         try {
