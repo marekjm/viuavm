@@ -205,6 +205,7 @@ auto check_use_of_register(Register_usage_profile& rup,
                       "register of `copy` and `move` instructions"));
     }
 
+    // FIXME check in bound-ness of register sets other than local
     if ((not rup.in_bounds(r)) and r.rss == Register_sets::LOCAL) {
         throw Traced_syntax_error{}
             .append(Invalid_syntax{
@@ -216,17 +217,6 @@ auto check_use_of_register(Register_usage_profile& rup,
             .append(Invalid_syntax{rup.allocated_where().value(), ""}.note(
                 "increase this value to " + std::to_string(r.index + 1)
                 + " to fix this issue"));
-    } else if (not rup.in_bounds(r)) {
-        auto const msg = "access to "
-            + to_string(r.rss)
-            + " register "
-            + str::enquote(std::to_string(r.index))
-            + " out of bounds";
-        throw Traced_syntax_error{}
-            .append(Invalid_syntax{
-                r.tokens.at(0),
-                msg
-            });
     }
 
     if (not rup.defined(Register(r))) {

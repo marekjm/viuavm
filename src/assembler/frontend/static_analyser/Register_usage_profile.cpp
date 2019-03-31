@@ -183,6 +183,7 @@ auto Register_usage_profile::allocated_where() const
 }
 
 auto Register_usage_profile::in_bounds(Register const r) const -> bool {
+    // FIXME check in bound-ness of register sets other than local
     return not(allocated_registers()
                and r.index >= allocated_registers().value());
 }
