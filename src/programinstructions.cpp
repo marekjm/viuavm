@@ -240,6 +240,16 @@ auto Program::opor(int_op const regr, int_op const rega, int_op const regb)
     return (*this);
 }
 
+auto Program::opbits_of_integer(int_op const a, int_op const b) -> Program& {
+    addr_ptr = cg::bytecode::opbits_of_integer(addr_ptr, a, b);
+    return (*this);
+}
+
+auto Program::opinteger_of_bits(int_op const a, int_op const b) -> Program& {
+    addr_ptr = cg::bytecode::opinteger_of_bits(addr_ptr, a, b);
+    return (*this);
+}
+
 auto Program::opbits(int_op const target, int_op const count) -> Program& {
     addr_ptr = cg::bytecode::opbits(addr_ptr, target, count);
     return (*this);

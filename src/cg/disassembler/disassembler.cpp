@@ -562,6 +562,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case BITNOT:
     case ROL:
     case ROR:
+    case BITS_OF_INTEGER:
+    case INTEGER_OF_BITS:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 

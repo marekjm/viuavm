@@ -111,6 +111,9 @@ class Program {
     auto opand(int_op const, int_op const, int_op const) -> Program&;
     auto opor(int_op const, int_op const, int_op const) -> Program&;
 
+    auto opbits_of_integer(int_op const, int_op const) -> Program&;
+    auto opinteger_of_bits(int_op const, int_op const) -> Program&;
+
     auto opbits(int_op const, int_op const) -> Program&;
     auto opbits(int_op const, std::vector<uint8_t> const) -> Program&;
     auto opbitand(int_op const, int_op const, int_op const) -> Program&;

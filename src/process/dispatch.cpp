@@ -229,6 +229,12 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case OR:
         addr = opor(addr + 1);
         break;
+    case BITS_OF_INTEGER:
+        addr = opbits_of_integer(addr + 1);
+        break;
+    case INTEGER_OF_BITS:
+        addr = opinteger_of_bits(addr + 1);
+        break;
     case BITS:
         addr = opbits(addr + 1);
         break;

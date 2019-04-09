@@ -131,6 +131,9 @@ enum OPCODE : viua::internals::types::byte {
     AND,   // logical and of any two values
     OR,    // logical or of any two values
 
+    BITS_OF_INTEGER,
+    INTEGER_OF_BITS,
+
     BITS,    // create a bits value from a literal, or a zero-filled value of a
              // specified width
     BITAND,  // binary and of two bits values

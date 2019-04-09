@@ -637,6 +637,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bitset.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bit_shifts.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_bits.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_bits_of_integer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_boolean_and_or.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_call.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_capturecopy.o \
@@ -656,6 +657,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_if.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_integer_of_bits.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_isnull.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_itof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
@@ -663,23 +665,23 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_jump.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_move.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_not.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_pideq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_print.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_process.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_ptrlive.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_ptr.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_receive.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_self.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_pideq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_send.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_stoi.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_streq.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_string.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_structat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structinsert.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structkeys.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_struct.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_structremove.o \
-	build/assembler/frontend/static_analyser/checkers/check_op_structat.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_swap.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_tailcall.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_textat.o \

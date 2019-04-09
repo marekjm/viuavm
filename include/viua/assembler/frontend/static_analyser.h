@@ -388,6 +388,10 @@ auto check_op_not(Register_usage_profile& register_usage_profile,
                   Instruction const& instruction) -> void;
 auto check_op_boolean_and_or(Register_usage_profile& register_usage_profile,
                              Instruction const& instruction) -> void;
+auto check_op_bits_of_integer(Register_usage_profile& register_usage_profile,
+                   Instruction const& instruction) -> void;
+auto check_op_integer_of_bits(Register_usage_profile& register_usage_profile,
+                   Instruction const& instruction) -> void;
 auto check_op_bits(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_binary_logic(Register_usage_profile& register_usage_profile,

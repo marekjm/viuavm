@@ -261,6 +261,12 @@ auto check_register_usage_for_instruction_block_impl(
             case OR:
                 check_op_boolean_and_or(register_usage_profile, *instruction);
                 break;
+            case BITS_OF_INTEGER:
+                check_op_bits_of_integer(register_usage_profile, *instruction);
+                break;
+            case INTEGER_OF_BITS:
+                check_op_integer_of_bits(register_usage_profile, *instruction);
+                break;
             case BITS:
                 check_op_bits(register_usage_profile, *instruction);
                 break;

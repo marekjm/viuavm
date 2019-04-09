@@ -105,6 +105,8 @@ There are several categories of change:
 - bic, feature: `watchdog` requires a frame, but allows passing additional information
   to watchdog functions
 - feature: add `pideq` instruction to compare PIDs for equality
+- feature: add `bits_of_integer` and `integer_of_bits` instructions to convert between
+  bits and integers
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.

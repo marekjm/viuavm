@@ -309,6 +309,9 @@ class Process {
     auto opand(Op_address_type) -> Op_address_type;
     auto opor(Op_address_type) -> Op_address_type;
 
+    auto opbits_of_integer(Op_address_type) -> Op_address_type;
+    auto opinteger_of_bits(Op_address_type) -> Op_address_type;
+
     auto opbits(Op_address_type) -> Op_address_type;
     auto opbitand(Op_address_type) -> Op_address_type;
     auto opbitor(Op_address_type) -> Op_address_type;

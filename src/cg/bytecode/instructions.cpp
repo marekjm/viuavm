@@ -450,6 +450,15 @@ auto opor(viua::internals::types::byte* addr_ptr,
     return insert_three_ri_instruction(addr_ptr, OR, regr, rega, regb);
 }
 
+auto opbits_of_integer(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
+    -> viua::internals::types::byte* {
+    return insert_two_ri_instruction(addr_ptr, BITS_OF_INTEGER, a, b);
+}
+auto opinteger_of_bits(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
+    -> viua::internals::types::byte* {
+    return insert_two_ri_instruction(addr_ptr, INTEGER_OF_BITS, a, b);
+}
+
 auto opbits(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs)
     -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, BITS, target, lhs);

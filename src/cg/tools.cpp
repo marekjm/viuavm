@@ -474,6 +474,10 @@ static auto const size_of_and =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto const size_of_or =
     size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto const size_of_bits_of_integer =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
+static auto const size_of_integer_of_bits =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto size_of_bits(TokenVector const& tokens, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size =
@@ -1130,6 +1134,12 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "or") {
             ++i;
             tie(increase, i) = size_of_or(tokens, i);
+        } else if (tokens.at(i) == "bits_of_integer") {
+            ++i;
+            tie(increase, i) = size_of_bits_of_integer(tokens, i);
+        } else if (tokens.at(i) == "integer_of_bits") {
+            ++i;
+            tie(increase, i) = size_of_integer_of_bits(tokens, i);
         } else if (tokens.at(i) == "bits") {
             ++i;
             tie(increase, i) = size_of_bits(tokens, i);

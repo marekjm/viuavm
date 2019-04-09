@@ -151,6 +151,11 @@ auto opand(viua::internals::types::byte*, int_op, int_op, int_op)
 auto opor(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
 
+auto opbits_of_integer(viua::internals::types::byte*, int_op, int_op)
+    -> viua::internals::types::byte*;
+auto opinteger_of_bits(viua::internals::types::byte*, int_op, int_op)
+    -> viua::internals::types::byte*;
+
 auto opbits(viua::internals::types::byte*, int_op, int_op)
     -> viua::internals::types::byte*;
 auto opbits(viua::internals::types::byte*, int_op, std::vector<uint8_t>)

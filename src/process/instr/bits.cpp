@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
@@ -31,6 +32,52 @@ using namespace std;
 
 using viua::internals::types::Op_address_type;
 using viua::util::memory::load_aligned;
+
+
+auto viua::process::Process::opbits_of_integer(Op_address_type addr) -> Op_address_type {
+    viua::kernel::Register* target = nullptr;
+    std::tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Integer* n = nullptr;
+    std::tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Integer>(addr, this);
+
+    auto const size_in_bits = sizeof(viua::types::Integer::underlying_type) * 8;
+    auto decomposed = std::vector<bool>(size_in_bits);
+    auto const base_mask = viua::types::Integer::underlying_type{1};
+    for (auto i = decltype(size_in_bits){0}; i < size_in_bits; ++i) {
+        decomposed.at(i) = (n->as_unsigned() & static_cast<uint64_t>(base_mask << i));
+    }
+
+    *target = make_unique<viua::types::Bits>(std::move(decomposed));
+
+    return addr;
+}
+
+auto viua::process::Process::opinteger_of_bits(Op_address_type addr) -> Op_address_type {
+    viua::kernel::Register* target = nullptr;
+    std::tie(addr, target) =
+        viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* b = nullptr;
+    std::tie(addr, b) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Bits>(addr, this);
+
+    auto const size_in_bits = b->size();
+    auto decomposed = std::vector<bool>(size_in_bits);
+    auto const base_mask = viua::types::Integer::underlying_type{1};
+    auto n = viua::types::Integer::underlying_type{0};
+    for (auto i = decltype(size_in_bits){0}; i < size_in_bits; ++i) {
+        if (b->at(i)) {
+            n = (n | (base_mask << i));
+        }
+    }
+
+    *target = std::make_unique<viua::types::Integer>(n);
+
+    return addr;
+}
 
 
 auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type {
