@@ -174,6 +174,7 @@ class Fstream : public viua::types::Value {
     }
 
     auto peek() -> std::string;
+    auto getline(std::string::value_type const = '\n') -> std::string;
 
     Fstream(std::string const& path):
         file_name(path)
@@ -188,6 +189,12 @@ class Fstream : public viua::types::Value {
 
 auto Fstream::peek() -> std::string {
     return std::string{1, static_cast<std::string::value_type>(the_stream.peek())};
+}
+
+auto Fstream::getline(std::string::value_type const delim) -> std::string {
+    auto s = std::string{};
+    std::getline(the_stream, s, delim);
+    return s;
 }
 
 static auto fstream_open(Frame* frame,
@@ -214,6 +221,33 @@ static auto fstream_peek(Frame* frame,
     frame->local_register_set->set(
         0, std::make_unique<viua::types::String>(fstream->peek()));
 }
+
+static auto fstream_getline_default(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::String>(fstream->getline()));
+}
+
+static auto fstream_getline_delim(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    auto const delim = frame->arguments->get(1)->str().at(0);
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::String>(fstream->getline(delim)));
+}
 }
 
 const Foreign_function_spec functions[] = {
@@ -230,6 +264,8 @@ const Foreign_function_spec functions[] = {
      */
     {"std::io::fstream::open/1", &io::fstream_open},
     {"std::io::fstream::peek/1", &io::fstream_peek},
+    {"std::io::fstream::getline/1", &io::fstream_getline_default},
+    {"std::io::fstream::getline/2", &io::fstream_getline_delim},
 
     {nullptr, nullptr},
 };
