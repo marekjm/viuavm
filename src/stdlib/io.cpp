@@ -175,6 +175,8 @@ class Fstream : public viua::types::Value {
 
     auto peek() -> std::string;
     auto getline(std::string::value_type const = '\n') -> std::string;
+    auto read(size_t const) -> std::string;
+    auto read() -> std::string;
 
     Fstream(std::string const& path):
         file_name(path)
@@ -195,6 +197,23 @@ auto Fstream::getline(std::string::value_type const delim) -> std::string {
     auto s = std::string{};
     std::getline(the_stream, s, delim);
     return s;
+}
+
+auto Fstream::read(size_t const size) -> std::string {
+    auto s = std::vector<std::string::value_type>(size);
+    the_stream.read(s.data(), static_cast<std::streamsize>(size));
+    return std::string{s.data(), static_cast<std::string::size_type>(the_stream.gcount())};
+}
+
+auto Fstream::read() -> std::string {
+    auto const current_position = the_stream.tellg();
+    the_stream.seekg(0, std::ios_base::end);
+    auto const size = the_stream.tellg();
+    the_stream.seekg(current_position);
+
+    auto s = std::vector<std::string::value_type>(static_cast<size_t>(size));
+    the_stream.read(s.data(), static_cast<std::streamsize>(size));
+    return std::string{s.data(), static_cast<std::string::size_type>(the_stream.gcount())};
 }
 
 static auto fstream_open(Frame* frame,
@@ -248,6 +267,34 @@ static auto fstream_getline_delim(Frame* frame,
     frame->local_register_set->set(
         0, std::make_unique<viua::types::String>(fstream->getline(delim)));
 }
+
+static auto fstream_read(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    auto const size =
+        static_cast<viua::types::Integer*>(frame->arguments->get(1))->as_unsigned();
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::String>(fstream->read(size)));
+}
+
+static auto fstream_read_whole(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::String>(fstream->read()));
+}
 }
 
 const Foreign_function_spec functions[] = {
@@ -266,6 +313,8 @@ const Foreign_function_spec functions[] = {
     {"std::io::fstream::peek/1", &io::fstream_peek},
     {"std::io::fstream::getline/1", &io::fstream_getline_default},
     {"std::io::fstream::getline/2", &io::fstream_getline_delim},
+    {"std::io::fstream::read/1", &io::fstream_read_whole},
+    {"std::io::fstream::read/2", &io::fstream_read},
 
     {nullptr, nullptr},
 };
