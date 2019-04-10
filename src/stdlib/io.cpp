@@ -177,6 +177,7 @@ class Fstream : public viua::types::Value {
     auto getline(std::string::value_type const = '\n') -> std::string;
     auto read(size_t const) -> std::string;
     auto read() -> std::string;
+    auto write(std::string const) -> void;
 
     Fstream(std::string const& path):
         file_name(path)
@@ -214,6 +215,12 @@ auto Fstream::read() -> std::string {
     auto s = std::vector<std::string::value_type>(static_cast<size_t>(size));
     the_stream.read(s.data(), static_cast<std::streamsize>(size));
     return std::string{s.data(), static_cast<std::string::size_type>(the_stream.gcount())};
+}
+
+auto Fstream::write(std::string const data) -> void {
+    the_stream.clear();
+    the_stream.seekp(0);
+    the_stream.write(data.data(), static_cast<std::streamsize>(data.size()));
 }
 
 static auto fstream_open(Frame* frame,
@@ -295,6 +302,17 @@ static auto fstream_read_whole(Frame* frame,
     frame->local_register_set->set(
         0, std::make_unique<viua::types::String>(fstream->read()));
 }
+
+static auto fstream_write(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    auto const data = frame->arguments->get(1)->str();
+    fstream->write(data);
+}
 }
 
 const Foreign_function_spec functions[] = {
@@ -315,6 +333,7 @@ const Foreign_function_spec functions[] = {
     {"std::io::fstream::getline/2", &io::fstream_getline_delim},
     {"std::io::fstream::read/1", &io::fstream_read_whole},
     {"std::io::fstream::read/2", &io::fstream_read},
+    {"std::io::fstream::write/2", &io::fstream_write},
 
     {nullptr, nullptr},
 };
