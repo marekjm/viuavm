@@ -151,6 +151,71 @@ static auto io_ifstream_getline(Frame* frame,
         0, make_unique<viua::types::String>(in->getline()));
 }
 
+namespace io {
+class Fstream : public viua::types::Value {
+    std::string const file_name;
+    mutable std::fstream the_stream;
+
+  public:
+    auto type() const -> std::string override {
+        return "Fstream";
+    }
+    auto str() const -> std::string override {
+        return type();
+    }
+    auto repr() const -> std::string override {
+        return str();
+    }
+    auto boolean() const -> bool override {
+        return the_stream.is_open();
+    }
+    auto copy() const -> std::unique_ptr<viua::types::Value> override {
+        throw make_unique<viua::types::Exception>("Fstream is not copyable");
+    }
+
+    auto peek() -> std::string;
+
+    Fstream(std::string const& path):
+        file_name(path)
+        , the_stream{file_name}
+    {}
+    virtual ~Fstream() {
+        if (the_stream.is_open()) {
+            the_stream.close();
+        }
+    }
+};
+
+auto Fstream::peek() -> std::string {
+    return std::string{1, static_cast<std::string::value_type>(the_stream.peek())};
+}
+
+static auto fstream_open(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process*,
+                         viua::kernel::Kernel*) -> void {
+    auto const path = frame->arguments->get(0)->str();
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0,
+                                   std::make_unique<Fstream>(path));
+}
+
+static auto fstream_peek(Frame* frame,
+                         viua::kernel::Register_set*,
+                         viua::kernel::Register_set*,
+                         viua::process::Process* p,
+                         viua::kernel::Kernel*) -> void {
+    auto const fstream = dynamic_cast<Fstream*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::String>(fstream->peek()));
+}
+}
+
 const Foreign_function_spec functions[] = {
     {"std::io::stdin::getline/0", &io_stdin_getline},
     {"std::io::stdout::write/1", &io_stdout_write},
@@ -159,6 +224,13 @@ const Foreign_function_spec functions[] = {
     {"std::io::file::write/1", &io_file_write},
     {"std::io::ifstream::open/1", &io_ifstream_open},
     {"std::io::ifstream::getline/1", &io_ifstream_getline},
+
+    /*
+     * New I/O library.
+     */
+    {"std::io::fstream::open/1", &io::fstream_open},
+    {"std::io::fstream::peek/1", &io::fstream_peek},
+
     {nullptr, nullptr},
 };
 
