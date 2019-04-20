@@ -145,19 +145,15 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     /** Send a message to a process.
      */
-    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
+    viua::types::Process *proc = nullptr;
+    std::tie(addr, proc) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(proc)>::type>(addr, this);
+
     auto source = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (auto const thrd = dynamic_cast<viua::types::Process*>(target->get())) {
-        scheduler->send(thrd->pid(), source->give());
-    } else {
-        throw std::make_unique<viua::types::Exception>(
-            "invalid type: expected viua::process::Process");
-    }
+    scheduler->send(proc->pid(), source->give());
 
     return addr;
 }
