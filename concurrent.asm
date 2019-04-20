@@ -1,3 +1,34 @@
+.import: [[dynamic]] std::io
+
+.signature: std::io::stdin::getline/0
+
+.function: leaf/1
+    allocate_registers %6 local
+
+    .name: iota gate_guardian_pid
+    move %gate_guardian_pid local %0 parameters
+
+    .name: iota packet
+    .name: iota sender
+    .name: iota message
+    .name: iota x
+    struct %packet local
+
+    atom %message local 'message'
+    integer %x local 0
+    structinsert %packet local %message local %x local
+
+    atom %sender local 'sender'
+    self %x local
+    structinsert %packet local %sender local %x local
+
+    send %gate_guardian_pid local %packet local
+    receive %x local 16ms
+    print %x local
+
+    return
+.end
+
 .function: grow/2
     allocate_registers %3 local
 
@@ -6,9 +37,46 @@
     move %counter local %0 parameters
     move %gate_guardian_pid local %1 parameters
 
-    print %counter local
-    print %gate_guardian_pid local
+    idec %counter local
+    if %counter local +1 no_more
 
+    frame %3
+    copy %0 arguments %counter local
+    copy %1 arguments %gate_guardian_pid local
+    move %2 arguments %counter local
+    process void grow_more/3
+
+    .mark: no_more
+    frame %1
+    move %0 arguments %gate_guardian_pid local
+    tailcall leaf/1
+.end
+
+.function: grow_more/3
+    allocate_registers %4 local
+
+    .name: iota counter
+    .name: iota gate_guardian_pid
+    .name: iota n
+    move %counter local %0 parameters
+    move %gate_guardian_pid local %1 parameters
+    move %n local %2 parameters
+
+    if %n local +1 this_is_the_end
+
+    frame %2
+    copy %0 arguments %counter local
+    copy %1 arguments %gate_guardian_pid local
+    process void grow/2
+
+    idec %n local
+    frame %3
+    move %0 arguments %counter local
+    move %1 arguments %gate_guardian_pid local
+    move %2 arguments %n local
+    tailcall grow_more/3
+
+    .mark: this_is_the_end
     return
 .end
 
@@ -21,7 +89,7 @@
     .name: iota packet
     .name: iota message
     receive %packet local
-    print %packet local
+    ;print %packet local
 
     atom %message local 'message'
     structat %message local %packet local %message local
@@ -90,6 +158,11 @@
     move %0 arguments %no_of_processes local
     copy %1 arguments %gate_guardian_pid local
     call grow/2
+
+    frame %0
+    call void std::io::stdin::getline/0
+    text %0 local "sending kill signal"
+    print %0 local
 
     .name: iota packet
     .name: iota message
