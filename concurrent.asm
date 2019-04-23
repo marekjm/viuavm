@@ -23,7 +23,7 @@
     structinsert %packet local %sender local %x local
 
     send %gate_guardian_pid local %packet local
-    receive %x local 16ms
+    receive %x local 160ms
     print %x local
 
     return

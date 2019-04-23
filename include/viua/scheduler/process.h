@@ -1,0 +1,98 @@
+/*
+ *  Copyright (C) 2019 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef VIUA_SCHEDULER_PROCESS_H
+#define VIUA_SCHEDULER_PROCESS_H
+
+#include <deque>
+#include <mutex>
+
+namespace viua {
+    namespace process {
+        class Process;
+    }
+    namespace kernel {
+        class Kernel;
+    }
+}
+
+namespace viua { namespace scheduler {
+class Process_scheduler {
+    using process_type = viua::process::Process;
+
+  private:
+    /*
+     * The kernel to which the scheduler is attached. There is only one kernel
+     * present in the VM (while there are possibly many process schedulers) but
+     * it is better to have the pointer be a scheduler's local variable than a
+     * global one.
+     */
+    viua::kernel::Kernel& attached_kernel;
+
+    /*
+     * Main process of a scheduler.
+     */
+    process_type* main_process = nullptr;
+
+    /*
+     * The set of processes running on this scheduler. It may be modified either
+     * when a new process is spawned, or when the work stealing algorithm kicks
+     * in (two schedulers' process queues are modified then), or when the load
+     * balancing algorithm kicks in (possibly many schedulers are affected when
+     * this happens).
+     */
+    std::deque<std::unique_ptr<process_type>> process_queue;
+    std::mutex process_queue_mtx;
+
+    /*
+     * Exit code of the scheduler. It is useful only for the scheduler running
+     * the main function of launched program.
+     */
+    int exit_code = 0;
+
+    /*
+     * Variable signifying that the scheduler should shut down at the earliest
+     * possible moment. Without this set to true the scheduler will wait until
+     * a new process is spawned and then try to steal it instead of just
+     * shutting down.
+     */
+    std::atomic_bool should_shut_down;
+
+    /*
+     * The thread that runs the scheduler's code.
+     */
+    std::thread scheduler_thread;
+
+  public:
+    Process_scheduler(viua::kernel::Kernel&);
+    Process_scheduler(Process_scheduler const&) = delete;
+    auto operator=(Process_scheduler const&) -> Process_scheduler& = delete;
+    Process_scheduler(Process_scheduler&&) = delete;
+    auto operator=(Process_scheduler&&) -> Process_scheduler& = delete;
+    ~Process_scheduler();
+
+    auto spawn(std::unique_ptr<Frame>, process_type*, bool) -> process_type*;
+
+    auto send(const viua::process::PID, std::unique_ptr<viua::types::Value>) -> void;
+    auto receive(const viua::process::PID,
+                 std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
+};
+}}
+
+#endif

@@ -51,6 +51,7 @@ class Process;
 }
 namespace scheduler {
 class Virtual_process_scheduler;
+class Process_scheduler;
 
 namespace ffi {
 class Foreign_function_call_request;
@@ -126,8 +127,9 @@ class Kernel {
 #ifdef VIUAVM_AS_DEBUG_HEADER
   public:
 #endif
-    /*  Bytecode pointer is a pointer to program's code.
-     *  Size and executable offset are metadata exported from bytecode dump.
+    /*
+     * Bytecode pointer is a pointer to program's code. Size and executable
+     * offset are metadata exported from bytecode dump.
      */
     std::unique_ptr<viua::internals::types::byte[]> bytecode;
     viua::internals::types::bytecode_size bytecode_size;
@@ -152,7 +154,7 @@ class Kernel {
     int return_code;
 
     /*
-     *  VIRTUAL PROCESSES SCHEDULING
+     *  OLD VIRTUAL PROCESSES SCHEDULING
      *
      *  List of virtual processes that do not belong to any scheduler, and
      *  are waiting to be adopted, along with means of synchronization of
@@ -181,12 +183,34 @@ class Kernel {
         default_vp_schedulers_limit = 2;
     viua::internals::types::schedulers_count vp_schedulers_limit;
 
-    /*  This is the interface between programs compiled to VM bytecode and
-     *  extension libraries written in C++.
+    /*
+     * NEW VIRTUAL PROCESS SCHEDULING
+     */
+    std::vector<std::unique_ptr<viua::scheduler::Process_scheduler>> process_schedulers;
+
+    /*
+     * This condition variable is used to signal that there is a process
+     * available to be stolen. A signal for work stealing algorithm to kick in
+     * and do its job.
+     */
+    std::condition_variable process_spawned_cv;
+
+    /*
+     * FFI MODULES
+     *
+     * This is the interface between programs compiled to VM bytecode and
+     * extension libraries written in C++. Modules written in C++ are opened as
+     * shared objects, the functions they export are loaded and made available
+     * to running code.
      */
     std::map<std::string, ForeignFunction*> foreign_functions;
     std::mutex foreign_functions_mutex;
+    std::vector<void*> cxx_dynamic_lib_handles;
 
+    /*
+     * FFI SCHEDULING
+     *
+     */
     // Foreign function call requests are placed here to be executed later.
     std::vector<
         std::unique_ptr<viua::scheduler::ffi::Foreign_function_call_request>>
@@ -198,8 +222,16 @@ class Kernel {
     viua::internals::types::schedulers_count ffi_schedulers_limit;
     std::vector<std::unique_ptr<std::thread>> foreign_call_workers;
 
-    std::vector<void*> cxx_dynamic_lib_handles;
-
+    /*
+     * MESSAGE PASSING
+     *
+     * Why are mailboxes are kept inside the kernel? To remove the need to look
+     * for the process on possibly many schedulers (as we would need to lock 'em
+     * all to avoid race conditions with process migration algorithms), and to
+     * make it easier to send and receive messages (just call kernel's routines
+     * instead of finding the right scheduler and process). This adds a level of
+     * indirection but in this case I think it is justified.
+     */
     std::map<viua::process::PID, Mailbox> mailboxes;
     std::mutex mailbox_mutex;
 

@@ -519,6 +519,7 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/kernel.o \
 	build/scheduler/vps.o \
+	build/scheduler/process.o \
 	build/front/vm.o \
 	build/runtime/imports.o \
 	build/assert.o \
