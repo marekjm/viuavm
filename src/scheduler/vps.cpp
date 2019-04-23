@@ -337,7 +337,7 @@ viua::process::Process* viua::scheduler::Virtual_process_scheduler::spawn(
     if (not disown) {
         attached_kernel->create_result_slot_for(process_ptr->pid());
     }
-    const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
+    const auto running_schedulers = attached_kernel->no_of_process_schedulers();
 
     /*
      * Determine if this scheduler is overburdened and should post processes to
@@ -681,7 +681,7 @@ void viua::scheduler::Virtual_process_scheduler::operator()() {
          * Repeat until we're a good, hardworking scheduler.
          */
         const auto total_processes    = attached_kernel->pids();
-        const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
+        const auto running_schedulers = attached_kernel->no_of_process_schedulers();
         /*
          * The "<=" check is *FREAKIN' IMPORTANT* because if:
          *

@@ -282,7 +282,7 @@ class Kernel {
                  std::queue<std::unique_ptr<viua::types::Value>>&);
     uint64_t pids() const;
 
-    auto static no_of_vp_schedulers()
+    auto static no_of_process_schedulers()
         -> viua::internals::types::schedulers_count;
     auto static no_of_ffi_schedulers()
         -> viua::internals::types::schedulers_count;

@@ -471,9 +471,9 @@ static auto no_of_schedulers(
     }
     return limit;
 }
-auto viua::kernel::Kernel::no_of_vp_schedulers()
+auto viua::kernel::Kernel::no_of_process_schedulers()
     -> viua::internals::types::schedulers_count {
-    return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
+    return no_of_schedulers("VIUA_PROC_SCHEDULERS", default_vp_schedulers_limit);
 }
 auto viua::kernel::Kernel::no_of_ffi_schedulers()
     -> viua::internals::types::schedulers_count {
@@ -497,7 +497,7 @@ int viua::kernel::Kernel::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    vp_schedulers_limit = no_of_vp_schedulers();
+    vp_schedulers_limit = no_of_process_schedulers();
     bool enable_tracing = is_tracing_enabled();
 
     auto vp_schedulers =

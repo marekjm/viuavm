@@ -47,7 +47,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
 
 static auto display_vm_information(bool const verbose) -> void {
     auto const full_version = std::string{VERSION} + "." + MICRO;
-    auto const proc_schedulers = viua::kernel::Kernel::no_of_vp_schedulers();
+    auto const proc_schedulers = viua::kernel::Kernel::no_of_process_schedulers();
     auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
     auto const cpus_available = std::thread::hardware_concurrency();
 
