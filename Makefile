@@ -546,31 +546,6 @@ build/bin/vm/kernel: build/front/kernel.o \
 	build/cg/lex/cook.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
-build/bin/vm/vdb: build/front/wdb.o \
-	build/lib/linenoise.o \
-	build/kernel/kernel.o \
-	build/scheduler/vps.o \
-	build/front/vm.o \
-	build/assert.o \
-	build/process.o \
-	build/process/stack.o \
-	build/pid.o \
-	build/process/dispatch.o \
-	build/scheduler/ffi/request.o \
-	build/scheduler/ffi/scheduler.o \
-	build/kernel/registerset.o \
-	build/kernel/frame.o \
-	build/loader.o \
-	build/machine.o \
-	build/cg/disassembler/disassembler.o \
-	build/printutils.o \
-	build/support/pointer.o \
-	build/support/string.o \
-	build/support/env.o \
-	$(VIUA_INSTR_FILES_O) \
-	$(VIUA_TYPES_FILES_O)
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
-
 OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
 	build/assembler/backend/op_assemblers/assemble_op_bitset.o \
