@@ -45,13 +45,31 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
+static auto display_vm_information(bool const verbose) -> void {
+    auto const full_version = std::string{VERSION} + "." + MICRO;
+    auto const proc_schedulers = viua::kernel::Kernel::no_of_vp_schedulers();
+    auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
+    auto const cpus_available = std::thread::hardware_concurrency();
+
+    std::cerr << "Viua VM " << full_version << " [";
+
+    if (verbose) { std::cerr << "hardware="; }
+    std::cerr << cpus_available << ':';
+
+    if (verbose) { std::cerr << "proc="; }
+    std::cerr << proc_schedulers << ':';
+
+    if (verbose) { std::cerr << "ffi="; }
+    std::cerr << ffi_schedulers;
+
+    std::cerr << "]\n";
+}
 static bool usage(std::string const program,
                   std::vector<std::string> const& args) {
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;
     bool show_info    = false;
-    bool show_json    = false;
 
     for (auto option : args) {
         if (option == "--help" or option == "-h") {
@@ -66,15 +84,13 @@ static bool usage(std::string const program,
         } else if (option == "--info" or option == "-i") {
             show_info = true;
             continue;
-        } else if (option == "--json") {
-            show_json = true;
         } else if (str::startswith(option, "-")) {
-            cerr << send_control_seq(COLOR_FG_RED) << "error"
+            std::cerr << send_control_seq(COLOR_FG_RED) << "error"
                  << send_control_seq(ATTR_RESET);
-            cerr << ": unknown option: ";
-            cerr << send_control_seq(COLOR_FG_WHITE) << option
+            std::cerr << ": unknown option: ";
+            std::cerr << send_control_seq(COLOR_FG_WHITE) << option
                  << send_control_seq(ATTR_RESET);
-            cerr << endl;
+            std::cerr << "\n";
             exit(1);
         } else {
             // first operand, options processing should stop
@@ -82,37 +98,22 @@ static bool usage(std::string const program,
         }
     }
 
-    if (show_json) {
-        cout << "{\"version\": \"" << VERSION << '.' << MICRO
-             << "\", \"sched\": {\"ffi\": "
-             << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
-        cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers()
-             << "}}\n";
+    if (show_info) {
+        display_vm_information(verbose);
         return true;
     }
 
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM kernel, version ";
+        std::cout << "Viua VM kernel version ";
     }
-    if (show_help or show_version or show_info) {
-        cout << VERSION << '.' << MICRO;
-        if (not show_info) {
-            cout << endl;
-        }
-    }
-    if (show_info) {
-        cout << ' ';
-        cout << "[sched:ffi=" << viua::kernel::Kernel::no_of_ffi_schedulers()
-             << ']';
-        cout << ' ';
-        cout << "[sched:vp=" << viua::kernel::Kernel::no_of_vp_schedulers()
-             << ']' << endl;
+    if (show_help or show_version) {
+        std::cout << VERSION << '.' << MICRO << "\n";
     }
     if (show_help) {
-        cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] <executable>\n" << endl;
-        cout << "OPTIONS:\n";
-        cout
+        std::cout << "\nUSAGE:\n";
+        std::cout << "    " << program << " [option...] <executable>\n" << endl;
+        std::cout << "OPTIONS:\n";
+        std::cout
             << "    "
             << "-V, --version            - show version\n"
             << "    "
@@ -127,7 +128,7 @@ static bool usage(std::string const program,
             << "    --json               - same as --info but in JSON format\n";
     }
 
-    return (show_help or show_version or show_info);
+    return (show_help or show_version);
 }
 
 int main(int argc, char* argv[]) {
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (args.size() == 0) {
-        cout << "fatal: no input file" << endl;
+        std::cerr << "fatal: no input file\n";
         return 1;
     }
 
@@ -150,11 +151,11 @@ int main(int argc, char* argv[]) {
     filename      = args[0];
 
     if (!filename.size()) {
-        cout << "fatal: no file to run" << endl;
+        std::cout << "fatal: no file to run\n";
         return 1;
     }
     if (!viua::support::env::is_file(filename)) {
-        cout << "fatal: could not open file: " << filename << endl;
+        std::cout << "fatal: could not open file: " << filename << "\n";
         return 1;
     }
 
