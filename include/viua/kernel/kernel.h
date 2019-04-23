@@ -123,7 +123,7 @@ class Process_result {
 };
 
 class Kernel {
-#ifdef AS_DEBUG_HEADER
+#ifdef VIUAVM_AS_DEBUG_HEADER
   public:
 #endif
     /*  Bytecode pointer is a pointer to program's code.
