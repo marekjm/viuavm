@@ -76,11 +76,11 @@ GENERIC_CXXFLAGS=-Wall \
 # -Wcovered-switch-default 			-- breaks existing code
 # -Wunused-template					-- breaks existing code
 # -Wfloat-equal 					-- breaks existing code
+# -Wlifetime						-- would be useful
 CLANG_CXXFLAGS=-Wall \
 			   -Wextra \
 			   -Wabsolute-value \
 			   -Wabstract-vbase-init \
-			   -Waligned-allocation-unavailable \
 			   -Warray-bounds-pointer-arithmetic \
 			   -Wassign-enum \
 			   -Wbad-function-cast \
