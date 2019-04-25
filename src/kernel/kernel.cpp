@@ -474,12 +474,16 @@ static auto no_of_schedulers(
 }
 auto viua::kernel::Kernel::no_of_process_schedulers()
     -> viua::internals::types::schedulers_count {
-    return no_of_schedulers("VIUA_PROC_SCHEDULERS", default_vp_schedulers_limit);
+    auto const default_value = std::thread::hardware_concurrency();
+    using viua::internals::types::schedulers_count;
+    return no_of_schedulers("VIUA_PROC_SCHEDULERS", static_cast<schedulers_count>(default_value));
 }
 auto viua::kernel::Kernel::no_of_ffi_schedulers()
     -> viua::internals::types::schedulers_count {
+    auto const default_value = (std::thread::hardware_concurrency() / 2);
+    using viua::internals::types::schedulers_count;
     return no_of_schedulers("VIUA_FFI_SCHEDULERS",
-                            default_ffi_schedulers_limit);
+                            static_cast<schedulers_count>(default_value));
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
     auto viua_enable_tracing = std::string{};
