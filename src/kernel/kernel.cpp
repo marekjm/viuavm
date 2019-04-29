@@ -507,9 +507,11 @@ int viua::kernel::Kernel::run() {
 
     auto vp_schedulers =
         std::vector<viua::scheduler::Virtual_process_scheduler>{};
+    auto proc_schedulers = decltype(process_schedulers){};
 
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);
+    proc_schedulers.reserve(vp_schedulers_limit);
 
     vp_schedulers.emplace_back(this,
                                &free_virtual_processes,
@@ -517,6 +519,13 @@ int viua::kernel::Kernel::run() {
                                &free_virtual_processes_cv,
                                enable_tracing);
     vp_schedulers.front().bootstrap(commandline_arguments);
+
+    proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
+    /*
+     * Do not bootstrap the scheduler yet, as the Process class still uses the old scheduler
+     * bindings.
+     */
+    // proc_schedulers.front()->bootstrap(commandline_arguments);
 
     for (auto i = (vp_schedulers_limit - 1); i; --i) {
         vp_schedulers.emplace_back(this,

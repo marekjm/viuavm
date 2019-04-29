@@ -46,6 +46,7 @@ class Halt_exception : public std::runtime_error {
 
 namespace viua { namespace scheduler {
 class Virtual_process_scheduler;
+class Process_scheduler;
 }}  // namespace viua::scheduler
 
 namespace viua { namespace process {
@@ -193,6 +194,7 @@ class Process {
      * schedulers during load balancing.
      */
     viua::scheduler::Virtual_process_scheduler* scheduler;
+    viua::scheduler::Process_scheduler* attached_scheduler;
 
     /*
      * Parent process of this process.
@@ -472,6 +474,10 @@ class Process {
 
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Virtual_process_scheduler*,
+            viua::process::Process*,
+            bool const = false);
+    Process(std::unique_ptr<Frame>,
+            viua::scheduler::Process_scheduler*,
             viua::process::Process*,
             bool const = false);
     ~Process();

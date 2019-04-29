@@ -87,6 +87,8 @@ class Process_scheduler {
     auto operator=(Process_scheduler&&) -> Process_scheduler& = delete;
     ~Process_scheduler();
 
+    auto bootstrap(std::vector<std::string>) -> void;
+
     auto spawn(std::unique_ptr<Frame>, process_type*, bool) -> process_type*;
 
     auto send(const viua::process::PID, std::unique_ptr<viua::types::Value>) -> void;

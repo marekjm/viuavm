@@ -420,6 +420,33 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
                                 bool const enable_tracing)
         : tracing_enabled(enable_tracing)
         , scheduler(sch)
+        , attached_scheduler(nullptr)
+        , parent_process(pt)
+        , global_register_set(nullptr)
+        , stack(nullptr)
+        , finished(false)
+        , is_joinable(true)
+        , is_suspended(false)
+        , process_priority(512)
+        , process_id(this)
+        , is_hidden(false) {
+    global_register_set =
+        std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
+    auto s = std::make_unique<Stack>(
+        frm->function_name, this, global_register_set.get(), scheduler);
+    s->emplace_back(std::move(frm));
+    s->bind(global_register_set.get());
+    stack           = s.get();
+    stacks[s.get()] = std::move(s);
+}
+
+viua::process::Process::Process(std::unique_ptr<Frame> frm,
+                                viua::scheduler::Process_scheduler* sch,
+                                viua::process::Process* pt,
+                                bool const enable_tracing)
+        : tracing_enabled(enable_tracing)
+        , scheduler(nullptr)
+        , attached_scheduler(sch)
         , parent_process(pt)
         , global_register_set(nullptr)
         , stack(nullptr)
