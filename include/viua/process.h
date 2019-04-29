@@ -459,7 +459,7 @@ class Process {
 
     auto become(std::string const&, std::unique_ptr<Frame>) -> Op_address_type;
 
-    auto begin() -> Op_address_type;
+    auto start() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);
 
     std::vector<Frame*> trace() const;

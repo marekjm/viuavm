@@ -373,7 +373,7 @@ auto viua::process::Process::become(std::string const& function_name,
     return (stack->instruction_pointer = adjust_jump_base_for(function_name));
 }
 
-auto viua::process::Process::begin() -> Op_address_type {
+auto viua::process::Process::start() -> Op_address_type {
     if (not scheduler->is_native_function(stack->at(0)->function_name)) {
         throw make_unique<viua::types::Exception>(
             "process from undefined function: " + stack->at(0)->function_name);
