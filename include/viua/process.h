@@ -264,10 +264,10 @@ class Process {
     /*  Methods dealing with stack and frame manipulation, and
      *  function calls.
      */
-    Frame* request_new_frame(
-        viua::internals::types::register_index const arguments_size = 0);
-    Try_frame* request_new_try_frame();
-    void push_frame();
+    auto request_new_frame(
+        viua::internals::types::register_index const arguments_size = 0) -> Frame*;
+    auto request_new_try_frame() -> Try_frame*;
+    auto push_frame() -> void;
     auto adjust_jump_base_for_block(std::string const&)
         -> viua::internals::types::Op_address_type;
     auto adjust_jump_base_for(std::string const&)
@@ -463,8 +463,8 @@ class Process {
     auto dispatch(Op_address_type) -> Op_address_type;
     auto tick() -> Op_address_type;
 
-    viua::kernel::Register* register_at(viua::internals::types::register_index,
-                                        viua::internals::Register_sets);
+    auto register_at(viua::internals::types::register_index,
+                     viua::internals::Register_sets) -> viua::kernel::Register*;
 
     bool joinable() const;
     void join();
@@ -474,28 +474,28 @@ class Process {
     void wakeup();
     bool suspended() const;
 
-    viua::process::Process* parent() const;
-    std::string starting_function() const;
+    auto parent() const -> viua::process::Process*;
+    auto starting_function() const -> std::string;
 
-    void pass(std::unique_ptr<viua::types::Value>);
+    auto pass(std::unique_ptr<viua::types::Value>) -> void;
 
     auto priority() const -> decltype(process_priority);
-    void priority(decltype(process_priority) p);
+    auto priority(decltype(process_priority) p) -> void;
 
-    bool stopped() const;
+    auto stopped() const -> bool;
 
-    bool terminated() const;
-    viua::types::Value* get_active_exception();
-    std::unique_ptr<viua::types::Value> transfer_active_exception();
-    void raise(std::unique_ptr<viua::types::Value>);
-    void handle_active_exception();
+    auto terminated() const -> bool;
+    auto get_active_exception() -> viua::types::Value*;
+    auto transfer_active_exception() -> std::unique_ptr<viua::types::Value>;
+    auto raise(std::unique_ptr<viua::types::Value>) -> void;
+    auto handle_active_exception() -> void;
 
-    void migrate_to(viua::scheduler::Virtual_process_scheduler*);
+    auto migrate_to(viua::scheduler::Virtual_process_scheduler*) -> void;
 
-    std::unique_ptr<viua::types::Value> get_return_value();
+    auto get_return_value() -> std::unique_ptr<viua::types::Value>;
 
-    bool watchdogged() const;
-    std::string watchdog() const;
+    auto watchdogged() const -> bool;
+    auto watchdog() const -> std::string;
     auto frame_for_watchdog() -> std::unique_ptr<Frame>;
 
     auto become(std::string const&, std::unique_ptr<Frame>) -> Op_address_type;
@@ -503,13 +503,13 @@ class Process {
     auto start() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);
 
-    std::vector<Frame*> trace() const;
+    auto trace() const -> std::vector<Frame*>;
 
-    viua::process::PID pid() const;
-    bool hidden() const;
-    void hidden(bool);
+    auto pid() const -> viua::process::PID;
+    auto hidden() const -> bool;
+    auto hidden(bool) -> void;
 
-    bool empty() const;
+    auto empty() const -> bool;
 
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Virtual_process_scheduler*,
