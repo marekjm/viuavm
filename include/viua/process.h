@@ -140,21 +140,26 @@ class Stack {
 
     auto bind(viua::kernel::Register_set*) -> void;
 
+    /*
+     * Iteration over and access to frames of the currently active stack in the process.
+     */
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
-
     auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
     auto back() const -> decltype(frames.back());
+    auto pop() -> std::unique_ptr<Frame>;
+    auto emplace_back(std::unique_ptr<Frame> f)
+        -> decltype(frames.emplace_back(f));
+
+    /*
+     * Access to information about the depth of the currently active stack in
+     * the process.
+     */
+    auto size() const -> decltype(frames)::size_type;
+    auto clear() -> void;   // FIXME is this used?
 
     auto register_deferred_calls_from(Frame*) -> void;
     auto register_deferred_calls(bool const = true) -> void;
-    auto pop() -> std::unique_ptr<Frame>;
-
-    auto size() const -> decltype(frames)::size_type;
-    auto clear() -> void;
-
-    auto emplace_back(std::unique_ptr<Frame> f)
-        -> decltype(frames.emplace_back(f));
 
     auto prepare_frame(viua::internals::types::register_index const) -> Frame*;
     auto push_prepared_frame() -> void;
@@ -202,25 +207,59 @@ class Process {
      */
     viua::process::Process* parent_process;
 
+    /*
+     * Watchdog function is the final in-process defense mechanism against
+     * failure. When an exception causes the whole active stack to be unwound it
+     * means that the process was unable to handle the exception for whatever
+     * reason and the handling is delegated to the watchdog function.
+     *
+     * The exception is wrapped in a struct, along with some other information
+     * and passed as the first argument to the function set as watchdog.
+     */
     std::string watchdog_function{""};
     std::unique_ptr<Frame> watchdog_frame;
     bool watchdog_failed{false};
 
+    /*
+     * Every process has its own global and static register sets. They are both
+     * shared among each process' stack, though to facilitate quick exchange of
+     * information between them if needed.
+     */
     std::unique_ptr<viua::kernel::Register_set> global_register_set;
-
-    // Static registers
     std::map<std::string, std::unique_ptr<viua::kernel::Register_set>>
         static_registers;
+    auto ensure_static_registers(std::string) -> void;
 
 
-    // Call stack
+    /*
+     * Call stack information.
+     *
+     * A process may have many suspended stacks (the simplest example: during
+     * execution of a deferred function which itself has registered a deferred
+     * call), and at most one active stack.
+     *
+     * A process always begins execution with exactly one stack. During the
+     * execution of the main function of the process more stacks may be added.
+     * The number of stacks in the process is dynamic and may change many times
+     * during execution.
+     *
+     * A process has zero stacks when if finished execution but has not yet been
+     * reaped.
+     *
+     * When one stack finishes running (pops off its last frame), the execution
+     * returns to the "previous stack". In effect, there is a stack of stacks
+     * inside every running process.
+     */
     std::map<Stack*, std::unique_ptr<Stack>> stacks;
     Stack* stack;
     std::stack<Stack*> stacks_order;
 
+    /*
+     * Messages which the process already has locally. To avoid synchronisation
+     * with the kernel on every receive operation, messages are buffered locally
+     * and fetched from the kernel-held mailbox in batches.
+     */
     std::queue<std::unique_ptr<viua::types::Value>> message_queue;
-
-    void ensure_static_registers(std::string);
 
     /*  Methods dealing with stack and frame manipulation, and
      *  function calls.
