@@ -136,7 +136,7 @@ class Stack {
     auto state_of() const -> STATE;
     auto state_of(const STATE) -> STATE;
 
-    viua::scheduler::Virtual_process_scheduler* scheduler;
+    viua::scheduler::Process_scheduler* attached_scheduler;
 
     auto bind(viua::kernel::Register_set*) -> void;
 
@@ -198,7 +198,6 @@ class Process {
      * This is not constant because processes may migrate between
      * schedulers during load balancing.
      */
-    viua::scheduler::Virtual_process_scheduler* scheduler;
     viua::scheduler::Process_scheduler* attached_scheduler;
 
     /*
