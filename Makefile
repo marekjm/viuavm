@@ -532,7 +532,6 @@ build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/registerset.o \
 	build/kernel/frame.o \
 	build/loader.o \
-	build/machine.o \
 	build/printutils.o \
 	build/support/pointer.o \
 	build/support/string.o \
@@ -589,7 +588,6 @@ build/bin/vm/asm: build/front/asm.o \
 	build/cg/assembler/utils.o \
 	build/cg/bytecode/instructions.o \
 	build/loader.o \
-	build/machine.o \
 	build/support/string.o \
 	build/support/env.o \
 	build/cg/assembler/binary_literals.o \
@@ -709,7 +707,6 @@ build/bin/vm/parser: build/front/parser.o \
 
 build/bin/vm/dis: build/front/dis.o \
 	build/loader.o \
-	build/machine.o \
 	build/cg/disassembler/disassembler.o \
 	build/support/pointer.o \
 	build/support/string.o \

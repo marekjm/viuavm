@@ -69,7 +69,7 @@ class Loader {
     void calculate_function_sizes();
 
     void load_magic_number(std::ifstream&);
-    void assume_binary_type(std::ifstream&, ViuaBinaryType);
+    void assume_binary_type(std::ifstream&, Viua_binary_type);
 
     void load_meta_information(std::ifstream&);
 
