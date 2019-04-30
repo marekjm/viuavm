@@ -87,13 +87,54 @@ class Process_scheduler {
     auto operator=(Process_scheduler&&) -> Process_scheduler& = delete;
     ~Process_scheduler();
 
+    /*
+     * Bootstrap the scheduler by creating a call to program entry function.
+     * The entry function has the same role (setting up the environment and
+     * calling user-supplied main) as the `_start` function in C (as emitted by
+     * GCC, at least).
+     */
     auto bootstrap(std::vector<std::string>) -> void;
 
+    /*
+     * Spawn a new process. This will create and start a new process on this
+     * scheduler, create a mailbox inside the VM kernel and perform some other
+     * bookkeeping that is needed for correct operation of the VM.
+     */
     auto spawn(std::unique_ptr<Frame>, process_type*, bool) -> process_type*;
 
+    /*
+     * This is the message exchange interface. It talks to the kernel to push
+     * messages to and pop them from kernel-held queues.
+     */
     auto send(const viua::process::PID, std::unique_ptr<viua::types::Value>) -> void;
     auto receive(const viua::process::PID,
                  std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
+
+    /*
+     * FFI gateway for Viua processes. It initiates a call on a FFI scheduler
+     * and needs to talk to the kernel to do this - as the process scheduler
+     * does not hold any references to the FFI schedulers list.
+     */
+    auto request_ffi_call(std::unique_ptr<Frame>, viua::process::Process&) -> void;
+
+    /*
+     * Function type inquiry. This is used when spawning processes and calling
+     * functions as only Viua-bytecode functions can be made into processes, and
+     * foreign functions must be run on a different type of scheduler.
+     */
+    auto is_native_function(std::string const) const -> bool;
+    auto is_foreign_function(std::string const) const -> bool;
+
+    /*
+     * Functions providing access to entry point and bytecode base information.
+     * This is needed to properly set offset bases for bytecode modules.
+     */
+    auto get_entry_point_of_block(std::string const) const
+        -> std::pair<viua::internals::types::Op_address_type,
+                     viua::internals::types::Op_address_type>;
+    auto get_entry_point_of_function(std::string const&) const
+        -> std::pair<viua::internals::types::Op_address_type,
+                     viua::internals::types::Op_address_type>;
 };
 }}
 

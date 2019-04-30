@@ -173,7 +173,7 @@ class Stack {
     Stack(std::string,
           Process*,
           viua::kernel::Register_set*,
-          viua::scheduler::Virtual_process_scheduler*);
+          viua::scheduler::Process_scheduler*);
 
     static uint16_t const MAX_STACK_SIZE = 8192;
 };
@@ -489,7 +489,7 @@ class Process {
     auto raise(std::unique_ptr<viua::types::Value>) -> void;
     auto handle_active_exception() -> void;
 
-    auto migrate_to(viua::scheduler::Virtual_process_scheduler*) -> void;
+    auto migrate_to(viua::scheduler::Process_scheduler*) -> void;
 
     auto get_return_value() -> std::unique_ptr<viua::types::Value>;
 
@@ -510,10 +510,6 @@ class Process {
 
     auto empty() const -> bool;
 
-    Process(std::unique_ptr<Frame>,
-            viua::scheduler::Virtual_process_scheduler*,
-            viua::process::Process*,
-            bool const = false);
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,
