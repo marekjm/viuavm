@@ -290,6 +290,7 @@ class Kernel {
                      viua::internals::types::Op_address_type>;
 
     void request_foreign_function_call(Frame*, viua::process::Process*);
+    void request_foreign_function_call(std::unique_ptr<Frame>, viua::process::Process&);
 
     void post_free_process(std::unique_ptr<viua::process::Process>);
 

@@ -327,6 +327,20 @@ void viua::kernel::Kernel::request_foreign_function_call(
     foreign_call_queue_condition.notify_one();
 }
 
+void viua::kernel::Kernel::request_foreign_function_call(
+    std::unique_ptr<Frame> frame,
+    viua::process::Process& requesting_process) {
+    std::unique_lock<std::mutex> lock(foreign_call_queue_mutex);
+    foreign_call_queue.emplace_back(
+        std::make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
+            std::move(frame), requesting_process, this));
+
+    // unlock before calling notify_one() to avoid waking the worker thread when
+    // it cannot obtain the lock and fetch the call request
+    lock.unlock();
+    foreign_call_queue_condition.notify_one();
+}
+
 void viua::kernel::Kernel::post_free_process(
     std::unique_ptr<viua::process::Process> p) {
     unique_lock<mutex> lock(free_virtual_processes_mutex);
