@@ -32,7 +32,7 @@ auto viua::process::Process::get_trace_line(
     auto trace_line = std::ostringstream{};
 
     trace_line << "[";
-    trace_line << " scheduler = " << std::hex << scheduler << std::dec;
+    trace_line << " scheduler = " << std::hex << attached_scheduler << std::dec;
     trace_line << ", process = " << std::hex << this << std::dec;
     trace_line << ", stack = " << std::hex << stack << std::dec;
     trace_line << ", frame = 0x" << std::hex

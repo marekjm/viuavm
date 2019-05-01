@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,7 +23,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/bits.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
