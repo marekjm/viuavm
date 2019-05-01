@@ -103,11 +103,25 @@ class Process_scheduler {
     auto spawn(std::unique_ptr<Frame>, process_type*, bool) -> process_type*;
 
     /*
+     * Process state inquiry functions.
+     */
+    auto is_joinable(viua::process::PID const) const -> bool;
+    auto is_stopped(viua::process::PID const) const -> bool;
+    auto is_terminated(viua::process::PID const) const -> bool;
+
+    /*
+     * Transfer the exception that killed a process to the current process, or
+     * the return value of the process (if it has successfully terminated).
+     */
+    auto transfer_exception_of(viua::process::PID const) const -> std::unique_ptr<viua::types::Value>;
+    auto transfer_result_of(viua::process::PID const) const -> std::unique_ptr<viua::types::Value>;
+
+    /*
      * This is the message exchange interface. It talks to the kernel to push
      * messages to and pop them from kernel-held queues.
      */
-    auto send(const viua::process::PID, std::unique_ptr<viua::types::Value>) -> void;
-    auto receive(const viua::process::PID,
+    auto send(viua::process::PID const, std::unique_ptr<viua::types::Value>) -> void;
+    auto receive(viua::process::PID const,
                  std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
 
     /*
@@ -124,6 +138,12 @@ class Process_scheduler {
      */
     auto is_native_function(std::string const) const -> bool;
     auto is_foreign_function(std::string const) const -> bool;
+    auto is_block(std::string const) const -> bool;
+
+    /*
+     * Interface for module loading and reloading.
+     */
+    auto load_module(std::string const) -> void;
 
     /*
      * Functions providing access to entry point and bytecode base information.
