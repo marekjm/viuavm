@@ -72,4 +72,59 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
 
     return process_ptr;
 }
+
+auto Process_scheduler::is_joinable(viua::process::PID const pid) const -> bool {
+    return attached_kernel.is_process_joinable(pid);
+}
+auto Process_scheduler::is_stopped(viua::process::PID const pid) const -> bool {
+    return attached_kernel.is_process_stopped(pid);
+}
+auto Process_scheduler::is_terminated(viua::process::PID const pid) const -> bool {
+    return attached_kernel.is_process_terminated(pid);
+}
+
+auto Process_scheduler::transfer_exception_of(viua::process::PID const pid) const -> std::unique_ptr<viua::types::Value> {
+    return attached_kernel.transfer_exception_of(pid);
+}
+auto Process_scheduler::transfer_result_of(viua::process::PID const pid) const -> std::unique_ptr<viua::types::Value> {
+    return attached_kernel.transfer_result_of(pid);
+}
+
+auto Process_scheduler::send(viua::process::PID const pid, std::unique_ptr<viua::types::Value> message) -> void {
+    attached_kernel.send(pid, std::move(message));
+}
+auto Process_scheduler::receive(viua::process::PID const pid,
+             std::queue<std::unique_ptr<viua::types::Value>>& message_queue) -> void {
+    attached_kernel.receive(pid, message_queue);
+}
+
+auto Process_scheduler::request_ffi_call(std::unique_ptr<Frame> frame, viua::process::Process& p) -> void {
+    attached_kernel.request_foreign_function_call(std::move(frame), p);
+}
+
+auto Process_scheduler::is_native_function(std::string const name) const -> bool {
+    return attached_kernel.is_native_function(name);
+}
+auto Process_scheduler::is_foreign_function(std::string const name) const -> bool {
+    return attached_kernel.is_foreign_function(name);
+}
+auto Process_scheduler::is_block(std::string const name) const -> bool {
+    return attached_kernel.is_block(name);
+}
+
+auto Process_scheduler::load_module(std::string const name) -> void {
+    attached_kernel.load_module(name);
+}
+
+
+auto Process_scheduler::get_entry_point_of_block(std::string const name) const
+    -> std::pair<viua::internals::types::Op_address_type,
+                 viua::internals::types::Op_address_type> {
+    return attached_kernel.get_entry_point_of_block(name);
+}
+auto Process_scheduler::get_entry_point_of_function(std::string const& name) const
+    -> std::pair<viua::internals::types::Op_address_type,
+                 viua::internals::types::Op_address_type> {
+    return attached_kernel.get_entry_point_of(name);
+}
 }}
