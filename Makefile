@@ -518,7 +518,6 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 
 build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/kernel.o \
-	build/scheduler/vps.o \
 	build/scheduler/process.o \
 	build/front/vm.o \
 	build/runtime/imports.o \
@@ -722,8 +721,7 @@ build/bin/vm/dis: build/front/dis.o \
 build/kernel/kernel.o: src/kernel/kernel.cpp \
 	include/viua/kernel/kernel.h \
 	include/viua/bytecode/opcodes.h \
-	include/viua/kernel/frame.h \
-	build/scheduler/vps.o
+	include/viua/kernel/frame.h
 build/kernel/registerset.o: src/kernel/registerset.cpp \
 	include/viua/kernel/registerset.h
 build/kernel/frame.o: src/kernel/frame.cpp \
