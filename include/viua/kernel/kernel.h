@@ -50,7 +50,6 @@ namespace process {
 class Process;
 }
 namespace scheduler {
-class Virtual_process_scheduler;
 class Process_scheduler;
 
 namespace ffi {
@@ -169,13 +168,6 @@ class Kernel {
     std::vector<std::unique_ptr<viua::process::Process>> free_virtual_processes;
     std::mutex free_virtual_processes_mutex;
     std::condition_variable free_virtual_processes_cv;
-    // list of running VP schedulers, pairs of {scheduler-pointer, thread}
-    std::vector<
-        std::pair<viua::scheduler::Virtual_process_scheduler*, std::thread>>
-        virtual_process_schedulers;
-    // list of idle VP schedulers
-    std::vector<viua::scheduler::Virtual_process_scheduler*>
-        idle_virtual_process_schedulers;
 
     std::atomic<viua::internals::types::processes_count> running_processes{0};
 

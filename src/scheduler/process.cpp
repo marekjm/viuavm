@@ -127,4 +127,14 @@ auto Process_scheduler::get_entry_point_of_function(std::string const& name) con
                  viua::internals::types::Op_address_type> {
     return attached_kernel.get_entry_point_of(name);
 }
+
+auto Process_scheduler::launch() -> void {
+}
+auto Process_scheduler::shutdown() -> void {
+}
+auto Process_scheduler::join() -> void {
+}
+auto Process_scheduler::exit() const -> int {
+    return 0;
+}
 }}

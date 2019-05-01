@@ -155,6 +155,15 @@ class Process_scheduler {
     auto get_entry_point_of_function(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
+
+    /*
+     * Scheduler management interface. Launching, stopping, etc. related to the
+     * scheduler itself.
+     */
+    auto launch() -> void;
+    auto shutdown() -> void;
+    auto join() -> void;
+    auto exit() const -> int;
 };
 }}
 
