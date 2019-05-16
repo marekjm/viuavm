@@ -46,7 +46,7 @@ std::string String::str() const {
     return svalue;
 }
 std::string String::repr() const {
-    return str::enquote(svalue);
+    return "b" + str::enquote(svalue);
 }
 bool String::boolean() const {
     return svalue.size() != 0;
