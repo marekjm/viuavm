@@ -581,7 +581,7 @@ auto generate(std::vector<Token> const& tokens,
                       << send_control_seq(ATTR_RESET) << ": "
                       << send_control_seq(COLOR_FG_YELLOW) << "debug"
                       << send_control_seq(ATTR_RESET) << ": "
-                      << "marking function \""
+                      << "marking local-linked function \""
                       << send_control_seq(COLOR_FG_WHITE) << f
                       << send_control_seq(ATTR_RESET) << "\" (from \""
                       << send_control_seq(COLOR_FG_WHITE) << filename
@@ -626,7 +626,7 @@ auto generate(std::vector<Token> const& tokens,
                               << send_control_seq(ATTR_RESET) << ": "
                               << send_control_seq(COLOR_FG_YELLOW) << "debug"
                               << send_control_seq(ATTR_RESET) << ": "
-                              << "marking function \""
+                              << "marking static-linked function \""
                               << send_control_seq(COLOR_FG_WHITE) << fn
                               << send_control_seq(ATTR_RESET) << "\" (from \""
                               << send_control_seq(COLOR_FG_WHITE) << lnk
@@ -821,7 +821,7 @@ auto generate(std::vector<Token> const& tokens,
                             << send_control_seq(ATTR_RESET) << ": "
                             << send_control_seq(COLOR_FG_YELLOW) << "debug"
                             << send_control_seq(ATTR_RESET) << ": "
-                            << "marking function \""
+                            << "marking dynamic-linked function \""
                             << send_control_seq(COLOR_FG_WHITE) << fn
                             << send_control_seq(ATTR_RESET) << "\" (from \""
                             << send_control_seq(COLOR_FG_WHITE) << lnk.first
