@@ -498,12 +498,12 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case SATURATINGUMUL:
     case SATURATINGUDIV:
     default:
-        ostringstream error;
-        error << "unrecognised instruction (byte value " << int(*addr) << ")";
+        std::ostringstream error;
+        error << "unrecognised instruction (byte value " << static_cast<int>(*addr) << ")";
         if (OP_NAMES.count(static_cast<OPCODE>(*addr))) {
             error << ": " << OP_NAMES.at(static_cast<OPCODE>(*addr));
         }
-        throw make_unique<viua::types::Exception>(error.str());
+        throw std::make_unique<viua::types::Exception>(error.str());
     }
     return addr;
 }

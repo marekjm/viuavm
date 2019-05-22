@@ -78,6 +78,7 @@ class Process_scheduler {
      * The thread that runs the scheduler's code.
      */
     std::thread scheduler_thread;
+    auto operator()() -> void;
 
   public:
     Process_scheduler(viua::kernel::Kernel&);
