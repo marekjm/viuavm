@@ -606,6 +606,17 @@ auto generate(std::vector<Token> const& tokens,
 
         {
             auto fn_names = loader.get_functions();
+            if (fn_names.empty()) {
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << send_control_seq(COLOR_FG_RED) << "warning"
+                          << send_control_seq(ATTR_RESET) << ": "
+                          << "static-linked module \""
+                          << send_control_seq(COLOR_FG_WHITE) << lnk
+                          << send_control_seq(ATTR_RESET)
+                          << "\" defines no functions\n";
+            }
+
             for (auto const& fn : fn_names) {
                 if (function_addresses.count(fn)) {
                     throw("duplicate symbol '" + fn + "' found when linking '"
