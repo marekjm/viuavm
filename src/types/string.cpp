@@ -33,7 +33,6 @@
 #include <viua/types/string.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
-using namespace std;
 using namespace viua::assertions;
 using namespace viua::types;
 
@@ -53,7 +52,7 @@ bool String::boolean() const {
 }
 
 std::unique_ptr<Value> String::copy() const {
-    return make_unique<String>(svalue);
+    return std::make_unique<String>(svalue);
 }
 
 std::string& String::value() {
@@ -111,7 +110,7 @@ void String::stringify(Frame* frame,
                        viua::process::Process* process,
                        viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
-        throw make_unique<viua::types::Exception>("expected 2 parameters");
+        throw std::make_unique<viua::types::Exception>("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->str();
 }
@@ -122,7 +121,7 @@ void String::represent(Frame* frame,
                        viua::process::Process* process,
                        viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
-        throw make_unique<viua::types::Exception>("expected 2 parameters");
+        throw std::make_unique<viua::types::Exception>("expected 2 parameters");
     }
     svalue =
         static_cast<Pointer*>(frame->arguments->at(1))->to(process)->repr();
@@ -147,7 +146,7 @@ void String::startswith(Frame* frame,
     }
 
     frame->local_register_set->set(
-        0, make_unique<viua::types::Boolean>(starts_with));
+        0, std::make_unique<viua::types::Boolean>(starts_with));
 }
 
 void String::endswith(Frame* frame,
@@ -171,7 +170,7 @@ void String::endswith(Frame* frame,
     }
 
     frame->local_register_set->set(
-        0, make_unique<viua::types::Boolean>(ends_with));
+        0, std::make_unique<viua::types::Boolean>(ends_with));
 }
 
 void String::format(Frame* frame,
@@ -179,15 +178,15 @@ void String::format(Frame* frame,
                     viua::kernel::Register_set*,
                     viua::process::Process*,
                     viua::kernel::Kernel*) {
-    regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
+    std::regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
     std::string result = svalue;
 
-    if (regex_search(result, key_regex)) {
+    if (std::regex_search(result, key_regex)) {
         auto matches = std::vector<std::string>{};
-        for (sregex_iterator match =
-                 sregex_iterator(result.begin(), result.end(), key_regex);
-             match != sregex_iterator();
+        for (auto match =
+                 std::sregex_iterator(result.begin(), result.end(), key_regex);
+             match != std::sregex_iterator();
              ++match) {
             matches.emplace_back(match->str());
         }
@@ -211,12 +210,12 @@ void String::format(Frame* frame,
                     static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
             }
             std::string pat("#\\{" + m + "\\}");
-            regex subst(pat);
-            result = regex_replace(result, subst, replacement);
+            std::regex subst(pat);
+            result = std::regex_replace(result, subst, replacement);
         }
     }
 
-    frame->local_register_set->set(0, make_unique<String>(result));
+    frame->local_register_set->set(0, std::make_unique<String>(result));
 }
 
 void String::substr(Frame* frame,
@@ -252,7 +251,7 @@ void String::concatenate(Frame* frame,
                          viua::kernel::Kernel*) {
     frame->local_register_set->set(
         0,
-        make_unique<String>(
+        std::make_unique<String>(
             static_cast<String*>(frame->arguments->at(0))->value()
             + static_cast<String*>(frame->arguments->at(1))->value()));
 }
@@ -271,7 +270,7 @@ void String::size(Frame* frame,
                   viua::process::Process*,
                   viua::kernel::Kernel*) {
     frame->local_register_set->set(
-        0, make_unique<Integer>(static_cast<int>(svalue.size())));
+        0, std::make_unique<Integer>(static_cast<int>(svalue.size())));
 }
 
 String::String(std::string s) : svalue(s) {}

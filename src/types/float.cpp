@@ -22,7 +22,6 @@
 #include <viua/exceptions.h>
 #include <viua/types/boolean.h>
 #include <viua/types/float.h>
-using namespace std;
 using namespace viua::types;
 
 std::string const viua::types::Float::type_name = "Float";
@@ -32,7 +31,7 @@ std::string Float::type() const {
     return "Float";
 }
 std::string Float::str() const {
-    return to_string(number);
+    return std::to_string(number);
 }
 bool Float::boolean() const {
     return (number != 0);
@@ -43,7 +42,7 @@ auto Float::value() -> decltype(number)& {
 }
 
 std::unique_ptr<viua::types::Value> Float::copy() const {
-    return make_unique<Float>(number);
+    return std::make_unique<Float>(number);
 }
 
 auto Float::as_integer() const -> int64_t {
@@ -56,15 +55,15 @@ auto Float::as_float() const -> viua::float64 {
 
 auto Float::operator+(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Float>(number + that.as_float());
+    return std::make_unique<Float>(number + that.as_float());
 }
 auto Float::operator-(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Float>(number - that.as_float());
+    return std::make_unique<Float>(number - that.as_float());
 }
 auto Float::operator*(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Float>(number * that.as_float());
+    return std::make_unique<Float>(number * that.as_float());
 }
 auto Float::operator/(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
@@ -72,28 +71,28 @@ auto Float::operator/(numeric::Number const& that) const
         throw viua::util::exceptions::make_unique_exception<
             viua::runtime::exceptions::Zero_division>();
     }
-    return make_unique<Float>(number / that.as_float());
+    return std::make_unique<Float>(number / that.as_float());
 }
 
 auto Float::operator<(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number < that.as_float());
+    return std::make_unique<Boolean>(number < that.as_float());
 }
 auto Float::operator<=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number <= that.as_float());
+    return std::make_unique<Boolean>(number <= that.as_float());
 }
 auto Float::operator>(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number > that.as_float());
+    return std::make_unique<Boolean>(number > that.as_float());
 }
 auto Float::operator>=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number >= that.as_float());
+    return std::make_unique<Boolean>(number >= that.as_float());
 }
 auto Float::operator==(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number == that.as_float());
+    return std::make_unique<Boolean>(number == that.as_float());
 }
 
 Float::Float(decltype(number) n) : number(n) {}

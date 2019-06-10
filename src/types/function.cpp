@@ -21,7 +21,6 @@
 #include <string>
 #include <viua/types/function.h>
 #include <viua/types/value.h>
-using namespace std;
 
 std::string const viua::types::Function::type_name = "Function";
 
@@ -37,7 +36,7 @@ std::string viua::types::Function::type() const {
 }
 
 std::string viua::types::Function::str() const {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << "Function: " << function_name;
     return oss.str();
 }
@@ -51,7 +50,7 @@ bool viua::types::Function::boolean() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Function::copy() const {
-    return make_unique<viua::types::Function>(function_name);
+    return std::make_unique<viua::types::Function>(function_name);
 }
 
 

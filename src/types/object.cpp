@@ -24,7 +24,6 @@
 #include <viua/kernel/frame.h>
 #include <viua/types/exception.h>
 #include <viua/types/object.h>
-using namespace std;
 
 std::string const viua::types::Object::type_name = "Object";
 
@@ -36,7 +35,7 @@ bool viua::types::Object::boolean() const {
 }
 
 std::string viua::types::Object::str() const {
-    ostringstream oss;
+    std::ostringstream oss;
 
     oss << object_type_name << '#';
     oss << '{';
@@ -54,7 +53,7 @@ std::string viua::types::Object::str() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
-    auto cp = make_unique<viua::types::Object>(object_type_name);
+    auto cp = std::make_unique<viua::types::Object>(object_type_name);
     for (auto const& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
@@ -73,9 +72,9 @@ void viua::types::Object::insert(std::string const& key,
 std::unique_ptr<viua::types::Value> viua::types::Object::remove(
     std::string const& key) {
     if (not attributes.count(key)) {
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "attribute not found: " << key;
-        throw make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(oss.str());
     }
     auto o = std::move(attributes.at(key));
     attributes.erase(key);

@@ -21,7 +21,7 @@
 #include <sstream>
 #include <viua/support/string.h>
 #include <viua/types/text.h>
-using namespace std;
+
 
 std::string const viua::types::Text::type_name = "Text";
 
@@ -107,7 +107,7 @@ std::string viua::types::Text::type() const {
 }
 
 std::string viua::types::Text::str() const {
-    ostringstream oss;
+    std::ostringstream oss;
     for (auto const& each : text) {
         oss << each;
     }

@@ -25,7 +25,7 @@
 #include <viua/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/process.h>
-using namespace std;
+
 
 std::string const viua::types::Process::type_name = "Process";
 
@@ -34,8 +34,8 @@ std::string viua::types::Process::type() const {
 }
 
 std::string viua::types::Process::str() const {
-    ostringstream oss;
-    oss << "Process: " << hex << pid().str() << dec;
+    std::ostringstream oss;
+    oss << "Process: " << std::hex << pid().str() << std::dec;
     return oss.str();
 }
 
@@ -50,7 +50,7 @@ bool viua::types::Process::boolean() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Process::copy() const {
-    return make_unique<Process>(thrd);
+    return std::make_unique<Process>(thrd);
 }
 
 viua::process::PID viua::types::Process::pid() const {

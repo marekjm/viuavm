@@ -25,7 +25,7 @@
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
 #include <viua/util/exceptions.h>
-using namespace std;
+
 
 using viua::util::exceptions::make_unique_exception;
 
@@ -39,7 +39,7 @@ void viua::types::Vector::insert(long int index,
     if (index > 0
         and static_cast<decltype(internal_object)::size_type>(index)
                 > internal_object.size()) {
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "positive vector index out of range: index = " << index
             << ", size = " << internal_object.size();
         throw make_unique_exception<Out_of_range_exception>(oss.str());
@@ -135,7 +135,7 @@ std::string viua::types::Vector::type() const {
 }
 
 std::string viua::types::Vector::str() const {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << "[";
     for (decltype(internal_object)::size_type i = 0; i < internal_object.size();
          ++i) {
@@ -151,7 +151,7 @@ bool viua::types::Vector::boolean() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
-    auto v = make_unique<Vector>();
+    auto v = std::make_unique<Vector>();
     for (unsigned i = 0; i < internal_object.size(); ++i) {
         v->push(internal_object[i]->copy());
     }

@@ -24,7 +24,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
-using namespace std;
 using namespace viua::types;
 
 std::string const viua::types::Integer::type_name = "Integer";
@@ -33,7 +32,7 @@ std::string Integer::type() const {
     return "Integer";
 }
 std::string Integer::str() const {
-    return to_string(number);
+    return std::to_string(number);
 }
 bool Integer::boolean() const {
     return (number != 0);
@@ -51,12 +50,12 @@ int64_t Integer::decrement() {
 }
 
 std::unique_ptr<Value> Integer::copy() const {
-    return make_unique<Integer>(number);
+    return std::make_unique<Integer>(number);
 }
 
 auto Integer::as_unsigned() const -> uint64_t {
     if (number < 0) {
-        throw make_unique<viua::types::Exception>("number is negative");
+        throw std::make_unique<viua::types::Exception>("number is negative");
     }
     return static_cast<uint64_t>(number);
 }
@@ -71,15 +70,15 @@ auto Integer::as_float() const -> viua::float64 {
 
 auto Integer::operator+(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Integer>(number + that.as_integer());
+    return std::make_unique<Integer>(number + that.as_integer());
 }
 auto Integer::operator-(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Integer>(number - that.as_integer());
+    return std::make_unique<Integer>(number - that.as_integer());
 }
 auto Integer::operator*(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
-    return make_unique<Integer>(number * that.as_integer());
+    return std::make_unique<Integer>(number * that.as_integer());
 }
 auto Integer::operator/(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number> {
@@ -87,26 +86,26 @@ auto Integer::operator/(numeric::Number const& that) const
         throw viua::util::exceptions::make_unique_exception<
             viua::runtime::exceptions::Zero_division>();
     }
-    return make_unique<Integer>(number / that.as_integer());
+    return std::make_unique<Integer>(number / that.as_integer());
 }
 
 auto Integer::operator<(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number < that.as_integer());
+    return std::make_unique<Boolean>(number < that.as_integer());
 }
 auto Integer::operator<=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number <= that.as_integer());
+    return std::make_unique<Boolean>(number <= that.as_integer());
 }
 auto Integer::operator>(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number > that.as_integer());
+    return std::make_unique<Boolean>(number > that.as_integer());
 }
 auto Integer::operator>=(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number >= that.as_integer());
+    return std::make_unique<Boolean>(number >= that.as_integer());
 }
 auto Integer::operator==(numeric::Number const& that) const
     -> std::unique_ptr<Boolean> {
-    return make_unique<Boolean>(number == that.as_integer());
+    return std::make_unique<Boolean>(number == that.as_integer());
 }

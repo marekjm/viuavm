@@ -24,14 +24,13 @@
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 std::string viua::types::Value::type() const {
     return "Value";
 }
 std::string viua::types::Value::str() const {
-    ostringstream s;
+    std::ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
@@ -50,7 +49,7 @@ bool viua::types::Value::boolean() const {
 
 std::unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
     const viua::process::Process* process_of_origin) {
-    return make_unique<viua::types::Pointer>(this, process_of_origin);
+    return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }
 
 viua::types::Value::~Value() {

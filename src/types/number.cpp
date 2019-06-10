@@ -19,7 +19,6 @@
 
 #include <string>
 #include <viua/types/number.h>
-using namespace std;
 
 
 std::string const viua::types::numeric::Number::type_name = "Number";
