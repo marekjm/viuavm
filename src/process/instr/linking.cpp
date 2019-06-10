@@ -32,7 +32,7 @@ auto viua::process::Process::opimport(Op_address_type addr) -> Op_address_type {
     /** Run import instruction.
      */
     auto module = std::string{};
-    tie(addr, module) =
+    std::tie(addr, module) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
     scheduler->load_module(module);
     return addr;

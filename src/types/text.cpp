@@ -171,7 +171,7 @@ auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
 
 auto viua::types::Text::common_prefix(Text const& other) const -> size_type {
     size_type length_of_common_prefix = 0;
-    auto limit                        = max(size(), other.size());
+    auto limit                        = std::max(size(), other.size());
 
     while (length_of_common_prefix < limit
            and text.at(length_of_common_prefix)

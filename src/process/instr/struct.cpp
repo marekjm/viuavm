@@ -72,19 +72,19 @@ auto viua::process::Process::opstructremove(Op_address_type addr)
     viua::kernel::Register* target = nullptr;
 
     if (not void_target) {
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     viua::types::Struct* struct_operand = nullptr;
-    tie(addr, struct_operand) =
+    std::tie(addr, struct_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(
             addr, this);
 
     viua::types::Atom* key = nullptr;
-    tie(addr, key) =
+    std::tie(addr, key) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(
             addr, this);
 
