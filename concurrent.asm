@@ -23,7 +23,7 @@
     structinsert %packet local %sender local %x local
 
     send %gate_guardian_pid local %packet local
-    receive %x local 160ms
+    receive %x local 2s
     print %x local
 
     return
@@ -151,8 +151,14 @@
     move %0 arguments %0 local
     process void gate_guardian/1
 
+    text %0 local "awaiting gate_guardian's PID"
+    print %0 local
+
     .name: iota gate_guardian_pid
     receive %gate_guardian_pid local 1s
+
+    text %0 local "got gate_guardian's PID"
+    print %0 local
 
     frame %2
     move %0 arguments %no_of_processes local
