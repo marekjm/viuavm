@@ -527,6 +527,12 @@ int viua::kernel::Kernel::run() {
     proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
     proc_schedulers.front()->bootstrap(commandline_arguments);
 
+    if (vp_schedulers_limit) {
+        for (auto i = (vp_schedulers_limit - 1); i < vp_schedulers_limit; ++i) {
+            proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
+        }
+    }
+
     for (auto& sched : proc_schedulers) {
         sched->launch();
     }
