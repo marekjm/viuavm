@@ -582,6 +582,7 @@ auto Process_scheduler::shutdown() -> void {
 }
 auto Process_scheduler::join() -> void {
     scheduler_thread.join();
+    std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] scheduler joined\n";
 }
 auto Process_scheduler::exit() const -> int {
     return 0;
