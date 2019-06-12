@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <mutex>
 #include <viua/support/env.h>
 #include <viua/printutils.h>
 #include <viua/machine.h>
@@ -179,6 +180,21 @@ static void print_stack_trace(viua::process::Process& process) {
 constexpr auto SCHEDULER_DEBUG = false;
 
 namespace viua { namespace scheduler {
+auto Process_scheduler::push(std::unique_ptr<process_type> proc) -> void {
+    std::lock_guard<std::mutex> lck { process_queue_mtx };
+    process_queue.push_back(std::move(proc));
+}
+auto Process_scheduler::pop() -> std::unique_ptr<process_type> {
+    std::lock_guard<std::mutex> lck { process_queue_mtx };
+    auto proc = std::move(process_queue.front());
+    process_queue.pop_front();
+    return proc;
+}
+auto Process_scheduler::empty() const -> bool {
+    std::lock_guard<std::mutex> lck { process_queue_mtx };
+    return process_queue.empty();
+}
+
 Process_scheduler::Process_scheduler(viua::kernel::Kernel& k):
     attached_kernel{k}
 {}
@@ -332,13 +348,12 @@ auto Process_scheduler::operator()() -> void {
     auto any_active = false;
 
     while (true) {
-        if (process_queue.empty()) {
+        if (empty()) {
             std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] no processes left to run\n";
             return;
         }
 
-        auto a_process = std::move(process_queue.front());
-        process_queue.pop_front();
+        auto a_process = pop();
 
         if constexpr (SCHEDULER_DEBUG) {
             std::cerr
@@ -375,7 +390,7 @@ auto Process_scheduler::operator()() -> void {
                     << a_process->pid().get()
                     << "] is stopped and joinable, waiting on parent\n";
             }
-            process_queue.push_back(std::move(a_process));
+            push(std::move(a_process));
             continue;
         }
 
@@ -395,7 +410,7 @@ auto Process_scheduler::operator()() -> void {
                     << a_process->pid().get()
                     << "] is suspended\n";
             }
-            process_queue.push_back(std::move(a_process));
+            push(std::move(a_process));
             continue;
         }
 
@@ -482,7 +497,7 @@ auto Process_scheduler::operator()() -> void {
              * is waking the process up so as long as the process is suspended
              * it must be considered to be running.
              */
-            process_queue.push_back(std::move(a_process));
+            push(std::move(a_process));
             continue;
         }
         if (a_process->terminated() and not a_process->joinable()
@@ -541,7 +556,7 @@ auto Process_scheduler::operator()() -> void {
                 auto death_frame = std::move(a_process->frame_for_watchdog());
                 death_frame->arguments->set(0, std::move(death_message));
                 a_process->become(a_process->watchdog(), std::move(death_frame));
-                process_queue.push_back(std::move(a_process));
+                push(std::move(a_process));
                 ticked = true;
                 continue;
             }
@@ -550,7 +565,7 @@ auto Process_scheduler::operator()() -> void {
         if (a_process->stopped()) {
             attached_kernel.record_process_result(a_process.get());
         } else {
-            process_queue.push_back(std::move(a_process));
+            push(std::move(a_process));
         }
 
         if (not ticked) {

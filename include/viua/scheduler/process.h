@@ -58,7 +58,12 @@ class Process_scheduler {
      * this happens).
      */
     std::deque<std::unique_ptr<process_type>> process_queue;
-    std::mutex process_queue_mtx;
+    mutable std::mutex process_queue_mtx;
+
+    auto push(std::unique_ptr<process_type>) -> void;
+    auto pop() -> std::unique_ptr<process_type>;
+    auto size() const -> decltype(process_queue)::size_type;
+    auto empty() const -> bool;
 
     /*
      * Exit code of the scheduler. It is useful only for the scheduler running
