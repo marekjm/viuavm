@@ -290,6 +290,9 @@ class Kernel {
     void request_foreign_function_call(std::unique_ptr<Frame>, viua::process::Process&);
 
     void post_free_process(std::unique_ptr<viua::process::Process>);
+    auto notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void;
+    auto notify_about_process_death() -> void;
+    auto process_count() const -> viua::internals::types::processes_count;
 
     auto create_mailbox(const viua::process::PID)
         -> viua::internals::types::processes_count;

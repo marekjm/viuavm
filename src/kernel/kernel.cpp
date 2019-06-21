@@ -348,6 +348,15 @@ void viua::kernel::Kernel::post_free_process(
     lock.unlock();
     free_virtual_processes_cv.notify_one();
 }
+auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void {
+    ++running_processes;
+}
+auto viua::kernel::Kernel::notify_about_process_death() -> void {
+    --running_processes;
+}
+auto viua::kernel::Kernel::process_count() const -> viua::internals::types::processes_count {
+    return running_processes;
+}
 
 auto viua::kernel::Kernel::create_mailbox(const viua::process::PID pid)
     -> viua::internals::types::processes_count {

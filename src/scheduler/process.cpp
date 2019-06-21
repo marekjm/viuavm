@@ -255,6 +255,8 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
             << ")\n";
     }
 
+    attached_kernel.notify_about_process_spawned(this);
+
     return process_ptr;
 }
 
@@ -512,6 +514,7 @@ auto Process_scheduler::operator()() -> void {
                 }
                 print_stack_trace(*a_process.get());
                 attached_kernel.delete_mailbox(a_process->pid());
+                attached_kernel.notify_about_process_death();
                 continue;
             } else {
                 if (a_process->trace().at(0)->function_name == a_process->watchdog()) {
@@ -568,6 +571,7 @@ auto Process_scheduler::operator()() -> void {
 
         if (a_process->stopped()) {
             attached_kernel.record_process_result(a_process.get());
+            attached_kernel.notify_about_process_death();
         } else {
             push(std::move(a_process));
         }
