@@ -177,6 +177,14 @@ static void print_stack_trace(viua::process::Process& process) {
     }
 }
 
+struct atomic_cerr {
+    atomic_cerr(std::function<void(std::ostream&)> const& fn) {
+        std::ostringstream output;
+        fn(output);
+        std::cerr << output.str();
+    }
+};
+
 constexpr auto SCHEDULER_DEBUG = false;
 
 namespace viua { namespace scheduler {
@@ -332,11 +340,15 @@ struct deferred {
 };
 
 auto Process_scheduler::launch() -> void {
-    std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] launching...\n";
+    atomic_cerr([this](std::ostream& o) -> void {
+        o << "[scheduler][id=" << std::hex << this << std::dec << "] launching...\n";
+    });
     scheduler_thread = std::thread([this]{ (*this)(); });
 }
 auto Process_scheduler::operator()() -> void {
-    std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] starts running\n";
+    atomic_cerr([this](std::ostream& o) -> void {
+        o << "[scheduler][id=" << std::hex << this << std::dec << "] starts running\n";
+    });
 
     /*
      * Used to check if any processes "ticked". A ticking process either did
