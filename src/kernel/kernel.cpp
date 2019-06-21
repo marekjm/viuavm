@@ -350,13 +350,45 @@ void viua::kernel::Kernel::post_free_process(
 }
 auto viua::kernel::Kernel::steal_processes() ->
     std::vector<std::unique_ptr<viua::process::Process>> {
-    // FIXME actually steal some processes
+
+    std::unique_lock<std::mutex> lock { process_spawned_mtx };
+
+    /*
+     * If any scheduler spawned a process recently, let's try to steal some work
+     * from it.
+     */
+    if (not process_spawned_by.empty()) {
+        auto sched = std::move(process_spawned_by.front());
+        process_spawned_by.pop_front();
+        return sched->give_up_processes();
+    }
+
+    /*
+     * If no scheduler spawned a process recently, let's wait for a bit and
+     * check again.
+     */
+    auto const STEAL_WAIT_PERIOD = std::chrono::milliseconds{16};
+    process_spawned_cv.wait_for(lock, STEAL_WAIT_PERIOD);
+
+    /*
+     * Make sure that we don't accidentaly try to use empty queue.
+     */
+    if (not process_spawned_by.empty()) {
+        auto sched = std::move(process_spawned_by.front());
+        process_spawned_by.pop_front();
+        return sched->give_up_processes();
+    }
 
     auto stolen = std::vector<std::unique_ptr<viua::process::Process>>{};
     return stolen;
 }
-auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void {
+auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process_scheduler* sched) -> void {
+    {
+        std::unique_lock<std::mutex> lck { process_spawned_mtx };
+        process_spawned_by.push_back(sched);
+    }
     ++running_processes;
+    process_spawned_cv.notify_one();
 }
 auto viua::kernel::Kernel::notify_about_process_death() -> void {
     --running_processes;

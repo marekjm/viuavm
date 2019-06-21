@@ -191,6 +191,12 @@ class Kernel {
      * and do its job.
      */
     std::condition_variable process_spawned_cv;
+    std::mutex process_spawned_mtx;
+    // FIXME Maybe use a ring buffer instead of a deque to make the size of
+    // the "who spawned a process" list bounded? If all schedulers are populated
+    // and don't need to steal work this list could otherwise get uncomfortably
+    // long really quick.
+    std::deque<viua::scheduler::Process_scheduler*> process_spawned_by;
 
     /*
      * FFI MODULES
