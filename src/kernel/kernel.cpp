@@ -479,7 +479,7 @@ static auto no_of_schedulers(
     decltype(default_limit) limit = default_limit;
     char* env_limit               = getenv(env_name);
     if (env_limit != nullptr) {
-        int raw_limit = stoi(env_limit);
+        int raw_limit = std::stoi(env_limit);
         if (raw_limit > 0) {
             limit = static_cast<decltype(limit)>(raw_limit);
         }
@@ -559,7 +559,7 @@ viua::kernel::Kernel::Kernel()
     ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
         foreign_call_workers.emplace_back(
-            make_unique<std::thread>(viua::scheduler::ffi::ff_call_processor,
+            std::make_unique<std::thread>(viua::scheduler::ffi::ff_call_processor,
                                      &foreign_call_queue,
                                      &foreign_functions,
                                      &foreign_functions_mutex,
