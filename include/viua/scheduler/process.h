@@ -107,6 +107,7 @@ class Process_scheduler {
      * bookkeeping that is needed for correct operation of the VM.
      */
     auto spawn(std::unique_ptr<Frame>, process_type*, bool) -> process_type*;
+    auto give_up_processes() -> std::vector<std::unique_ptr<process_type>>;
 
     /*
      * Process state inquiry functions.

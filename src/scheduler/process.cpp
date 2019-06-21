@@ -267,6 +267,10 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
 
     return process_ptr;
 }
+auto Process_scheduler::give_up_processes() -> std::vector<std::unique_ptr<process_type>> {
+    auto given_up = std::vector<std::unique_ptr<process_type>>{};
+    return given_up;
+}
 
 auto Process_scheduler::is_joinable(viua::process::PID const pid) const -> bool {
     return attached_kernel.is_process_joinable(pid);
@@ -367,8 +371,30 @@ auto Process_scheduler::operator()() -> void {
 
     while (true) {
         if (empty()) {
-            std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] no processes left to run\n";
-            return;
+            auto stolen_processes = attached_kernel.steal_processes();
+            if (stolen_processes.empty()) {
+                /*
+                 *  If there are no processes to steal, there is nothing we can do
+                 *  but shut down.
+                 */
+                if (attached_kernel.process_count() == 0) {
+                    break;
+                }
+
+                /*
+                 *  If there are processes running on the VM, but we were not
+                 *  able to steal any of them, let's wait again and see if the
+                 *  situation will change.
+                 */
+                continue;
+            }
+
+            std::lock_guard<std::mutex> lck { process_queue_mtx };
+            for (auto& each : stolen_processes) {
+                process_queue.push_back(std::move(each));
+            }
+
+            continue;
         }
 
         auto a_process = pop();

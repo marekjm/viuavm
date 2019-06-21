@@ -348,6 +348,13 @@ void viua::kernel::Kernel::post_free_process(
     lock.unlock();
     free_virtual_processes_cv.notify_one();
 }
+auto viua::kernel::Kernel::steal_processes() ->
+    std::vector<std::unique_ptr<viua::process::Process>> {
+    // FIXME actually steal some processes
+
+    auto stolen = std::vector<std::unique_ptr<viua::process::Process>>{};
+    return stolen;
+}
 auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void {
     ++running_processes;
 }
