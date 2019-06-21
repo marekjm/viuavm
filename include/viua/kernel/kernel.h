@@ -169,6 +169,11 @@ class Kernel {
     std::mutex free_virtual_processes_mutex;
     std::condition_variable free_virtual_processes_cv;
 
+    /*
+     * The number of running processes. This is needed to calculate the load on
+     * schedulers and other things (e.g. if there are no processes we can shut
+     * down).
+     */
     std::atomic<viua::internals::types::processes_count> running_processes{0};
 
     static const viua::internals::types::schedulers_count
