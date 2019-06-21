@@ -582,7 +582,10 @@ auto Process_scheduler::operator()() -> void {
              * FIXME Instead of breaking we should perform rebalancing. Steal
              * some running processes from other schedulers.
              */
-            break;
+            auto const n = attached_kernel.process_count();
+            if (n == 0) {
+                break;
+            }
         }
     }
 }
