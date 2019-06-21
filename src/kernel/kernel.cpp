@@ -529,23 +529,48 @@ int viua::kernel::Kernel::run() {
     /* bool enable_tracing = is_tracing_enabled(); */
 
     auto proc_schedulers = decltype(process_schedulers){};
-
-    // reserver memory for all schedulers ahead of time
     proc_schedulers.reserve(vp_schedulers_limit);
 
+    /*
+     * Immediately allocate and bootstrap the "main" scheduler.
+     *
+     * It is done outside any loops and limits because we always need at least
+     * one scheduler to run any code at all. This way, even if the limit of
+     * schedulers is specified to be 0 the VM will be able to run.
+     *
+     * But why bootstrap it now? Because we need the process to be ready to run
+     * immediately after launch. Otherwise it will just shut down because the
+     * kernel will tell it that there are no processes in the whole VM and it is
+     * free to stop running.
+     */
     proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
     proc_schedulers.front()->bootstrap(commandline_arguments);
 
+    /*
+     * Allocate the additional process schedulers requested. Remember to launch
+     * (n - 1) of them as the main scheduler also counts into the limit of
+     * schedulers.
+     */
     if (vp_schedulers_limit) {
         for (auto i = (vp_schedulers_limit - 1); i; --i) {
             proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
         }
     }
 
+    /*
+     * Launch all the schedulers. With the main scheduler bootstrapped and all
+     * the extra process schedulers already allocated we can just set them loose
+     * and let them run the software...
+     */
     for (auto& sched : proc_schedulers) {
         sched->launch();
     }
 
+    /*
+     * ...and then there is nothing for us to do but wait for them to complete
+     * running. Please not that this condition may never be met if the software
+     * loaded into the VM is intended to run indefinitely.
+     */
     for (auto& sched : proc_schedulers) {
         sched->shutdown();
         sched->join();
