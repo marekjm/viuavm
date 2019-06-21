@@ -571,6 +571,7 @@ auto Process_scheduler::operator()() -> void {
 
         if (a_process->stopped()) {
             attached_kernel.record_process_result(a_process.get());
+            attached_kernel.delete_mailbox(a_process->pid());
             attached_kernel.notify_about_process_death();
         } else {
             push(std::move(a_process));
