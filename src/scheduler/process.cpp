@@ -298,7 +298,11 @@ auto Process_scheduler::give_up_processes() -> std::vector<std::unique_ptr<proce
 
     auto given_up = std::vector<std::unique_ptr<process_type>>{};
 
-    // FIXME actually return some processes
+    for (auto i = 0; i < give_up_limit; ++i) {
+        auto proc = std::move(process_queue.front());
+        process_queue.pop_front();
+        given_up.push_back(std::move(proc));
+    }
 
     return given_up;
 }
