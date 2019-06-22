@@ -255,8 +255,12 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
         attached_kernel.create_result_slot_for(pid_of_new_process);
     }
 
+    // FIXME This is fishy, and probably unsafe. Obtaining a pointer to this
+    // newly spawned process, pushing it onto the process queue, and then using
+    // the saved pointer for things... sounds like asking for problems.
     auto process_ptr = process.get();
-    process_queue.emplace_back(std::move(process));
+
+    push(std::move(process));
 
     if constexpr (SCHEDULER_DEBUG) {
         std::cerr
@@ -420,9 +424,16 @@ auto Process_scheduler::operator()() -> void {
                 continue;
             }
 
-            std::lock_guard<std::mutex> lck { process_queue_mtx };
-            for (auto& each : stolen_processes) {
-                process_queue.push_back(std::move(each));
+            {
+                /*
+                 * Obtain the lock once for all of the stolen processes instead
+                 * of using the push() function which would pay the cost of
+                 * acquiring the lock for every process pushed.
+                 */
+                std::lock_guard<std::mutex> lck { process_queue_mtx };
+                for (auto& each : stolen_processes) {
+                    process_queue.push_back(std::move(each));
+                }
             }
 
             continue;
