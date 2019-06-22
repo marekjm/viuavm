@@ -584,7 +584,7 @@ int viua::kernel::Kernel::run() {
      * free to stop running.
      */
     std::cerr << "[kernel] bootstrapping main scheduler\n";
-    proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
+    proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this, 0));
     proc_schedulers.front()->bootstrap(commandline_arguments);
 
     /*
@@ -593,8 +593,11 @@ int viua::kernel::Kernel::run() {
      * schedulers.
      */
     if (vp_schedulers_limit) {
+        auto n = viua::scheduler::Process_scheduler::id_type{1};
         for (auto i = (vp_schedulers_limit - 1); i; --i) {
-            proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
+            proc_schedulers.emplace_back(
+                std::make_unique<viua::scheduler::Process_scheduler>(
+                    *this, n++));
         }
     }
     std::cerr << "[kernel] created " << proc_schedulers.size() << " process scheduler(s)\n";

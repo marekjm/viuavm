@@ -34,9 +34,17 @@ namespace viua {
 
 namespace viua { namespace scheduler {
 class Process_scheduler {
+  public:
     using process_type = viua::process::Process;
+    using id_type = size_t;
 
   private:
+    /*
+     * The ID assigned to this scheduler by the kernel. Does not do much and is
+     * used mostly to identify the scheduler in logs.
+     */
+    id_type const assigned_id;
+
     /*
      * The kernel to which the scheduler is attached. There is only one kernel
      * present in the VM (while there are possibly many process schedulers) but
@@ -86,12 +94,14 @@ class Process_scheduler {
     auto operator()() -> void;
 
   public:
-    Process_scheduler(viua::kernel::Kernel&);
+    Process_scheduler(viua::kernel::Kernel&, id_type const);
     Process_scheduler(Process_scheduler const&) = delete;
     auto operator=(Process_scheduler const&) -> Process_scheduler& = delete;
     Process_scheduler(Process_scheduler&&) = delete;
     auto operator=(Process_scheduler&&) -> Process_scheduler& = delete;
     ~Process_scheduler();
+
+    auto id() const -> id_type;
 
     /*
      * Bootstrap the scheduler by creating a call to program entry function.

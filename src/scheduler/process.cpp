@@ -207,11 +207,16 @@ auto Process_scheduler::empty() const -> bool {
     return process_queue.empty();
 }
 
-Process_scheduler::Process_scheduler(viua::kernel::Kernel& k):
-    attached_kernel{k}
+Process_scheduler::Process_scheduler(viua::kernel::Kernel& k, id_type const x):
+      assigned_id{x}
+    , attached_kernel{k}
 {}
 
 Process_scheduler::~Process_scheduler() {}
+
+auto Process_scheduler::id() const -> id_type {
+    return assigned_id;
+}
 
 auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void {
     auto initial_frame           = std::make_unique<Frame>(nullptr, 0);
