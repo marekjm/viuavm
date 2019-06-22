@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iomanip>
 #include <mutex>
 #include <viua/support/env.h>
 #include <viua/printutils.h>
@@ -260,7 +261,7 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
     if constexpr (SCHEDULER_DEBUG) {
         std::cerr
             << "[scheduler][id="
-            << std::hex << this << std::dec
+            << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
             << "] spawned new process with PID "
             << process_ptr->pid().get()
             << " ("
@@ -350,13 +351,17 @@ struct deferred {
 
 auto Process_scheduler::launch() -> void {
     atomic_cerr([this](std::ostream& o) -> void {
-        o << "[scheduler][id=" << std::hex << this << std::dec << "] launching...\n";
+        o << "[scheduler][id="
+        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
+        << "] launching...\n";
     });
     scheduler_thread = std::thread([this]{ (*this)(); });
 }
 auto Process_scheduler::operator()() -> void {
     atomic_cerr([this](std::ostream& o) -> void {
-        o << "[scheduler][id=" << std::hex << this << std::dec << "] starts running\n";
+        o << "[scheduler][id="
+        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
+        << "] starts running\n";
     });
 
     /*
@@ -407,7 +412,7 @@ auto Process_scheduler::operator()() -> void {
         if constexpr (SCHEDULER_DEBUG) {
             std::cerr
                 << "[scheduler][id="
-                << std::hex << this << std::dec
+                << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                 << "][pid="
                 << a_process->pid().get()
                 << "] executing process PID "
@@ -434,7 +439,7 @@ auto Process_scheduler::operator()() -> void {
             if constexpr (SCHEDULER_DEBUG) {
                 std::cerr
                     << "[scheduler][id="
-                    << std::hex << this << std::dec
+                    << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                     << "][pid="
                     << a_process->pid().get()
                     << "] is stopped and joinable, waiting on parent\n";
@@ -454,7 +459,7 @@ auto Process_scheduler::operator()() -> void {
             if constexpr (SCHEDULER_DEBUG) {
                 std::cerr
                     << "[scheduler][id="
-                    << std::hex << this << std::dec
+                    << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                     << "][pid="
                     << a_process->pid().get()
                     << "] is suspended\n";
@@ -483,7 +488,7 @@ auto Process_scheduler::operator()() -> void {
                 if constexpr (SCHEDULER_DEBUG) {
                     std::cerr
                         << "[scheduler][id="
-                        << std::hex << this << std::dec
+                        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                         << "][pid="
                         << a_process->pid().get()
                         << "] became stopped";
@@ -501,7 +506,7 @@ auto Process_scheduler::operator()() -> void {
                 if constexpr (SCHEDULER_DEBUG) {
                     std::cerr
                         << "[scheduler][id="
-                        << std::hex << this << std::dec
+                        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                         << "][pid="
                         << a_process->pid().get()
                         << "] became suspended\n";
@@ -568,7 +573,7 @@ auto Process_scheduler::operator()() -> void {
                      */
                     std::cerr
                         << "[scheduler][id="
-                        << std::hex << this << std::dec
+                        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                         << "][pid="
                         << a_process->pid().get()
                         << "] watchdog failed, the process is broken beyond repair\n";
@@ -579,7 +584,7 @@ auto Process_scheduler::operator()() -> void {
 
                 std::cerr
                     << "[scheduler][id="
-                    << std::hex << this << std::dec
+                    << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
                     << "][pid="
                     << a_process->pid().get()
                     << "] the process has crashed, calling watchdog: "
@@ -637,7 +642,9 @@ auto Process_scheduler::shutdown() -> void {
 }
 auto Process_scheduler::join() -> void {
     scheduler_thread.join();
-    std::cerr << "[scheduler][id=" << std::hex << this << std::dec << "] scheduler joined\n";
+    std::cerr << "[scheduler][id="
+        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
+        << "] scheduler joined\n";
 }
 auto Process_scheduler::exit() const -> int {
     return 0;
