@@ -565,6 +565,7 @@ int viua::kernel::Kernel::run() {
     }
 
     vp_schedulers_limit = no_of_process_schedulers();
+    std::cerr << "[kernel] process scheduler limit: " << vp_schedulers_limit << "\n";
     /* bool enable_tracing = is_tracing_enabled(); */
 
     auto proc_schedulers = decltype(process_schedulers){};
@@ -582,6 +583,7 @@ int viua::kernel::Kernel::run() {
      * kernel will tell it that there are no processes in the whole VM and it is
      * free to stop running.
      */
+    std::cerr << "[kernel] bootstrapping main scheduler\n";
     proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
     proc_schedulers.front()->bootstrap(commandline_arguments);
 
@@ -595,6 +597,7 @@ int viua::kernel::Kernel::run() {
             proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this));
         }
     }
+    std::cerr << "[kernel] created " << proc_schedulers.size() << " process scheduler(s)\n";
 
     /*
      * Launch all the schedulers. With the main scheduler bootstrapped and all
@@ -604,6 +607,7 @@ int viua::kernel::Kernel::run() {
     for (auto& sched : proc_schedulers) {
         sched->launch();
     }
+    std::cerr << "[kernel] all " << proc_schedulers.size() << " scheduler(s) launched\n";
 
     /*
      * ...and then there is nothing for us to do but wait for them to complete
@@ -614,6 +618,7 @@ int viua::kernel::Kernel::run() {
         sched->shutdown();
         sched->join();
     }
+    std::cerr << "[kernel] all schedulers shut down\n";
 
     return_code = proc_schedulers.front()->exit();
 
