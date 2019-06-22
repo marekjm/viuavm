@@ -274,7 +274,28 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
     return process_ptr;
 }
 auto Process_scheduler::give_up_processes() -> std::vector<std::unique_ptr<process_type>> {
+    std::lock_guard<std::mutex> lck { process_queue_mtx };
+
+    /*
+     * If we have no or only one process then do not give up anything. It would
+     * be counterproductive to give up our only process, be left with no work to
+     * do, and go straight into the wait queue to steal some processes...
+     */
+    if (process_queue.empty() or (process_queue.size() == 1)) {
+        return {};
+    }
+
+    auto const give_up_limit = static_cast<int64_t>(
+        ((process_queue.size() * 100) / 141) - process_queue.size()) * -1;
+    std::cerr
+        << "[scheduler][id="
+        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
+        << "] would give up " << give_up_limit << " process(es)\n";
+
     auto given_up = std::vector<std::unique_ptr<process_type>>{};
+
+    // FIXME actually return some processes
+
     return given_up;
 }
 
