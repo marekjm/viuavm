@@ -178,16 +178,6 @@ static void print_stack_trace(viua::process::Process& process) {
     }
 }
 
-struct atomic_cerr {
-    atomic_cerr(std::function<void(std::ostream&)> const& fn) {
-        std::ostringstream output;
-        fn(output);
-        std::cerr << output.str();
-    }
-};
-
-constexpr auto SCHEDULER_DEBUG = false;
-
 namespace viua { namespace scheduler {
 auto Process_scheduler::push(std::unique_ptr<process_type> proc) -> void {
     std::lock_guard<std::mutex> lck { process_queue_mtx };
@@ -262,17 +252,6 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent
 
     push(std::move(process));
 
-    if constexpr (SCHEDULER_DEBUG) {
-        std::cerr
-            << "[scheduler][id="
-            << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-            << "] spawned new process with PID "
-            << process_ptr->pid().get()
-            << " ("
-            << process_ptr->trace().front()->function_name
-            << ")\n";
-    }
-
     attached_kernel.notify_about_process_spawned(this);
 
     return process_ptr;
@@ -291,10 +270,6 @@ auto Process_scheduler::give_up_processes() -> std::vector<std::unique_ptr<proce
 
     auto const give_up_limit = static_cast<int64_t>(
         ((process_queue.size() * 100) / 141) - process_queue.size()) * -1;
-    std::cerr
-        << "[scheduler][id="
-        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-        << "] would give up " << give_up_limit << " process(es)\n";
 
     auto given_up = std::vector<std::unique_ptr<process_type>>{};
 
@@ -379,20 +354,9 @@ struct deferred {
 };
 
 auto Process_scheduler::launch() -> void {
-    atomic_cerr([this](std::ostream& o) -> void {
-        o << "[scheduler][id="
-        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-        << "] launching...\n";
-    });
     scheduler_thread = std::thread([this]{ (*this)(); });
 }
 auto Process_scheduler::operator()() -> void {
-    atomic_cerr([this](std::ostream& o) -> void {
-        o << "[scheduler][id="
-        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-        << "] starts running\n";
-    });
-
     /*
      * Used to check if any processes "ticked". A ticking process either did
      * some work, or is in a suspended state awaiting a wake-up signal (so has
@@ -428,11 +392,6 @@ auto Process_scheduler::operator()() -> void {
                 continue;
             }
 
-            std::cerr
-                << "[scheduler][id="
-                << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                << "] stole " << stolen_processes.size() << " process(es)\n";
-
             {
                 /*
                  * Obtain the lock once for all of the stolen processes instead
@@ -450,43 +409,8 @@ auto Process_scheduler::operator()() -> void {
 
         auto a_process = pop();
 
-        if constexpr (SCHEDULER_DEBUG) {
-            std::cerr
-                << "[scheduler][id="
-                << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                << "][pid="
-                << a_process->pid().get()
-                << "] executing process PID "
-                << a_process->pid().get()
-                << " (";
-            if (not a_process->trace().empty()) {
-                std::cerr
-                    << a_process->trace().front()->function_name
-                    << "..."
-                    << a_process->trace().back()->function_name;
-            } else {
-                std::cerr << "null";
-            }
-
-            auto const sz = size();
-            std::cerr
-                << ") with "
-                << sz
-                << " process(es) in queue (total of "
-                << (sz + 1)
-                << ")\n";
-        }
-
         if (a_process->stopped() and a_process->joinable()) {
             // return false in execute_quant()
-            if constexpr (SCHEDULER_DEBUG) {
-                std::cerr
-                    << "[scheduler][id="
-                    << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                    << "][pid="
-                    << a_process->pid().get()
-                    << "] is stopped and joinable, waiting on parent\n";
-            }
             push(std::move(a_process));
             continue;
         }
@@ -499,61 +423,24 @@ auto Process_scheduler::operator()() -> void {
 
         if (a_process->suspended()) {
             // return true in execute_quant()
-            if constexpr (SCHEDULER_DEBUG) {
-                std::cerr
-                    << "[scheduler][id="
-                    << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                    << "][pid="
-                    << a_process->pid().get()
-                    << "] is suspended\n";
-            }
             push(std::move(a_process));
             continue;
         }
 
         constexpr auto CYCLES_PER_BURST = uint32_t{256};
         for (auto i = CYCLES_PER_BURST; i; --i) {
-            /* std::cerr */
-            /*     << "[scheduler][id=" */
-            /*     << std::hex << this << std::dec */
-            /*     << "][pid=" */
-            /*     << a_process->pid().get() */
-            /*     << "] " */
-            /*     << i */
-            /*     << " cycles left in this burst\n"; */
-
             if (a_process->stopped()) {
                 /*
                  * Remember to break if the process stopped
                  * otherwise the kernel will try to tick the process and
                  * it will crash (will try to execute instructions from 0x0 pointer).
                  */
-                if constexpr (SCHEDULER_DEBUG) {
-                    std::cerr
-                        << "[scheduler][id="
-                        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                        << "][pid="
-                        << a_process->pid().get()
-                        << "] became stopped";
-                    if (a_process->terminated()) {
-                        std::cerr << " (because it crashed)";
-                    }
-                    std::cerr << "\n";
-                }
                 break;
             }
             if (a_process->suspended()) {
                 /*
                  * Do not execute suspended processes.
                  */
-                if constexpr (SCHEDULER_DEBUG) {
-                    std::cerr
-                        << "[scheduler][id="
-                        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-                        << "][pid="
-                        << a_process->pid().get()
-                        << "] became suspended\n";
-                }
                 break;
             }
 
@@ -685,9 +572,6 @@ auto Process_scheduler::shutdown() -> void {
 }
 auto Process_scheduler::join() -> void {
     scheduler_thread.join();
-    std::cerr << "[scheduler][id="
-        << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
-        << "] scheduler joined\n";
 }
 auto Process_scheduler::exit() const -> int {
     return 0;
