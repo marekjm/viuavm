@@ -447,11 +447,13 @@ auto Process_scheduler::operator()() -> void {
             } else {
                 std::cerr << "null";
             }
+
+            auto const sz = size();
             std::cerr
                 << ") with "
-                << process_queue.size()
+                << sz
                 << " process(es) in queue (total of "
-                << (process_queue.size() + 1)
+                << (sz + 1)
                 << ")\n";
         }
 
