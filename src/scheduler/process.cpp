@@ -199,7 +199,7 @@ auto Process_scheduler::pop() -> std::unique_ptr<process_type> {
     process_queue.pop_front();
     return proc;
 }
-auto Process_scheduler::size() const -> decltype(process_queue)::size_type {
+auto Process_scheduler::size() const -> size_type {
     std::lock_guard<std::mutex> lck { process_queue_mtx };
     return process_queue.size();
 }

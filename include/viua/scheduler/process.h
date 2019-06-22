@@ -36,6 +36,8 @@ namespace viua { namespace scheduler {
 class Process_scheduler {
   public:
     using process_type = viua::process::Process;
+    using process_queue_type = std::deque<std::unique_ptr<process_type>>;
+    using size_type = process_queue_type::size_type;
     using id_type = size_t;
 
   private:
@@ -65,12 +67,12 @@ class Process_scheduler {
      * balancing algorithm kicks in (possibly many schedulers are affected when
      * this happens).
      */
-    std::deque<std::unique_ptr<process_type>> process_queue;
+    process_queue_type process_queue;
     mutable std::mutex process_queue_mtx;
 
     auto push(std::unique_ptr<process_type>) -> void;
     auto pop() -> std::unique_ptr<process_type>;
-    auto size() const -> decltype(process_queue)::size_type;
+    auto size() const -> size_type;
     auto empty() const -> bool;
 
     /*
