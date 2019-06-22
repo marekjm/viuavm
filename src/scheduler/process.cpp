@@ -424,6 +424,11 @@ auto Process_scheduler::operator()() -> void {
                 continue;
             }
 
+            std::cerr
+                << "[scheduler][id="
+                << std::hex << std::setw(4) << std::setfill('0') << id() << std::dec
+                << "] stole " << stolen_processes.size() << " process(es)\n";
+
             {
                 /*
                  * Obtain the lock once for all of the stolen processes instead
