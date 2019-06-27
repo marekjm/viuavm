@@ -223,6 +223,7 @@ auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void {
 
     main_process = spawn(std::move(initial_frame), nullptr, true);
     main_process->priority(16);
+    main_process->pin();
 }
 
 auto Process_scheduler::spawn(std::unique_ptr<Frame> frame, process_type* parent, bool disown)
@@ -272,11 +273,20 @@ auto Process_scheduler::give_up_processes() -> std::vector<std::unique_ptr<proce
         ((process_queue.size() * 100) / 141) - process_queue.size()) * -1;
 
     auto given_up = std::vector<std::unique_ptr<process_type>>{};
+    auto saved = std::vector<std::unique_ptr<process_type>>{};
 
     for (auto i = 0; i < give_up_limit; ++i) {
         auto proc = std::move(process_queue.front());
         process_queue.pop_front();
-        given_up.push_back(std::move(proc));
+        if (proc->pinned()) {
+            saved.push_back(std::move(proc));
+        } else {
+            given_up.push_back(std::move(proc));
+        }
+    }
+
+    for (auto& proc : saved) {
+        process_queue.push_back(std::move(proc));
     }
 
     return given_up;

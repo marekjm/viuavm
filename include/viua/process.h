@@ -199,6 +199,7 @@ class Process {
      * schedulers during load balancing.
      */
     viua::scheduler::Process_scheduler* attached_scheduler;
+    std::atomic<bool> is_pinned_to_scheduler = false;
 
     /*
      * Parent process of this process.
@@ -509,6 +510,13 @@ class Process {
     auto hidden(bool) -> void;
 
     auto empty() const -> bool;
+
+    auto pin(bool const x = true) -> void {
+        is_pinned_to_scheduler = x;
+    }
+    auto pinned() const -> bool {
+        return is_pinned_to_scheduler;
+    }
 
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Process_scheduler*,
