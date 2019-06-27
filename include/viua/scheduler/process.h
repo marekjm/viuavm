@@ -79,7 +79,7 @@ class Process_scheduler {
      * Exit code of the scheduler. It is useful only for the scheduler running
      * the main function of launched program.
      */
-    int exit_code = 0;
+    std::optional<int> exit_code;
 
     /*
      * Variable signifying that the scheduler should shut down at the earliest

@@ -497,7 +497,7 @@ auto Process_scheduler::operator()() -> void {
         if (a_process->terminated() and not a_process->joinable()
             and a_process->parent() == nullptr) {
             if (not a_process->watchdogged()) {
-                if (a_process.get() == main_process) {
+                if (a_process.get() == main_process and not exit_code.has_value()) {
                     exit_code = 1;
                 }
                 print_stack_trace(*a_process.get());
@@ -519,6 +519,9 @@ auto Process_scheduler::operator()() -> void {
                         << "] watchdog failed, the process is broken beyond repair\n";
 
                     print_stack_trace(*a_process.get());
+                    if (a_process.get() == main_process and not exit_code.has_value()) {
+                        exit_code = 1;
+                    }
                     continue;
                 }
 
@@ -584,6 +587,6 @@ auto Process_scheduler::join() -> void {
     scheduler_thread.join();
 }
 auto Process_scheduler::exit() const -> int {
-    return 0;
+    return exit_code.value_or(0);
 }
 }}
