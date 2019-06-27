@@ -519,6 +519,8 @@ auto Process_scheduler::operator()() -> void {
                         << "] watchdog failed, the process is broken beyond repair\n";
 
                     print_stack_trace(*a_process.get());
+                    attached_kernel.delete_mailbox(a_process->pid());
+                    attached_kernel.notify_about_process_death();
                     if (a_process.get() == main_process and not exit_code.has_value()) {
                         exit_code = 1;
                     }
