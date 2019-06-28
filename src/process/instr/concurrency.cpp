@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,7 +22,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/closure.h>
 #include <viua/types/function.h>
@@ -62,8 +62,8 @@ auto viua::process::Process::opprocess(Op_address_type addr)
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    auto const is_native  = scheduler->is_native_function(call_name);
-    auto const is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = attached_scheduler->is_native_function(call_name);
+    auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw std::make_unique<viua::types::Exception>(
@@ -73,7 +73,7 @@ auto viua::process::Process::opprocess(Op_address_type addr)
     stack->frame_new->function_name = call_name;
 
     auto spawned_process =
-        scheduler->spawn(std::move(stack->frame_new), this, target_is_void);
+        attached_scheduler->spawn(std::move(stack->frame_new), this, target_is_void);
     if (not target_is_void) {
         *target = std::make_unique<viua::types::Process>(spawned_process);
     }
@@ -107,7 +107,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
     std::tie(addr, timeout) =
         viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
-    if (not scheduler->is_joinable(thrd->pid())) {
+    if (not attached_scheduler->is_joinable(thrd->pid())) {
         throw std::make_unique<viua::types::Exception>(
             "process cannot be joined");
     }
@@ -121,12 +121,12 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
         timeout_active      = true;
     }
 
-    if (scheduler->is_stopped(thrd->pid())) {
+    if (attached_scheduler->is_stopped(thrd->pid())) {
         return_addr = addr;
-        if (scheduler->is_terminated(thrd->pid())) {
-            stack->thrown = scheduler->transfer_exception_of(thrd->pid());
+        if (attached_scheduler->is_terminated(thrd->pid())) {
+            stack->thrown = attached_scheduler->transfer_exception_of(thrd->pid());
         } else {
-            auto result = scheduler->transfer_result_of(thrd->pid());
+            auto result = attached_scheduler->transfer_result_of(thrd->pid());
             if (not target_is_void) {
                 *target = std::move(result);
             }
@@ -153,7 +153,7 @@ auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    scheduler->send(proc->pid(), source->give());
+    attached_scheduler->send(proc->pid(), source->give());
 
     return addr;
 }
@@ -191,7 +191,7 @@ auto viua::process::Process::opreceive(Op_address_type addr)
     }
 
     if (not is_hidden) {
-        scheduler->receive(process_id, message_queue);
+        attached_scheduler->receive(process_id, message_queue);
     }
 
     if (not message_queue.empty()) {
@@ -224,8 +224,8 @@ auto viua::process::Process::opwatchdog(Op_address_type addr)
     std::tie(addr, call_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    auto const is_native  = scheduler->is_native_function(call_name);
-    auto const is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = attached_scheduler->is_native_function(call_name);
+    auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw std::make_unique<viua::types::Exception>(

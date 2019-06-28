@@ -326,7 +326,7 @@ viua::process::Process* viua::scheduler::Virtual_process_scheduler::spawn(
     bool disown) {
     auto p = make_unique<viua::process::Process>(
         std::move(frame), this, parent, tracing_enabled);
-    p->begin();
+    p->start();
     if (disown) {
         p->detach();
     }

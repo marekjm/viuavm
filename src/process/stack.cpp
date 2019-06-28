@@ -18,17 +18,17 @@
  */
 
 #include <memory>
+#include <experimental/memory>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/exception.h>
-using namespace std;
 
 
 viua::process::Stack::Stack(std::string fn,
                             Process* pp,
                             viua::kernel::Register_set* gs,
-                            viua::scheduler::Virtual_process_scheduler* sch)
+                            viua::scheduler::Process_scheduler* sch)
         : current_state(STATE::RUNNING)
         , entry_function(fn)
         , parent_process(pp)
@@ -40,14 +40,14 @@ viua::process::Stack::Stack(std::string fn,
         , caught(nullptr)
         , global_register_set(gs)
         , return_value(nullptr)
-        , scheduler(sch) {}
+        , attached_scheduler(sch) {}
 
 auto viua::process::Stack::set_return_value() -> void {
     // FIXME find better name for this function
     if (back()->return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if (back()->local_register_set->at(0) == nullptr) {
-            throw make_unique<viua::types::Exception>(
+            throw std::make_unique<viua::types::Exception>(
                 "return value requested by frame but function did not set "
                 "return register");
         }
@@ -88,10 +88,10 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
 
 auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     for (auto& each : frame->deferred_calls) {
-        auto s = make_unique<Stack>(each->function_name,
+        auto s = std::make_unique<Stack>(each->function_name,
                                     parent_process,
                                     global_register_set,
-                                    scheduler);
+                                    attached_scheduler);
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
         s->bind(global_register_set);
@@ -124,7 +124,7 @@ auto viua::process::Stack::pop() -> std::unique_ptr<Frame> {
          ++i) {
         if (frame->arguments->at(i) != nullptr
             and frame->arguments->isflagged(i, MOVED)) {
-            throw make_unique<viua::types::Exception>(
+            throw std::make_unique<viua::types::Exception>(
                 "unused pass-by-move parameter");
         }
     }
@@ -152,7 +152,7 @@ auto viua::process::Stack::emplace_back(std::unique_ptr<Frame> frame)
 auto viua::process::Stack::adjust_jump_base_for_block(
     std::string const& call_name) -> Op_address_type {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
-    auto ep          = scheduler->get_entry_point_of_block(call_name);
+    auto const ep    = attached_scheduler->get_entry_point_of_block(call_name);
     entry_point      = ep.first;
     jump_base        = ep.second;
     return entry_point;
@@ -160,7 +160,7 @@ auto viua::process::Stack::adjust_jump_base_for_block(
 auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
     -> Op_address_type {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
-    auto ep          = scheduler->get_entry_point_of(call_name);
+    auto const ep    = attached_scheduler->get_entry_point_of_function(call_name);
     entry_point      = ep.first;
     jump_base        = ep.second;
     return entry_point;
@@ -196,7 +196,7 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
     }
 
     if (state_of() != STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "stack left in an invalid state during unwinding");
     }
 
@@ -222,24 +222,24 @@ auto viua::process::Stack::unwind_to(const Try_frame* tframe,
 }
 
 auto viua::process::Stack::find_catch_frame()
-    -> tuple<Try_frame*, std::string> {
-    Try_frame* found_exception_frame = nullptr;
+    -> std::tuple<Try_frame*, std::string> {
+    auto found_exception_frame = std::experimental::observer_ptr<Try_frame>();
     auto caught_with_type            = std::string{""};
-    std::string handler_found_for_type =
+    auto handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        Try_frame* tframe  = tryframes[(i - 1)].get();
+        auto tframe  = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         if (handler_found) {
-            found_exception_frame = tframe;
+            found_exception_frame.reset(tframe);
             caught_with_type      = handler_found_for_type;
             break;
         }
     }
 
-    return tuple<Try_frame*, std::string>(found_exception_frame,
+    return std::tuple<Try_frame*, std::string>(found_exception_frame,
                                           caught_with_type);
 }
 
@@ -287,22 +287,22 @@ auto viua::process::Stack::prepare_frame(
     if (frame_new) {
         throw "requested new frame while last one is unused";
     }
-    frame_new = make_unique<Frame>(nullptr, arguments_size);
+    frame_new = std::make_unique<Frame>(nullptr, arguments_size);
     return frame_new.get();
 }
 
 auto viua::process::Stack::push_prepared_frame() -> void {
     if (size() > MAX_STACK_SIZE) {
-        ostringstream oss;
+        auto oss = std::ostringstream{};
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '"
             << frame_new->function_name << '\'';
-        throw make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(oss.str());
     }
 
-    if (find(begin(), end(), frame_new) != end()) {
-        ostringstream oss;
+    if (std::find(begin(), end(), frame_new) != end()) {
+        auto oss = std::ostringstream{};
         oss << "stack corruption: frame ";
-        oss << hex << frame_new.get() << dec;
+        oss << std::hex << frame_new.get() << std::dec;
         oss << " for function " << frame_new->function_name << '/'
             << frame_new->arguments->size();
         oss << " pushed more than once";

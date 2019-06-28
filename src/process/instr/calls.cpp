@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,7 +21,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/closure.h>
 #include <viua/types/function.h>
 #include <viua/types/integer.h>
@@ -167,8 +167,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
 
-    auto const is_native  = scheduler->is_native_function(call_name);
-    auto const is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = attached_scheduler->is_native_function(call_name);
+    auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>("call to undefined function: "
@@ -223,8 +223,8 @@ auto viua::process::Process::optailcall(Op_address_type addr)
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
 
-    auto const is_native  = scheduler->is_native_function(call_name);
-    auto const is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = attached_scheduler->is_native_function(call_name);
+    auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(
@@ -268,8 +268,8 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
 
-    auto const is_native  = scheduler->is_native_function(call_name);
-    auto const is_foreign = scheduler->is_foreign_function(call_name);
+    auto const is_native  = attached_scheduler->is_native_function(call_name);
+    auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
         throw make_unique<viua::types::Exception>(

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2018, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,7 +21,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/integer.h>
 using namespace std;
 
@@ -45,7 +45,7 @@ auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
     tie(addr, catcher_block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->is_block(catcher_block_name)) {
+    if (not attached_scheduler->is_block(catcher_block_name)) {
         throw make_unique<viua::types::Exception>(
             "registering undefined handler block '" + catcher_block_name
             + "' to handle " + type_name);
@@ -88,7 +88,7 @@ auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     tie(addr, block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    if (not scheduler->is_block(block_name)) {
+    if (not attached_scheduler->is_block(block_name)) {
         throw make_unique<viua::types::Exception>(
             "cannot enter undefined block: " + block_name);
     }

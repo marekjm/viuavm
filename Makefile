@@ -76,11 +76,11 @@ GENERIC_CXXFLAGS=-Wall \
 # -Wcovered-switch-default 			-- breaks existing code
 # -Wunused-template					-- breaks existing code
 # -Wfloat-equal 					-- breaks existing code
+# -Wlifetime						-- would be useful
 CLANG_CXXFLAGS=-Wall \
 			   -Wextra \
 			   -Wabsolute-value \
 			   -Wabstract-vbase-init \
-			   -Waligned-allocation-unavailable \
 			   -Warray-bounds-pointer-arithmetic \
 			   -Wassign-enum \
 			   -Wbad-function-cast \
@@ -518,7 +518,7 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 
 build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/kernel.o \
-	build/scheduler/vps.o \
+	build/scheduler/process.o \
 	build/front/vm.o \
 	build/runtime/imports.o \
 	build/assert.o \
@@ -531,7 +531,6 @@ build/bin/vm/kernel: build/front/kernel.o \
 	build/kernel/registerset.o \
 	build/kernel/frame.o \
 	build/loader.o \
-	build/machine.o \
 	build/printutils.o \
 	build/support/pointer.o \
 	build/support/string.o \
@@ -588,7 +587,6 @@ build/bin/vm/asm: build/front/asm.o \
 	build/cg/assembler/utils.o \
 	build/cg/bytecode/instructions.o \
 	build/loader.o \
-	build/machine.o \
 	build/support/string.o \
 	build/support/env.o \
 	build/cg/assembler/binary_literals.o \
@@ -708,7 +706,6 @@ build/bin/vm/parser: build/front/parser.o \
 
 build/bin/vm/dis: build/front/dis.o \
 	build/loader.o \
-	build/machine.o \
 	build/cg/disassembler/disassembler.o \
 	build/support/pointer.o \
 	build/support/string.o \
@@ -724,8 +721,7 @@ build/bin/vm/dis: build/front/dis.o \
 build/kernel/kernel.o: src/kernel/kernel.cpp \
 	include/viua/kernel/kernel.h \
 	include/viua/bytecode/opcodes.h \
-	include/viua/kernel/frame.h \
-	build/scheduler/vps.o
+	include/viua/kernel/frame.h
 build/kernel/registerset.o: src/kernel/registerset.cpp \
 	include/viua/kernel/registerset.h
 build/kernel/frame.o: src/kernel/frame.cpp \
