@@ -57,7 +57,7 @@ std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
     for (auto const& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
-    return std::move(cp);
+    return cp;
 }
 
 void viua::types::Object::set(std::string const& name,
