@@ -277,7 +277,8 @@ all: build/bin/vm/asm \
 	platform \
 	stdlib \
 	standardlibrary \
-	compile-test
+	compile-test \
+	tooling
 
 what:
 	@echo "compiler:  $(CXX)"
