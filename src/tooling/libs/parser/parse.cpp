@@ -1239,6 +1239,8 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
             case ISNULL:
             case SEND:
             case STRUCTKEYS:
+            case BITS_OF_INTEGER:
+            case INTEGER_OF_BITS:
                 i += parse_any_2_register_instruction(fragments,
                                                       vector_view{tokens, i});
                 break;
@@ -1257,6 +1259,7 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
             case GT:
             case GTE:
             case EQ:
+            case PIDEQ:
             case TEXTEQ:
             case TEXTAT:
             case TEXTCOMMONPREFIX:

@@ -1334,6 +1334,8 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case ISNULL:
             case SEND:
             case STRUCTKEYS:
+            case BITS_OF_INTEGER:
+            case INTEGER_OF_BITS:
                 i += normalise_any_2_register_instruction(
                     tokens, vector_view{source, i});
                 break;
@@ -1352,6 +1354,7 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case GT:
             case GTE:
             case EQ:
+            case PIDEQ:
             case TEXTEQ:
             case TEXTAT:
             case TEXTCOMMONPREFIX:
