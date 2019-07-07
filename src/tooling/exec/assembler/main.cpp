@@ -155,6 +155,8 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
             parsed.linkable_module = true;
         } else if (arg == "-C" or arg == "--verify") {
             parsed.sa_only = true;
+        } else if (arg == "--no-sa") {
+            parsed.enabled_sa = false;
         } else if (arg == "-h" or arg == "--help") {
             // do nothing
         } else if (arg == "--version") {
@@ -655,11 +657,13 @@ auto main(int argc, char* argv[]) -> int {
         std::cout << std::endl;
     }
 
-    try {
-        viua::tooling::libs::static_analyser::analyse(cooked_fragments);
-    } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
-        display_error_in_context(raw_tokens, e, parsed_args.input_file);
-        exit(1);
+    if (parsed_args.enabled_sa) {
+        try {
+            viua::tooling::libs::static_analyser::analyse(cooked_fragments);
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+            display_error_in_context(raw_tokens, e, parsed_args.input_file);
+            exit(1);
+        }
     }
 
     return 0;
