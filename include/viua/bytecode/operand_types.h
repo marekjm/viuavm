@@ -134,6 +134,10 @@ enum class Value_types : ValueTypesType {
     OBJECT = 1 << 14,
 
     POINTER = 1 << 15,
+
+    IO_REQUEST = 1 << 16,
+    IO_PORT = 1 << 17,
+    IO_PORT_LIKE = (IO_PORT | INTEGER),
 };
 }}  // namespace viua::internals
 

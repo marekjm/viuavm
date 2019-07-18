@@ -29,6 +29,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
+#include <viua/types/io.h>
 using namespace std;
 
 // Provide storage for static member.
@@ -210,25 +211,32 @@ auto viua::process::Process::tick() -> Op_address_type {
         return nullptr;
     }
 
-    /*  Machine should halt execution if previous instruction pointer is the
-     * same as current one as it means that the execution flow is corrupted and
-     *  entered an infinite loop.
+    /*
+     * Machine should halt execution if previous instruction pointer is the same
+     * as current one as it means that the execution flow is corrupted and
+     * entered an infinite loop.
      *
-     *  However, execution *should not* be halted if:
-     *      - the offending opcode is RETURN (as this may indicate exiting
-     * recursive function),
-     *      - the offending opcode is JOIN (as this means that a process is
-     * waiting for another process to finish),
-     *      - the offending opcode is RECEIVE (as this means that a process is
-     * waiting for a message),
-     *      - an object has been thrown, as the instruction pointer will be
-     * adjusted by catchers or execution will be halted on unhandled types,
+     * However, execution *should not* be halted if:
+     * - the offending opcode is RETURN (as this may indicate exiting recursive
+     *   function)
+     * - the offending opcode is JOIN (as this means that a process is waiting
+     *   for another process to finish)
+     * - the offending opcode is RECEIVE (as this means that a process is
+     *   waiting for a message)
+     * - the offending opcode is IO_WAIT (as this means that a process is
+     *   waiting for I/O to complete)
+     * - an object has been thrown, as the instruction pointer will be adjusted
+     *   by catchers or execution will be halted on unhandled types
      */
+    auto const allowed_unchanged_ops = std::set<OPCODE>{
+        RETURN,
+        JOIN,
+        RECEIVE,
+        IO_WAIT,
+    };
     if (stack->instruction_pointer == previous_instruction_pointer
         and stack->state_of() == viua::process::Stack::STATE::RUNNING
-        and (OPCODE(*stack->instruction_pointer) != RETURN
-             and OPCODE(*stack->instruction_pointer) != JOIN
-             and OPCODE(*stack->instruction_pointer) != RECEIVE)
+        and (not allowed_unchanged_ops.count(OPCODE(*stack->instruction_pointer)))
         and (not stack->thrown)) {
         stack->thrown =
             make_unique<viua::types::Exception>("InstructionUnchanged");
@@ -407,6 +415,14 @@ void viua::process::Process::hidden(bool state) {
 
 bool viua::process::Process::empty() const {
     return message_queue.empty();
+}
+
+auto viua::process::Process::schedule_io(std::unique_ptr<viua::types::IO_interaction> i)
+    -> void {
+    attached_scheduler->schedule_io(std::move(i));
+}
+auto viua::process::Process::cancel_io(std::tuple<uint64_t, uint64_t> const interaction_id) -> void {
+    attached_scheduler->cancel_io(interaction_id);
 }
 
 void viua::process::Process::migrate_to(

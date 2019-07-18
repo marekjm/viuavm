@@ -802,6 +802,31 @@ auto Program::opstructkeys(int_op const a, int_op const b) -> Program& {
     return (*this);
 }
 
+auto Program::op_io_read(int_op const req, int_op const port, int_op const limit) -> Program& {
+    addr_ptr = cg::bytecode::op_io_read(addr_ptr, req, port, limit);
+    return (*this);
+}
+
+auto Program::op_io_write(int_op const req, int_op const port, int_op const payload) -> Program& {
+    addr_ptr = cg::bytecode::op_io_write(addr_ptr, req, port, payload);
+    return (*this);
+}
+
+auto Program::op_io_close(int_op const req, int_op const port) -> Program& {
+    addr_ptr = cg::bytecode::op_io_close(addr_ptr, req, port);
+    return (*this);
+}
+
+auto Program::op_io_wait(int_op const result, int_op const req, timeout_op limit) -> Program& {
+    addr_ptr = cg::bytecode::op_io_wait(addr_ptr, result, req, limit);
+    return (*this);
+}
+
+auto Program::op_io_cancel(int_op const req) -> Program& {
+    addr_ptr = cg::bytecode::op_io_cancel(addr_ptr, req);
+    return (*this);
+}
+
 auto Program::opreturn() -> Program& {
     addr_ptr = cg::bytecode::opreturn(addr_ptr);
     return (*this);

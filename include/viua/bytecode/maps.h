@@ -200,6 +200,12 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {STRUCTAT, "structat"},
     {STRUCTKEYS, "structkeys"},
 
+    {IO_READ, "io_read"},
+    {IO_WRITE, "io_write"},
+    {IO_CLOSE, "io_close"},
+    {IO_WAIT, "io_wait"},
+    {IO_CANCEL, "io_cancel"},
+
     {RETURN, "return"},
     {HALT, "halt"},
 };

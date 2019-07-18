@@ -478,6 +478,17 @@ auto check_register_usage_for_instruction_block_impl(
             case STRUCTKEYS:
                 check_op_structkeys(register_usage_profile, *instruction);
                 break;
+            case IO_READ:
+                check_op_io_read(register_usage_profile, *instruction);
+                break;
+            case IO_WRITE:
+                /* check_op_io_read(register_usage_profile, *instruction); */
+                /* break; */
+            case IO_CLOSE:
+            case IO_WAIT:
+            case IO_CANCEL:
+                // FIXME implement static analysis for these instructions
+                break;
             case RETURN:
                 // do nothing
                 break;

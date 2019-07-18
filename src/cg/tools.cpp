@@ -958,6 +958,29 @@ static auto size_of_insert =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_remove =
     size_of_instruction_with_three_ri_operands_with_rs_types;
+
+static auto size_of_io_read = size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_io_write = size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_io_close = size_of_instruction_with_two_ri_operands_with_rs_types;
+static auto size_of_io_wait(TokenVector const& tokens, TokenVector::size_type i)
+    -> tuple<bytecode_size_type, decltype(i)> {
+    auto calculated_size = bytecode_size_type{0};
+    std::tie(calculated_size, i) =
+        size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+
+    if (str::is_timeout_literal(tokens.at(i))) {
+        calculated_size += sizeof(viua::internals::types::byte);
+        calculated_size += sizeof(viua::internals::types::timeout);
+        ++i;
+    } else {
+        throw viua::cg::lex::Invalid_syntax(
+            tokens.at(i), "invalid timeout token in 'io_wait'");
+    }
+
+    return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
+}
+static auto size_of_io_cancel = size_of_instruction_with_one_ri_operand_with_rs_type;
+
 static auto size_of_return(TokenVector const&, TokenVector::size_type i)
     -> tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{
@@ -1405,6 +1428,21 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         } else if (tokens.at(i) == "remove") {
             ++i;
             tie(increase, i) = size_of_remove(tokens, i);
+        } else if (tokens.at(i) == "io_read") {
+            ++i;
+            std::tie(increase, i) = size_of_io_read(tokens, i);
+        } else if (tokens.at(i) == "io_write") {
+            ++i;
+            std::tie(increase, i) = size_of_io_write(tokens, i);
+        } else if (tokens.at(i) == "io_close") {
+            ++i;
+            std::tie(increase, i) = size_of_io_close(tokens, i);
+        } else if (tokens.at(i) == "io_wait") {
+            ++i;
+            std::tie(increase, i) = size_of_io_wait(tokens, i);
+        } else if (tokens.at(i) == "io_cancel") {
+            ++i;
+            std::tie(increase, i) = size_of_io_cancel(tokens, i);
         } else if (tokens.at(i) == "return") {
             ++i;
             tie(increase, i) = size_of_return(tokens, i);

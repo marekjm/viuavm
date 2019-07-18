@@ -37,12 +37,14 @@
 #include <viua/scheduler/ffi.h>
 #include <viua/scheduler/vps.h>
 #include <viua/scheduler/process.h>
+#include <viua/scheduler/io.h>
 #include <viua/support/env.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
 #include <viua/types/exception.h>
 #include <viua/types/function.h>
 #include <viua/types/integer.h>
+#include <viua/types/io.h>
 #include <viua/types/object.h>
 #include <viua/types/reference.h>
 #include <viua/types/string.h>
@@ -509,6 +511,82 @@ uint64_t viua::kernel::Kernel::pids() const {
     return running_processes;
 }
 
+auto viua::kernel::Kernel::schedule_io(std::unique_ptr<viua::types::IO_interaction> i)
+    -> void {
+    {
+        std::unique_lock<std::mutex> lck { io_requests_mtx };
+        io_requests.insert({ i->id(), i.get() });
+    }
+    {
+        std::unique_lock<std::mutex> lck { io_request_mutex };
+        io_request_queue.push_back(std::move(i));
+    }
+    io_request_cv.notify_one();
+}
+auto viua::kernel::Kernel::cancel_io(std::tuple<uint64_t, uint64_t> const interaction_id)
+    -> void {
+    std::unique_lock<std::mutex> lck { io_requests_mtx };
+    std::cerr << "elo\n";
+    /*
+     * We have to check if the request is still there to avoid crashing when the
+     * cancellation order arrives just after the request has been completed, as
+     * request slots are removed after completion.
+     */
+    // FIXME Maybe change the I/O pipeline so that the .count() call is not
+    // needed? A better correctness guarantee would be much more reasurring than
+    // a "see if it's there" bandaid. Maybe don't erase the request slot until
+    // after the process has waited for the request in question?
+    if (io_requests.count(interaction_id)) {
+        io_requests.at(interaction_id)->cancel();
+        std::cerr << "cancelled I/O\n";
+    } else {
+        std::cerr << "nope\n";
+    }
+}
+auto viua::kernel::Kernel::io_complete(std::tuple<uint64_t, uint64_t> const interaction_id) const -> bool {
+    std::unique_lock<std::mutex> lck { io_result_mtx };
+    if (not io_results.count(interaction_id)) {
+        return false;
+    }
+    return io_results.at(interaction_id).is_complete;
+}
+auto viua::kernel::Kernel::complete_io(std::tuple<uint64_t, uint64_t> const interaction_id, IO_result result) -> void {
+    {
+        std::unique_lock<std::mutex> lck { io_requests_mtx };
+        io_requests.erase(io_requests.find(interaction_id));
+    }
+    std::unique_lock<std::mutex> lck { io_result_mtx };
+    io_results.insert({ interaction_id, std::move(result) });
+}
+auto viua::kernel::Kernel::io_result(std::tuple<uint64_t, uint64_t> const interaction_id)
+    -> std::unique_ptr<viua::types::Value> {
+    std::unique_lock<std::mutex> lck { io_result_mtx };
+    auto result = std::move(io_results.at(interaction_id));
+    io_results.erase(io_results.find(interaction_id));
+    lck.unlock();
+
+    if (result.is_successful) {
+        return std::move(result.value);
+    }
+    throw std::move(result.error);
+}
+
+viua::kernel::Kernel::IO_result::IO_result(bool const ok, std::unique_ptr<viua::types::Value> x)
+    : value{ok ? std::move(x) : nullptr}
+    , error{ok ? nullptr : std::move(x)}
+    , is_complete{true}
+    , is_cancelled{false}
+    , is_successful{ok}
+{}
+auto viua::kernel::Kernel::IO_result::make_success(std::unique_ptr<viua::types::Value> x)
+    -> IO_result {
+    return IO_result{true, std::move(x)};
+}
+auto viua::kernel::Kernel::IO_result::make_error(std::unique_ptr<viua::types::Value> x)
+    -> IO_result {
+    return IO_result{false, std::move(x)};
+}
+
 int viua::kernel::Kernel::exit() const {
     return return_code;
 }
@@ -538,6 +616,13 @@ auto viua::kernel::Kernel::no_of_ffi_schedulers()
     auto const default_value = (std::thread::hardware_concurrency() / 2);
     using viua::internals::types::schedulers_count;
     return no_of_schedulers("VIUA_FFI_SCHEDULERS",
+                            static_cast<schedulers_count>(default_value));
+}
+auto viua::kernel::Kernel::no_of_io_schedulers()
+    -> viua::internals::types::schedulers_count {
+    auto const default_value = (std::thread::hardware_concurrency() / 2);
+    using viua::internals::types::schedulers_count;
+    return no_of_schedulers("VIUA_IO_SCHEDULERS",
                             static_cast<schedulers_count>(default_value));
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
@@ -649,41 +734,64 @@ viua::kernel::Kernel::Kernel()
                                      &foreign_call_queue_mutex,
                                      &foreign_call_queue_condition));
     }
+
+    auto const io_schedulers_limit = no_of_io_schedulers();
+    for (auto i = io_schedulers_limit; i; --i) {
+        io_workers.emplace_back(
+            std::make_unique<std::thread>(viua::scheduler::io::io_scheduler,
+                (io_schedulers_limit - i),
+                std::ref(*this),
+                std::ref(io_request_queue),
+                std::ref(io_request_mutex),
+                std::ref(io_request_cv)));
+    }
 }
 
 viua::kernel::Kernel::~Kernel() {
-    /** Send a poison pill to every foreign function call worker thread.
-     *  Collect them after they are killed.
-     *
-     * Use std::defer_lock to preven constructor from acquiring the mutex
-     * .lock() is called manually later
-     */
-    std::unique_lock<std::mutex> lck(foreign_call_queue_mutex, std::defer_lock);
-    for (auto i = foreign_call_workers.size(); i; --i) {
-        // acquire the mutex for foreign call request queue
-        lck.lock();
+    {
+        /*
+         * Send a poison pill to every foreign function call worker thread.
+         * Collect them after they are killed.
+         */
+        std::unique_lock<std::mutex> lck {foreign_call_queue_mutex, std::defer_lock};
+        for (auto i = foreign_call_workers.size(); i; --i) {
+            lck.lock();
 
-        // send poison pill;
-        // one per worker thread since we can be sure that a thread consumes at
-        // most one pill
-        foreign_call_queue.push_back(nullptr);
+            /*
+             * Send the actual poison pill. One per worker thread since we can
+             * be sure that a thread consumes at most one pill.
+             */
+            foreign_call_queue.push_back(nullptr);
 
-        // release the mutex and notify worker thread that there is work to do
-        // the thread consumes the pill and aborts
-        lck.unlock();
-        foreign_call_queue_condition.notify_all();
+            lck.unlock();
+            foreign_call_queue_condition.notify_all();
+        }
+        while (not foreign_call_workers.empty()) {
+            auto w = std::move(foreign_call_workers.back());
+            foreign_call_workers.pop_back();
+            w->join();
+        }
     }
-    while (not foreign_call_workers.empty()) {
-        // fetch handle for worker thread and
-        // remove it from the list of workers
-        auto w = std::move(foreign_call_workers.back());
-        foreign_call_workers.pop_back();
-
-        // join worker back to main thread and
-        // delete it
-        // by now, all workers should be killed by poison pills we sent them
-        // earlier
-        w->join();
+    {
+        /*
+         * Send a poison pill to every I/O worker thread.
+         */
+        std::cerr
+            << "[kernel] starting I/O shutdown, "
+            << io_workers.size()
+            << " workers to kill\n";
+        {
+            std::unique_lock<std::mutex> lck {io_request_mutex};
+            for (auto const& _[[maybe_unused]] : io_workers) {
+                io_request_queue.push_back(nullptr);
+            }
+        }
+        io_request_cv.notify_all();
+        for (auto& each : io_workers) {
+            std::cerr << "[kernel] waiting for I/O worker\n";
+            each->join();
+        }
+        std::cerr << "[kernel] done with I/O shutdown\n";
     }
 
     for (auto const each : cxx_dynamic_lib_handles) {

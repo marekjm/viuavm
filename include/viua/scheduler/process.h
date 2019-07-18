@@ -20,8 +20,15 @@
 #ifndef VIUA_SCHEDULER_PROCESS_H
 #define VIUA_SCHEDULER_PROCESS_H
 
+#include <atomic>
 #include <deque>
 #include <mutex>
+#include <optional>
+#include <queue>
+#include <thread>
+#include <vector>
+#include <viua/kernel/frame.h>
+#include <viua/pid.h>
 
 namespace viua {
     namespace process {
@@ -29,6 +36,9 @@ namespace viua {
     }
     namespace kernel {
         class Kernel;
+    }
+    namespace types {
+        class IO_interaction;
     }
 }
 
@@ -183,6 +193,11 @@ class Process_scheduler {
     auto shutdown() -> void;
     auto join() -> void;
     auto exit() const -> int;
+
+    auto schedule_io(std::unique_ptr<viua::types::IO_interaction>) -> void;
+    auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
+    auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;
+    auto io_result(std::tuple<uint64_t, uint64_t> const) -> std::unique_ptr<viua::types::Value>;
 };
 }}
 

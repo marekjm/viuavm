@@ -472,6 +472,21 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case NOP:
         ++addr;
         break;
+    case IO_READ:
+        addr = op_io_read(addr + 1);
+        break;
+    case IO_WRITE:
+        addr = op_io_write(addr + 1);
+        break;
+    case IO_CLOSE:
+        addr = op_io_close(addr + 1);
+        break;
+    case IO_WAIT:
+        addr = op_io_wait(addr + 1);
+        break;
+    case IO_CANCEL:
+        addr = op_io_cancel(addr + 1);
+        break;
     case STREQ:
     case BOOL:
     case BITSWIDTH:

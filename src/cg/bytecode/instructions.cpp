@@ -1134,6 +1134,39 @@ auto opstructkeys(viua::internals::types::byte* addr_ptr,
     return insert_two_ri_instruction(addr_ptr, STRUCTKEYS, target, source);
 }
 
+auto op_io_read(viua::internals::types::byte* addr_ptr, int_op req, int_op port, int_op limit)
+    -> viua::internals::types::byte* {
+    return insert_three_ri_instruction(addr_ptr, IO_READ, req, port, limit);
+}
+auto op_io_write(viua::internals::types::byte* addr_ptr, int_op req, int_op port, int_op data)
+    -> viua::internals::types::byte* {
+    return insert_three_ri_instruction(addr_ptr, IO_WRITE, req, port, data);
+}
+auto op_io_close(viua::internals::types::byte* addr_ptr, int_op req, int_op port)
+    -> viua::internals::types::byte* {
+    return insert_two_ri_instruction(addr_ptr, IO_CLOSE, req, port);
+}
+auto op_io_wait(viua::internals::types::byte* addr_ptr, int_op result, int_op req, timeout_op limit)
+    -> viua::internals::types::byte* {
+    addr_ptr = insert_two_ri_instruction(addr_ptr, IO_WAIT, result, req);
+
+    // FIXME change to OT_TIMEOUT?
+    *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
+    viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
+        addr_ptr);
+
+    aligned_write(addr_ptr) = limit.value;
+    viua::support::pointer::inc<viua::internals::types::timeout,
+                                viua::internals::types::byte>(addr_ptr);
+
+    return addr_ptr;
+}
+auto op_io_cancel(viua::internals::types::byte* addr_ptr, int_op port)
+    -> viua::internals::types::byte* {
+    *(addr_ptr++) = IO_CANCEL;
+    return insert_ri_operand(addr_ptr, port);
+}
+
 auto opreturn(viua::internals::types::byte* addr_ptr)
     -> viua::internals::types::byte* {
     *(addr_ptr++) = RETURN;
