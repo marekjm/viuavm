@@ -26,6 +26,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <viua/runtime/imports.h>
 #include <viua/tooling/errors/compile_time.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
@@ -34,6 +35,7 @@
 #include <viua/util/filesystem.h>
 #include <viua/util/string/escape_sequences.h>
 #include <viua/util/string/ops.h>
+#include <viua/loader.h>
 #include <viua/version.h>
 
 std::string const OPTION_HELP_LONG  = "--help";
@@ -181,11 +183,15 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
             viua::tooling::errors::compile_time::Compile_time_error::
                 No_input_file);
     }
-    parsed.input_file = args.at(i);
+    parsed.input_file = args.at(i++);
     if (parsed.input_file.size() == 0) {
         viua::tooling::errors::compile_time::display_error_and_exit(
             viua::tooling::errors::compile_time::Compile_time_error::
                 No_input_file);
+    }
+
+    for (; i < args.size(); ++i) {
+        parsed.linked_modules.push_back(args.at(i));
     }
 
     if (parsed.sa_only) {
@@ -543,6 +549,60 @@ static auto to_json(
     return o.str();
 }
 
+struct Symbols {
+    enum class Kind {
+        Function,
+        Closure,
+        Block,
+    };
+    enum class Linkage_location {
+        Local,      /* symbols defined in current compilation unit */
+        External,   /* symbols defined in other compilation units */
+    };
+    struct Symbol {
+        Kind const kind;
+        Linkage_location const linkage_location;
+        std::string const source_file;
+        std::string const source_module;
+        std::string const name;
+
+        Symbol(Kind const k, Linkage_location const ll, std::string sf
+                , std::string sm, std::string n)
+            : kind{k}
+            , linkage_location{ll}
+            , source_file{std::move(sf)}
+            , source_module{std::move(sm)}
+            , name{std::move(n)}
+        {}
+    };
+
+    std::map<std::string, Symbol> available;
+};
+
+static auto to_string(Symbols::Kind const k) -> std::string {
+    switch (k) {
+        case Symbols::Kind::Function:
+            return "function";
+        case Symbols::Kind::Closure:
+            return "closure";
+        case Symbols::Kind::Block:
+            return "block";
+        default:
+            throw std::out_of_range{"invalid symbol kind"};
+    }
+}
+
+static auto to_string(Symbols::Linkage_location const ll) -> std::string {
+    switch (ll) {
+        case Symbols::Linkage_location::Local:
+            return "local";
+        case Symbols::Linkage_location::External:
+            return "external";
+        default:
+            throw std::out_of_range{"invalid linkage location"};
+    }
+}
+
 auto main(int argc, char* argv[]) -> int {
     auto const args = make_args(argc, argv);
     if (usage(args)) {
@@ -668,6 +728,181 @@ auto main(int argc, char* argv[]) -> int {
 
     if (parsed_args.sa_only) {
         return 0;
+    }
+
+    auto symbols = Symbols{};
+    for (auto const& each : cooked_fragments.function_fragments) {
+        auto const& fn =
+            *static_cast<viua::tooling::libs::parser::Function_head const*>(
+                each.second.lines.at(0).get());
+        auto const name = fn.function_name + "/" + std::to_string(fn.arity);
+        symbols.available.insert({ name, Symbols::Symbol{
+            Symbols::Kind::Function,
+            Symbols::Linkage_location::Local,
+            parsed_args.input_file,
+            "<this>",
+            name
+        }});
+    }
+
+    {
+        using viua::util::string::escape_sequences::ATTR_RESET;
+        using viua::util::string::escape_sequences::COLOR_FG_RED;
+        using viua::util::string::escape_sequences::COLOR_FG_WHITE;
+        using viua::util::string::escape_sequences::send_escape_seq;
+
+        for (auto const& each : parsed_args.linked_modules) {
+            if (viua::util::filesystem::is_file(each)) {
+                continue;
+            }
+
+            std::cerr << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                      << send_escape_seq(ATTR_RESET) << ':'
+                      << send_escape_seq(COLOR_FG_RED) << "error"
+                      << send_escape_seq(ATTR_RESET)
+                      << ": file cannot be linked: not found: \""
+                      << send_escape_seq(COLOR_FG_WHITE) << each
+                      << send_escape_seq(ATTR_RESET) << "\"\n";
+            return 1;
+        }
+
+        auto static_imports = std::vector<std::string>{};
+        auto dynamic_imports = std::vector<std::pair<std::string, std::string>>{};
+
+        std::copy(
+              parsed_args.linked_modules.begin()
+            , parsed_args.linked_modules.end()
+            , std::back_inserter(static_imports)
+        );
+
+        auto const STATIC_IMPORT_TAG  = std::string{"static"};
+        auto const DYNAMIC_IMPORT_TAG = std::string{"dynamic"};
+
+        for (auto const& each : cooked_fragments.import_fragments) {
+            auto const& name = each->module_name;
+            auto const& attrs = each->attributes;
+
+            using viua::util::string::escape_sequences::ATTR_RESET;
+            using viua::util::string::escape_sequences::COLOR_FG_CYAN;
+            using viua::util::string::escape_sequences::COLOR_FG_RED;
+            using viua::util::string::escape_sequences::COLOR_FG_WHITE;
+            using viua::util::string::escape_sequences::send_escape_seq;
+
+            auto const module_path = viua::runtime::imports::find_module(name);
+            if (not module_path.has_value()) {
+                std::cerr << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                          << send_escape_seq(ATTR_RESET) << ':'
+                          << send_escape_seq(COLOR_FG_RED) << "error"
+                          << send_escape_seq(ATTR_RESET)
+                          << ": did not find module \""
+                          << send_escape_seq(COLOR_FG_WHITE) << name
+                          << send_escape_seq(ATTR_RESET) << "\"\n";
+                return 1;
+            }
+
+            using viua::runtime::imports::Module_type;
+            if (attrs.count(STATIC_IMPORT_TAG)
+                and module_path->first != Module_type::Bytecode) {
+                std::cerr
+                    << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                    << send_escape_seq(ATTR_RESET) << ':'
+                    << send_escape_seq(COLOR_FG_RED) << "error"
+                    << send_escape_seq(ATTR_RESET)
+                    << ": only bytecode modules may be statically imported: \""
+                    << send_escape_seq(COLOR_FG_WHITE) << name
+                    << send_escape_seq(ATTR_RESET) << "\" is found in "
+                    << module_path->second
+                    << "\n";
+                return 1;
+            }
+
+            if (attrs.count(STATIC_IMPORT_TAG)) {
+                static_imports.push_back(module_path->second);
+            } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
+                dynamic_imports.push_back({name, module_path->second});
+            } else {
+                std::cerr << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                          << send_escape_seq(ATTR_RESET) << ':'
+                          << send_escape_seq(COLOR_FG_RED) << "error"
+                          << send_escape_seq(ATTR_RESET)
+                          << ": link mode not specified for module \""
+                          << send_escape_seq(COLOR_FG_WHITE) << name
+                          << send_escape_seq(ATTR_RESET) << "\"\n";
+                std::cerr << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                          << send_escape_seq(ATTR_RESET) << ':'
+                          << send_escape_seq(COLOR_FG_CYAN) << "note"
+                          << send_escape_seq(ATTR_RESET)
+                          << ": expected either \""
+                          << send_escape_seq(COLOR_FG_WHITE) << "static"
+                          << send_escape_seq(ATTR_RESET) << '"' << " or \""
+                          << send_escape_seq(COLOR_FG_WHITE) << "dynamic"
+                          << send_escape_seq(ATTR_RESET) << "\"\n";
+                return 1;
+            }
+        }
+
+        std::cerr << "static imports:\n";
+        for (auto const& each : static_imports) {
+            std::cerr << "    " << each << "\n";
+        }
+
+        {
+            for (auto const& each : static_imports) {
+                auto loader = Loader{each};
+                loader.load();
+
+                {
+                    auto fns = loader.get_functions();
+                    if (fns.empty()) {
+                        std::cerr << send_escape_seq(COLOR_FG_WHITE) << parsed_args.input_file
+                                  << send_escape_seq(ATTR_RESET) << ": "
+                                  << send_escape_seq(COLOR_FG_RED) << "warning"
+                                  << send_escape_seq(ATTR_RESET) << ": "
+                                  << "static-linked module \""
+                                  << send_escape_seq(COLOR_FG_WHITE) << each
+                                  << send_escape_seq(ATTR_RESET)
+                                  << "\" defines no functions\n";
+                    }
+
+                    for (auto const& fn : fns) {
+                        if (symbols.available.count(fn)) {
+                            std::cerr
+                                << send_escape_seq(COLOR_FG_WHITE)
+                                << parsed_args.input_file
+                                << send_escape_seq(ATTR_RESET) << ": "
+                                << send_escape_seq(COLOR_FG_RED) << "error"
+                                << send_escape_seq(ATTR_RESET) << ": "
+                                << "duplicate symbol '"
+                                << fn
+                                << "' found when importing '"
+                                << each
+                                << "', previously found in '"
+                                << symbols.available.at(fn).source_file
+                                << "'"
+                                << "\n";
+                            return 1;
+                        }
+                    }
+
+                    for (auto const& fn : fns) {
+                        symbols.available.insert({ fn, Symbols::Symbol{
+                            Symbols::Kind::Function,
+                            Symbols::Linkage_location::External,
+                            each,
+                            each,   // FIXME specify module name, not file path
+                            name
+                        }});
+                    }
+                }
+            }
+        }
+    }
+
+    std::cout << "available symbols:\n";
+    for (auto const& [ name, each ] : symbols.available) {
+        std::cout << "    " << name << ": ";
+        std::cout << to_string(each.linkage_location) << " " << to_string(each.kind) << "\n";
+        std::cout << "        from module: " << each.source_module << " (" << each.source_file << ")\n";
     }
 
     return 0;

@@ -592,7 +592,7 @@ auto generate(std::vector<Token> const& tokens,
 
     auto links = std::vector<std::string>{};
     for (auto const& lnk : static_imports) {
-        if (find(links.begin(), links.end(), lnk) == links.end()) {
+        if (std::find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
         } else {
             throw("requested to link module '" + lnk + "' more than once");

@@ -820,6 +820,9 @@ tooling: build/tooling/exec/assembler.bin
 
 build/tooling/libs/lexer/tokenise.o: build/tooling/libs/lexer/normaliser.o
 build/tooling/exec/assembler.bin: \
+	build/loader.o \
+	build/runtime/imports.o \
+	build/support/env.o \
 	build/tooling/exec/assembler/main.o \
 	build/tooling/errors/compile_time.o \
 	build/util/string/escape_sequences.o \
