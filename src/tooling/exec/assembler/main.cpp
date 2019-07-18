@@ -666,5 +666,9 @@ auto main(int argc, char* argv[]) -> int {
         }
     }
 
+    if (parsed_args.sa_only) {
+        return 0;
+    }
+
     return 0;
 }
