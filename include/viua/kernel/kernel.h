@@ -163,6 +163,8 @@ class Kernel {
      *  its own process back).
      *
      *  Also, a list of spawned VP schedulers.
+     *
+     *  FIXME remove this old code.
      */
     // list of virtual processes not associated with any VP scheduler
     std::vector<std::unique_ptr<viua::process::Process>> free_virtual_processes;
