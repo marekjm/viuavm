@@ -153,25 +153,6 @@ class Kernel {
     int return_code;
 
     /*
-     *  OLD VIRTUAL PROCESSES SCHEDULING
-     *
-     *  List of virtual processes that do not belong to any scheduler, and
-     *  are waiting to be adopted, along with means of synchronization of
-     *  concurrent accesses to said list.
-     *  Schedulers can post their spawned processes to the Kernel to let
-     *  other schedulers execute them (sometimes, a scheduler may fetch
-     *  its own process back).
-     *
-     *  Also, a list of spawned VP schedulers.
-     *
-     *  FIXME remove this old code.
-     */
-    // list of virtual processes not associated with any VP scheduler
-    std::vector<std::unique_ptr<viua::process::Process>> free_virtual_processes;
-    std::mutex free_virtual_processes_mutex;
-    std::condition_variable free_virtual_processes_cv;
-
-    /*
      * The number of running processes. This is needed to calculate the load on
      * schedulers and other things (e.g. if there are no processes we can shut
      * down).
@@ -183,7 +164,7 @@ class Kernel {
     viua::internals::types::schedulers_count vp_schedulers_limit;
 
     /*
-     * NEW VIRTUAL PROCESS SCHEDULING
+     * VIRTUAL PROCESS SCHEDULING
      */
     std::vector<std::unique_ptr<viua::scheduler::Process_scheduler>> process_schedulers;
 
@@ -297,7 +278,6 @@ class Kernel {
     void request_foreign_function_call(Frame*, viua::process::Process*);
     void request_foreign_function_call(std::unique_ptr<Frame>, viua::process::Process&);
 
-    void post_free_process(std::unique_ptr<viua::process::Process>);
     auto steal_processes() -> std::vector<std::unique_ptr<viua::process::Process>>;
     auto notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void;
     auto notify_about_process_death() -> void;

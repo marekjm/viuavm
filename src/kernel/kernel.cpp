@@ -341,13 +341,6 @@ void viua::kernel::Kernel::request_foreign_function_call(
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::post_free_process(
-    std::unique_ptr<viua::process::Process> p) {
-    unique_lock<mutex> lock(free_virtual_processes_mutex);
-    free_virtual_processes.emplace_back(std::move(p));
-    lock.unlock();
-    free_virtual_processes_cv.notify_one();
-}
 auto viua::kernel::Kernel::steal_processes() ->
     std::vector<std::unique_ptr<viua::process::Process>> {
 
@@ -572,8 +565,7 @@ int viua::kernel::Kernel::run() {
     }
     /* bool enable_tracing = is_tracing_enabled(); */
 
-    auto proc_schedulers = decltype(process_schedulers){};
-    proc_schedulers.reserve(vp_schedulers_limit);
+    process_schedulers.reserve(vp_schedulers_limit);
 
     /*
      * Immediately allocate and bootstrap the "main" scheduler.
@@ -590,8 +582,8 @@ int viua::kernel::Kernel::run() {
     if constexpr (KERNEL_SETUP_DEBUG) {
         std::cerr << "[kernel] bootstrapping main scheduler\n";
     }
-    proc_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this, 0));
-    proc_schedulers.front()->bootstrap(commandline_arguments);
+    process_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this, 0));
+    process_schedulers.front()->bootstrap(commandline_arguments);
 
     /*
      * Allocate the additional process schedulers requested. Remember to launch
@@ -601,13 +593,13 @@ int viua::kernel::Kernel::run() {
     if (vp_schedulers_limit) {
         auto n = viua::scheduler::Process_scheduler::id_type{1};
         for (auto i = (vp_schedulers_limit - 1); i; --i) {
-            proc_schedulers.emplace_back(
+            process_schedulers.emplace_back(
                 std::make_unique<viua::scheduler::Process_scheduler>(
                     *this, n++));
         }
     }
     if constexpr (KERNEL_SETUP_DEBUG) {
-        std::cerr << "[kernel] created " << proc_schedulers.size() << " process scheduler(s)\n";
+        std::cerr << "[kernel] created " << process_schedulers.size() << " process scheduler(s)\n";
     }
 
     /*
@@ -615,11 +607,11 @@ int viua::kernel::Kernel::run() {
      * the extra process schedulers already allocated we can just set them loose
      * and let them run the software...
      */
-    for (auto& sched : proc_schedulers) {
+    for (auto& sched : process_schedulers) {
         sched->launch();
     }
     if constexpr (KERNEL_SETUP_DEBUG) {
-        std::cerr << "[kernel] all " << proc_schedulers.size() << " scheduler(s) launched\n";
+        std::cerr << "[kernel] all " << process_schedulers.size() << " scheduler(s) launched\n";
     }
 
     /*
@@ -627,7 +619,7 @@ int viua::kernel::Kernel::run() {
      * running. Please not that this condition may never be met if the software
      * loaded into the VM is intended to run indefinitely.
      */
-    for (auto& sched : proc_schedulers) {
+    for (auto& sched : process_schedulers) {
         sched->shutdown();
         sched->join();
     }
@@ -635,7 +627,7 @@ int viua::kernel::Kernel::run() {
         std::cerr << "[kernel] all schedulers shut down\n";
     }
 
-    return_code = proc_schedulers.front()->exit();
+    return_code = process_schedulers.front()->exit();
 
     return return_code;
 }
