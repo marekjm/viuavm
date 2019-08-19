@@ -22,7 +22,7 @@
 #include <viua/support/string.h>
 #include <viua/types/struct.h>
 #include <viua/util/exceptions.h>
-using namespace std;
+
 
 std::string const viua::types::Struct::type_name = "Struct";
 
@@ -35,7 +35,7 @@ bool viua::types::Struct::boolean() const {
 }
 
 std::string viua::types::Struct::str() const {
-    ostringstream oss;
+    std::ostringstream oss;
 
     oss << '{';
 
@@ -105,7 +105,7 @@ std::vector<std::string> viua::types::Struct::keys() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
-    auto copied = make_unique<Struct>();
+    auto copied = std::make_unique<Struct>();
     for (auto const& each : attributes) {
         copied->insert(each.first, each.second->copy());
     }

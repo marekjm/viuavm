@@ -292,6 +292,20 @@ int main(int argc, char* argv[]) {
         disassembled_lines.emplace_back("\n");
     }
 
+    {
+        auto dynamic_imports = loader.dynamic_imports();
+        if (dynamic_imports.size()) {
+            disassembled_lines.emplace_back("; dynamic imports\n");
+        }
+        for (auto const& each : dynamic_imports) {
+            disassembled_lines.emplace_back(
+                ".import: [[dynamic]] " + each + "\n");
+        }
+        if (dynamic_imports.size()) {
+            disassembled_lines.emplace_back("\n");
+        }
+    }
+
     for (unsigned i = 0; i < elements.size(); ++i) {
         std::string const name = elements[i];
         const auto el_size     = element_sizes[name];

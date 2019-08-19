@@ -24,7 +24,7 @@
 #include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
-#include <viua/scheduler/vps.h>
+#include <viua/scheduler/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/process.h>
@@ -130,7 +130,7 @@ auto viua::process::Process::call_foreign(
     stack->frame_new->return_register = return_register;
 
     suspend();
-    scheduler->request_foreign_function_call(stack->frame_new.release(), this);
+    attached_scheduler->request_ffi_call(std::move(stack->frame_new), *this);
 
     return return_address;
 }
@@ -355,8 +355,8 @@ auto viua::process::Process::frame_for_watchdog() -> std::unique_ptr<Frame> {
 auto viua::process::Process::become(std::string const& function_name,
                                     std::unique_ptr<Frame> frame_to_use)
     -> Op_address_type {
-    if (not scheduler->is_native_function(function_name)) {
-        throw make_unique<viua::types::Exception>(
+    if (not attached_scheduler->is_native_function(function_name)) {
+        throw std::make_unique<viua::types::Exception>(
             "process from undefined function: " + function_name);
     }
 
@@ -373,9 +373,9 @@ auto viua::process::Process::become(std::string const& function_name,
     return (stack->instruction_pointer = adjust_jump_base_for(function_name));
 }
 
-auto viua::process::Process::begin() -> Op_address_type {
-    if (not scheduler->is_native_function(stack->at(0)->function_name)) {
-        throw make_unique<viua::types::Exception>(
+auto viua::process::Process::start() -> Op_address_type {
+    if (not attached_scheduler->is_native_function(stack->at(0)->function_name)) {
+        throw std::make_unique<viua::types::Exception>(
             "process from undefined function: " + stack->at(0)->function_name);
     }
     return (stack->instruction_pointer =
@@ -410,16 +410,16 @@ bool viua::process::Process::empty() const {
 }
 
 void viua::process::Process::migrate_to(
-    viua::scheduler::Virtual_process_scheduler* sch) {
-    scheduler = sch;
+    viua::scheduler::Process_scheduler* sch) {
+    attached_scheduler = sch;
 }
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
-                                viua::scheduler::Virtual_process_scheduler* sch,
+                                viua::scheduler::Process_scheduler* sch,
                                 viua::process::Process* pt,
                                 bool const enable_tracing)
         : tracing_enabled(enable_tracing)
-        , scheduler(sch)
+        , attached_scheduler(sch)
         , parent_process(pt)
         , global_register_set(nullptr)
         , stack(nullptr)
@@ -432,7 +432,7 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
     auto s = std::make_unique<Stack>(
-        frm->function_name, this, global_register_set.get(), scheduler);
+        frm->function_name, this, global_register_set.get(), attached_scheduler);
     s->emplace_back(std::move(frm));
     s->bind(global_register_set.get());
     stack           = s.get();

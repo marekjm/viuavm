@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Marek Marecki
+ *  Copyright (C) 2018, 2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -70,14 +70,14 @@ static auto usage(std::vector<std::string> const& args) -> bool {
         std::cout << "    <option> is any option that is accepted by the "
                      "assembler.\n";
         std::cout << "    <output> is the file to which the assembled bytecode "
-                     "will be written."
-                     " The default is to write output to `a.out` file.\n";
+                     "will be written.\n"
+                     "     The default is to write output to `a.out` file.\n";
         std::cout << "    <source> is the name of the file containing the Viua "
-                     "VM assembly language"
-                     " program to be assembled.\n";
+                     "VM assembly language\n"
+                     "    program to be assembled.\n";
         std::cout << "    <module> is a module that is to be statically linked "
-                     "to the currently assembled"
-                     " file.\n";
+                     "to the currently\n"
+                     "    assembled file.\n";
 
         std::cout << '\n';
 
@@ -87,21 +87,21 @@ static auto usage(std::vector<std::string> const& args) -> bool {
         std::cout << "    -o, --out <file>  - write output to <file>; the "
                      "default is to write to `a.out`\n";
         std::cout << "    -c, --lib         - assemble as a linkable module; "
-                     "the default is to assemble an"
-                     " executable\n";
+                     "the default is to assemble\n"
+                     "                        an executable\n";
         std::cout << "    -C, --verify      - perform static analysis, but do "
                      "not output bytecode\n";
         std::cout << "        --no-sa       - disable static analysis (useful "
-                     "in case of false positives"
-                     " being thrown by the SA engine)\n";
+                     "in case of false positives\n"
+                     "                        being thrown by the SA engine)\n";
         std::cout << "        --lex         - perform just the lexical "
-                     "analysis, and return results as a"
-                     "                        JSON list\n";
+                     "analysis, and return results\n"
+                     "                        as a JSON list\n";
 
         std::cout << '\n';
 
         std::cout << "COPYRIGHT\n";
-        std::cout << "    Copyright (C) 2018 Marek Marecki\n";
+        std::cout << "    Copyright (C) 2018-2019 Marek Marecki\n";
         std::cout << "    License GPLv3+: GNU GPL version 3 or later "
                      "<https://gnu.org/licenses/gpl.html>.\n";
         std::cout << "    This is free software: you are free to change and "
@@ -155,6 +155,8 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
             parsed.linkable_module = true;
         } else if (arg == "-C" or arg == "--verify") {
             parsed.sa_only = true;
+        } else if (arg == "--no-sa") {
+            parsed.enabled_sa = false;
         } else if (arg == "-h" or arg == "--help") {
             // do nothing
         } else if (arg == "--version") {
@@ -655,11 +657,17 @@ auto main(int argc, char* argv[]) -> int {
         std::cout << std::endl;
     }
 
-    try {
-        viua::tooling::libs::static_analyser::analyse(cooked_fragments);
-    } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
-        display_error_in_context(raw_tokens, e, parsed_args.input_file);
-        exit(1);
+    if (parsed_args.enabled_sa) {
+        try {
+            viua::tooling::libs::static_analyser::analyse(cooked_fragments);
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+            display_error_in_context(raw_tokens, e, parsed_args.input_file);
+            exit(1);
+        }
+    }
+
+    if (parsed_args.sa_only) {
+        return 0;
     }
 
     return 0;

@@ -56,7 +56,10 @@ class Token {
           std::string,
           std::string = "");
     Token();
+    Token(Token const&) = default;
+    Token(Token&&) = default;
     auto operator=(Token const&) -> Token&;
+    auto operator=(Token&&) -> Token& = delete;
 };
 
 auto tokenise(std::string const&) -> std::vector<Token>;

@@ -19,7 +19,7 @@
 
 #include <sstream>
 #include <viua/types/reference.h>
-using namespace std;
+
 
 std::string const viua::types::Reference::type_name = "Reference";
 
@@ -58,7 +58,7 @@ bool viua::types::Reference::boolean() const {
 
 std::unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
-    return make_unique<viua::types::Reference>(pointer, counter);
+    return std::make_unique<viua::types::Reference>(pointer, counter);
 }
 
 viua::types::Reference::Reference(viua::types::Value* ptr)

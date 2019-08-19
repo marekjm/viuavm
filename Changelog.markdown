@@ -109,11 +109,14 @@ There are several categories of change:
   bits and integers
 - fix: target of `send` instruction may be given by pointer dereference
 - bic: rename `VIUA_VP_SCHEDULERS` to `VIUA_PROC_SCHEDULERS`
-- bic: remove the `--json` option from kernel frontend's set of options
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
 
+This release changes how the virtual process scheduler works. It should now be
+impossible for a process to become stuck in a "free process" queue... because
+there is no such queue! The new algorithm is a very primitive implementation of
+work-stealing so every process is always owned by a scheduler.
 
 ----
 

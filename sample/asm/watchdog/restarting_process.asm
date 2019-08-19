@@ -149,10 +149,10 @@
 
 .signature: std::misc::cycle/1
 
+.import: [[dynamic]] std::misc
+
 .function: main/1
     allocate_registers %3 local
-
-    import std::misc
 
     frame %0
     process void a_detached_concurrent_process/0

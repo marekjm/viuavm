@@ -89,7 +89,7 @@ void Loader::load_magic_number(ifstream& in) {
 }
 
 void Loader::assume_binary_type(ifstream& in,
-                                ViuaBinaryType assumed_binary_type) {
+                                Viua_binary_type assumed_binary_type) {
     char bt;
     in.read(&bt, sizeof(decltype(bt)));
     if (bt != assumed_binary_type) {

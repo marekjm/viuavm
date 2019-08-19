@@ -26,7 +26,7 @@
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
-using namespace std;
+
 
 std::string const viua::types::Pointer::type_name = "Pointer";
 
@@ -68,11 +68,11 @@ void viua::types::Pointer::reset(viua::types::Value* t) {
 viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     if (process_of_origin != p) {
         // Dereferencing pointers outside of their original process is illegal.
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "InvalidDereference: outside of original process");
     }
     if (not valid) {
-        throw make_unique<viua::types::Exception>("expired pointer exception");
+        throw std::make_unique<viua::types::Exception>("expired pointer exception");
     }
     return points_to;
 }
@@ -91,9 +91,9 @@ std::string viua::types::Pointer::str() const {
 
 std::unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
-        return make_unique<Pointer>(process_of_origin);
+        return std::make_unique<Pointer>(process_of_origin);
     }
-    return make_unique<Pointer>(points_to, process_of_origin);
+    return std::make_unique<Pointer>(points_to, process_of_origin);
 }
 
 

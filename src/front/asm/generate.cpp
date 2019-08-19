@@ -1233,9 +1233,9 @@ auto generate(std::vector<Token> const& tokens,
 
     out.write(VIUA_MAGIC_NUMBER, sizeof(char) * 5);
     if (flags.as_lib) {
-        out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
+        out.put(static_cast<Viua_binary_type>(VIUA_LINKABLE));
     } else {
-        out.write(&VIUA_EXECUTABLE, sizeof(ViuaBinaryType));
+        out.put(static_cast<Viua_binary_type>(VIUA_EXECUTABLE));
     }
 
 

@@ -19,7 +19,6 @@
 
 #include <string>
 #include <viua/types/exception.h>
-using namespace std;
 
 std::string const viua::types::Exception::type_name = "Exception";
 
@@ -54,10 +53,10 @@ bool viua::types::Exception::boolean() const {
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
-    return make_unique<Exception>(cause);
+    return std::make_unique<Exception>(cause);
 }
 
 viua::types::Exception::Exception(std::string s)
         : cause(s), detailed_type("Exception") {}
-viua::types::Exception::Exception(std::string ts, string cs)
+viua::types::Exception::Exception(std::string ts, std::string cs)
         : cause(cs), detailed_type(ts) {}

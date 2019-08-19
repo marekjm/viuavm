@@ -57,16 +57,16 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
         // FIXME vector is inserted into a register after packing, so this
         // exception is not entirely well thought-out allow packing target
         // register
-        throw make_unique<viua::types::Exception>("vector would pack itself");
+        throw std::make_unique<viua::types::Exception>("vector would pack itself");
     }
     if ((pack_start_ri + pack_size)
         >= stack->back()->local_register_set->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "vector: packing outside of register set range");
     }
     for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
-            throw make_unique<viua::types::Exception>(
+            throw std::make_unique<viua::types::Exception>(
                 "vector: cannot pack null register");
         }
     }
@@ -74,7 +74,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
     // register set is used because there will be no packing.
     if (pack_size
         and (pack_start_rs != viua::internals::Register_sets::LOCAL)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "packing vector from non-local register set is not allowed: "
             + std::to_string(static_cast<uint64_t>(pack_start_rs)) + " "
             + std::to_string(pack_size));
@@ -128,7 +128,7 @@ auto viua::process::Process::opvinsert(Op_address_type addr)
 
 auto viua::process::Process::opvpush(Op_address_type addr) -> Op_address_type {
     viua::types::Vector* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
@@ -190,16 +190,16 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opvat(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) =
+    std::tie(addr, vector_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
     viua::types::Integer* index_operand = nullptr;
-    tie(addr, index_operand) =
+    std::tie(addr, index_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Integer>(addr, this);
 

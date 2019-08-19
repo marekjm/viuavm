@@ -50,7 +50,7 @@ namespace process {
 class Process;
 }
 namespace scheduler {
-class Virtual_process_scheduler;
+class Process_scheduler;
 
 namespace ffi {
 class Foreign_function_call_request;
@@ -126,8 +126,9 @@ class Kernel {
 #ifdef VIUAVM_AS_DEBUG_HEADER
   public:
 #endif
-    /*  Bytecode pointer is a pointer to program's code.
-     *  Size and executable offset are metadata exported from bytecode dump.
+    /*
+     * Bytecode pointer is a pointer to program's code. Size and executable
+     * offset are metadata exported from bytecode dump.
      */
     std::unique_ptr<viua::internals::types::byte[]> bytecode;
     viua::internals::types::bytecode_size bytecode_size;
@@ -152,41 +153,50 @@ class Kernel {
     int return_code;
 
     /*
-     *  VIRTUAL PROCESSES SCHEDULING
-     *
-     *  List of virtual processes that do not belong to any scheduler, and
-     *  are waiting to be adopted, along with means of synchronization of
-     *  concurrent accesses to said list.
-     *  Schedulers can post their spawned processes to the Kernel to let
-     *  other schedulers execute them (sometimes, a scheduler may fetch
-     *  its own process back).
-     *
-     *  Also, a list of spawned VP schedulers.
+     * The number of running processes. This is needed to calculate the load on
+     * schedulers and other things (e.g. if there are no processes we can shut
+     * down).
      */
-    // list of virtual processes not associated with any VP scheduler
-    std::vector<std::unique_ptr<viua::process::Process>> free_virtual_processes;
-    std::mutex free_virtual_processes_mutex;
-    std::condition_variable free_virtual_processes_cv;
-    // list of running VP schedulers, pairs of {scheduler-pointer, thread}
-    std::vector<
-        std::pair<viua::scheduler::Virtual_process_scheduler*, std::thread>>
-        virtual_process_schedulers;
-    // list of idle VP schedulers
-    std::vector<viua::scheduler::Virtual_process_scheduler*>
-        idle_virtual_process_schedulers;
-
     std::atomic<viua::internals::types::processes_count> running_processes{0};
 
     static const viua::internals::types::schedulers_count
         default_vp_schedulers_limit = 2;
     viua::internals::types::schedulers_count vp_schedulers_limit;
 
-    /*  This is the interface between programs compiled to VM bytecode and
-     *  extension libraries written in C++.
+    /*
+     * VIRTUAL PROCESS SCHEDULING
+     */
+    std::vector<std::unique_ptr<viua::scheduler::Process_scheduler>> process_schedulers;
+
+    /*
+     * This condition variable is used to signal that there is a process
+     * available to be stolen. A signal for work stealing algorithm to kick in
+     * and do its job.
+     */
+    std::condition_variable process_spawned_cv;
+    std::mutex process_spawned_mtx;
+    // FIXME Maybe use a ring buffer instead of a deque to make the size of
+    // the "who spawned a process" list bounded? If all schedulers are populated
+    // and don't need to steal work this list could otherwise get uncomfortably
+    // long really quick.
+    std::deque<viua::scheduler::Process_scheduler*> process_spawned_by;
+
+    /*
+     * FFI MODULES
+     *
+     * This is the interface between programs compiled to VM bytecode and
+     * extension libraries written in C++. Modules written in C++ are opened as
+     * shared objects, the functions they export are loaded and made available
+     * to running code.
      */
     std::map<std::string, ForeignFunction*> foreign_functions;
     std::mutex foreign_functions_mutex;
+    std::vector<void*> cxx_dynamic_lib_handles;
 
+    /*
+     * FFI SCHEDULING
+     *
+     */
     // Foreign function call requests are placed here to be executed later.
     std::vector<
         std::unique_ptr<viua::scheduler::ffi::Foreign_function_call_request>>
@@ -198,8 +208,16 @@ class Kernel {
     viua::internals::types::schedulers_count ffi_schedulers_limit;
     std::vector<std::unique_ptr<std::thread>> foreign_call_workers;
 
-    std::vector<void*> cxx_dynamic_lib_handles;
-
+    /*
+     * MESSAGE PASSING
+     *
+     * Why are mailboxes are kept inside the kernel? To remove the need to look
+     * for the process on possibly many schedulers (as we would need to lock 'em
+     * all to avoid race conditions with process migration algorithms), and to
+     * make it easier to send and receive messages (just call kernel's routines
+     * instead of finding the right scheduler and process). This adds a level of
+     * indirection but in this case I think it is justified.
+     */
     std::map<viua::process::PID, Mailbox> mailboxes;
     std::mutex mailbox_mutex;
 
@@ -258,8 +276,12 @@ class Kernel {
                      viua::internals::types::Op_address_type>;
 
     void request_foreign_function_call(Frame*, viua::process::Process*);
+    void request_foreign_function_call(std::unique_ptr<Frame>, viua::process::Process&);
 
-    void post_free_process(std::unique_ptr<viua::process::Process>);
+    auto steal_processes() -> std::vector<std::unique_ptr<viua::process::Process>>;
+    auto notify_about_process_spawned(viua::scheduler::Process_scheduler*) -> void;
+    auto notify_about_process_death() -> void;
+    auto process_count() const -> viua::internals::types::processes_count;
 
     auto create_mailbox(const viua::process::PID)
         -> viua::internals::types::processes_count;
