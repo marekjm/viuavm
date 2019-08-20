@@ -157,7 +157,7 @@ auto viua::process::Process::op_io_cancel(Op_address_type addr) -> Op_address_ty
     std::tie(addr, request) = viua::bytecode::decoder::operands::fetch_object_of<
         std::remove_pointer<decltype(request)>::type>(addr, this);
 
-    attached_scheduler->cancel_io(request->id());
+    cancel_io(request->id());
 
     return addr;
 }

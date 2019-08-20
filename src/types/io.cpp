@@ -190,7 +190,7 @@ auto IO_fd::read(viua::process::Process& proc, std::unique_ptr<Value> x) -> std:
         , file_descriptor
         , static_cast<size_t>(limit)
     ));
-    return std::make_unique<IO_request>(interaction_id);
+    return std::make_unique<IO_request>(&proc, interaction_id);
 }
 
 IO_fd::IO_fd(int const x)
@@ -222,8 +222,11 @@ std::unique_ptr<Value> IO_request::copy() const {
     );
 }
 
-IO_request::IO_request(IO_interaction::id_type const x)
+IO_request::IO_request(viua::process::Process* proc, IO_interaction::id_type const x)
     : interaction_id{x}
+    , from_process{proc}
 {}
-IO_request::~IO_request() {}
+IO_request::~IO_request() {
+    from_process->cancel_io(id());
+}
 }

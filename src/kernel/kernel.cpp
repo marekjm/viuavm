@@ -526,7 +526,6 @@ auto viua::kernel::Kernel::schedule_io(std::unique_ptr<viua::types::IO_interacti
 auto viua::kernel::Kernel::cancel_io(std::tuple<uint64_t, uint64_t> const interaction_id)
     -> void {
     std::unique_lock<std::mutex> lck { io_requests_mtx };
-    std::cerr << "elo\n";
     /*
      * We have to check if the request is still there to avoid crashing when the
      * cancellation order arrives just after the request has been completed, as
@@ -538,9 +537,6 @@ auto viua::kernel::Kernel::cancel_io(std::tuple<uint64_t, uint64_t> const intera
     // after the process has waited for the request in question?
     if (io_requests.count(interaction_id)) {
         io_requests.at(interaction_id)->cancel();
-        std::cerr << "cancelled I/O\n";
-    } else {
-        std::cerr << "nope\n";
     }
 }
 auto viua::kernel::Kernel::io_complete(std::tuple<uint64_t, uint64_t> const interaction_id) const -> bool {

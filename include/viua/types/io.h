@@ -131,6 +131,7 @@ struct IO_read_interaction : public IO_interaction {
 
 class IO_request : public Value {
     IO_interaction::id_type const interaction_id;
+    viua::process::Process* const from_process;
   public:
     static std::string const type_name;
 
@@ -145,7 +146,7 @@ class IO_request : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    IO_request(IO_interaction::id_type const);
+    IO_request(viua::process::Process*, IO_interaction::id_type const);
     ~IO_request();
 };
 
