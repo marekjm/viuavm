@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -559,7 +559,7 @@ int viua::kernel::Kernel::run() {
 
     constexpr auto const KERNEL_SETUP_DEBUG = false;
 
-    vp_schedulers_limit = no_of_process_schedulers();
+    auto const vp_schedulers_limit = no_of_process_schedulers();
     if constexpr (KERNEL_SETUP_DEBUG) {
         std::cerr << "[kernel] process scheduler limit: " << vp_schedulers_limit << "\n";
     }
@@ -637,11 +637,9 @@ viua::kernel::Kernel::Kernel()
         , bytecode_size(0)
         , executable_offset(0)
         , return_code(0)
-        , vp_schedulers_limit(default_vp_schedulers_limit)
-        , ffi_schedulers_limit(default_ffi_schedulers_limit)
         , debug(false)
         , errors(false) {
-    ffi_schedulers_limit = no_of_ffi_schedulers();
+    auto const ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
         foreign_call_workers.emplace_back(
             std::make_unique<std::thread>(viua::scheduler::ffi::ff_call_processor,

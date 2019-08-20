@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015-2019 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -159,10 +159,6 @@ class Kernel {
      */
     std::atomic<viua::internals::types::processes_count> running_processes{0};
 
-    static const viua::internals::types::schedulers_count
-        default_vp_schedulers_limit = 2;
-    viua::internals::types::schedulers_count vp_schedulers_limit;
-
     /*
      * VIRTUAL PROCESS SCHEDULING
      */
@@ -203,9 +199,6 @@ class Kernel {
         foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
-    static const viua::internals::types::schedulers_count
-        default_ffi_schedulers_limit = 2;
-    viua::internals::types::schedulers_count ffi_schedulers_limit;
     std::vector<std::unique_ptr<std::thread>> foreign_call_workers;
 
     /*
