@@ -128,6 +128,14 @@ struct IO_read_interaction : public IO_interaction {
 
     IO_read_interaction(viua::process::Process* const, id_type const, int const, size_t const);
 };
+struct IO_write_interaction : public IO_interaction {
+    int const file_descriptor;
+    std::string const buffer;
+
+    auto interact() -> Interaction_result override;
+
+    IO_write_interaction(viua::process::Process* const, id_type const, int const, std::string);
+};
 
 class IO_request : public Value {
     IO_interaction::id_type const interaction_id;
@@ -169,6 +177,10 @@ class IO_port : public Value {
           viua::process::Process&
         , std::unique_ptr<Value>
     ) -> std::unique_ptr<IO_request> = 0;
+    virtual auto write(
+          viua::process::Process&
+        , std::unique_ptr<Value>
+    ) -> std::unique_ptr<IO_request> = 0;
 
     IO_port();
     ~IO_port();
@@ -192,7 +204,7 @@ class IO_fd : public IO_port {
     std::unique_ptr<Value> copy() const override;
 
     auto read(viua::process::Process&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
-    auto write(std::string) -> int;
+    auto write(viua::process::Process&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
 
     IO_fd(int const);
     ~IO_fd();

@@ -139,6 +139,63 @@ auto IO_read_interaction::interact() -> Interaction_result {
     };
 }
 
+IO_write_interaction::IO_write_interaction(
+    viua::process::Process* const proc
+    , id_type const x
+    , int const fd
+    , std::string buf)
+    : IO_interaction(proc, x)
+    , file_descriptor{fd}
+    , buffer{std::move(buf)}
+{}
+auto IO_write_interaction::interact() -> Interaction_result {
+    if (cancelled()) {
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Cancelled,
+            std::make_unique<viua::types::Exception>("IO_cancel", "I/O cancelled")
+        };
+    }
+
+    fd_set writefds;
+    FD_ZERO(&writefds);
+    FD_SET(file_descriptor, &writefds);
+
+    timeval timeout;
+    memset(&timeout, 0, sizeof(timeout));
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 1;
+
+    auto const s = select(file_descriptor + 1, nullptr, &writefds, nullptr, &timeout);
+    if (s == -1) {
+        auto const saved_errno = errno;
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Error,
+            std::make_unique<viua::types::Integer>(saved_errno)
+        };
+    }
+    if (s == 0) {
+        return Interaction_result{};
+    }
+
+    auto const n = ::write(file_descriptor, buffer.data(), buffer.size());
+
+    if (n == -1) {
+        auto const saved_errno = errno;
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Error,
+            std::make_unique<viua::types::Integer>(saved_errno)
+        };
+    }
+    return Interaction_result{
+        IO_interaction::State::Complete,
+        IO_interaction::Status::Success,
+        std::make_unique<viua::types::String>(buffer.substr(static_cast<size_t>(n)))
+    };
+}
+
 std::string const viua::types::IO_port::type_name = "IO_port";
 
 std::string IO_port::type() const {
@@ -189,6 +246,17 @@ auto IO_fd::read(viua::process::Process& proc, std::unique_ptr<Value> x) -> std:
         , interaction_id
         , file_descriptor
         , static_cast<size_t>(limit)
+    ));
+    return std::make_unique<IO_request>(&proc, interaction_id);
+}
+auto IO_fd::write(viua::process::Process& proc, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
+    auto const interaction_id = IO_interaction::id_type{ file_descriptor, counter++ };
+    auto buffer = x->str();
+    proc.schedule_io(std::make_unique<IO_write_interaction>(
+        &proc
+        , interaction_id
+        , file_descriptor
+        , std::move(buffer)
     ));
     return std::make_unique<IO_request>(&proc, interaction_id);
 }

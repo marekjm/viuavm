@@ -37,7 +37,6 @@ auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
     std::tie(addr, porty) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-
     viua::kernel::Register* limity = nullptr;
     std::tie(addr, limity) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -68,19 +67,15 @@ auto viua::process::Process::op_io_write(Op_address_type addr) -> Op_address_typ
     std::tie(addr, data) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    auto const buffer = data->get()->str();
-
     if (dynamic_cast<viua::types::Integer*>(porty->get())) {
-        /* auto port = std::make_unique<viua::types::IO_fd>( */
-        /*     static_cast<viua::types::Integer&>(*porty->get()).as_integer() */
-        /* ); */
-        /* port->write(buffer); */
+        auto port = std::make_unique<viua::types::IO_fd>(
+            static_cast<viua::types::Integer&>(*porty->get()).as_integer()
+        );
+        *target = port->write(*this, data->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
         /* auto port = static_cast<viua::types::IO_fd&>(*porty->get()); */
         /* port.write(buffer); */
     }
-
-    *target = std::make_unique<viua::types::String>(buffer);
 
     return addr;
 }
