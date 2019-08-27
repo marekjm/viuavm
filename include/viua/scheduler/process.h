@@ -194,6 +194,10 @@ class Process_scheduler {
     auto join() -> void;
     auto exit() const -> int;
 
+    auto kernel() const -> viua::kernel::Kernel& {
+        return attached_kernel;
+    }
+
     auto schedule_io(std::unique_ptr<viua::types::IO_interaction>) -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
     auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;

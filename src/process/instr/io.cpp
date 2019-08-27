@@ -45,10 +45,10 @@ auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
         auto port = std::make_unique<viua::types::IO_fd>(
             static_cast<viua::types::Integer&>(*porty->get()).as_integer()
         );
-        *target = port->read(*this, limity->give());
+        *target = port->read(attached_scheduler->kernel(), limity->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
         auto port = static_cast<viua::types::IO_fd&>(*porty->get());
-        *target = port.read(*this, limity->give());
+        *target = port.read(attached_scheduler->kernel(), limity->give());
     }
 
     return addr;
@@ -71,7 +71,7 @@ auto viua::process::Process::op_io_write(Op_address_type addr) -> Op_address_typ
         auto port = std::make_unique<viua::types::IO_fd>(
             static_cast<viua::types::Integer&>(*porty->get()).as_integer()
         );
-        *target = port->write(*this, data->give());
+        *target = port->write(attached_scheduler->kernel(), data->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
         /* auto port = static_cast<viua::types::IO_fd&>(*porty->get()); */
         /* port.write(buffer); */

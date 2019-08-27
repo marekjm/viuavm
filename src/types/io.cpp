@@ -22,6 +22,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <viua/kernel/kernel.h>
 #include <viua/exceptions.h>
 #include <viua/types/integer.h>
 #include <viua/types/io.h>
@@ -50,9 +51,8 @@ auto IO_interaction::completed() const -> bool {
     return is_complete.load(std::memory_order_acquire);
 }
 
-IO_interaction::IO_interaction(viua::process::Process* const proc, id_type const x)
+IO_interaction::IO_interaction(id_type const x)
     : assigned_id{x}
-    , from_process{proc}
 {}
 IO_interaction::~IO_interaction() {}
 
@@ -75,11 +75,10 @@ auto IO_fake_interaction::interact() -> Interaction_result {
 }
 
 IO_read_interaction::IO_read_interaction(
-    viua::process::Process* const proc
-    , id_type const x
+      id_type const x
     , int const fd
     , size_t const limit)
-    : IO_interaction(proc, x)
+    : IO_interaction(x)
     , file_descriptor{fd}
     , buffer(limit, '\0')
 {}
@@ -140,11 +139,10 @@ auto IO_read_interaction::interact() -> Interaction_result {
 }
 
 IO_write_interaction::IO_write_interaction(
-    viua::process::Process* const proc
-    , id_type const x
+      id_type const x
     , int const fd
     , std::string buf)
-    : IO_interaction(proc, x)
+    : IO_interaction(x)
     , file_descriptor{fd}
     , buffer{std::move(buf)}
 {}
@@ -238,27 +236,25 @@ std::unique_ptr<Value> IO_fd::copy() const {
     return std::make_unique<IO_fd>(file_descriptor);
 }
 
-auto IO_fd::read(viua::process::Process& proc, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
+auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
     auto const interaction_id = IO_interaction::id_type{ file_descriptor, counter++ };
     auto const limit = static_cast<viua::types::Integer*>(x.get())->as_integer();
-    proc.schedule_io(std::make_unique<IO_read_interaction>(
-        &proc
-        , interaction_id
+    k.schedule_io(std::make_unique<IO_read_interaction>(
+          interaction_id
         , file_descriptor
         , static_cast<size_t>(limit)
     ));
-    return std::make_unique<IO_request>(&proc, interaction_id);
+    return std::make_unique<IO_request>(&k, interaction_id);
 }
-auto IO_fd::write(viua::process::Process& proc, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
+auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
     auto const interaction_id = IO_interaction::id_type{ file_descriptor, counter++ };
     auto buffer = x->str();
-    proc.schedule_io(std::make_unique<IO_write_interaction>(
-        &proc
-        , interaction_id
+    k.schedule_io(std::make_unique<IO_write_interaction>(
+          interaction_id
         , file_descriptor
         , std::move(buffer)
     ));
-    return std::make_unique<IO_request>(&proc, interaction_id);
+    return std::make_unique<IO_request>(&k, interaction_id);
 }
 
 IO_fd::IO_fd(int const x)
@@ -290,11 +286,11 @@ std::unique_ptr<Value> IO_request::copy() const {
     );
 }
 
-IO_request::IO_request(viua::process::Process* proc, IO_interaction::id_type const x)
+IO_request::IO_request(viua::kernel::Kernel* k, IO_interaction::id_type const x)
     : interaction_id{x}
-    , from_process{proc}
+    , kernel{k}
 {}
 IO_request::~IO_request() {
-    from_process->cancel_io(id());
+    kernel->cancel_io(id());
 }
 }

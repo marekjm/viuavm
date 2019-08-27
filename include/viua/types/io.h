@@ -47,7 +47,6 @@ struct IO_interaction {
 
   private:
     id_type const assigned_id;
-    viua::process::Process* const from_process;
 
     std::atomic_bool is_complete = false;
     std::atomic_bool is_cancelled = false;
@@ -112,7 +111,7 @@ struct IO_interaction {
     auto complete() -> void;
     auto completed() const -> bool;
 
-    IO_interaction(viua::process::Process* const, id_type const);
+    IO_interaction(id_type const);
     virtual ~IO_interaction();
 };
 struct IO_fake_interaction : public IO_interaction {
@@ -126,7 +125,7 @@ struct IO_read_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    IO_read_interaction(viua::process::Process* const, id_type const, int const, size_t const);
+    IO_read_interaction(id_type const, int const, size_t const);
 };
 struct IO_write_interaction : public IO_interaction {
     int const file_descriptor;
@@ -134,12 +133,12 @@ struct IO_write_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    IO_write_interaction(viua::process::Process* const, id_type const, int const, std::string);
+    IO_write_interaction(id_type const, int const, std::string);
 };
 
 class IO_request : public Value {
     IO_interaction::id_type const interaction_id;
-    viua::process::Process* const from_process;
+    viua::kernel::Kernel* const kernel;
   public:
     static std::string const type_name;
 
@@ -154,7 +153,7 @@ class IO_request : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    IO_request(viua::process::Process*, IO_interaction::id_type const);
+    IO_request(viua::kernel::Kernel*, IO_interaction::id_type const);
     ~IO_request();
 };
 
@@ -174,11 +173,11 @@ class IO_port : public Value {
     std::unique_ptr<Value> copy() const override;
 
     virtual auto read(
-          viua::process::Process&
+          viua::kernel::Kernel&
         , std::unique_ptr<Value>
     ) -> std::unique_ptr<IO_request> = 0;
     virtual auto write(
-          viua::process::Process&
+          viua::kernel::Kernel&
         , std::unique_ptr<Value>
     ) -> std::unique_ptr<IO_request> = 0;
 
@@ -203,8 +202,8 @@ class IO_fd : public IO_port {
 
     std::unique_ptr<Value> copy() const override;
 
-    auto read(viua::process::Process&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
-    auto write(viua::process::Process&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
+    auto read(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
+    auto write(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
 
     IO_fd(int const);
     ~IO_fd();

@@ -17,11 +17,11 @@
     print %data local
 
     ;io_cancel %4 local
-    io_wait %data local %data local 1s
+    io_wait %data local %data local 10s
 
     ;print %4 local
     io_write %data local %stdout local %data local
-    io_wait %data local %data local 1s
+    ;io_wait %data local %data local 1s
 
     send %parent local %data local
 
@@ -37,6 +37,8 @@
     process void yep/1
 
     receive %0 local 10s
+    print %0 local
+    io_wait %0 local %0 local 1s
     print %0 local
 
     izero %0 local
