@@ -769,6 +769,7 @@ stdlib: build/bin/vm/asm \
 	build/stdlib/Std/Io.so \
 	build/stdlib/std/posix/network.so \
 	build/stdlib/Std/Posix/Network.so \
+	build/stdlib/std/posix/io.so \
 	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
@@ -802,6 +803,7 @@ build/stdlib/std/os.so: build/stdlib/std/os.o
 build/stdlib/std/io.so: build/stdlib/std/io.o
 
 build/stdlib/std/posix/network.so: build/stdlib/std/posix/network.o
+build/stdlib/std/posix/io.so: build/stdlib/std/posix/io.o
 
 build/stdlib/std/random.so: build/stdlib/std/random.o
 
