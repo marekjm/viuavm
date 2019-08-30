@@ -10,7 +10,7 @@
     integer %stdout local 1
 
     .name: 2 buffer_size
-    integer %buffer_size local 8
+    integer %buffer_size local 512
 
     .name: 4 data
     io_read %data local %fd_in local %buffer_size local
@@ -28,14 +28,22 @@
     return
 .end
 
+.import: [[dynamic]] std::posix::io
+.signature: std::posix::io::open/1
+
 .function: main/0
     allocate_registers %2 local
 
+    frame %1
+    text %1 local "./io.asm"
+    move %0 arguments %1 local
+    call %1 local std::posix::io::open/1
+
     frame %2
+    ;integer %1 local 0
+    move %1 arguments %1 local
     self %1 local
     move %0 arguments %1 local
-    integer %1 local 0
-    move %1 arguments %1 local
     process void yep/2
 
     receive %0 local 10s
