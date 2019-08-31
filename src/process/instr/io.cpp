@@ -75,8 +75,8 @@ auto viua::process::Process::op_io_write(Op_address_type addr) -> Op_address_typ
         );
         *target = port->write(attached_scheduler->kernel(), data->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
-        /* auto port = static_cast<viua::types::IO_fd&>(*porty->get()); */
-        /* port.write(buffer); */
+        auto port = static_cast<viua::types::IO_fd&>(*porty->get());
+        *target = port.write(attached_scheduler->kernel(), data->give());
     }
 
     return addr;
