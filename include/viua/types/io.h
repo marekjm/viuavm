@@ -186,12 +186,20 @@ class IO_port : public Value {
 };
 
 class IO_fd : public IO_port {
+  public:
+    enum class Ownership : bool {
+        Owned,
+        Borrowed,
+    };
+
+  private:
     /*
      * The simples possible I/O port represents the "file descriptor" known from
      * the usual POSIX interfaces. It supports two basic operations: reading and
      * writing.
      */
     int const file_descriptor;
+    Ownership const ownership;
   public:
     static std::string const type_name;
 
@@ -205,7 +213,7 @@ class IO_fd : public IO_port {
     auto read(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
     auto write(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
 
-    IO_fd(int const);
+    IO_fd(int const, Ownership const = Ownership::Owned);
     ~IO_fd();
 };
 }}  // namespace viua::types

@@ -44,6 +44,7 @@ auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
     if (dynamic_cast<viua::types::Integer*>(porty->get())) {
         auto port = std::make_unique<viua::types::IO_fd>(
             static_cast<viua::types::Integer&>(*porty->get()).as_integer()
+            , viua::types::IO_fd::Ownership::Borrowed
         );
         *target = port->read(attached_scheduler->kernel(), limity->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
@@ -70,6 +71,7 @@ auto viua::process::Process::op_io_write(Op_address_type addr) -> Op_address_typ
     if (dynamic_cast<viua::types::Integer*>(porty->get())) {
         auto port = std::make_unique<viua::types::IO_fd>(
             static_cast<viua::types::Integer&>(*porty->get()).as_integer()
+            , viua::types::IO_fd::Ownership::Borrowed
         );
         *target = port->write(attached_scheduler->kernel(), data->give());
     } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
