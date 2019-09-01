@@ -26,6 +26,7 @@
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
+#include <viua/types/io.h>
 #include <viua/types/string.h>
 
 
@@ -47,7 +48,7 @@ static auto open(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, std::make_unique<viua::types::Integer>(fd));
+        0, std::make_unique<viua::types::IO_fd>(fd));
 }
 }}}}  // namespace viua::stdlib::posix::io
 
