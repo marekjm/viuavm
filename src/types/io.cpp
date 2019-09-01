@@ -233,7 +233,7 @@ bool IO_fd::boolean() const {
 }
 
 std::unique_ptr<Value> IO_fd::copy() const {
-    return std::make_unique<IO_fd>(file_descriptor);
+    throw std::make_unique<viua::types::Exception>("Not_copyable");
 }
 
 auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
