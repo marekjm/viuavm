@@ -333,21 +333,12 @@ void viua::kernel::Register_set::clear(
 bool viua::kernel::Register_set::isflagged(
     viua::internals::types::register_index index,
     mask_type filter) {
-    /** Returns true if given filter is enabled for register specified by given
-     * index. Returns false otherwise.
-     *
-     *  Performs bounds checking.
-     */
     if (index >= registerset_size) {
+        // FIXME Use tagged exception.
         throw make_unique<viua::types::Exception>(
             "register access out of bounds: mask_isenabled");
     }
-    // FIXME: should throw when accessing empty register, but that breaks set()
-    if (index >= registers.size()) {
-        return registers.at(index).is_flagged(filter);
-    } else {
-        return false;
-    }
+    return registers.at(index).is_flagged(filter);
 }
 
 void viua::kernel::Register_set::setmask(
