@@ -28,6 +28,7 @@
 #include <thread>
 #include <vector>
 #include <viua/kernel/frame.h>
+#include <viua/scheduler/io/interactions.h>
 #include <viua/pid.h>
 
 namespace viua {
@@ -36,9 +37,6 @@ namespace viua {
     }
     namespace kernel {
         class Kernel;
-    }
-    namespace types {
-        class IO_interaction;
     }
 }
 
@@ -198,7 +196,7 @@ class Process_scheduler {
         return attached_kernel;
     }
 
-    auto schedule_io(std::unique_ptr<viua::types::IO_interaction>) -> void;
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
     auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;
     auto io_result(std::tuple<uint64_t, uint64_t> const) -> std::unique_ptr<viua::types::Value>;

@@ -417,7 +417,7 @@ bool viua::process::Process::empty() const {
     return message_queue.empty();
 }
 
-auto viua::process::Process::schedule_io(std::unique_ptr<viua::types::IO_interaction> i)
+auto viua::process::Process::schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction> i)
     -> void {
     attached_scheduler->schedule_io(std::move(i));
 }

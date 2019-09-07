@@ -28,7 +28,7 @@
 #include <viua/types/io.h>
 #include <viua/types/string.h>
 
-namespace viua::types {
+namespace viua::scheduler::io {
 auto IO_interaction::id() const -> id_type {
     return assigned_id;
 }
@@ -193,7 +193,9 @@ auto IO_write_interaction::interact() -> Interaction_result {
         std::make_unique<viua::types::String>(buffer.substr(static_cast<size_t>(n)))
     };
 }
+}
 
+namespace viua::types {
 std::string const viua::types::IO_port::type_name = "IO_port";
 
 std::string IO_port::type() const {
@@ -237,6 +239,9 @@ std::unique_ptr<Value> IO_fd::copy() const {
 }
 
 auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
+    using viua::scheduler::io::IO_interaction;
+    using viua::scheduler::io::IO_read_interaction;
+
     auto const interaction_id = IO_interaction::id_type{ file_descriptor, counter++ };
     auto const limit = static_cast<viua::types::Integer*>(x.get())->as_integer();
     k.schedule_io(std::make_unique<IO_read_interaction>(
@@ -247,6 +252,9 @@ auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::uniq
     return std::make_unique<IO_request>(&k, interaction_id);
 }
 auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
+    using viua::scheduler::io::IO_interaction;
+    using viua::scheduler::io::IO_write_interaction;
+
     auto const interaction_id = IO_interaction::id_type{ file_descriptor, counter++ };
     auto buffer = x->str();
     k.schedule_io(std::make_unique<IO_write_interaction>(
@@ -291,7 +299,7 @@ std::unique_ptr<Value> IO_request::copy() const {
     );
 }
 
-IO_request::IO_request(viua::kernel::Kernel* k, IO_interaction::id_type const x)
+IO_request::IO_request(viua::kernel::Kernel* k, interaction_id_type const x)
     : interaction_id{x}
     , kernel{k}
 {}

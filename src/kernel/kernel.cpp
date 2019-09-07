@@ -511,7 +511,7 @@ uint64_t viua::kernel::Kernel::pids() const {
     return running_processes;
 }
 
-auto viua::kernel::Kernel::schedule_io(std::unique_ptr<viua::types::IO_interaction> i)
+auto viua::kernel::Kernel::schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction> i)
     -> void {
     {
         std::unique_lock<std::mutex> lck { io_requests_mtx };

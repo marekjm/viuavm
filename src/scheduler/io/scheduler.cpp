@@ -26,22 +26,23 @@
 #include <vector>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/io.h>
+#include <viua/scheduler/io/interactions.h>
 #include <viua/types/exception.h>
 #include <viua/types/io.h>
 
-static auto is_sentinel(std::unique_ptr<viua::types::IO_interaction> const& item) -> bool {
+static auto is_sentinel(std::unique_ptr<viua::scheduler::io::IO_interaction> const& item) -> bool {
     return (item.get() == nullptr);
 }
 
 void viua::scheduler::io::io_scheduler(
     uint64_t const scheduler_id,
     viua::kernel::Kernel& kernel,
-    std::deque<std::unique_ptr<viua::types::IO_interaction>>& requests,
+    std::deque<std::unique_ptr<IO_interaction>>& requests,
     std::mutex& io_request_mutex,
     std::condition_variable& io_request_cv) {
 
     while (true) {
-        std::unique_ptr<viua::types::IO_interaction> work;
+        std::unique_ptr<IO_interaction> work;
         {
             std::unique_lock<std::mutex> lck { io_request_mutex };
 
@@ -71,7 +72,6 @@ void viua::scheduler::io::io_scheduler(
             break;
         }
 
-        using viua::types::IO_interaction;
         auto result = work->interact();
         if (result.state == IO_interaction::State::Complete) {
             kernel.complete_io(work->id(), (

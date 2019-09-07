@@ -34,6 +34,7 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
+#include <viua/scheduler/io/interactions.h>
 #include <viua/pid.h>
 #include <viua/types/value.h>
 
@@ -532,7 +533,7 @@ class Process {
         return is_pinned_to_scheduler;
     }
 
-    auto schedule_io(std::unique_ptr<viua::types::IO_interaction>) -> void;
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
     Process(std::unique_ptr<Frame>,

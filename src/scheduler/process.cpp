@@ -599,21 +599,21 @@ auto Process_scheduler::exit() const -> int {
     return exit_code.value_or(0);
 }
 
-auto Process_scheduler::schedule_io(std::unique_ptr<viua::types::IO_interaction> i)
+auto Process_scheduler::schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction> i)
     -> void {
     attached_kernel.schedule_io(std::move(i));
 }
 
-auto Process_scheduler::cancel_io(viua::types::IO_interaction::id_type const interaction_id)
+auto Process_scheduler::cancel_io(viua::scheduler::io::IO_interaction::id_type const interaction_id)
     -> void {
     attached_kernel.cancel_io(interaction_id);
 }
 
-auto Process_scheduler::io_complete(viua::types::IO_interaction::id_type const interaction_id) const -> bool {
+auto Process_scheduler::io_complete(viua::scheduler::io::IO_interaction::id_type const interaction_id) const -> bool {
     return attached_kernel.io_complete(interaction_id);
 }
 
-auto Process_scheduler::io_result(viua::types::IO_interaction::id_type const interaction_id)
+auto Process_scheduler::io_result(viua::scheduler::io::IO_interaction::id_type const interaction_id)
     -> std::unique_ptr<viua::types::Value> {
     return attached_kernel.io_result(interaction_id);
 }

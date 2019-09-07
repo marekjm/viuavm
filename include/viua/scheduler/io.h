@@ -24,6 +24,7 @@
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <viua/scheduler/io/interactions.h>
 
 
 namespace viua {
@@ -35,16 +36,12 @@ class Kernel;
 }
 }  // namespace viua
 
-namespace viua::types {
-    struct IO_interaction;
-}
-
 
 namespace viua { namespace scheduler { namespace io {
 void io_scheduler(
     uint64_t const,
     viua::kernel::Kernel&,
-    std::deque<std::unique_ptr<viua::types::IO_interaction>>& requests,
+    std::deque<std::unique_ptr<viua::scheduler::io::IO_interaction>>& requests,
     std::mutex& mtx,
     std::condition_variable& cv);
 }}}  // namespace viua::scheduler::io

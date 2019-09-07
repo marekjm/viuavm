@@ -59,6 +59,7 @@ class Foreign_function_call_request;
 
 namespace io {
 class IO_request;
+struct IO_interaction;
 }
 }  // namespace scheduler
 }  // namespace viua
@@ -209,7 +210,7 @@ class Kernel {
     /*
      * I/O SCHEDULING
      */
-    std::deque<std::unique_ptr<viua::types::IO_interaction>>
+    std::deque<std::unique_ptr<viua::scheduler::io::IO_interaction>>
         io_request_queue;
     std::mutex io_request_mutex;
     std::condition_variable io_request_cv;
@@ -243,9 +244,9 @@ class Kernel {
     };
 
   private:
-    // FIXME Use viua::types::IO_interaction::id_type.
+    // FIXME Use viua::scheduler::io::IO_interaction::id_type.
     mutable std::mutex io_requests_mtx;
-    std::map<std::tuple<uint64_t, uint64_t>, viua::types::IO_interaction*> io_requests;
+    std::map<std::tuple<uint64_t, uint64_t>, viua::scheduler::io::IO_interaction*> io_requests;
     mutable std::mutex io_result_mtx;
     std::map<std::tuple<uint64_t, uint64_t>, IO_result> io_results;
 
@@ -345,7 +346,7 @@ class Kernel {
                  std::queue<std::unique_ptr<viua::types::Value>>&);
     uint64_t pids() const;
 
-    auto schedule_io(std::unique_ptr<viua::types::IO_interaction>) -> void;
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
     auto complete_io(std::tuple<uint64_t, uint64_t> const, IO_result) -> void;
     auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;
