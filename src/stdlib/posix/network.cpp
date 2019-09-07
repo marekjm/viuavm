@@ -34,6 +34,8 @@
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
+#include <viua/types/pointer.h>
+#include <viua/types/io.h>
 
 
 namespace viua { namespace stdlib { namespace posix { namespace network {
@@ -55,6 +57,8 @@ static auto inet_ston(std::string const& s) -> uint32_t {
 template<typename T> auto memset(T& value, int const c) -> void {
     ::memset(&value, c, sizeof(std::remove_reference_t<T>));
 }
+
+using Socket_type = viua::types::IO_fd;
 
 static auto socket(Frame* frame,
                    viua::kernel::Register_set*,
@@ -161,7 +165,10 @@ static auto socket(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, std::make_unique<viua::types::Integer>(sock));
+        0, std::make_unique<Socket_type>(
+            sock
+            , viua::types::IO_fd::Ownership::Owned
+        ));
 }
 
 static auto connect(Frame* frame,
@@ -178,10 +185,9 @@ static auto connect(Frame* frame,
             ->as_integer()));
     addr.sin_addr.s_addr = inet_ston(frame->arguments->get(1)->str());
 
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
-    if (::connect(static_cast<int>(sock),
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
+    if (::connect(sock.fd(),
                   reinterpret_cast<sockaddr*>(&addr),
                   sizeof(addr))
         == -1) {
@@ -310,10 +316,9 @@ static auto bind(Frame* frame,
             ->as_integer()));
     addr.sin_addr.s_addr = inet_ston(frame->arguments->get(1)->str());
 
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
-    if (::bind(static_cast<int>(sock),
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
+    if (::bind(sock.fd(),
                reinterpret_cast<sockaddr*>(&addr),
                sizeof(addr))
         == -1) {
@@ -426,6 +431,10 @@ static auto bind(Frame* frame,
         throw std::make_unique<viua::types::Exception>(
             known_errors.at(error_number));
     }
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0, std::move(frame->arguments->pop(0)));
 }
 
 static auto listen(Frame* frame,
@@ -433,13 +442,12 @@ static auto listen(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::process::Process*,
                    viua::kernel::Kernel*) -> void {
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const backlog =
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
             ->as_integer();
-    if (::listen(static_cast<int>(sock), static_cast<int>(backlog)) == -1) {
+    if (::listen(sock.fd(), static_cast<int>(backlog)) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
             {
@@ -549,17 +557,20 @@ static auto listen(Frame* frame,
         throw std::make_unique<viua::types::Exception>(
             known_errors.at(error_number));
     }
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0, std::move(frame->arguments->pop(0)));
 }
 
 static auto accept(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
-                   viua::process::Process*,
+                   viua::process::Process* proc,
                    viua::kernel::Kernel*) -> void {
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
-    auto const incoming = ::accept(static_cast<int>(sock), nullptr, nullptr);
+    auto const& sock = static_cast<Socket_type&>(
+        *static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(proc));
+    auto const incoming = ::accept(sock.fd(), nullptr, nullptr);
     if (incoming == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
@@ -731,7 +742,7 @@ static auto accept(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, std::make_unique<viua::types::Integer>(incoming));
+        0, std::make_unique<Socket_type>(incoming, Socket_type::Ownership::Owned));
 }
 
 static auto write(Frame* frame,
@@ -739,12 +750,11 @@ static auto write(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
-    auto const sock = static_cast<int>(
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer());
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto const buffer  = frame->arguments->get(1)->str();
-    auto const written = ::write(sock, buffer.c_str(), buffer.size());
+    auto const written = ::write(sock.fd(), buffer.c_str(), buffer.size());
 
     if (written == -1) {
         auto const error_number = errno;
@@ -868,12 +878,11 @@ static auto read(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
                  viua::kernel::Kernel*) -> void {
-    auto const sock = static_cast<int>(
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer());
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto buffer        = std::array<char, 1024>{};
-    auto const n_bytes = ::read(sock, buffer.data(), buffer.size());
+    auto const n_bytes = ::read(sock.fd(), buffer.data(), buffer.size());
 
     if (n_bytes == 0) {
         throw std::make_unique<viua::types::Exception>("Eof",
@@ -1004,15 +1013,14 @@ static auto recv(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
                  viua::kernel::Kernel*) -> void {
-    auto const sock = static_cast<int>(
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer());
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const buffer_length = static_cast<size_t>(
         static_cast<viua::types::Integer*>(frame->arguments->get(0))
             ->as_integer());
 
     auto buffer        = std::vector<char>(buffer_length, '\0');
-    auto const n_bytes = ::recv(sock, buffer.data(), buffer.size(), 0);
+    auto const n_bytes = ::recv(sock.fd(), buffer.data(), buffer.size(), 0);
 
     if (n_bytes == 0) {
         throw std::make_unique<viua::types::Exception>("Eof",
@@ -1152,11 +1160,10 @@ static auto shutdown(Frame* frame,
                      viua::kernel::Register_set*,
                      viua::process::Process*,
                      viua::kernel::Kernel*) -> void {
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
     // FIXME allow shutting down just SHUT_WR or SHUT_RD
-    if (::shutdown(static_cast<int>(sock), SHUT_RDWR) == -1) {
+    if (::shutdown(sock.fd(), SHUT_RDWR) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
             {
@@ -1193,10 +1200,9 @@ static auto close(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
-    auto const sock =
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
-            ->as_integer();
-    if (::close(static_cast<int>(sock)) == -1) {
+    auto const& sock =
+        static_cast<Socket_type&>(*frame->arguments->get(0));
+    if (::close(sock.fd()) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
             {
