@@ -238,6 +238,9 @@ std::unique_ptr<Value> IO_fd::copy() const {
     throw std::make_unique<viua::types::Exception>("Not_copyable");
 }
 
+auto IO_fd::fd() const -> int {
+    return file_descriptor;
+}
 auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::unique_ptr<IO_request> {
     using viua::scheduler::io::IO_interaction;
     using viua::scheduler::io::IO_read_interaction;

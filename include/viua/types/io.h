@@ -107,6 +107,7 @@ class IO_fd : public IO_port {
 
     std::unique_ptr<Value> copy() const override;
 
+    auto fd() const -> int;
     auto read(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
     auto write(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
 
