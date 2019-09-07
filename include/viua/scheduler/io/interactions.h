@@ -21,10 +21,17 @@
 #define VIUA_SCHEDULER_IO_INTERACTIONS_H
 
 #include <atomic>
+#include <optional>
 
 namespace viua { namespace scheduler { namespace io {
+enum class IO_kind : uint8_t {
+    Input,
+    Output,
+};
+
 struct IO_interaction {
     using id_type = std::tuple<uint64_t, uint64_t>;
+    using fd_type = int;
 
     enum class State : uint8_t {
         Queued,
@@ -93,6 +100,8 @@ struct IO_interaction {
     virtual auto interact() -> Interaction_result = 0;
 
     auto id() const -> id_type;
+    virtual auto fd() const -> std::optional<fd_type> { return std::nullopt; }
+    virtual auto kind() const -> IO_kind = 0;
 
     auto cancel() -> void;
     auto cancelled() const -> bool;
@@ -117,6 +126,9 @@ struct IO_read_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
+    auto fd() const -> std::optional<fd_type> { return file_descriptor; }
+    auto kind() const -> IO_kind { return IO_kind::Input; }
+
     IO_read_interaction(id_type const, int const, size_t const);
 };
 struct IO_write_interaction : public IO_interaction {
@@ -124,6 +136,9 @@ struct IO_write_interaction : public IO_interaction {
     std::string const buffer;
 
     auto interact() -> Interaction_result override;
+
+    auto fd() const -> std::optional<fd_type> { return file_descriptor; }
+    auto kind() const -> IO_kind { return IO_kind::Output; }
 
     IO_write_interaction(id_type const, int const, std::string);
 };
