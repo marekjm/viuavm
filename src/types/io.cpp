@@ -225,10 +225,10 @@ std::string IO_fd::type() const {
     return "IO_fd";
 }
 std::string IO_fd::str() const {
-    return "";
+    return "IO_fd: " + std::to_string(file_descriptor);
 }
 std::string IO_fd::repr() const {
-    return "";
+    return std::to_string(file_descriptor);
 }
 bool IO_fd::boolean() const {
     return true;
