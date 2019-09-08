@@ -41,8 +41,10 @@ void viua::scheduler::io::io_scheduler(
     std::mutex& io_request_mutex,
     std::condition_variable& io_request_cv) {
 
+    auto local_interactions = std::deque<std::unique_ptr<IO_interaction>>{};
+
     while (true) {
-        std::unique_ptr<IO_interaction> work;
+        std::unique_ptr<IO_interaction> interaction;
         {
             std::unique_lock<std::mutex> lck { io_request_mutex };
 
@@ -56,15 +58,16 @@ void viua::scheduler::io::io_scheduler(
              * running in too tight a loop?) which leads to starvation of other
              * threads who never get to lock it... including the main kernel thread.
              */
-            while (not io_request_cv.wait_for(lck, std::chrono::milliseconds{10}, [&requests]{
-                return (not requests.empty());
+            auto const timeout = std::chrono::milliseconds{local_interactions.empty() ? 10 : 0};
+            while (not io_request_cv.wait_for(lck, timeout, [&requests, &local_interactions]{
+                return (not (requests.empty() and local_interactions.empty()));
             }));
 
-            work = std::move(requests.front());
+            interaction = std::move(requests.front());
             requests.pop_front();
         }
 
-        if (is_sentinel(work)) {
+        if (is_sentinel(interaction)) {
             if constexpr (false) {
                 std::cerr <<
                     ("[io][id=" + std::to_string(scheduler_id) + "] received sentinel\n");
@@ -72,15 +75,91 @@ void viua::scheduler::io::io_scheduler(
             break;
         }
 
-        auto result = work->interact();
-        if (result.state == IO_interaction::State::Complete) {
-            kernel.complete_io(work->id(), (
-                (result.status == IO_interaction::Status::Success)
-                ? viua::kernel::Kernel::IO_result::make_success
-                : viua::kernel::Kernel::IO_result::make_error
-            )(std::move(result.result)));
-        } else {
-            kernel.schedule_io(std::move(work));
+        if (not interaction->fd().has_value()) {
+            /*
+             * Do not work with interactions that do not expose file
+             * descriptors. Idle them indefinitely.
+             */
+            kernel.schedule_io(std::move(interaction));
+            continue;
+        }
+
+        {
+            auto& work = *interaction;
+
+            fd_set readfds;
+            fd_set writefds;
+            FD_ZERO(&readfds);
+            FD_ZERO(&writefds);
+
+            switch (work.kind()) {
+                case IO_kind::Input:
+                    FD_SET(*work.fd(), &readfds);
+                    break;
+                case IO_kind::Output:
+                    FD_SET(*work.fd(), &writefds);
+                    break;
+                default:
+                    /*
+                     * Doing nothing is harmless in this situation.
+                     */
+                    break;
+            }
+
+            timeval timeout;
+            memset(&timeout, 0, sizeof(timeout));
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 1;
+
+            auto const s = select(*work.fd() + 1, &readfds, &writefds, nullptr, &timeout);
+            if (s == -1) {
+                auto const saved_errno = errno;
+                std::cerr << (
+                    "[io][id=" + std::to_string(scheduler_id)
+                    + "] select(3) error: " + std::to_string(saved_errno)
+                    + "\n");
+                kernel.schedule_io(std::move(interaction));
+                continue;
+            }
+            if (s == 0) {
+                std::cerr << (
+                    "[io][id=" + std::to_string(scheduler_id)
+                    + "] select(3) returned 0 for "
+                    + (work.kind() == IO_kind::Input ? "input" : "output")
+                    + " interaction on fd " + std::to_string(*work.fd())
+                    + "\n");
+                kernel.schedule_io(std::move(interaction));
+                continue;
+            }
+
+            auto is_ready = false;
+            switch (work.kind()) {
+                case IO_kind::Input:
+                    is_ready = FD_ISSET(*work.fd(),  &readfds);
+                    break;
+                case IO_kind::Output:
+                    is_ready = FD_ISSET(*work.fd(), &writefds);
+                    break;
+                default:
+                    /* It is safe to do nothing in this case. */
+                    break;
+            }
+
+            if (not is_ready) {
+                kernel.schedule_io(std::move(interaction));
+                continue;
+            }
+
+            auto result = work.interact();
+            if (result.state == IO_interaction::State::Complete) {
+                kernel.complete_io(work.id(), (
+                    (result.status == IO_interaction::Status::Success)
+                    ? viua::kernel::Kernel::IO_result::make_success
+                    : viua::kernel::Kernel::IO_result::make_error
+                )(std::move(result.result)));
+            } else {
+                kernel.schedule_io(std::move(interaction));
+            }
         }
     }
 

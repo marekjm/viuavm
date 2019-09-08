@@ -91,28 +91,6 @@ auto IO_read_interaction::interact() -> Interaction_result {
         };
     }
 
-    fd_set readfds;
-    FD_ZERO(&readfds);
-    FD_SET(file_descriptor, &readfds);
-
-    timeval timeout;
-    memset(&timeout, 0, sizeof(timeout));
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 1;
-
-    auto const s = select(file_descriptor + 1, &readfds, nullptr, nullptr, &timeout);
-    if (s == -1) {
-        auto const saved_errno = errno;
-        return Interaction_result{
-            IO_interaction::State::Complete,
-            IO_interaction::Status::Error,
-            std::make_unique<viua::types::Integer>(saved_errno)
-        };
-    }
-    if (s == 0) {
-        return Interaction_result{};
-    }
-
     auto const n = ::read(file_descriptor, buffer.data(), buffer.size());
 
     if (n == -1) {
@@ -153,28 +131,6 @@ auto IO_write_interaction::interact() -> Interaction_result {
             IO_interaction::Status::Cancelled,
             std::make_unique<viua::types::Exception>("IO_cancel", "I/O cancelled")
         };
-    }
-
-    fd_set writefds;
-    FD_ZERO(&writefds);
-    FD_SET(file_descriptor, &writefds);
-
-    timeval timeout;
-    memset(&timeout, 0, sizeof(timeout));
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 1;
-
-    auto const s = select(file_descriptor + 1, nullptr, &writefds, nullptr, &timeout);
-    if (s == -1) {
-        auto const saved_errno = errno;
-        return Interaction_result{
-            IO_interaction::State::Complete,
-            IO_interaction::Status::Error,
-            std::make_unique<viua::types::Integer>(saved_errno)
-        };
-    }
-    if (s == 0) {
-        return Interaction_result{};
     }
 
     auto const n = ::write(file_descriptor, buffer.data(), buffer.size());
