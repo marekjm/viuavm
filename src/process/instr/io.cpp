@@ -135,7 +135,10 @@ auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
     }
 
     if (attached_scheduler->io_complete(request->id())) {
-        *target = attached_scheduler->io_result(request->id());
+        auto result = attached_scheduler->io_result(request->id());
+        if (target) {
+            *target = std::move(result);
+        }
 
         timeout_active = false;
         wait_until_infinity = false;

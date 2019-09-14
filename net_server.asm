@@ -73,9 +73,6 @@
     move %0 arguments %client_sock local
     process void reader_of_messages/1
 
-    text %0 local "i znowu..."
-    print %0 local
-
     izero %0 local
     return
 .end
