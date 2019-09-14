@@ -223,15 +223,18 @@ auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x) -> std::uni
     ));
     return std::make_unique<IO_request>(&k, interaction_id);
 }
+auto IO_fd::close() -> void {
+    if (ownership == Ownership::Owned) {
+        ::close(file_descriptor);
+    }
+}
 
 IO_fd::IO_fd(int const x, Ownership const o)
     : file_descriptor{x}
     , ownership{o}
 {}
 IO_fd::~IO_fd() {
-    if (ownership == Ownership::Owned) {
-        close(file_descriptor);
-    }
+    close();
 }
 
 

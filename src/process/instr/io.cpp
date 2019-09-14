@@ -83,7 +83,12 @@ auto viua::process::Process::op_io_write(Op_address_type addr) -> Op_address_typ
 }
 
 auto viua::process::Process::op_io_close(Op_address_type addr) -> Op_address_type {
-    std::cerr << "io_close ...\n";
+    viua::types::IO_port* port = nullptr;
+    std::tie(addr, port) = viua::bytecode::decoder::operands::fetch_object_of<
+        std::remove_pointer<decltype(port)>::type>(addr, this);
+
+    port->close();
+
     return addr;
 }
 
