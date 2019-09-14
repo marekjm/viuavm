@@ -2,32 +2,39 @@
 ; It must be present in every executable file.
 ; Valid main functions are main/0, main/1 and main/2.
 ;
-.function: main/0
+.function: [[no_sa]] main/0
     ; Allocate local register set.
-    ; This is done explicitly by the callee because it is an
-    ; implementation detail - if a newer version of the function
-    ; requires fewer registers the code using it should not have
-    ; to be compiled.
-    ; Also, when a module is reloaded the code using it can stay
-    ; the same as long as the number and types of parameters of
-    ; the function stay the same.
-    ;
-    ; In this function, two local registers are allocated.
-    allocate_registers %2 local
+    ; This is done explicitly by the callee because it is an implementation
+    ; detail - if a newer version of the function requires fewer (or more)
+    ; registers the code using it should not have to be recompiled.
+    ; Also, when a module is reloaded the code using it can stay the same as
+    ; long as the number and types of parameters of the function stay the same.
+    allocate_registers %3 local
 
-    ; Store text value in register with index 1.
+    ; Store text value in local register with index 1.
     ; The text instruction shares operand order with majority of
     ; other instructions:
     ;
     ;   <mnemonic> <target> <sources>...
     ;
-    text %1 local "Hello World!"
+    text %1 local "Hello World!\n"
 
-    ; Print contents of a register to standard output.
-    ; This is the most primitive form of output the VM supports, and
-    ; should be used only in the simplest programs and
-    ; for quick-and-dirty debugging.
-    print %1 local
+    ; Store integer value in local register 2.
+    ; Use a 1 because it will be used to represent the standard output stream on
+    ; UNIX-like systems.
+    integer %2 local 1
+
+    ; Write "Hello World!" on standard output. The io_write instruction will
+    ; create an I/O request that will be carried out asynchronously and
+    ; immediately return control to the process.
+    io_write %2 local %2 local %1 local
+
+    ; Wait for the completion of the I/O request. In this case, the timeout
+    ; given is 1 second.
+    ; Void register (signified by the use of 'void') is used to tell the
+    ; instruction that the result of the I/O operation is not needed and may be
+    ; discarded.
+    io_wait void %2 local 1s
 
     ; The finishing sequence of every program running on Viua.
     ;
