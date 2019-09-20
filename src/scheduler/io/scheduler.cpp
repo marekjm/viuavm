@@ -121,20 +121,24 @@ void viua::scheduler::io::io_scheduler(
             auto const s = select(*work.fd() + 1, &readfds, &writefds, nullptr, &timeout);
             if (s == -1) {
                 auto const saved_errno = errno;
-                std::cerr << (
-                    "[io][id=" + std::to_string(scheduler_id)
-                    + "] select(3) error: " + std::to_string(saved_errno)
-                    + "\n");
+                if constexpr (false) {
+                    std::cerr << (
+                        "[io][id=" + std::to_string(scheduler_id)
+                        + "] select(3) error: " + std::to_string(saved_errno)
+                        + "\n");
+                }
                 kernel.schedule_io(std::move(interaction));
                 continue;
             }
             if (s == 0) {
-                std::cerr << (
-                    "[io][id=" + std::to_string(scheduler_id)
-                    + "] select(3) returned 0 for "
-                    + (work.kind() == IO_kind::Input ? "input" : "output")
-                    + " interaction on fd " + std::to_string(*work.fd())
-                    + "\n");
+                if constexpr (false) {
+                    std::cerr << (
+                        "[io][id=" + std::to_string(scheduler_id)
+                        + "] select(3) returned 0 for "
+                        + (work.kind() == IO_kind::Input ? "input" : "output")
+                        + " interaction on fd " + std::to_string(*work.fd())
+                        + "\n");
+                }
                 kernel.schedule_io(std::move(interaction));
                 continue;
             }
@@ -170,6 +174,8 @@ void viua::scheduler::io::io_scheduler(
         }
     }
 
-    std::cerr <<
-        ("[io][id=" + std::to_string(scheduler_id) + "] scheduler shutting down\n");
+    if constexpr (false) {
+        std::cerr <<
+            ("[io][id=" + std::to_string(scheduler_id) + "] scheduler shutting down\n");
+    }
 }

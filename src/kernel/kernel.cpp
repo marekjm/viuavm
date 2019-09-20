@@ -772,10 +772,12 @@ viua::kernel::Kernel::~Kernel() {
         /*
          * Send a poison pill to every I/O worker thread.
          */
-        std::cerr
-            << "[kernel] starting I/O shutdown, "
-            << io_workers.size()
-            << " workers to kill\n";
+        if constexpr (false) {
+            std::cerr
+                << "[kernel] starting I/O shutdown, "
+                << io_workers.size()
+                << " workers to kill\n";
+        }
         {
             std::unique_lock<std::mutex> lck {io_request_mutex};
             for (auto const& _[[maybe_unused]] : io_workers) {
@@ -784,10 +786,14 @@ viua::kernel::Kernel::~Kernel() {
         }
         io_request_cv.notify_all();
         for (auto& each : io_workers) {
-            std::cerr << "[kernel] waiting for I/O worker\n";
+            if constexpr (false) {
+                std::cerr << "[kernel] waiting for I/O worker\n";
+            }
             each->join();
         }
-        std::cerr << "[kernel] done with I/O shutdown\n";
+        if constexpr (false) {
+            std::cerr << "[kernel] done with I/O shutdown\n";
+        }
     }
 
     for (auto const each : cxx_dynamic_lib_handles) {
