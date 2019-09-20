@@ -78,9 +78,16 @@ void viua::scheduler::io::io_scheduler(
         if (not interaction->fd().has_value()) {
             /*
              * Do not work with interactions that do not expose file
-             * descriptors. Idle them indefinitely.
+             * descriptors. Just fail them. Maybe next time they will behave
+             * better.
              */
-            kernel.schedule_io(std::move(interaction));
+            kernel.complete_io(
+                interaction->id()
+                , viua::kernel::Kernel::IO_result::make_error(std::make_unique<viua::types::Exception>(
+                    "IO_without_fd"
+                    , "I/O port did not expose file descriptor"
+                ))
+            );
             continue;
         }
 
