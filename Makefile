@@ -639,6 +639,8 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer_of_bits.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_cancel.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_close.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_io_read.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_io_wait.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_io_write.o \

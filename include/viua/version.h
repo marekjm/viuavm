@@ -36,6 +36,6 @@
 #pragma once
 
 const char* VERSION = "0.9.0";
-const char* MICRO   = "2542";
+const char* MICRO   = "2545";
 
 #endif

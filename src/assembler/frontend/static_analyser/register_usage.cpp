@@ -485,13 +485,13 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_io_write(register_usage_profile, *instruction);
                 break;
             case IO_CLOSE:
-                // FIXME TODO
+                check_op_io_close(register_usage_profile, *instruction);
                 break;
             case IO_WAIT:
                 check_op_io_wait(register_usage_profile, *instruction);
                 break;
             case IO_CANCEL:
-                // FIXME TODO
+                check_op_io_cancel(register_usage_profile, *instruction);
                 break;
             case RETURN:
                 // do nothing
