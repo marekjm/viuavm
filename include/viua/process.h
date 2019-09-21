@@ -34,6 +34,7 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
+#include <viua/scheduler/io/interactions.h>
 #include <viua/pid.h>
 #include <viua/types/value.h>
 
@@ -42,6 +43,11 @@ class Halt_exception : public std::runtime_error {
   public:
     Halt_exception() : std::runtime_error("execution halted") {}
 };
+
+
+namespace viua::types {
+    struct IO_interaction;
+}
 
 
 namespace viua { namespace scheduler {
@@ -296,8 +302,11 @@ class Process {
     viua::process::PID process_id;
     bool is_hidden;
 
-    /*  Timeouts for message passing, and
-     *  multiprocessing.
+    /*
+     * Timeouts for receiving messages, waiting for processes, and waiting for
+     * I/O. They can be reused for all these things since for the duration of
+     * each type of wait the process is suspended and is unable to execute any
+     * code.
      */
     std::chrono::steady_clock::time_point waiting_until;
     bool timeout_active      = false;
@@ -459,6 +468,12 @@ class Process {
 
     auto opimport(Op_address_type) -> Op_address_type;
 
+    auto op_io_read(Op_address_type) -> Op_address_type;
+    auto op_io_write(Op_address_type) -> Op_address_type;
+    auto op_io_close(Op_address_type) -> Op_address_type;
+    auto op_io_wait(Op_address_type) -> Op_address_type;
+    auto op_io_cancel(Op_address_type) -> Op_address_type;
+
   public:
     auto dispatch(Op_address_type) -> Op_address_type;
     auto tick() -> Op_address_type;
@@ -517,6 +532,9 @@ class Process {
     auto pinned() const -> bool {
         return is_pinned_to_scheduler;
     }
+
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
+    auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Process_scheduler*,

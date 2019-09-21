@@ -343,6 +343,7 @@ platform: build/platform/types/exception.o \
 	build/platform/types/pointer.o \
 	build/platform/types/number.o \
 	build/platform/types/integer.o \
+	build/platform/types/io.o \
 	build/platform/types/bits.o \
 	build/platform/types/float.o \
 	build/platform/types/string.o \
@@ -479,8 +480,9 @@ build/cg/%.o: src/cg/%.cpp
 
 ############################################################
 # VIRTUAL MACHINE CODE
-VIUA_INSTR_FILES_O=build/process/instr/atom.o \
+VIUA_INSTR_FILES_O=\
 				   build/process/instr/arithmetic.o \
+				   build/process/instr/atom.o \
 				   build/process/instr/bits.o \
 				   build/process/instr/bool.o \
 				   build/process/instr/calls.o \
@@ -490,6 +492,7 @@ VIUA_INSTR_FILES_O=build/process/instr/atom.o \
 				   build/process/instr/float.o \
 				   build/process/instr/general.o \
 				   build/process/instr/int.o \
+				   build/process/instr/io.o \
 				   build/process/instr/linking.o \
 				   build/process/instr/registers.o \
 				   build/process/instr/str.o \
@@ -506,6 +509,7 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/float.o \
 				   build/types/function.o \
 				   build/types/integer.o \
+				   build/types/io.o \
 				   build/types/number.o \
 				   build/types/object.o \
 				   build/types/pointer.o \
@@ -529,6 +533,8 @@ build/bin/vm/kernel: build/front/kernel.o \
 	build/process/dispatch.o \
 	build/scheduler/ffi/request.o \
 	build/scheduler/ffi/scheduler.o \
+	build/scheduler/io/request.o \
+	build/scheduler/io/scheduler.o \
 	build/kernel/registerset.o \
 	build/kernel/frame.o \
 	build/loader.o \
@@ -554,6 +560,7 @@ OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_frame.o \
 	build/assembler/backend/op_assemblers/assemble_op_if.o \
 	build/assembler/backend/op_assemblers/assemble_op_integer.o \
+	build/assembler/backend/op_assemblers/assemble_op_io_wait.o \
 	build/assembler/backend/op_assemblers/assemble_op_join.o \
 	build/assembler/backend/op_assemblers/assemble_op_jump.o \
 	build/assembler/backend/op_assemblers/assemble_op_process.o \
@@ -632,6 +639,11 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_iinc.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_integer_of_bits.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_cancel.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_close.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_read.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_wait.o \
+	build/assembler/frontend/static_analyser/checkers/check_op_io_write.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_isnull.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_itof.o \
 	build/assembler/frontend/static_analyser/checkers/check_op_izero.o \
@@ -761,6 +773,7 @@ stdlib: build/bin/vm/asm \
 	build/stdlib/Std/Io.so \
 	build/stdlib/std/posix/network.so \
 	build/stdlib/Std/Posix/Network.so \
+	build/stdlib/std/posix/io.so \
 	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
@@ -794,6 +807,7 @@ build/stdlib/std/os.so: build/stdlib/std/os.o
 build/stdlib/std/io.so: build/stdlib/std/io.o
 
 build/stdlib/std/posix/network.so: build/stdlib/std/posix/network.o
+build/stdlib/std/posix/io.so: build/stdlib/std/posix/io.o
 
 build/stdlib/std/random.so: build/stdlib/std/random.o
 

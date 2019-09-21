@@ -378,6 +378,17 @@ auto opinsert(viua::internals::types::byte*, int_op, int_op, int_op)
 auto opremove(viua::internals::types::byte*, int_op, int_op, int_op)
     -> viua::internals::types::byte*;
 
+auto op_io_read(viua::internals::types::byte*, int_op, int_op, int_op)
+    -> viua::internals::types::byte*;
+auto op_io_write(viua::internals::types::byte*, int_op, int_op, int_op)
+    -> viua::internals::types::byte*;
+auto op_io_close(viua::internals::types::byte*, int_op, int_op)
+    -> viua::internals::types::byte*;
+auto op_io_wait(viua::internals::types::byte*, int_op, int_op, timeout_op)
+    -> viua::internals::types::byte*;
+auto op_io_cancel(viua::internals::types::byte*, int_op)
+    -> viua::internals::types::byte*;
+
 auto opreturn(viua::internals::types::byte*) -> viua::internals::types::byte*;
 auto ophalt(viua::internals::types::byte*) -> viua::internals::types::byte*;
 }}  // namespace cg::bytecode

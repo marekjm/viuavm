@@ -35,7 +35,7 @@
 .end
 
 .function: cycle_burner/2
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     ; burn as many cycles as are requested
     ; preferably there are as many cycles to burn through as to give the
@@ -48,8 +48,11 @@
 
     ; print hello to the screen to show that the process #n just finished running
     ; where #n is the "ID" assigned by the caller
-    echo (string %1 local "Hello World from process ") local
-    print (move %1 local %0 parameters) local
+    text %1 local "Hello World from process "
+    move %2 local %0 parameters
+    text %2 local %2 local
+    textconcat %1 local %1 local %2 local
+    print %1 local
 
     return
 .end

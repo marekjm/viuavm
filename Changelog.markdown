@@ -109,6 +109,9 @@ There are several categories of change:
   bits and integers
 - fix: target of `send` instruction may be given by pointer dereference
 - bic: rename `VIUA_VP_SCHEDULERS` to `VIUA_PROC_SCHEDULERS`
+- feature: I/O instructions (`io_read`, `io_write`, `io_wait`, `io_cancel`) to interact
+  with the outside world using I/O ports
+- feature: `VIUA_IO_SCHEDULERS` to limit the number of I/O schedulers spawned
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement
 fixed-width integers when signed arithmetic is requested.
@@ -117,6 +120,14 @@ This release changes how the virtual process scheduler works. It should now be
 impossible for a process to become stuck in a "free process" queue... because
 there is no such queue! The new algorithm is a very primitive implementation of
 work-stealing so every process is always owned by a scheduler.
+
+However, the "free X" queues are not gone from VM's kernel. In fact, while the
+"free process" queue might have been removed, a new "free I/O request" queue was
+introduced. Along with a completely new I/O subsystem, I/O instructions and a
+major revamp in the way I/O is performed by programs running on Viua VM.
+
+A dedicated I/O subsystem will free the generic FFI subsystem to do more work
+not related to I/O that has to be done outside of the "normal" VM constraints.
 
 ----
 

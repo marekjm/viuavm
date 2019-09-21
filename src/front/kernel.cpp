@@ -49,6 +49,7 @@ static auto display_vm_information(bool const verbose) -> void {
     auto const full_version = std::string{VERSION} + "." + MICRO;
     auto const proc_schedulers = viua::kernel::Kernel::no_of_process_schedulers();
     auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
+    auto const io_schedulers = viua::kernel::Kernel::no_of_io_schedulers();
     auto const cpus_available = std::thread::hardware_concurrency();
 
     std::cerr << "Viua VM " << full_version << " [";
@@ -60,7 +61,10 @@ static auto display_vm_information(bool const verbose) -> void {
     std::cerr << proc_schedulers << ':';
 
     if (verbose) { std::cerr << "ffi="; }
-    std::cerr << ffi_schedulers;
+    std::cerr << ffi_schedulers << ':';
+
+    if (verbose) { std::cerr << "io="; }
+    std::cerr << io_schedulers;
 
     std::cerr << "]\n";
 }

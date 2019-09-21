@@ -1311,7 +1311,7 @@ class VectorInstructionsTests(unittest.TestCase):
     PATH = './sample/asm/vector'
 
     def testPackingVec(self):
-        runTest(self, 'vec_packing.asm', '["answer to life", 42]', 0, lambda o: o.strip())
+        runTest(self, 'vec_packing.asm', '[b"answer to life", 42]', 0, lambda o: o.strip())
 
     def testPackingVecRefusesToPackItself(self):
         # pass --no-sa because we want to test runtime exception

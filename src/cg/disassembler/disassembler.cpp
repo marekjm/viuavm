@@ -754,6 +754,44 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
                                     viua::internals::types::byte>(ptr);
 
         break;
+    case IO_READ:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // limit or void
+
+        break;
+    case IO_WRITE:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // byte vector
+
+        break;
+    case IO_CLOSE:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
+
+        break;
+    case IO_WAIT:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // result
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+
+        viua::support::pointer::inc<viua::internals::types::byte,
+                                    viua::internals::types::byte>(ptr);
+
+        oss << ' ';
+        if (decode_timeout(ptr)) {
+            oss << decode_timeout(ptr) - 1 << "ms";
+        } else {
+            oss << "infinity";
+        }
+        viua::support::pointer::inc<viua::internals::types::timeout,
+                                    viua::internals::types::byte>(ptr);
+
+        break;
+    case IO_CANCEL:
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+
+        break;
     default:
         // if opcode was not covered here, it means it must have been a
         // variable-length opcode

@@ -323,6 +323,18 @@ auto const value_type_names = std::map<Value_types, std::string>{
         Value_types::OBJECT,
         "object",
     },
+    {
+        Value_types::IO_REQUEST,
+        "I/O request",
+    },
+    {
+        Value_types::IO_PORT,
+        "I/O port",
+    },
+    {
+        Value_types::IO_PORT_LIKE,
+        "I/O port-like",
+    },
 };
 auto operator|(const Value_types lhs, const Value_types rhs) -> Value_types {
     // FIXME find out if it is possible to remove the outermost static_cast<>

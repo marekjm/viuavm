@@ -436,6 +436,12 @@ enum OPCODE : viua::internals::types::byte {
      */
     STRUCTKEYS,
 
+    IO_READ,
+    IO_WRITE,
+    IO_CLOSE,
+    IO_WAIT,
+    IO_CANCEL,
+
     RETURN,
     HALT,
 };

@@ -22,11 +22,12 @@
 
 #pragma once
 
+#include <dlfcn.h>
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
-#include <dlfcn.h>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -54,6 +55,11 @@ class Process_scheduler;
 
 namespace ffi {
 class Foreign_function_call_request;
+}
+
+namespace io {
+class IO_request;
+struct IO_interaction;
 }
 }  // namespace scheduler
 }  // namespace viua
@@ -202,6 +208,49 @@ class Kernel {
     std::vector<std::unique_ptr<std::thread>> foreign_call_workers;
 
     /*
+     * I/O SCHEDULING
+     */
+    std::deque<std::unique_ptr<viua::scheduler::io::IO_interaction>>
+        io_request_queue;
+    std::mutex io_request_mutex;
+    std::condition_variable io_request_cv;
+    std::vector<std::unique_ptr<std::thread>> io_workers;
+
+  public:
+    class IO_result {
+        IO_result(bool const, std::unique_ptr<viua::types::Value>);
+      public:
+        std::unique_ptr<viua::types::Value> value;
+        std::unique_ptr<viua::types::Value> error;
+
+        bool is_complete;
+        bool is_cancelled;
+        bool is_successful;
+
+        IO_result() = default;
+        IO_result(IO_result const&) = delete;
+        auto operator=(IO_result const&) -> IO_result& = delete;
+        IO_result(IO_result&& that)
+            : value{std::move(that.value)}
+            , error{std::move(that.error)}
+            , is_complete{that.is_complete}
+            , is_cancelled{that.is_cancelled}
+            , is_successful{that.is_successful}
+        {}
+        auto operator=(IO_result&& that) -> IO_result& = delete;
+
+        static auto make_success(std::unique_ptr<viua::types::Value>) -> IO_result;
+        static auto make_error(std::unique_ptr<viua::types::Value>) -> IO_result;
+    };
+
+  private:
+    // FIXME Use viua::scheduler::io::IO_interaction::id_type.
+    mutable std::mutex io_requests_mtx;
+    std::map<std::tuple<uint64_t, uint64_t>, viua::scheduler::io::IO_interaction*> io_requests;
+    mutable std::mutex io_result_mtx;
+    std::map<std::tuple<uint64_t, uint64_t>, IO_result> io_results;
+
+    /*
      * MESSAGE PASSING
      *
      * Why are mailboxes are kept inside the kernel? To remove the need to look
@@ -297,9 +346,17 @@ class Kernel {
                  std::queue<std::unique_ptr<viua::types::Value>>&);
     uint64_t pids() const;
 
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
+    auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
+    auto complete_io(std::tuple<uint64_t, uint64_t> const, IO_result) -> void;
+    auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;
+    auto io_result(std::tuple<uint64_t, uint64_t> const) -> std::unique_ptr<viua::types::Value>;
+
     auto static no_of_process_schedulers()
         -> viua::internals::types::schedulers_count;
     auto static no_of_ffi_schedulers()
+        -> viua::internals::types::schedulers_count;
+    auto static no_of_io_schedulers()
         -> viua::internals::types::schedulers_count;
     auto static is_tracing_enabled() -> bool;
 

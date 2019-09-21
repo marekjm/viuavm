@@ -226,6 +226,12 @@ class Program {
     auto opstructat(int_op const, int_op const, int_op const) -> Program&;
     auto opstructkeys(int_op const, int_op const) -> Program&;
 
+    auto op_io_read(int_op const, int_op const, int_op const) -> Program&;
+    auto op_io_write(int_op const, int_op const, int_op const) -> Program&;
+    auto op_io_close(int_op const, int_op const) -> Program&;
+    auto op_io_wait(int_op const, int_op const, timeout_op) -> Program&;
+    auto op_io_cancel(int_op const) -> Program&;
+
     auto opreturn() -> Program&;
     auto ophalt() -> Program&;
 

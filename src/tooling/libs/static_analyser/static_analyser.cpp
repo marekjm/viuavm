@@ -3783,6 +3783,14 @@ static auto analyse_single_arm(
 
                 break;
             }
+            case IO_READ:
+            case IO_WRITE:
+            case IO_CLOSE:
+            case IO_WAIT:
+            case IO_CANCEL: {
+                // FIXME add static analysis for I/O instructions
+                break;
+            }
             case RETURN:
             case HALT: {
                 /*

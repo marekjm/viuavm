@@ -551,6 +551,17 @@ auto assemble_instruction(
         assemble_op_structat(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
+    } else if (tokens.at(i) == "io_read") {
+        assemble_three_register_op<&Program::op_io_read>(program, tokens, i);
+    } else if (tokens.at(i) == "io_write") {
+        assemble_three_register_op<&Program::op_io_write>(program, tokens, i);
+    } else if (tokens.at(i) == "io_close") {
+        assemble_double_register_op<&Program::op_io_close>(program, tokens, i);
+    } else if (tokens.at(i) == "io_wait") {
+        viua::assembler::backend::op_assemblers::assemble_op_io_wait(
+            program, tokens, i);
+    } else if (tokens.at(i) == "io_cancel") {
+        assemble_single_register_op<&Program::op_io_cancel>(program, tokens, i);
     } else if (tokens.at(i) == "return") {
         program.opreturn();
     } else if (tokens.at(i) == "halt") {
