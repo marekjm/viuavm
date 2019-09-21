@@ -500,6 +500,10 @@ auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
 auto check_op_io_read(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
+auto check_op_io_write(Register_usage_profile& register_usage_profile,
+                         Instruction const& instruction) -> void;
+auto check_op_io_wait(Register_usage_profile& register_usage_profile,
+                         Instruction const& instruction) -> void;
 
 auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void;
