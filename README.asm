@@ -29,8 +29,6 @@
     ; immediately return control to the process.
     io_write %3 local %2 local %1 local
 
-    io_close %2 local
-
     ; Wait for the completion of the I/O request. In this case, the timeout
     ; given is 1 second.
     ; Void register (signified by the use of 'void') is used to tell the
