@@ -1156,6 +1156,36 @@ static auto parse_op_import(
     return i;
 }
 
+static auto parse_op_io_wait(
+    std::vector<std::unique_ptr<Fragment>>& fragments,
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
+    -> index_type {
+    auto i = index_type{0};
+
+    auto frag = std::make_unique<Instruction>(
+        string_to_opcode(tokens.at(i++).str()).value());
+    frag->add(tokens.at(0));
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    using viua::tooling::libs::lexer::classifier::is_void;
+    if (auto const& token = tokens.at(i);
+        is_access_type_specifier(token.str())) {
+        i += parse_register_address(*frag, tokens.advance(i));
+    } else if (is_void(token.str())) {
+        i += parse_void(*frag, tokens.advance(i));
+    }
+
+    i += parse_register_address(*frag, tokens.advance(i));
+
+    auto lit = std::make_unique<Timeout_literal>(tokens.at(i).str());
+    lit->add(tokens.at(i++));
+    frag->operands.push_back(std::move(lit));
+
+    fragments.push_back(std::move(frag));
+
+    return i;
+}
+
 // FIXME this is duplicated code
 static auto make_unexpected_token_error(
     viua::tooling::libs::lexer::Token const& token,
@@ -1372,6 +1402,19 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
             case IMPORT:
                 i += parse_op_import(fragments, vector_view{tokens, i});
                 break;
+            case IO_READ:
+            case IO_WRITE:
+                i += parse_any_3_register_instruction(fragments, vector_view{tokens, i});
+                break;
+            case IO_CLOSE:
+                i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
+                break;
+            case IO_WAIT:
+                i += parse_op_io_wait(fragments, vector_view{tokens, i});
+                break;
+            case IO_CANCEL:
+                i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
+                break;
             case PARAM:
             case PAMV:
             case ARG:
@@ -1396,11 +1439,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
             case BITALTE:
             case BITAGT:
             case BITAGTE:
-            case IO_READ:
-            case IO_WRITE:
-            case IO_CLOSE:
-            case IO_WAIT:
-            case IO_CANCEL:
             default:
                 throw viua::tooling::errors::compile_time::Error_wrapper{}
                     .append(viua::tooling::errors::compile_time::Error{

@@ -1169,6 +1169,42 @@ static auto normalise_vpop(std::vector<Token>& tokens,
     return i;
 }
 
+static auto normalise_io_wait(std::vector<Token>& tokens,
+                              vector_view<Token> const& source) -> index_type {
+    tokens.push_back(source.at(0));
+
+    auto i = std::remove_reference_t<decltype(source)>::size_type{1};
+
+    using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
+    if (auto const& token = source.at(i);
+        is_access_type_specifier(token.str())) {
+        i += normalise_register_access(tokens, source.advance(1));
+    } else if (token == "void") {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
+            make_unexpected_token_error(
+                token, "expected register access specifier or void"));
+    }
+
+    i += normalise_register_access(tokens, source.advance(i));
+
+    using viua::tooling::libs::lexer::classifier::is_default;
+    using viua::tooling::libs::lexer::classifier::is_timeout_literal;
+    if (auto const& token = source.at(i);
+        is_timeout_literal(token.str()) or is_default(token.str())) {
+        tokens.push_back(token);
+        ++i;
+    } else {
+        throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
+            make_unexpected_token_error(token, "expected timeout literal")
+                .comment("example timeout duration: `1s', `2500ms'"));
+    }
+
+    return i;
+}
+
 static auto normalise_closure_definition(std::vector<Token>& tokens,
                                          vector_view<Token> const& source)
     -> index_type {
@@ -1460,6 +1496,19 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case ATOM:
                 i += normalise_atom(tokens, vector_view{source, i});
                 break;
+            case IO_READ:
+            case IO_WRITE:
+                i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
+                break;
+            case IO_CLOSE:
+                i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
+                break;
+            case IO_WAIT:
+                i += normalise_io_wait(tokens, vector_view{source, i});
+                break;
+            case IO_CANCEL:
+                i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
+                break;
             case STREQ:
             case BOOL:
             case BITSEQ:
@@ -1472,11 +1521,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
             case BITALTE:
             case BITAGT:
             case BITAGTE:
-            case IO_READ:
-            case IO_WRITE:
-            case IO_CLOSE:
-            case IO_WAIT:
-            case IO_CANCEL:
                 throw viua::tooling::errors::compile_time::Error_wrapper{}
                     .append(viua::tooling::errors::compile_time::Error{
                         viua::tooling::errors::compile_time::
