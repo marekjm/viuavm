@@ -189,6 +189,16 @@ class Pid : public Value {
   public:
     Pid();
 };
+
+class IO_port : public Value {
+  public:
+    IO_port();
+};
+
+class IO_request : public Value {
+  public:
+    IO_request();
+};
 }  // namespace values
 
 class Function_state {
