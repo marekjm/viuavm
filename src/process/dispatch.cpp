@@ -92,7 +92,7 @@ auto viua::process::Process::get_trace_line(
                                : " with no deferred");
         } else if (stack->state_of()
                    == viua::process::Stack::STATE::
-                          SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+                       SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
             trace_line << " after deferred";
         }
     }
@@ -513,7 +513,8 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case SATURATINGUDIV:
     default:
         std::ostringstream error;
-        error << "unrecognised instruction (byte value " << static_cast<int>(*addr) << ")";
+        error << "unrecognised instruction (byte value "
+              << static_cast<int>(*addr) << ")";
         if (OP_NAMES.count(static_cast<OPCODE>(*addr))) {
             error << ": " << OP_NAMES.at(static_cast<OPCODE>(*addr));
         }

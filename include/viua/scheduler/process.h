@@ -28,25 +28,25 @@
 #include <thread>
 #include <vector>
 #include <viua/kernel/frame.h>
-#include <viua/scheduler/io/interactions.h>
 #include <viua/pid.h>
+#include <viua/scheduler/io/interactions.h>
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
-    namespace kernel {
-        class Kernel;
-    }
+namespace process {
+class Process;
 }
+namespace kernel {
+class Kernel;
+}
+}  // namespace viua
 
 namespace viua { namespace scheduler {
 class Process_scheduler {
   public:
-    using process_type = viua::process::Process;
+    using process_type       = viua::process::Process;
     using process_queue_type = std::deque<std::unique_ptr<process_type>>;
-    using size_type = process_queue_type::size_type;
-    using id_type = size_t;
+    using size_type          = process_queue_type::size_type;
+    using id_type            = size_t;
 
   private:
     /*
@@ -107,8 +107,8 @@ class Process_scheduler {
     Process_scheduler(viua::kernel::Kernel&, id_type const);
     Process_scheduler(Process_scheduler const&) = delete;
     auto operator=(Process_scheduler const&) -> Process_scheduler& = delete;
-    Process_scheduler(Process_scheduler&&) = delete;
-    auto operator=(Process_scheduler&&) -> Process_scheduler& = delete;
+    Process_scheduler(Process_scheduler&&)                         = delete;
+    auto operator=(Process_scheduler &&) -> Process_scheduler& = delete;
     ~Process_scheduler();
 
     auto id() const -> id_type;
@@ -140,14 +140,17 @@ class Process_scheduler {
      * Transfer the exception that killed a process to the current process, or
      * the return value of the process (if it has successfully terminated).
      */
-    auto transfer_exception_of(viua::process::PID const) const -> std::unique_ptr<viua::types::Value>;
-    auto transfer_result_of(viua::process::PID const) const -> std::unique_ptr<viua::types::Value>;
+    auto transfer_exception_of(viua::process::PID const) const
+        -> std::unique_ptr<viua::types::Value>;
+    auto transfer_result_of(viua::process::PID const) const
+        -> std::unique_ptr<viua::types::Value>;
 
     /*
      * This is the message exchange interface. It talks to the kernel to push
      * messages to and pop them from kernel-held queues.
      */
-    auto send(viua::process::PID const, std::unique_ptr<viua::types::Value>) -> void;
+    auto send(viua::process::PID const, std::unique_ptr<viua::types::Value>)
+        -> void;
     auto receive(viua::process::PID const,
                  std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
 
@@ -156,7 +159,8 @@ class Process_scheduler {
      * and needs to talk to the kernel to do this - as the process scheduler
      * does not hold any references to the FFI schedulers list.
      */
-    auto request_ffi_call(std::unique_ptr<Frame>, viua::process::Process&) -> void;
+    auto request_ffi_call(std::unique_ptr<Frame>, viua::process::Process&)
+        -> void;
 
     /*
      * Function type inquiry. This is used when spawning processes and calling
@@ -196,11 +200,13 @@ class Process_scheduler {
         return attached_kernel;
     }
 
-    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
+        -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
     auto io_complete(std::tuple<uint64_t, uint64_t> const) const -> bool;
-    auto io_result(std::tuple<uint64_t, uint64_t> const) -> std::unique_ptr<viua::types::Value>;
+    auto io_result(std::tuple<uint64_t, uint64_t> const)
+        -> std::unique_ptr<viua::types::Value>;
 };
-}}
+}}  // namespace viua::scheduler
 
 #endif

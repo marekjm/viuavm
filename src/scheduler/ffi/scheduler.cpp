@@ -38,9 +38,9 @@ void viua::scheduler::ffi::ff_call_processor(
 
         // wait in a loop, because wait_for() can still return even if the
         // requests queue is empty
-        while (not cv->wait_for(lock, std::chrono::milliseconds(2000), [requests]() {
-            return not requests->empty();
-        }))
+        while (not cv->wait_for(lock,
+                                std::chrono::milliseconds(2000),
+                                [requests]() { return not requests->empty(); }))
             ;
 
         std::unique_ptr<Foreign_function_call_request> request(

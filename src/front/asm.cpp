@@ -70,8 +70,9 @@ static bool usage(const char* program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program
-             << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n";
+        std::cout
+            << "    " << program
+            << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n";
 
         std::cout << "\nOPTIONS:\n";
 
@@ -154,10 +155,10 @@ int main(int argc, char* argv[]) {
                 compilename = std::string(argv[++i]);
             } else {
                 std::cout << send_control_seq(COLOR_FG_RED) << "error"
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << ": option '" << send_control_seq(COLOR_FG_WHITE)
-                     << argv[i] << send_control_seq(ATTR_RESET)
-                     << "' requires an argument: filename";
+                          << argv[i] << send_control_seq(ATTR_RESET)
+                          << "' requires an argument: filename";
                 std::cout << std::endl;
                 exit(1);
             }
@@ -186,20 +187,20 @@ int main(int argc, char* argv[]) {
                 allow_error(e.value());
             } else {
                 std::cerr << send_control_seq(COLOR_FG_RED) << "error"
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cerr << ": unknown option: ";
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << option
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cerr << std::endl;
                 return 1;
             }
             continue;
         } else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
             std::cerr << send_control_seq(COLOR_FG_WHITE) << option
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << std::endl;
             return 1;
         }
@@ -215,7 +216,7 @@ int main(int argc, char* argv[]) {
 
     if (args.size() == 0) {
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": no input file" << std::endl;
         return 1;
     }
@@ -225,15 +226,15 @@ int main(int argc, char* argv[]) {
     filename = args[0];
     if (!filename.size()) {
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": no file to assemble" << std::endl;
         return 1;
     }
     if (!viua::support::env::is_file(filename)) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET) << ": ";
+                  << send_control_seq(ATTR_RESET) << ": ";
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": could not open file" << std::endl;
         return 1;
     }
@@ -250,14 +251,14 @@ int main(int argc, char* argv[]) {
 
     if (VERBOSE) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << "assembling to \"";
         std::cout << send_control_seq(COLOR_FG_WHITE) << compilename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << "\"\n";
     }
 
@@ -444,16 +445,16 @@ int main(int argc, char* argv[]) {
     } catch (std::string const& e) {
         ret_code = 1;
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET) << ": ";
+                  << send_control_seq(ATTR_RESET) << ": ";
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": " << e << std::endl;
     } catch (const char* e) {
         ret_code = 1;
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET) << ": ";
+                  << send_control_seq(ATTR_RESET) << ": ";
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": " << e << std::endl;
     } catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(

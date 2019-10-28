@@ -35,7 +35,8 @@ bool assembler::utils::is_valid_function_name(
     return std::regex_match(function_name, get_function_name_regex());
 }
 
-std::smatch assembler::utils::match_function_name(std::string const& function_name) {
+std::smatch assembler::utils::match_function_name(
+    std::string const& function_name) {
     std::smatch parts;
     std::regex_match(function_name, parts, get_function_name_regex());
     return parts;

@@ -66,11 +66,11 @@ static void encode_json(std::string const& filename,
         std::cout << "{";
         std::cout << str::enquote("line") << ": " << t.second.line() << ", ";
         std::cout << str::enquote("character") << ": " << t.second.character()
-             << ", ";
+                  << ", ";
         std::cout << str::enquote("content") << ": "
-             << str::enquote(str::strencode(t.second.str())) << ", ";
+                  << str::enquote(str::strencode(t.second.str())) << ", ";
         std::cout << str::enquote("original") << ": "
-             << str::enquote(str::strencode(t.second.original()));
+                  << str::enquote(str::strencode(t.second.original()));
         std::cout << '}';
         if (t.first + 1 < limit) {
             std::cout << ", ";
@@ -92,25 +92,27 @@ static bool usage(const char* program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program << " [option...] <infile>\n" << std::endl;
+        std::cout << "    " << program << " [option...] <infile>\n"
+                  << std::endl;
         std::cout << "OPTIONS:\n";
 
         // generic options
-        std::cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
-             // misc options
-             << "    "
-             << "    --size               - calculate and display compiled "
-                "bytecode size\n"
-             << "    "
-             << "    --raw                - dump raw token list\n"
-             << "    "
-             << "    --ws                 - reduce whitespace and remove "
-                "comments\n"
-             << "    "
-             << "    --dirs               - reduce directives\n";
+        std::cout
+            << "    "
+            << "-V, --version            - show version\n"
+            << "    "
+            << "-h, --help               - display this message\n"
+            // misc options
+            << "    "
+            << "    --size               - calculate and display compiled "
+               "bytecode size\n"
+            << "    "
+            << "    --raw                - dump raw token list\n"
+            << "    "
+            << "    --ws                 - reduce whitespace and remove "
+               "comments\n"
+            << "    "
+            << "    --dirs               - reduce directives\n";
     }
 
     return (show_help or show_version);
@@ -136,12 +138,13 @@ static void display_results(std::string const& filename,
                             std::vector<Token> const& tokens) {
     if (DISPLAY_SIZE) {
         try {
-            std::cout << viua::cg::tools::calculate_bytecode_size2(tokens) << std::endl;
+            std::cout << viua::cg::tools::calculate_bytecode_size2(tokens)
+                      << std::endl;
         } catch (Invalid_syntax const& e) {
             std::cerr << filename << ':' << e.line_number << ':'
-                 << e.character_in_line;
-            std::cerr << ": error: invalid syntax: " << str::strencode(e.content)
-                 << std::endl;
+                      << e.character_in_line;
+            std::cerr << ": error: invalid syntax: "
+                      << str::strencode(e.content) << std::endl;
         }
         return;
     }
@@ -215,7 +218,8 @@ int main(int argc, char* argv[]) {
     // READ LINES IN
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (!in) {
-        std::cerr << "fatal: file could not be opened: " << filename << std::endl;
+        std::cerr << "fatal: file could not be opened: " << filename
+                  << std::endl;
         return 1;
     }
 
@@ -252,9 +256,8 @@ int main(int argc, char* argv[]) {
     } catch (Invalid_syntax const& e) {
         auto const message = std::string{e.what()};
         std::cerr << filename << ':' << e.line_number + 1 << ':'
-             << e.character_in_line + 1
-             << ": error: " << (message.size() ? message : "invalid syntax")
-             << std::endl;
+                  << e.character_in_line + 1 << ": error: "
+                  << (message.size() ? message : "invalid syntax") << std::endl;
         return 1;
     }
 

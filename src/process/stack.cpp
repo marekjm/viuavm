@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <memory>
 #include <experimental/memory>
+#include <memory>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
 #include <viua/scheduler/process.h>
@@ -89,9 +89,9 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
 auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     for (auto& each : frame->deferred_calls) {
         auto s = std::make_unique<Stack>(each->function_name,
-                                    parent_process,
-                                    global_register_set,
-                                    attached_scheduler);
+                                         parent_process,
+                                         global_register_set,
+                                         attached_scheduler);
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
         s->bind(global_register_set);
@@ -160,9 +160,9 @@ auto viua::process::Stack::adjust_jump_base_for_block(
 auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
     -> Op_address_type {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
-    auto const ep    = attached_scheduler->get_entry_point_of_function(call_name);
-    entry_point      = ep.first;
-    jump_base        = ep.second;
+    auto const ep = attached_scheduler->get_entry_point_of_function(call_name);
+    entry_point   = ep.first;
+    jump_base     = ep.second;
     return entry_point;
 }
 
@@ -224,23 +224,23 @@ auto viua::process::Stack::unwind_to(const Try_frame* tframe,
 auto viua::process::Stack::find_catch_frame()
     -> std::tuple<Try_frame*, std::string> {
     auto found_exception_frame = std::experimental::observer_ptr<Try_frame>();
-    auto caught_with_type            = std::string{""};
+    auto caught_with_type      = std::string{""};
     auto handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        auto tframe  = tryframes[(i - 1)].get();
+        auto tframe        = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         if (handler_found) {
             found_exception_frame.reset(tframe);
-            caught_with_type      = handler_found_for_type;
+            caught_with_type = handler_found_for_type;
             break;
         }
     }
 
     return std::tuple<Try_frame*, std::string>(found_exception_frame,
-                                          caught_with_type);
+                                               caught_with_type);
 }
 
 auto viua::process::Stack::unwind() -> void {

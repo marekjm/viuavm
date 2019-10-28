@@ -85,8 +85,8 @@ static void strwrite(std::ofstream& out, std::string const& s) {
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op,
                                                          int_op,
                                                          int_op);
-const std::map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
-    {
+const std::map<std::string, ThreeIntopAssemblerFunction>
+    THREE_INTOP_ASM_FUNCTIONS = {
         {"and", &Program::opand},
         {"or", &Program::opor},
 
@@ -493,14 +493,14 @@ auto generate(std::vector<Token> const& tokens,
     if (((flags.verbose and main_function != "main/1" and main_function != ""))
         and not flags.as_lib) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << "main function set to: ";
         std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << std::endl;
     }
 
@@ -518,17 +518,18 @@ auto generate(std::vector<Token> const& tokens,
     }
     if (not main_is_defined and flags.verbose and not flags.as_lib) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << "main function (";
         std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
-             << send_control_seq(ATTR_RESET);
-        std::cout << ") is not defined, deferring main function check to post-link "
-                "phase"
-             << std::endl;
+                  << send_control_seq(ATTR_RESET);
+        std::cout
+            << ") is not defined, deferring main function check to post-link "
+               "phase"
+            << std::endl;
     }
 
 
@@ -917,16 +918,17 @@ auto generate(std::vector<Token> const& tokens,
         if (main_function_found.size() > 1) {
             for (auto f : main_function_found) {
                 std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << ": ";
                 std::cout << send_control_seq(COLOR_FG_CYAN) << "note"
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << ": ";
                 std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << f
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << " function found in module ";
-                std::cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f)
-                     << send_control_seq(ATTR_RESET);
+                std::cout << send_control_seq(COLOR_FG_WHITE)
+                          << symbol_sources.at(f)
+                          << send_control_seq(ATTR_RESET);
                 std::cout << std::endl;
             }
             throw "more than one candidate for main function";
@@ -1037,10 +1039,10 @@ auto generate(std::vector<Token> const& tokens,
     // REPORT TOTAL BYTECODE SIZE
     if (flags.verbose and linked_function_names.size() != 0) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << "total required bytes: " << bytes << " bytes" << std::endl;
     }
@@ -1050,12 +1052,13 @@ auto generate(std::vector<Token> const& tokens,
     // REPORT FIRST INSTRUCTION
     if (flags.verbose and not flags.as_lib) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
         std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-             << send_control_seq(ATTR_RESET);
+                  << send_control_seq(ATTR_RESET);
         std::cout << ": ";
-        std::cout << "first instruction pointer: " << starting_instruction << std::endl;
+        std::cout << "first instruction pointer: " << starting_instruction
+                  << std::endl;
     }
 
 
@@ -1072,35 +1075,36 @@ auto generate(std::vector<Token> const& tokens,
     auto functions_bytecode =
         std::map<std::string,
                  std::tuple<viua::internals::types::bytecode_size,
-                       std::unique_ptr<viua::internals::types::byte[]>>>{};
+                            std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto block_bodies_bytecode =
         std::map<std::string,
                  std::tuple<viua::internals::types::bytecode_size,
-                       std::unique_ptr<viua::internals::types::byte[]>>>{};
+                            std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto functions_section_size    = viua::internals::types::bytecode_size{0};
     auto block_bodies_section_size = viua::internals::types::bytecode_size{0};
 
     auto jump_positions =
         std::vector<std::tuple<viua::internals::types::bytecode_size,
-                          viua::internals::types::bytecode_size>>{};
+                               viua::internals::types::bytecode_size>>{};
 
     for (auto const& name : blocks.names) {
         // do not generate bytecode for blocks that were linked
-        if (std::find(linked_block_names.begin(), linked_block_names.end(), name)
+        if (std::find(
+                linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
             continue;
         }
 
         if (flags.verbose) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << ": ";
             std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << ": ";
             std::cout << "generating bytecode for block \"";
             std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << '"';
         }
         auto fun_bytes = viua::internals::types::bytecode_size{0};
@@ -1109,7 +1113,7 @@ auto generate(std::vector<Token> const& tokens,
                 blocks.tokens.at(name));
             if (flags.verbose) {
                 std::cout << " (" << fun_bytes << " bytes at byte "
-                     << block_bodies_section_size << ')' << std::endl;
+                          << block_bodies_section_size << ')' << std::endl;
             }
         } catch (std::string const& e) {
             throw("failed block size count (during pre-assembling): " + e);
@@ -1132,7 +1136,7 @@ auto generate(std::vector<Token> const& tokens,
 
         auto local_jumps =
             std::vector<std::tuple<viua::internals::types::bytecode_size,
-                              viua::internals::types::bytecode_size>>{};
+                                   viua::internals::types::bytecode_size>>{};
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
@@ -1201,7 +1205,7 @@ auto generate(std::vector<Token> const& tokens,
 
         auto local_jumps =
             std::vector<std::tuple<viua::internals::types::bytecode_size,
-                              viua::internals::types::bytecode_size>>{};
+                                   viua::internals::types::bytecode_size>>{};
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
@@ -1319,14 +1323,14 @@ auto generate(std::vector<Token> const& tokens,
 
             if (flags.verbose) {
                 std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << ": ";
                 std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << ": ";
                 std::cout << "dynamically linked module \"";
                 std::cout << send_control_seq(COLOR_FG_WHITE) << module_name
-                     << send_control_seq(ATTR_RESET);
+                          << send_control_seq(ATTR_RESET);
                 std::cout << "\" scheduled for loading at startup" << std::endl;
             }
         }
@@ -1359,7 +1363,8 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    auto program_bytecode = std::make_unique<viua::internals::types::byte[]>(bytes);
+    auto program_bytecode =
+        std::make_unique<viua::internals::types::byte[]>(bytes);
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
@@ -1371,8 +1376,7 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        auto const fun_size =
-            std::get<0>(block_bodies_bytecode[name]);
+        auto const fun_size = std::get<0>(block_bodies_bytecode[name]);
         auto const fun_bytecode =
             std::get<1>(block_bodies_bytecode[name]).get();
 
@@ -1394,10 +1398,8 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        auto const fun_size =
-            std::get<0>(functions_bytecode[name]);
-        auto const fun_bytecode =
-            std::get<1>(functions_bytecode[name]).get();
+        auto const fun_size     = std::get<0>(functions_bytecode[name]);
+        auto const fun_bytecode = std::get<1>(functions_bytecode[name]).get();
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
@@ -1416,14 +1418,14 @@ auto generate(std::vector<Token> const& tokens,
 
         if (flags.verbose) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << ": ";
             std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << ": ";
             std::cout << "linked module \"";
             std::cout << send_control_seq(COLOR_FG_WHITE) << lib_name
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cout << "\" written at offset " << bytes_offset << std::endl;
         }
 

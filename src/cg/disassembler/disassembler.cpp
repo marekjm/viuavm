@@ -754,25 +754,25 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
 
         break;
     case IO_READ:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // limit or void
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // port
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // limit or void
 
         break;
     case IO_WRITE:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // byte vector
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // port
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // byte vector
 
         break;
     case IO_CLOSE:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // port
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // port
 
         break;
     case IO_WAIT:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // result
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // result
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // request
 
         viua::support::pointer::inc<viua::internals::types::byte,
                                     viua::internals::types::byte>(ptr);
@@ -788,7 +788,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
 
         break;
     case IO_CANCEL:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);    // request
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);  // request
 
         break;
     default:
@@ -805,6 +805,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     auto const increase =
         static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
 
-    return std::tuple<std::string, viua::internals::types::bytecode_size>(oss.str(),
-                                                                     increase);
+    return std::tuple<std::string, viua::internals::types::bytecode_size>(
+        oss.str(), increase);
 }

@@ -80,8 +80,8 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {AND, "and"},
     {OR, "or"},
 
-    { BITS_OF_INTEGER, "bits_of_integer" },
-    { INTEGER_OF_BITS, "integer_of_bits" },
+    {BITS_OF_INTEGER, "bits_of_integer"},
+    {INTEGER_OF_BITS, "integer_of_bits"},
 
     {BITS, "bits"},
     {BITAND, "bitand"},

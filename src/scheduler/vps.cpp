@@ -679,8 +679,9 @@ void viua::scheduler::Virtual_process_scheduler::operator()() {
          * fetch a process.
          * Repeat until we're a good, hardworking scheduler.
          */
-        const auto total_processes    = attached_kernel->pids();
-        const auto running_schedulers = attached_kernel->no_of_process_schedulers();
+        const auto total_processes = attached_kernel->pids();
+        const auto running_schedulers =
+            attached_kernel->no_of_process_schedulers();
         /*
          * The "<=" check is *FREAKIN' IMPORTANT* because if:
          *

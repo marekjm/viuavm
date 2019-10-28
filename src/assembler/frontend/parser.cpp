@@ -141,9 +141,9 @@ auto viua::assembler::frontend::parser::parse_operand(
                     "register index outside of defined range (max allowed "
                     "register index is "
                         + std::to_string(
-                              std::numeric_limits<
-                                  viua::internals::types::register_index>::max()
-                              - 1)
+                            std::numeric_limits<
+                                viua::internals::types::register_index>::max()
+                            - 1)
                         + ')'};
             }
             ri->resolved = true;
@@ -230,9 +230,9 @@ auto viua::assembler::frontend::parser::parse_operand(
         operand = std::move(void_literal);
     } else if (str::is_register_set_name(tok)) {
         auto label = std::make_unique<Label>();  // FIXME use a special type for
-                                            // register set names, not the
-                                            // 'Label' type - register set names
-                                            // are not really labels
+                                                 // register set names, not the
+                                                 // 'Label' type - register set
+                                                 // names are not really labels
         label->content = tokens.at(i);
         label->add(tokens.at(i));
         ++i;

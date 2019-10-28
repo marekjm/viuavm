@@ -60,7 +60,7 @@ static auto to_string(values::Value const& value) -> std::string {
     case values::Value_type::Vector:
         return "vector of "
                + to_string(
-                     static_cast<values::Vector const&>(value).of().value());
+                   static_cast<values::Vector const&>(value).of().value());
     case values::Value_type::String:
         return "string";
     case values::Value_type::Text:
@@ -68,7 +68,7 @@ static auto to_string(values::Value const& value) -> std::string {
     case values::Value_type::Pointer:
         return "pointer to "
                + to_string(
-                     static_cast<values::Pointer const&>(value).of().value());
+                   static_cast<values::Pointer const&>(value).of().value());
     case values::Value_type::Boolean:
         return "boolean";
     case values::Value_type::Bits:
@@ -98,7 +98,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
     case values::Value_type::Vector:
         return "vector#" + std::to_string(value.index()) + " of "
                + to_string(
-                     static_cast<values::Vector const&>(value.value()).of());
+                   static_cast<values::Vector const&>(value.value()).of());
     case values::Value_type::String:
         return "string#" + std::to_string(value.index());
     case values::Value_type::Text:
@@ -106,7 +106,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
     case values::Value_type::Pointer:
         return "pointer#" + std::to_string(value.index()) + " to "
                + to_string(
-                     static_cast<values::Pointer const&>(value.value()).of());
+                   static_cast<values::Pointer const&>(value.value()).of());
     case values::Value_type::Boolean:
         return "boolean#" + std::to_string(value.index());
     case values::Value_type::Bits:
@@ -404,7 +404,7 @@ static auto analyse_single_arm(
             (bl.has_value()
                  ? bl.value().get().body().at(annotated_body.at(i).source_line)
                  : fn.value().get().body().at(
-                       annotated_body.at(i).source_line));
+                     annotated_body.at(i).source_line));
 
         std::cout << "analysing: " << line->token(0).str() << " (" << i
                   << " of " << (annotated_body.size() - 1) << " lines)"
@@ -481,10 +481,10 @@ static auto analyse_single_arm(
                     (target_access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::Integer}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::Integer}
                         : std::vector<values::Value_type>{
-                              values::Value_type::Integer};
+                            values::Value_type::Integer};
                 if (not function_state.assume_type(target_index,
                                                    target.register_set,
                                                    target_type_signature)) {
@@ -506,9 +506,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(target_index, target.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(target_index, target.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -568,10 +568,10 @@ static auto analyse_single_arm(
                     (source.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::Integer}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::Integer}
                         : std::vector<values::Value_type>{
-                              values::Value_type::Integer};
+                            values::Value_type::Integer};
                 if (not function_state.assume_type(source_index,
                                                    source.register_set,
                                                    source_type_signature)) {
@@ -593,9 +593,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -631,10 +631,10 @@ static auto analyse_single_arm(
                     (source.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::Float}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::Float}
                         : std::vector<values::Value_type>{
-                              values::Value_type::Float};
+                            values::Value_type::Float};
                 if (not function_state.assume_type(source_index,
                                                    source.register_set,
                                                    source_type_signature)) {
@@ -656,9 +656,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -694,10 +694,10 @@ static auto analyse_single_arm(
                     (source.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::String}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::String}
                         : std::vector<values::Value_type>{
-                              values::Value_type::String};
+                            values::Value_type::String};
                 if (not function_state.assume_type(source_index,
                                                    source.register_set,
                                                    source_type_signature)) {
@@ -719,9 +719,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -757,10 +757,10 @@ static auto analyse_single_arm(
                     (source.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::String}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::String}
                         : std::vector<values::Value_type>{
-                              values::Value_type::String};
+                            values::Value_type::String};
                 if (not function_state.assume_type(source_index,
                                                    source.register_set,
                                                    source_type_signature)) {
@@ -782,9 +782,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -839,9 +839,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -896,9 +896,9 @@ static auto analyse_single_arm(
                         definition_location.at(0),
                         ("...got `"
                          + to_string(
-                               function_state
-                                   .type_of(source_index, source.register_set)
-                                   .to_simple())
+                             function_state
+                                 .type_of(source_index, source.register_set)
+                                 .to_simple())
                          + "'")}
                                      .note("defined here"));
                     throw error;
@@ -938,10 +938,10 @@ static auto analyse_single_arm(
                     (lhs.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::Integer}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::Integer}
                         : std::vector<values::Value_type>{
-                              values::Value_type::Integer};
+                            values::Value_type::Integer};
                 throw_if_invalid_type(
                     function_state, lhs, lhs_index, lhs_type_signature);
 
@@ -950,10 +950,10 @@ static auto analyse_single_arm(
                     (rhs.access
                      == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                         ? std::vector<
-                              values::Value_type>{values::Value_type::Pointer,
-                                                  values::Value_type::Integer}
+                            values::Value_type>{values::Value_type::Pointer,
+                                                values::Value_type::Integer}
                         : std::vector<values::Value_type>{
-                              values::Value_type::Integer};
+                            values::Value_type::Integer};
                 throw_if_invalid_type(
                     function_state, rhs, rhs_index, rhs_type_signature);
 
@@ -1720,20 +1720,19 @@ static auto analyse_single_arm(
                         (dest_type_signature.front()
                          == values::Value_type::Pointer)
                             ? static_cast<values::Vector&>(
-                                  static_cast<values::Pointer&>(
-                                      function_state
-                                          .type_of(dest_index,
-                                                   dest.register_set)
-                                          .value())
-                                      .of()
-                                      .value())
+                                static_cast<values::Pointer&>(
+                                    function_state
+                                        .type_of(dest_index, dest.register_set)
+                                        .value())
+                                    .of()
+                                    .value())
                             : static_cast<values::Vector&>(
-                                  function_state
-                                      .type_of(dest_index, dest.register_set)
-                                      .value());
+                                function_state
+                                    .type_of(dest_index, dest.register_set)
+                                    .value());
                     if (source.access
                         == viua::internals::Access_specifier::
-                               POINTER_DEREFERENCE) {
+                            POINTER_DEREFERENCE) {
                         wrapper.of(
                             static_cast<values::Pointer&>(
                                 function_state
@@ -1788,20 +1787,19 @@ static auto analyse_single_arm(
                         (dest_type_signature.front()
                          == values::Value_type::Pointer)
                             ? static_cast<values::Vector&>(
-                                  static_cast<values::Pointer&>(
-                                      function_state
-                                          .type_of(dest_index,
-                                                   dest.register_set)
-                                          .value())
-                                      .of()
-                                      .value())
+                                static_cast<values::Pointer&>(
+                                    function_state
+                                        .type_of(dest_index, dest.register_set)
+                                        .value())
+                                    .of()
+                                    .value())
                             : static_cast<values::Vector&>(
-                                  function_state
-                                      .type_of(dest_index, dest.register_set)
-                                      .value());
+                                function_state
+                                    .type_of(dest_index, dest.register_set)
+                                    .value());
                     if (source.access
                         == viua::internals::Access_specifier::
-                               POINTER_DEREFERENCE) {
+                            POINTER_DEREFERENCE) {
                         wrapper.of(
                             static_cast<values::Pointer&>(
                                 function_state
@@ -2968,14 +2966,14 @@ static auto analyse_single_arm(
                     instruction.operands.at(2).get());
 
                 auto const lhs_index = throw_if_empty(function_state, lhs);
-                auto const lhs_type_signature = maybe_with_pointer(
-                    lhs.access, {values::Value_type::Pid});
+                auto const lhs_type_signature =
+                    maybe_with_pointer(lhs.access, {values::Value_type::Pid});
                 throw_if_invalid_type(
                     function_state, lhs, lhs_index, lhs_type_signature);
 
                 auto const rhs_index = throw_if_empty(function_state, rhs);
-                auto const rhs_type_signature = maybe_with_pointer(
-                    rhs.access, {values::Value_type::Pid});
+                auto const rhs_type_signature =
+                    maybe_with_pointer(rhs.access, {values::Value_type::Pid});
                 throw_if_invalid_type(
                     function_state, rhs, rhs_index, rhs_type_signature);
 
@@ -3946,10 +3944,10 @@ static auto analyse_single_function(
                 (target_access
                  == viua::internals::Access_specifier::POINTER_DEREFERENCE)
                     ? std::vector<
-                          values::Value_type>{values::Value_type::Pointer,
-                                              values::Value_type::Integer}
+                        values::Value_type>{values::Value_type::Pointer,
+                                            values::Value_type::Integer}
                     : std::vector<values::Value_type>{
-                          values::Value_type::Integer};
+                        values::Value_type::Integer};
             if (not function_state.assume_type(
                     target_index, target.register_set, target_type_signature)) {
                 auto error =

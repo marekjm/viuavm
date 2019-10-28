@@ -34,7 +34,7 @@ using Token = viua::cg::lex::Token;
 
 auto assembler::ce::getmarks(std::vector<viua::cg::lex::Token> const& tokens)
     -> std::map<std::string,
-           std::remove_reference<decltype(tokens)>::type::size_type> {
+                std::remove_reference<decltype(tokens)>::type::size_type> {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
@@ -71,10 +71,10 @@ static auto looks_like_name_definition(Token const t) -> bool {
     return (t == ".function:" or t == ".closure:" or t == ".block:"
             or t == ".signature:" or t == ".bsignature:");
 }
-static auto get_instruction_block_names(std::vector<Token> const& tokens,
-                                        std::string const directive,
-                                        void predicate(Token) = [](Token) {})
-    -> std::vector<std::string> {
+static auto get_instruction_block_names(
+    std::vector<Token> const& tokens,
+    std::string const directive,
+    void predicate(Token) = [](Token) {}) -> std::vector<std::string> {
     auto names         = std::vector<std::string>{};
     auto all_names     = std::vector<std::string>{};
     auto defined_where = std::map<std::string, Token>{};
@@ -192,6 +192,7 @@ static auto get_raw_block_bodies(std::string const& type,
 }
 auto assembler::ce::get_invokables_token_bodies(
     std::string const& type,
-    std::vector<Token> const& tokens) -> std::map<std::string, std::vector<Token>> {
+    std::vector<Token> const& tokens)
+    -> std::map<std::string, std::vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }

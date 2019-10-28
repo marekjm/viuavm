@@ -78,15 +78,16 @@ static bool usage(const char* program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program << " [option...] <infile>\n" << std::endl;
+        std::cout << "    " << program << " [option...] <infile>\n"
+                  << std::endl;
         std::cout << "OPTIONS:\n";
 
         // generic options
         std::cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
-             << "    ";
+                  << "-V, --version            - show version\n"
+                  << "    "
+                  << "-h, --help               - display this message\n"
+                  << "    ";
 
         // compilation options
         std::cout << "-c, --lib                - assemble as a library\n";
@@ -159,7 +160,8 @@ int main(int argc, char* argv[]) {
     // READ LINES IN
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (!in) {
-        std::cerr << "fatal: file could not be opened: " << filename << std::endl;
+        std::cerr << "fatal: file could not be opened: " << filename
+                  << std::endl;
         return 1;
     }
 

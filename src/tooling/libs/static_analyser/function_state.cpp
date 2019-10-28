@@ -375,7 +375,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
     case values::Value_type::Vector:
         return "vector#" + std::to_string(value.index()) + " of "
                + to_string(
-                     static_cast<values::Vector const&>(value.value()).of());
+                   static_cast<values::Vector const&>(value.value()).of());
     case values::Value_type::String:
         return "string#" + std::to_string(value.index());
     case values::Value_type::Text:
@@ -383,7 +383,7 @@ static auto to_string(values::Value_wrapper const& value) -> std::string {
     case values::Value_type::Pointer:
         return "pointer#" + std::to_string(value.index()) + " to "
                + to_string(
-                     static_cast<values::Pointer const&>(value.value()).of());
+                   static_cast<values::Pointer const&>(value.value()).of());
     case values::Value_type::Boolean:
         return "boolean#" + std::to_string(value.index());
     case values::Value_type::Bits:

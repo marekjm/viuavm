@@ -170,8 +170,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw std::make_unique<viua::types::Exception>("call to undefined function: "
-                                                  + call_name);
+        throw std::make_unique<viua::types::Exception>(
+            "call to undefined function: " + call_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::call_native

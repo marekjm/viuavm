@@ -42,7 +42,8 @@ auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type {
 
 using Addr_type = viua::internals::types::Op_address_type;
 template<typename Oper>
-static auto binary_logical_op(Addr_type addr, viua::process::Process* proc) -> Addr_type {
+static auto binary_logical_op(Addr_type addr, viua::process::Process* proc)
+    -> Addr_type {
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, proc);
@@ -53,8 +54,8 @@ static auto binary_logical_op(Addr_type addr, viua::process::Process* proc) -> A
     std::tie(addr, second) =
         viua::bytecode::decoder::operands::fetch_object(addr, proc);
 
-    *target = std::make_unique<viua::types::Boolean>(Oper{}(first->boolean(),
-                                                second->boolean()));
+    *target = std::make_unique<viua::types::Boolean>(
+        Oper{}(first->boolean(), second->boolean()));
 
     return addr;
 }

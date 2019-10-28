@@ -149,8 +149,8 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
     if (error.aside().size()) {
         std::cout << indent.str();
         std::cout << send_control_seq(COLOR_FG_RED_1) << '^'
-             << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside()
-             << send_control_seq(ATTR_RESET) << std::endl;
+                  << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' '
+                  << error.aside() << send_control_seq(ATTR_RESET) << std::endl;
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_line(
@@ -214,18 +214,20 @@ auto viua::assembler::util::pretty_printer::display_error_header(
     std::string const& filename) -> void {
     if (error.str().size()) {
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
-             << error.line() + 1 << ':' << error.character() + 1 << ':'
-             << send_control_seq(ATTR_RESET) << ' ';
+                  << error.line() + 1 << ':' << error.character() + 1 << ':'
+                  << send_control_seq(ATTR_RESET) << ' ';
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET) << ": " << error.what() << std::endl;
+                  << send_control_seq(ATTR_RESET) << ": " << error.what()
+                  << std::endl;
     }
     if (error.notes().size()) {
         for (auto const& note : error.notes()) {
             std::cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
-                 << error.line() + 1 << ':' << error.character() + 1 << ':'
-                 << send_control_seq(ATTR_RESET) << ' ';
+                      << error.line() + 1 << ':' << error.character() + 1 << ':'
+                      << send_control_seq(ATTR_RESET) << ' ';
             std::cout << send_control_seq(COLOR_FG_CYAN) << "note"
-                 << send_control_seq(ATTR_RESET) << ": " << note << std::endl;
+                      << send_control_seq(ATTR_RESET) << ": " << note
+                      << std::endl;
         }
     }
 }

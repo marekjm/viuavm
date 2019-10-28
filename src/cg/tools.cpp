@@ -500,7 +500,8 @@ static auto size_of_bits(TokenVector const& tokens, TokenVector::size_type i)
         std::tie(size_increment, i) = size_of_octal_literal_operand(tokens, i);
         calculated_size += size_increment;
     } else if (tokens.at(i).str().at(1) == 'x') {
-        std::tie(size_increment, i) = size_of_hexadecimal_literal_operand(tokens, i);
+        std::tie(size_increment, i) =
+            size_of_hexadecimal_literal_operand(tokens, i);
         calculated_size += size_increment;
     }
 
@@ -958,9 +959,12 @@ static auto size_of_insert =
 static auto size_of_remove =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 
-static auto size_of_io_read = size_of_instruction_with_three_ri_operands_with_rs_types;
-static auto size_of_io_write = size_of_instruction_with_three_ri_operands_with_rs_types;
-static auto size_of_io_close = size_of_instruction_with_two_ri_operands_with_rs_types;
+static auto size_of_io_read =
+    size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_io_write =
+    size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_io_close =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
 static auto size_of_io_wait(TokenVector const& tokens, TokenVector::size_type i)
     -> std::tuple<bytecode_size_type, decltype(i)> {
     auto calculated_size = bytecode_size_type{0};
@@ -978,7 +982,8 @@ static auto size_of_io_wait(TokenVector const& tokens, TokenVector::size_type i)
 
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
-static auto size_of_io_cancel = size_of_instruction_with_one_ri_operand_with_rs_type;
+static auto size_of_io_cancel =
+    size_of_instruction_with_one_ri_operand_with_rs_type;
 
 static auto size_of_return(TokenVector const&, TokenVector::size_type i)
     -> std::tuple<bytecode_size_type, decltype(i)> {

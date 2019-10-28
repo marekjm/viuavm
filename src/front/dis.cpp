@@ -70,29 +70,31 @@ static bool usage(const char* program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program << " [option...] [-o <outfile>] <infile>\n"
-             << std::endl;
+        std::cout << "    " << program
+                  << " [option...] [-o <outfile>] <infile>\n"
+                  << std::endl;
         std::cout << "OPTIONS:\n";
-        std::cout << "    "
-             << "-V, --version            - show version\n"
-             << "    "
-             << "-h, --help               - display this message\n"
-             << "    "
-             << "-v, --verbose            - show verbose output\n"
-             << "    "
-             << "-o, --out                - output to given path (by default "
-                "prints to std::cout)\n"
-             << "    "
-             << "-i, --info               - include information about "
-                "executable in output\n"
-             << "    "
-             << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME
-             << " function in disassembly\n"
-             << "    "
-             << "-L, --line-by-line       - display output line by line\n"
-             << "    "
-             << "-F, --function <name>    - disassemble only selected "
-                "function\n";
+        std::cout
+            << "    "
+            << "-V, --version            - show version\n"
+            << "    "
+            << "-h, --help               - display this message\n"
+            << "    "
+            << "-v, --verbose            - show verbose output\n"
+            << "    "
+            << "-o, --out                - output to given path (by default "
+               "prints to std::cout)\n"
+            << "    "
+            << "-i, --info               - include information about "
+               "executable in output\n"
+            << "    "
+            << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME
+            << " function in disassembly\n"
+            << "    "
+            << "-L, --line-by-line       - display output line by line\n"
+            << "    "
+            << "-F, --function <name>    - disassemble only selected "
+               "function\n";
     }
 
     return (show_help or show_version);
@@ -129,7 +131,8 @@ int main(int argc, char* argv[]) {
                 SELECTED_FUNCTION = std::string(argv[++i]);
             } else {
                 std::cout << "error: option '" << argv[i]
-                     << "' requires an argument: function name" << std::endl;
+                          << "' requires an argument: function name"
+                          << std::endl;
                 exit(1);
             }
             continue;
@@ -138,16 +141,16 @@ int main(int argc, char* argv[]) {
                 disasmname = std::string(argv[++i]);
             } else {
                 std::cout << "error: option '" << argv[i]
-                     << "' requires an argument: filename" << std::endl;
+                          << "' requires an argument: filename" << std::endl;
                 exit(1);
             }
             continue;
         } else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
             std::cerr << send_control_seq(COLOR_FG_WHITE) << option
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << std::endl;
             return 1;
         } else {
@@ -190,8 +193,9 @@ int main(int argc, char* argv[]) {
 
     std::map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
-    std::vector<std::string> functions        = loader.get_functions();
-    std::map<std::string, uint64_t> function_sizes = loader.get_function_sizes();
+    std::vector<std::string> functions = loader.get_functions();
+    std::map<std::string, uint64_t> function_sizes =
+        loader.get_function_sizes();
 
     std::map<std::string, uint64_t> block_address_mapping =
         loader.get_block_addresses();
@@ -297,8 +301,8 @@ int main(int argc, char* argv[]) {
             disassembled_lines.emplace_back("; dynamic imports\n");
         }
         for (auto const& each : dynamic_imports) {
-            disassembled_lines.emplace_back(
-                ".import: [[dynamic]] " + each + "\n");
+            disassembled_lines.emplace_back(".import: [[dynamic]] " + each
+                                            + "\n");
         }
         if (dynamic_imports.size()) {
             disassembled_lines.emplace_back("\n");
@@ -318,7 +322,8 @@ int main(int argc, char* argv[]) {
         (DEBUG ? std::cout : oss)
             << '.' << element_types[name] << ": " << name << '\n';
         if (LINE_BY_LINE) {
-            (DEBUG ? std::cout : oss) << '.' << element_types[name] << ": " << name;
+            (DEBUG ? std::cout : oss)
+                << '.' << element_types[name] << ": " << name;
             getline(std::cin, dummy);
         }
 
@@ -336,29 +341,32 @@ int main(int argc, char* argv[]) {
                     }
                     (DEBUG ? std::cout : oss)
                         << "    ; size: " << size << " bytes\n";
-                    (DEBUG ? std::cout : oss)
-                        << "    ; address: 0x" << std::hex << j << std::dec << '\n';
+                    (DEBUG ? std::cout : oss) << "    ; address: 0x" << std::hex
+                                              << j << std::dec << '\n';
                 }
                 (DEBUG ? std::cout : oss) << "    " << instruction << '\n';
                 j += size;
             } catch (std::out_of_range const& e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? std::cout : oss) << "disassembly terminated after throwing "
-                                        "an instance of std::out_of_range\n";
+                (DEBUG ? std::cout : oss)
+                    << "disassembly terminated after throwing "
+                       "an instance of std::out_of_range\n";
                 (DEBUG ? std::cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
             } catch (std::string const& e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? std::cout : oss) << "disassembly terminated after throwing "
-                                        "an instance of std::out_of_range\n";
+                (DEBUG ? std::cout : oss)
+                    << "disassembly terminated after throwing "
+                       "an instance of std::out_of_range\n";
                 (DEBUG ? std::cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
             } catch (const char* e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? std::cout : oss) << "disassembly terminated after throwing "
-                                        "an instance of const char*\n";
+                (DEBUG ? std::cout : oss)
+                    << "disassembly terminated after throwing "
+                       "an instance of const char*\n";
                 (DEBUG ? std::cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;

@@ -98,8 +98,9 @@ else {
 }
 
 // FIXME: check if the jump is within the size of bytecode
-return std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr,
-                                                                   jump_type);
+return std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(
+    addr,
+    jump_type);
 }
 
 auto ::assembler::operands::resolve_register(Token const token,
@@ -316,9 +317,11 @@ auto assemble_instruction(
     } else if (tokens.at(i) == "or") {
         assemble_three_register_op<&Program::opor>(program, tokens, i);
     } else if (tokens.at(i) == "bits_of_integer") {
-        assemble_double_register_op<&Program::opbits_of_integer>(program, tokens, i);
+        assemble_double_register_op<&Program::opbits_of_integer>(
+            program, tokens, i);
     } else if (tokens.at(i) == "integer_of_bits") {
-        assemble_double_register_op<&Program::opinteger_of_bits>(program, tokens, i);
+        assemble_double_register_op<&Program::opinteger_of_bits>(
+            program, tokens, i);
     } else if (tokens.at(i) == "bits") {
         assemble_op_bits(program, tokens, i);
     } else if (tokens.at(i) == "bitand") {

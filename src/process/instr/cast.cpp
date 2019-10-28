@@ -75,10 +75,10 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
         result_integer = std::stoi(supplied_string);
     } catch (std::out_of_range const& e) {
         throw std::make_unique<viua::types::Exception>("out of range: "
-                                                  + supplied_string);
+                                                       + supplied_string);
     } catch (std::invalid_argument const& e) {
         throw std::make_unique<viua::types::Exception>("invalid argument: "
-                                                  + supplied_string);
+                                                       + supplied_string);
     }
 
     *target = std::make_unique<viua::types::Integer>(result_integer);
@@ -98,7 +98,7 @@ auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type {
     auto const supplied_string =
         static_cast<viua::types::String*>(source)->value();
     auto const convert_from = std::stod(supplied_string);
-    *target             = std::make_unique<viua::types::Float>(convert_from);
+    *target = std::make_unique<viua::types::Float>(convert_from);
 
     return addr;
 }

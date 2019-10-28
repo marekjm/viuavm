@@ -337,14 +337,14 @@ static auto make_unexpected_token_error(Token const& token, std::string message)
     -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n") ? viua::tooling::errors::compile_time::
-                               Compile_time_error::Unexpected_newline
+                 Compile_time_error::Unexpected_newline
                          : viua::tooling::errors::compile_time::
-                               Compile_time_error::Unexpected_token),
+                             Compile_time_error::Unexpected_token),
         token,
         std::move(message)}
         .note("got "
               + viua::util::string::ops::quoted(
-                    (viua::util::string::ops::strencode(token.str()))));
+                  (viua::util::string::ops::strencode(token.str()))));
 }
 
 static auto normalise_register_access(std::vector<Token>& tokens,
@@ -1498,16 +1498,19 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
                 break;
             case IO_READ:
             case IO_WRITE:
-                i += normalise_any_3_register_instruction(tokens, vector_view{source, i});
+                i += normalise_any_3_register_instruction(
+                    tokens, vector_view{source, i});
                 break;
             case IO_CLOSE:
-                i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
+                i += normalise_any_1_register_instruction(
+                    tokens, vector_view{source, i});
                 break;
             case IO_WAIT:
                 i += normalise_io_wait(tokens, vector_view{source, i});
                 break;
             case IO_CANCEL:
-                i += normalise_any_1_register_instruction(tokens, vector_view{source, i});
+                i += normalise_any_1_register_instruction(
+                    tokens, vector_view{source, i});
                 break;
             case STREQ:
             case BOOL:

@@ -56,7 +56,8 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
         // FIXME vector is inserted into a register after packing, so this
         // exception is not entirely well thought-out allow packing target
         // register
-        throw std::make_unique<viua::types::Exception>("vector would pack itself");
+        throw std::make_unique<viua::types::Exception>(
+            "vector would pack itself");
     }
     if ((pack_start_ri + pack_size)
         >= stack->back()->local_register_set->size()) {

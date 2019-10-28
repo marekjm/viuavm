@@ -35,9 +35,9 @@
 #include <viua/machine.h>
 #include <viua/runtime/imports.h>
 #include <viua/scheduler/ffi.h>
-#include <viua/scheduler/vps.h>
-#include <viua/scheduler/process.h>
 #include <viua/scheduler/io.h>
+#include <viua/scheduler/process.h>
+#include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
@@ -280,7 +280,7 @@ bool viua::kernel::Kernel::is_linked_block(std::string const& name) const {
 
 auto viua::kernel::Kernel::get_entry_point_of_block(std::string const& name)
     const -> std::pair<viua::internals::types::Op_address_type,
-                  viua::internals::types::Op_address_type> {
+                       viua::internals::types::Op_address_type> {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto module_base = viua::internals::types::Op_address_type{nullptr};
     if (block_addresses.count(name)) {
@@ -292,13 +292,13 @@ auto viua::kernel::Kernel::get_entry_point_of_block(std::string const& name)
         module_base   = linked_modules.at(lf.first).second.get();
     }
     return std::pair<viua::internals::types::Op_address_type,
-                viua::internals::types::Op_address_type>(entry_point,
-                                                         module_base);
+                     viua::internals::types::Op_address_type>(entry_point,
+                                                              module_base);
 }
 
 auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
     -> std::pair<viua::internals::types::Op_address_type,
-            viua::internals::types::Op_address_type> {
+                 viua::internals::types::Op_address_type> {
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto module_base = viua::internals::types::Op_address_type{nullptr};
     if (function_addresses.count(name)) {
@@ -310,8 +310,8 @@ auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
         module_base   = linked_modules.at(lf.first).second.get();
     }
     return std::pair<viua::internals::types::Op_address_type,
-                viua::internals::types::Op_address_type>(entry_point,
-                                                         module_base);
+                     viua::internals::types::Op_address_type>(entry_point,
+                                                              module_base);
 }
 
 void viua::kernel::Kernel::request_foreign_function_call(
@@ -342,10 +342,9 @@ void viua::kernel::Kernel::request_foreign_function_call(
     foreign_call_queue_condition.notify_one();
 }
 
-auto viua::kernel::Kernel::steal_processes() ->
-    std::vector<std::unique_ptr<viua::process::Process>> {
-
-    std::unique_lock<std::mutex> lock { process_spawned_mtx };
+auto viua::kernel::Kernel::steal_processes()
+    -> std::vector<std::unique_ptr<viua::process::Process>> {
+    std::unique_lock<std::mutex> lock{process_spawned_mtx};
 
     /*
      * If any scheduler spawned a process recently, let's try to steal some work
@@ -376,9 +375,10 @@ auto viua::kernel::Kernel::steal_processes() ->
     auto stolen = std::vector<std::unique_ptr<viua::process::Process>>{};
     return stolen;
 }
-auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process_scheduler* sched) -> void {
+auto viua::kernel::Kernel::notify_about_process_spawned(
+    viua::scheduler::Process_scheduler* sched) -> void {
     {
-        std::unique_lock<std::mutex> lck { process_spawned_mtx };
+        std::unique_lock<std::mutex> lck{process_spawned_mtx};
         process_spawned_by.push_back(sched);
     }
     ++running_processes;
@@ -387,7 +387,8 @@ auto viua::kernel::Kernel::notify_about_process_spawned(viua::scheduler::Process
 auto viua::kernel::Kernel::notify_about_process_death() -> void {
     --running_processes;
 }
-auto viua::kernel::Kernel::process_count() const -> viua::internals::types::processes_count {
+auto viua::kernel::Kernel::process_count() const
+    -> viua::internals::types::processes_count {
     return running_processes;
 }
 
@@ -510,21 +511,21 @@ uint64_t viua::kernel::Kernel::pids() const {
     return running_processes;
 }
 
-auto viua::kernel::Kernel::schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction> i)
-    -> void {
+auto viua::kernel::Kernel::schedule_io(
+    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void {
     {
-        std::unique_lock<std::mutex> lck { io_requests_mtx };
-        io_requests.insert({ i->id(), i.get() });
+        std::unique_lock<std::mutex> lck{io_requests_mtx};
+        io_requests.insert({i->id(), i.get()});
     }
     {
-        std::unique_lock<std::mutex> lck { io_request_mutex };
+        std::unique_lock<std::mutex> lck{io_request_mutex};
         io_request_queue.push_back(std::move(i));
     }
     io_request_cv.notify_one();
 }
-auto viua::kernel::Kernel::cancel_io(std::tuple<uint64_t, uint64_t> const interaction_id)
-    -> void {
-    std::unique_lock<std::mutex> lck { io_requests_mtx };
+auto viua::kernel::Kernel::cancel_io(
+    std::tuple<uint64_t, uint64_t> const interaction_id) -> void {
+    std::unique_lock<std::mutex> lck{io_requests_mtx};
     /*
      * We have to check if the request is still there to avoid crashing when the
      * cancellation order arrives just after the request has been completed, as
@@ -538,24 +539,28 @@ auto viua::kernel::Kernel::cancel_io(std::tuple<uint64_t, uint64_t> const intera
         io_requests.at(interaction_id)->cancel();
     }
 }
-auto viua::kernel::Kernel::io_complete(std::tuple<uint64_t, uint64_t> const interaction_id) const -> bool {
-    std::unique_lock<std::mutex> lck { io_result_mtx };
+auto viua::kernel::Kernel::io_complete(
+    std::tuple<uint64_t, uint64_t> const interaction_id) const -> bool {
+    std::unique_lock<std::mutex> lck{io_result_mtx};
     if (not io_results.count(interaction_id)) {
         return false;
     }
     return io_results.at(interaction_id).is_complete;
 }
-auto viua::kernel::Kernel::complete_io(std::tuple<uint64_t, uint64_t> const interaction_id, IO_result result) -> void {
+auto viua::kernel::Kernel::complete_io(
+    std::tuple<uint64_t, uint64_t> const interaction_id,
+    IO_result result) -> void {
     {
-        std::unique_lock<std::mutex> lck { io_requests_mtx };
+        std::unique_lock<std::mutex> lck{io_requests_mtx};
         io_requests.erase(io_requests.find(interaction_id));
     }
-    std::unique_lock<std::mutex> lck { io_result_mtx };
-    io_results.insert({ interaction_id, std::move(result) });
+    std::unique_lock<std::mutex> lck{io_result_mtx};
+    io_results.insert({interaction_id, std::move(result)});
 }
-auto viua::kernel::Kernel::io_result(std::tuple<uint64_t, uint64_t> const interaction_id)
+auto viua::kernel::Kernel::io_result(
+    std::tuple<uint64_t, uint64_t> const interaction_id)
     -> std::unique_ptr<viua::types::Value> {
-    std::unique_lock<std::mutex> lck { io_result_mtx };
+    std::unique_lock<std::mutex> lck{io_result_mtx};
     auto result = std::move(io_results.at(interaction_id));
     io_results.erase(io_results.find(interaction_id));
     lck.unlock();
@@ -566,19 +571,20 @@ auto viua::kernel::Kernel::io_result(std::tuple<uint64_t, uint64_t> const intera
     throw std::move(result.error);
 }
 
-viua::kernel::Kernel::IO_result::IO_result(bool const ok, std::unique_ptr<viua::types::Value> x)
-    : value{ok ? std::move(x) : nullptr}
-    , error{ok ? nullptr : std::move(x)}
-    , is_complete{true}
-    , is_cancelled{false}
-    , is_successful{ok}
-{}
-auto viua::kernel::Kernel::IO_result::make_success(std::unique_ptr<viua::types::Value> x)
-    -> IO_result {
+viua::kernel::Kernel::IO_result::IO_result(
+    bool const ok,
+    std::unique_ptr<viua::types::Value> x)
+        : value{ok ? std::move(x) : nullptr}
+        , error{ok ? nullptr : std::move(x)}
+        , is_complete{true}
+        , is_cancelled{false}
+        , is_successful{ok} {}
+auto viua::kernel::Kernel::IO_result::make_success(
+    std::unique_ptr<viua::types::Value> x) -> IO_result {
     return IO_result{true, std::move(x)};
 }
-auto viua::kernel::Kernel::IO_result::make_error(std::unique_ptr<viua::types::Value> x)
-    -> IO_result {
+auto viua::kernel::Kernel::IO_result::make_error(
+    std::unique_ptr<viua::types::Value> x) -> IO_result {
     return IO_result{false, std::move(x)};
 }
 
@@ -604,7 +610,8 @@ auto viua::kernel::Kernel::no_of_process_schedulers()
     -> viua::internals::types::schedulers_count {
     auto const default_value = std::thread::hardware_concurrency();
     using viua::internals::types::schedulers_count;
-    return no_of_schedulers("VIUA_PROC_SCHEDULERS", static_cast<schedulers_count>(default_value));
+    return no_of_schedulers("VIUA_PROC_SCHEDULERS",
+                            static_cast<schedulers_count>(default_value));
 }
 auto viua::kernel::Kernel::no_of_ffi_schedulers()
     -> viua::internals::types::schedulers_count {
@@ -641,7 +648,8 @@ int viua::kernel::Kernel::run() {
 
     auto const vp_schedulers_limit = no_of_process_schedulers();
     if constexpr (KERNEL_SETUP_DEBUG) {
-        std::cerr << "[kernel] process scheduler limit: " << vp_schedulers_limit << "\n";
+        std::cerr << "[kernel] process scheduler limit: " << vp_schedulers_limit
+                  << "\n";
     }
     /* bool enable_tracing = is_tracing_enabled(); */
 
@@ -662,7 +670,8 @@ int viua::kernel::Kernel::run() {
     if constexpr (KERNEL_SETUP_DEBUG) {
         std::cerr << "[kernel] bootstrapping main scheduler\n";
     }
-    process_schedulers.emplace_back(std::make_unique<viua::scheduler::Process_scheduler>(*this, 0));
+    process_schedulers.emplace_back(
+        std::make_unique<viua::scheduler::Process_scheduler>(*this, 0));
     process_schedulers.front()->bootstrap(commandline_arguments);
 
     /*
@@ -674,12 +683,13 @@ int viua::kernel::Kernel::run() {
         auto n = viua::scheduler::Process_scheduler::id_type{1};
         for (auto i = (vp_schedulers_limit - 1); i; --i) {
             process_schedulers.emplace_back(
-                std::make_unique<viua::scheduler::Process_scheduler>(
-                    *this, n++));
+                std::make_unique<viua::scheduler::Process_scheduler>(*this,
+                                                                     n++));
         }
     }
     if constexpr (KERNEL_SETUP_DEBUG) {
-        std::cerr << "[kernel] created " << process_schedulers.size() << " process scheduler(s)\n";
+        std::cerr << "[kernel] created " << process_schedulers.size()
+                  << " process scheduler(s)\n";
     }
 
     /*
@@ -691,7 +701,8 @@ int viua::kernel::Kernel::run() {
         sched->launch();
     }
     if constexpr (KERNEL_SETUP_DEBUG) {
-        std::cerr << "[kernel] all " << process_schedulers.size() << " scheduler(s) launched\n";
+        std::cerr << "[kernel] all " << process_schedulers.size()
+                  << " scheduler(s) launched\n";
     }
 
     /*
@@ -721,24 +732,24 @@ viua::kernel::Kernel::Kernel()
         , errors(false) {
     auto const ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
-        foreign_call_workers.emplace_back(
-            std::make_unique<std::thread>(viua::scheduler::ffi::ff_call_processor,
-                                     &foreign_call_queue,
-                                     &foreign_functions,
-                                     &foreign_functions_mutex,
-                                     &foreign_call_queue_mutex,
-                                     &foreign_call_queue_condition));
+        foreign_call_workers.emplace_back(std::make_unique<std::thread>(
+            viua::scheduler::ffi::ff_call_processor,
+            &foreign_call_queue,
+            &foreign_functions,
+            &foreign_functions_mutex,
+            &foreign_call_queue_mutex,
+            &foreign_call_queue_condition));
     }
 
     auto const io_schedulers_limit = no_of_io_schedulers();
     for (auto i = io_schedulers_limit; i; --i) {
         io_workers.emplace_back(
             std::make_unique<std::thread>(viua::scheduler::io::io_scheduler,
-                (io_schedulers_limit - i),
-                std::ref(*this),
-                std::ref(io_request_queue),
-                std::ref(io_request_mutex),
-                std::ref(io_request_cv)));
+                                          (io_schedulers_limit - i),
+                                          std::ref(*this),
+                                          std::ref(io_request_queue),
+                                          std::ref(io_request_mutex),
+                                          std::ref(io_request_cv)));
     }
 }
 
@@ -748,7 +759,8 @@ viua::kernel::Kernel::~Kernel() {
          * Send a poison pill to every foreign function call worker thread.
          * Collect them after they are killed.
          */
-        std::unique_lock<std::mutex> lck {foreign_call_queue_mutex, std::defer_lock};
+        std::unique_lock<std::mutex> lck{foreign_call_queue_mutex,
+                                         std::defer_lock};
         for (auto i = foreign_call_workers.size(); i; --i) {
             lck.lock();
 
@@ -772,14 +784,12 @@ viua::kernel::Kernel::~Kernel() {
          * Send a poison pill to every I/O worker thread.
          */
         if constexpr (false) {
-            std::cerr
-                << "[kernel] starting I/O shutdown, "
-                << io_workers.size()
-                << " workers to kill\n";
+            std::cerr << "[kernel] starting I/O shutdown, " << io_workers.size()
+                      << " workers to kill\n";
         }
         {
-            std::unique_lock<std::mutex> lck {io_request_mutex};
-            for (auto const& _[[maybe_unused]] : io_workers) {
+            std::unique_lock<std::mutex> lck{io_request_mutex};
+            for (auto const& _ [[maybe_unused]] : io_workers) {
                 io_request_queue.push_back(nullptr);
             }
         }

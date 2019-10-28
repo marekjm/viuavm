@@ -105,7 +105,8 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type {
     auto working_index = convert_signed_integer_to_text_size_type(
         source_text, index->as_integer());
 
-    *target = std::make_unique<viua::types::Text>(source_text->at(working_index));
+    *target =
+        std::make_unique<viua::types::Text>(source_text->at(working_index));
 
     return addr;
 }
@@ -123,10 +124,12 @@ auto viua::process::Process::optextsub(Op_address_type addr)
             addr, this);
 
     viua::types::Integer *first_index = nullptr, *last_index = nullptr;
-    std::tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Integer>(addr, this);
-    std::tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Integer>(addr, this);
+    std::tie(addr, first_index) =
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Integer>(addr, this);
+    std::tie(addr, last_index) =
+        viua::bytecode::decoder::operands::fetch_object_of<
+            viua::types::Integer>(addr, this);
 
     auto working_first_index = convert_signed_integer_to_text_size_type(
         source, first_index->as_integer());

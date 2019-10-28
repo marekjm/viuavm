@@ -320,7 +320,7 @@ auto get_input_operand(
     auto operand = get_operand<T>(instruction, operand_index);
     if ((not operand)
         and dynamic_cast<viua::assembler::frontend::parser::Void_literal*>(
-                instruction.operands.at(operand_index).get())) {
+            instruction.operands.at(operand_index).get())) {
         throw viua::cg::lex::Invalid_syntax{
             instruction.operands.at(operand_index)->tokens.at(0),
             "use of void as input register:"};
@@ -389,9 +389,9 @@ auto check_op_not(Register_usage_profile& register_usage_profile,
 auto check_op_boolean_and_or(Register_usage_profile& register_usage_profile,
                              Instruction const& instruction) -> void;
 auto check_op_bits_of_integer(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
+                              Instruction const& instruction) -> void;
 auto check_op_integer_of_bits(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void;
+                              Instruction const& instruction) -> void;
 auto check_op_bits(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_binary_logic(Register_usage_profile& register_usage_profile,
@@ -454,7 +454,7 @@ auto check_op_process(Register_usage_profile& register_usage_profile,
 auto check_op_self(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_pideq(Register_usage_profile& register_usage_profile,
-                     Instruction const& instruction) -> void;
+                    Instruction const& instruction) -> void;
 auto check_op_join(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void;
 auto check_op_send(Register_usage_profile& register_usage_profile,
@@ -499,15 +499,15 @@ auto check_op_structat(Register_usage_profile& register_usage_profile,
 auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
 auto check_op_io_read(Register_usage_profile& register_usage_profile,
-                         Instruction const& instruction) -> void;
+                      Instruction const& instruction) -> void;
 auto check_op_io_write(Register_usage_profile& register_usage_profile,
-                         Instruction const& instruction) -> void;
+                       Instruction const& instruction) -> void;
 auto check_op_io_wait(Register_usage_profile& register_usage_profile,
-                         Instruction const& instruction) -> void;
+                      Instruction const& instruction) -> void;
 auto check_op_io_cancel(Register_usage_profile& register_usage_profile,
-                         Instruction const& instruction) -> void;
+                        Instruction const& instruction) -> void;
 auto check_op_io_close(Register_usage_profile& register_usage_profile,
-                         Instruction const& instruction) -> void;
+                       Instruction const& instruction) -> void;
 
 auto check_for_unused_registers(
     Register_usage_profile const& register_usage_profile) -> void;

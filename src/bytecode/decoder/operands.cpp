@@ -121,8 +121,8 @@ static auto extract_register_type_and_index(Op_address_type ip,
                                             viua::process::Process* process,
                                             bool const pointers_allowed = false)
     -> std::tuple<Op_address_type,
-             viua::internals::Register_sets,
-             viua::internals::types::register_index> {
+                  viua::internals::Register_sets,
+                  viua::internals::types::register_index> {
     auto const ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
@@ -153,8 +153,8 @@ static auto extract_register_type_and_index(Op_address_type ip,
         register_index = integer_to_register_index(i->as_integer());
     }
     return std::tuple<Op_address_type,
-                 viua::internals::Register_sets,
-                 viua::internals::types::register_index>(
+                      viua::internals::Register_sets,
+                      viua::internals::types::register_index>(
         ip, register_type, register_index);
 }
 auto viua::bytecode::decoder::operands::fetch_register_index(
@@ -180,15 +180,15 @@ auto viua::bytecode::decoder::operands::fetch_register_type_and_index(
     Op_address_type ip,
     viua::process::Process* process)
     -> std::tuple<Op_address_type,
-             viua::internals::Register_sets,
-             viua::internals::types::register_index> {
+                  viua::internals::Register_sets,
+                  viua::internals::types::register_index> {
     auto register_type = viua::internals::Register_sets::LOCAL;
     auto target        = viua::internals::types::register_index{0};
     std::tie(ip, register_type, target) =
         extract_register_type_and_index(ip, process);
     return std::tuple<Op_address_type,
-                 viua::internals::Register_sets,
-                 viua::internals::types::register_index>(
+                      viua::internals::Register_sets,
+                      viua::internals::types::register_index>(
         ip, register_type, target);
 }
 
@@ -206,7 +206,8 @@ auto viua::bytecode::decoder::operands::fetch_timeout(Op_address_type ip,
         throw std::make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected O_INT");
     }
-    return std::tuple<Op_address_type, viua::internals::types::timeout>(ip, value);
+    return std::tuple<Op_address_type, viua::internals::types::timeout>(ip,
+                                                                        value);
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(
@@ -219,7 +220,8 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint(
 auto viua::bytecode::decoder::operands::fetch_registerset_type(
     Op_address_type ip,
     viua::process::Process*)
-    -> std::tuple<Op_address_type, viua::internals::types::registerset_type_marker> {
+    -> std::tuple<Op_address_type,
+                  viua::internals::types::registerset_type_marker> {
     auto const rs_type =
         extract<viua::internals::types::registerset_type_marker>(ip);
     ip += sizeof(decltype(rs_type));
@@ -268,7 +270,8 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(
             "decoded invalid operand type: expected OT_REGISTER_REFERENCE, "
             "OT_INT");
     }
-    return std::tuple<Op_address_type, viua::internals::types::plain_int>(ip, value);
+    return std::tuple<Op_address_type, viua::internals::types::plain_int>(
+        ip, value);
 }
 
 auto viua::bytecode::decoder::operands::fetch_raw_int(Op_address_type ip,

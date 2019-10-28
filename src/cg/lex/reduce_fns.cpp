@@ -876,8 +876,8 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
 
 auto replace_named_registers(std::vector<Token> input_tokens)
     -> std::vector<Token> {
-    auto tokens = std::vector<Token>{};
-    auto names = std::map<std::string, std::string>{};
+    auto tokens      = std::vector<Token>{};
+    auto names       = std::map<std::string, std::string>{};
     auto open_blocks = unsigned{0};
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();

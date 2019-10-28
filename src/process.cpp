@@ -27,9 +27,9 @@
 #include <viua/scheduler/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
+#include <viua/types/io.h>
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
-#include <viua/types/io.h>
 
 // Provide storage for static member.
 viua::internals::types::register_index const
@@ -83,8 +83,9 @@ void viua::process::Process::push_frame() {
     if (find(stack->begin(), stack->end(), stack->frame_new) != stack->end()) {
         std::ostringstream oss;
         oss << "stack corruption: frame " << std::hex << stack->frame_new.get()
-            << std::dec << " for function " << stack->frame_new->function_name << '/'
-            << stack->frame_new->arguments->size() << " pushed more than once";
+            << std::dec << " for function " << stack->frame_new->function_name
+            << '/' << stack->frame_new->arguments->size()
+            << " pushed more than once";
         throw oss.str();
     }
     stack->emplace_back(std::move(stack->frame_new));
@@ -235,7 +236,8 @@ auto viua::process::Process::tick() -> Op_address_type {
     };
     if (stack->instruction_pointer == previous_instruction_pointer
         and stack->state_of() == viua::process::Stack::STATE::RUNNING
-        and (not allowed_unchanged_ops.count(OPCODE(*stack->instruction_pointer)))
+        and (not allowed_unchanged_ops.count(
+            OPCODE(*stack->instruction_pointer)))
         and (not stack->thrown)) {
         stack->thrown =
             std::make_unique<viua::types::Exception>("InstructionUnchanged");
@@ -381,7 +383,8 @@ auto viua::process::Process::become(std::string const& function_name,
 }
 
 auto viua::process::Process::start() -> Op_address_type {
-    if (not attached_scheduler->is_native_function(stack->at(0)->function_name)) {
+    if (not attached_scheduler->is_native_function(
+            stack->at(0)->function_name)) {
         throw std::make_unique<viua::types::Exception>(
             "process from undefined function: " + stack->at(0)->function_name);
     }
@@ -416,11 +419,12 @@ bool viua::process::Process::empty() const {
     return message_queue.empty();
 }
 
-auto viua::process::Process::schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction> i)
-    -> void {
+auto viua::process::Process::schedule_io(
+    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void {
     attached_scheduler->schedule_io(std::move(i));
 }
-auto viua::process::Process::cancel_io(std::tuple<uint64_t, uint64_t> const interaction_id) -> void {
+auto viua::process::Process::cancel_io(
+    std::tuple<uint64_t, uint64_t> const interaction_id) -> void {
     attached_scheduler->cancel_io(interaction_id);
 }
 
@@ -446,8 +450,10 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , is_hidden(false) {
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
-    auto s = std::make_unique<Stack>(
-        frm->function_name, this, global_register_set.get(), attached_scheduler);
+    auto s = std::make_unique<Stack>(frm->function_name,
+                                     this,
+                                     global_register_set.get(),
+                                     attached_scheduler);
     s->emplace_back(std::move(frm));
     s->bind(global_register_set.get());
     stack           = s.get();

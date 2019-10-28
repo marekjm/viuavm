@@ -85,7 +85,8 @@ auto viua::types::Struct::at(std::string const& key) -> viua::types::Value* {
     return value.get();
 }
 
-auto viua::types::Struct::at(std::string const& key) const -> viua::types::Value const* {
+auto viua::types::Struct::at(std::string const& key) const
+    -> viua::types::Value const* {
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<

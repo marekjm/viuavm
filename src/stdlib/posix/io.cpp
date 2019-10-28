@@ -17,12 +17,12 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>  // for close(3), write(3), read(3)
 #include <iostream>
 #include <memory>
 #include <string_view>
+#include <sys/stat.h>
+#include <unistd.h>  // for close(3), write(3), read(3)
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
@@ -36,10 +36,10 @@ template<typename T> auto memset(T& value, int const c) -> void {
 }
 
 static auto open(Frame* frame,
-                   viua::kernel::Register_set*,
-                   viua::kernel::Register_set*,
-                   viua::process::Process*,
-                   viua::kernel::Kernel*) -> void {
+                 viua::kernel::Register_set*,
+                 viua::kernel::Register_set*,
+                 viua::process::Process*,
+                 viua::kernel::Kernel*) -> void {
     auto const fd = ::open(frame->arguments->get(0)->str().c_str(), 0);
     if (fd == -1) {
         throw std::make_unique<viua::types::Exception>("Unknown_errno");
@@ -47,8 +47,7 @@ static auto open(Frame* frame,
 
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
-    frame->local_register_set->set(
-        0, std::make_unique<viua::types::IO_fd>(fd));
+    frame->local_register_set->set(0, std::make_unique<viua::types::IO_fd>(fd));
 }
 }}}}  // namespace viua::stdlib::posix::io
 

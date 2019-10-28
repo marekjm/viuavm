@@ -177,7 +177,8 @@ static void check_timeout_operand(Token token) {
         throw viua::cg::lex::Invalid_syntax(token, "missing timeout operand");
     }
     static std::regex const timeout_regex{"^(?:0|[1-9]\\d*)m?s$"};
-    if (token != "infinity" and not std::regex_match(token.str(), timeout_regex)) {
+    if (token != "infinity"
+        and not std::regex_match(token.str(), timeout_regex)) {
         throw viua::cg::lex::Invalid_syntax(token, "invalid timeout operand");
     }
 }
@@ -414,12 +415,13 @@ static auto get_token_index_of_operand(TokenVector const& tokens,
     return i;
 }
 
-static void check_block_body(TokenVector const& body_tokens,
-                             TokenVector::size_type i,
-                             Registers& registers,
-                             std::map<std::string, std::string> named_registers,
-                             const std::map<std::string, TokenVector>& block_bodies,
-                             bool const debug) {
+static void check_block_body(
+    TokenVector const& body_tokens,
+    TokenVector::size_type i,
+    Registers& registers,
+    std::map<std::string, std::string> named_registers,
+    const std::map<std::string, TokenVector>& block_bodies,
+    bool const debug) {
     using TokenIndex = TokenVector::size_type;
 
     for (; i < body_tokens.size(); ++i) {
@@ -445,11 +447,11 @@ static void check_block_body(TokenVector const& body_tokens,
                 strip_access_mode_sigil(body_tokens.at(i + 1));
             if (debug) {
                 std::cout << "  "
-                     << "register "
-                     << str::enquote(str::strencode(body_tokens.at(i + 1)))
-                     << " is named "
-                     << str::enquote(str::strencode(body_tokens.at(i + 2)))
-                     << std::endl;
+                          << "register "
+                          << str::enquote(str::strencode(body_tokens.at(i + 1)))
+                          << " is named "
+                          << str::enquote(str::strencode(body_tokens.at(i + 2)))
+                          << std::endl;
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -724,7 +726,7 @@ static void check_block_body(TokenVector const& body_tokens,
                     body_tokens.at(target),
                     ("useless check, register will always be defined: "
                      + str::strencode(
-                           strip_access_mode_sigil(body_tokens.at(source)))));
+                         strip_access_mode_sigil(body_tokens.at(source)))));
             }
             registers.insert(
                 resolve_register_name(named_registers, body_tokens.at(target)),
@@ -1236,7 +1238,7 @@ static void check_block_body(TokenVector const& body_tokens,
             registers.insert(reg, body_tokens.at(target));
             if (debug) {
                 std::cout << "  " << str::enquote(token) << " defined register "
-                     << str::enquote(str::strencode(reg_original));
+                          << str::enquote(str::strencode(reg_original));
                 if (reg != reg_original) {
                     std::cout << " = " << str::enquote(str::strencode(reg));
                 }
@@ -1248,11 +1250,12 @@ static void check_block_body(TokenVector const& body_tokens,
     }
     check_defined_but_unused(registers);
 }
-static void check_block_body(TokenVector const& body_tokens,
-                             TokenVector::size_type i,
-                             Registers& registers,
-                             const std::map<std::string, TokenVector>& block_bodies,
-                             bool const debug) {
+static void check_block_body(
+    TokenVector const& body_tokens,
+    TokenVector::size_type i,
+    Registers& registers,
+    const std::map<std::string, TokenVector>& block_bodies,
+    bool const debug) {
     std::map<std::string, std::string> named_registers;
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);

@@ -72,7 +72,8 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
             "InvalidDereference: outside of original process");
     }
     if (not valid) {
-        throw std::make_unique<viua::types::Exception>("expired pointer exception");
+        throw std::make_unique<viua::types::Exception>(
+            "expired pointer exception");
     }
     return points_to;
 }

@@ -94,7 +94,8 @@ auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target->empty()) {
-        throw std::make_unique<viua::types::Exception>("delete of null register");
+        throw std::make_unique<viua::types::Exception>(
+            "delete of null register");
     }
     target->give();
 

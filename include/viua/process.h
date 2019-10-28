@@ -34,8 +34,8 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
-#include <viua/scheduler/io/interactions.h>
 #include <viua/pid.h>
+#include <viua/scheduler/io/interactions.h>
 #include <viua/types/value.h>
 
 
@@ -46,7 +46,7 @@ class Halt_exception : public std::runtime_error {
 
 
 namespace viua::types {
-    struct IO_interaction;
+struct IO_interaction;
 }
 
 
@@ -147,7 +147,8 @@ class Stack {
     auto bind(viua::kernel::Register_set*) -> void;
 
     /*
-     * Iteration over and access to frames of the currently active stack in the process.
+     * Iteration over and access to frames of the currently active stack in the
+     * process.
      */
     auto begin() const -> decltype(frames.begin());
     auto end() const -> decltype(frames.end());
@@ -162,7 +163,7 @@ class Stack {
      * the process.
      */
     auto size() const -> decltype(frames)::size_type;
-    auto clear() -> void;   // FIXME is this used?
+    auto clear() -> void;  // FIXME is this used?
 
     auto register_deferred_calls_from(Frame*) -> void;
     auto register_deferred_calls(bool const = true) -> void;
@@ -271,7 +272,8 @@ class Process {
      *  function calls.
      */
     auto request_new_frame(
-        viua::internals::types::register_index const arguments_size = 0) -> Frame*;
+        viua::internals::types::register_index const arguments_size = 0)
+        -> Frame*;
     auto request_new_try_frame() -> Try_frame*;
     auto push_frame() -> void;
     auto adjust_jump_base_for_block(std::string const&)
@@ -533,7 +535,8 @@ class Process {
         return is_pinned_to_scheduler;
     }
 
-    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>) -> void;
+    auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
+        -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
     Process(std::unique_ptr<Frame>,

@@ -23,12 +23,12 @@
 #include <string>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
+#include <viua/process.h>
 #include <viua/scheduler/io/interactions.h>
 #include <viua/support/string.h>
 #include <viua/types/integer.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
-#include <viua/process.h>
 
 
 namespace viua { namespace types {
@@ -36,6 +36,7 @@ class IO_request : public Value {
     using interaction_id_type = viua::scheduler::io::IO_interaction::id_type;
     interaction_id_type const interaction_id;
     viua::kernel::Kernel* const kernel;
+
   public:
     static std::string const type_name;
 
@@ -56,9 +57,11 @@ class IO_request : public Value {
 
 class IO_port : public Value {
   public:
-      using counter_type = uint64_t;
+    using counter_type = uint64_t;
+
   protected:
-      counter_type counter = 0;
+    counter_type counter = 0;
+
   public:
     static std::string const type_name;
 
@@ -69,14 +72,10 @@ class IO_port : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    virtual auto read(
-          viua::kernel::Kernel&
-        , std::unique_ptr<Value>
-    ) -> std::unique_ptr<IO_request> = 0;
-    virtual auto write(
-          viua::kernel::Kernel&
-        , std::unique_ptr<Value>
-    ) -> std::unique_ptr<IO_request> = 0;
+    virtual auto read(viua::kernel::Kernel&, std::unique_ptr<Value>)
+        -> std::unique_ptr<IO_request> = 0;
+    virtual auto write(viua::kernel::Kernel&, std::unique_ptr<Value>)
+        -> std::unique_ptr<IO_request> = 0;
 
     virtual auto close() -> void = 0;
 
@@ -99,6 +98,7 @@ class IO_fd : public IO_port {
      */
     int const file_descriptor;
     Ownership const ownership;
+
   public:
     static std::string const type_name;
 
@@ -110,8 +110,10 @@ class IO_fd : public IO_port {
     std::unique_ptr<Value> copy() const override;
 
     auto fd() const -> int;
-    auto read(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
-    auto write(viua::kernel::Kernel&, std::unique_ptr<Value>) -> std::unique_ptr<IO_request> override;
+    auto read(viua::kernel::Kernel&, std::unique_ptr<Value>)
+        -> std::unique_ptr<IO_request> override;
+    auto write(viua::kernel::Kernel&, std::unique_ptr<Value>)
+        -> std::unique_ptr<IO_request> override;
     auto close() -> void override;
 
     IO_fd(int const, Ownership const = Ownership::Owned);

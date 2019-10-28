@@ -46,23 +46,32 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
 
 static auto display_vm_information(bool const verbose) -> void {
     auto const full_version = std::string{VERSION} + "." + MICRO;
-    auto const proc_schedulers = viua::kernel::Kernel::no_of_process_schedulers();
+    auto const proc_schedulers =
+        viua::kernel::Kernel::no_of_process_schedulers();
     auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
-    auto const io_schedulers = viua::kernel::Kernel::no_of_io_schedulers();
+    auto const io_schedulers  = viua::kernel::Kernel::no_of_io_schedulers();
     auto const cpus_available = std::thread::hardware_concurrency();
 
     std::cerr << "Viua VM " << full_version << " [";
 
-    if (verbose) { std::cerr << "hardware="; }
+    if (verbose) {
+        std::cerr << "hardware=";
+    }
     std::cerr << cpus_available << ':';
 
-    if (verbose) { std::cerr << "proc="; }
+    if (verbose) {
+        std::cerr << "proc=";
+    }
     std::cerr << proc_schedulers << ':';
 
-    if (verbose) { std::cerr << "ffi="; }
+    if (verbose) {
+        std::cerr << "ffi=";
+    }
     std::cerr << ffi_schedulers << ':';
 
-    if (verbose) { std::cerr << "io="; }
+    if (verbose) {
+        std::cerr << "io=";
+    }
     std::cerr << io_schedulers;
 
     std::cerr << "]\n";
@@ -89,10 +98,10 @@ static bool usage(std::string const program,
             continue;
         } else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
             std::cerr << send_control_seq(COLOR_FG_WHITE) << option
-                 << send_control_seq(ATTR_RESET);
+                      << send_control_seq(ATTR_RESET);
             std::cerr << "\n";
             exit(1);
         } else {
@@ -114,7 +123,8 @@ static bool usage(std::string const program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program << " [option...] <executable>\n" << std::endl;
+        std::cout << "    " << program << " [option...] <executable>\n"
+                  << std::endl;
         std::cout << "OPTIONS:\n";
         std::cout
             << "    "
@@ -189,12 +199,12 @@ int main(int argc, char* argv[]) {
     try {
         kernel.run();
     } catch (std::unique_ptr<viua::types::Exception> const& e) {
-        std::cout << "VM error: an irrecoverable VM exception occured: " << e->what()
-             << std::endl;
+        std::cout << "VM error: an irrecoverable VM exception occured: "
+                  << e->what() << std::endl;
         return 1;
     } catch (std::exception const& e) {
         std::cout << "VM error: an irrecoverable host exception occured: "
-             << e.what() << std::endl;
+                  << e.what() << std::endl;
         return 1;
     }
     // the catch (...) is intentionally omitted, if we can't provide useful

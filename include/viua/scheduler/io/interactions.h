@@ -47,9 +47,9 @@ struct IO_interaction {
   private:
     id_type const assigned_id;
 
-    std::atomic_bool is_complete = false;
+    std::atomic_bool is_complete  = false;
     std::atomic_bool is_cancelled = false;
-    std::atomic_bool is_aborted = false;
+    std::atomic_bool is_aborted   = false;
 
   public:
     /*
@@ -100,7 +100,9 @@ struct IO_interaction {
     virtual auto interact() -> Interaction_result = 0;
 
     auto id() const -> id_type;
-    virtual auto fd() const -> std::optional<fd_type> { return std::nullopt; }
+    virtual auto fd() const -> std::optional<fd_type> {
+        return std::nullopt;
+    }
     virtual auto kind() const -> IO_kind = 0;
 
     auto cancel() -> void;
@@ -126,8 +128,12 @@ struct IO_read_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    auto fd() const -> std::optional<fd_type> { return file_descriptor; }
-    auto kind() const -> IO_kind { return IO_kind::Input; }
+    auto fd() const -> std::optional<fd_type> {
+        return file_descriptor;
+    }
+    auto kind() const -> IO_kind {
+        return IO_kind::Input;
+    }
 
     IO_read_interaction(id_type const, int const, size_t const);
 };
@@ -137,11 +143,15 @@ struct IO_write_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    auto fd() const -> std::optional<fd_type> { return file_descriptor; }
-    auto kind() const -> IO_kind { return IO_kind::Output; }
+    auto fd() const -> std::optional<fd_type> {
+        return file_descriptor;
+    }
+    auto kind() const -> IO_kind {
+        return IO_kind::Output;
+    }
 
     IO_write_interaction(id_type const, int const, std::string);
 };
-}}}
+}}}  // namespace viua::scheduler::io
 
 #endif

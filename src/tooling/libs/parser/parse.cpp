@@ -1192,14 +1192,14 @@ static auto make_unexpected_token_error(
     std::string message) -> viua::tooling::errors::compile_time::Error {
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n") ? viua::tooling::errors::compile_time::
-                               Compile_time_error::Unexpected_newline
+                 Compile_time_error::Unexpected_newline
                          : viua::tooling::errors::compile_time::
-                               Compile_time_error::Unexpected_token),
+                             Compile_time_error::Unexpected_token),
         token,
         std::move(message)}
         .note("got "
               + viua::util::string::ops::quoted(
-                    (viua::util::string::ops::strencode(token.str()))));
+                  (viua::util::string::ops::strencode(token.str()))));
 }
 
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
@@ -1404,16 +1404,19 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
                 break;
             case IO_READ:
             case IO_WRITE:
-                i += parse_any_3_register_instruction(fragments, vector_view{tokens, i});
+                i += parse_any_3_register_instruction(fragments,
+                                                      vector_view{tokens, i});
                 break;
             case IO_CLOSE:
-                i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
+                i += parse_any_1_register_instruction(fragments,
+                                                      vector_view{tokens, i});
                 break;
             case IO_WAIT:
                 i += parse_op_io_wait(fragments, vector_view{tokens, i});
                 break;
             case IO_CANCEL:
-                i += parse_any_1_register_instruction(fragments, vector_view{tokens, i});
+                i += parse_any_1_register_instruction(fragments,
+                                                      vector_view{tokens, i});
                 break;
             case PARAM:
             case PAMV:

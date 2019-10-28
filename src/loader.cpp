@@ -82,8 +82,8 @@ void Loader::load_magic_number(std::ifstream& in) {
         throw "invalid magic number";
     }
     if (std::string{magic_number.data()} != std::string{VIUA_MAGIC_NUMBER}) {
-        throw(std::string{ "invalid magic number: " }
-              + std::string{ magic_number.data() });
+        throw(std::string{"invalid magic number: "}
+              + std::string{magic_number.data()});
     }
 }
 
@@ -101,7 +101,8 @@ void Loader::assume_binary_type(std::ifstream& in,
     }
 }
 
-static std::map<std::string, std::string> load_meta_information_map(std::ifstream& in) {
+static std::map<std::string, std::string> load_meta_information_map(
+    std::ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
@@ -195,7 +196,8 @@ void Loader::load_blocks_map(std::ifstream& in) {
     uint64_t lib_block_ids_section_size = 0;
     readinto(in, &lib_block_ids_section_size);
 
-    auto lib_buffer_block_ids = std::make_unique<char[]>(lib_block_ids_section_size);
+    auto lib_buffer_block_ids =
+        std::make_unique<char[]>(lib_block_ids_section_size);
     in.read(lib_buffer_block_ids.get(),
             static_cast<std::streamsize>(lib_block_ids_section_size));
 

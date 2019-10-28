@@ -72,8 +72,8 @@ auto viua::process::Process::opprocess(Op_address_type addr)
 
     stack->frame_new->function_name = call_name;
 
-    auto spawned_process =
-        attached_scheduler->spawn(std::move(stack->frame_new), this, target_is_void);
+    auto spawned_process = attached_scheduler->spawn(
+        std::move(stack->frame_new), this, target_is_void);
     if (not target_is_void) {
         *target = std::make_unique<viua::types::Process>(spawned_process);
     }
@@ -124,7 +124,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
     if (attached_scheduler->is_stopped(thrd->pid())) {
         return_addr = addr;
         if (attached_scheduler->is_terminated(thrd->pid())) {
-            stack->thrown = attached_scheduler->transfer_exception_of(thrd->pid());
+            stack->thrown =
+                attached_scheduler->transfer_exception_of(thrd->pid());
         } else {
             auto result = attached_scheduler->transfer_result_of(thrd->pid());
             if (not target_is_void) {
@@ -145,7 +146,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type {
 auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type {
     /** Send a message to a process.
      */
-    viua::types::Process *proc = nullptr;
+    viua::types::Process* proc = nullptr;
     std::tie(addr, proc) = viua::bytecode::decoder::operands::fetch_object_of<
         std::remove_pointer<decltype(proc)>::type>(addr, this);
 
@@ -242,7 +243,7 @@ auto viua::process::Process::opwatchdog(Op_address_type addr)
     }
 
     watchdog_function = call_name;
-    watchdog_frame = std::move(stack->frame_new);
+    watchdog_frame    = std::move(stack->frame_new);
 
     return addr;
 }

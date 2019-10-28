@@ -48,13 +48,15 @@ static auto alu_impl(Op_address_type addr, viua::process::Process* process)
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
 
-    auto lhs       = dumb_ptr<Number>{nullptr};
-    std::tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
-        addr, process);
+    auto lhs = dumb_ptr<Number>{nullptr};
+    std::tie(addr, lhs) =
+        viua::bytecode::decoder::operands::fetch_object_of<Number>(addr,
+                                                                   process);
 
-    auto rhs       = dumb_ptr<Number>{nullptr};
-    std::tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
-        addr, process);
+    auto rhs = dumb_ptr<Number>{nullptr};
+    std::tie(addr, rhs) =
+        viua::bytecode::decoder::operands::fetch_object_of<Number>(addr,
+                                                                   process);
 
     *target = (lhs->*action)(*rhs);
 

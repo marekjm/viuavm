@@ -164,8 +164,8 @@ auto assembler::operands::getint(
 
 auto assembler::operands::getbyte(std::string const& s) -> byte_op {
     auto const ref = (s[0] == '@');
-    return std::tuple<bool, char>(ref,
-                             static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
+    return std::tuple<bool, char>(
+        ref, static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
 auto assembler::operands::getfloat(std::string const& s) -> float_op {
@@ -173,8 +173,10 @@ auto assembler::operands::getfloat(std::string const& s) -> float_op {
     return std::tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
 }
 
-auto assembler::operands::get2(std::string const s) -> std::tuple<std::string, std::string> {
-    /** Returns std::tuple of two strings - two operands chunked from the `s` std::string.
+auto assembler::operands::get2(std::string const s)
+    -> std::tuple<std::string, std::string> {
+    /** Returns std::tuple of two strings - two operands chunked from the `s`
+     * std::string.
      */
     auto const op_a = str::chunk(s);
     auto const op_b = str::chunk(str::sub(s, op_a.size()));

@@ -33,7 +33,8 @@ using viua::internals::types::Op_address_type;
 using viua::util::memory::load_aligned;
 
 
-auto viua::process::Process::opbits_of_integer(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbits_of_integer(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -43,10 +44,11 @@ auto viua::process::Process::opbits_of_integer(Op_address_type addr) -> Op_addre
         viua::types::Integer>(addr, this);
 
     auto const size_in_bits = sizeof(viua::types::Integer::underlying_type) * 8;
-    auto decomposed = std::vector<bool>(size_in_bits);
-    auto const base_mask = viua::types::Integer::underlying_type{1};
+    auto decomposed         = std::vector<bool>(size_in_bits);
+    auto const base_mask    = viua::types::Integer::underlying_type{1};
     for (auto i = decltype(size_in_bits){0}; i < size_in_bits; ++i) {
-        decomposed.at(i) = (n->as_unsigned() & static_cast<uint64_t>(base_mask << i));
+        decomposed.at(i) =
+            (n->as_unsigned() & static_cast<uint64_t>(base_mask << i));
     }
 
     *target = std::make_unique<viua::types::Bits>(std::move(decomposed));
@@ -54,19 +56,21 @@ auto viua::process::Process::opbits_of_integer(Op_address_type addr) -> Op_addre
     return addr;
 }
 
-auto viua::process::Process::opinteger_of_bits(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opinteger_of_bits(Op_address_type addr)
+    -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Bits* b = nullptr;
-    std::tie(addr, b) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Bits>(addr, this);
+    std::tie(addr, b) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
+            addr, this);
 
     auto const size_in_bits = b->size();
-    auto decomposed = std::vector<bool>(size_in_bits);
-    auto const base_mask = viua::types::Integer::underlying_type{1};
-    auto n = viua::types::Integer::underlying_type{0};
+    auto decomposed         = std::vector<bool>(size_in_bits);
+    auto const base_mask    = viua::types::Integer::underlying_type{1};
+    auto n                  = viua::types::Integer::underlying_type{0};
     for (auto i = decltype(size_in_bits){0}; i < size_in_bits; ++i) {
         if (b->at(i)) {
             n = (n | (base_mask << i));
@@ -195,7 +199,8 @@ auto viua::process::Process::opbitat(Op_address_type addr) -> Op_address_type {
     std::tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, this);
 
-    *target = std::make_unique<viua::types::Boolean>(bits->at(n->as_unsigned()));
+    *target =
+        std::make_unique<viua::types::Boolean>(bits->at(n->as_unsigned()));
 
     return addr;
 }
@@ -252,7 +257,7 @@ static auto execute_bit_shift_instruction(viua::process::Process* process,
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
             addr, process);
 
-    auto offset       = dumb_ptr<viua::types::Integer>{nullptr};
+    auto offset            = dumb_ptr<viua::types::Integer>{nullptr};
     std::tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, process);
 
@@ -296,7 +301,7 @@ static auto execute_bit_rotate_op(viua::process::Process* process,
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
             addr, process);
 
-    auto offset       = dumb_ptr<viua::types::Integer>{nullptr};
+    auto offset            = dumb_ptr<viua::types::Integer>{nullptr};
     std::tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, process);
 

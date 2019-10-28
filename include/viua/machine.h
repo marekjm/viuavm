@@ -25,13 +25,13 @@
 #define VIUA_VM_DEBUG_LOG 0
 
 
-constexpr auto ENTRY_FUNCTION_NAME[[maybe_unused]] = "__entry";
-constexpr auto VIUA_MAGIC_NUMBER[[maybe_unused]] = "VIUA";
+constexpr auto ENTRY_FUNCTION_NAME [[maybe_unused]] = "__entry";
+constexpr auto VIUA_MAGIC_NUMBER [[maybe_unused]]   = "VIUA";
 
 using Viua_binary_type = char;
 
 enum Viua_module_type {
-    VIUA_LINKABLE = Viua_binary_type{'L'},
+    VIUA_LINKABLE   = Viua_binary_type{'L'},
     VIUA_EXECUTABLE = Viua_binary_type{'E'},
 };
 

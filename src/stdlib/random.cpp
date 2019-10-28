@@ -65,7 +65,8 @@ static auto random_drandom(Frame* frame,
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
-    frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(rint));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::Integer>(rint));
 }
 
 static auto random_durandom(Frame* frame,
@@ -88,7 +89,8 @@ static auto random_durandom(Frame* frame,
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
-    frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(rint));
+    frame->local_register_set->set(
+        0, std::make_unique<viua::types::Integer>(rint));
 }
 
 static auto random_random(Frame* frame,

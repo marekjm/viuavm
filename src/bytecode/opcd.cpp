@@ -38,13 +38,14 @@ int main() {
     auto const initial_column = std::string{"MNEMONIC            "};
     std::cout << initial_column << "| OPCODE  | HEX OPCODE\n" << std::endl;
 
-    auto const column_length = std::max(max_mnemonic_length, initial_column.size());
+    auto const column_length =
+        std::max(max_mnemonic_length, initial_column.size());
 
     for (auto i = viua::internals::types::byte{0};
          i < static_cast<viua::internals::types::byte>(0xff);
          ++i) {
-        auto const opcode   = static_cast<OPCODE>(i);
-        auto mnemonic = std::string{"??"};
+        auto const opcode = static_cast<OPCODE>(i);
+        auto mnemonic     = std::string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
         } else {

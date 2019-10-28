@@ -280,10 +280,10 @@ static auto reduce_scoped_names(std::vector<Token> source)
 
                 j += 2;
 
-                while (
-                    source.at(j + 1) == "::" and is_id(source.at(j + 2).str())
-                    and adjacent(
-                            source.at(j), source.at(j + 1), source.at(j + 2))) {
+                while (source.at(j + 1) == "::"
+                       and is_id(source.at(j + 2).str())
+                       and adjacent(
+                           source.at(j), source.at(j + 1), source.at(j + 2))) {
                     scoped_name_tokens.push_back(source.at(j + 1));  // ::
                     scoped_name_tokens.push_back(source.at(j + 2));  // id
                     j += 2;

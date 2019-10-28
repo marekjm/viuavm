@@ -33,9 +33,9 @@
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
-#include <viua/types/string.h>
-#include <viua/types/pointer.h>
 #include <viua/types/io.h>
+#include <viua/types/pointer.h>
+#include <viua/types/string.h>
 
 
 namespace viua { namespace stdlib { namespace posix { namespace network {
@@ -165,10 +165,9 @@ static auto socket(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, std::make_unique<Socket_type>(
-            sock
-            , viua::types::IO_fd::Ownership::Owned
-        ));
+        0,
+        std::make_unique<Socket_type>(sock,
+                                      viua::types::IO_fd::Ownership::Owned));
 }
 
 static auto connect(Frame* frame,
@@ -185,11 +184,8 @@ static auto connect(Frame* frame,
             ->as_integer()));
     addr.sin_addr.s_addr = inet_ston(frame->arguments->get(1)->str());
 
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
-    if (::connect(sock.fd(),
-                  reinterpret_cast<sockaddr*>(&addr),
-                  sizeof(addr))
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
+    if (::connect(sock.fd(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr))
         == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
@@ -316,11 +312,8 @@ static auto bind(Frame* frame,
             ->as_integer()));
     addr.sin_addr.s_addr = inet_ston(frame->arguments->get(1)->str());
 
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
-    if (::bind(sock.fd(),
-               reinterpret_cast<sockaddr*>(&addr),
-               sizeof(addr))
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
+    if (::bind(sock.fd(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr))
         == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{
@@ -442,8 +435,7 @@ static auto listen(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::process::Process*,
                    viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const backlog =
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
             ->as_integer();
@@ -569,7 +561,8 @@ static auto accept(Frame* frame,
                    viua::process::Process* proc,
                    viua::kernel::Kernel*) -> void {
     auto const& sock = static_cast<Socket_type&>(
-        *static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(proc));
+        *static_cast<viua::types::Pointer*>(frame->arguments->get(0))
+             ->to(proc));
     auto const incoming = ::accept(sock.fd(), nullptr, nullptr);
     if (incoming == -1) {
         auto const error_number = errno;
@@ -742,7 +735,8 @@ static auto accept(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, std::make_unique<Socket_type>(incoming, Socket_type::Ownership::Owned));
+        0,
+        std::make_unique<Socket_type>(incoming, Socket_type::Ownership::Owned));
 }
 
 static auto write(Frame* frame,
@@ -750,8 +744,7 @@ static auto write(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto const buffer  = frame->arguments->get(1)->str();
     auto const written = ::write(sock.fd(), buffer.c_str(), buffer.size());
@@ -878,8 +871,7 @@ static auto read(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
                  viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto buffer        = std::array<char, 1024>{};
     auto const n_bytes = ::read(sock.fd(), buffer.data(), buffer.size());
@@ -1013,8 +1005,7 @@ static auto recv(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
                  viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const buffer_length = static_cast<size_t>(
         static_cast<viua::types::Integer*>(frame->arguments->get(0))
             ->as_integer());
@@ -1160,8 +1151,7 @@ static auto shutdown(Frame* frame,
                      viua::kernel::Register_set*,
                      viua::process::Process*,
                      viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     // FIXME allow shutting down just SHUT_WR or SHUT_RD
     if (::shutdown(sock.fd(), SHUT_RDWR) == -1) {
         auto const error_number = errno;
@@ -1200,8 +1190,7 @@ static auto close(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
                   viua::kernel::Kernel*) -> void {
-    auto const& sock =
-        static_cast<Socket_type&>(*frame->arguments->get(0));
+    auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     if (::close(sock.fd()) == -1) {
         auto const error_number = errno;
         auto const known_errors = std::map<decltype(error_number), std::string>{

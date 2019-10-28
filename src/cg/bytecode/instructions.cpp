@@ -449,12 +449,14 @@ auto opor(viua::internals::types::byte* addr_ptr,
     return insert_three_ri_instruction(addr_ptr, OR, regr, rega, regb);
 }
 
-auto opbits_of_integer(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
+auto opbits_of_integer(viua::internals::types::byte* addr_ptr,
+                       int_op a,
+                       int_op b) -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, BITS_OF_INTEGER, a, b);
 }
-auto opinteger_of_bits(viua::internals::types::byte* addr_ptr, int_op a, int_op b)
-    -> viua::internals::types::byte* {
+auto opinteger_of_bits(viua::internals::types::byte* addr_ptr,
+                       int_op a,
+                       int_op b) -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, INTEGER_OF_BITS, a, b);
 }
 
@@ -940,9 +942,9 @@ auto opself(viua::internals::types::byte* addr_ptr, int_op target)
 }
 
 auto oppideq(viua::internals::types::byte* addr_ptr,
-              int_op target,
-              int_op lhs,
-              int_op rhs) -> viua::internals::types::byte* {
+             int_op target,
+             int_op lhs,
+             int_op rhs) -> viua::internals::types::byte* {
     return insert_three_ri_instruction(addr_ptr, PIDEQ, target, lhs, rhs);
 }
 
@@ -1133,20 +1135,27 @@ auto opstructkeys(viua::internals::types::byte* addr_ptr,
     return insert_two_ri_instruction(addr_ptr, STRUCTKEYS, target, source);
 }
 
-auto op_io_read(viua::internals::types::byte* addr_ptr, int_op req, int_op port, int_op limit)
-    -> viua::internals::types::byte* {
+auto op_io_read(viua::internals::types::byte* addr_ptr,
+                int_op req,
+                int_op port,
+                int_op limit) -> viua::internals::types::byte* {
     return insert_three_ri_instruction(addr_ptr, IO_READ, req, port, limit);
 }
-auto op_io_write(viua::internals::types::byte* addr_ptr, int_op req, int_op port, int_op data)
-    -> viua::internals::types::byte* {
+auto op_io_write(viua::internals::types::byte* addr_ptr,
+                 int_op req,
+                 int_op port,
+                 int_op data) -> viua::internals::types::byte* {
     return insert_three_ri_instruction(addr_ptr, IO_WRITE, req, port, data);
 }
-auto op_io_close(viua::internals::types::byte* addr_ptr, int_op req, int_op port)
-    -> viua::internals::types::byte* {
+auto op_io_close(viua::internals::types::byte* addr_ptr,
+                 int_op req,
+                 int_op port) -> viua::internals::types::byte* {
     return insert_two_ri_instruction(addr_ptr, IO_CLOSE, req, port);
 }
-auto op_io_wait(viua::internals::types::byte* addr_ptr, int_op result, int_op req, timeout_op limit)
-    -> viua::internals::types::byte* {
+auto op_io_wait(viua::internals::types::byte* addr_ptr,
+                int_op result,
+                int_op req,
+                timeout_op limit) -> viua::internals::types::byte* {
     addr_ptr = insert_two_ri_instruction(addr_ptr, IO_WAIT, result, req);
 
     // FIXME change to OT_TIMEOUT?
