@@ -30,7 +30,6 @@
 #include <viua/types/integer.h>
 #include <viua/types/reference.h>
 #include <viua/types/value.h>
-using namespace std;
 
 using viua::bytecode::decoder::operands::fetch_and_advance_addr;
 using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
@@ -52,7 +51,7 @@ auto viua::process::Process::opcapture(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_register, addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of "
             "closure register set");
     }
@@ -66,7 +65,7 @@ auto viua::process::Process::opcapture(Op_address_type addr)
          * This is needed to bind the captured object's life to lifetime of the
          * closure, instead of to lifetime of the frame.
          */
-        auto ref = make_unique<viua::types::Reference>(nullptr);
+        auto ref = std::make_unique<viua::types::Reference>(nullptr);
         ref->rebind(source->give());
 
         *source = std::move(ref);  // set the register to contain the
@@ -92,7 +91,7 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_object, addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of "
             "closure register set");
     }
@@ -117,7 +116,7 @@ auto viua::process::Process::opcapturemove(Op_address_type addr)
         viua::bytecode::decoder::operands::fetch_register, addr, this);
 
     if (target_register >= target->rs()->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "cannot capture object: register index out exceeded size of "
             "closure register set");
     }
@@ -137,11 +136,11 @@ auto viua::process::Process::opclosure(Op_address_type addr)
     auto const function_name = fetch_and_advance_addr<std::string>(
         viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
-    auto rs = make_unique<viua::kernel::Register_set>(
+    auto rs = std::make_unique<viua::kernel::Register_set>(
         std::max(stack->back()->local_register_set->size(),
                  viua::internals::types::register_index{16}));
     auto closure =
-        make_unique<viua::types::Closure>(function_name, std::move(rs));
+        std::make_unique<viua::types::Closure>(function_name, std::move(rs));
 
     *target = std::move(closure);
 
@@ -162,7 +161,7 @@ auto viua::process::Process::opfunction(Op_address_type addr)
     auto const function_name = fetch_and_advance_addr<std::string>(
         viua::bytecode::decoder::operands::fetch_atom, addr, this);
 
-    *target = make_unique<viua::types::Function>(function_name);
+    *target = std::make_unique<viua::types::Function>(function_name);
 
     return addr;
 }

@@ -21,7 +21,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-using namespace std;
 
 
 /** Log shortener tool; to be used when logs are verbose and plenty.
@@ -55,31 +54,31 @@ using namespace std;
 
 
 int main(int argc, char *argv[]) {
-    string input_filename;
+    std::string input_filename;
 
     if (argc < 2) {
-        cerr << "error: no input file" << endl;
+        std::cerr << "error: no input file" << std::endl;
         return 1;
     }
 
     // extract input and output filenames from
     // commandline parameters
-    input_filename = string(argv[1]);
+    input_filename = std::string(argv[1]);
 
-    ifstream in(input_filename);
+    std::ifstream in(input_filename);
 
     // The `preprevious` is just for checking, never for printing while
     // inside the loop.
     // After the loop, `preprevious` can be used for printing during
     // the finishing section.
-    string line, previous, preprevious;
-    string _;
+    std::string line, previous, preprevious;
+    std::string _;
     unsigned long repeated = 0;
 
     int initialisation = 3;
     unsigned long line_counter = 0;
 
-    while (getline(in, _)) {
+    while (std::getline(in, _)) {
         preprevious = previous;
         previous = line;
         line = _;
@@ -95,20 +94,20 @@ int main(int argc, char *argv[]) {
             // another repeated line
             ++repeated;
         } else if (line != previous and previous == preprevious) {
-            cout << previous << endl;
+            std::cout << previous << std::endl;
             if (repeated > 1) {
-                cout << "\n# repeated " << repeated+1 << " time(s), continuing from line " << line_counter << "...\n" << endl;
+                std::cout << "\n# repeated " << repeated+1 << " time(s), continuing from line " << line_counter << "...\n" << endl;
             } else if (repeated == 1) {
-                cout << previous << endl;
+                std::cout << previous << std::endl;
             } else {
                 // repeated zero times
             }
-            cout << previous << endl;
+            std::cout << previous << std::endl;
             repeated = 0;
         } else if (line == previous and previous != preprevious) {
             // do nothing
         } else if (line != previous and previous != preprevious) {
-            cout << previous << endl;
+            std::cout << previous << std::endl;
             repeated = 0;
         }
 
@@ -116,26 +115,26 @@ int main(int argc, char *argv[]) {
     }
 
     if (line == previous and previous == preprevious) {
-        cout << line << endl;
+        std::cout << line << std::endl;
         if (repeated > 1) {
-            cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
-            cout << line << endl;
+            std::cout << "\n# repeated " << repeated+1 << " time(s)...\n" << std::endl;
+            std::cout << line << std::endl;
         } else if (repeated == 1) {
-            cout << line << endl;
-            cout << line << endl;
+            std::cout << line << std::endl;
+            std::cout << line << std::endl;
         } else {
             // repeated zero times
         }
     } else if (line != previous and previous == preprevious) {
-        cout << line << endl;
+        std::cout << line << std::endl;
         if (repeated) {
-            cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
-            cout << line << endl;
+            std::cout << "\n# repeated " << repeated+1 << " time(s)...\n" << std::endl;
+            std::cout << line << std::endl;
         }
     } else if (line == previous and previous != preprevious) {
-        cout << preprevious << endl;
+        std::cout << preprevious << std::endl;
     } else if (line != previous and previous != preprevious) {
-        cout << previous << endl;
+        std::cout << previous << std::endl;
     }
 
 

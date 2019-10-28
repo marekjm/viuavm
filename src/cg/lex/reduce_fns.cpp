@@ -23,7 +23,6 @@
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 #include <viua/support/string.h>
-using namespace std;
 
 namespace viua { namespace cg { namespace lex {
 static auto is_valid_register_id(std::string s) -> bool {
@@ -52,7 +51,7 @@ static auto match(std::vector<Token> const& tokens,
 static auto match_adjacent(
     std::vector<Token> const& tokens,
     std::remove_reference<decltype(tokens)>::type::size_type i,
-    std::vector<string> const& sequence) -> bool {
+    std::vector<std::string> const& sequence) -> bool {
     if (i + sequence.size() >= tokens.size()) {
         return false;
     }
@@ -739,7 +738,7 @@ auto replace_iotas(std::vector<Token> input_tokens) -> std::vector<Token> {
                      + str::strencode(input_tokens.at(i + 1))));
             }
 
-            iotas.back() = stoul(input_tokens.at(i + 1));
+            iotas.back() = std::stoul(input_tokens.at(i + 1));
 
             ++i;
             continue;
@@ -878,8 +877,8 @@ auto replace_defaults(std::vector<Token> input_tokens) -> std::vector<Token> {
 auto replace_named_registers(std::vector<Token> input_tokens)
     -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
-    map<std::string, std::string> names;
-    unsigned open_blocks = 0;
+    auto names = std::map<std::string, std::string>{};
+    auto open_blocks = unsigned{0};
 
     for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size();
          ++i) {

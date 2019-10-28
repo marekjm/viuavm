@@ -27,14 +27,13 @@
 #include <viua/cg/lex.h>
 #include <viua/program.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 using Token = viua::cg::lex::Token;
 
 
 auto assembler::ce::getmarks(std::vector<viua::cg::lex::Token> const& tokens)
-    -> map<std::string,
+    -> std::map<std::string,
            std::remove_reference<decltype(tokens)>::type::size_type> {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
@@ -44,7 +43,7 @@ auto assembler::ce::getmarks(std::vector<viua::cg::lex::Token> const& tokens)
         0};  // we need separate instruction counter
              // because number of lines is not
              // exactly number of instructions
-    auto marks = map<std::string, decltype(instruction)>{};
+    auto marks = std::map<std::string, decltype(instruction)>{};
 
     for (auto i = decltype(tokens.size()){0}; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".name:" or tokens.at(i) == ".import:") {
@@ -78,7 +77,7 @@ static auto get_instruction_block_names(std::vector<Token> const& tokens,
     -> std::vector<std::string> {
     auto names         = std::vector<std::string>{};
     auto all_names     = std::vector<std::string>{};
-    auto defined_where = map<std::string, Token>{};
+    auto defined_where = std::map<std::string, Token>{};
 
     auto const limit       = tokens.size();
     auto const looking_for = std::string{"." + directive + ":"};
@@ -151,8 +150,8 @@ auto assembler::ce::get_block_signatures(std::vector<Token> const& tokens)
 
 static auto get_raw_block_bodies(std::string const& type,
                                  std::vector<Token> const& tokens)
-    -> map<std::string, std::vector<Token>> {
-    auto invokables = map<std::string, std::vector<Token>>{};
+    -> std::map<std::string, std::vector<Token>> {
+    auto invokables = std::map<std::string, std::vector<Token>>{};
 
     auto const looking_for = std::string{"." + type + ":"};
 
@@ -193,6 +192,6 @@ static auto get_raw_block_bodies(std::string const& type,
 }
 auto assembler::ce::get_invokables_token_bodies(
     std::string const& type,
-    std::vector<Token> const& tokens) -> map<std::string, std::vector<Token>> {
+    std::vector<Token> const& tokens) -> std::map<std::string, std::vector<Token>> {
     return get_raw_block_bodies(type, tokens);
 }

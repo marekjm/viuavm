@@ -20,7 +20,6 @@
 #include <memory>
 #include <viua/assert.h>
 #include <viua/util/exceptions.h>
-using namespace std;
 
 
 void viua::assertions::assert_typeof(viua::types::Value* object,

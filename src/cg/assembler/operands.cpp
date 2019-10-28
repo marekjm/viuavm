@@ -25,7 +25,6 @@
 #include <viua/cg/lex.h>
 #include <viua/program.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 static auto resolveregister(viua::cg::lex::Token const token,
@@ -34,10 +33,10 @@ static auto resolveregister(viua::cg::lex::Token const token,
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
-     *  This function MUST return string as teh result is further passed to
-     * assembler::operands::getint() function which *expects* string.
+     *  This function MUST return std::string as teh result is further passed to
+     * assembler::operands::getint() function which *expects* std::string.
      */
-    auto out       = ostringstream{};
+    auto out       = std::ostringstream{};
     auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
@@ -84,7 +83,7 @@ static auto resolveregister(viua::cg::lex::Token const token,
 auto assembler::operands::getint(std::string const& s,
                                  bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
-        throw "empty string cannot be used as operand";
+        throw "empty std::string cannot be used as operand";
     }
 
     if (s == "void") {
@@ -109,7 +108,7 @@ auto assembler::operands::getint_with_rs_type(
     viua::internals::Register_sets const rs_type,
     bool const allow_bare_integers) -> int_op {
     if (s.size() == 0) {
-        throw "empty string cannot be used as operand";
+        throw "empty std::string cannot be used as operand";
     }
 
     if (s == "void") {
@@ -137,7 +136,7 @@ auto assembler::operands::getint(
     auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {
-        throw "empty string cannot be used as operand";
+        throw "empty std::string cannot be used as operand";
     }
 
     if (s == "void") {
@@ -165,25 +164,25 @@ auto assembler::operands::getint(
 
 auto assembler::operands::getbyte(std::string const& s) -> byte_op {
     auto const ref = (s[0] == '@');
-    return tuple<bool, char>(ref,
+    return std::tuple<bool, char>(ref,
                              static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
 auto assembler::operands::getfloat(std::string const& s) -> float_op {
     auto const ref = (s[0] == '@');
-    return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
+    return std::tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
 }
 
-auto assembler::operands::get2(std::string const s) -> tuple<string, string> {
-    /** Returns tuple of two strings - two operands chunked from the `s` string.
+auto assembler::operands::get2(std::string const s) -> std::tuple<std::string, std::string> {
+    /** Returns std::tuple of two strings - two operands chunked from the `s` std::string.
      */
     auto const op_a = str::chunk(s);
     auto const op_b = str::chunk(str::sub(s, op_a.size()));
-    return tuple<std::string, std::string>(op_a, op_b);
+    return std::tuple<std::string, std::string>(op_a, op_b);
 }
 
 auto assembler::operands::get3(std::string const s, bool const fill_third)
-    -> tuple<std::string, std::string, std::string> {
+    -> std::tuple<std::string, std::string, std::string> {
     auto const op_a      = str::chunk(s);
     auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
@@ -192,13 +191,13 @@ auto assembler::operands::get3(std::string const s, bool const fill_third)
 
     /* If s is empty and fill_third is true, use first operand as a filler.
      * In any other case, use the chunk of s.
-     * The chunk of empty std::string will give us empty string and
+     * The chunk of empty std::string will give us empty std::string and
      * it is a valid (and sometimes wanted) value to return.
      */
     auto const op_c =
         (s.size() == 0 and fill_third ? op_a : str::chunk(s_after_b));
 
-    return tuple<std::string, string, string>(op_a, op_b, op_c);
+    return std::tuple<std::string, std::string, std::string>(op_a, op_b, op_c);
 }
 
 auto assembler::operands::convert_token_to_bitstring_operand(

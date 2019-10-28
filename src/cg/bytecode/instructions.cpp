@@ -21,7 +21,6 @@
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/bytecode/instructions.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 using viua::util::memory::aligned_write;
 

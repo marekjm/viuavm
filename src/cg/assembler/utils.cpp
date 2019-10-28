@@ -21,24 +21,23 @@
 #include <string>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
-regex assembler::utils::get_function_name_regex() {
+std::regex assembler::utils::get_function_name_regex() {
     // FIXME function names *MUST* end with '/' to avoid ambiguity when
     // determining whether a token is a function name, or a label
-    return regex{
+    return std::regex{
         "(?:::)?[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z_][a-zA-Z0-9_]*)*/([0-9]+)?"};
 }
 
 bool assembler::utils::is_valid_function_name(
     std::string const& function_name) {
-    return regex_match(function_name, get_function_name_regex());
+    return std::regex_match(function_name, get_function_name_regex());
 }
 
-smatch assembler::utils::match_function_name(std::string const& function_name) {
-    smatch parts;
-    regex_match(function_name, parts, get_function_name_regex());
+std::smatch assembler::utils::match_function_name(std::string const& function_name) {
+    std::smatch parts;
+    std::regex_match(function_name, parts, get_function_name_regex());
     return parts;
 }
 

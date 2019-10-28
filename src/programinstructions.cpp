@@ -20,7 +20,6 @@
 #include <viua/bytecode/opcodes.h>
 #include <viua/program.h>
 #include <viua/support/pointer.h>
-using namespace std;
 
 
 auto Program::opnop() -> Program& {

@@ -27,7 +27,6 @@
 #include <viua/types/string.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
-using namespace std;
 
 
 static void kitchensink_sleep(Frame* frame,

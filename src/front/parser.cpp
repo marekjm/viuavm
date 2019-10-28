@@ -35,7 +35,6 @@
 #include <viua/support/env.h>
 #include <viua/support/string.h>
 #include <viua/version.h>
-using namespace std;
 
 
 // MISC FLAGS
@@ -54,9 +53,9 @@ using viua::cg::lex::Traced_syntax_error;
 
 template<class T>
 static auto enumerate(std::vector<T> const& v)
-    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    -> std::vector<std::pair<typename std::vector<T>::size_type, T>> {
     auto enumerated_vector =
-        std::vector<pair<typename std::vector<T>::size_type, T>>{};
+        std::vector<std::pair<typename std::vector<T>::size_type, T>>{};
 
     typename std::vector<T>::size_type i = 0;
     for (auto const& each : v) {
@@ -72,34 +71,34 @@ static bool usage(const char* program,
                   bool show_version,
                   bool verbose) {
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM lexer, version ";
+        std::cout << "Viua VM lexer, version ";
     }
     if (show_help or show_version) {
-        cout << VERSION << '.' << MICRO << endl;
+        std::cout << VERSION << '.' << MICRO << std::endl;
     }
     if (show_help) {
-        cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] <infile>\n" << endl;
-        cout << "OPTIONS:\n";
+        std::cout << "\nUSAGE:\n";
+        std::cout << "    " << program << " [option...] <infile>\n" << std::endl;
+        std::cout << "OPTIONS:\n";
 
         // generic options
-        cout << "    "
+        std::cout << "    "
              << "-V, --version            - show version\n"
              << "    "
              << "-h, --help               - display this message\n"
              << "    ";
 
         // compilation options
-        cout << "-c, --lib                - assemble as a library\n";
+        std::cout << "-c, --lib                - assemble as a library\n";
     }
 
     return (show_help or show_version);
 }
 
-static std::string read_file(ifstream& in) {
-    ostringstream source_in;
+static std::string read_file(std::ifstream& in) {
+    std::ostringstream source_in;
     auto line = std::string{};
-    while (getline(in, line)) {
+    while (std::getline(in, line)) {
         source_in << line << '\n';
     }
 
@@ -129,7 +128,7 @@ int main(int argc, char* argv[]) {
             AS_LIB = true;
             continue;
         } else if (str::startswith(option, "-")) {
-            cerr << "error: unknown option: " << option << endl;
+            std::cerr << "error: unknown option: " << option << std::endl;
             return 1;
         }
         args.emplace_back(argv[i]);
@@ -140,7 +139,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (args.size() == 0) {
-        cout << "fatal: no input file" << endl;
+        std::cerr << "fatal: no input file" << std::endl;
         return 1;
     }
 
@@ -148,23 +147,23 @@ int main(int argc, char* argv[]) {
     // FIND FILENAME AND COMPILENAME
     filename = args[0];
     if (!filename.size()) {
-        cout << "fatal: no file to tokenize" << endl;
+        std::cerr << "fatal: no file to tokenize" << std::endl;
         return 1;
     }
     if (!viua::support::env::is_file(filename)) {
-        cout << "fatal: could not open file: " << filename << endl;
+        std::cerr << "fatal: could not open file: " << filename << std::endl;
         return 1;
     }
 
     ////////////////
     // READ LINES IN
-    ifstream in(filename, ios::in | ios::binary);
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (!in) {
-        cout << "fatal: file could not be opened: " << filename << endl;
+        std::cerr << "fatal: file could not be opened: " << filename << std::endl;
         return 1;
     }
 
-    std::string source = read_file(in);
+    auto const source = read_file(in);
 
     auto raw_tokens        = viua::cg::lex::tokenise(source);
     auto tokens            = std::vector<Token>{};

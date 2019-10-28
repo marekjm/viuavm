@@ -26,16 +26,15 @@
 #include <viua/types/exception.h>
 #include <viua/types/float.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 static auto math_sqrt(Frame* frame, viua::kernel::Register_set*, viua::kernel::Register_set*,
                       viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw make_unique<viua::types::Exception>("expected float as first argument");
+        throw std::make_unique<viua::types::Exception>("expected float as first argument");
     }
     if (frame->arguments->at(0)->type() != "Float") {
-        throw make_unique<viua::types::Exception>("invalid type of parameter 0: expected Float");
+        throw std::make_unique<viua::types::Exception>("invalid type of parameter 0: expected Float");
     }
 
     auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_float());

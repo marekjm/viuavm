@@ -29,7 +29,6 @@
 #include <viua/types/exception.h>
 #include <viua/types/float.h>
 #include <viua/types/integer.h>
-using namespace std;
 
 
 static auto getrandom() -> long double {
@@ -53,19 +52,20 @@ static auto random_drandom(Frame* frame,
                            viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
-    /** Return random integer.
+    /*
+     * Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
      *  This call can block if not enough entropy bytes are available.
      */
-    ifstream in("/dev/random");
+    std::ifstream in("/dev/random");
     if (!in) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "failed to open random device: /dev/random");
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
-    frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
+    frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(rint));
 }
 
 static auto random_durandom(Frame* frame,
@@ -73,21 +73,22 @@ static auto random_durandom(Frame* frame,
                             viua::kernel::Register_set*,
                             viua::process::Process*,
                             viua::kernel::Kernel*) -> void {
-    /** Return random integer.
+    /*
+     * Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
      *  This is a nonblocking call.
      *  If not enough entropy bytes are available a pseudo-random generator is
      *  employed to supply missing bytes.
      */
-    ifstream in("/dev/urandom");
+    std::ifstream in("/dev/urandom");
     if (!in) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "failed to open random device: /dev/urandom");
     }
     int rint = 0;
     in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
-    frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
+    frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(rint));
 }
 
 static auto random_random(Frame* frame,
@@ -95,7 +96,8 @@ static auto random_random(Frame* frame,
                           viua::kernel::Register_set*,
                           viua::process::Process*,
                           viua::kernel::Kernel*) -> void {
-    /** Return random float from range between 0.0 and 1.0.
+    /*
+     * Return random float from range between 0.0 and 1.0.
      */
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
@@ -108,7 +110,8 @@ static auto random_randint(Frame* frame,
                            viua::kernel::Register_set*,
                            viua::process::Process*,
                            viua::kernel::Kernel*) -> void {
-    /** Return random integer from selected range.
+    /*
+     * Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.
      *  Returned integer is in range [lower, upper).
@@ -122,7 +125,7 @@ static auto random_randint(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
-        0, make_unique<viua::types::Integer>(lower_bound + modifer));
+        0, std::make_unique<viua::types::Integer>(lower_bound + modifer));
 }
 
 const Foreign_function_spec functions[] = {

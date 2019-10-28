@@ -23,7 +23,6 @@
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/front/asm.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 auto viua::assembler::util::pretty_printer::send_control_seq(
@@ -61,12 +60,12 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
      * first underlined token, and servers as additional comment for the error
      * or note.
      */
-    ostringstream indent;
+    std::ostringstream indent;
 
     /*
      * Remember to increase the indent also.
      */
-    cout << "     ";
+    std::cout << "     ";
     indent << "     ";
 
     /*
@@ -75,7 +74,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
      */
     auto len = str::stringify((error.line() + 1), false).size();
     while (len--) {
-        cout << ' ';
+        std::cout << ' ';
         indent << ' ';
     }
 
@@ -83,7 +82,7 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
      * Insert additional space between line number and source code listing to
      * aid readability.
      */
-    cout << ' ';
+    std::cout << ' ';
     indent << ' ';
 
     bool has_matched           = false;
@@ -93,12 +92,12 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
         bool match       = error.match(each);
 
         if (each == "\n") {
-            cout << send_control_seq(ATTR_RESET);
+            std::cout << send_control_seq(ATTR_RESET);
             break;
         }
 
         if (match) {
-            cout << send_control_seq(COLOR_FG_RED_1);
+            std::cout << send_control_seq(COLOR_FG_RED_1);
         }
 
         char c = (match ? (has_matched ? '~' : '^') : ' ');
@@ -131,27 +130,27 @@ auto viua::assembler::util::pretty_printer::underline_error_token(
          * The loop is for the string of '~'.
          */
         if (len--) {
-            cout << c;
+            std::cout << c;
             if (match) {
                 c = '~';
             }
         }
         while (len--) {
-            cout << c;
+            std::cout << c;
         }
 
         if (match) {
-            cout << send_control_seq(ATTR_RESET);
+            std::cout << send_control_seq(ATTR_RESET);
         }
     }
 
-    cout << '\n';
+    std::cout << '\n';
 
     if (error.aside().size()) {
-        cout << indent.str();
-        cout << send_control_seq(COLOR_FG_RED_1) << '^'
+        std::cout << indent.str();
+        std::cout << send_control_seq(COLOR_FG_RED_1) << '^'
              << send_control_seq(COLOR_FG_LIGHT_GREEN) << ' ' << error.aside()
-             << send_control_seq(ATTR_RESET) << endl;
+             << send_control_seq(ATTR_RESET) << std::endl;
     }
 }
 auto viua::assembler::util::pretty_printer::display_error_line(
@@ -161,31 +160,31 @@ auto viua::assembler::util::pretty_printer::display_error_line(
     size_t const line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
-    cout << send_control_seq(COLOR_FG_RED);
-    cout << ">>>>";  // message indent, ">>>>" on error line
-    cout << ' ';
+    std::cout << send_control_seq(COLOR_FG_RED);
+    std::cout << ">>>>";  // message indent, ">>>>" on error line
+    std::cout << ' ';
 
-    cout << send_control_seq(COLOR_FG_YELLOW);
-    cout << std::setw(static_cast<int>(line_no_width));
-    cout << token_line + 1;
-    cout << ' ';
+    std::cout << send_control_seq(COLOR_FG_YELLOW);
+    std::cout << std::setw(static_cast<int>(line_no_width));
+    std::cout << token_line + 1;
+    std::cout << ' ';
 
     auto original_i = i;
 
-    cout << send_control_seq(COLOR_FG_WHITE);
+    std::cout << send_control_seq(COLOR_FG_WHITE);
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
         bool highlighted = false;
         if (error.match(tokens.at(i))) {
-            cout << send_control_seq(COLOR_FG_ORANGE_RED_1);
+            std::cout << send_control_seq(COLOR_FG_ORANGE_RED_1);
             highlighted = true;
         }
-        cout << tokens.at(i++).str();
+        std::cout << tokens.at(i++).str();
         if (highlighted) {
-            cout << send_control_seq(COLOR_FG_WHITE);
+            std::cout << send_control_seq(COLOR_FG_WHITE);
         }
     }
 
-    cout << send_control_seq(ATTR_RESET);
+    std::cout << send_control_seq(ATTR_RESET);
 
     underline_error_token(tokens, original_i, error);
 
@@ -198,14 +197,14 @@ auto viua::assembler::util::pretty_printer::display_context_line(
     size_t const line_no_width) -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
-    cout << "    ";  // message indent, ">>>>" on error line
-    cout << ' ';
-    cout << std::setw(static_cast<int>(line_no_width));
-    cout << token_line + 1;
-    cout << ' ';
+    std::cout << "    ";  // message indent, ">>>>" on error line
+    std::cout << ' ';
+    std::cout << std::setw(static_cast<int>(line_no_width));
+    std::cout << token_line + 1;
+    std::cout << ' ';
 
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
-        cout << tokens.at(i++).str();
+        std::cout << tokens.at(i++).str();
     }
 
     return i;
@@ -214,19 +213,19 @@ auto viua::assembler::util::pretty_printer::display_error_header(
     viua::cg::lex::Invalid_syntax const& error,
     std::string const& filename) -> void {
     if (error.str().size()) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
+        std::cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
              << error.line() + 1 << ':' << error.character() + 1 << ':'
              << send_control_seq(ATTR_RESET) << ' ';
-        cout << send_control_seq(COLOR_FG_RED) << "error"
-             << send_control_seq(ATTR_RESET) << ": " << error.what() << endl;
+        std::cout << send_control_seq(COLOR_FG_RED) << "error"
+             << send_control_seq(ATTR_RESET) << ": " << error.what() << std::endl;
     }
     if (error.notes().size()) {
         for (auto const& note : error.notes()) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
+            std::cout << send_control_seq(COLOR_FG_WHITE) << filename << ':'
                  << error.line() + 1 << ':' << error.character() + 1 << ':'
                  << send_control_seq(ATTR_RESET) << ' ';
-            cout << send_control_seq(COLOR_FG_CYAN) << "note"
-                 << send_control_seq(ATTR_RESET) << ": " << note << endl;
+            std::cout << send_control_seq(COLOR_FG_CYAN) << "note"
+                 << send_control_seq(ATTR_RESET) << ": " << note << std::endl;
         }
     }
 }
@@ -263,7 +262,7 @@ auto viua::assembler::util::pretty_printer::display_error_in_context(
     const viua::cg::lex::Invalid_syntax error,
     std::string const& filename) -> void {
     display_error_header(error, filename);
-    cout << "\n";
+    std::cout << "\n";
     display_error_location(tokens, error);
 }
 auto viua::assembler::util::pretty_printer::display_error_in_context(
@@ -272,6 +271,6 @@ auto viua::assembler::util::pretty_printer::display_error_in_context(
     std::string const& filename) -> void {
     for (auto const& e : error.errors) {
         display_error_in_context(tokens, e, filename);
-        cout << "\n";
+        std::cout << "\n";
     }
 }

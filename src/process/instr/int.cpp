@@ -27,36 +27,35 @@
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = make_unique<viua::types::Integer>(0);
+    *target = std::make_unique<viua::types::Integer>(0);
     return addr;
 }
 
 auto viua::process::Process::opinteger(Op_address_type addr)
     -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     int integer = 0;
-    tie(addr, integer) =
+    std::tie(addr, integer) =
         viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
-    *target = make_unique<viua::types::Integer>(integer);
+    *target = std::make_unique<viua::types::Integer>(integer);
 
     return addr;
 }
 
 auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type {
     viua::types::Integer* target{nullptr};
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
+    std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, this);
 
     target->increment();
@@ -66,7 +65,7 @@ auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opidec(Op_address_type addr) -> Op_address_type {
     viua::types::Integer* target{nullptr};
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
+    std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, this);
 
     target->decrement();

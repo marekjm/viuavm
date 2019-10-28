@@ -30,7 +30,6 @@
 #include <viua/loader.h>
 #include <viua/machine.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 using viua::util::memory::aligned_read;
 
@@ -38,7 +37,7 @@ using viua::util::memory::aligned_read;
 IdToAddressMapping Loader::loadmap(char* bytedump,
                                    uint64_t const& bytedump_size) {
     auto order = std::vector<std::string>{};
-    map<std::string, uint64_t> mapping;
+    std::map<std::string, uint64_t> mapping;
 
     char* lib_function_ids_map = bytedump;
 
@@ -76,24 +75,24 @@ void Loader::calculate_function_sizes() {
     }
 }
 
-void Loader::load_magic_number(ifstream& in) {
-    char magic_number[5];
-    in.read(magic_number, sizeof(char) * 5);
-    if (magic_number[4] != '\0') {
+void Loader::load_magic_number(std::ifstream& in) {
+    std::array<char, 5> magic_number;
+    in.read(magic_number.data(), sizeof(char) * magic_number.size());
+    if (magic_number.back() != '\0') {
         throw "invalid magic number";
     }
-    if (std::string(magic_number) != string(VIUA_MAGIC_NUMBER)) {
-        throw(std::string("invalid magic number: ")
-              + std::string(magic_number));
+    if (std::string{magic_number.data()} != std::string{VIUA_MAGIC_NUMBER}) {
+        throw(std::string{ "invalid magic number: " }
+              + std::string{ magic_number.data() });
     }
 }
 
-void Loader::assume_binary_type(ifstream& in,
+void Loader::assume_binary_type(std::ifstream& in,
                                 Viua_binary_type assumed_binary_type) {
     char bt;
     in.read(&bt, sizeof(decltype(bt)));
     if (bt != assumed_binary_type) {
-        ostringstream error;
+        std::ostringstream error;
         error << "not a "
               << (assumed_binary_type == VIUA_LINKABLE ? "linkable"
                                                        : "executable")
@@ -102,16 +101,16 @@ void Loader::assume_binary_type(ifstream& in,
     }
 }
 
-static map<std::string, std::string> load_meta_information_map(ifstream& in) {
+static std::map<std::string, std::string> load_meta_information_map(std::ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
     auto meta_information_map_buffer =
-        make_unique<char[]>(meta_information_map_size);
+        std::make_unique<char[]>(meta_information_map_size);
     in.read(meta_information_map_buffer.get(),
             static_cast<std::streamsize>(meta_information_map_size));
 
-    map<std::string, std::string> meta_information_map;
+    std::map<std::string, std::string> meta_information_map;
 
     char* buffer = meta_information_map_buffer.get();
     uint64_t i   = 0;
@@ -126,16 +125,16 @@ static map<std::string, std::string> load_meta_information_map(ifstream& in) {
 
     return meta_information_map;
 }
-void Loader::load_meta_information(ifstream& in) {
+void Loader::load_meta_information(std::ifstream& in) {
     meta_information = load_meta_information_map(in);
 }
 
-static std::vector<std::string> load_string_list(ifstream& in) {
+static std::vector<std::string> load_string_list(std::ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
     auto signatures_section_buffer =
-        make_unique<char[]>(signatures_section_size);
+        std::make_unique<char[]>(signatures_section_size);
     in.read(signatures_section_buffer.get(),
             static_cast<std::streamsize>(signatures_section_size));
 
@@ -151,17 +150,17 @@ static std::vector<std::string> load_string_list(ifstream& in) {
 
     return strings_list;
 }
-void Loader::load_external_signatures(ifstream& in) {
+void Loader::load_external_signatures(std::ifstream& in) {
     external_signatures = load_string_list(in);
 }
-void Loader::load_external_block_signatures(ifstream& in) {
+void Loader::load_external_block_signatures(std::ifstream& in) {
     external_signatures_block = load_string_list(in);
 }
-auto Loader::load_dynamic_imports_section(ifstream& in) -> void {
+auto Loader::load_dynamic_imports_section(std::ifstream& in) -> void {
     dynamic_linked_modules = load_string_list(in);
 }
 
-void Loader::load_jump_table(ifstream& in) {
+void Loader::load_jump_table(std::ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
     readinto(in, &lib_total_jumps);
@@ -172,17 +171,17 @@ void Loader::load_jump_table(ifstream& in) {
         jumps.push_back(lib_jmp);
     }
 }
-void Loader::load_functions_map(ifstream& in) {
+void Loader::load_functions_map(std::ifstream& in) {
     uint64_t lib_function_ids_section_size = 0;
     readinto(in, &lib_function_ids_section_size);
 
     auto lib_buffer_function_ids =
-        make_unique<char[]>(lib_function_ids_section_size);
+        std::make_unique<char[]>(lib_function_ids_section_size);
     in.read(lib_buffer_function_ids.get(),
             static_cast<std::streamsize>(lib_function_ids_section_size));
 
     auto order = std::vector<std::string>{};
-    map<std::string, uint64_t> mapping;
+    std::map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
         loadmap(lib_buffer_function_ids.get(), lib_function_ids_section_size);
@@ -192,16 +191,16 @@ void Loader::load_functions_map(ifstream& in) {
         function_addresses[p] = mapping[p];
     }
 }
-void Loader::load_blocks_map(ifstream& in) {
+void Loader::load_blocks_map(std::ifstream& in) {
     uint64_t lib_block_ids_section_size = 0;
     readinto(in, &lib_block_ids_section_size);
 
-    auto lib_buffer_block_ids = make_unique<char[]>(lib_block_ids_section_size);
+    auto lib_buffer_block_ids = std::make_unique<char[]>(lib_block_ids_section_size);
     in.read(lib_buffer_block_ids.get(),
             static_cast<std::streamsize>(lib_block_ids_section_size));
 
     auto order = std::vector<std::string>{};
-    map<std::string, uint64_t> mapping;
+    std::map<std::string, uint64_t> mapping;
 
     tie(order, mapping) =
         loadmap(lib_buffer_block_ids.get(), lib_block_ids_section_size);
@@ -211,15 +210,15 @@ void Loader::load_blocks_map(ifstream& in) {
         block_addresses[p] = mapping[p];
     }
 }
-void Loader::load_bytecode(ifstream& in) {
+void Loader::load_bytecode(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
-    bytecode = make_unique<viua::internals::types::byte[]>(size);
+    bytecode = std::make_unique<viua::internals::types::byte[]>(size);
     in.read(reinterpret_cast<char*>(bytecode.get()),
             static_cast<std::streamsize>(size));
 }
 
 Loader& Loader::load() {
-    ifstream in(path, ios::in | ios::binary);
+    std::ifstream in(path, std::ios::in | std::ios::binary);
     if (!in) {
         throw("failed to open file: " + path);
     }
@@ -244,7 +243,7 @@ Loader& Loader::load() {
 }
 
 Loader& Loader::executable() {
-    ifstream in(path, ios::in | ios::binary);
+    std::ifstream in(path, std::ios::in | std::ios::binary);
     if (!in) {
         throw("fatal: failed to open file: " + path);
     }
@@ -268,44 +267,44 @@ Loader& Loader::executable() {
 uint64_t Loader::get_bytecode_size() {
     return size;
 }
-std::unique_ptr<viua::internals::types::byte[]> Loader::get_bytecode() {
-    auto copy = make_unique<viua::internals::types::byte[]>(size);
+auto Loader::get_bytecode() -> std::unique_ptr<viua::internals::types::byte[]> {
+    auto copy = std::make_unique<viua::internals::types::byte[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }
     return copy;
 }
 
-std::vector<uint64_t> Loader::get_jumps() {
+auto Loader::get_jumps() -> std::vector<uint64_t> {
     return jumps;
 }
 
-map<std::string, std::string> Loader::get_meta_information() {
+auto Loader::get_meta_information() -> std::map<std::string, std::string> {
     return meta_information;
 }
 
-std::vector<std::string> Loader::get_external_signatures() {
+auto Loader::get_external_signatures() -> std::vector<std::string> {
     return external_signatures;
 }
 
-std::vector<std::string> Loader::get_external_block_signatures() {
+auto Loader::get_external_block_signatures() -> std::vector<std::string> {
     return external_signatures_block;
 }
 
-map<std::string, uint64_t> Loader::get_function_addresses() {
+auto Loader::get_function_addresses() -> std::map<std::string, uint64_t> {
     return function_addresses;
 }
-map<std::string, uint64_t> Loader::get_function_sizes() {
+auto Loader::get_function_sizes() -> std::map<std::string, uint64_t> {
     return function_sizes;
 }
-std::vector<std::string> Loader::get_functions() {
+auto Loader::get_functions() -> std::vector<std::string> {
     return functions;
 }
 
-map<std::string, uint64_t> Loader::get_block_addresses() {
+auto Loader::get_block_addresses() -> std::map<std::string, uint64_t> {
     return block_addresses;
 }
-std::vector<std::string> Loader::get_blocks() {
+auto Loader::get_blocks() -> std::vector<std::string> {
     return blocks;
 }
 

@@ -23,7 +23,6 @@
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 #include <viua/support/string.h>
-using namespace std;
 
 namespace viua { namespace cg { namespace lex {
 auto Token::line() const -> decltype(line_number) {
@@ -263,7 +262,7 @@ auto assert_is_not_reserved_keyword(Token token, std::string const& message)
 auto tokenise(std::string const& source) -> std::vector<Token> {
     auto tokens = std::vector<Token>{};
 
-    ostringstream candidate_token;
+    std::ostringstream candidate_token;
     candidate_token.str("");
 
     decltype(candidate_token.str().size()) line_number       = 0,
@@ -361,7 +360,7 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
     return tokens;
 }
 
-auto is_register_set_name(string const& s) -> bool {
+auto is_register_set_name(std::string const& s) -> bool {
     return (s == "local" or s == "static" or s == "global" or s == "arguments"
             or s == "parameters");
 }
@@ -1969,7 +1968,7 @@ auto normalise(std::vector<Token> input_tokens) -> std::vector<Token> {
 auto join_tokens(std::vector<Token> const tokens,
                  decltype(tokens)::size_type const from,
                  decltype(from) const to) -> std::string {
-    ostringstream joined;
+    std::ostringstream joined;
 
     for (auto i = from; i < tokens.size() and i < to; ++i) {
         joined << tokens.at(i).str();

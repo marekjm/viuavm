@@ -27,7 +27,6 @@
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
-using namespace std;
 
 using viua::bytecode::decoder::operands::fetch_and_advance_addr;
 using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
@@ -80,7 +79,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type {
             + std::to_string(pack_size));
     }
 
-    auto v = make_unique<viua::types::Vector>();
+    auto v = std::make_unique<viua::types::Vector>();
     for (auto i = decltype(pack_size){0}; i < pack_size; ++i) {
         v->push(register_at(pack_start_ri + i, pack_start_rs)->give());
     }
@@ -113,7 +112,7 @@ auto viua::process::Process::opvinsert(Op_address_type addr)
     int64_t position_operand_index      = 0;
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
-        tie(addr, index_operand) =
+        std::tie(addr, index_operand) =
             viua::bytecode::decoder::operands::fetch_object_of<
                 viua::types::Integer>(addr, this);
         position_operand_index = index_operand->as_integer();
@@ -136,12 +135,12 @@ auto viua::process::Process::opvpush(Op_address_type addr) -> Op_address_type {
     if (viua::bytecode::decoder::operands::get_operand_type(addr)
         == OT_POINTER) {
         viua::types::Value* source = nullptr;
-        tie(addr, source) =
+        std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
         object = source->copy();
     } else {
         viua::kernel::Register* source = nullptr;
-        tie(addr, source) =
+        std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
         object = source->give();
     }
@@ -156,14 +155,14 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
 
     if (not void_target) {
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) =
+    std::tie(addr, vector_operand) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
@@ -171,7 +170,7 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type {
     int64_t position_operand_index      = -1;
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
-        tie(addr, index_operand) =
+        std::tie(addr, index_operand) =
             viua::bytecode::decoder::operands::fetch_object_of<
                 viua::types::Integer>(addr, this);
         position_operand_index = index_operand->as_integer();
@@ -212,13 +211,13 @@ auto viua::process::Process::opvlen(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
     viua::types::Vector* source    = nullptr;
 
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(
             addr, this);
 
-    *target = make_unique<viua::types::Integer>(source->len());
+    *target = std::make_unique<viua::types::Integer>(source->len());
 
     return addr;
 }

@@ -28,7 +28,6 @@
 #include <viua/program.h>
 #include <viua/support/string.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 using viua::util::memory::aligned_write;
 using viua::util::memory::load_aligned;
@@ -55,9 +54,9 @@ auto Program::size() const -> uint64_t {
 
 using Token = viua::cg::lex::Token;
 auto Program::calculate_jumps(
-    std::vector<tuple<uint64_t, uint64_t>> const jump_positions,
+    std::vector<std::tuple<uint64_t, uint64_t>> const jump_positions,
     std::vector<Token> const& tokens) -> Program& {
-    for (auto jmp : jump_positions) {
+    for (auto const jmp : jump_positions) {
         auto const [position, offset] = jmp;
 
         // usually beware of the reinterpret_cast<>'s but here we *know* what

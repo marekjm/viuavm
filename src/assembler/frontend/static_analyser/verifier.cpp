@@ -21,7 +21,6 @@
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
-using namespace std;
 using namespace viua::assembler::frontend::parser;
 
 
@@ -306,7 +305,7 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                     ::assembler::utils::get_function_arity(function_name);
 
                 if (arity >= 0 and arity != frame_parameters_count) {
-                    ostringstream report;
+                    std::ostringstream report;
                     report
                         << "invalid number of parameters in call to function "
                         << function_name << ": expected " << arity << ", got "
@@ -388,7 +387,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                     if (detected_slot_index and detected_frame_parameters_count
                         and slot_index >= frame_parameters_count) {
-                        ostringstream report;
+                        std::ostringstream report;
                         report << "pass to parameter slot " << slot_index
                                << " in frame with only "
                                << frame_parameters_count << " slots available";
@@ -444,7 +443,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                     if (detected_slot_index and detected_frame_parameters_count
                         and slot_index >= frame_parameters_count) {
-                        ostringstream report;
+                        std::ostringstream report;
                         report << "pass to parameter slot " << slot_index
                                << " in frame with only "
                                << frame_parameters_count << " slots available";
@@ -501,7 +500,7 @@ static auto validate_jump(
     std::string const& extracted_jump,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
-    const map<std::string, InstructionIndex>& jump_targets)
+    const std::map<std::string, InstructionIndex>& jump_targets)
     -> InstructionIndex {
     auto target = InstructionIndex{0};
     if (str::isnum(extracted_jump, false)) {
@@ -558,7 +557,7 @@ static auto validate_jump_pair(
     Token const& when_false,
     const InstructionIndex instruction_counter,
     const InstructionIndex current_instruction_counter,
-    const map<std::string, InstructionIndex>& jump_targets) -> void {
+    const std::map<std::string, InstructionIndex>& jump_targets) -> void {
     if (when_true.str() == when_false.str()) {
         throw viua::cg::lex::Invalid_syntax(
             branch_token,
@@ -592,7 +591,7 @@ auto viua::assembler::frontend::static_analyser::verify_jumps_are_in_range(
             auto current_instruction_counter =
                 static_cast<InstructionIndex>(-1);
 
-            map<std::string, decltype(instruction_counter)> jump_targets;
+            std::map<std::string, decltype(instruction_counter)> jump_targets;
 
             for (auto const& line : ib.body) {
                 auto mnemonic = line->tokens.at(0);

@@ -29,7 +29,6 @@
 #include <viua/types/integer.h>
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
-using namespace std;
 
 
 viua::process::PID::PID(const viua::process::Process* p)
@@ -62,7 +61,7 @@ auto viua::process::PID::get() const -> decltype(associated_process) {
 }
 
 auto viua::process::PID::str() const -> std::string {
-    ostringstream oss;
-    oss << hex << associated_process;
+    std::ostringstream oss;
+    oss << std::hex << associated_process;
     return oss.str();
 }

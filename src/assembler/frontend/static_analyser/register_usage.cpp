@@ -25,7 +25,6 @@
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
 #include <viua/util/range.h>
-using namespace std;
 using namespace viua::assembler::frontend::parser;
 
 

@@ -24,14 +24,13 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 static auto printer_print(Frame* frame, viua::kernel::Register_set*, viua::kernel::Register_set*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
-    std::unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
+    auto arg = frame->arguments->pop(0);
     // concatenate before printing to avoid mangled output
-    cout << ("Hello " + arg->str() + "!\n");
+    std::cout << ("Hello " + arg->str() + "!\n");
 }
 
 

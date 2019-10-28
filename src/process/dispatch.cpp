@@ -24,7 +24,6 @@
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
 #include <viua/types/exception.h>
-using namespace std;
 
 
 auto viua::process::Process::get_trace_line(

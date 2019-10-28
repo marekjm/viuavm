@@ -23,7 +23,6 @@
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 #include <viua/support/string.h>
-using namespace std;
 
 namespace viua { namespace cg { namespace lex {
 static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {

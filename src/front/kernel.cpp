@@ -32,7 +32,6 @@
 #include <viua/printutils.h>
 #include <viua/program.h>
 #include <viua/version.h>
-using namespace std;
 
 
 using viua::assembler::util::pretty_printer::ATTR_RESET;
@@ -115,7 +114,7 @@ static bool usage(std::string const program,
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
-        std::cout << "    " << program << " [option...] <executable>\n" << endl;
+        std::cout << "    " << program << " [option...] <executable>\n" << std::endl;
         std::cout << "OPTIONS:\n";
         std::cout
             << "    "
@@ -172,10 +171,10 @@ int main(int argc, char* argv[]) {
                   << '\n';
         return 1;
     } catch (const char* e) {
-        cout << "error: " << e << endl;
+        std::cout << "error: " << e << std::endl;
         return 1;
     } catch (std::string const& e) {
-        cout << "error: " << e << endl;
+        std::cout << "error: " << e << std::endl;
         return 1;
     }
 
@@ -183,19 +182,19 @@ int main(int argc, char* argv[]) {
         // try preloading dynamic libraries specified by environment
         viua::front::vm::preload_libraries(kernel);
     } catch (std::unique_ptr<viua::types::Exception> const& e) {
-        cout << "fatal: preload: " << e->what() << endl;
+        std::cout << "fatal: preload: " << e->what() << std::endl;
         return 1;
     }
 
     try {
         kernel.run();
     } catch (std::unique_ptr<viua::types::Exception> const& e) {
-        cout << "VM error: an irrecoverable VM exception occured: " << e->what()
-             << endl;
+        std::cout << "VM error: an irrecoverable VM exception occured: " << e->what()
+             << std::endl;
         return 1;
     } catch (std::exception const& e) {
-        cout << "VM error: an irrecoverable host exception occured: "
-             << e.what() << endl;
+        std::cout << "VM error: an irrecoverable host exception occured: "
+             << e.what() << std::endl;
         return 1;
     }
     // the catch (...) is intentionally omitted, if we can't provide useful

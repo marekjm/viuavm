@@ -25,7 +25,6 @@
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
 #include <viua/types/integer.h>
-using namespace std;
 
 
 auto viua::process::Process::opimport(Op_address_type addr) -> Op_address_type {

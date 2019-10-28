@@ -25,21 +25,20 @@
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     ++addr;  // for operand type
 
     auto s = std::string{};
-    tie(addr, s) =
+    std::tie(addr, s) =
         viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    *target = make_unique<viua::types::String>(str::strdecode(s));
+    *target = std::make_unique<viua::types::String>(str::strdecode(s));
 
     return addr;
 }

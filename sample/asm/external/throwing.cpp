@@ -26,12 +26,11 @@
 #include <viua/types/exception.h>
 #include <viua/types/float.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 static auto throwing_oh_noes[[noreturn]](Frame*, viua::kernel::Register_set*, viua::kernel::Register_set*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
-    throw make_unique<viua::types::Exception>("OH NOES!");
+    throw std::make_unique<viua::types::Exception>("OH NOES!");
 }
 
 

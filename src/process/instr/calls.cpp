@@ -26,7 +26,6 @@
 #include <viua/types/function.h>
 #include <viua/types/integer.h>
 #include <viua/types/reference.h>
-using namespace std;
 
 using viua::bytecode::decoder::operands::fetch_and_advance_addr;
 using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
@@ -59,7 +58,7 @@ auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
         viua::bytecode::decoder::operands::fetch_object, addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "parameter register index out of bounds (greater than arguments "
             "set "
             "size) while adding parameter");
@@ -81,7 +80,7 @@ auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
         fetch_register, addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "parameter register index out of bounds (greater than arguments "
             "set "
             "size) while adding parameter");
@@ -105,10 +104,10 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
             fetch_register_index, addr, this);
 
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
-        auto oss = ostringstream{};
+        auto oss = std::ostringstream{};
         oss << "invalid read: read from argument register out of bounds: "
             << parameter_no_operand_index;
-        throw make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(oss.str());
     }
 
     std::unique_ptr<viua::types::Value> argument;
@@ -171,7 +170,7 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
     auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>("call to undefined function: "
+        throw std::make_unique<viua::types::Exception>("call to undefined function: "
                                                   + call_name);
     }
 
@@ -197,7 +196,7 @@ auto viua::process::Process::optailcall(Op_address_type addr)
 
     if (stack->state_of()
         != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "stack left in an invalid state");
     }
 
@@ -227,12 +226,12 @@ auto viua::process::Process::optailcall(Op_address_type addr)
     auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "tail call to undefined function: " + call_name);
     }
     // FIXME: make to possible to tail call foreign functions and methods
     if (not is_native) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "tail call to non-native function: " + call_name);
     }
 
@@ -272,7 +271,7 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
     auto const is_foreign = attached_scheduler->is_foreign_function(call_name);
 
     if (not(is_native or is_foreign)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "defer of undefined function: " + call_name);
     }
 
@@ -283,7 +282,7 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
     if (stack->size() == 0) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "no frame on stack: no call to return from");
     }
 
@@ -302,7 +301,7 @@ auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
 
     if (stack->state_of()
         != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "stack left in an invalid state");
     }
 

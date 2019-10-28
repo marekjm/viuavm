@@ -33,7 +33,6 @@
 #include <viua/types/string.h>
 #include <viua/types/struct.h>
 #include <viua/types/vector.h>
-using namespace std;
 
 
 static auto print_stack_trace_default(viua::process::Process* process) -> void {

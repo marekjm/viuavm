@@ -26,27 +26,26 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 static auto sleeper_lazy_print(Frame*, viua::kernel::Register_set*, viua::kernel::Register_set*,
                                viua::process::Process*, viua::kernel::Kernel*) -> void {
-    cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
+    std::cout << "sleeper::lazy_print/0: sleep for 5ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-    cout << "sleeper::lazy_print/0: sleep for 15ms" << endl;
+    std::cout << "sleeper::lazy_print/0: sleep for 15ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(15));
 
-    cout << "sleeper::lazy_print/0: sleep for 25ms" << endl;
+    std::cout << "sleeper::lazy_print/0: sleep for 25ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(25));
 
-    cout << "sleeper::lazy_print/0: sleep for 10ms" << endl;
+    std::cout << "sleeper::lazy_print/0: sleep for 10ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-    cout << "sleeper::lazy_print/0: sleep for 100ms" << endl;
+    std::cout << "sleeper::lazy_print/0: sleep for 100ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    cout << "sleeper::lazy_print/0: done" << endl;
+    std::cout << "sleeper::lazy_print/0: done" << std::endl;
 }
 
 

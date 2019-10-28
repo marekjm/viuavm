@@ -21,10 +21,9 @@
 #include <string>
 #include <viua/printutils.h>
 #include <viua/types/value.h>
-using namespace std;
 
 std::string stringify_function_invocation(const Frame* frame) {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << frame->function_name << '/' << frame->arguments->size();
     oss << '(';
     for (unsigned i = 0; i < frame->arguments->size(); ++i) {

@@ -22,7 +22,6 @@
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 namespace viua { namespace assembler { namespace frontend {
@@ -58,7 +57,7 @@ auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
 
 auto gather_meta_information(std::vector<viua::cg::lex::Token> const& tokens)
     -> std::map<std::string, std::string> {
-    auto meta_information = map<std::string, std::string>{};
+    auto meta_information = std::map<std::string, std::string>{};
 
     for (auto i = std::remove_reference<decltype(tokens)>::type::size_type{0};
          i < tokens.size();

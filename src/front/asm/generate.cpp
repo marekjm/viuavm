@@ -37,7 +37,6 @@
 #include <viua/support/env.h>
 #include <viua/support/string.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 using viua::util::memory::aligned_read;
 using viua::util::memory::aligned_write;
@@ -57,10 +56,10 @@ extern bool VERBOSE;
 using Token = viua::cg::lex::Token;
 
 
-template<class T> void bwrite(ofstream& out, T const& object) {
+template<class T> void bwrite(std::ofstream& out, T const& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
-static void strwrite(ofstream& out, std::string const& s) {
+static void strwrite(std::ofstream& out, std::string const& s) {
     out.write(s.c_str(), static_cast<std::streamsize>(s.size()));
     out.put('\0');
 }
@@ -86,7 +85,7 @@ static void strwrite(ofstream& out, std::string const& s) {
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op,
                                                          int_op,
                                                          int_op);
-const map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
+const std::map<std::string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS =
     {
         {"and", &Program::opand},
         {"or", &Program::opor},
@@ -162,8 +161,8 @@ static auto map_invocable_addresses(
     viua::internals::types::bytecode_size& starting_instruction,
     viua::front::assembler::Invocables const& blocks)
     -> std::map<std::string, viua::internals::types::bytecode_size> {
-    map<std::string, viua::internals::types::bytecode_size> addresses;
-    for (std::string name : blocks.names) {
+    std::map<std::string, viua::internals::types::bytecode_size> addresses;
+    for (auto const& name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
             starting_instruction += viua::cg::tools::calculate_bytecode_size2(
@@ -493,16 +492,16 @@ auto generate(std::vector<Token> const& tokens,
     auto main_function = get_main_function(functions.names);
     if (((flags.verbose and main_function != "main/1" and main_function != ""))
         and not flags.as_lib) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
+        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+        std::cout << ": ";
+        std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "main function set to: ";
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
+        std::cout << ": ";
+        std::cout << "main function set to: ";
+        std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
              << send_control_seq(ATTR_RESET);
-        cout << endl;
+        std::cout << std::endl;
     }
 
 
@@ -518,18 +517,18 @@ auto generate(std::vector<Token> const& tokens,
         check_main_function(main_function, functions.tokens.at(main_function));
     }
     if (not main_is_defined and flags.verbose and not flags.as_lib) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
+        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+        std::cout << ": ";
+        std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "main function (";
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
+        std::cout << ": ";
+        std::cout << "main function (";
+        std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function
              << send_control_seq(ATTR_RESET);
-        cout << ") is not defined, deferring main function check to post-link "
+        std::cout << ") is not defined, deferring main function check to post-link "
                 "phase"
-             << endl;
+             << std::endl;
     }
 
 
@@ -917,18 +916,18 @@ auto generate(std::vector<Token> const& tokens,
         }
         if (main_function_found.size() > 1) {
             for (auto f : main_function_found) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                      << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_CYAN) << "note"
+                std::cout << ": ";
+                std::cout << send_control_seq(COLOR_FG_CYAN) << "note"
                      << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << f
+                std::cout << ": ";
+                std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << f
                      << send_control_seq(ATTR_RESET);
-                cout << " function found in module ";
-                cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f)
+                std::cout << " function found in module ";
+                std::cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f)
                      << send_control_seq(ATTR_RESET);
-                cout << endl;
+                std::cout << std::endl;
             }
             throw "more than one candidate for main function";
         } else if (main_function_found.size() == 0) {
@@ -1037,26 +1036,26 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////
     // REPORT TOTAL BYTECODE SIZE
     if (flags.verbose and linked_function_names.size() != 0) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
+        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+        std::cout << ": ";
+        std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "total required bytes: " << bytes << " bytes" << endl;
+        std::cout << ": ";
+        std::cout << "total required bytes: " << bytes << " bytes" << std::endl;
     }
 
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
     if (flags.verbose and not flags.as_lib) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename
+        std::cout << send_control_seq(COLOR_FG_WHITE) << filename
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+        std::cout << ": ";
+        std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
              << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "first instruction pointer: " << starting_instruction << endl;
+        std::cout << ": ";
+        std::cout << "first instruction pointer: " << starting_instruction << std::endl;
     }
 
 
@@ -1072,45 +1071,45 @@ auto generate(std::vector<Token> const& tokens,
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
     auto functions_bytecode =
         std::map<std::string,
-                 tuple<viua::internals::types::bytecode_size,
+                 std::tuple<viua::internals::types::bytecode_size,
                        std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto block_bodies_bytecode =
         std::map<std::string,
-                 tuple<viua::internals::types::bytecode_size,
+                 std::tuple<viua::internals::types::bytecode_size,
                        std::unique_ptr<viua::internals::types::byte[]>>>{};
     auto functions_section_size    = viua::internals::types::bytecode_size{0};
     auto block_bodies_section_size = viua::internals::types::bytecode_size{0};
 
     auto jump_positions =
-        std::vector<tuple<viua::internals::types::bytecode_size,
+        std::vector<std::tuple<viua::internals::types::bytecode_size,
                           viua::internals::types::bytecode_size>>{};
 
     for (auto const& name : blocks.names) {
         // do not generate bytecode for blocks that were linked
-        if (find(linked_block_names.begin(), linked_block_names.end(), name)
+        if (std::find(linked_block_names.begin(), linked_block_names.end(), name)
             != linked_block_names.end()) {
             continue;
         }
 
         if (flags.verbose) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
+            std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+            std::cout << ": ";
+            std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
                  << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "generating bytecode for block \"";
-            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
+            std::cout << ": ";
+            std::cout << "generating bytecode for block \"";
+            std::cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name
                  << send_control_seq(ATTR_RESET);
-            cout << '"';
+            std::cout << '"';
         }
         auto fun_bytes = viua::internals::types::bytecode_size{0};
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size2(
                 blocks.tokens.at(name));
             if (flags.verbose) {
-                cout << " (" << fun_bytes << " bytes at byte "
-                     << block_bodies_section_size << ')' << endl;
+                std::cout << " (" << fun_bytes << " bytes at byte "
+                     << block_bodies_section_size << ')' << std::endl;
             }
         } catch (std::string const& e) {
             throw("failed block size count (during pre-assembling): " + e);
@@ -1132,7 +1131,7 @@ auto generate(std::vector<Token> const& tokens,
         auto jumps = blok.jumps();
 
         auto local_jumps =
-            std::vector<tuple<viua::internals::types::bytecode_size,
+            std::vector<std::tuple<viua::internals::types::bytecode_size,
                               viua::internals::types::bytecode_size>>{};
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
@@ -1201,7 +1200,7 @@ auto generate(std::vector<Token> const& tokens,
         auto jumps = func.jumps();
 
         auto local_jumps =
-            std::vector<tuple<viua::internals::types::bytecode_size,
+            std::vector<std::tuple<viua::internals::types::bytecode_size,
                               viua::internals::types::bytecode_size>>{};
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
@@ -1214,7 +1213,7 @@ auto generate(std::vector<Token> const& tokens,
         // store generated bytecode fragment for future use (we must not yet
         // write it to the file to conform to bytecode format)
         functions_bytecode[name] =
-            tuple<viua::internals::types::bytecode_size, decltype(btcode)>{
+            std::tuple<viua::internals::types::bytecode_size, decltype(btcode)>{
                 func.size(), std::move(btcode)};
 
         // extend jump table with jumps from current function
@@ -1229,7 +1228,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
-    auto out = std::ofstream{compilename, ios::out | ios::binary};
+    auto out = std::ofstream{compilename, std::ios::out | std::ios::binary};
 
     out.write(VIUA_MAGIC_NUMBER, sizeof(char) * 5);
     if (flags.as_lib) {
@@ -1319,16 +1318,16 @@ auto generate(std::vector<Token> const& tokens,
             strwrite(out, module_name);
 
             if (flags.verbose) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename
+                std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                      << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+                std::cout << ": ";
+                std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
                      << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "dynamically linked module \"";
-                cout << send_control_seq(COLOR_FG_WHITE) << module_name
+                std::cout << ": ";
+                std::cout << "dynamically linked module \"";
+                std::cout << send_control_seq(COLOR_FG_WHITE) << module_name
                      << send_control_seq(ATTR_RESET);
-                cout << "\" scheduled for loading at startup" << endl;
+                std::cout << "\" scheduled for loading at startup" << std::endl;
             }
         }
     }
@@ -1360,7 +1359,7 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    auto program_bytecode = make_unique<viua::internals::types::byte[]>(bytes);
+    auto program_bytecode = std::make_unique<viua::internals::types::byte[]>(bytes);
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
@@ -1372,10 +1371,10 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        viua::internals::types::bytecode_size fun_size =
-            get<0>(block_bodies_bytecode[name]);
-        viua::internals::types::byte* fun_bytecode =
-            get<1>(block_bodies_bytecode[name]).get();
+        auto const fun_size =
+            std::get<0>(block_bodies_bytecode[name]);
+        auto const fun_bytecode =
+            std::get<1>(block_bodies_bytecode[name]).get();
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
@@ -1395,10 +1394,10 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        viua::internals::types::bytecode_size fun_size =
-            get<0>(functions_bytecode[name]);
-        viua::internals::types::byte* fun_bytecode =
-            get<1>(functions_bytecode[name]).get();
+        auto const fun_size =
+            std::get<0>(functions_bytecode[name]);
+        auto const fun_bytecode =
+            std::get<1>(functions_bytecode[name]).get();
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
@@ -1409,23 +1408,23 @@ auto generate(std::vector<Token> const& tokens,
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     for (auto& lnk : linked_libs_bytecode) {
-        auto const lib_name        = get<0>(lnk);
-        auto const linked_bytecode = get<2>(lnk).get();
-        auto const linked_size     = get<1>(lnk);
+        auto const lib_name        = std::get<0>(lnk);
+        auto const linked_bytecode = std::get<2>(lnk).get();
+        auto const linked_size     = std::get<1>(lnk);
 
         auto const bytes_offset = linked_module_offsets.at(lib_name);
 
         if (flags.verbose) {
-            cout << send_control_seq(COLOR_FG_WHITE) << filename
+            std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                  << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
+            std::cout << ": ";
+            std::cout << send_control_seq(COLOR_FG_YELLOW) << "debug"
                  << send_control_seq(ATTR_RESET);
-            cout << ": ";
-            cout << "linked module \"";
-            cout << send_control_seq(COLOR_FG_WHITE) << lib_name
+            std::cout << ": ";
+            std::cout << "linked module \"";
+            std::cout << send_control_seq(COLOR_FG_WHITE) << lib_name
                  << send_control_seq(ATTR_RESET);
-            cout << "\" written at offset " << bytes_offset << endl;
+            std::cout << "\" written at offset " << bytes_offset << std::endl;
         }
 
         auto linked_jumptable =

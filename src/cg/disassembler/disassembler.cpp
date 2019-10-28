@@ -28,13 +28,12 @@
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
 #include <viua/util/memory.h>
-using namespace std;
 
 using viua::util::memory::load_aligned;
 
 
 auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
-    auto oss = ostringstream{};
+    auto oss = std::ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
@@ -72,7 +71,7 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
 }
 auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
     -> std::string {
-    auto oss = ostringstream{};
+    auto oss = std::ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
     viua::support::pointer::inc<OperandType, viua::internals::types::byte>(ptr);
@@ -185,7 +184,7 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
 static auto disassemble_bit_string(viua::internals::types::byte* ptr,
                                    viua::internals::types::bits_size const size)
     -> std::string {
-    static map<uint8_t, char> const decodings = {
+    static auto const decodings = std::map<uint8_t, char>{
         {
             0b0000,
             '0',
@@ -252,7 +251,7 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr,
         },
     };
 
-    auto oss = ostringstream{};
+    auto oss = std::ostringstream{};
     oss << "0x";
 
     static auto const mask_high = uint8_t{0b00001111};
@@ -275,7 +274,7 @@ static auto decode_timeout(viua::internals::types::byte* ptr)
     -> viua::internals::types::timeout {
     return load_aligned<viua::internals::types::timeout>(ptr);
 }
-static auto disassemble_ri_operand(ostream& oss,
+static auto disassemble_ri_operand(std::ostream& oss,
                                    viua::internals::types::byte* ptr)
     -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop(ptr);
@@ -307,7 +306,7 @@ static auto disassemble_ri_operand(ostream& oss,
     return ptr;
 }
 static auto disassemble_ri_operand_with_rs_type(
-    ostream& oss,
+    std::ostream& oss,
     viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
@@ -338,7 +337,7 @@ static auto disassemble_ri_operand_with_rs_type(
     return ptr;
 }
 auto disassembler::instruction(viua::internals::types::byte* ptr)
-    -> tuple<std::string, viua::internals::types::bytecode_size> {
+    -> std::tuple<std::string, viua::internals::types::bytecode_size> {
     viua::internals::types::byte* saved_ptr = ptr;
 
     auto const op = OPCODE(*saved_ptr);
@@ -367,12 +366,12 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         }
         ++ptr;
     } catch (std::out_of_range const& e) {
-        auto emsg = ostringstream{};
+        auto emsg = std::ostringstream{};
         emsg << "could not find name for opcode: " << op;
         throw emsg.str();
     }
 
-    auto oss = ostringstream{};
+    auto oss = std::ostringstream{};
     oss << opname;
 
     if (op == STRING) {
@@ -689,30 +688,30 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         break;
     case JUMP:
         oss << " 0x";
-        oss << hex;
+        oss << std::hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
         viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
             ptr);
 
-        oss << dec;
+        oss << std::dec;
 
         break;
     case IF:
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << " 0x";
-        oss << hex;
+        oss << std::hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
         viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
             ptr);
 
         oss << " 0x";
-        oss << hex;
+        oss << std::hex;
         oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
         viua::support::pointer::inc<uint64_t, viua::internals::types::byte>(
             ptr);
 
-        oss << dec;
+        oss << std::dec;
 
         break;
     case FLOAT:
@@ -806,6 +805,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     auto const increase =
         static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
 
-    return tuple<std::string, viua::internals::types::bytecode_size>(oss.str(),
+    return std::tuple<std::string, viua::internals::types::bytecode_size>(oss.str(),
                                                                      increase);
 }

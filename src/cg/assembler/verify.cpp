@@ -31,10 +31,9 @@
 #include <viua/cg/lex.h>
 #include <viua/program.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
-using ErrorReport = pair<unsigned, std::string>;
+using ErrorReport = std::pair<unsigned, std::string>;
 using Token       = viua::cg::lex::Token;
 
 
@@ -57,7 +56,7 @@ void assembler::verify::function_calls_are_defined(
     std::vector<Token> const& tokens,
     std::vector<std::string> const& function_names,
     std::vector<std::string> const& function_signatures) {
-    ostringstream report("");
+    std::ostringstream report("");
     auto line = std::string{};
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);

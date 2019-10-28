@@ -31,7 +31,6 @@
 #include <viua/types/integer.h>
 #include <viua/types/number.h>
 #include <viua/types/value.h>
-using namespace std;
 
 using viua::types::numeric::Number;
 using ArithmeticOp = std::unique_ptr<Number> (Number::*)(Number const&) const;
@@ -46,15 +45,15 @@ template<typename OpType, OpType action>
 static auto alu_impl(Op_address_type addr, viua::process::Process* process)
     -> Op_address_type {
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
 
     auto lhs       = dumb_ptr<Number>{nullptr};
-    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
+    std::tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
     auto rhs       = dumb_ptr<Number>{nullptr};
-    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
+    std::tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<Number>(
         addr, process);
 
     *target = (lhs->*action)(*rhs);

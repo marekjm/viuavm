@@ -18,12 +18,11 @@
  */
 
 #include <viua/cg/assembler/assembler.h>
-using namespace std;
 
 
 auto assembler::operands::normalise_binary_literal(std::string const s)
-    -> string {
-    auto oss = ostringstream{};
+    -> std::string {
+    auto oss = std::ostringstream{};
 
     if (s.size() == 0) {
         // FIXME create InternalError class
@@ -47,7 +46,7 @@ auto assembler::operands::normalise_binary_literal(std::string const s)
 
     return oss.str();
 }
-static auto strip_leading_zeroes(std::string const s) -> string {
+static auto strip_leading_zeroes(std::string const s) -> std::string {
     auto leading_zeroes = decltype(s)::size_type{0};
     while (leading_zeroes < s.size() and s.at(leading_zeroes) == '0') {
         ++leading_zeroes;
@@ -55,9 +54,9 @@ static auto strip_leading_zeroes(std::string const s) -> string {
     return (leading_zeroes < s.size() ? s.substr(leading_zeroes) : "0");
 }
 auto assembler::operands::octal_to_binary_literal(std::string const s)
-    -> string {
-    ostringstream oss;
-    static map<const char, std::string const> const lookup = {
+    -> std::string {
+    std::ostringstream oss;
+    static std::map<const char, std::string const> const lookup = {
         {
             '0',
             "000",
@@ -98,8 +97,8 @@ auto assembler::operands::octal_to_binary_literal(std::string const s)
 }
 auto assembler::operands::hexadecimal_to_binary_literal(std::string const s)
     -> std::string {
-    ostringstream oss;
-    static map<const char, std::string const> const lookup = {
+    std::ostringstream oss;
+    static std::map<const char, std::string const> const lookup = {
         {
             '0',
             "0000",

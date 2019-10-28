@@ -23,7 +23,6 @@
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
 #include <viua/types/integer.h>
-using namespace std;
 
 
 auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
@@ -32,7 +31,7 @@ auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
     if (stack->try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    stack->try_frame_new = make_unique<Try_frame>();
+    stack->try_frame_new = std::make_unique<Try_frame>();
     return addr;
 }
 
@@ -40,19 +39,19 @@ auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
     /** Run catch instruction.
      */
     std::string type_name, catcher_block_name;
-    tie(addr, type_name) =
+    std::tie(addr, type_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    tie(addr, catcher_block_name) =
+    std::tie(addr, catcher_block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not attached_scheduler->is_block(catcher_block_name)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "registering undefined handler block '" + catcher_block_name
             + "' to handle " + type_name);
     }
 
     stack->try_frame_new->catchers[type_name] =
-        make_unique<Catcher>(type_name, catcher_block_name);
+        std::make_unique<Catcher>(type_name, catcher_block_name);
 
     return addr;
 }
@@ -68,11 +67,11 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
         stack->caught.reset(nullptr);
     } else {
         viua::kernel::Register* target = nullptr;
-        tie(addr, target) =
+        std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
 
         if (not stack->caught) {
-            throw make_unique<viua::types::Exception>(
+            throw std::make_unique<viua::types::Exception>(
                 "no caught object to draw");
         }
         *target = std::move(stack->caught);
@@ -85,11 +84,11 @@ auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     /*  Run enter instruction.
      */
     auto block_name = std::string{};
-    tie(addr, block_name) =
+    std::tie(addr, block_name) =
         viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not attached_scheduler->is_block(block_name)) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "cannot enter undefined block: " + block_name);
     }
 
@@ -108,13 +107,13 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type {
     /** Run throw instruction.
      */
     viua::kernel::Register* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (source->empty()) {
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "throw from null register";
-        throw make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(oss.str());
     }
     stack->thrown = source->give();
 
@@ -125,7 +124,7 @@ auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type {
     /*  Run leave instruction.
      */
     if (stack->tryframes.size() == 0) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "bad leave: no block has been entered");
     }
     addr = stack->tryframes.back()->return_address;

@@ -30,7 +30,6 @@
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
 #include <viua/types/io.h>
-using namespace std;
 
 // Provide storage for static member.
 viua::internals::types::register_index const
@@ -64,7 +63,7 @@ void viua::process::Process::ensure_static_registers(
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] =
-            make_unique<viua::kernel::Register_set>(16);
+            std::make_unique<viua::kernel::Register_set>(16);
     }
 }
 
@@ -74,17 +73,17 @@ Frame* viua::process::Process::request_new_frame(
 }
 void viua::process::Process::push_frame() {
     if (stack->size() > Stack::MAX_STACK_SIZE) {
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "stack size (" << Stack::MAX_STACK_SIZE
             << ") exceeded with call to '" << stack->frame_new->function_name
             << '\'';
-        throw make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(oss.str());
     }
 
     if (find(stack->begin(), stack->end(), stack->frame_new) != stack->end()) {
-        ostringstream oss;
-        oss << "stack corruption: frame " << hex << stack->frame_new.get()
-            << dec << " for function " << stack->frame_new->function_name << '/'
+        std::ostringstream oss;
+        oss << "stack corruption: frame " << std::hex << stack->frame_new.get()
+            << std::dec << " for function " << stack->frame_new->function_name << '/'
             << stack->frame_new->arguments->size() << " pushed more than once";
         throw oss.str();
     }
@@ -107,7 +106,7 @@ auto viua::process::Process::call_native(
     auto call_address = adjust_jump_base_for(call_name);
 
     if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "function call without a frame: use `frame 0' in source code if "
             "the "
             "function takes no parameters");
@@ -139,7 +138,7 @@ auto viua::process::Process::call_foreign(
 auto viua::process::Process::push_deferred(std::string const call_name)
     -> void {
     if (not stack->frame_new) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "function call without a frame: use `frame 0' in source code if "
             "the "
             "function takes no parameters");
@@ -239,7 +238,7 @@ auto viua::process::Process::tick() -> Op_address_type {
         and (not allowed_unchanged_ops.count(OPCODE(*stack->instruction_pointer)))
         and (not stack->thrown)) {
         stack->thrown =
-            make_unique<viua::types::Exception>("InstructionUnchanged");
+            std::make_unique<viua::types::Exception>("InstructionUnchanged");
     }
 
     if (stack->thrown and stack->frame_new) {

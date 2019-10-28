@@ -26,7 +26,6 @@
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
-using namespace std;
 
 
 static auto typeof(Frame* frame,
@@ -35,7 +34,7 @@ static auto typeof(Frame* frame,
                    viua::process::Process* process,
                    viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {
-        throw make_unique<viua::types::Exception>("requires 1 parameter");
+        throw std::make_unique<viua::types::Exception>("requires 1 parameter");
     }
     if (auto const pointer =
             dynamic_cast<viua::types::Pointer*>(frame->arguments->get(0));
@@ -43,9 +42,9 @@ static auto typeof(Frame* frame,
         frame->set_local_register_set(
             std::make_unique<viua::kernel::Register_set>(1));
         frame->local_register_set->set(
-            0, make_unique<viua::types::String>(pointer->to(process)->type()));
+            0, std::make_unique<viua::types::String>(pointer->to(process)->type()));
     } else {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "expected a pointer as parameter 0");
     }
 }

@@ -19,7 +19,6 @@
 
 #include <memory>
 #include <viua/front/vm.h>
-using namespace std;
 
 
 void viua::front::vm::initialise(viua::kernel::Kernel& kernel,

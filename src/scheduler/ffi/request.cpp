@@ -23,7 +23,6 @@
 #include <viua/scheduler/ffi.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
-using namespace std;
 
 
 std::string viua::scheduler::ffi::Foreign_function_call_request::function_name()
@@ -45,7 +44,7 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
-                caller_process.raise(make_unique<viua::types::Exception>(
+                caller_process.raise(std::make_unique<viua::types::Exception>(
                     "return value requested by frame but external function did "
                     "not set return register"));
             }

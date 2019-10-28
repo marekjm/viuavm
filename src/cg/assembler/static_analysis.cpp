@@ -31,17 +31,16 @@
 #include <viua/cg/lex.h>
 #include <viua/program.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 using Token       = viua::cg::lex::Token;
 using TokenVector = std::vector<Token>;
 
 class Registers {
-    map<std::string, Token> defined_registers;
-    map<std::string, Token> used_registers;
-    map<std::string, Token> erased_registers;
-    set<std::string> maybe_unused_registers;
+    std::map<std::string, Token> defined_registers;
+    std::map<std::string, Token> used_registers;
+    std::map<std::string, Token> erased_registers;
+    std::set<std::string> maybe_unused_registers;
 
   public:
     bool defined(std::string const& r) {
@@ -95,7 +94,7 @@ static auto skip_till_next_line(TokenVector const& tokens,
     } while (i < tokens.size() and tokens.at(i) != "\n");
     return i;
 }
-static auto is_named(const map<std::string, std::string>& named_registers,
+static auto is_named(std::map<std::string, std::string> const& named_registers,
                      std::string name) -> bool {
     return (std::find_if(named_registers.begin(),
                          named_registers.end(),
@@ -105,7 +104,7 @@ static auto is_named(const map<std::string, std::string>& named_registers,
                          })
             != named_registers.end());
 }
-static auto get_name(const map<std::string, std::string>& named_registers,
+static auto get_name(std::map<std::string, std::string> const& named_registers,
                      std::string name,
                      Token context) -> std::string {
     auto it = std::find_if(
@@ -121,7 +120,7 @@ static auto get_name(const map<std::string, std::string>& named_registers,
     return it->first;
 }
 static std::string resolve_register_name(
-    const map<string, std::string>& named_registers,
+    const std::map<std::string, std::string>& named_registers,
     Token token,
     std::string name,
     bool const allow_direct_access = false) {
@@ -168,7 +167,7 @@ static std::string resolve_register_name(
     return named_registers.at(name);
 }
 static std::string resolve_register_name(
-    const map<std::string, std::string>& named_registers,
+    const std::map<std::string, std::string>& named_registers,
     Token token) {
     return resolve_register_name(named_registers, token, token.str());
 }
@@ -177,13 +176,13 @@ static void check_timeout_operand(Token token) {
     if (token == "\n") {
         throw viua::cg::lex::Invalid_syntax(token, "missing timeout operand");
     }
-    static const regex timeout_regex{"^(?:0|[1-9]\\d*)m?s$"};
-    if (token != "infinity" and not regex_match(token.str(), timeout_regex)) {
+    static std::regex const timeout_regex{"^(?:0|[1-9]\\d*)m?s$"};
+    if (token != "infinity" and not std::regex_match(token.str(), timeout_regex)) {
         throw viua::cg::lex::Invalid_syntax(token, "invalid timeout operand");
     }
 }
 
-static auto strip_access_mode_sigil(std::string s) -> string {
+static auto strip_access_mode_sigil(std::string s) -> std::string {
     return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1)
                                                                  : s);
 }
@@ -193,7 +192,7 @@ static void check_use_of_register_index(
     long unsigned by,
     std::string register_index,
     Registers& registers,
-    map<std::string, std::string>& named_registers,
+    std::map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
     bool const allow_direct_access_to_target = true) {
     auto resolved_register_name = std::string{};
@@ -238,7 +237,7 @@ static void check_use_of_register(
     long unsigned i,
     long unsigned by,
     Registers& registers,
-    map<std::string, std::string>& named_registers,
+    std::map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
     bool const allow_direct_access_to_target = true) {
     check_use_of_register_index(tokens,
@@ -255,7 +254,7 @@ static void check_use_of_register(
     long unsigned i,
     long unsigned by,
     Registers& registers,
-    map<std::string, std::string>& named_registers) {
+    std::map<std::string, std::string>& named_registers) {
     check_use_of_register_index(tokens,
                                 i,
                                 by,
@@ -282,7 +281,7 @@ static void check_defined_but_unused(Registers& registers) {
 static auto in_block_offset(TokenVector const& body_tokens,
                             TokenVector::size_type i,
                             Registers& registers,
-                            map<std::string, std::string>& named_registers)
+                            std::map<std::string, std::string>& named_registers)
     -> decltype(i) {
     auto const& checked_token = body_tokens.at(i);
 
@@ -366,11 +365,11 @@ static auto in_block_offset(TokenVector const& body_tokens,
 static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type,
                              Registers&,
-                             const map<std::string, TokenVector>&,
+                             const std::map<std::string, TokenVector>&,
                              bool const);
 
 static void erase_register(Registers& registers,
-                           map<std::string, std::string>& named_registers,
+                           std::map<std::string, std::string>& named_registers,
                            Token const& name,
                            Token const& context) {
     /*
@@ -418,8 +417,8 @@ static auto get_token_index_of_operand(TokenVector const& tokens,
 static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type i,
                              Registers& registers,
-                             map<std::string, std::string> named_registers,
-                             const map<std::string, TokenVector>& block_bodies,
+                             std::map<std::string, std::string> named_registers,
+                             const std::map<std::string, TokenVector>& block_bodies,
                              bool const debug) {
     using TokenIndex = TokenVector::size_type;
 
@@ -445,12 +444,12 @@ static void check_block_body(TokenVector const& body_tokens,
             named_registers[body_tokens.at(i + 2)] =
                 strip_access_mode_sigil(body_tokens.at(i + 1));
             if (debug) {
-                cout << "  "
+                std::cout << "  "
                      << "register "
                      << str::enquote(str::strencode(body_tokens.at(i + 1)))
                      << " is named "
                      << str::enquote(str::strencode(body_tokens.at(i + 2)))
-                     << endl;
+                     << std::endl;
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -1236,12 +1235,12 @@ static void check_block_body(TokenVector const& body_tokens,
                                                     body_tokens.at(target));
             registers.insert(reg, body_tokens.at(target));
             if (debug) {
-                cout << "  " << str::enquote(token) << " defined register "
+                std::cout << "  " << str::enquote(token) << " defined register "
                      << str::enquote(str::strencode(reg_original));
                 if (reg != reg_original) {
-                    cout << " = " << str::enquote(str::strencode(reg));
+                    std::cout << " = " << str::enquote(str::strencode(reg));
                 }
-                cout << endl;
+                std::cout << std::endl;
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -1252,9 +1251,9 @@ static void check_block_body(TokenVector const& body_tokens,
 static void check_block_body(TokenVector const& body_tokens,
                              TokenVector::size_type i,
                              Registers& registers,
-                             const map<std::string, TokenVector>& block_bodies,
+                             const std::map<std::string, TokenVector>& block_bodies,
                              bool const debug) {
-    map<std::string, std::string> named_registers;
+    std::map<std::string, std::string> named_registers;
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);
 }

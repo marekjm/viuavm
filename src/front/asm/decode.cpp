@@ -21,7 +21,6 @@
 #include <viua/cg/tokenizer.h>
 #include <viua/front/asm.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 namespace viua { namespace front { namespace assembler {

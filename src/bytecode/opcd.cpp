@@ -24,30 +24,26 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
-using namespace std;
 
 
 int main() {
-    std::string::size_type max_mnemonic_length = 0;
-    for (pair<const OPCODE, std::string> i : OP_NAMES) {
-        max_mnemonic_length = ((max_mnemonic_length >= i.second.size())
-                                   ? max_mnemonic_length
-                                   : i.second.size());
-    }
+    auto const max_mnemonic_length = []() -> std::string::size_type {
+        auto l = std::string::size_type{0};
+        for (std::pair<const OPCODE, std::string> i : OP_NAMES) {
+            l = std::max(l, i.second.size());
+        }
+        return (l + 1);
+    }();
 
-    max_mnemonic_length += 1;
+    auto const initial_column = std::string{"MNEMONIC            "};
+    std::cout << initial_column << "| OPCODE  | HEX OPCODE\n" << std::endl;
 
-    const auto initial_column = std::string{"MNEMONIC            "};
-    cout << initial_column << "| OPCODE  | HEX OPCODE\n" << endl;
-
-    max_mnemonic_length = (max_mnemonic_length < initial_column.size()
-                               ? initial_column.size()
-                               : max_mnemonic_length);
+    auto const column_length = std::max(max_mnemonic_length, initial_column.size());
 
     for (auto i = viua::internals::types::byte{0};
          i < static_cast<viua::internals::types::byte>(0xff);
          ++i) {
-        auto opcode   = static_cast<OPCODE>(i);
+        auto const opcode   = static_cast<OPCODE>(i);
         auto mnemonic = std::string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
@@ -55,22 +51,22 @@ int main() {
             continue;
         }
 
-        cout << mnemonic;
-        cout << ' ';
-        for (auto j = mnemonic.size() + 1; j < (max_mnemonic_length); ++j) {
-            cout << '.';
+        std::cout << mnemonic;
+        std::cout << ' ';
+        for (auto j = mnemonic.size() + 1; j < column_length; ++j) {
+            std::cout << '.';
         }
-        cout << "| ";
+        std::cout << "| ";
 
-        cout << "  ";
-        cout << (opcode < 10 ? " " : "");
-        cout << (opcode < 100 ? " " : "");
-        cout << opcode;
-        cout << "       ";
-        cout << "0x";
-        cout << (opcode < 0x10 ? "0" : "");
-        cout << hex << opcode << dec;
-        cout << '\n';
+        std::cout << "  ";
+        std::cout << (opcode < 10 ? " " : "");
+        std::cout << (opcode < 100 ? " " : "");
+        std::cout << opcode;
+        std::cout << "       ";
+        std::cout << "0x";
+        std::cout << (opcode < 0x10 ? "0" : "");
+        std::cout << std::hex << opcode << std::dec;
+        std::cout << '\n';
     }
     return 0;
 }

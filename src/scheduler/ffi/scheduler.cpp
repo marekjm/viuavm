@@ -24,22 +24,21 @@
 #include <viua/kernel/frame.h>
 #include <viua/scheduler/ffi.h>
 #include <viua/types/exception.h>
-using namespace std;
 
 
 void viua::scheduler::ffi::ff_call_processor(
     std::vector<std::unique_ptr<
         viua::scheduler::ffi::Foreign_function_call_request>>* requests,
-    map<std::string, ForeignFunction*>* foreign_functions,
-    mutex* ff_map_mtx,
-    mutex* mtx,
-    condition_variable* cv) {
+    std::map<std::string, ForeignFunction*>* foreign_functions,
+    std::mutex* ff_map_mtx,
+    std::mutex* mtx,
+    std::condition_variable* cv) {
     while (true) {
-        unique_lock<mutex> lock(*mtx);
+        std::unique_lock<std::mutex> lock(*mtx);
 
         // wait in a loop, because wait_for() can still return even if the
         // requests queue is empty
-        while (not cv->wait_for(lock, chrono::milliseconds(2000), [requests]() {
+        while (not cv->wait_for(lock, std::chrono::milliseconds(2000), [requests]() {
             return not requests->empty();
         }))
             ;
@@ -57,9 +56,9 @@ void viua::scheduler::ffi::ff_call_processor(
         }
 
         std::string call_name = request->function_name();
-        unique_lock<mutex> ff_map_lock(*ff_map_mtx);
+        std::unique_lock<std::mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
-            request->raise(make_unique<viua::types::Exception>(
+            request->raise(std::make_unique<viua::types::Exception>(
                 "call to unregistered foreign function: " + call_name));
         } else {
             auto function = foreign_functions->at(call_name);

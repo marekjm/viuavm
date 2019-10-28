@@ -25,7 +25,6 @@
 #include <viua/kernel/registerset.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
-using namespace std;
 
 
 static void os_system(Frame* frame,
@@ -34,12 +33,12 @@ static void os_system(Frame* frame,
                       viua::process::Process*,
                       viua::kernel::Kernel*) {
     if (frame->arguments->at(0) == nullptr) {
-        throw make_unique<viua::types::Exception>(
+        throw std::make_unique<viua::types::Exception>(
             "expected command to launch (string) as parameter 0");
     }
     auto const command = frame->arguments->get(0)->str();
     auto const ret     = system(command.c_str());
-    frame->local_register_set->set(0, make_unique<viua::types::Integer>(ret));
+    frame->local_register_set->set(0, std::make_unique<viua::types::Integer>(ret));
 }
 
 

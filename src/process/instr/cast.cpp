@@ -27,19 +27,18 @@
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Float>(
+    *target = std::make_unique<viua::types::Float>(
         static_cast<viua::types::Integer*>(source)->as_float());
 
     return addr;
@@ -47,14 +46,14 @@ auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Integer>(
+    *target = std::make_unique<viua::types::Integer>(
         static_cast<viua::types::Float*>(source)->as_integer());
 
     return addr;
@@ -62,11 +61,11 @@ auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type {
 
 auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     int result_integer = 0;
@@ -75,31 +74,31 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
     try {
         result_integer = std::stoi(supplied_string);
     } catch (std::out_of_range const& e) {
-        throw make_unique<viua::types::Exception>("out of range: "
+        throw std::make_unique<viua::types::Exception>("out of range: "
                                                   + supplied_string);
     } catch (std::invalid_argument const& e) {
-        throw make_unique<viua::types::Exception>("invalid argument: "
+        throw std::make_unique<viua::types::Exception>("invalid argument: "
                                                   + supplied_string);
     }
 
-    *target = make_unique<viua::types::Integer>(result_integer);
+    *target = std::make_unique<viua::types::Integer>(result_integer);
 
     return addr;
 }
 
 auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    std::string supplied_string =
+    auto const supplied_string =
         static_cast<viua::types::String*>(source)->value();
-    double convert_from = std::stod(supplied_string);
-    *target             = make_unique<viua::types::Float>(convert_from);
+    auto const convert_from = std::stod(supplied_string);
+    *target             = std::make_unique<viua::types::Float>(convert_from);
 
     return addr;
 }

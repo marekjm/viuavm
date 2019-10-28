@@ -28,7 +28,6 @@
 #include <viua/support/env.h>
 #include <viua/support/string.h>
 #include <viua/version.h>
-using namespace std;
 
 
 // MISC FLAGS
@@ -43,9 +42,9 @@ using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 template<class T>
 static auto enumerate(std::vector<T> const& v)
-    -> std::vector<pair<typename std::vector<T>::size_type, T>> {
+    -> std::vector<std::pair<typename std::vector<T>::size_type, T>> {
     auto enumerated_vector =
-        std::vector<pair<typename std::vector<T>::size_type, T>>{};
+        std::vector<std::pair<typename std::vector<T>::size_type, T>>{};
 
     typename std::vector<T>::size_type i = 0;
     for (auto const& each : v) {
@@ -58,27 +57,27 @@ static auto enumerate(std::vector<T> const& v)
 
 static void encode_json(std::string const& filename,
                         std::vector<Token> const& tokens) {
-    cout << "{";
-    cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
-    cout << str::enquote("tokens") << ": [";
+    std::cout << "{";
+    std::cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
+    std::cout << str::enquote("tokens") << ": [";
 
     const auto limit = tokens.size();
     for (auto const& t : enumerate(tokens)) {
-        cout << "{";
-        cout << str::enquote("line") << ": " << t.second.line() << ", ";
-        cout << str::enquote("character") << ": " << t.second.character()
+        std::cout << "{";
+        std::cout << str::enquote("line") << ": " << t.second.line() << ", ";
+        std::cout << str::enquote("character") << ": " << t.second.character()
              << ", ";
-        cout << str::enquote("content") << ": "
+        std::cout << str::enquote("content") << ": "
              << str::enquote(str::strencode(t.second.str())) << ", ";
-        cout << str::enquote("original") << ": "
+        std::cout << str::enquote("original") << ": "
              << str::enquote(str::strencode(t.second.original()));
-        cout << '}';
+        std::cout << '}';
         if (t.first + 1 < limit) {
-            cout << ", ";
+            std::cout << ", ";
         }
     }
 
-    cout << "]}\n";
+    std::cout << "]}\n";
 }
 
 static bool usage(const char* program,
@@ -86,18 +85,18 @@ static bool usage(const char* program,
                   bool show_version,
                   bool verbose) {
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM lexer, version ";
+        std::cout << "Viua VM lexer, version ";
     }
     if (show_help or show_version) {
-        cout << VERSION << '.' << MICRO << endl;
+        std::cout << VERSION << '.' << MICRO << std::endl;
     }
     if (show_help) {
-        cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] <infile>\n" << endl;
-        cout << "OPTIONS:\n";
+        std::cout << "\nUSAGE:\n";
+        std::cout << "    " << program << " [option...] <infile>\n" << std::endl;
+        std::cout << "OPTIONS:\n";
 
         // generic options
-        cout << "    "
+        std::cout << "    "
              << "-V, --version            - show version\n"
              << "    "
              << "-h, --help               - display this message\n"
@@ -117,10 +116,10 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static std::string read_file(ifstream& in) {
-    ostringstream source_in;
+static std::string read_file(std::ifstream& in) {
+    std::ostringstream source_in;
     auto line = std::string{};
-    while (getline(in, line)) {
+    while (std::getline(in, line)) {
         source_in << line << '\n';
     }
 
@@ -137,12 +136,12 @@ static void display_results(std::string const& filename,
                             std::vector<Token> const& tokens) {
     if (DISPLAY_SIZE) {
         try {
-            cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
+            std::cout << viua::cg::tools::calculate_bytecode_size2(tokens) << std::endl;
         } catch (Invalid_syntax const& e) {
-            cerr << filename << ':' << e.line_number << ':'
+            std::cerr << filename << ':' << e.line_number << ':'
                  << e.character_in_line;
-            cerr << ": error: invalid syntax: " << str::strencode(e.content)
-                 << endl;
+            std::cerr << ": error: invalid syntax: " << str::strencode(e.content)
+                 << std::endl;
         }
         return;
     }
@@ -185,7 +184,7 @@ int main(int argc, char* argv[]) {
             MANUAL_REDUCING   = true;
             continue;
         } else if (str::startswith(option, "-")) {
-            cerr << "error: unknown option: " << option << endl;
+            std::cerr << "error: unknown option: " << option << std::endl;
             return 1;
         }
         args.emplace_back(argv[i]);
@@ -196,7 +195,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (args.size() == 0) {
-        cout << "fatal: no input file" << endl;
+        std::cerr << "fatal: no input file" << std::endl;
         return 1;
     }
 
@@ -204,23 +203,23 @@ int main(int argc, char* argv[]) {
     // FIND FILENAME AND COMPILENAME
     filename = args[0];
     if (!filename.size()) {
-        cout << "fatal: no file to tokenize" << endl;
+        std::cerr << "fatal: no file to tokenize" << std::endl;
         return 1;
     }
     if (!viua::support::env::is_file(filename)) {
-        cout << "fatal: could not open file: " << filename << endl;
+        std::cerr << "fatal: could not open file: " << filename << std::endl;
         return 1;
     }
 
     ////////////////
     // READ LINES IN
-    ifstream in(filename, ios::in | ios::binary);
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (!in) {
-        cout << "fatal: file could not be opened: " << filename << endl;
+        std::cerr << "fatal: file could not be opened: " << filename << std::endl;
         return 1;
     }
 
-    std::string source = read_file(in);
+    auto const source = read_file(in);
 
     auto tokens = std::vector<Token>{};
     try {
@@ -251,11 +250,11 @@ int main(int argc, char* argv[]) {
             }
         }
     } catch (Invalid_syntax const& e) {
-        std::string message = e.what();
-        cerr << filename << ':' << e.line_number + 1 << ':'
+        auto const message = std::string{e.what()};
+        std::cerr << filename << ':' << e.line_number + 1 << ':'
              << e.character_in_line + 1
              << ": error: " << (message.size() ? message : "invalid syntax")
-             << endl;
+             << std::endl;
         return 1;
     }
 

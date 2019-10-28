@@ -34,7 +34,6 @@
 #include <viua/program.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
-using namespace std;
 
 
 using viua::assembler::util::pretty_printer::ATTR_RESET;
@@ -60,8 +59,8 @@ auto ::assembler::operands::resolve_jump(
         enum JUMPTYPE jump_type                    = JMP_RELATIVE;
         if (str::isnum(jmp, false)){addr = stoul(jmp);}
 else if (jmp.substr(0, 2) == "0x") {
-    stringstream ss;
-    ss << hex << jmp;
+    std::stringstream ss;
+    ss << std::hex << jmp;
     ss >> addr;
     jump_type = JMP_TO_BYTE;
 }
@@ -70,7 +69,7 @@ else if (jmp[0] == '-') {
     if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
         // FIXME: move jump verification to assembler::verify namespace
         // function
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "use of relative jump results in a jump to negative index: ";
         oss << "jump_value = " << jump_value << ", ";
         oss << "instruction_index = " << instruction_index;
@@ -99,7 +98,7 @@ else {
 }
 
 // FIXME: check if the jump is within the size of bytecode
-return tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr,
+return std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr,
                                                                    jump_type);
 }
 
@@ -112,7 +111,7 @@ auto ::assembler::operands::resolve_register(Token const token,
      *  This function MUST return string as teh result is further passed to
      * assembler::operands::getint() function which *expects* string.
      */
-    auto out       = ostringstream{};
+    auto out       = std::ostringstream{};
     auto const reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,

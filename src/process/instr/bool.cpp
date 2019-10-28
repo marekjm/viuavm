@@ -24,19 +24,18 @@
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/value.h>
-using namespace std;
 
 
 auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) =
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
-    tie(addr, source) =
+    std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = make_unique<viua::types::Boolean>(not source->boolean());
+    *target = std::make_unique<viua::types::Boolean>(not source->boolean());
 
     return addr;
 }
