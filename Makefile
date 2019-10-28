@@ -318,9 +318,9 @@ bininstall: build/bin/vm/asm \
 
 libinstall: stdlib
 	mkdir -p $(LIB_PATH)/std
-	mkdir -p $(LIB_PATH)/site
-	cp ./build/stdlib/*.so $(LIB_PATH)/std
-	cp ./build/stdlib/std/*.module $(LIB_PATH)/std
+	mkdir -p $(LIB_PATH)/std/posix
+	cp ./build/stdlib/std/*.so $(LIB_PATH)/std
+	cp ./build/stdlib/std/posix/*.so $(LIB_PATH)/std/posix
 
 installdevel: platform
 	mkdir -p $(LIB_PATH)/platform
@@ -760,6 +760,10 @@ build/stdlib/Std/Posix/Network.so: build/stdlib/std/posix/network.so
 	mkdir -p build/stdlib/Std/Posix
 	cp -v $^ $@
 
+build/stdlib/Std/Posix/Io.so: build/stdlib/std/posix/io.so
+	mkdir -p build/stdlib/Std/Posix
+	cp -v $^ $@
+
 build/stdlib/Std/Random.so: build/stdlib/std/random.so
 	mkdir -p build/stdlib/Std
 	cp -v $^ $@
@@ -774,6 +778,7 @@ stdlib: build/bin/vm/asm \
 	build/stdlib/std/posix/network.so \
 	build/stdlib/Std/Posix/Network.so \
 	build/stdlib/std/posix/io.so \
+	build/stdlib/Std/Posix/Io.so \
 	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
