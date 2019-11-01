@@ -1007,7 +1007,7 @@ static auto recv(Frame* frame,
                  viua::kernel::Kernel*) -> void {
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const buffer_length = static_cast<size_t>(
-        static_cast<viua::types::Integer*>(frame->arguments->get(0))
+        static_cast<viua::types::Integer*>(frame->arguments->get(1))
             ->as_integer());
 
     auto buffer        = std::vector<char>(buffer_length, '\0');

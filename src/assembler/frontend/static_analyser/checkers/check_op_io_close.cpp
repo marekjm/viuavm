@@ -28,9 +28,11 @@ auto check_op_io_close(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::Void_literal;
 
-    auto source = get_operand<Register_index>(instruction, 0);
+    // FIXME should create close I/O request in slot 0
+
+    auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
-        throw invalid_syntax(instruction.operands.at(0)->tokens,
+        throw invalid_syntax(instruction.operands.at(1)->tokens,
                              "invalid operand")
             .note("expected register index");
     }
