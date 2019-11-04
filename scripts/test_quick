@@ -31,5 +31,6 @@ else
 fi
 
 export VIUA_LIBRARY_PATH=./build/test:./build/stdlib
+export ASAN_OPTIONS=detect_odr_violation=0
 
 VIUA_TEST_SUITE_VALGRIND_CHECKS=0 python3 ./tests/tests.py --verbose --catch --failfast "$@"
