@@ -56,7 +56,7 @@ using Token = viua::cg::lex::Token;
 auto Program::calculate_jumps(
     std::vector<std::tuple<uint64_t, uint64_t>> const jump_positions,
     std::vector<Token> const& tokens) -> Program& {
-    for (auto const jmp : jump_positions) {
+    for (auto const& jmp : jump_positions) {
         auto const [position, offset] = jmp;
 
         // usually beware of the reinterpret_cast<>'s but here we *know* what

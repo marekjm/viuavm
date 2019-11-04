@@ -986,7 +986,7 @@ auto generate(std::vector<Token> const& tokens,
     {
         std::map<viua::internals::types::bytecode_size, std::string>
             address_of_fn;
-        for (auto const [name, addr] : function_addresses) {
+        for (auto const& [name, addr] : function_addresses) {
             if (not address_of_fn.insert({addr, name}).second) {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET);
@@ -1007,7 +1007,7 @@ auto generate(std::vector<Token> const& tokens,
     {
         std::map<viua::internals::types::bytecode_size, std::string>
             address_of_bl;
-        for (auto const [name, addr] : block_addresses) {
+        for (auto const& [name, addr] : block_addresses) {
             if (not address_of_bl.insert({addr, name}).second) {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET);

@@ -427,7 +427,7 @@ static auto bind(Frame* frame,
 
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
-    frame->local_register_set->set(0, std::move(frame->arguments->pop(0)));
+    frame->local_register_set->set(0, frame->arguments->pop(0));
 }
 
 static auto listen(Frame* frame,
@@ -552,7 +552,7 @@ static auto listen(Frame* frame,
 
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
-    frame->local_register_set->set(0, std::move(frame->arguments->pop(0)));
+    frame->local_register_set->set(0, frame->arguments->pop(0));
 }
 
 static auto accept(Frame* frame,

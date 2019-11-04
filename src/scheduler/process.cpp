@@ -45,7 +45,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void {
     }
     std::cerr << "\n";
 
-    auto const thrown_object = std::move(process.transfer_active_exception());
+    auto const thrown_object = process.transfer_active_exception();
     auto const ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     auto const ex_type = thrown_object->type();
 
@@ -564,7 +564,7 @@ auto Process_scheduler::operator()() -> void {
                 death_message->insert("exception", std::move(exc));
                 death_message->insert("parameters", std::move(parameters));
 
-                auto death_frame = std::move(a_process->frame_for_watchdog());
+                auto death_frame = a_process->frame_for_watchdog();
                 death_frame->arguments->set(0, std::move(death_message));
                 a_process->become(a_process->watchdog(),
                                   std::move(death_frame));
