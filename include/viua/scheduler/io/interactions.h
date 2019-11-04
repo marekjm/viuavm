@@ -91,7 +91,7 @@ struct IO_interaction {
         using result_type = std::unique_ptr<viua::types::Value>;
 
         State const state = State::In_flight;
-        std::optional<Status> const status;
+        std::optional<Status> const status = std::nullopt;
         std::unique_ptr<viua::types::Value> result;
 
         Interaction_result() = default;
