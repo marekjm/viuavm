@@ -51,7 +51,6 @@ struct IO_interaction;
 
 
 namespace viua { namespace scheduler {
-class Virtual_process_scheduler;
 class Process_scheduler;
 }}  // namespace viua::scheduler
 

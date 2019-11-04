@@ -37,7 +37,6 @@
 #include <viua/scheduler/ffi.h>
 #include <viua/scheduler/io.h>
 #include <viua/scheduler/process.h>
-#include <viua/scheduler/vps.h>
 #include <viua/support/env.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>

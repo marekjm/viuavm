@@ -24,7 +24,6 @@
 #include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
-#include <viua/scheduler/vps.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/process.h>
