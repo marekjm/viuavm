@@ -2766,7 +2766,6 @@ static auto analyse_single_arm(
                         Compile_time_error::Empty_error,
                         line->token(0),
                         "cannot reallocate register set"});
-                break;
             }
             case CALL: {
             }

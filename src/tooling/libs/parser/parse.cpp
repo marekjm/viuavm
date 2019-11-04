@@ -1429,7 +1429,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
                             Compile_time_error::Unexpected_token,
                         token,
                         "internal instruction found in user code"});
-                break;
             case STREQ:
             case BOOL:
             case BITSEQ:
