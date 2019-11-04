@@ -783,7 +783,7 @@ viua::kernel::Kernel::~Kernel() {
         /*
          * Send a poison pill to every I/O worker thread.
          */
-        if constexpr (false) {
+        if constexpr ((false)) {
             std::cerr << "[kernel] starting I/O shutdown, " << io_workers.size()
                       << " workers to kill\n";
         }
@@ -795,12 +795,12 @@ viua::kernel::Kernel::~Kernel() {
         }
         io_request_cv.notify_all();
         for (auto& each : io_workers) {
-            if constexpr (false) {
+            if constexpr ((false)) {
                 std::cerr << "[kernel] waiting for I/O worker\n";
             }
             each->join();
         }
-        if constexpr (false) {
+        if constexpr ((false)) {
             std::cerr << "[kernel] done with I/O shutdown\n";
         }
     }

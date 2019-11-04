@@ -73,7 +73,7 @@ void viua::scheduler::io::io_scheduler(
         }
 
         if (is_sentinel(interaction)) {
-            if constexpr (false) {
+            if constexpr ((false)) {
                 std::cerr << ("[io][id=" + std::to_string(scheduler_id)
                               + "] received sentinel\n");
             }
@@ -126,7 +126,7 @@ void viua::scheduler::io::io_scheduler(
                 select(*work.fd() + 1, &readfds, &writefds, nullptr, &timeout);
             if (s == -1) {
                 auto const saved_errno = errno;
-                if constexpr (false) {
+                if constexpr ((false)) {
                     std::cerr << ("[io][id=" + std::to_string(scheduler_id)
                                   + "] select(3) error: "
                                   + std::to_string(saved_errno) + "\n");
@@ -135,7 +135,7 @@ void viua::scheduler::io::io_scheduler(
                 continue;
             }
             if (s == 0) {
-                if constexpr (false) {
+                if constexpr ((false)) {
                     std::cerr << ("[io][id=" + std::to_string(scheduler_id)
                                   + "] select(3) returned 0 for "
                                   + (work.kind() == IO_kind::Input ? "input"
@@ -179,7 +179,7 @@ void viua::scheduler::io::io_scheduler(
         }
     }
 
-    if constexpr (false) {
+    if constexpr ((false)) {
         std::cerr << ("[io][id=" + std::to_string(scheduler_id)
                       + "] scheduler shutting down\n");
     }
