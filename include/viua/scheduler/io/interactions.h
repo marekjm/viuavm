@@ -128,10 +128,10 @@ struct IO_read_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    auto fd() const -> std::optional<fd_type> {
+    std::optional<fd_type> fd() const override {
         return file_descriptor;
     }
-    auto kind() const -> IO_kind {
+    IO_kind kind() const override {
         return IO_kind::Input;
     }
 
@@ -143,10 +143,10 @@ struct IO_write_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    auto fd() const -> std::optional<fd_type> {
+    std::optional<fd_type> fd() const override {
         return file_descriptor;
     }
-    auto kind() const -> IO_kind {
+    IO_kind kind() const override {
         return IO_kind::Output;
     }
 
