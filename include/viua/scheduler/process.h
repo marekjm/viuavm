@@ -95,7 +95,9 @@ class Process_scheduler {
      * a new process is spawned and then try to steal it instead of just
      * shutting down.
      */
-    std::atomic_bool should_shut_down;
+    // FIXME Remove this variable after double-checking that it really isn't
+    // needed.
+    //std::atomic_bool should_shut_down;
 
     /*
      * The thread that runs the scheduler's code.
