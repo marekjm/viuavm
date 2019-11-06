@@ -53,9 +53,9 @@ enum class Compile_time_error {
 };
 
 auto display_error(Compile_time_error const) -> std::string;
-auto display_error_and_exit[[noreturn]](Compile_time_error const) -> void;
-auto display_error_and_exit[[noreturn]](Compile_time_error const, std::string const)
-    -> void;
+auto display_error_and_exit [[noreturn]] (Compile_time_error const) -> void;
+auto display_error_and_exit
+    [[noreturn]] (Compile_time_error const, std::string const) -> void;
 }}}}  // namespace viua::tooling::errors::compile_time
 
 #endif

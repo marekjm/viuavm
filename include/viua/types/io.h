@@ -115,8 +115,7 @@ class IO_fd : public IO_port {
         -> std::unique_ptr<IO_request> override;
     auto write(viua::kernel::Kernel&, std::unique_ptr<Value>)
         -> std::unique_ptr<IO_request> override;
-    auto close(viua::kernel::Kernel&)
-        -> std::unique_ptr<IO_request> override;
+    auto close(viua::kernel::Kernel&) -> std::unique_ptr<IO_request> override;
 
     auto close() -> void;
 

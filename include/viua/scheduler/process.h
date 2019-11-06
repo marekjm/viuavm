@@ -97,7 +97,7 @@ class Process_scheduler {
      */
     // FIXME Remove this variable after double-checking that it really isn't
     // needed.
-    //std::atomic_bool should_shut_down;
+    // std::atomic_bool should_shut_down;
 
     /*
      * The thread that runs the scheduler's code.
