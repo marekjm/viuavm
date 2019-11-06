@@ -59,14 +59,6 @@ IO_interaction::Interaction_result::Interaction_result(State const st,
                                                        result_type r)
         : state{st}, status{su}, result{std::move(r)} {}
 
-auto IO_fake_interaction::interact() -> Interaction_result {
-    std::cerr << "IO_fake_interaction interacting!\n";
-    return Interaction_result{
-        IO_interaction::State::Complete,
-        IO_interaction::Status::Success,
-        std::make_unique<viua::types::String>("Hello, World!")};
-}
-
 IO_read_interaction::IO_read_interaction(id_type const x,
                                          int const fd,
                                          size_t const limit)
