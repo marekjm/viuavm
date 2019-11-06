@@ -28,7 +28,14 @@ auto check_op_io_close(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void {
     using viua::assembler::frontend::parser::Void_literal;
 
-    // FIXME should create close I/O request in slot 0
+    auto result = get_operand<Register_index>(instruction, 0);
+    if (not result) {
+        throw invalid_syntax(instruction.operands.at(0)->tokens,
+                             "invalid operand")
+            .note("expected register index");
+    }
+
+    check_if_name_resolved(register_usage_profile, *result);
 
     auto source = get_operand<Register_index>(instruction, 1);
     if (not source) {
@@ -40,5 +47,9 @@ auto check_op_io_close(Register_usage_profile& register_usage_profile,
     check_use_of_register(register_usage_profile, *source);
     assert_type_of_register<viua::internals::Value_types::IO_PORT>(
         register_usage_profile, *source);
+
+    auto val       = Register(*result);
+    val.value_type = Value_types::IO_REQUEST;
+    register_usage_profile.define(val, result->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
