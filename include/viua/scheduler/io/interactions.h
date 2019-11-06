@@ -117,6 +117,18 @@ struct IO_interaction {
     IO_interaction(id_type const);
     virtual ~IO_interaction();
 };
+struct IO_empty_interaction : public IO_interaction {
+    auto interact() -> Interaction_result override;
+
+    std::optional<fd_type> fd() const override {
+        return std::nullopt;
+    }
+    IO_kind kind() const override {
+        return IO_kind::Output;
+    }
+
+    using IO_interaction::IO_interaction;
+};
 struct IO_read_interaction : public IO_interaction {
     int const file_descriptor;
     std::string buffer;

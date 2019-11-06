@@ -118,6 +118,19 @@ auto IO_write_interaction::interact() -> Interaction_result {
                               std::make_unique<viua::types::String>(
                                   buffer.substr(static_cast<size_t>(n)))};
 }
+
+auto IO_empty_interaction::interact() -> Interaction_result {
+    if (cancelled()) {
+        return Interaction_result{IO_interaction::State::Complete,
+                                  IO_interaction::Status::Cancelled,
+                                  std::make_unique<viua::types::Exception>(
+                                      "IO_cancel", "I/O cancelled")};
+    }
+
+    return Interaction_result{IO_interaction::State::Complete,
+                              IO_interaction::Status::Success,
+                              std::make_unique<viua::types::Boolean>(true)};
+}
 }  // namespace viua::scheduler::io
 
 namespace viua::types {
