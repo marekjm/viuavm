@@ -114,7 +114,8 @@ auto tokenise(std::string const&) -> std::vector<Token>;
 auto standardise(std::vector<Token>) -> std::vector<Token>;
 auto normalise(std::vector<Token>) -> std::vector<Token>;
 
-template<class T, typename... R> bool adjacent(T first, T second) {
+template<class T, typename... R> bool adjacent(T first, T second)
+{
     if (first.line() != second.line()) {
         return false;
     }
@@ -123,7 +124,8 @@ template<class T, typename... R> bool adjacent(T first, T second) {
     }
     return true;
 }
-template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+template<class T, typename... R> bool adjacent(T first, T second, R... rest)
+{
     if (first.line() != second.line()) {
         return false;
     }

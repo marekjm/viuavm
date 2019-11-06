@@ -23,7 +23,8 @@ namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
 auto assemble_op_float(Program& program,
                        std::vector<Token> const& tokens,
-                       Token_index const i) -> void {
+                       Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 2;
 

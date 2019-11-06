@@ -22,7 +22,8 @@
 #include <viua/util/filesystem.h>
 
 namespace viua { namespace util { namespace filesystem {
-auto is_file(std::string const& path) -> bool {
+auto is_file(std::string const& path) -> bool
+{
     struct stat sf;
 
     // not a file if stat returned error

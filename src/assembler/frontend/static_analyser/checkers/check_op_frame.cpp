@@ -24,7 +24,8 @@ using viua::assembler::frontend::parser::Instruction;
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
-auto check_op_frame(Register_usage_profile&, Instruction const&) -> void {
+auto check_op_frame(Register_usage_profile&, Instruction const&) -> void
+{
     // do nothing, FRAMEs do not modify registers;
     // also, frame balance and arity is handled by verifier which runs before SA
 }

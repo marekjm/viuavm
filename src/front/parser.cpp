@@ -53,7 +53,8 @@ using viua::cg::lex::Traced_syntax_error;
 
 template<class T>
 static auto enumerate(std::vector<T> const& v)
-    -> std::vector<std::pair<typename std::vector<T>::size_type, T>> {
+    -> std::vector<std::pair<typename std::vector<T>::size_type, T>>
+{
     auto enumerated_vector =
         std::vector<std::pair<typename std::vector<T>::size_type, T>>{};
 
@@ -69,7 +70,8 @@ static auto enumerate(std::vector<T> const& v)
 static bool usage(const char* program,
                   bool show_help,
                   bool show_version,
-                  bool verbose) {
+                  bool verbose)
+{
     if (show_help or (show_version and verbose)) {
         std::cout << "Viua VM lexer, version ";
     }
@@ -96,7 +98,8 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static std::string read_file(std::ifstream& in) {
+static std::string read_file(std::ifstream& in)
+{
     std::ostringstream source_in;
     auto line = std::string{};
     while (std::getline(in, line)) {
@@ -106,7 +109,8 @@ static std::string read_file(std::ifstream& in) {
     return source_in.str();
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // setup command line arguments vector
     auto args   = std::vector<std::string>{};
     auto option = std::string{};
@@ -119,16 +123,20 @@ int main(int argc, char* argv[]) {
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version" or option == "-V") {
+        }
+        else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose" or option == "-v") {
+        }
+        else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
-        } else if (option == "--lib" or option == "-c") {
+        }
+        else if (option == "--lib" or option == "-c") {
             AS_LIB = true;
             continue;
-        } else if (str::startswith(option, "-")) {
+        }
+        else if (str::startswith(option, "-")) {
             std::cerr << "error: unknown option: " << option << std::endl;
             return 1;
         }
@@ -174,11 +182,13 @@ int main(int argc, char* argv[]) {
     try {
         tokens            = viua::cg::lex::cook(raw_tokens);
         normalised_tokens = normalise(tokens);
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -189,11 +199,13 @@ int main(int argc, char* argv[]) {
             viua::assembler::frontend::parser::parse(normalised_tokens);
         parsed_source.as_library = AS_LIB;
         viua::assembler::frontend::static_analyser::verify(parsed_source);
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;

@@ -26,18 +26,16 @@
 #include <viua/types/value.h>
 
 
-std::string viua::types::Value::type() const {
-    return "Value";
-}
-std::string viua::types::Value::str() const {
+std::string viua::types::Value::type() const { return "Value"; }
+std::string viua::types::Value::str() const
+{
     std::ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-std::string viua::types::Value::repr() const {
-    return str();
-}
-bool viua::types::Value::boolean() const {
+std::string viua::types::Value::repr() const { return str(); }
+bool viua::types::Value::boolean() const
+{
     /*  Boolean defaults to false.
      *  This is because in if, loops etc. we will NOT execute code depending on
      * unknown state. If a derived object overrides this method it is free to
@@ -48,11 +46,13 @@ bool viua::types::Value::boolean() const {
 
 
 std::unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
-    const viua::process::Process* process_of_origin) {
+    const viua::process::Process* process_of_origin)
+{
     return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }
 
-viua::types::Value::~Value() {
+viua::types::Value::~Value()
+{
     for (auto p : pointers) {
         p->invalidate(this);
     }

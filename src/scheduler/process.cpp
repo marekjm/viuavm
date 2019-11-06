@@ -33,7 +33,8 @@
 #include <viua/types/struct.h>
 #include <viua/types/vector.h>
 
-static auto print_stack_trace_default(viua::process::Process& process) -> void {
+static auto print_stack_trace_default(viua::process::Process& process) -> void
+{
     auto const trace = process.trace();
     std::cerr << "stack trace: from entry point, most recent call last...\n";
     auto i = decltype(trace)::size_type{0};
@@ -83,9 +84,11 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void {
                           << "> " << last->local_register_set->get(r)->str()
                           << "\n";
             }
-        } else if (not last->local_register_set.owns()) {
+        }
+        else if (not last->local_register_set.owns()) {
             std::cerr << "  this frame did not own its registers\n";
-        } else {
+        }
+        else {
             std::cerr << "  no registers were allocated for this frame\n";
         }
 
@@ -107,22 +110,27 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void {
                     if (ptr->expired()) {
                         std::cerr << "<ExpiredPointer>"
                                   << "\n";
-                    } else {
+                    }
+                    else {
                         std::cerr << '<' << ptr->type() << ">\n";
                     }
-                } else {
+                }
+                else {
                     std::cerr << '<' << last->arguments->get(r)->type() << "> "
                               << last->arguments->get(r)->str() << "\n";
                 }
             }
-        } else {
+        }
+        else {
             std::cerr << "  no arguments were passed to this frame\n";
         }
-    } else {
+    }
+    else {
         std::cerr << "no stack trace available\n";
     }
 }
-static auto print_stack_trace_json(viua::process::Process& process) -> void {
+static auto print_stack_trace_json(viua::process::Process& process) -> void
+{
     std::ostringstream oss;
     oss << '{';
 
@@ -158,13 +166,16 @@ static auto print_stack_trace_json(viua::process::Process& process) -> void {
     }
     if (to == "stdout") {
         std::cout << oss.str() << "\n";
-    } else if (to == "stderr") {
+    }
+    else if (to == "stderr") {
         std::cerr << oss.str() << "\n";
-    } else {
+    }
+    else {
         std::cerr << oss.str() << "\n";
     }
 }
-static void print_stack_trace(viua::process::Process& process) {
+static void print_stack_trace(viua::process::Process& process)
+{
     auto stack_trace_print_type =
         viua::support::env::get_var("VIUA_STACKTRACE_SERIALISATION");
     if (stack_trace_print_type == "") {
@@ -173,43 +184,50 @@ static void print_stack_trace(viua::process::Process& process) {
 
     if (stack_trace_print_type == "default") {
         print_stack_trace_default(process);
-    } else if (stack_trace_print_type == "json") {
+    }
+    else if (stack_trace_print_type == "json") {
         print_stack_trace_json(process);
-    } else {
+    }
+    else {
         print_stack_trace_default(process);
     }
 }
 
 namespace viua { namespace scheduler {
-auto Process_scheduler::push(std::unique_ptr<process_type> proc) -> void {
+auto Process_scheduler::push(std::unique_ptr<process_type> proc) -> void
+{
     std::lock_guard<std::mutex> lck{process_queue_mtx};
     process_queue.push_back(std::move(proc));
 }
-auto Process_scheduler::pop() -> std::unique_ptr<process_type> {
+auto Process_scheduler::pop() -> std::unique_ptr<process_type>
+{
     std::lock_guard<std::mutex> lck{process_queue_mtx};
     auto proc = std::move(process_queue.front());
     process_queue.pop_front();
     return proc;
 }
-auto Process_scheduler::size() const -> size_type {
+auto Process_scheduler::size() const -> size_type
+{
     std::lock_guard<std::mutex> lck{process_queue_mtx};
     return process_queue.size();
 }
-auto Process_scheduler::empty() const -> bool {
+auto Process_scheduler::empty() const -> bool
+{
     std::lock_guard<std::mutex> lck{process_queue_mtx};
     return process_queue.empty();
 }
 
 Process_scheduler::Process_scheduler(viua::kernel::Kernel& k, id_type const x)
-        : assigned_id{x}, attached_kernel{k} {}
+        : assigned_id{x}, attached_kernel{k}
+{
+}
 
 Process_scheduler::~Process_scheduler() {}
 
-auto Process_scheduler::id() const -> id_type {
-    return assigned_id;
-}
+auto Process_scheduler::id() const -> id_type { return assigned_id; }
 
-auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void {
+auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void
+{
     auto initial_frame           = std::make_unique<Frame>(nullptr, 0);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
     initial_frame->set_local_register_set(
@@ -228,7 +246,8 @@ auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void {
 
 auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
                               process_type* parent,
-                              bool disown) -> viua::process::Process* {
+                              bool disown) -> viua::process::Process*
+{
     auto process = std::make_unique<process_type>(
         std::move(frame), this, parent, false /* tracing_enabled */
     );
@@ -256,7 +275,8 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
     return process_ptr;
 }
 auto Process_scheduler::give_up_processes()
-    -> std::vector<std::unique_ptr<process_type>> {
+    -> std::vector<std::unique_ptr<process_type>>
+{
     std::lock_guard<std::mutex> lck{process_queue_mtx};
 
     /*
@@ -281,7 +301,8 @@ auto Process_scheduler::give_up_processes()
         process_queue.pop_front();
         if (proc->pinned()) {
             saved.push_back(std::move(proc));
-        } else {
+        }
+        else {
             given_up.push_back(std::move(proc));
         }
     }
@@ -293,68 +314,80 @@ auto Process_scheduler::give_up_processes()
     return given_up;
 }
 
-auto Process_scheduler::is_joinable(viua::process::PID const pid) const
-    -> bool {
+auto Process_scheduler::is_joinable(viua::process::PID const pid) const -> bool
+{
     return attached_kernel.is_process_joinable(pid);
 }
-auto Process_scheduler::is_stopped(viua::process::PID const pid) const -> bool {
+auto Process_scheduler::is_stopped(viua::process::PID const pid) const -> bool
+{
     return attached_kernel.is_process_stopped(pid);
 }
 auto Process_scheduler::is_terminated(viua::process::PID const pid) const
-    -> bool {
+    -> bool
+{
     return attached_kernel.is_process_terminated(pid);
 }
 
 auto Process_scheduler::transfer_exception_of(
-    viua::process::PID const pid) const -> std::unique_ptr<viua::types::Value> {
+    viua::process::PID const pid) const -> std::unique_ptr<viua::types::Value>
+{
     return attached_kernel.transfer_exception_of(pid);
 }
 auto Process_scheduler::transfer_result_of(viua::process::PID const pid) const
-    -> std::unique_ptr<viua::types::Value> {
+    -> std::unique_ptr<viua::types::Value>
+{
     return attached_kernel.transfer_result_of(pid);
 }
 
 auto Process_scheduler::send(viua::process::PID const pid,
                              std::unique_ptr<viua::types::Value> message)
-    -> void {
+    -> void
+{
     attached_kernel.send(pid, std::move(message));
 }
 auto Process_scheduler::receive(
     viua::process::PID const pid,
-    std::queue<std::unique_ptr<viua::types::Value>>& message_queue) -> void {
+    std::queue<std::unique_ptr<viua::types::Value>>& message_queue) -> void
+{
     attached_kernel.receive(pid, message_queue);
 }
 
 auto Process_scheduler::request_ffi_call(std::unique_ptr<Frame> frame,
-                                         viua::process::Process& p) -> void {
+                                         viua::process::Process& p) -> void
+{
     attached_kernel.request_foreign_function_call(std::move(frame), p);
 }
 
-auto Process_scheduler::is_native_function(std::string const name) const
-    -> bool {
+auto Process_scheduler::is_native_function(std::string const name) const -> bool
+{
     return attached_kernel.is_native_function(name);
 }
 auto Process_scheduler::is_foreign_function(std::string const name) const
-    -> bool {
+    -> bool
+{
     return attached_kernel.is_foreign_function(name);
 }
-auto Process_scheduler::is_block(std::string const name) const -> bool {
+auto Process_scheduler::is_block(std::string const name) const -> bool
+{
     return attached_kernel.is_block(name);
 }
 
-auto Process_scheduler::load_module(std::string const name) -> void {
+auto Process_scheduler::load_module(std::string const name) -> void
+{
     attached_kernel.load_module(name);
 }
 
 
 auto Process_scheduler::get_entry_point_of_block(std::string const name) const
     -> std::pair<viua::internals::types::Op_address_type,
-                 viua::internals::types::Op_address_type> {
+                 viua::internals::types::Op_address_type>
+{
     return attached_kernel.get_entry_point_of_block(name);
 }
 auto Process_scheduler::get_entry_point_of_function(std::string const& name)
     const -> std::pair<viua::internals::types::Op_address_type,
-                       viua::internals::types::Op_address_type> {
+                       viua::internals::types::Op_address_type>
+{
     return attached_kernel.get_entry_point_of(name);
 }
 
@@ -366,15 +399,15 @@ template<typename T> struct deferred {
     auto operator=(deferred<T> const&) = delete;
     deferred(deferred<T>&&)            = delete;
     auto operator=(deferred<T>&&) = delete;
-    inline ~deferred() {
-        fn_to_call();
-    }
+    inline ~deferred() { fn_to_call(); }
 };
 
-auto Process_scheduler::launch() -> void {
+auto Process_scheduler::launch() -> void
+{
     scheduler_thread = std::thread([this] { (*this)(); });
 }
-auto Process_scheduler::operator()() -> void {
+auto Process_scheduler::operator()() -> void
+{
     /*
      * Used to check if any processes "ticked". A ticking process either did
      * some work, or is in a suspended state awaiting a wake-up signal (so has
@@ -515,7 +548,8 @@ auto Process_scheduler::operator()() -> void {
                 attached_kernel.delete_mailbox(a_process->pid());
                 attached_kernel.notify_about_process_death();
                 continue;
-            } else {
+            }
+            else {
                 if (a_process->trace().at(0)->function_name
                     == a_process->watchdog()) {
                     /*
@@ -584,7 +618,8 @@ auto Process_scheduler::operator()() -> void {
                     static_cast<viua::types::Integer*>(ret.get());
                 exit_code = (ret ? static_cast<int>(ret_int->as_integer()) : 0);
             }
-        } else {
+        }
+        else {
             push(std::move(a_process));
         }
 
@@ -602,32 +637,32 @@ auto Process_scheduler::operator()() -> void {
 }
 
 auto Process_scheduler::shutdown() -> void {}
-auto Process_scheduler::join() -> void {
-    scheduler_thread.join();
-}
-auto Process_scheduler::exit() const -> int {
-    return exit_code.value_or(0);
-}
+auto Process_scheduler::join() -> void { scheduler_thread.join(); }
+auto Process_scheduler::exit() const -> int { return exit_code.value_or(0); }
 
 auto Process_scheduler::schedule_io(
-    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void {
+    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void
+{
     attached_kernel.schedule_io(std::move(i));
 }
 
 auto Process_scheduler::cancel_io(
-    viua::scheduler::io::IO_interaction::id_type const interaction_id) -> void {
+    viua::scheduler::io::IO_interaction::id_type const interaction_id) -> void
+{
     attached_kernel.cancel_io(interaction_id);
 }
 
 auto Process_scheduler::io_complete(
     viua::scheduler::io::IO_interaction::id_type const interaction_id) const
-    -> bool {
+    -> bool
+{
     return attached_kernel.io_complete(interaction_id);
 }
 
 auto Process_scheduler::io_result(
     viua::scheduler::io::IO_interaction::id_type const interaction_id)
-    -> std::unique_ptr<viua::types::Value> {
+    -> std::unique_ptr<viua::types::Value>
+{
     return attached_kernel.io_result(interaction_id);
 }
 }}  // namespace viua::scheduler

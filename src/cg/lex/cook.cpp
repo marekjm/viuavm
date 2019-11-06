@@ -25,7 +25,8 @@
 #include <viua/support/string.h>
 
 namespace viua { namespace cg { namespace lex {
-static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {
+static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void
+{
     using size_type = std::remove_reference_t<decltype(tokens)>::size_type;
     for (auto i = size_type{0}; i < tokens.size(); ++i) {
         if (tokens.at(i) != ".") {
@@ -56,7 +57,8 @@ static auto check_for_missing_colons(std::vector<Token> const& tokens) -> void {
 }
 
 auto cook(std::vector<Token> tokens, bool const with_replaced_names)
-    -> std::vector<Token> {
+    -> std::vector<Token>
+{
     /*
      * Remove whitespace as first step to reduce noise in token stream.
      * Remember not to remove newlines ('\n') because they act as separators

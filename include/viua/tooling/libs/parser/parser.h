@@ -31,7 +31,6 @@
 #include <viua/types/integer.h>
 
 namespace viua { namespace tooling { namespace libs { namespace parser {
-
 enum class Fragment_type {
     Extern_function,
     Extern_block,

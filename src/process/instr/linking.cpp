@@ -27,7 +27,8 @@
 #include <viua/types/integer.h>
 
 
-auto viua::process::Process::opimport(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opimport(Op_address_type addr) -> Op_address_type
+{
     /** Run import instruction.
      */
     auto module = std::string{};

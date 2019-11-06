@@ -23,7 +23,8 @@ namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
 auto assemble_op_vector(Program& program,
                         std::vector<Token> const& tokens,
-                        Token_index const i) -> void {
+                        Token_index const i) -> void
+{
     Token_index target           = i + 1;
     Token_index pack_range_start = target + 2;
     Token_index pack_range_count = pack_range_start + 2;

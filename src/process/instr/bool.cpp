@@ -26,7 +26,8 @@
 #include <viua/types/value.h>
 
 
-auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -43,7 +44,8 @@ auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type {
 using Addr_type = viua::internals::types::Op_address_type;
 template<typename Oper>
 static auto binary_logical_op(Addr_type addr, viua::process::Process* proc)
-    -> Addr_type {
+    -> Addr_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, proc);
@@ -60,10 +62,12 @@ static auto binary_logical_op(Addr_type addr, viua::process::Process* proc)
     return addr;
 }
 
-auto viua::process::Process::opand(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opand(Op_address_type addr) -> Op_address_type
+{
     return binary_logical_op<std::logical_and<bool>>(addr, this);
 }
 
-auto viua::process::Process::opor(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opor(Op_address_type addr) -> Op_address_type
+{
     return binary_logical_op<std::logical_or<bool>>(addr, this);
 }

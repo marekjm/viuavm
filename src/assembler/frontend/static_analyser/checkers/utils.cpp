@@ -61,12 +61,14 @@ auto register_set_names = std::map<Register_sets, std::string>{
         "parameters",
     },
 };
-auto to_string(Register_sets const register_set_id) -> std::string {
+auto to_string(Register_sets const register_set_id) -> std::string
+{
     return register_set_names.at(register_set_id);
 }
 
 auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
-    -> Invalid_syntax {
+    -> Invalid_syntax
+{
     auto invalid_syntax_error = Invalid_syntax(tokens.at(0), message);
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
          i < tokens.size();
@@ -78,7 +80,8 @@ auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
 
 auto get_line_index_of_instruction(InstructionIndex const n,
                                    Instructions_block const& ib)
-    -> InstructionIndex {
+    -> InstructionIndex
+{
     auto left = n;
     auto i    = InstructionIndex{0};
     for (; left and i < ib.body.size(); ++i) {
@@ -95,14 +98,16 @@ auto get_line_index_of_instruction(InstructionIndex const n,
 auto erase_if_direct_access(
     Register_usage_profile& register_usage_profile,
     Register_index* const r,
-    viua::assembler::frontend::parser::Instruction const& instruction) -> void {
+    viua::assembler::frontend::parser::Instruction const& instruction) -> void
+{
     if (r->as == viua::internals::Access_specifier::DIRECT) {
         register_usage_profile.erase(Register(*r), instruction.tokens.at(0));
     }
 }
 
 template<typename K, typename V>
-static auto keys_of(std::map<K, V> const& m) -> std::vector<K> {
+static auto keys_of(std::map<K, V> const& m) -> std::vector<K>
+{
     auto keys = std::vector<K>{};
 
     for (auto const& each : m) {
@@ -112,7 +117,8 @@ static auto keys_of(std::map<K, V> const& m) -> std::vector<K> {
     return keys;
 }
 auto check_if_name_resolved(Register_usage_profile const& rup,
-                            Register_index const r) -> void {
+                            Register_index const r) -> void
+{
     if (not r.resolved) {
         auto error = Invalid_syntax(r.tokens.at(0), "unresolved name");
         if (auto suggestion = str::levenshtein_best(
@@ -131,7 +137,8 @@ static auto maybe_mistyped_register_set_helper(
     Register_usage_profile& rup,
     viua::assembler::frontend::parser::Register_index r,
     Traced_syntax_error& error,
-    Register_sets rs_id) -> bool {
+    Register_sets rs_id) -> bool
+{
     if (r.rss != rs_id) {
         auto val         = Register{};
         val.index        = r.index;
@@ -153,7 +160,8 @@ static auto maybe_mistyped_register_set_helper(
 static auto maybe_mistyped_register_set(
     Register_usage_profile& rup,
     viua::assembler::frontend::parser::Register_index r,
-    Traced_syntax_error& error) -> void {
+    Traced_syntax_error& error) -> void
+{
     if (maybe_mistyped_register_set_helper(
             rup, r, error, Register_sets::LOCAL)) {
         return;
@@ -167,7 +175,8 @@ auto check_use_of_register(Register_usage_profile& rup,
                            viua::assembler::frontend::parser::Register_index r,
                            std::string const error_core_msg,
                            bool const allow_arguments,
-                           bool const allow_parameters) -> void {
+                           bool const allow_parameters) -> void
+{
     check_if_name_resolved(rup, r);
     if (r.rss == Register_sets::GLOBAL) {
         /*
@@ -336,25 +345,30 @@ auto const value_type_names = std::map<Value_types, std::string>{
         "I/O port-like",
     },
 };
-auto operator|(const Value_types lhs, const Value_types rhs) -> Value_types {
+auto operator|(const Value_types lhs, const Value_types rhs) -> Value_types
+{
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                     | static_cast<ValueTypesType>(rhs));
 }
-auto operator&(const Value_types lhs, const Value_types rhs) -> Value_types {
+auto operator&(const Value_types lhs, const Value_types rhs) -> Value_types
+{
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                     & static_cast<ValueTypesType>(rhs));
 }
-auto operator^(const Value_types lhs, const Value_types rhs) -> Value_types {
+auto operator^(const Value_types lhs, const Value_types rhs) -> Value_types
+{
     // FIXME find out if it is possible to remove the outermost static_cast<>
     return static_cast<Value_types>(static_cast<ValueTypesType>(lhs)
                                     ^ static_cast<ValueTypesType>(rhs));
 }
-auto operator!(const Value_types v) -> bool {
+auto operator!(const Value_types v) -> bool
+{
     return not static_cast<ValueTypesType>(v);
 }
-auto to_string(Value_types const value_type_id) -> std::string {
+auto to_string(Value_types const value_type_id) -> std::string
+{
     auto const has_pointer = not not(value_type_id & Value_types::POINTER);
     auto const type_name   = value_type_names.at(
         has_pointer ? (value_type_id ^ Value_types::POINTER) : value_type_id);
@@ -362,7 +376,8 @@ auto to_string(Value_types const value_type_id) -> std::string {
 }
 auto depointerise_type_if_needed(Value_types const t,
                                  bool const access_via_pointer_dereference)
-    -> Value_types {
+    -> Value_types
+{
     return (access_via_pointer_dereference ? (t ^ Value_types::POINTER) : t);
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

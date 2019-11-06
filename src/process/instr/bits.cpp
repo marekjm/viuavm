@@ -34,7 +34,8 @@ using viua::util::memory::load_aligned;
 
 
 auto viua::process::Process::opbits_of_integer(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -57,7 +58,8 @@ auto viua::process::Process::opbits_of_integer(Op_address_type addr)
 }
 
 auto viua::process::Process::opinteger_of_bits(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -83,7 +85,8 @@ auto viua::process::Process::opinteger_of_bits(Op_address_type addr)
 }
 
 
-auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -95,7 +98,8 @@ auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type {
         addr += sizeof(bits_size);
         *target = std::make_unique<viua::types::Bits>(bits_size, addr);
         addr += bits_size;
-    } else {
+    }
+    else {
         viua::types::Integer* n = nullptr;
         std::tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Integer>(addr, this);
@@ -106,7 +110,8 @@ auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitand(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitand(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -127,7 +132,8 @@ auto viua::process::Process::opbitand(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitor(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitor(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -148,7 +154,8 @@ auto viua::process::Process::opbitor(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitnot(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitnot(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -164,7 +171,8 @@ auto viua::process::Process::opbitnot(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitxor(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitxor(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -185,7 +193,8 @@ auto viua::process::Process::opbitxor(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitat(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitat(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -206,7 +215,8 @@ auto viua::process::Process::opbitat(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opbitset(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opbitset(Op_address_type addr) -> Op_address_type
+{
     viua::types::Bits* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
@@ -221,10 +231,12 @@ auto viua::process::Process::opbitset(Op_address_type addr) -> Op_address_type {
     if (ot == OT_TRUE) {
         ++addr;  // for operand type
         value = true;
-    } else if (ot == OT_FALSE) {
+    }
+    else if (ot == OT_FALSE) {
         ++addr;  // for operand type
         value = false;
-    } else {
+    }
+    else {
         viua::types::Boolean* x = nullptr;
         std::tie(addr, x) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Boolean>(addr, this);
@@ -243,11 +255,13 @@ using BitShiftOp = decltype(&viua::types::Bits::shl);
 template<const BitShiftOp op>
 static auto execute_bit_shift_instruction(viua::process::Process* process,
                                           Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     if (viua::bytecode::decoder::operands::is_void(addr)) {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
-    } else {
+    }
+    else {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, process);
     }
@@ -273,29 +287,34 @@ static auto execute_bit_shift_instruction(viua::process::Process* process,
     return addr;
 }
 
-auto viua::process::Process::opshl(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opshl(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_shift_instruction<&viua::types::Bits::shl>(this, addr);
 }
 
 
-auto viua::process::Process::opshr(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opshr(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_shift_instruction<&viua::types::Bits::shr>(this, addr);
 }
 
 
-auto viua::process::Process::opashl(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opashl(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_shift_instruction<&viua::types::Bits::ashl>(this, addr);
 }
 
 
-auto viua::process::Process::opashr(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opashr(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_shift_instruction<&viua::types::Bits::ashr>(this, addr);
 }
 
 using BitRotateOp = decltype(&viua::types::Bits::rol);
 template<BitRotateOp const op>
 static auto execute_bit_rotate_op(viua::process::Process* process,
-                                  Op_address_type addr) -> Op_address_type {
+                                  Op_address_type addr) -> Op_address_type
+{
     auto target = dumb_ptr<viua::types::Bits>{nullptr};
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
@@ -310,12 +329,14 @@ static auto execute_bit_rotate_op(viua::process::Process* process,
     return addr;
 }
 
-auto viua::process::Process::oprol(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::oprol(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_rotate_op<&viua::types::Bits::rol>(this, addr);
 }
 
 
-auto viua::process::Process::opror(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opror(Op_address_type addr) -> Op_address_type
+{
     return execute_bit_rotate_op<&viua::types::Bits::ror>(this, addr);
 }
 
@@ -323,7 +344,8 @@ using BitsIncrementDecrementOp = decltype(&viua::types::Bits::increment);
 template<BitsIncrementDecrementOp const op>
 static auto execute_increment_decrement_op(viua::process::Process* process,
                                            Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto target = dumb_ptr<viua::types::Bits>{nullptr};
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(
@@ -337,7 +359,8 @@ static auto execute_increment_decrement_op(viua::process::Process* process,
 using BitsArithmeticOp = decltype(&viua::types::Bits::wrapadd);
 template<BitsArithmeticOp const op>
 static auto execute_arithmetic_op(viua::process::Process* process,
-                                  Op_address_type addr) -> Op_address_type {
+                                  Op_address_type addr) -> Op_address_type
+{
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
@@ -358,92 +381,106 @@ static auto execute_arithmetic_op(viua::process::Process* process,
 }
 
 auto viua::process::Process::opwrapincrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<&viua::types::Bits::increment>(this,
                                                                          addr);
 }
 auto viua::process::Process::opwrapdecrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<&viua::types::Bits::decrement>(this,
                                                                          addr);
 }
-auto viua::process::Process::opwrapadd(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opwrapadd(Op_address_type addr) -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::wrapadd>(this, addr);
 }
-auto viua::process::Process::opwrapsub(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opwrapsub(Op_address_type addr) -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::wrapsub>(this, addr);
 }
-auto viua::process::Process::opwrapmul(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opwrapmul(Op_address_type addr) -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::wrapmul>(this, addr);
 }
-auto viua::process::Process::opwrapdiv(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opwrapdiv(Op_address_type addr) -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::wrapdiv>(this, addr);
 }
 
 
 auto viua::process::Process::opcheckedsincrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<
         &viua::types::Bits::checked_signed_increment>(this, addr);
 }
 auto viua::process::Process::opcheckedsdecrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<
         &viua::types::Bits::checked_signed_decrement>(this, addr);
 }
 auto viua::process::Process::opcheckedsadd(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::checked_signed_add>(this,
                                                                          addr);
 }
 auto viua::process::Process::opcheckedssub(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::checked_signed_sub>(this,
                                                                          addr);
 }
 auto viua::process::Process::opcheckedsmul(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::checked_signed_mul>(this,
                                                                          addr);
 }
 auto viua::process::Process::opcheckedsdiv(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::checked_signed_div>(this,
                                                                          addr);
 }
 
 
 auto viua::process::Process::opsaturatingsincrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<
         &viua::types::Bits::saturating_signed_increment>(this, addr);
 }
 auto viua::process::Process::opsaturatingsdecrement(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_increment_decrement_op<
         &viua::types::Bits::saturating_signed_decrement>(this, addr);
 }
 auto viua::process::Process::opsaturatingsadd(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::saturating_signed_add>(
         this, addr);
 }
 auto viua::process::Process::opsaturatingssub(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::saturating_signed_sub>(
         this, addr);
 }
 auto viua::process::Process::opsaturatingsmul(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::saturating_signed_mul>(
         this, addr);
 }
 auto viua::process::Process::opsaturatingsdiv(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     return execute_arithmetic_op<&viua::types::Bits::saturating_signed_div>(
         this, addr);
 }

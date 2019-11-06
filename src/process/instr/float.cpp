@@ -29,7 +29,8 @@
 #include <viua/util/memory.h>
 
 
-auto viua::process::Process::opfloat(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opfloat(Op_address_type addr) -> Op_address_type
+{
     auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
     auto value  = float{0.0};
 

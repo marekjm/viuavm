@@ -35,7 +35,8 @@ using viua::util::memory::aligned_read;
 
 
 IdToAddressMapping Loader::loadmap(char* bytedump,
-                                   uint64_t const& bytedump_size) {
+                                   uint64_t const& bytedump_size)
+{
     auto order = std::vector<std::string>{};
     std::map<std::string, uint64_t> mapping;
 
@@ -56,7 +57,8 @@ IdToAddressMapping Loader::loadmap(char* bytedump,
 
     return IdToAddressMapping(order, mapping);
 }
-void Loader::calculate_function_sizes() {
+void Loader::calculate_function_sizes()
+{
     for (unsigned i = 0; i < functions.size(); ++i) {
         std::string name = functions[i];
         uint64_t el_size = 0;
@@ -65,7 +67,8 @@ void Loader::calculate_function_sizes() {
             uint64_t a = function_addresses[name];
             uint64_t b = function_addresses[functions[i + 1]];
             el_size    = (b - a);
-        } else {
+        }
+        else {
             uint64_t a = function_addresses[name];
             uint64_t b = size;
             el_size    = (b - a);
@@ -75,7 +78,8 @@ void Loader::calculate_function_sizes() {
     }
 }
 
-void Loader::load_magic_number(std::ifstream& in) {
+void Loader::load_magic_number(std::ifstream& in)
+{
     std::array<char, 5> magic_number;
     in.read(magic_number.data(), sizeof(char) * magic_number.size());
     if (magic_number.back() != '\0') {
@@ -88,7 +92,8 @@ void Loader::load_magic_number(std::ifstream& in) {
 }
 
 void Loader::assume_binary_type(std::ifstream& in,
-                                Viua_binary_type assumed_binary_type) {
+                                Viua_binary_type assumed_binary_type)
+{
     char bt;
     in.read(&bt, sizeof(decltype(bt)));
     if (bt != assumed_binary_type) {
@@ -102,7 +107,8 @@ void Loader::assume_binary_type(std::ifstream& in,
 }
 
 static std::map<std::string, std::string> load_meta_information_map(
-    std::ifstream& in) {
+    std::ifstream& in)
+{
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
@@ -126,11 +132,13 @@ static std::map<std::string, std::string> load_meta_information_map(
 
     return meta_information_map;
 }
-void Loader::load_meta_information(std::ifstream& in) {
+void Loader::load_meta_information(std::ifstream& in)
+{
     meta_information = load_meta_information_map(in);
 }
 
-static std::vector<std::string> load_string_list(std::ifstream& in) {
+static std::vector<std::string> load_string_list(std::ifstream& in)
+{
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
@@ -151,17 +159,21 @@ static std::vector<std::string> load_string_list(std::ifstream& in) {
 
     return strings_list;
 }
-void Loader::load_external_signatures(std::ifstream& in) {
+void Loader::load_external_signatures(std::ifstream& in)
+{
     external_signatures = load_string_list(in);
 }
-void Loader::load_external_block_signatures(std::ifstream& in) {
+void Loader::load_external_block_signatures(std::ifstream& in)
+{
     external_signatures_block = load_string_list(in);
 }
-auto Loader::load_dynamic_imports_section(std::ifstream& in) -> void {
+auto Loader::load_dynamic_imports_section(std::ifstream& in) -> void
+{
     dynamic_linked_modules = load_string_list(in);
 }
 
-void Loader::load_jump_table(std::ifstream& in) {
+void Loader::load_jump_table(std::ifstream& in)
+{
     // load jump table
     uint64_t lib_total_jumps;
     readinto(in, &lib_total_jumps);
@@ -172,7 +184,8 @@ void Loader::load_jump_table(std::ifstream& in) {
         jumps.push_back(lib_jmp);
     }
 }
-void Loader::load_functions_map(std::ifstream& in) {
+void Loader::load_functions_map(std::ifstream& in)
+{
     uint64_t lib_function_ids_section_size = 0;
     readinto(in, &lib_function_ids_section_size);
 
@@ -192,7 +205,8 @@ void Loader::load_functions_map(std::ifstream& in) {
         function_addresses[p] = mapping[p];
     }
 }
-void Loader::load_blocks_map(std::ifstream& in) {
+void Loader::load_blocks_map(std::ifstream& in)
+{
     uint64_t lib_block_ids_section_size = 0;
     readinto(in, &lib_block_ids_section_size);
 
@@ -212,14 +226,16 @@ void Loader::load_blocks_map(std::ifstream& in) {
         block_addresses[p] = mapping[p];
     }
 }
-void Loader::load_bytecode(std::ifstream& in) {
+void Loader::load_bytecode(std::ifstream& in)
+{
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
     bytecode = std::make_unique<viua::internals::types::byte[]>(size);
     in.read(reinterpret_cast<char*>(bytecode.get()),
             static_cast<std::streamsize>(size));
 }
 
-Loader& Loader::load() {
+Loader& Loader::load()
+{
     std::ifstream in(path, std::ios::in | std::ios::binary);
     if (!in) {
         throw("failed to open file: " + path);
@@ -244,7 +260,8 @@ Loader& Loader::load() {
     return (*this);
 }
 
-Loader& Loader::executable() {
+Loader& Loader::executable()
+{
     std::ifstream in(path, std::ios::in | std::ios::binary);
     if (!in) {
         throw("fatal: failed to open file: " + path);
@@ -266,10 +283,9 @@ Loader& Loader::executable() {
     return (*this);
 }
 
-uint64_t Loader::get_bytecode_size() {
-    return size;
-}
-auto Loader::get_bytecode() -> std::unique_ptr<viua::internals::types::byte[]> {
+uint64_t Loader::get_bytecode_size() { return size; }
+auto Loader::get_bytecode() -> std::unique_ptr<viua::internals::types::byte[]>
+{
     auto copy = std::make_unique<viua::internals::types::byte[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
@@ -277,39 +293,40 @@ auto Loader::get_bytecode() -> std::unique_ptr<viua::internals::types::byte[]> {
     return copy;
 }
 
-auto Loader::get_jumps() -> std::vector<uint64_t> {
-    return jumps;
-}
+auto Loader::get_jumps() -> std::vector<uint64_t> { return jumps; }
 
-auto Loader::get_meta_information() -> std::map<std::string, std::string> {
+auto Loader::get_meta_information() -> std::map<std::string, std::string>
+{
     return meta_information;
 }
 
-auto Loader::get_external_signatures() -> std::vector<std::string> {
+auto Loader::get_external_signatures() -> std::vector<std::string>
+{
     return external_signatures;
 }
 
-auto Loader::get_external_block_signatures() -> std::vector<std::string> {
+auto Loader::get_external_block_signatures() -> std::vector<std::string>
+{
     return external_signatures_block;
 }
 
-auto Loader::get_function_addresses() -> std::map<std::string, uint64_t> {
+auto Loader::get_function_addresses() -> std::map<std::string, uint64_t>
+{
     return function_addresses;
 }
-auto Loader::get_function_sizes() -> std::map<std::string, uint64_t> {
+auto Loader::get_function_sizes() -> std::map<std::string, uint64_t>
+{
     return function_sizes;
 }
-auto Loader::get_functions() -> std::vector<std::string> {
-    return functions;
-}
+auto Loader::get_functions() -> std::vector<std::string> { return functions; }
 
-auto Loader::get_block_addresses() -> std::map<std::string, uint64_t> {
+auto Loader::get_block_addresses() -> std::map<std::string, uint64_t>
+{
     return block_addresses;
 }
-auto Loader::get_blocks() -> std::vector<std::string> {
-    return blocks;
-}
+auto Loader::get_blocks() -> std::vector<std::string> { return blocks; }
 
-auto Loader::dynamic_imports() const -> std::vector<std::string> {
+auto Loader::dynamic_imports() const -> std::vector<std::string>
+{
     return dynamic_linked_modules;
 }

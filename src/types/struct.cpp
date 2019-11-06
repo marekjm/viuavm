@@ -26,15 +26,12 @@
 
 std::string const viua::types::Struct::type_name = "Struct";
 
-std::string viua::types::Struct::type() const {
-    return "Struct";
-}
+std::string viua::types::Struct::type() const { return "Struct"; }
 
-bool viua::types::Struct::boolean() const {
-    return (not attributes.empty());
-}
+bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
 
-std::string viua::types::Struct::str() const {
+std::string viua::types::Struct::str() const
+{
     std::ostringstream oss;
 
     oss << '{';
@@ -52,17 +49,17 @@ std::string viua::types::Struct::str() const {
     return oss.str();
 }
 
-std::string viua::types::Struct::repr() const {
-    return str();
-}
+std::string viua::types::Struct::repr() const { return str(); }
 
 void viua::types::Struct::insert(std::string const& key,
-                                 std::unique_ptr<viua::types::Value> value) {
+                                 std::unique_ptr<viua::types::Value> value)
+{
     attributes[key] = std::move(value);
 }
 
 std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
-    std::string const& key) {
+    std::string const& key)
+{
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
@@ -74,7 +71,8 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     return value;
 }
 
-auto viua::types::Struct::at(std::string const& key) -> viua::types::Value* {
+auto viua::types::Struct::at(std::string const& key) -> viua::types::Value*
+{
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
@@ -86,7 +84,8 @@ auto viua::types::Struct::at(std::string const& key) -> viua::types::Value* {
 }
 
 auto viua::types::Struct::at(std::string const& key) const
-    -> viua::types::Value const* {
+    -> viua::types::Value const*
+{
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
@@ -97,7 +96,8 @@ auto viua::types::Struct::at(std::string const& key) const
     return value.get();
 }
 
-std::vector<std::string> viua::types::Struct::keys() const {
+std::vector<std::string> viua::types::Struct::keys() const
+{
     auto ks = std::vector<std::string>{};
     for (auto const& each : attributes) {
         ks.push_back(each.first);
@@ -105,7 +105,8 @@ std::vector<std::string> viua::types::Struct::keys() const {
     return ks;
 }
 
-std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const
+{
     auto copied = std::make_unique<Struct>();
     for (auto const& each : attributes) {
         copied->insert(each.first, each.second->copy());

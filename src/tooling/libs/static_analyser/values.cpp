@@ -27,16 +27,14 @@ namespace viua {
     namespace tooling {
         namespace libs {
             namespace static_analyser {
-
 namespace values {
 Value::Value(Value_type const t) : type_of_value{t} {}
 
-auto Value::type() const -> Value_type {
-    return type_of_value;
-}
+auto Value::type() const -> Value_type { return type_of_value; }
 
 auto Value::clone(Value const& value, Value_wrapper::map_type& values)
-    -> std::unique_ptr<Value> {
+    -> std::unique_ptr<Value>
+{
     auto cloned = std::unique_ptr<Value>{};
 
     switch (value.type()) {
@@ -44,7 +42,8 @@ auto Value::clone(Value const& value, Value_wrapper::map_type& values)
         auto x = static_cast<Integer const&>(value);
         if (x.known()) {
             cloned = std::make_unique<Integer>(x.of());
-        } else {
+        }
+        else {
             cloned = std::make_unique<Integer>();
         }
         break;
@@ -93,7 +92,8 @@ auto Value::clone(Value const& value, Value_wrapper::map_type& values)
         auto x = static_cast<Atom const&>(value);
         if (x.known()) {
             cloned = std::make_unique<Atom>(x.of());
-        } else {
+        }
+        else {
             cloned = std::make_unique<Atom>();
         }
         break;
@@ -125,38 +125,27 @@ Integer::Integer() : Value{Value_type::Integer} {}
 
 Integer::Integer(int const x) : Value{Value_type::Integer}, n{x} {}
 
-auto Integer::known() const -> bool {
-    return n.has_value();
-}
+auto Integer::known() const -> bool { return n.has_value(); }
 
-auto Integer::of() const -> int {
-    return n.value();
-}
-auto Integer::of(int const x) -> void {
-    n = x;
-}
+auto Integer::of() const -> int { return n.value(); }
+auto Integer::of(int const x) -> void { n = x; }
 
 Float::Float() : Value{Value_type::Float} {}
 
-Vector::Vector(Value_wrapper v)
-        : Value{Value_type::Vector}, contained_type{v} {}
+Vector::Vector(Value_wrapper v) : Value{Value_type::Vector}, contained_type{v}
+{
+}
 
-auto Vector::of() const -> Value_wrapper const& {
-    return contained_type;
-}
-auto Vector::of(Value_wrapper v) -> void {
-    contained_type = v;
-}
+auto Vector::of() const -> Value_wrapper const& { return contained_type; }
+auto Vector::of(Value_wrapper v) -> void { contained_type = v; }
 
 Pointer::Pointer(Value_wrapper v)
-        : Value{Value_type::Pointer}, contained_type{v} {}
+        : Value{Value_type::Pointer}, contained_type{v}
+{
+}
 
-auto Pointer::of() const -> Value_wrapper const& {
-    return contained_type;
-}
-auto Pointer::of(Value_wrapper v) -> void {
-    contained_type = v;
-}
+auto Pointer::of() const -> Value_wrapper const& { return contained_type; }
+auto Pointer::of(Value_wrapper v) -> void { contained_type = v; }
 
 String::String() : Value{Value_type::String} {}
 
@@ -168,60 +157,59 @@ Bits::Bits() : Value{Value_type::Bits} {}
 
 Closure::Closure(std::string n) : Value{Value_type::Closure}, name{n} {}
 
-auto Closure::of() const -> std::string {
-    return name;
-}
+auto Closure::of() const -> std::string { return name; }
 
 Function::Function(std::string n) : Value{Value_type::Function}, name{n} {}
 
-auto Function::of() const -> std::string {
-    return name;
-}
+auto Function::of() const -> std::string { return name; }
 
 Atom::Atom() : Value{Value_type::Atom} {}
 
 Atom::Atom(std::string s) : Value{Value_type::Atom}, value{s} {}
 
-auto Atom::known() const -> bool {
-    return value.has_value();
-}
+auto Atom::known() const -> bool { return value.has_value(); }
 
-auto Atom::of() const -> std::string {
-    return value.value();
-}
+auto Atom::of() const -> std::string { return value.value(); }
 
 Struct::Struct() : Value{Value_type::Struct} {}
 
-auto Struct::fields() const -> decltype(known_fields) const& {
+auto Struct::fields() const -> decltype(known_fields) const&
+{
     return known_fields;
 }
 
-auto Struct::field(std::string const& key) const
-    -> std::optional<Value_wrapper> {
+auto Struct::field(std::string const& key) const -> std::optional<Value_wrapper>
+{
     if (known_fields.count(key)) {
         return {known_fields.at(key)};
     }
     return {};
 }
 
-auto Struct::field(std::string key, Value_wrapper value) -> void {
+auto Struct::field(std::string key, Value_wrapper value) -> void
+{
     known_fields.insert_or_assign(std::move(key), value);
 }
 
 Pid::Pid() : Value{Value_type::Pid} {}
 
-Value_wrapper::Value_wrapper(index_type const v, map_type& m)
-        : i{v}, values{&m} {}
+Value_wrapper::Value_wrapper(index_type const v, map_type& m) : i{v}, values{&m}
+{
+}
 
 Value_wrapper::Value_wrapper(Value_wrapper const& that)
-        : i{that.i}, values{that.values} {}
+        : i{that.i}, values{that.values}
+{
+}
 
-auto Value_wrapper::operator=(Value_wrapper const& that) -> Value_wrapper& {
+auto Value_wrapper::operator=(Value_wrapper const& that) -> Value_wrapper&
+{
     i      = that.i;
     values = that.values;
     return *this;
 }
-auto Value_wrapper::operator=(Value_wrapper&& that) -> Value_wrapper& {
+auto Value_wrapper::operator=(Value_wrapper&& that) -> Value_wrapper&
+{
     i      = that.i;
     values = that.values;
     return *this;
@@ -229,15 +217,18 @@ auto Value_wrapper::operator=(Value_wrapper&& that) -> Value_wrapper& {
 
 Value_wrapper::~Value_wrapper() {}
 
-auto Value_wrapper::Value_wrapper::value() const -> Value& {
+auto Value_wrapper::Value_wrapper::value() const -> Value&
+{
     return *(values->at(i));
 }
 
-auto Value_wrapper::Value_wrapper::value(std::unique_ptr<Value> v) -> void {
+auto Value_wrapper::Value_wrapper::value(std::unique_ptr<Value> v) -> void
+{
     values->at(i) = std::move(v);
 }
 
-auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
+auto Value_wrapper::to_simple() const -> std::vector<Value_type>
+{
     auto wrappers = std::vector<Value_wrapper const*>{this};
 
     while ((wrappers.back()->value().type() == Value_type::Vector)
@@ -245,7 +236,8 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
         if (wrappers.back()->value().type() == Value_type::Vector) {
             wrappers.push_back(
                 &static_cast<Vector const&>(wrappers.back()->value()).of());
-        } else {
+        }
+        else {
             wrappers.push_back(
                 &static_cast<Pointer const&>(wrappers.back()->value()).of());
         }
@@ -260,11 +252,10 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type> {
     return simple;
 }
 
-auto Value_wrapper::index() const -> index_type {
-    return i;
-}
+auto Value_wrapper::index() const -> index_type { return i; }
 
-auto Value_wrapper::rebind(map_type& to) const -> Value_wrapper {
+auto Value_wrapper::rebind(map_type& to) const -> Value_wrapper
+{
     return Value_wrapper{i, to};
 }
 }}}}}  // namespace viua::tooling::libs::static_analyser::values

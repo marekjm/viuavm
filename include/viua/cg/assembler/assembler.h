@@ -33,7 +33,6 @@
 
 namespace assembler {
 namespace operands {
-
 auto resolve_register(viua::cg::lex::Token const,
                       bool const allow_bare_integers = false) -> std::string;
 auto resolve_rs_type(viua::cg::lex::Token const)

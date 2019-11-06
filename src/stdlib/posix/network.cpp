@@ -39,7 +39,8 @@
 
 
 namespace viua { namespace stdlib { namespace posix { namespace network {
-static auto inet_ston(std::string const& s) -> uint32_t {
+static auto inet_ston(std::string const& s) -> uint32_t
+{
     auto address = uint32_t{0};
     auto const ret =
         inet_pton(AF_INET, s.c_str(), static_cast<void*>(&address));
@@ -54,7 +55,8 @@ static auto inet_ston(std::string const& s) -> uint32_t {
     return address;
 }
 
-template<typename T> auto memset(T& value, int const c) -> void {
+template<typename T> auto memset(T& value, int const c) -> void
+{
     ::memset(&value, c, sizeof(std::remove_reference_t<T>));
 }
 
@@ -64,7 +66,8 @@ static auto socket(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
                    viua::process::Process*,
-                   viua::kernel::Kernel*) -> void {
+                   viua::kernel::Kernel*) -> void
+{
     auto const sock = ::socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
         auto const error_number = errno;
@@ -174,7 +177,8 @@ static auto connect(Frame* frame,
                     viua::kernel::Register_set*,
                     viua::kernel::Register_set*,
                     viua::process::Process*,
-                    viua::kernel::Kernel*) -> void {
+                    viua::kernel::Kernel*) -> void
+{
     sockaddr_in addr;
     memset(addr, 0);
 
@@ -302,7 +306,8 @@ static auto bind(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
-                 viua::kernel::Kernel*) -> void {
+                 viua::kernel::Kernel*) -> void
+{
     sockaddr_in addr;
     memset(addr, 0);
 
@@ -434,7 +439,8 @@ static auto listen(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
                    viua::process::Process*,
-                   viua::kernel::Kernel*) -> void {
+                   viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const backlog =
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
@@ -559,7 +565,8 @@ static auto accept(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
                    viua::process::Process* proc,
-                   viua::kernel::Kernel*) -> void {
+                   viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(
         *static_cast<viua::types::Pointer*>(frame->arguments->get(0))
              ->to(proc));
@@ -743,7 +750,8 @@ static auto write(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
-                  viua::kernel::Kernel*) -> void {
+                  viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto const buffer  = frame->arguments->get(1)->str();
@@ -870,7 +878,8 @@ static auto read(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
-                 viua::kernel::Kernel*) -> void {
+                 viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
 
     auto buffer        = std::array<char, 1024>{};
@@ -1004,7 +1013,8 @@ static auto recv(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
-                 viua::kernel::Kernel*) -> void {
+                 viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     auto const buffer_length = static_cast<size_t>(
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
@@ -1150,7 +1160,8 @@ static auto shutdown(Frame* frame,
                      viua::kernel::Register_set*,
                      viua::kernel::Register_set*,
                      viua::process::Process*,
-                     viua::kernel::Kernel*) -> void {
+                     viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     // FIXME allow shutting down just SHUT_WR or SHUT_RD
     if (::shutdown(sock.fd(), SHUT_RDWR) == -1) {
@@ -1189,7 +1200,8 @@ static auto close(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
-                  viua::kernel::Kernel*) -> void {
+                  viua::kernel::Kernel*) -> void
+{
     auto const& sock = static_cast<Socket_type&>(*frame->arguments->get(0));
     if (::close(sock.fd()) == -1) {
         auto const error_number = errno;
@@ -1231,6 +1243,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

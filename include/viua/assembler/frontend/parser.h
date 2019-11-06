@@ -32,7 +32,6 @@
 
 
 namespace viua { namespace assembler { namespace frontend {
-
 auto gather_functions(std::vector<viua::cg::lex::Token> const&)
     -> viua::front::assembler::Invocables;
 auto gather_blocks(std::vector<viua::cg::lex::Token> const& tokens)
@@ -58,7 +57,8 @@ struct Register_index : public Operand {
     viua::internals::Register_sets rss;
     bool resolved = false;
 };
-struct Instruction_block_name : public Operand {};
+struct Instruction_block_name : public Operand {
+};
 struct Bits_literal : public Operand {
     std::string content;
 };
@@ -143,17 +143,20 @@ template<typename T> class vector_view {
   public:
     using size_type = std::remove_const_t<decltype(offset)>;
 
-    auto at(decltype(offset) const i) const -> T const& {
+    auto at(decltype(offset) const i) const -> T const&
+    {
         return vec.at(offset + i);
     }
-    auto size() const -> size_type {
-        return vec.size();
-    }
+    auto size() const -> size_type { return vec.size(); }
 
     vector_view(const decltype(vec) v, const decltype(offset) o)
-            : vec(v), offset(o) {}
+            : vec(v), offset(o)
+    {
+    }
     vector_view(const vector_view<T>& v, const decltype(offset) o)
-            : vec(v.vec), offset(v.offset + o) {}
+            : vec(v.vec), offset(v.offset + o)
+    {
+    }
 };
 
 auto parse_attribute_value(const vector_view<viua::cg::lex::Token> tokens,

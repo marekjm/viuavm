@@ -30,7 +30,6 @@
 
 
 namespace viua { namespace front { namespace assembler {
-
 struct Invocables {
     std::vector<std::string> names;
     std::vector<std::string> signatures;

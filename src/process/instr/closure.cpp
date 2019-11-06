@@ -36,8 +36,8 @@ using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
 using Register_index = viua::internals::types::register_index;
 
 
-auto viua::process::Process::opcapture(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type
+{
     auto const target = fetch_and_advance_addr<viua::types::Closure*>(
         viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Closure>,
@@ -77,7 +77,8 @@ auto viua::process::Process::opcapture(Op_address_type addr)
 }
 
 auto viua::process::Process::opcapturecopy(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto const target = fetch_and_advance_addr<viua::types::Closure*>(
         viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Closure>,
@@ -102,7 +103,8 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr)
 }
 
 auto viua::process::Process::opcapturemove(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto const target = fetch_and_advance_addr<viua::types::Closure*>(
         viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Closure>,
@@ -126,8 +128,8 @@ auto viua::process::Process::opcapturemove(Op_address_type addr)
     return addr;
 }
 
-auto viua::process::Process::opclosure(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type
+{
     /** Create a closure from a function.
      */
     auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
@@ -147,8 +149,8 @@ auto viua::process::Process::opclosure(Op_address_type addr)
     return addr;
 }
 
-auto viua::process::Process::opfunction(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opfunction(Op_address_type addr) -> Op_address_type
+{
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and

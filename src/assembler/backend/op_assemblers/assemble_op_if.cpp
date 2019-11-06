@@ -26,7 +26,8 @@ auto assemble_op_if(Program& program,
                     std::vector<Token> const& tokens,
                     Token_index const i,
                     viua::internals::types::bytecode_size const& instruction,
-                    std::map<std::string, Token_index> const& marks) -> void {
+                    std::map<std::string, Token_index> const& marks) -> void
+{
     /*  If branch is given three operands, it means its full, three-operands
      * form is being used. Otherwise, it is short, two-operands form
      * instruction and assembler should fill third operand accordingly.
@@ -57,7 +58,8 @@ auto assemble_op_if(Program& program,
         std::tie(addrf_target, addrf_jump_type) =
             ::assembler::operands::resolve_jump(
                 tokens.at(i + 4), marks, instruction);
-    } else {
+    }
+    else {
         addrf_jump_type = JMP_RELATIVE;
         addrf_target    = instruction + 1;
     }

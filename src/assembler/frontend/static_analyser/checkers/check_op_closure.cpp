@@ -26,7 +26,8 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_closure(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction,
-                      std::map<Register, Closure>& created_closures) -> void {
+                      std::map<Register, Closure>& created_closures) -> void
+{
     using viua::assembler::frontend::parser::Function_name_literal;
 
     auto target = get_operand<Register_index>(instruction, 0);

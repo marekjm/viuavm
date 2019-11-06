@@ -24,46 +24,55 @@
 
 namespace viua { namespace tooling { namespace libs { namespace lexer {
 namespace classifier {
-auto is_id(std::string const& s) -> bool {
+auto is_id(std::string const& s) -> bool
+{
     static auto const identifier = std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*$"};
     return regex_match(s, identifier);
 }
-auto is_scoped_id(std::string const& s) -> bool {
+auto is_scoped_id(std::string const& s) -> bool
+{
     static auto const identifier =
         std::regex{"^[a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*$"};
     return regex_match(s, identifier);
 }
 
-auto is_binary_integer(std::string const& s) -> bool {
+auto is_binary_integer(std::string const& s) -> bool
+{
     auto const decimal_integer = std::regex{"^0b[01]+$"};
     return regex_match(s, decimal_integer);
 }
-auto is_octal_integer(std::string const& s) -> bool {
+auto is_octal_integer(std::string const& s) -> bool
+{
     auto const decimal_integer = std::regex{"^0o[0-7]+$"};
     return regex_match(s, decimal_integer);
 }
-auto is_decimal_integer(std::string const& s) -> bool {
+auto is_decimal_integer(std::string const& s) -> bool
+{
     auto const decimal_integer = std::regex{"^-?(0|[1-9][0-9]*)$"};
     return regex_match(s, decimal_integer);
 }
-auto is_hexadecimal_integer(std::string const& s) -> bool {
+auto is_hexadecimal_integer(std::string const& s) -> bool
+{
     auto const decimal_integer = std::regex{"^0x[0-9a-f]+$"};
     return regex_match(s, decimal_integer);
 }
 
-auto is_access_type_specifier(std::string const& s) -> bool {
+auto is_access_type_specifier(std::string const& s) -> bool
+{
     return (s == "%"     // direct access
             or s == "@"  // register indirect access
             or s == "*"  // pointer dereference access
     );
 }
-auto is_register_set_name(std::string const& s) -> bool {
+auto is_register_set_name(std::string const& s) -> bool
+{
     return (s == "local" or s == "static" or s == "global" or s == "arguments"
             or s == "parameters" or s == "closure_local");
 }
 
 auto is_quoted_text(std::string const& s, std::string::value_type const c)
-    -> bool {
+    -> bool
+{
     if (s.empty()) {
         return false;
     }
@@ -72,21 +81,20 @@ auto is_quoted_text(std::string const& s, std::string::value_type const c)
     }
     return (s.front() == c and s.back() == c);
 }
-auto is_float(std::string const& s) -> bool {
+auto is_float(std::string const& s) -> bool
+{
     auto const decimal_integer = std::regex{"^-?(0|[1-9][0-9]*)\\.[0-9]+$"};
     return regex_match(s, decimal_integer);
 }
-auto is_default(std::string const& s) -> bool {
-    return (s == "default");
-}
-auto is_void(std::string const& s) -> bool {
-    return (s == "void");
-}
+auto is_default(std::string const& s) -> bool { return (s == "default"); }
+auto is_void(std::string const& s) -> bool { return (s == "void"); }
 
-auto is_boolean_literal(std::string const& s) -> bool {
+auto is_boolean_literal(std::string const& s) -> bool
+{
     return (s == "true" or s == "false");
 }
-auto is_timeout_literal(std::string const& s) -> bool {
+auto is_timeout_literal(std::string const& s) -> bool
+{
     if (s == "infinity") {
         return true;
     }

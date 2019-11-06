@@ -35,7 +35,8 @@ using Single_register_op = Program& (Program::*)(int_op);
 template<Single_register_op const op>
 auto assemble_single_register_op(Program& program,
                                  std::vector<Token> const& tokens,
-                                 Token_index const i) -> void {
+                                 Token_index const i) -> void
+{
     Token_index target = i + 1;
 
     (program.*op)(::assembler::operands::getint_with_rs_type(
@@ -47,7 +48,8 @@ using Double_register_op = Program& (Program::*)(int_op, int_op);
 template<Double_register_op const op>
 auto assemble_double_register_op(Program& program,
                                  std::vector<Token> const& tokens,
-                                 Token_index const i) -> void {
+                                 Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 2;
 
@@ -64,7 +66,8 @@ using Three_register_op = Program& (Program::*)(int_op, int_op, int_op);
 template<Three_register_op const op>
 auto assemble_three_register_op(Program& program,
                                 std::vector<Token> const& tokens,
-                                Token_index const i) -> void {
+                                Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;
@@ -85,7 +88,8 @@ using Four_register_op = Program& (Program::*)(int_op, int_op, int_op, int_op);
 template<Four_register_op const op>
 auto assemble_four_register_op(Program& program,
                                std::vector<Token> const& tokens,
-                               Token_index const i) -> void {
+                               Token_index const i) -> void
+{
     Token_index target      = i + 1;
     Token_index source      = target + 2;
     Token_index begin_index = source + 2;
@@ -110,7 +114,8 @@ using Capture_op = Program& (Program::*)(int_op, int_op, int_op);
 template<Capture_op const op>
 auto assemble_capture_op(Program& program,
                          std::vector<Token> const& tokens,
-                         Token_index const i) -> void {
+                         Token_index const i) -> void
+{
     Token_index target       = i + 1;
     Token_index inside_index = target + 2;
     Token_index source       = inside_index + 1;
@@ -130,7 +135,8 @@ using Fn_ctor_op = Program& (Program::*)(int_op, std::string const&);
 template<Fn_ctor_op const op>
 auto assemble_fn_ctor_op(Program& program,
                          std::vector<Token> const& tokens,
-                         Token_index const i) -> void {
+                         Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 2;
 
@@ -147,13 +153,15 @@ template<No_result_value_call_op const op_name,
          No_result_name_call_op const op_value>
 auto assemble_no_result_call_op(Program& program,
                                 std::vector<Token> const& tokens,
-                                Token_index const i) -> void {
+                                Token_index const i) -> void
+{
     if (tokens.at(i + 1).str().at(0) == '*'
         or tokens.at(i + 1).str().at(0) == '%') {
         (program.*op_value)(::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(i + 1)),
             ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
-    } else {
+    }
+    else {
         (program.*op_name)(tokens.at(i + 1));
     }
 }
@@ -162,7 +170,8 @@ using Parameter_op = Program& (Program::*)(int_op, int_op);
 template<Parameter_op const op>
 auto assemble_parameter_op(Program& program,
                            std::vector<Token> const& tokens,
-                           Token_index const i) -> void {
+                           Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 1;
 
@@ -179,7 +188,8 @@ using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
 template<const ShiftOp op>
 auto assemble_bit_shift_instruction(Program& program,
                                     std::vector<Token> const& tokens,
-                                    const Token_index i) -> void {
+                                    const Token_index i) -> void
+{
     Token_index target = i + 1;
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;
@@ -190,7 +200,8 @@ auto assemble_bit_shift_instruction(Program& program,
         --rhs;
         ret = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(target)));
-    } else {
+    }
+    else {
         ret = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
@@ -210,7 +221,8 @@ using IncrementOp = Program& (Program::*)(int_op);
 template<IncrementOp const op>
 auto assemble_increment_instruction(Program& program,
                                     std::vector<Token> const& tokens,
-                                    Token_index const i) -> void {
+                                    Token_index const i) -> void
+{
     Token_index target = i + 1;
 
     (program.*op)(::assembler::operands::getint_with_rs_type(
@@ -222,7 +234,8 @@ using ArithmeticOp = Program& (Program::*)(int_op, int_op, int_op);
 template<ArithmeticOp const op>
 auto assemble_arithmetic_instruction(Program& program,
                                      std::vector<Token> const& tokens,
-                                     Token_index const i) -> void {
+                                     Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;

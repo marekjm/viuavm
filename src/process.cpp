@@ -37,29 +37,34 @@ viua::internals::types::register_index const
 
 auto viua::process::Process::register_at(
     viua::internals::types::register_index i,
-    viua::internals::Register_sets rs) -> viua::kernel::Register* {
+    viua::internals::Register_sets rs) -> viua::kernel::Register*
+{
     if (rs == viua::internals::Register_sets::LOCAL) {
         return stack->back()->local_register_set->register_at(i);
-    } else if (rs == viua::internals::Register_sets::STATIC) {
+    }
+    else if (rs == viua::internals::Register_sets::STATIC) {
         ensure_static_registers(stack->back()->function_name);
         return static_registers.at(stack->back()->function_name)
             ->register_at(i);
-    } else if (rs == viua::internals::Register_sets::GLOBAL) {
+    }
+    else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
-    } else {
+    }
+    else {
         throw std::make_unique<viua::types::Exception>(
             "unsupported register set type");
     }
 }
 
-void viua::process::Process::ensure_static_registers(
-    std::string function_name) {
+void viua::process::Process::ensure_static_registers(std::string function_name)
+{
     /** Makes sure that static register set for requested function is
      * initialized.
      */
     try {
         static_registers.at(function_name);
-    } catch (std::out_of_range const& e) {
+    }
+    catch (std::out_of_range const& e) {
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] =
@@ -68,10 +73,12 @@ void viua::process::Process::ensure_static_registers(
 }
 
 Frame* viua::process::Process::request_new_frame(
-    viua::internals::types::register_index const arguments_size) {
+    viua::internals::types::register_index const arguments_size)
+{
     return stack->prepare_frame(arguments_size);
 }
-void viua::process::Process::push_frame() {
+void viua::process::Process::push_frame()
+{
     if (stack->size() > Stack::MAX_STACK_SIZE) {
         std::ostringstream oss;
         oss << "stack size (" << Stack::MAX_STACK_SIZE
@@ -92,18 +99,21 @@ void viua::process::Process::push_frame() {
 }
 
 auto viua::process::Process::adjust_jump_base_for_block(
-    std::string const& call_name) -> viua::internals::types::Op_address_type {
+    std::string const& call_name) -> viua::internals::types::Op_address_type
+{
     return stack->adjust_jump_base_for_block(call_name);
 }
 auto viua::process::Process::adjust_jump_base_for(std::string const& call_name)
-    -> viua::internals::types::Op_address_type {
+    -> viua::internals::types::Op_address_type
+{
     return stack->adjust_jump_base_for(call_name);
 }
 auto viua::process::Process::call_native(
     Op_address_type return_address,
     std::string const& call_name,
     viua::kernel::Register* return_register,
-    std::string const&) -> Op_address_type {
+    std::string const&) -> Op_address_type
+{
     auto call_address = adjust_jump_base_for(call_name);
 
     if (not stack->frame_new) {
@@ -125,7 +135,8 @@ auto viua::process::Process::call_foreign(
     Op_address_type return_address,
     std::string const& call_name,
     viua::kernel::Register* return_register,
-    std::string const&) -> Op_address_type {
+    std::string const&) -> Op_address_type
+{
     stack->frame_new->function_name   = call_name;
     stack->frame_new->return_address  = return_address;
     stack->frame_new->return_register = return_register;
@@ -136,8 +147,8 @@ auto viua::process::Process::call_foreign(
     return return_address;
 }
 
-auto viua::process::Process::push_deferred(std::string const call_name)
-    -> void {
+auto viua::process::Process::push_deferred(std::string const call_name) -> void
+{
     if (not stack->frame_new) {
         throw std::make_unique<viua::types::Exception>(
             "function call without a frame: use `frame 0' in source code if "
@@ -152,10 +163,9 @@ auto viua::process::Process::push_deferred(std::string const call_name)
     stack->back()->deferred_calls.push_back(std::move(stack->frame_new));
 }
 
-void viua::process::Process::handle_active_exception() {
-    stack->unwind();
-}
-auto viua::process::Process::tick() -> Op_address_type {
+void viua::process::Process::handle_active_exception() { stack->unwind(); }
+auto viua::process::Process::tick() -> Op_address_type
+{
     Op_address_type previous_instruction_pointer = stack->instruction_pointer;
 
     try {
@@ -187,7 +197,8 @@ auto viua::process::Process::tick() -> Op_address_type {
         default:
             break;
         }
-    } catch (std::unique_ptr<viua::types::Exception>& e) {
+    }
+    catch (std::unique_ptr<viua::types::Exception>& e) {
         /*
          * All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -198,7 +209,8 @@ auto viua::process::Process::tick() -> Op_address_type {
          * block) they will terminate execution later.
          */
         stack->thrown = std::move(e);
-    } catch (std::unique_ptr<viua::types::Value>& e) {
+    }
+    catch (std::unique_ptr<viua::types::Value>& e) {
         /*
          * All values can be thrown as exceptions, so Values must also be
          * caught.
@@ -268,7 +280,8 @@ auto viua::process::Process::tick() -> Op_address_type {
     return stack->instruction_pointer;
 }
 
-void viua::process::Process::join() {
+void viua::process::Process::join()
+{
     /** Join a process with calling process.
      *
      *  This function causes calling process to be blocked until
@@ -276,7 +289,8 @@ void viua::process::Process::join() {
      */
     is_joinable.store(false, std::memory_order_release);
 }
-void viua::process::Process::detach() {
+void viua::process::Process::detach()
+{
     /** Detach a process.
      *
      *  This function causes the process to become unjoinable, but
@@ -289,81 +303,100 @@ void viua::process::Process::detach() {
     is_joinable.store(false, std::memory_order_release);
     parent_process = nullptr;
 }
-bool viua::process::Process::joinable() const {
+bool viua::process::Process::joinable() const
+{
     return is_joinable.load(std::memory_order_acquire);
 }
 
-void viua::process::Process::suspend() {
+void viua::process::Process::suspend()
+{
     is_suspended.store(true, std::memory_order_release);
 }
-void viua::process::Process::wakeup() {
+void viua::process::Process::wakeup()
+{
     is_suspended.store(false, std::memory_order_release);
 }
-bool viua::process::Process::suspended() const {
+bool viua::process::Process::suspended() const
+{
     return is_suspended.load(std::memory_order_acquire);
 }
 
-viua::process::Process* viua::process::Process::parent() const {
+viua::process::Process* viua::process::Process::parent() const
+{
     return parent_process;
 }
 
-std::string viua::process::Process::starting_function() const {
+std::string viua::process::Process::starting_function() const
+{
     return stack->entry_function;
 }
 
-auto viua::process::Process::priority() const -> decltype(process_priority) {
+auto viua::process::Process::priority() const -> decltype(process_priority)
+{
     return process_priority;
 }
-void viua::process::Process::priority(decltype(process_priority) p) {
+void viua::process::Process::priority(decltype(process_priority) p)
+{
     process_priority = p;
 }
 
-bool viua::process::Process::stopped() const {
+bool viua::process::Process::stopped() const
+{
     return (finished.load(std::memory_order_acquire) or terminated());
 }
 
-bool viua::process::Process::terminated() const {
+bool viua::process::Process::terminated() const
+{
     return static_cast<bool>(stack->thrown);
 }
 
-void viua::process::Process::pass(std::unique_ptr<viua::types::Value> message) {
+void viua::process::Process::pass(std::unique_ptr<viua::types::Value> message)
+{
     message_queue.push(std::move(message));
     wakeup();
 }
 
 
-viua::types::Value* viua::process::Process::get_active_exception() {
+viua::types::Value* viua::process::Process::get_active_exception()
+{
     return stack->thrown.get();
 }
 
 std::unique_ptr<viua::types::Value> viua::process::Process::
-    transfer_active_exception() {
+    transfer_active_exception()
+{
     return std::move(stack->thrown);
 }
 
 void viua::process::Process::raise(
-    std::unique_ptr<viua::types::Value> exception) {
+    std::unique_ptr<viua::types::Value> exception)
+{
     stack->thrown = std::move(exception);
 }
 
 
-std::unique_ptr<viua::types::Value> viua::process::Process::get_return_value() {
+std::unique_ptr<viua::types::Value> viua::process::Process::get_return_value()
+{
     return std::move(stack->return_value);
 }
 
-bool viua::process::Process::watchdogged() const {
+bool viua::process::Process::watchdogged() const
+{
     return (not watchdog_function.empty());
 }
-std::string viua::process::Process::watchdog() const {
+std::string viua::process::Process::watchdog() const
+{
     return watchdog_function;
 }
-auto viua::process::Process::frame_for_watchdog() -> std::unique_ptr<Frame> {
+auto viua::process::Process::frame_for_watchdog() -> std::unique_ptr<Frame>
+{
     return std::move(watchdog_frame);
 }
 
 auto viua::process::Process::become(std::string const& function_name,
                                     std::unique_ptr<Frame> frame_to_use)
-    -> Op_address_type {
+    -> Op_address_type
+{
     if (not attached_scheduler->is_native_function(function_name)) {
         throw std::make_unique<viua::types::Exception>(
             "process from undefined function: " + function_name);
@@ -382,7 +415,8 @@ auto viua::process::Process::become(std::string const& function_name,
     return (stack->instruction_pointer = adjust_jump_base_for(function_name));
 }
 
-auto viua::process::Process::start() -> Op_address_type {
+auto viua::process::Process::start() -> Op_address_type
+{
     if (not attached_scheduler->is_native_function(
             stack->at(0)->function_name)) {
         throw std::make_unique<viua::types::Exception>(
@@ -392,12 +426,14 @@ auto viua::process::Process::start() -> Op_address_type {
                 adjust_jump_base_for(stack->at(0)->function_name));
 }
 auto viua::process::Process::execution_at() const
-    -> decltype(stack->instruction_pointer) {
+    -> decltype(stack->instruction_pointer)
+{
     return stack->instruction_pointer;
 }
 
 
-std::vector<Frame*> viua::process::Process::trace() const {
+std::vector<Frame*> viua::process::Process::trace() const
+{
     auto tr = std::vector<Frame*>{};
     for (auto& each : *stack) {
         tr.push_back(each.get());
@@ -405,31 +441,25 @@ std::vector<Frame*> viua::process::Process::trace() const {
     return tr;
 }
 
-viua::process::PID viua::process::Process::pid() const {
-    return process_id;
-}
-bool viua::process::Process::hidden() const {
-    return is_hidden;
-}
-void viua::process::Process::hidden(bool state) {
-    is_hidden = state;
-}
+viua::process::PID viua::process::Process::pid() const { return process_id; }
+bool viua::process::Process::hidden() const { return is_hidden; }
+void viua::process::Process::hidden(bool state) { is_hidden = state; }
 
-bool viua::process::Process::empty() const {
-    return message_queue.empty();
-}
+bool viua::process::Process::empty() const { return message_queue.empty(); }
 
 auto viua::process::Process::schedule_io(
-    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void {
+    std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void
+{
     attached_scheduler->schedule_io(std::move(i));
 }
 auto viua::process::Process::cancel_io(
-    std::tuple<uint64_t, uint64_t> const interaction_id) -> void {
+    std::tuple<uint64_t, uint64_t> const interaction_id) -> void
+{
     attached_scheduler->cancel_io(interaction_id);
 }
 
-void viua::process::Process::migrate_to(
-    viua::scheduler::Process_scheduler* sch) {
+void viua::process::Process::migrate_to(viua::scheduler::Process_scheduler* sch)
+{
     attached_scheduler = sch;
 }
 
@@ -447,7 +477,8 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , is_suspended(false)
         , process_priority(512)
         , process_id(this)
-        , is_hidden(false) {
+        , is_hidden(false)
+{
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);
     auto s = std::make_unique<Stack>(frm->function_name,

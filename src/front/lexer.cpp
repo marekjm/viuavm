@@ -42,7 +42,8 @@ using Invalid_syntax = viua::cg::lex::Invalid_syntax;
 
 template<class T>
 static auto enumerate(std::vector<T> const& v)
-    -> std::vector<std::pair<typename std::vector<T>::size_type, T>> {
+    -> std::vector<std::pair<typename std::vector<T>::size_type, T>>
+{
     auto enumerated_vector =
         std::vector<std::pair<typename std::vector<T>::size_type, T>>{};
 
@@ -56,7 +57,8 @@ static auto enumerate(std::vector<T> const& v)
 }
 
 static void encode_json(std::string const& filename,
-                        std::vector<Token> const& tokens) {
+                        std::vector<Token> const& tokens)
+{
     std::cout << "{";
     std::cout << str::enquote("file") << ": " << str::enquote(filename) << ',';
     std::cout << str::enquote("tokens") << ": [";
@@ -83,7 +85,8 @@ static void encode_json(std::string const& filename,
 static bool usage(const char* program,
                   bool show_help,
                   bool show_version,
-                  bool verbose) {
+                  bool verbose)
+{
     if (show_help or (show_version and verbose)) {
         std::cout << "Viua VM lexer, version ";
     }
@@ -118,7 +121,8 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static std::string read_file(std::ifstream& in) {
+static std::string read_file(std::ifstream& in)
+{
     std::ostringstream source_in;
     auto line = std::string{};
     while (std::getline(in, line)) {
@@ -135,12 +139,14 @@ static bool REDUCE_WHITESPACE = false;
 static bool REDUCE_DIRECTIVES = false;
 
 static void display_results(std::string const& filename,
-                            std::vector<Token> const& tokens) {
+                            std::vector<Token> const& tokens)
+{
     if (DISPLAY_SIZE) {
         try {
             std::cout << viua::cg::tools::calculate_bytecode_size2(tokens)
                       << std::endl;
-        } catch (Invalid_syntax const& e) {
+        }
+        catch (Invalid_syntax const& e) {
             std::cerr << filename << ':' << e.line_number << ':'
                       << e.character_in_line;
             std::cerr << ": error: invalid syntax: "
@@ -152,7 +158,8 @@ static void display_results(std::string const& filename,
     encode_json(filename, tokens);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // setup command line arguments vector
     auto args   = std::vector<std::string>{};
     auto option = std::string{};
@@ -165,28 +172,35 @@ int main(int argc, char* argv[]) {
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version" or option == "-V") {
+        }
+        else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose" or option == "-v") {
+        }
+        else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
-        } else if (option == "--size") {
+        }
+        else if (option == "--size") {
             DISPLAY_SIZE = true;
             continue;
-        } else if (option == "--raw") {
+        }
+        else if (option == "--raw") {
             DISPLAY_RAW     = true;
             MANUAL_REDUCING = true;
             continue;
-        } else if (option == "--ws") {
+        }
+        else if (option == "--ws") {
             REDUCE_WHITESPACE = true;
             MANUAL_REDUCING   = true;
             continue;
-        } else if (option == "--dirs") {
+        }
+        else if (option == "--dirs") {
             REDUCE_DIRECTIVES = true;
             MANUAL_REDUCING   = true;
             continue;
-        } else if (str::startswith(option, "-")) {
+        }
+        else if (str::startswith(option, "-")) {
             std::cerr << "error: unknown option: " << option << std::endl;
             return 1;
         }
@@ -253,7 +267,8 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_mark_directive(tokens);
             }
         }
-    } catch (Invalid_syntax const& e) {
+    }
+    catch (Invalid_syntax const& e) {
         auto const message = std::string{e.what()};
         std::cerr << filename << ':' << e.line_number + 1 << ':'
                   << e.character_in_line + 1 << ": error: "

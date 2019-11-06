@@ -27,7 +27,8 @@
 #include <viua/types/text.h>
 
 
-auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -39,7 +40,8 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type {
         std::tie(addr, o) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
         s = o->str();
-    } else {
+    }
+    else {
         ++addr;  // for operand type
         std::tie(addr, s) =
             viua::bytecode::decoder::operands::fetch_primitive_string(addr,
@@ -53,7 +55,8 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::optexteq(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optexteq(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -74,7 +77,8 @@ auto viua::process::Process::optexteq(Op_address_type addr) -> Op_address_type {
 
 static auto convert_signed_integer_to_text_size_type(
     const viua::types::Text* text,
-    const int64_t signed_index) -> viua::types::Text::size_type {
+    const int64_t signed_index) -> viua::types::Text::size_type
+{
     /*
      *  Cast jugglery to satisfy Clang++ with -Wsign-conversion enabled.
      */
@@ -82,13 +86,15 @@ static auto convert_signed_integer_to_text_size_type(
     if (signed_index < 0) {
         index = (text->size()
                  - static_cast<viua::types::Text::size_type>(-signed_index));
-    } else {
+    }
+    else {
         index = static_cast<viua::types::Text::size_type>(signed_index);
     }
     return index;
 }
 
-auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -112,8 +118,8 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::optextsub(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::optextsub(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -144,7 +150,8 @@ auto viua::process::Process::optextsub(Op_address_type addr)
 
 
 auto viua::process::Process::optextlength(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -161,7 +168,8 @@ auto viua::process::Process::optextlength(Op_address_type addr)
 
 
 auto viua::process::Process::optextcommonprefix(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -184,7 +192,8 @@ auto viua::process::Process::optextcommonprefix(Op_address_type addr)
 
 
 auto viua::process::Process::optextcommonsuffix(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -207,7 +216,8 @@ auto viua::process::Process::optextcommonsuffix(Op_address_type addr)
 
 
 auto viua::process::Process::optextconcat(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

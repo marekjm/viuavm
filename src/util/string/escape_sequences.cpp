@@ -25,8 +25,8 @@ namespace viua {
     namespace util {
         namespace string {
             namespace escape_sequences {
-
-auto send_escape_seq(std::string const& seq) -> std::string {
+auto send_escape_seq(std::string const& seq) -> std::string
+{
     auto is_terminal = isatty(1);
     std::string env_color_flag{
         getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
@@ -35,11 +35,14 @@ auto send_escape_seq(std::string const& seq) -> std::string {
     if (env_color_flag == "default") {
         // do nothing; the default is to colorise when printing to teminal and
         // do not colorise otherwise
-    } else if (env_color_flag == "never") {
+    }
+    else if (env_color_flag == "never") {
         colorise = false;
-    } else if (env_color_flag == "always") {
+    }
+    else if (env_color_flag == "always") {
         colorise = true;
-    } else {
+    }
+    else {
         // unknown value, do nothing
     }
 

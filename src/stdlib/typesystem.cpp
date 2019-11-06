@@ -32,7 +32,8 @@ static auto typeof(Frame* frame,
                    viua::kernel::Register_set*,
                    viua::kernel::Register_set*,
                    viua::process::Process* process,
-                   viua::kernel::Kernel*) -> void {
+                   viua::kernel::Kernel*) -> void
+{
     if (not frame->arguments->at(0)) {
         throw std::make_unique<viua::types::Exception>("requires 1 parameter");
     }
@@ -44,7 +45,8 @@ static auto typeof(Frame* frame,
         frame->local_register_set->set(0,
                                        std::make_unique<viua::types::String>(
                                            pointer->to(process)->type()));
-    } else {
+    }
+    else {
         throw std::make_unique<viua::types::Exception>(
             "expected a pointer as parameter 0");
     }
@@ -56,6 +58,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

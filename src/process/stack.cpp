@@ -40,9 +40,12 @@ viua::process::Stack::Stack(std::string fn,
         , caught(nullptr)
         , global_register_set(gs)
         , return_value(nullptr)
-        , attached_scheduler(sch) {}
+        , attached_scheduler(sch)
+{
+}
 
-auto viua::process::Stack::set_return_value() -> void {
+auto viua::process::Stack::set_return_value() -> void
+{
     // FIXME find better name for this function
     if (back()->return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
@@ -55,38 +58,43 @@ auto viua::process::Stack::set_return_value() -> void {
     }
 }
 
-auto viua::process::Stack::state_of() const -> STATE {
-    return current_state;
-}
+auto viua::process::Stack::state_of() const -> STATE { return current_state; }
 
-auto viua::process::Stack::state_of(const STATE s) -> STATE {
+auto viua::process::Stack::state_of(const STATE s) -> STATE
+{
     auto previous_state = current_state;
     current_state       = s;
     return previous_state;
 }
 
-auto viua::process::Stack::bind(viua::kernel::Register_set* gs) -> void {
+auto viua::process::Stack::bind(viua::kernel::Register_set* gs) -> void
+{
     global_register_set = gs;
 }
 
-auto viua::process::Stack::begin() const -> decltype(frames.begin()) {
+auto viua::process::Stack::begin() const -> decltype(frames.begin())
+{
     return frames.begin();
 }
 
-auto viua::process::Stack::end() const -> decltype(frames.end()) {
+auto viua::process::Stack::end() const -> decltype(frames.end())
+{
     return frames.end();
 }
 
 auto viua::process::Stack::at(decltype(frames)::size_type i) const
-    -> decltype(frames.at(i)) {
+    -> decltype(frames.at(i))
+{
     return frames.at(i);
 }
 
-auto viua::process::Stack::back() const -> decltype(frames.back()) {
+auto viua::process::Stack::back() const -> decltype(frames.back())
+{
     return frames.back();
 }
 
-auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
+auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void
+{
     for (auto& each : frame->deferred_calls) {
         auto s = std::make_unique<Stack>(each->function_name,
                                          parent_process,
@@ -104,7 +112,8 @@ auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     frame->deferred_calls.clear();
 }
 auto viua::process::Stack::register_deferred_calls(bool const push_this_stack)
-    -> void {
+    -> void
+{
     // Mark current stack as the one to return to after all
     // the deferred calls complete, *but* only if the stack is not exhausted as
     // there is no reason to return to such stacks.
@@ -115,7 +124,8 @@ auto viua::process::Stack::register_deferred_calls(bool const push_this_stack)
     register_deferred_calls_from(back().get());
 }
 
-auto viua::process::Stack::pop() -> std::unique_ptr<Frame> {
+auto viua::process::Stack::pop() -> std::unique_ptr<Frame>
+{
     std::unique_ptr<Frame> frame{std::move(frames.back())};
     frames.pop_back();
 
@@ -136,21 +146,22 @@ auto viua::process::Stack::pop() -> std::unique_ptr<Frame> {
     return frame;
 }
 
-auto viua::process::Stack::size() const -> decltype(frames)::size_type {
+auto viua::process::Stack::size() const -> decltype(frames)::size_type
+{
     return frames.size();
 }
 
-auto viua::process::Stack::clear() -> void {
-    frames.clear();
-}
+auto viua::process::Stack::clear() -> void { frames.clear(); }
 
 auto viua::process::Stack::emplace_back(std::unique_ptr<Frame> frame)
-    -> decltype(frames.emplace_back(frame)) {
+    -> decltype(frames.emplace_back(frame))
+{
     return frames.emplace_back(std::move(frame));
 }
 
 auto viua::process::Stack::adjust_jump_base_for_block(
-    std::string const& call_name) -> Op_address_type {
+    std::string const& call_name) -> Op_address_type
+{
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto const ep    = attached_scheduler->get_entry_point_of_block(call_name);
     entry_point      = ep.first;
@@ -158,7 +169,8 @@ auto viua::process::Stack::adjust_jump_base_for_block(
     return entry_point;
 }
 auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto entry_point = viua::internals::types::Op_address_type{nullptr};
     auto const ep = attached_scheduler->get_entry_point_of_function(call_name);
     entry_point   = ep.first;
@@ -168,11 +180,13 @@ auto viua::process::Stack::adjust_jump_base_for(std::string const& call_name)
 
 auto viua::process::Stack::adjust_instruction_pointer(
     const Try_frame* tframe,
-    std::string const handler_found_for_type) -> void {
+    std::string const handler_found_for_type) -> void
+{
     instruction_pointer = adjust_jump_base_for_block(
         tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
-auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
+auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void
+{
     size_type distance = 0;
     for (size_type j = (size() - 1); j > 0; --j) {
         if (at(j).get() == frame) {
@@ -206,8 +220,8 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
         pop();
     }
 }
-auto viua::process::Stack::unwind_try_stack_to(const Try_frame* tframe)
-    -> void {
+auto viua::process::Stack::unwind_try_stack_to(const Try_frame* tframe) -> void
+{
     while (tryframes.back().get() != tframe) {
         tryframes.pop_back();
     }
@@ -215,14 +229,16 @@ auto viua::process::Stack::unwind_try_stack_to(const Try_frame* tframe)
 
 auto viua::process::Stack::unwind_to(const Try_frame* tframe,
                                      std::string const handler_found_for_type)
-    -> void {
+    -> void
+{
     adjust_instruction_pointer(tframe, handler_found_for_type);
     unwind_call_stack_to(tframe->associated_frame);
     unwind_try_stack_to(tframe);
 }
 
 auto viua::process::Stack::find_catch_frame()
-    -> std::tuple<Try_frame*, std::string> {
+    -> std::tuple<Try_frame*, std::string>
+{
     auto found_exception_frame = std::experimental::observer_ptr<Try_frame>();
     auto caught_with_type      = std::string{""};
     auto handler_found_for_type =
@@ -243,7 +259,8 @@ auto viua::process::Stack::find_catch_frame()
                                                caught_with_type);
 }
 
-auto viua::process::Stack::unwind() -> void {
+auto viua::process::Stack::unwind() -> void
+{
     Try_frame* tframe           = nullptr;
     auto handler_found_for_type = std::string{};
 
@@ -268,7 +285,8 @@ auto viua::process::Stack::unwind() -> void {
         // During the first call unwinding changes stack state to suspended to
         // let the VM run stacks of deferred calls.
         unwind_to(tframe, handler_found_for_type);
-    } else {
+    }
+    else {
         // No catcher has been found so we can just unwind the stack and
         // be done with the exception.
         parent_process->stacks_order.push(this);
@@ -283,7 +301,8 @@ auto viua::process::Stack::unwind() -> void {
 }
 
 auto viua::process::Stack::prepare_frame(
-    viua::internals::types::register_index const arguments_size) -> Frame* {
+    viua::internals::types::register_index const arguments_size) -> Frame*
+{
     if (frame_new) {
         throw "requested new frame while last one is unused";
     }
@@ -291,7 +310,8 @@ auto viua::process::Stack::prepare_frame(
     return frame_new.get();
 }
 
-auto viua::process::Stack::push_prepared_frame() -> void {
+auto viua::process::Stack::push_prepared_frame() -> void
+{
     if (size() > MAX_STACK_SIZE) {
         auto oss = std::ostringstream{};
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '"

@@ -34,20 +34,21 @@ namespace viua { namespace tooling { namespace libs { namespace parser {
 using viua::util::vector_view;
 using index_type = std::vector<viua::tooling::libs::lexer::Token>::size_type;
 
-auto Fragment::type() const -> Fragment_type {
-    return fragment_type;
-}
+auto Fragment::type() const -> Fragment_type { return fragment_type; }
 
-auto Fragment::add(viua::tooling::libs::lexer::Token tok) -> void {
+auto Fragment::add(viua::tooling::libs::lexer::Token tok) -> void
+{
     fragment_tokens.push_back(std::move(tok));
 }
 
-auto Fragment::tokens() const -> decltype(fragment_tokens) const& {
+auto Fragment::tokens() const -> decltype(fragment_tokens) const&
+{
     return fragment_tokens;
 }
 
 auto Fragment::token(Tokens_size_type const n) const
-    -> viua::tooling::libs::lexer::Token const& {
+    -> viua::tooling::libs::lexer::Token const&
+{
     return fragment_tokens.at(n);
 }
 
@@ -56,10 +57,14 @@ Fragment::Fragment(Fragment_type t) : fragment_type{t} {}
 Extern_function::Extern_function(std::string fn, uint64_t const a)
         : Fragment{Fragment_type::Extern_function}
         , function_name{std::move(fn)}
-        , arity{a} {}
+        , arity{a}
+{
+}
 
 Extern_block::Extern_block(std::string bn)
-        : Fragment{Fragment_type::Extern_block}, block_name{std::move(bn)} {}
+        : Fragment{Fragment_type::Extern_block}, block_name{std::move(bn)}
+{
+}
 
 End_directive::End_directive() : Fragment{Fragment_type::End_directive} {}
 
@@ -69,7 +74,9 @@ Function_head::Function_head(std::string fn,
         : Fragment{Fragment_type::Function_head}
         , function_name{std::move(fn)}
         , arity{a}
-        , attributes{std::move(attrs)} {}
+        , attributes{std::move(attrs)}
+{
+}
 
 Closure_head::Closure_head(std::string fn,
                            uint64_t const a,
@@ -77,25 +84,35 @@ Closure_head::Closure_head(std::string fn,
         : Fragment{Fragment_type::Closure_head}
         , function_name{std::move(fn)}
         , arity{a}
-        , attributes{std::move(attrs)} {}
+        , attributes{std::move(attrs)}
+{
+}
 
 Block_head::Block_head(std::string bn, std::set<std::string> attrs)
         : Fragment{Fragment_type::Block_head}
         , name{std::move(bn)}
-        , attributes{std::move(attrs)} {}
+        , attributes{std::move(attrs)}
+{
+}
 
 Import_directive::Import_directive(std::string bn, std::set<std::string> attrs)
         : Fragment{Fragment_type::Import_directive}
         , module_name{std::move(bn)}
-        , attributes{std::move(attrs)} {}
+        , attributes{std::move(attrs)}
+{
+}
 
 Info_directive::Info_directive(std::string k, std::string v)
         : Fragment{Fragment_type::Info_directive}
         , key{std::move(k)}
-        , value{std::move(v)} {}
+        , value{std::move(v)}
+{
+}
 
 Mark_directive::Mark_directive(std::string m)
-        : Fragment{Fragment_type::Mark_directive}, mark{std::move(m)} {}
+        : Fragment{Fragment_type::Mark_directive}, mark{std::move(m)}
+{
+}
 
 Name_directive::Name_directive(viua::internals::types::register_index const ri,
                                bool const i,
@@ -103,17 +120,19 @@ Name_directive::Name_directive(viua::internals::types::register_index const ri,
         : Fragment{Fragment_type::Name_directive}
         , register_index{ri}
         , iota{i}
-        , name{std::move(n)} {}
-
-auto Operand::type() const -> Operand_type {
-    return operand_type;
+        , name{std::move(n)}
+{
 }
 
-auto Operand::add(viua::tooling::libs::lexer::Token t) -> void {
+auto Operand::type() const -> Operand_type { return operand_type; }
+
+auto Operand::add(viua::tooling::libs::lexer::Token t) -> void
+{
     operand_tokens.push_back(t);
 }
 
-auto Operand::tokens() const -> decltype(operand_tokens) const& {
+auto Operand::tokens() const -> decltype(operand_tokens) const&
+{
     return operand_tokens;
 }
 
@@ -130,55 +149,83 @@ Register_address::Register_address(
         , iota{i}
         , name{n}
         , register_set{rs}
-        , access{as} {}
+        , access{as}
+{
+}
 
 Integer_literal::Integer_literal(viua::types::Integer::underlying_type const x)
-        : Operand{Operand_type::Integer_literal}, n{x} {}
+        : Operand{Operand_type::Integer_literal}, n{x}
+{
+}
 
 Float_literal::Float_literal(viua::types::Float::underlying_type const x)
-        : Operand{Operand_type::Float_literal}, n{x} {}
+        : Operand{Operand_type::Float_literal}, n{x}
+{
+}
 
 Text_literal::Text_literal(std::string s)
-        : Operand{Operand_type::Text_literal}, text{std::move(s)} {}
+        : Operand{Operand_type::Text_literal}, text{std::move(s)}
+{
+}
 
 Atom_literal::Atom_literal(std::string s)
-        : Operand{Operand_type::Atom_literal}, text{std::move(s)} {}
+        : Operand{Operand_type::Atom_literal}, text{std::move(s)}
+{
+}
 
 Bits_literal::Bits_literal(std::string s)
-        : Operand{Operand_type::Bits_literal}, text{std::move(s)} {}
+        : Operand{Operand_type::Bits_literal}, text{std::move(s)}
+{
+}
 
 Boolean_literal::Boolean_literal(bool const v)
-        : Operand{Operand_type::Boolean_literal}, value{v} {}
+        : Operand{Operand_type::Boolean_literal}, value{v}
+{
+}
 
 Void::Void() : Operand{Operand_type::Void} {}
 
 Function_name::Function_name(std::string fn, uint64_t const a)
         : Operand{Operand_type::Function_name}
         , function_name{std::move(fn)}
-        , arity{a} {}
+        , arity{a}
+{
+}
 
 Block_name::Block_name(std::string bn)
-        : Operand{Operand_type::Block_name}, name{std::move(bn)} {}
+        : Operand{Operand_type::Block_name}, name{std::move(bn)}
+{
+}
 
 Module_name::Module_name(std::string bn)
-        : Operand{Operand_type::Module_name}, name{std::move(bn)} {}
+        : Operand{Operand_type::Module_name}, name{std::move(bn)}
+{
+}
 
 Timeout_literal::Timeout_literal(std::string s)
-        : Operand{Operand_type::Timeout_literal}, value{std::move(s)} {}
+        : Operand{Operand_type::Timeout_literal}, value{std::move(s)}
+{
+}
 
 Jump_offset::Jump_offset(std::string s)
-        : Operand{Operand_type::Jump_offset}, value{std::move(s)} {}
+        : Operand{Operand_type::Jump_offset}, value{std::move(s)}
+{
+}
 
 Jump_label::Jump_label(std::string s)
-        : Operand{Operand_type::Jump_label}, value{std::move(s)} {}
+        : Operand{Operand_type::Jump_label}, value{std::move(s)}
+{
+}
 
 Instruction::Instruction(OPCODE const o)
-        : Fragment{Fragment_type::Instruction}, opcode{o} {}
+        : Fragment{Fragment_type::Instruction}, opcode{o}
+{
+}
 
 static auto parse_extern_function_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto frag = std::make_unique<Extern_function>(
         tokens.at(1).str(), std::stoull(tokens.at(3).str()));
 
@@ -194,8 +241,8 @@ static auto parse_extern_function_directive(
 
 static auto parse_extern_block_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto frag = std::make_unique<Extern_block>(tokens.at(1).str());
 
     frag->add(tokens.at(0));  // .extern_block:
@@ -209,8 +256,8 @@ static auto parse_extern_block_directive(
 template<typename T>
 auto parse_function_head(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     ++i;  // .function: or .closure:
@@ -254,8 +301,8 @@ auto parse_function_head(
 
 static auto parse_block_head(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     ++i;  // .block:
@@ -292,8 +339,8 @@ static auto parse_block_head(
 
 static auto parse_name_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto const is_iota = (tokens.at(1) == "iota");
@@ -313,8 +360,8 @@ static auto parse_name_directive(
 
 static auto parse_info_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Info_directive>(tokens.at(1).str(),
@@ -331,8 +378,8 @@ static auto parse_info_directive(
 // FIXME the code is the same as for .block:
 static auto parse_import_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     ++i;  // .import:
@@ -369,8 +416,8 @@ static auto parse_import_directive(
 
 static auto parse_mark_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Mark_directive>(tokens.at(1).str());
@@ -383,7 +430,8 @@ static auto parse_mark_directive(
 }
 
 // FIXME this is duplicated code
-static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
+static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE>
+{
     for (auto const& [opcode, name] : OP_NAMES) {
         if (name == s) {
             return opcode;
@@ -393,7 +441,8 @@ static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
 }
 
 static auto string_to_register_set(std::string const& s)
-    -> viua::internals::Register_sets {
+    -> viua::internals::Register_sets
+{
     using viua::internals::Register_sets;
     static auto const mapping = std::map<std::string, Register_sets>{
         {
@@ -425,7 +474,8 @@ static auto string_to_register_set(std::string const& s)
 }
 
 static auto string_to_access_type(std::string const& s)
-    -> viua::internals::Access_specifier {
+    -> viua::internals::Access_specifier
+{
     using viua::internals::Access_specifier;
     static auto const mapping = std::map<std::string, Access_specifier>{
         {
@@ -446,8 +496,8 @@ static auto string_to_access_type(std::string const& s)
 
 static auto parse_any_no_input_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -461,8 +511,8 @@ static auto parse_any_no_input_instruction(
 
 static auto parse_register_address(
     Instruction& instruction,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     using viua::tooling::libs::lexer::classifier::is_id;
 
     auto const is_iota = (tokens.at(1) == "iota");
@@ -489,8 +539,8 @@ static auto parse_register_address(
 
 static auto parse_void(
     Instruction& instruction,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto operand = std::make_unique<Void>();
     operand->add(tokens.at(0));
 
@@ -502,8 +552,8 @@ static auto parse_void(
 
 static auto parse_function_name(
     Instruction& instruction,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto name = std::make_unique<Function_name>(
@@ -522,8 +572,8 @@ static auto parse_function_name(
 
 static auto parse_any_1_register_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -543,8 +593,8 @@ static auto parse_any_1_register_instruction(
 
 static auto parse_any_2_register_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -565,8 +615,8 @@ static auto parse_any_2_register_instruction(
 
 static auto parse_any_3_register_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -588,8 +638,8 @@ static auto parse_any_3_register_instruction(
 
 static auto parse_any_3_register_with_void_target_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -599,7 +649,8 @@ static auto parse_any_3_register_with_void_target_instruction(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
     i += parse_register_address(*frag, tokens.advance(i));
@@ -616,8 +667,8 @@ static auto parse_any_3_register_with_void_target_instruction(
 
 static auto parse_any_4_register_instruction(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -640,8 +691,8 @@ static auto parse_any_4_register_instruction(
 
 static auto parse_op_vinsert(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -654,7 +705,8 @@ static auto parse_op_vinsert(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -669,8 +721,8 @@ static auto parse_op_vinsert(
 
 static auto parse_op_vpop(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -681,7 +733,8 @@ static auto parse_op_vpop(
 
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -689,7 +742,8 @@ static auto parse_op_vpop(
 
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -704,8 +758,8 @@ static auto parse_op_vpop(
 
 static auto parse_op_integer(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -728,8 +782,8 @@ static auto parse_op_integer(
 
 static auto parse_op_float(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -748,8 +802,8 @@ static auto parse_op_float(
 
 static auto parse_op_text(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -769,8 +823,8 @@ static auto parse_op_text(
 
 static auto parse_op_atom(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -790,8 +844,8 @@ static auto parse_op_atom(
 
 static auto parse_op_bits(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -804,7 +858,8 @@ static auto parse_op_bits(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         auto lit = std::make_unique<Bits_literal>(tokens.at(i).str());
         lit->add(tokens.at(i++));
         frag->operands.push_back(std::move(lit));
@@ -817,8 +872,8 @@ static auto parse_op_bits(
 
 static auto parse_op_vector(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -830,14 +885,16 @@ static auto parse_op_vector(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -850,20 +907,23 @@ static auto parse_op_vector(
     return i;
 }
 
-static auto string_to_boolean(std::string const& s) -> bool {
+static auto string_to_boolean(std::string const& s) -> bool
+{
     if (s == "true") {
         return true;
-    } else if (s == "false") {
+    }
+    else if (s == "false") {
         return false;
-    } else {
+    }
+    else {
         throw std::domain_error{s};
     }
 }
 
 static auto parse_op_bitset(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -885,8 +945,8 @@ static auto parse_op_bitset(
 
 static auto parse_op_call(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -898,7 +958,8 @@ static auto parse_op_call(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else if (is_void(token.str())) {
+    }
+    else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -908,9 +969,11 @@ static auto parse_op_call(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -926,8 +989,8 @@ static auto parse_op_call(
 
 static auto parse_op_function(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -940,7 +1003,8 @@ static auto parse_op_function(
     if (auto const& token = tokens.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -956,8 +1020,8 @@ static auto parse_op_function(
 
 static auto parse_op_tailcall(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -970,7 +1034,8 @@ static auto parse_op_tailcall(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(1));
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(1));
     }
 
@@ -981,8 +1046,8 @@ static auto parse_op_tailcall(
 
 static auto parse_join(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -994,7 +1059,8 @@ static auto parse_join(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else if (is_void(token.str())) {
+    }
+    else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1011,8 +1077,8 @@ static auto parse_join(
 
 static auto parse_receive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1024,7 +1090,8 @@ static auto parse_receive(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else if (is_void(token.str())) {
+    }
+    else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1039,8 +1106,8 @@ static auto parse_receive(
 
 static auto parse_jump_target(
     Instruction& instruction,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
@@ -1049,9 +1116,10 @@ static auto parse_jump_target(
         auto label = std::make_unique<Jump_label>(token.str());
         label->add(tokens.at(i++));
         instruction.operands.push_back(std::move(label));
-    } else if (auto const c = token.str().at(0);
-               (c == '+' or c == '-')
-               and is_decimal_integer(token.str().substr(1))) {
+    }
+    else if (auto const c = token.str().at(0);
+             (c == '+' or c == '-')
+             and is_decimal_integer(token.str().substr(1))) {
         auto offset = std::make_unique<Jump_offset>(token.str());
         offset->add(tokens.at(i++));
         instruction.operands.push_back(std::move(offset));
@@ -1062,8 +1130,8 @@ static auto parse_jump_target(
 
 static auto parse_op_jump(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1079,8 +1147,8 @@ static auto parse_op_jump(
 
 static auto parse_op_if(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1098,8 +1166,8 @@ static auto parse_op_if(
 
 static auto parse_op_catch(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1121,8 +1189,8 @@ static auto parse_op_catch(
 
 static auto parse_op_enter(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1140,8 +1208,8 @@ static auto parse_op_enter(
 
 static auto parse_op_import(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1158,8 +1226,8 @@ static auto parse_op_import(
 
 static auto parse_op_io_wait(
     std::vector<std::unique_ptr<Fragment>>& fragments,
-    vector_view<viua::tooling::libs::lexer::Token> const& tokens)
-    -> index_type {
+    vector_view<viua::tooling::libs::lexer::Token> const& tokens) -> index_type
+{
     auto i = index_type{0};
 
     auto frag = std::make_unique<Instruction>(
@@ -1171,7 +1239,8 @@ static auto parse_op_io_wait(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    } else if (is_void(token.str())) {
+    }
+    else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1189,7 +1258,8 @@ static auto parse_op_io_wait(
 // FIXME this is duplicated code
 static auto make_unexpected_token_error(
     viua::tooling::libs::lexer::Token const& token,
-    std::string message) -> viua::tooling::errors::compile_time::Error {
+    std::string message) -> viua::tooling::errors::compile_time::Error
+{
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n") ? viua::tooling::errors::compile_time::
                  Compile_time_error::Unexpected_newline
@@ -1203,7 +1273,8 @@ static auto make_unexpected_token_error(
 }
 
 auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
-    -> std::vector<std::unique_ptr<Fragment>> {
+    -> std::vector<std::unique_ptr<Fragment>>
+{
     auto fragments = std::vector<std::unique_ptr<Fragment>>{};
 
     /*
@@ -1459,29 +1530,39 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
         if (token == ".extern_function:") {
             i += parse_extern_function_directive(fragments,
                                                  vector_view{tokens, i});
-        } else if (token == ".extern_block:") {
+        }
+        else if (token == ".extern_block:") {
             i +=
                 parse_extern_block_directive(fragments, vector_view{tokens, i});
-        } else if (token == ".function:") {
+        }
+        else if (token == ".function:") {
             i += parse_function_head<Function_head>(fragments,
                                                     vector_view{tokens, i});
-        } else if (token == ".closure:") {
+        }
+        else if (token == ".closure:") {
             i += parse_function_head<Closure_head>(fragments,
                                                    vector_view{tokens, i});
-        } else if (token == ".block:") {
+        }
+        else if (token == ".block:") {
             i += parse_block_head(fragments, vector_view{tokens, i});
-        } else if (token == ".end") {
+        }
+        else if (token == ".end") {
             fragments.push_back(std::make_unique<End_directive>());
             fragments.back()->add(tokens.at(i++));
-        } else if (token == ".info:") {
+        }
+        else if (token == ".info:") {
             i += parse_info_directive(fragments, vector_view{tokens, i});
-        } else if (token == ".import:") {
+        }
+        else if (token == ".import:") {
             i += parse_import_directive(fragments, vector_view{tokens, i});
-        } else if (token == ".name:") {
+        }
+        else if (token == ".name:") {
             i += parse_name_directive(fragments, vector_view{tokens, i});
-        } else if (token == ".mark:") {
+        }
+        else if (token == ".mark:") {
             i += parse_mark_directive(fragments, vector_view{tokens, i});
-        } else {
+        }
+        else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
                 make_unexpected_token_error(token,
                                             "cannot be reduced by any rule"));
@@ -1491,11 +1572,13 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
     return fragments;
 }
 
-auto Cooked_function::head() const -> Function_head const& {
+auto Cooked_function::head() const -> Function_head const&
+{
     return *static_cast<Function_head*>(lines.at(0).get());
 }
 
-auto Cooked_function::body() const -> body_type {
+auto Cooked_function::body() const -> body_type
+{
     auto v = body_type{};
 
     for (auto each = lines.begin() + 1; each != lines.end(); ++each) {
@@ -1505,7 +1588,8 @@ auto Cooked_function::body() const -> body_type {
     return v;
 }
 
-auto Cooked_block::body() const -> body_type {
+auto Cooked_block::body() const -> body_type
+{
     auto v = body_type{};
 
     for (auto each = lines.begin() + 1; each != lines.end(); ++each) {
@@ -1515,12 +1599,13 @@ auto Cooked_block::body() const -> body_type {
     return v;
 }
 
-Cooked_fragments::Cooked_fragments(std::string f_n)
-        : file_name{std::move(f_n)} {}
+Cooked_fragments::Cooked_fragments(std::string f_n) : file_name{std::move(f_n)}
+{
+}
 
 auto cook(std::string file_name,
-          std::vector<std::unique_ptr<Fragment>> fragments)
-    -> Cooked_fragments {
+          std::vector<std::unique_ptr<Fragment>> fragments) -> Cooked_fragments
+{
     auto cooked = Cooked_fragments{std::move(file_name)};
 
     auto function = std::unique_ptr<Cooked_function>{};
@@ -1561,19 +1646,22 @@ auto cook(std::string file_name,
                                           + std::to_string(fn.arity)] =
                     std::move(*function);
                 function = nullptr;
-            } else if (closure) {
+            }
+            else if (closure) {
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
                 cooked.closure_fragments[fn.function_name + '/'
                                          + std::to_string(fn.arity)] =
                     std::move(*closure);
                 closure = nullptr;
-            } else if (block) {
+            }
+            else if (block) {
                 auto const& bl =
                     *static_cast<Block_head*>(block->lines.at(0).get());
                 cooked.block_fragments[bl.name] = std::move(*block);
                 block                           = nullptr;
-            } else {
+            }
+            else {
                 // do nothing
             }
             break;
@@ -1595,7 +1683,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (closure) {
+            }
+            else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1610,7 +1699,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (block) {
+            }
+            else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1622,7 +1712,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else {
+            }
+            else {
                 function = std::make_unique<Cooked_function>();
                 function->lines.push_back(std::move(each));
             }
@@ -1644,7 +1735,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (closure) {
+            }
+            else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1659,7 +1751,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (block) {
+            }
+            else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1672,7 +1765,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else {
+            }
+            else {
                 closure = std::make_unique<Cooked_closure>();
                 closure->lines.push_back(std::move(each));
             }
@@ -1694,7 +1788,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (closure) {
+            }
+            else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1709,7 +1804,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else if (block) {
+            }
+            else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1722,7 +1818,8 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            } else {
+            }
+            else {
                 block = std::make_unique<Cooked_block>();
                 block->lines.push_back(std::move(each));
             }
@@ -1735,11 +1832,14 @@ auto cook(std::string file_name,
         case Fragment_type::Mark_directive: {
             if (function) {
                 function->lines.push_back(std::move(each));
-            } else if (closure) {
+            }
+            else if (closure) {
                 closure->lines.push_back(std::move(each));
-            } else if (block) {
+            }
+            else if (block) {
                 block->lines.push_back(std::move(each));
-            } else {
+            }
+            else {
                 // FIXME Use some better error, maybe `Orphaned_instruction` for
                 // instructions outside of blocks and `Out_of_context_directive`
                 // for names and marks?

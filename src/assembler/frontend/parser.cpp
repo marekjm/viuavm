@@ -37,7 +37,8 @@ const auto max_distance_for_misspelled_ids = str::LevenshteinDistance{4};
 
 
 auto viua::assembler::frontend::parser::Parsed_source::block(
-    std::string const name) const -> Instructions_block const& {
+    std::string const name) const -> Instructions_block const&
+{
     for (auto const& each : blocks) {
         if (each.name == name) {
             return each;
@@ -47,22 +48,26 @@ auto viua::assembler::frontend::parser::Parsed_source::block(
 }
 
 
-auto viua::assembler::frontend::parser::Operand::add(Token t) -> void {
+auto viua::assembler::frontend::parser::Operand::add(Token t) -> void
+{
     tokens.push_back(t);
 }
 
-auto viua::assembler::frontend::parser::Line::add(Token t) -> void {
+auto viua::assembler::frontend::parser::Line::add(Token t) -> void
+{
     tokens.push_back(t);
 }
 
 auto viua::assembler::frontend::parser::parse_attribute_value(
     const vector_view<Token> tokens,
-    std::string& value) -> decltype(tokens)::size_type {
+    std::string& value) -> decltype(tokens)::size_type
+{
     auto i = decltype(tokens)::size_type{1};
 
     if (tokens.at(i) == "}") {
         // do nothing
-    } else {
+    }
+    else {
         value = tokens.at(i).str();
         ++i;
     }
@@ -77,7 +82,8 @@ auto viua::assembler::frontend::parser::parse_attribute_value(
 auto viua::assembler::frontend::parser::parse_attributes(
     const vector_view<Token> tokens,
     decltype(Instructions_block::attributes)& attributes)
-    -> decltype(tokens)::size_type {
+    -> decltype(tokens)::size_type
+{
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i) != "[[") {
@@ -91,11 +97,14 @@ auto viua::assembler::frontend::parser::parse_attributes(
 
         if (tokens.at(i) == ",") {
             ++i;
-        } else if (tokens.at(i) == "{") {
+        }
+        else if (tokens.at(i) == "{") {
             i += parse_attribute_value(vector_view<Token>(tokens, i), value);
-        } else if (tokens.at(i) == "]]") {
+        }
+        else if (tokens.at(i) == "]]") {
             // do nothing
-        } else {
+        }
+        else {
             throw Invalid_syntax(tokens.at(i), "expected ',' or '{' or ']]'");
         }
 
@@ -114,7 +123,8 @@ auto viua::assembler::frontend::parser::parse_attributes(
 auto viua::assembler::frontend::parser::parse_operand(
     const vector_view<Token> tokens,
     std::unique_ptr<Operand>& operand,
-    bool const integer_literal_means_offset) -> decltype(tokens)::size_type {
+    bool const integer_literal_means_offset) -> decltype(tokens)::size_type
+{
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();
@@ -124,9 +134,11 @@ auto viua::assembler::frontend::parser::parse_operand(
 
         if (tok.at(0) == '%') {
             ri->as = Access_specifier::DIRECT;
-        } else if (tok.at(0) == '*') {
+        }
+        else if (tok.at(0) == '*') {
             ri->as = Access_specifier::POINTER_DEREFERENCE;
-        } else if (tok.at(0) == '@') {
+        }
+        else if (tok.at(0) == '@') {
             ri->as = Access_specifier::REGISTER_INDIRECT;
         }
         ri->add(tokens.at(i));  // add index token
@@ -135,7 +147,8 @@ auto viua::assembler::frontend::parser::parse_operand(
             try {
                 ri->index =
                     static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
-            } catch (std::out_of_range&) {
+            }
+            catch (std::out_of_range&) {
                 throw Invalid_syntax{
                     tokens.at(0),
                     "register index outside of defined range (max allowed "
@@ -147,11 +160,13 @@ auto viua::assembler::frontend::parser::parse_operand(
                         + ')'};
             }
             ri->resolved = true;
-        } else if (str::isnum(tok.substr(1), true)) {
+        }
+        else if (str::isnum(tok.substr(1), true)) {
             throw Invalid_syntax(tokens.at(0),
                                  "register indexes cannot be negative: "
                                      + tok.substr(1));
-        } else {
+        }
+        else {
             // FIXME Throw this error during register usage analysis, when we
             // have a full map of names built so "did you mean...?" note can be
             // provided. Mark the register index as unresolved to prevent it
@@ -166,17 +181,23 @@ auto viua::assembler::frontend::parser::parse_operand(
         if (tokens.at(i) == "current") {
             throw Invalid_syntax{tokens.at(i),
                                  "current register set is illegal"};
-        } else if (tokens.at(i) == "local") {
+        }
+        else if (tokens.at(i) == "local") {
             ri->rss = Register_sets::LOCAL;
-        } else if (tokens.at(i) == "static") {
+        }
+        else if (tokens.at(i) == "static") {
             ri->rss = Register_sets::STATIC;
-        } else if (tokens.at(i) == "global") {
+        }
+        else if (tokens.at(i) == "global") {
             ri->rss = Register_sets::GLOBAL;
-        } else if (tokens.at(i) == "parameters") {
+        }
+        else if (tokens.at(i) == "parameters") {
             ri->rss = Register_sets::PARAMETERS;
-        } else if (tokens.at(i) == "arguments") {
+        }
+        else if (tokens.at(i) == "arguments") {
             ri->rss = Register_sets::ARGUMENTS;
-        } else {
+        }
+        else {
             /*
              * This is just for 'arg' instruction's special-case, where
              * the second operand *is* preceded by a '%' character, but
@@ -194,41 +215,47 @@ auto viua::assembler::frontend::parser::parse_operand(
         }
 
         operand = std::move(ri);
-    } else if (str::is_binary_literal(tok)) {
+    }
+    else if (str::is_binary_literal(tok)) {
         auto bits_literal     = std::make_unique<Bits_literal>();
         bits_literal->content = tokens.at(i);
         bits_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(bits_literal);
-    } else if (str::isnum(tok, true) and not integer_literal_means_offset) {
+    }
+    else if (str::isnum(tok, true) and not integer_literal_means_offset) {
         auto integer_literal     = std::make_unique<Integer_literal>();
         integer_literal->content = tokens.at(i);
         integer_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(integer_literal);
-    } else if (str::isfloat(tok, true)) {
+    }
+    else if (str::isfloat(tok, true)) {
         auto float_literal     = std::make_unique<Float_literal>();
         float_literal->content = tokens.at(i);
         float_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(float_literal);
-    } else if (str::is_boolean_literal(tok)) {
+    }
+    else if (str::is_boolean_literal(tok)) {
         auto boolean_literal     = std::make_unique<Boolean_literal>();
         boolean_literal->content = tokens.at(i);
         boolean_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(boolean_literal);
-    } else if (str::is_void(tok)) {
+    }
+    else if (str::is_void(tok)) {
         auto void_literal = std::make_unique<Void_literal>();
         void_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(void_literal);
-    } else if (str::is_register_set_name(tok)) {
+    }
+    else if (str::is_register_set_name(tok)) {
         auto label = std::make_unique<Label>();  // FIXME use a special type for
                                                  // register set names, not the
                                                  // 'Label' type - register set
@@ -238,50 +265,57 @@ auto viua::assembler::frontend::parser::parse_operand(
         ++i;
 
         operand = std::move(label);
-    } else if (::assembler::utils::is_valid_function_name(tok)) {
+    }
+    else if (::assembler::utils::is_valid_function_name(tok)) {
         auto fn_name_literal     = std::make_unique<Function_name_literal>();
         fn_name_literal->content = tokens.at(i);
         fn_name_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(fn_name_literal);
-    } else if (str::isid(tok) and not viua::cg::lex::is_mnemonic(tok)) {
+    }
+    else if (str::isid(tok) and not viua::cg::lex::is_mnemonic(tok)) {
         auto label     = std::make_unique<Label>();
         label->content = tokens.at(i);
         label->add(tokens.at(i));
         ++i;
 
         operand = std::move(label);
-    } else if (str::is_atom_literal(tok)) {
+    }
+    else if (str::is_atom_literal(tok)) {
         auto atom_literal     = std::make_unique<Atom_literal>();
         atom_literal->content = tokens.at(i);
         atom_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(atom_literal);
-    } else if (str::is_text_literal(tok)) {
+    }
+    else if (str::is_text_literal(tok)) {
         auto text_literal     = std::make_unique<Text_literal>();
         text_literal->content = tokens.at(i);
         text_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(text_literal);
-    } else if (str::is_timeout_literal(tok)) {
+    }
+    else if (str::is_timeout_literal(tok)) {
         auto duration_literal     = std::make_unique<Duration_literal>();
         duration_literal->content = tokens.at(i);
         duration_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(duration_literal);
-    } else if ((tok.at(0) == '+' and str::isnum(tok.substr(1)))
-               or str::isnum(tok, true)) {
+    }
+    else if ((tok.at(0) == '+' and str::isnum(tok.substr(1)))
+             or str::isnum(tok, true)) {
         auto offset     = std::make_unique<Offset>();
         offset->content = (tok.at(0) == '+' ? tok.substr(1) : tok);
         offset->add(tokens.at(i));
         ++i;
 
         operand = std::move(offset);
-    } else {
+    }
+    else {
         throw Invalid_syntax(tokens.at(i), "invalid operand");
     }
 
@@ -294,7 +328,8 @@ auto viua::assembler::frontend::parser::parse_operand(
 }
 
 auto viua::assembler::frontend::parser::mnemonic_to_opcode(
-    std::string const mnemonic) -> OPCODE {
+    std::string const mnemonic) -> OPCODE
+{
     OPCODE opcode = NOP;
     for (auto const& each : OP_NAMES) {
         if (each.second == mnemonic) {
@@ -304,14 +339,16 @@ auto viua::assembler::frontend::parser::mnemonic_to_opcode(
     }
     return opcode;
 }
-static auto get_mnemonics() -> std::vector<std::string> {
+static auto get_mnemonics() -> std::vector<std::string>
+{
     auto mnemonics = std::vector<std::string>{};
     for (auto const& each : OP_NAMES) {
         mnemonics.push_back(std::move(each.second));
     }
     return mnemonics;
 }
-static auto get_directives() -> std::vector<std::string> {
+static auto get_directives() -> std::vector<std::string>
+{
     return {
         ".end",
         ".function:",
@@ -326,7 +363,8 @@ static auto get_directives() -> std::vector<std::string> {
 }
 auto viua::assembler::frontend::parser::parse_instruction(
     const vector_view<Token> tokens,
-    std::unique_ptr<Instruction>& instruction) -> decltype(tokens)::size_type {
+    std::unique_ptr<Instruction>& instruction) -> decltype(tokens)::size_type
+{
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i).str().at(0) == '.') {
@@ -362,7 +400,8 @@ auto viua::assembler::frontend::parser::parse_instruction(
             instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
-    } catch (Invalid_syntax& e) {
+    }
+    catch (Invalid_syntax& e) {
         throw e.add(tokens.at(0));
     }
 
@@ -370,7 +409,8 @@ auto viua::assembler::frontend::parser::parse_instruction(
 }
 auto viua::assembler::frontend::parser::parse_directive(
     const vector_view<Token> tokens,
-    std::unique_ptr<Directive>& directive) -> decltype(tokens)::size_type {
+    std::unique_ptr<Directive>& directive) -> decltype(tokens)::size_type
+{
     auto i = decltype(tokens)::size_type{0};
 
     if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
@@ -397,14 +437,17 @@ auto viua::assembler::frontend::parser::parse_directive(
             throw Invalid_syntax(tokens.at(i), "expected a positive integer");
         }
         directive->operands.push_back(tokens.at(i++));
-    } else if (tokens.at(0) == ".mark:") {
+    }
+    else if (tokens.at(0) == ".mark:") {
         if (not str::isid(tokens.at(i))) {
             throw Invalid_syntax(tokens.at(i), "invalid marker");
         }
         directive->operands.push_back(tokens.at(i++));
-    } else if (tokens.at(0) == ".unused:") {
+    }
+    else if (tokens.at(0) == ".unused:") {
         directive->operands.push_back(tokens.at(i++));
-    } else if (tokens.at(0) == ".name:") {
+    }
+    else if (tokens.at(0) == ".name:") {
         directive->operands.push_back(tokens.at(i++));
         directive->operands.push_back(tokens.at(i++));
     }
@@ -419,13 +462,15 @@ auto viua::assembler::frontend::parser::parse_directive(
 }
 auto viua::assembler::frontend::parser::parse_line(
     const vector_view<Token> tokens,
-    std::unique_ptr<Line>& line) -> decltype(tokens)::size_type {
+    std::unique_ptr<Line>& line) -> decltype(tokens)::size_type
+{
     auto i = decltype(tokens)::size_type{0};
     if (tokens.at(0).str().at(0) == '.') {
         auto directive = std::make_unique<Directive>();
         i    = parse_directive(vector_view<Token>(tokens, 0), directive);
         line = std::move(directive);
-    } else {
+    }
+    else {
         auto instruction = std::make_unique<Instruction>();
         i    = parse_instruction(vector_view<Token>(tokens, 0), instruction);
         line = std::move(instruction);
@@ -442,8 +487,8 @@ using viua::assembler::frontend::parser::Directive;
 using viua::assembler::frontend::parser::Instructions_block;
 using InstructionIndex = decltype(
     viua::assembler::frontend::parser::Instructions_block::body)::size_type;
-static auto populate_marker_map(Instructions_block& instructions_block)
-    -> void {
+static auto populate_marker_map(Instructions_block& instructions_block) -> void
+{
     // XXX HACK start from maximum value, and wrap to zero when
     // incremented for first instruction; this is a hack
     auto instruction_counter = static_cast<InstructionIndex>(-1);
@@ -454,14 +499,16 @@ static auto populate_marker_map(Instructions_block& instructions_block)
                 instructions_block.marker_map[directive->operands.at(0)] =
                     instruction_counter + 1;
             }
-        } else {
+        }
+        else {
             ++instruction_counter;
         }
     }
 }
 auto viua::assembler::frontend::parser::parse_block_body(
     const vector_view<Token> tokens,
-    Instructions_block& instructions_block) -> decltype(tokens)::size_type {
+    Instructions_block& instructions_block) -> decltype(tokens)::size_type
+{
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
@@ -481,7 +528,8 @@ auto viua::assembler::frontend::parser::parse_block_body(
 
 auto viua::assembler::frontend::parser::parse_function(
     const vector_view<Token> tokens,
-    Instructions_block& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type
+{
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -503,7 +551,8 @@ auto viua::assembler::frontend::parser::parse_function(
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (Invalid_syntax& e) {
+    }
+    catch (Invalid_syntax& e) {
         throw Traced_syntax_error().append(e).append(
             Invalid_syntax(ib.name, ("in function " + ib.name.str())));
     }
@@ -517,7 +566,8 @@ auto viua::assembler::frontend::parser::parse_function(
 }
 auto viua::assembler::frontend::parser::parse_closure(
     const vector_view<Token> tokens,
-    Instructions_block& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type
+{
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -544,7 +594,8 @@ auto viua::assembler::frontend::parser::parse_closure(
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (Invalid_syntax& e) {
+    }
+    catch (Invalid_syntax& e) {
         throw Traced_syntax_error().append(e).append(
             Invalid_syntax(ib.name, ("in function " + ib.name.str())));
     }
@@ -558,7 +609,8 @@ auto viua::assembler::frontend::parser::parse_closure(
 }
 auto viua::assembler::frontend::parser::parse_block(
     const vector_view<Token> tokens,
-    Instructions_block& ib) -> decltype(tokens)::size_type {
+    Instructions_block& ib) -> decltype(tokens)::size_type
+{
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{1};
 
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
@@ -574,7 +626,8 @@ auto viua::assembler::frontend::parser::parse_block(
 
     try {
         i += parse_block_body(vector_view<Token>(tokens, i), ib);
-    } catch (Invalid_syntax& e) {
+    }
+    catch (Invalid_syntax& e) {
         throw Traced_syntax_error().append(e).append(
             Invalid_syntax(ib.name, ("in block " + ib.name.str())));
     }
@@ -588,7 +641,8 @@ auto viua::assembler::frontend::parser::parse_block(
 }
 
 auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
-    -> Parsed_source {
+    -> Parsed_source
+{
     Parsed_source parsed;
 
     for (auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
@@ -601,15 +655,18 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
             Instructions_block ib;
             i += parse_function(vector_view<Token>(tokens, i), ib);
             parsed.functions.push_back(std::move(ib));
-        } else if (tokens.at(i) == ".block:") {
+        }
+        else if (tokens.at(i) == ".block:") {
             Instructions_block ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
             parsed.blocks.push_back(std::move(ib));
-        } else if (tokens.at(i) == ".closure:") {
+        }
+        else if (tokens.at(i) == ".closure:") {
             Instructions_block ib;
             i += parse_closure(vector_view<Token>(tokens, i), ib);
             parsed.functions.push_back(std::move(ib));
-        } else if (tokens.at(i) == ".signature:") {
+        }
+        else if (tokens.at(i) == ".signature:") {
             ++i;
             if (tokens.at(i) == "\n") {
                 throw Invalid_syntax(tokens.at(i - 1), "missing function name");
@@ -618,19 +675,23 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
                 throw Invalid_syntax(tokens.at(i), "not a valid function name");
             }
             parsed.function_signatures.push_back(tokens.at(i++));
-        } else if (tokens.at(i) == ".bsignature:") {
+        }
+        else if (tokens.at(i) == ".bsignature:") {
             ++i;
             if (tokens.at(i) == "\n") {
                 throw Invalid_syntax(tokens.at(i - 1), "missing block name");
             }
             parsed.block_signatures.push_back(tokens.at(i++));
-        } else if (tokens.at(i) == ".end") {
+        }
+        else if (tokens.at(i) == ".end") {
             throw Invalid_syntax(tokens.at(i), "stray .end marker");
-        } else if (tokens.at(i) == ".info:") {
+        }
+        else if (tokens.at(i) == ".info:") {
             // FIXME add meta information to parsed source
             // for now just skip key and value
             i += 2;
-        } else if (tokens.at(i) == ".import:") {
+        }
+        else if (tokens.at(i) == ".import:") {
             auto const saved_i = i;
             ++i;
 
@@ -649,10 +710,12 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
                 throw Invalid_syntax(tokens.at(i), "double import")
                     .note("module " + name.str() + " was already imported");
             }
-        } else if (tokens.at(i).str().at(0) == '.') {
+        }
+        else if (tokens.at(i).str().at(0) == '.') {
             throw Invalid_syntax(tokens.at(i), "illegal directive")
                 .note("expected a function or block definition (or signature)");
-        } else {
+        }
+        else {
             throw Invalid_syntax(
                 tokens.at(i),
                 "expected a function or a block definition (or "

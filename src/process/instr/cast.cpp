@@ -29,7 +29,8 @@
 #include <viua/types/value.h>
 
 
-auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -44,7 +45,8 @@ auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -59,7 +61,8 @@ auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -73,10 +76,12 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
         static_cast<viua::types::String*>(source)->value();
     try {
         result_integer = std::stoi(supplied_string);
-    } catch (std::out_of_range const& e) {
+    }
+    catch (std::out_of_range const& e) {
         throw std::make_unique<viua::types::Exception>("out of range: "
                                                        + supplied_string);
-    } catch (std::invalid_argument const& e) {
+    }
+    catch (std::invalid_argument const& e) {
         throw std::make_unique<viua::types::Exception>("invalid argument: "
                                                        + supplied_string);
     }
@@ -86,7 +91,8 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

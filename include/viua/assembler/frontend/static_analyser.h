@@ -188,7 +188,8 @@ auto to_string(viua::internals::Value_types const) -> std::string;
 template<typename T>
 auto get_operand(
     viua::assembler::frontend::parser::Instruction const& instruction,
-    size_t operand_index) -> T* {
+    size_t operand_index) -> T*
+{
     if (operand_index >= instruction.operands.size()) {
         using viua::cg::lex::Invalid_syntax;
         throw Invalid_syntax{instruction.tokens.at(0), "not enough operands"}
@@ -222,7 +223,8 @@ auto depointerise_type_if_needed(viua::internals::Value_types const, bool const)
 template<viua::internals::Value_types expected_type>
 auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                              Register_index const& register_index)
-    -> viua::internals::Value_types {
+    -> viua::internals::Value_types
+{
     using viua::cg::lex::Invalid_syntax;
     using viua::cg::lex::Traced_syntax_error;
     using viua::internals::Value_types;
@@ -316,7 +318,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
 template<typename T>
 auto get_input_operand(
     viua::assembler::frontend::parser::Instruction const& instruction,
-    size_t operand_index) -> T* {
+    size_t operand_index) -> T*
+{
     auto operand = get_operand<T>(instruction, operand_index);
     if ((not operand)
         and dynamic_cast<viua::assembler::frontend::parser::Void_literal*>(

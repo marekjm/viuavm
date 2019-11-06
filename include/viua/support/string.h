@@ -58,7 +58,8 @@ auto join(std::string const& s, std::vector<std::string> const& v)
     -> std::string;
 
 template<typename T>
-auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
+auto join(std::vector<std::string> const& seq, T const& delim) -> std::string
+{
     auto const sz = seq.size();
     auto oss      = std::ostringstream{};
     for (auto i = std::remove_const_t<decltype(sz)>{0}; i < sz; ++i) {
@@ -70,8 +71,8 @@ auto join(std::vector<std::string> const& seq, T const& delim) -> std::string {
     return oss.str();
 }
 
-template<typename T>
-auto strmul(T const& s, size_t const times) -> std::string {
+template<typename T> auto strmul(T const& s, size_t const times) -> std::string
+{
     auto oss = std::ostringstream{};
     for (auto i = std::remove_const_t<decltype(times)>{0}; i < times; ++i) {
         oss << s;
@@ -100,8 +101,8 @@ auto strdecode(std::string const&) -> std::string;
 auto strencode(std::string const&) -> std::string;
 
 auto stringify(std::vector<std::string> const&) -> std::string;
-template<class T>
-auto stringify(T const o, bool const nl = true) -> std::string {
+template<class T> auto stringify(T const o, bool const nl = true) -> std::string
+{
     auto oss = std::ostringstream{};
     oss << o;
     if (nl) {

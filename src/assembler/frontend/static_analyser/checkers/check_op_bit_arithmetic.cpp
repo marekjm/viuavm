@@ -27,7 +27,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_bit_arithmetic(Register_usage_profile& register_usage_profile,
-                             Instruction const& instruction) -> void {
+                             Instruction const& instruction) -> void
+{
     using viua::assembler::frontend::parser::Register_index;
     auto result = get_operand<Register_index>(instruction, 0);
     if (not result) {

@@ -22,31 +22,29 @@
 
 std::string const viua::types::Atom::type_name = "viua::types::Atom";
 
-auto viua::types::Atom::type() const -> std::string {
+auto viua::types::Atom::type() const -> std::string
+{
     return "viua::types::Atom";
 }
 
-auto viua::types::Atom::boolean() const -> bool {
-    return true;
-}
+auto viua::types::Atom::boolean() const -> bool { return true; }
 
-auto viua::types::Atom::str() const -> std::string {
+auto viua::types::Atom::str() const -> std::string
+{
     return str::enquote(value, '\'');
 }
 
-auto viua::types::Atom::repr() const -> std::string {
-    return str();
-}
+auto viua::types::Atom::repr() const -> std::string { return str(); }
 
-viua::types::Atom::operator std::string() const {
-    return value;
-}
+viua::types::Atom::operator std::string() const { return value; }
 
-auto viua::types::Atom::copy() const -> std::unique_ptr<viua::types::Value> {
+auto viua::types::Atom::copy() const -> std::unique_ptr<viua::types::Value>
+{
     return std::make_unique<Atom>(value);
 }
 
-auto viua::types::Atom::operator==(Atom const& that) const -> bool {
+auto viua::types::Atom::operator==(Atom const& that) const -> bool
+{
     return (value == that.value);
 }
 

@@ -21,11 +21,13 @@
 #include <viua/support/env.h>
 
 namespace viua { namespace support { namespace env {
-auto get_var(std::string const& var) -> std::string {
+auto get_var(std::string const& var) -> std::string
+{
     auto const VAR = getenv(var.c_str());
     return (VAR == nullptr ? std::string("") : std::string(VAR));
 }
-auto get_paths(std::string const& var) -> std::vector<std::string> {
+auto get_paths(std::string const& var) -> std::vector<std::string>
+{
     auto const path = get_var(var);
     auto paths      = std::vector<std::string>{};
 
@@ -49,7 +51,8 @@ auto get_paths(std::string const& var) -> std::vector<std::string> {
     return paths;
 }
 
-auto is_file(std::string const& path) -> bool {
+auto is_file(std::string const& path) -> bool
+{
     struct stat sf;
 
     // not a file if stat returned error

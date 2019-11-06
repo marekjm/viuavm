@@ -61,7 +61,8 @@ bool VERBOSE = false;
 static bool usage(const char* program,
                   bool show_help,
                   bool show_version,
-                  bool verbose) {
+                  bool verbose)
+{
     if (show_help or (show_version and verbose)) {
         std::cout << "Viua VM assembler, version ";
     }
@@ -119,7 +120,8 @@ static bool usage(const char* program,
     return (show_help or show_version);
 }
 
-static std::string read_file(std::string const& path) {
+static std::string read_file(std::string const& path)
+{
     std::ifstream in(path, std::ios::in | std::ios::binary);
 
     std::ostringstream source_in;
@@ -131,7 +133,8 @@ static std::string read_file(std::string const& path) {
     return source_in.str();
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // setup command line arguments std::vector
     auto args   = std::vector<std::string>{};
     auto option = std::string{};
@@ -144,16 +147,20 @@ int main(int argc, char* argv[]) {
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version" or option == "-V") {
+        }
+        else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose" or option == "-v") {
+        }
+        else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
-        } else if (option == "--out" or option == "-o") {
+        }
+        else if (option == "--out" or option == "-o") {
             if (i < argc - 1) {
                 compilename = std::string(argv[++i]);
-            } else {
+            }
+            else {
                 std::cout << send_control_seq(COLOR_FG_RED) << "error"
                           << send_control_seq(ATTR_RESET);
                 std::cout << ": option '" << send_control_seq(COLOR_FG_WHITE)
@@ -163,29 +170,36 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
             continue;
-        } else if (option == "--lib" or option == "-c") {
+        }
+        else if (option == "--lib" or option == "-c") {
             AS_LIB = true;
             continue;
-        } else if (option == "--verify" or option == "-C") {
+        }
+        else if (option == "--verify" or option == "-C") {
             EARLY_VERIFICATION_ONLY = true;
             continue;
-        } else if (option == "--size") {
+        }
+        else if (option == "--size") {
             REPORT_BYTECODE_SIZE = true;
             continue;
-        } else if (option == "--meta") {
+        }
+        else if (option == "--meta") {
             SHOW_META = true;
             continue;
-        } else if (option == "--no-sa") {
+        }
+        else if (option == "--no-sa") {
             PERFORM_STATIC_ANALYSIS = false;
             continue;
-        } else if (option.find("-W") != std::string::npos) {
+        }
+        else if (option.find("-W") != std::string::npos) {
             using viua::assembler::frontend::static_analyser::allow_error;
             using viua::assembler::frontend::static_analyser::
                 to_reportable_error;
 
             if (auto e = to_reportable_error(option); e.has_value()) {
                 allow_error(e.value());
-            } else {
+            }
+            else {
                 std::cerr << send_control_seq(COLOR_FG_RED) << "error"
                           << send_control_seq(ATTR_RESET);
                 std::cerr << ": unknown option: ";
@@ -195,7 +209,8 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
             continue;
-        } else if (str::startswith(option, "-")) {
+        }
+        else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
                       << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
@@ -244,7 +259,8 @@ int main(int argc, char* argv[]) {
             compilename =
                 std::toupper(filename.at(0), std::locale("C"))
                 + (filename.substr(1, filename.rfind('.')) + "module");
-        } else {
+        }
+        else {
             compilename = "a.out";
         }
     }
@@ -277,11 +293,13 @@ int main(int argc, char* argv[]) {
         cooked_tokens =
             viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
         normalised_tokens = viua::cg::lex::normalise(cooked_tokens);
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -290,11 +308,13 @@ int main(int argc, char* argv[]) {
     auto functions = viua::front::assembler::Invocables{};
     try {
         functions = viua::assembler::frontend::gather_functions(cooked_tokens);
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -303,11 +323,13 @@ int main(int argc, char* argv[]) {
     auto blocks = viua::front::assembler::Invocables{};
     try {
         blocks = viua::assembler::frontend::gather_blocks(cooked_tokens);
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -327,11 +349,13 @@ int main(int argc, char* argv[]) {
                 parsed_source);
         }
         parsed_imports = parsed_source.imports;
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
@@ -402,15 +426,18 @@ int main(int argc, char* argv[]) {
                     << send_control_seq(COLOR_FG_WHITE) << name
                     << send_control_seq(ATTR_RESET) << "\"\n";
                 return 1;
-            } else if (attrs.count(STATIC_IMPORT_TAG)
-                       and module_path->first == Module_type::Bytecode) {
+            }
+            else if (attrs.count(STATIC_IMPORT_TAG)
+                     and module_path->first == Module_type::Bytecode) {
                 // FIXME Modules specified on command line are also to be
                 // statically linked. These two ways should probably be merged.
                 static_linked_parsed_imports.push_back(module_path->second);
                 commandline_given_links.push_back(module_path->second);
-            } else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
+            }
+            else if (attrs.count(DYNAMIC_IMPORT_TAG)) {
                 dynamic_linked_imports.push_back({name, module_path->second});
-            } else {
+            }
+            else {
                 std::cerr << send_control_seq(COLOR_FG_WHITE) << filename
                           << send_control_seq(ATTR_RESET) << ':'
                           << send_control_seq(COLOR_FG_RED) << "error"
@@ -442,25 +469,29 @@ int main(int argc, char* argv[]) {
                  commandline_given_links,
                  dynamic_linked_imports,
                  flags);
-    } catch (std::string const& e) {
+    }
+    catch (std::string const& e) {
         ret_code = 1;
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                   << send_control_seq(ATTR_RESET) << ": ";
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
                   << send_control_seq(ATTR_RESET);
         std::cout << ": " << e << std::endl;
-    } catch (const char* e) {
+    }
+    catch (const char* e) {
         ret_code = 1;
         std::cout << send_control_seq(COLOR_FG_WHITE) << filename
                   << send_control_seq(ATTR_RESET) << ": ";
         std::cout << send_control_seq(COLOR_FG_RED) << "error"
                   << send_control_seq(ATTR_RESET);
         std::cout << ": " << e << std::endl;
-    } catch (viua::cg::lex::Invalid_syntax const& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;
-    } catch (viua::cg::lex::Traced_syntax_error const& e) {
+    }
+    catch (viua::cg::lex::Traced_syntax_error const& e) {
         viua::assembler::util::pretty_printer::display_error_in_context(
             raw_tokens, e, filename);
         return 1;

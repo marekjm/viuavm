@@ -23,7 +23,8 @@ namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
 auto assemble_op_structremove(Program& program,
                               std::vector<Token> const& tokens,
-                              Token_index const i) -> void {
+                              Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 2;
     Token_index key    = source + 2;
@@ -40,7 +41,8 @@ auto assemble_op_structremove(Program& program,
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(key)),
                 ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-    } else {
+    }
+    else {
         program.opstructremove(
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(target)),

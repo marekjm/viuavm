@@ -21,7 +21,8 @@
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
-auto Closure::define(Register const r, viua::cg::lex::Token const t) -> void {
+auto Closure::define(Register const r, viua::cg::lex::Token const t) -> void
+{
     defined_registers.insert_or_assign(
         r, std::pair<viua::cg::lex::Token, Register>(t, r));
 }

@@ -26,14 +26,14 @@ using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 
-auto Register_usage_profile::fresh(Register const r) const -> bool {
+auto Register_usage_profile::fresh(Register const r) const -> bool
+{
     return fresh_registers.count(r);
 }
 
-auto Register_usage_profile::defresh() -> void {
-    fresh_registers.clear();
-}
-auto Register_usage_profile::erase_arguments(Token const t) -> void {
+auto Register_usage_profile::defresh() -> void { fresh_registers.clear(); }
+auto Register_usage_profile::erase_arguments(Token const t) -> void
+{
     auto args_regs = std::vector<Register>{};
     std::copy_if(fresh_registers.begin(),
                  fresh_registers.end(),
@@ -50,7 +50,8 @@ auto Register_usage_profile::erase_arguments(Token const t) -> void {
 
 auto Register_usage_profile::define(Register const r,
                                     Token const t,
-                                    bool const allow_overwrites) -> void {
+                                    bool const allow_overwrites) -> void
+{
     using viua::internals::Register_sets;
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
@@ -85,7 +86,8 @@ auto Register_usage_profile::define(Register const r,
 auto Register_usage_profile::define(Register const r,
                                     Token const index,
                                     Token const register_set,
-                                    bool const allow_overwrites) -> void {
+                                    bool const allow_overwrites) -> void
+{
     using viua::internals::Register_sets;
     if ((not in_bounds(r))
         and !(r.register_set == Register_sets::GLOBAL
@@ -118,17 +120,20 @@ auto Register_usage_profile::define(Register const r,
     defined_registers.insert_or_assign(r, std::pair<Token, Register>(index, r));
     fresh_registers.insert(r);
 }
-auto Register_usage_profile::defined(Register const r) const -> bool {
+auto Register_usage_profile::defined(Register const r) const -> bool
+{
     return defined_registers.count(r);
 }
-auto Register_usage_profile::defined_where(Register const r) const -> Token {
+auto Register_usage_profile::defined_where(Register const r) const -> Token
+{
     return defined_registers.at(r).first;
 }
 
 auto Register_usage_profile::infer(
     Register const r,
     const viua::internals::Value_types value_type_id,
-    Token const& t) -> void {
+    Token const& t) -> void
+{
     auto reg              = at(r);
     reg.second.value_type = value_type_id;
     reg.second.inferred   = {true, t};
@@ -141,58 +146,70 @@ auto Register_usage_profile::infer(
 }
 
 auto Register_usage_profile::at(Register const r) const -> const
-    decltype(defined_registers)::mapped_type {
+    decltype(defined_registers)::mapped_type
+{
     return defined_registers.at(r);
 }
 
-auto Register_usage_profile::used(Register const r) const -> bool {
+auto Register_usage_profile::used(Register const r) const -> bool
+{
     return used_registers.count(r);
 }
-auto Register_usage_profile::use(Register const r, Token const t) -> void {
+auto Register_usage_profile::use(Register const r, Token const t) -> void
+{
     used_registers[r] = t;
     fresh_registers.erase(r);
 }
 
-auto Register_usage_profile::erase(Register const r, Token const& token)
-    -> void {
+auto Register_usage_profile::erase(Register const r, Token const& token) -> void
+{
     erased_registers.emplace(r, token);
     defined_registers.erase(defined_registers.find(r));
 }
-auto Register_usage_profile::erased(Register const r) const -> bool {
+auto Register_usage_profile::erased(Register const r) const -> bool
+{
     return (erased_registers.count(r) == 1);
 }
-auto Register_usage_profile::erased_where(Register const r) const -> Token {
+auto Register_usage_profile::erased_where(Register const r) const -> Token
+{
     return erased_registers.at(r);
 }
 
 auto Register_usage_profile::allocated_registers(
-    viua::internals::types::register_index const n) -> void {
+    viua::internals::types::register_index const n) -> void
+{
     no_of_allocated_registers = n;
 }
 auto Register_usage_profile::allocated_registers() const
-    -> std::optional<viua::internals::types::register_index> {
+    -> std::optional<viua::internals::types::register_index>
+{
     return no_of_allocated_registers;
 }
 auto Register_usage_profile::allocated_where(viua::cg::lex::Token const& token)
-    -> void {
+    -> void
+{
     where_registers_were_allocated = token;
 }
 auto Register_usage_profile::allocated_where() const
-    -> std::optional<viua::cg::lex::Token> {
+    -> std::optional<viua::cg::lex::Token>
+{
     return where_registers_were_allocated;
 }
 
-auto Register_usage_profile::in_bounds(Register const r) const -> bool {
+auto Register_usage_profile::in_bounds(Register const r) const -> bool
+{
     // FIXME check in bound-ness of register sets other than local
     return not(allocated_registers()
                and r.index >= allocated_registers().value());
 }
 
 auto Register_usage_profile::begin() const
-    -> decltype(defined_registers.begin()) {
+    -> decltype(defined_registers.begin())
+{
     return defined_registers.begin();
 }
-auto Register_usage_profile::end() const -> decltype(defined_registers.end()) {
+auto Register_usage_profile::end() const -> decltype(defined_registers.end())
+{
     return defined_registers.end();
 }
 }}}}  // namespace viua::assembler::frontend::static_analyser

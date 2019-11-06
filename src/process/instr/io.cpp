@@ -28,8 +28,8 @@
 #include <viua/types/string.h>
 #include <viua/types/value.h>
 
-auto viua::process::Process::op_io_read(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -47,7 +47,8 @@ auto viua::process::Process::op_io_read(Op_address_type addr)
             static_cast<viua::types::Integer&>(*porty->get()).as_integer(),
             viua::types::IO_fd::Ownership::Borrowed);
         *target = port->read(attached_scheduler->kernel(), limity->give());
-    } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
+    }
+    else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
         auto& port = static_cast<viua::types::IO_fd&>(*porty->get());
         *target    = port.read(attached_scheduler->kernel(), limity->give());
     }
@@ -56,7 +57,8 @@ auto viua::process::Process::op_io_read(Op_address_type addr)
 }
 
 auto viua::process::Process::op_io_write(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -74,7 +76,8 @@ auto viua::process::Process::op_io_write(Op_address_type addr)
             static_cast<viua::types::Integer&>(*porty->get()).as_integer(),
             viua::types::IO_fd::Ownership::Borrowed);
         *target = port->write(attached_scheduler->kernel(), data->give());
-    } else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
+    }
+    else if (dynamic_cast<viua::types::IO_fd*>(porty->get())) {
         auto& port = static_cast<viua::types::IO_fd&>(*porty->get());
         *target    = port.write(attached_scheduler->kernel(), data->give());
     }
@@ -83,7 +86,8 @@ auto viua::process::Process::op_io_write(Op_address_type addr)
 }
 
 auto viua::process::Process::op_io_close(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -97,8 +101,8 @@ auto viua::process::Process::op_io_close(Op_address_type addr)
     return addr;
 }
 
-auto viua::process::Process::op_io_wait(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
+{
     /*
      * Wait for an I/O request to complete or a timeout to pass. If the request
      * completes in the specified time its result is returned in the destination
@@ -119,7 +123,8 @@ auto viua::process::Process::op_io_wait(Op_address_type addr)
     if (not target_is_void) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    } else {
+    }
+    else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -136,7 +141,8 @@ auto viua::process::Process::op_io_wait(Op_address_type addr)
         waiting_until  = (std::chrono::steady_clock::now()
                          + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
-    } else if (not timeout and not timeout_active) {
+    }
+    else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
         timeout_active      = true;
     }
@@ -150,7 +156,8 @@ auto viua::process::Process::op_io_wait(Op_address_type addr)
         timeout_active      = false;
         wait_until_infinity = false;
         return_addr         = addr;
-    } else {
+    }
+    else {
         if (timeout_active and (not wait_until_infinity)
             and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active      = false;
@@ -165,7 +172,8 @@ auto viua::process::Process::op_io_wait(Op_address_type addr)
 }
 
 auto viua::process::Process::op_io_cancel(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     viua::types::IO_request* request = nullptr;
     std::tie(addr, request) =
         viua::bytecode::decoder::operands::fetch_object_of<

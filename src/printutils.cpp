@@ -22,7 +22,8 @@
 #include <viua/printutils.h>
 #include <viua/types/value.h>
 
-std::string stringify_function_invocation(const Frame* frame) {
+std::string stringify_function_invocation(const Frame* frame)
+{
     std::ostringstream oss;
     oss << frame->function_name << '/' << frame->arguments->size();
     oss << '(';
@@ -30,7 +31,8 @@ std::string stringify_function_invocation(const Frame* frame) {
         auto optr = frame->arguments->at(i);
         if (optr == nullptr) {
             oss << "<moved or void>";
-        } else {
+        }
+        else {
             oss << optr->repr();
         }
         if (i < (frame->arguments->size() - 1)) {

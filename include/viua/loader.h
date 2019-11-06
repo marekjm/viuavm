@@ -37,7 +37,8 @@ typedef std::tuple<std::vector<std::string>,
                    std::map<std::string, viua::internals::types::bytecode_size>>
     IdToAddressMapping;
 
-template<class T> void readinto(std::ifstream& in, T* object) {
+template<class T> void readinto(std::ifstream& in, T* object)
+{
     in.read(reinterpret_cast<char*>(object), sizeof(T));
 }
 

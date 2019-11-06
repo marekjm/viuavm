@@ -26,7 +26,8 @@
 #include <viua/bytecode/opcodes.h>
 
 
-int main() {
+int main()
+{
     auto const max_mnemonic_length = []() -> std::string::size_type {
         auto l = std::string::size_type{0};
         for (std::pair<const OPCODE, std::string> i : OP_NAMES) {
@@ -48,7 +49,8 @@ int main() {
         auto mnemonic     = std::string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
-        } else {
+        }
+        else {
             continue;
         }
 

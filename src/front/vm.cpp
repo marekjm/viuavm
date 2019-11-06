@@ -23,7 +23,8 @@
 
 void viua::front::vm::initialise(viua::kernel::Kernel& kernel,
                                  std::string const& program,
-                                 std::vector<std::string> args) {
+                                 std::vector<std::string> args)
+{
     auto loader = Loader{program};
     loader.executable();
 
@@ -47,7 +48,8 @@ void viua::front::vm::initialise(viua::kernel::Kernel& kernel,
     kernel.load(std::move(bytecode)).bytes(bytes);
 }
 
-void viua::front::vm::preload_libraries(viua::kernel::Kernel& kernel) {
+void viua::front::vm::preload_libraries(viua::kernel::Kernel& kernel)
+{
     /** This method preloads dynamic libraries specified by environment.
      */
     auto const module_to_preload = support::env::get_paths("VIUA_IMPORT");

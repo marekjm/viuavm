@@ -21,23 +21,19 @@
 
 std::string const viua::types::Boolean::type_name = "Boolean";
 
-auto viua::types::Boolean::type() const -> std::string {
-    return "Boolean";
-}
+auto viua::types::Boolean::type() const -> std::string { return "Boolean"; }
 
-auto viua::types::Boolean::str() const -> std::string {
+auto viua::types::Boolean::str() const -> std::string
+{
     return (b ? "true" : "false");
 }
 
-auto viua::types::Boolean::boolean() const -> bool {
-    return b;
-}
+auto viua::types::Boolean::boolean() const -> bool { return b; }
 
-auto viua::types::Boolean::value() -> bool& {
-    return b;
-}
+auto viua::types::Boolean::value() -> bool& { return b; }
 
-auto viua::types::Boolean::copy() const -> std::unique_ptr<viua::types::Value> {
+auto viua::types::Boolean::copy() const -> std::unique_ptr<viua::types::Value>
+{
     return std::make_unique<Boolean>(b);
 }
 

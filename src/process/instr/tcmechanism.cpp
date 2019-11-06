@@ -25,7 +25,8 @@
 #include <viua/types/integer.h>
 
 
-auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type
+{
     /** Create new special frame for try blocks.
      */
     if (stack->try_frame_new) {
@@ -35,7 +36,8 @@ auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type
+{
     /** Run catch instruction.
      */
     std::string type_name, catcher_block_name;
@@ -56,7 +58,8 @@ auto viua::process::Process::opcatch(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type
+{
     /** Run draw instruction.
      */
     if (viua::bytecode::decoder::operands::is_void(addr)) {
@@ -65,7 +68,8 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
          * Catching thrown objects into a void register will just discard them.
          */
         stack->caught.reset(nullptr);
-    } else {
+    }
+    else {
         viua::kernel::Register* target = nullptr;
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -80,7 +84,8 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type
+{
     /*  Run enter instruction.
      */
     auto block_name = std::string{};
@@ -103,7 +108,8 @@ auto viua::process::Process::openter(Op_address_type addr) -> Op_address_type {
     return block_address;
 }
 
-auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type
+{
     /** Run throw instruction.
      */
     viua::kernel::Register* source = nullptr;
@@ -120,7 +126,8 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type
+{
     /*  Run leave instruction.
      */
     if (stack->tryframes.size() == 0) {

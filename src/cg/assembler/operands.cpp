@@ -29,7 +29,8 @@
 
 static auto resolveregister(viua::cg::lex::Token const token,
                             bool const allow_bare_integers = false)
-    -> std::string {
+    -> std::string
+{
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
@@ -50,7 +51,8 @@ static auto resolveregister(viua::cg::lex::Token const token,
         // holds an integer (the only value suitable to use as register
         // reference)
         out.str(reg);
-    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+    }
+    else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
          * everything is still nice and simple.
          */
@@ -59,7 +61,8 @@ static auto resolveregister(viua::cg::lex::Token const token,
         }
 
         out.str(reg);
-    } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
+    }
+    else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
          * everything is still nice and simple.
          */
@@ -68,11 +71,14 @@ static auto resolveregister(viua::cg::lex::Token const token,
         }
 
         out.str(reg);
-    } else if (reg == "void") {
+    }
+    else if (reg == "void") {
         out << reg;
-    } else if (allow_bare_integers and str::isnum(reg)) {
+    }
+    else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(
             token, ("illegal operand: " + token.str()));
     }
@@ -81,24 +87,30 @@ static auto resolveregister(viua::cg::lex::Token const token,
 
 
 auto assembler::operands::getint(std::string const& s,
-                                 bool const allow_bare_integers) -> int_op {
+                                 bool const allow_bare_integers) -> int_op
+{
     if (s.size() == 0) {
         throw "empty std::string cannot be used as operand";
     }
 
     if (s == "void") {
         return int_op(Integer_operand_type::VOID);
-    } else if (s.at(0) == '@') {
+    }
+    else if (s.at(0) == '@') {
         return int_op(Integer_operand_type::REGISTER_REFERENCE,
                       stoi(s.substr(1)));
-    } else if (s.at(0) == '*') {
+    }
+    else if (s.at(0) == '*') {
         return int_op(Integer_operand_type::POINTER_DEREFERENCE,
                       stoi(s.substr(1)));
-    } else if (s.at(0) == '%') {
+    }
+    else if (s.at(0) == '%') {
         return int_op(stoi(s.substr(1)));
-    } else if (allow_bare_integers and str::isnum(s)) {
+    }
+    else if (allow_bare_integers and str::isnum(s)) {
         return int_op(stoi(s));
-    } else {
+    }
+    else {
         throw("cannot convert to int operand: " + s);
     }
 }
@@ -106,33 +118,40 @@ auto assembler::operands::getint(std::string const& s,
 auto assembler::operands::getint_with_rs_type(
     std::string const& s,
     viua::internals::Register_sets const rs_type,
-    bool const allow_bare_integers) -> int_op {
+    bool const allow_bare_integers) -> int_op
+{
     if (s.size() == 0) {
         throw "empty std::string cannot be used as operand";
     }
 
     if (s == "void") {
         return int_op(Integer_operand_type::VOID);
-    } else if (s.at(0) == '@') {
+    }
+    else if (s.at(0) == '@') {
         return int_op(Integer_operand_type::REGISTER_REFERENCE,
                       rs_type,
                       stoi(s.substr(1)));
-    } else if (s.at(0) == '*') {
+    }
+    else if (s.at(0) == '*') {
         return int_op(Integer_operand_type::POINTER_DEREFERENCE,
                       rs_type,
                       stoi(s.substr(1)));
-    } else if (s.at(0) == '%') {
+    }
+    else if (s.at(0) == '%') {
         return int_op(Integer_operand_type::INDEX, rs_type, stoi(s.substr(1)));
-    } else if (allow_bare_integers and str::isnum(s)) {
+    }
+    else if (allow_bare_integers and str::isnum(s)) {
         return int_op(stoi(s));
-    } else {
+    }
+    else {
         throw("cannot convert to int operand: " + s);
     }
 }
 
 auto assembler::operands::getint(
     std::vector<viua::cg::lex::Token> const& tokens,
-    decltype(tokens.size()) const i) -> int_op {
+    decltype(tokens.size()) const i) -> int_op
+{
     auto const s = resolveregister(tokens.at(i));
 
     if (s.size() == 0) {
@@ -147,12 +166,15 @@ auto assembler::operands::getint(
     if (s.at(0) == '@') {
         iop =
             int_op(Integer_operand_type::REGISTER_REFERENCE, stoi(s.substr(1)));
-    } else if (s.at(0) == '*') {
+    }
+    else if (s.at(0) == '*') {
         iop = int_op(Integer_operand_type::POINTER_DEREFERENCE,
                      stoi(s.substr(1)));
-    } else if (s.at(0) == '%') {
+    }
+    else if (s.at(0) == '%') {
         iop = int_op(stoi(s.substr(1)));
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(tokens.at(i),
                                             "cannot convert to register index");
     }
@@ -162,19 +184,22 @@ auto assembler::operands::getint(
     return iop;
 }
 
-auto assembler::operands::getbyte(std::string const& s) -> byte_op {
+auto assembler::operands::getbyte(std::string const& s) -> byte_op
+{
     auto const ref = (s[0] == '@');
     return std::tuple<bool, char>(
         ref, static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
-auto assembler::operands::getfloat(std::string const& s) -> float_op {
+auto assembler::operands::getfloat(std::string const& s) -> float_op
+{
     auto const ref = (s[0] == '@');
     return std::tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
 }
 
 auto assembler::operands::get2(std::string const s)
-    -> std::tuple<std::string, std::string> {
+    -> std::tuple<std::string, std::string>
+{
     /** Returns std::tuple of two strings - two operands chunked from the `s`
      * std::string.
      */
@@ -184,7 +209,8 @@ auto assembler::operands::get2(std::string const s)
 }
 
 auto assembler::operands::get3(std::string const s, bool const fill_third)
-    -> std::tuple<std::string, std::string, std::string> {
+    -> std::tuple<std::string, std::string, std::string>
+{
     auto const op_a      = str::chunk(s);
     auto const s_after_a = str::lstrip(str::sub(s, op_a.size()));
 
@@ -203,18 +229,22 @@ auto assembler::operands::get3(std::string const s, bool const fill_third)
 }
 
 auto assembler::operands::convert_token_to_bitstring_operand(
-    viua::cg::lex::Token const token) -> std::vector<uint8_t> {
+    viua::cg::lex::Token const token) -> std::vector<uint8_t>
+{
     auto const s            = token.str();
     auto normalised_version = std::string{};
     if (s.at(1) == 'b') {
         normalised_version = normalise_binary_literal(s.substr(2));
-    } else if (s.at(1) == 'o') {
+    }
+    else if (s.at(1) == 'o') {
         normalised_version =
             normalise_binary_literal(octal_to_binary_literal(s));
-    } else if (s.at(1) == 'x') {
+    }
+    else if (s.at(1) == 'x') {
         normalised_version =
             normalise_binary_literal(hexadecimal_to_binary_literal(s));
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(token);
     }
 

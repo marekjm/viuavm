@@ -28,8 +28,8 @@ namespace viua {
     namespace tooling {
         namespace libs {
             namespace static_analyser {
-
-static auto to_string(viua::internals::Register_sets const rs) -> std::string {
+static auto to_string(viua::internals::Register_sets const rs) -> std::string
+{
     using viua::internals::Register_sets;
     switch (rs) {
     case Register_sets::GLOBAL:
@@ -51,7 +51,8 @@ static auto to_string(viua::internals::Register_sets const rs) -> std::string {
 
 static auto to_string(std::vector<values::Value_type> const& value,
                       std::vector<values::Value_type>::size_type const i)
-    -> std::string {
+    -> std::string
+{
     switch (value.at(i)) {
     case values::Value_type::Value:
         return "value";
@@ -86,19 +87,22 @@ static auto to_string(std::vector<values::Value_type> const& value,
     }
 }
 static auto to_string(std::vector<values::Value_type> const& value)
-    -> std::string {
+    -> std::string
+{
     return to_string(value, 0);
 }
 
 template<typename Container, typename Appender>
-auto copy_whole(Container const& source, Appender const& appender) -> void {
+auto copy_whole(Container const& source, Appender const& appender) -> void
+{
     std::copy(source.begin(), source.end(), appender);
 }
 
 static auto maybe_with_pointer(
     viua::internals::Access_specifier const access,
     std::initializer_list<values::Value_type> const base)
-    -> std::vector<values::Value_type> {
+    -> std::vector<values::Value_type>
+{
     auto signature =
         (access == viua::internals::Access_specifier::POINTER_DEREFERENCE
              ? std::vector<values::Value_type>{values::Value_type::Pointer}
@@ -108,7 +112,8 @@ static auto maybe_with_pointer(
 }
 static auto maybe_with_pointer(viua::internals::Access_specifier const access,
                                std::vector<values::Value_type> const base)
-    -> std::vector<values::Value_type> {
+    -> std::vector<values::Value_type>
+{
     auto signature =
         (access == viua::internals::Access_specifier::POINTER_DEREFERENCE
              ? std::vector<values::Value_type>{values::Value_type::Pointer}
@@ -120,7 +125,8 @@ static auto maybe_with_pointer(viua::internals::Access_specifier const access,
 static auto throw_if_empty(
     Function_state& function_state,
     viua::tooling::libs::parser::Register_address const& address)
-    -> viua::internals::types::register_index {
+    -> viua::internals::types::register_index
+{
     auto const address_index = function_state.resolve_index(address);
     if (not function_state.defined(address_index, address.register_set)) {
         auto error =
@@ -156,7 +162,8 @@ static auto throw_if_invalid_type(
     Function_state& function_state,
     viua::tooling::libs::parser::Register_address const& address,
     viua::internals::types::register_index const index,
-    std::vector<values::Value_type> const type_signature) -> void {
+    std::vector<values::Value_type> const type_signature) -> void
+{
     if (not function_state.assume_type(
             index, address.register_set, type_signature)) {
         auto error =
@@ -184,7 +191,8 @@ static auto throw_if_invalid_type(
 }
 
 template<typename T>
-static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
+static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T>
+{
     auto v = std::vector<T>{};
 
     v.reserve(seq.size() + 1);
@@ -194,7 +202,8 @@ static auto prepend(T&& element, std::vector<T> const& seq) -> std::vector<T> {
     return v;
 }
 
-template<typename T> auto int_range(T const n) -> std::vector<T> {
+template<typename T> auto int_range(T const n) -> std::vector<T>
+{
     auto v = std::vector<T>{};
     v.reserve(n);
 
@@ -215,7 +224,9 @@ struct Frame_representation {
 };
 Frame_representation::Frame_representation(
     viua::internals::types::register_index const size)
-        : allocated_parameters{size} {}
+        : allocated_parameters{size}
+{
+}
 
 struct Body_line {
     using size_type = decltype(
@@ -225,7 +236,9 @@ struct Body_line {
     size_type const instruction{0};
 
     Body_line(size_type const s, size_type const i)
-            : source_line{s}, instruction{i} {}
+            : source_line{s}, instruction{i}
+    {
+    }
     Body_line(Body_line const&) = default;
     Body_line(Body_line&&)      = default;
     auto operator=(Body_line const&) -> Body_line& = delete;
@@ -234,7 +247,8 @@ struct Body_line {
 
 static auto annotate_body(
     viua::tooling::libs::parser::Cooked_function::body_type body)
-    -> std::vector<Body_line> {
+    -> std::vector<Body_line>
+{
     auto annotated_body = std::vector<Body_line>{};
 
     auto source_line = Body_line::size_type{0};
@@ -256,7 +270,8 @@ static auto annotate_body(
 static auto create_label_map(
     viua::tooling::libs::parser::Cooked_function::body_type const& body,
     std::vector<Body_line> const& annotated_body)
-    -> std::map<std::string, Body_line> {
+    -> std::map<std::string, Body_line>
+{
     auto mapping = std::map<std::string, Body_line>{};
 
     for (auto i = Body_line::size_type{0}; i < body.size(); ++i) {
@@ -290,7 +305,8 @@ static auto analyse_single_arm(
     std::vector<Body_line> const& annotated_body,
     std::map<std::string, Body_line> const& label_map,
     viua::tooling::libs::parser::Cooked_function::body_type::size_type i,
-    bool const analyse_all = true) -> Arm_result {
+    bool const analyse_all = true) -> Arm_result
+{
     using viua::tooling::errors::compile_time::Compile_time_error;
     using viua::tooling::libs::parser::Fragment_type;
     using viua::tooling::libs::parser::Instruction;
@@ -439,7 +455,8 @@ static auto analyse_single_arm(
                 if (target_operand.known()) {
                     if (instruction.opcode == IINC) {
                         target_operand.of(target_operand.of() + 1);
-                    } else {
+                    }
+                    else {
                         target_operand.of(target_operand.of() - 1);
                     }
                 }
@@ -994,7 +1011,8 @@ static auto analyse_single_arm(
                         return static_cast<values::Pointer const&>(
                                    wrapper.value())
                             .of();
-                    } else {
+                    }
+                    else {
                         return wrapper;
                     }
                 };
@@ -1038,7 +1056,8 @@ static auto analyse_single_arm(
                     }
                     spawned_frame->filled_parameters.emplace(
                         dest.index, instruction.token(0));
-                } else {
+                }
+                else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -1101,9 +1120,11 @@ static auto analyse_single_arm(
                     auto const r = rhs_operand.of();
                     if (l < r) {
                         msg << "less than";
-                    } else if (l > r) {
+                    }
+                    else if (l > r) {
                         msg << "greater than";
-                    } else {
+                    }
+                    else {
                         msg << "equal to";
                     }
                     msg << " right-hand side";
@@ -1657,7 +1678,8 @@ static auto analyse_single_arm(
                                     .type_of(source_index, source.register_set)
                                     .value())
                                 .of());
-                    } else {
+                    }
+                    else {
                         wrapper.of(function_state.type_of(source_index,
                                                           source.register_set));
                     }
@@ -1724,7 +1746,8 @@ static auto analyse_single_arm(
                                     .type_of(source_index, source.register_set)
                                     .value())
                                 .of());
-                    } else {
+                    }
+                    else {
                         wrapper.of(function_state.type_of(source_index,
                                                           source.register_set));
                     }
@@ -1766,10 +1789,12 @@ static auto analyse_single_arm(
                                           index,
                                           index_index,
                                           index_type_signature);
-                } else if (instruction.operands.at(2)->type()
-                           == parser::Operand_type::Void) {
+                }
+                else if (instruction.operands.at(2)->type()
+                         == parser::Operand_type::Void) {
                     // do nothing
-                } else {
+                }
+                else {
                     // do nothing, errors should be handled in earlier stages
                 }
 
@@ -1794,10 +1819,12 @@ static auto analyse_single_arm(
                                 .value())
                             .of(),
                         std::move(defining_tokens));
-                } else if (instruction.operands.at(0)->type()
-                           == parser::Operand_type::Void) {
+                }
+                else if (instruction.operands.at(0)->type()
+                         == parser::Operand_type::Void) {
                     // do nothing
-                } else {
+                }
+                else {
                     // do nothing, errors should be handled in earlier stages
                 }
 
@@ -1851,7 +1878,8 @@ static auto analyse_single_arm(
                                         .value())
                                     .of())),
                         std::move(defining_tokens));
-                } else {
+                }
+                else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -2372,7 +2400,8 @@ static auto analyse_single_arm(
                         return static_cast<values::Pointer const&>(
                                    wrapper.value())
                             .of();
-                    } else {
+                    }
+                    else {
                         return wrapper;
                     }
                 };
@@ -2416,7 +2445,8 @@ static auto analyse_single_arm(
                     }
                     spawned_frame->filled_parameters.emplace(
                         dest.index, instruction.token(0));
-                } else {
+                }
+                else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -3057,8 +3087,9 @@ static auto analyse_single_arm(
                              : (i - std::stoul(jump_offset.value.substr(1))));
                     std::cerr << "  jumping to (offset): " << jump_offset.value
                               << " (instruction " << target << ')' << '\n';
-                } else if (instruction.operands.at(0)->type()
-                           == Operand_type::Jump_label) {
+                }
+                else if (instruction.operands.at(0)->type()
+                         == Operand_type::Jump_label) {
                     using viua::tooling::libs::parser::Jump_label;
 
                     auto const& jump_label = *static_cast<Jump_label const*>(
@@ -3080,8 +3111,8 @@ static auto analyse_single_arm(
                                        annotated_body,
                                        label_map,
                                        target);
-                } catch (
-                    viua::tooling::errors::compile_time::Error_wrapper& e) {
+                }
+                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(viua::tooling::errors::compile_time::Error{
                         viua::tooling::errors::compile_time::
                             Compile_time_error::Empty_error,
@@ -3124,8 +3155,9 @@ static auto analyse_single_arm(
                         std::cerr
                             << "  jumping to (offset): " << jump_offset.value
                             << " (instruction " << target << ')' << '\n';
-                    } else if (instruction.operands.at(1)->type()
-                               == Operand_type::Jump_label) {
+                    }
+                    else if (instruction.operands.at(1)->type()
+                             == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
                         auto const& jump_label =
@@ -3149,8 +3181,8 @@ static auto analyse_single_arm(
                                                          annotated_body,
                                                          label_map,
                                                          target);
-                } catch (
-                    viua::tooling::errors::compile_time::Error_wrapper& e) {
+                }
+                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(
                         viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::
@@ -3179,8 +3211,9 @@ static auto analyse_single_arm(
                         std::cerr
                             << "  jumping to (offset): " << jump_offset.value
                             << " (instruction " << target << ')' << '\n';
-                    } else if (instruction.operands.at(2)->type()
-                               == Operand_type::Jump_label) {
+                    }
+                    else if (instruction.operands.at(2)->type()
+                             == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
                         auto const& jump_label =
@@ -3211,8 +3244,8 @@ static auto analyse_single_arm(
                         annotated_body,
                         label_map,
                         target);
-                } catch (
-                    viua::tooling::errors::compile_time::Error_wrapper& e) {
+                }
+                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(
                         viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::
@@ -3348,8 +3381,8 @@ static auto analyse_single_arm(
                                        0);
 
                     std::cerr << "left block:     " << block_name << '\n';
-                } catch (
-                    viua::tooling::errors::compile_time::Error_wrapper& e) {
+                }
+                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(viua::tooling::errors::compile_time::Error{
                         viua::tooling::errors::compile_time::
                             Compile_time_error::Empty_error,
@@ -3419,7 +3452,8 @@ static auto analyse_single_arm(
                     auto const r = rhs_operand.of();
                     if (l == r) {
                         msg << "always";
-                    } else {
+                    }
+                    else {
                         msg << "never";
                     }
                     msg << " be equal to the right-hand side";
@@ -3594,7 +3628,8 @@ static auto analyse_single_arm(
                         dest.register_set,
                         struct_value.field(key_value.of()).value(),
                         std::move(defining_tokens));
-                } else {
+                }
+                else {
                     function_state.define_register(
                         function_state.resolve_index(dest),
                         dest.register_set,
@@ -3652,7 +3687,8 @@ static auto analyse_single_arm(
                             std::make_unique<values::Pointer>(
                                 struct_value.field(key_value.of()).value())),
                         std::move(defining_tokens));
-                } else {
+                }
+                else {
                     function_state.define_register(
                         function_state.resolve_index(dest),
                         dest.register_set,
@@ -3731,7 +3767,8 @@ static auto analyse_single_arm(
 static auto analyse_single_function(
     viua::tooling::libs::parser::Cooked_function const& fn,
     viua::tooling::libs::parser::Cooked_fragments const& fragments,
-    Analyser_state& as) -> void {
+    Analyser_state& as) -> void
+{
     using viua::tooling::errors::compile_time::Compile_time_error;
 
     if (fn.body().size() == 0) {
@@ -3780,7 +3817,8 @@ static auto analyse_single_function(
     if (fn.head().function_name == "main") {
         if (fn.head().arity == 0) {
             // no arguments passed
-        } else if (fn.head().arity == 1) {
+        }
+        else if (fn.head().arity == 1) {
             function_state.define_register(
                 0,
                 viua::internals::Register_sets::PARAMETERS,
@@ -3788,7 +3826,8 @@ static auto analyse_single_function(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
                 fn.head().tokens());
-        } else if (fn.head().arity == 2) {
+        }
+        else if (fn.head().arity == 2) {
             function_state.define_register(
                 0,
                 viua::internals::Register_sets::PARAMETERS,
@@ -3801,7 +3840,8 @@ static auto analyse_single_function(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
                 fn.head().tokens());
-        } else {
+        }
+        else {
             using viua::tooling::errors::compile_time::Compile_time_error;
             auto error =
                 viua::tooling::errors::compile_time::Error_wrapper{}.append(
@@ -3814,7 +3854,8 @@ static auto analyse_single_function(
                               "function"));
             throw error;
         }
-    } else {
+    }
+    else {
         using arity_type = viua::internals::types::register_index;
         for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
             function_state.define_register(
@@ -3891,7 +3932,8 @@ static auto analyse_single_function(
                                  .note("defined here"));
                 throw error;
             }
-        } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+        }
+        catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Empty_error,
@@ -3904,7 +3946,8 @@ static auto analyse_single_function(
 
 static auto analyse_functions(
     viua::tooling::libs::parser::Cooked_fragments const& fragments,
-    Analyser_state& analyser_state) -> void {
+    Analyser_state& analyser_state) -> void
+{
     auto const& functions = fragments.function_fragments;
 
     if (not(functions.count("main/0") or functions.count("main/1")
@@ -3923,7 +3966,8 @@ static auto analyse_functions(
     for (auto const& [name, fn] : functions) {
         try {
             analyse_single_function(fn, fragments, analyser_state);
-        } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+        }
+        catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Empty_error,
@@ -3935,7 +3979,8 @@ static auto analyse_functions(
 }
 
 auto analyse(viua::tooling::libs::parser::Cooked_fragments const& fragments)
-    -> void {
+    -> void
+{
     auto analyser_state = Analyser_state{};
 
     for (auto const& [name, block] : fragments.block_fragments) {

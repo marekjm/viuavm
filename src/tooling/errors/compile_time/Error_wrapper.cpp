@@ -21,16 +21,16 @@
 #include <viua/tooling/errors/compile_time/errors.h>
 
 namespace viua { namespace tooling { namespace errors { namespace compile_time {
-auto Error_wrapper::append(Error e) -> Error_wrapper& {
+auto Error_wrapper::append(Error e) -> Error_wrapper&
+{
     fallout.emplace_back(std::move(e));
     return *this;
 }
 
-auto Error_wrapper::errors() const -> std::vector<Error> const& {
+auto Error_wrapper::errors() const -> std::vector<Error> const&
+{
     return fallout;
 }
 
-auto Error_wrapper::errors() -> std::vector<Error>& {
-    return fallout;
-}
+auto Error_wrapper::errors() -> std::vector<Error>& { return fallout; }
 }}}}  // namespace viua::tooling::errors::compile_time

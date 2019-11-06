@@ -42,7 +42,8 @@ class Frame {
 
     std::string function_name;
 
-    inline auto ret_address() const -> viua::internals::types::byte const* {
+    inline auto ret_address() const -> viua::internals::types::byte const*
+    {
         return return_address;
     }
 

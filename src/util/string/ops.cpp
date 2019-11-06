@@ -23,7 +23,8 @@
 #include <viua/util/string/ops.h>
 
 namespace viua { namespace util { namespace string { namespace ops {
-auto extract(std::string const& s) -> std::string {
+auto extract(std::string const& s) -> std::string
+{
     /** Extracts *enquoted chunk*.
      *
      *  It is particularly useful if you have a std::string encoded in another
@@ -60,7 +61,8 @@ auto extract(std::string const& s) -> std::string {
         if (s[i] == quote and ((backs % 2) != 0)) {
             backs = 0;
             continue;
-        } else if (s[i] == quote and ((backs % 2) == 0)) {
+        }
+        else if (s[i] == quote and ((backs % 2) == 0)) {
             break;
         }
         if (s[i] == '\\') {
@@ -71,7 +73,8 @@ auto extract(std::string const& s) -> std::string {
     return chnk.str();
 }
 
-auto strencode(std::string const& s) -> std::string {
+auto strencode(std::string const& s) -> std::string
+{
     /** Encode escape sequences in strings.
      *
      *  This function recognizes escape sequences as listed on:
@@ -132,14 +135,16 @@ auto strencode(std::string const& s) -> std::string {
     return encoded.str();
 }
 
-auto quoted(std::string const& s) -> std::string {
+auto quoted(std::string const& s) -> std::string
+{
     auto o = std::ostringstream{};
     o << std::quoted(s);
     return o.str();
 }
 
 auto levenshtein(std::string const source, std::string const target)
-    -> LevenshteinDistance {
+    -> LevenshteinDistance
+{
     if (not source.size()) {
         return target.size();
     }
@@ -185,7 +190,8 @@ auto levenshtein(std::string const source, std::string const target)
 auto levenshtein_filter(std::string const source,
                         std::vector<std::string> const& candidates,
                         LevenshteinDistance const limit)
-    -> std::vector<DistancePair> {
+    -> std::vector<DistancePair>
+{
     auto matched = std::vector<DistancePair>{};
 
     for (auto const& each : candidates) {
@@ -198,7 +204,8 @@ auto levenshtein_filter(std::string const source,
 }
 auto levenshtein_best(std::string const source,
                       std::vector<std::string> const& candidates,
-                      LevenshteinDistance const limit) -> DistancePair {
+                      LevenshteinDistance const limit) -> DistancePair
+{
     /*
      * Use the maximum unsigned value as the "not found" marker.
      * This is what std::string::npos does.

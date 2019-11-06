@@ -23,7 +23,8 @@ namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
 auto assemble_op_bitset(Program& program,
                         std::vector<Token> const& tokens,
-                        Token_index const i) -> void {
+                        Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;
@@ -37,7 +38,8 @@ auto assemble_op_bitset(Program& program,
                 ::assembler::operands::resolve_register(tokens.at(lhs)),
                 ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
             (tokens.at(rhs) == "true"));
-    } else {
+    }
+    else {
         program.opbitset(
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(target)),

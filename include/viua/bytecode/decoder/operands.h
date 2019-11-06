@@ -41,7 +41,6 @@ class Process;
 
 
 namespace viua { namespace bytecode { namespace decoder { namespace operands {
-
 using viua::internals::types::Op_address_type;
 
 auto get_operand_type(Op_address_type const) -> OperandType;
@@ -89,7 +88,8 @@ auto fetch_object(Op_address_type, viua::process::Process*)
 
 template<typename RequestedType>
 auto fetch_object_of(Op_address_type ip, viua::process::Process* p)
-    -> std::tuple<Op_address_type, RequestedType*> {
+    -> std::tuple<Op_address_type, RequestedType*>
+{
     auto [addr_, fetched] = fetch_object(ip, p);
 
     RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
@@ -128,7 +128,8 @@ using Fetch_fn =
 template<typename Result>
 auto fetch_and_advance_addr(Fetch_fn<Result> const& fn,
                             Op_address_type& addr,
-                            viua::process::Process* process) -> Result {
+                            viua::process::Process* process) -> Result
+{
     auto [addr_, result] = fn(addr, process);
     addr                 = addr_;
     return result;
@@ -141,8 +142,8 @@ using Fetchs_fn = std::function<std::tuple<Op_address_type, Result...>(
 template<typename A, typename B>
 auto fetch_and_advance_addr(Fetchs_fn<A, B> const& fn,
                             Op_address_type& addr,
-                            viua::process::Process* process)
-    -> std::tuple<A, B> {
+                            viua::process::Process* process) -> std::tuple<A, B>
+{
     auto [addr_, a, b] = fn(addr, process);
     addr               = addr_;
     return std::tuple<A, B>{a, b};
@@ -151,7 +152,8 @@ template<typename Result>
 auto fetch_optional_and_advance_addr(Fetch_fn<Result> const& fn,
                                      Op_address_type& addr,
                                      viua::process::Process* process)
-    -> std::optional<Result> {
+    -> std::optional<Result>
+{
     if (viua::bytecode::decoder::operands::is_void(addr)) {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
         return {};

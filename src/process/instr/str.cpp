@@ -27,7 +27,8 @@
 #include <viua/types/value.h>
 
 
-auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

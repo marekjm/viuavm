@@ -26,7 +26,6 @@
 #include <viua/util/string/escape_sequences.h>
 
 namespace viua { namespace tooling { namespace errors { namespace compile_time {
-
 std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     {Compile_time_error::Unknown_error, "unknown error"},
     {Compile_time_error::Empty_error, ""},
@@ -67,7 +66,8 @@ std::map<Compile_time_error, std::string> compile_time_error_descriptions = {
     {Compile_time_error::Empty_block_body, "empty block body"},
 };
 
-auto display_error(Compile_time_error const error_code) -> std::string {
+auto display_error(Compile_time_error const error_code) -> std::string
+{
     if (error_code == Compile_time_error::Empty_error) {
         return "";
     }
@@ -85,7 +85,8 @@ auto display_error(Compile_time_error const error_code) -> std::string {
     return o.str();
 }
 
-auto display_error_and_exit(Compile_time_error const error_code) -> void {
+auto display_error_and_exit(Compile_time_error const error_code) -> void
+{
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::COLOR_FG_RED;
     using viua::util::string::escape_sequences::COLOR_FG_WHITE;
@@ -98,7 +99,8 @@ auto display_error_and_exit(Compile_time_error const error_code) -> void {
 }
 
 auto display_error_and_exit(Compile_time_error const error_code,
-                            std::string const message) -> void {
+                            std::string const message) -> void
+{
     using viua::util::string::escape_sequences::ATTR_RESET;
     using viua::util::string::escape_sequences::COLOR_FG_RED;
     using viua::util::string::escape_sequences::COLOR_FG_WHITE;

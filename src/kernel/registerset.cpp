@@ -28,33 +28,34 @@
 #include <viua/types/value.h>
 
 
-void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o) {
+void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o)
+{
     if (dynamic_cast<viua::types::Reference*>(value.get())) {
         static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
-    } else {
+    }
+    else {
         value = std::move(o);
     }
 }
 
-bool viua::kernel::Register::empty() const {
-    return value == nullptr;
-}
+bool viua::kernel::Register::empty() const { return value == nullptr; }
 
-viua::types::Value* viua::kernel::Register::get() {
-    return value.get();
-}
+viua::types::Value* viua::kernel::Register::get() { return value.get(); }
 
-viua::types::Value* viua::kernel::Register::release() {
+viua::types::Value* viua::kernel::Register::release()
+{
     mask = 0;
     return value.release();
 }
 
-std::unique_ptr<viua::types::Value> viua::kernel::Register::give() {
+std::unique_ptr<viua::types::Value> viua::kernel::Register::give()
+{
     mask = 0;
     return std::move(value);
 }
 
-void viua::kernel::Register::swap(Register& that) {
+void viua::kernel::Register::swap(Register& that)
+{
     value.swap(that.value);
     // FIXME are masks still used?
     auto tmp  = mask;
@@ -62,54 +63,59 @@ void viua::kernel::Register::swap(Register& that) {
     that.mask = tmp;
 }
 
-mask_type viua::kernel::Register::set_mask(mask_type new_mask) {
+mask_type viua::kernel::Register::set_mask(mask_type new_mask)
+{
     auto tmp = mask;
     mask     = new_mask;
     return tmp;
 }
 
-mask_type viua::kernel::Register::flag(mask_type new_mask) {
+mask_type viua::kernel::Register::flag(mask_type new_mask)
+{
     auto tmp = mask;
     mask     = (mask | new_mask);
     return tmp;
 }
 
-mask_type viua::kernel::Register::unflag(mask_type new_mask) {
+mask_type viua::kernel::Register::unflag(mask_type new_mask)
+{
     auto tmp = mask;
     mask     = (mask ^ new_mask);
     return tmp;
 }
 
-mask_type viua::kernel::Register::get_mask() const {
-    return mask;
-}
+mask_type viua::kernel::Register::get_mask() const { return mask; }
 
-bool viua::kernel::Register::is_flagged(mask_type filter) const {
+bool viua::kernel::Register::is_flagged(mask_type filter) const
+{
     return (mask & filter);
 }
 
 viua::kernel::Register::Register() : value(nullptr), mask(0) {}
 
 viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o)
-        : value(std::move(o)), mask(0) {}
+        : value(std::move(o)), mask(0)
+{
+}
 
 viua::kernel::Register::Register(Register&& that)
-        : value(std::move(that.value)), mask(that.mask) {
+        : value(std::move(that.value)), mask(that.mask)
+{
     that.mask = 0;
 }
 
-viua::kernel::Register::operator bool() const {
-    return not empty();
-}
+viua::kernel::Register::operator bool() const { return not empty(); }
 
-auto viua::kernel::Register::operator=(Register&& that) -> Register& {
+auto viua::kernel::Register::operator=(Register&& that) -> Register&
+{
     reset(std::move(that.value));
     mask      = that.mask;
     that.mask = 0;
     return *this;
 }
 
-auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register& {
+auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register&
+{
     reset(std::move(o));
     mask = 0;
     return *this;
@@ -118,7 +124,8 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register& {
 
 void viua::kernel::Register_set::put(
     viua::internals::types::register_index index,
-    std::unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object)
+{
     if (index >= registerset_size) {
         throw std::make_unique<viua::types::Exception>(
             "register access out of bounds: write");
@@ -127,7 +134,8 @@ void viua::kernel::Register_set::put(
 }
 
 std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     /** Pop an object from the register.
      */
     std::unique_ptr<viua::types::Value> object{at(index)};
@@ -140,7 +148,8 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
 
 void viua::kernel::Register_set::set(
     viua::internals::types::register_index index,
-    std::unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object)
+{
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -153,13 +162,15 @@ void viua::kernel::Register_set::set(
     if (dynamic_cast<viua::types::Reference*>(registers.at(index).get())) {
         static_cast<viua::types::Reference*>(registers.at(index).get())
             ->rebind(object.release());
-    } else {
+    }
+    else {
         registers.at(index).reset(std::move(object));
     }
 }
 
 viua::types::Value* viua::kernel::Register_set::get(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -180,7 +191,8 @@ viua::types::Value* viua::kernel::Register_set::get(
 }
 
 viua::types::Value* viua::kernel::Register_set::at(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -195,7 +207,8 @@ viua::types::Value* viua::kernel::Register_set::at(
 }
 
 viua::kernel::Register* viua::kernel::Register_set::register_at(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     if (index >= registerset_size) {
         std::ostringstream emsg;
         emsg << "register access out of bounds: read from " << index;
@@ -207,7 +220,8 @@ viua::kernel::Register* viua::kernel::Register_set::register_at(
 
 void viua::kernel::Register_set::move(
     viua::internals::types::register_index src,
-    viua::internals::types::register_index dst) {
+    viua::internals::types::register_index dst)
+{
     /** Move an object from src register to dst register.
      *
      *  Performs bound checking.
@@ -226,7 +240,8 @@ void viua::kernel::Register_set::move(
 
 void viua::kernel::Register_set::swap(
     viua::internals::types::register_index src,
-    viua::internals::types::register_index dst) {
+    viua::internals::types::register_index dst)
+{
     /** Swap objects in src and dst registers.
      *
      *  Performs bound checking.
@@ -244,7 +259,8 @@ void viua::kernel::Register_set::swap(
 }
 
 void viua::kernel::Register_set::empty(
-    viua::internals::types::register_index here) {
+    viua::internals::types::register_index here)
+{
     /** Empty a register.
      *
      *  Performs bound checking.
@@ -258,7 +274,8 @@ void viua::kernel::Register_set::empty(
 }
 
 void viua::kernel::Register_set::free(
-    viua::internals::types::register_index here) {
+    viua::internals::types::register_index here)
+{
     /** Free an object inside a register.
      *
      *  Performs bound checking.
@@ -278,7 +295,8 @@ void viua::kernel::Register_set::free(
 
 void viua::kernel::Register_set::flag(
     viua::internals::types::register_index index,
-    mask_type filter) {
+    mask_type filter)
+{
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -298,7 +316,8 @@ void viua::kernel::Register_set::flag(
 
 void viua::kernel::Register_set::unflag(
     viua::internals::types::register_index index,
-    mask_type filter) {
+    mask_type filter)
+{
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -317,7 +336,8 @@ void viua::kernel::Register_set::unflag(
 }
 
 void viua::kernel::Register_set::clear(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     /** Clear masks for given register.
      *
      *  Performs bounds checking.
@@ -331,7 +351,8 @@ void viua::kernel::Register_set::clear(
 
 bool viua::kernel::Register_set::isflagged(
     viua::internals::types::register_index index,
-    mask_type filter) {
+    mask_type filter)
+{
     if (index >= registerset_size) {
         // FIXME Use tagged exception.
         throw std::make_unique<viua::types::Exception>(
@@ -342,7 +363,8 @@ bool viua::kernel::Register_set::isflagged(
 
 void viua::kernel::Register_set::setmask(
     viua::internals::types::register_index index,
-    mask_type mask) {
+    mask_type mask)
+{
     /** Set mask for a register.
      *
      *  Performs bounds checking.
@@ -361,7 +383,8 @@ void viua::kernel::Register_set::setmask(
 }
 
 mask_type viua::kernel::Register_set::getmask(
-    viua::internals::types::register_index index) {
+    viua::internals::types::register_index index)
+{
     /** Get mask of a register.
      *
      *  Performs bounds checking.
@@ -380,7 +403,8 @@ mask_type viua::kernel::Register_set::getmask(
 }
 
 
-void viua::kernel::Register_set::drop() {
+void viua::kernel::Register_set::drop()
+{
     /** Drop register set contents.
      *
      *  This function makes the register set drop all objects it holds by
@@ -393,7 +417,8 @@ void viua::kernel::Register_set::drop() {
 }
 
 
-std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy() {
+std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy()
+{
     auto rscopy = std::make_unique<viua::kernel::Register_set>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
         if (at(i) == nullptr) {
@@ -407,7 +432,8 @@ std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy() {
 
 viua::kernel::Register_set::Register_set(
     viua::internals::types::register_index sz)
-        : registerset_size(sz) {
+        : registerset_size(sz)
+{
     /** Create register set with specified size.
      */
     registers.reserve(sz);

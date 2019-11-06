@@ -25,7 +25,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_tailcall(Register_usage_profile& register_usage_profile,
-                       Instruction const& instruction) -> void {
+                       Instruction const& instruction) -> void
+{
     using viua::assembler::frontend::parser::Atom_literal;
     using viua::assembler::frontend::parser::Function_name_literal;
     using viua::assembler::frontend::parser::Void_literal;

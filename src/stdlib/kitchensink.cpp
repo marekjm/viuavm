@@ -33,7 +33,8 @@ static void kitchensink_sleep(Frame* frame,
                               viua::kernel::Register_set*,
                               viua::kernel::Register_set*,
                               viua::process::Process*,
-                              viua::kernel::Kernel*) {
+                              viua::kernel::Kernel*)
+{
     sleep(static_cast<unsigned int>(
         dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))
             ->as_integer()));
@@ -44,6 +45,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

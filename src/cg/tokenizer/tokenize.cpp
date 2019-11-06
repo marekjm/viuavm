@@ -22,7 +22,8 @@
 #include <viua/support/string.h>
 
 namespace viua { namespace cg { namespace tokenizer {
-auto tokenize(std::string const& s) -> std::vector<std::string> {
+auto tokenize(std::string const& s) -> std::vector<std::string>
+{
     auto tokens = std::vector<std::string>{};
     auto token  = std::ostringstream{};
     token.str("");

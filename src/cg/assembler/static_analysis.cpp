@@ -43,59 +43,58 @@ class Registers {
     std::set<std::string> maybe_unused_registers;
 
   public:
-    bool defined(std::string const& r) {
+    bool defined(std::string const& r)
+    {
         return (defined_registers.count(r) == 1);
     }
-    Token defined_where(std::string r) {
-        return defined_registers.at(r);
-    }
-    void insert(std::string r, Token where) {
+    Token defined_where(std::string r) { return defined_registers.at(r); }
+    void insert(std::string r, Token where)
+    {
         if (r != "void") {
             defined_registers.emplace(r, where);
         }
     }
-    void erase(std::string const& r, Token const& token) {
+    void erase(std::string const& r, Token const& token)
+    {
         erased_registers.emplace(r, token);
         defined_registers.erase(defined_registers.find(r));
     }
-    bool erased(std::string const& r) {
+    bool erased(std::string const& r)
+    {
         return (erased_registers.count(r) == 1);
     }
-    Token erased_by(std::string const& r) {
-        return erased_registers.at(r);
-    }
-    void use(std::string r, Token where) {
-        used_registers.emplace(r, where);
-    }
-    bool used(std::string r) {
-        return used_registers.count(r);
-    }
+    Token erased_by(std::string const& r) { return erased_registers.at(r); }
+    void use(std::string r, Token where) { used_registers.emplace(r, where); }
+    bool used(std::string r) { return used_registers.count(r); }
 
-    void unused(std::string r) {
-        maybe_unused_registers.insert(r);
-    }
-    auto maybe_unused(std::string r) -> bool {
+    void unused(std::string r) { maybe_unused_registers.insert(r); }
+    auto maybe_unused(std::string r) -> bool
+    {
         return (maybe_unused_registers.count(r) != 0);
     }
 
-    auto begin() -> decltype(defined_registers.begin()) {
+    auto begin() -> decltype(defined_registers.begin())
+    {
         return defined_registers.begin();
     }
-    auto end() -> decltype(defined_registers.end()) {
+    auto end() -> decltype(defined_registers.end())
+    {
         return defined_registers.end();
     }
 };
 
 
 static auto skip_till_next_line(TokenVector const& tokens,
-                                TokenVector::size_type i) -> decltype(i) {
+                                TokenVector::size_type i) -> decltype(i)
+{
     do {
         ++i;
     } while (i < tokens.size() and tokens.at(i) != "\n");
     return i;
 }
 static auto is_named(std::map<std::string, std::string> const& named_registers,
-                     std::string name) -> bool {
+                     std::string name) -> bool
+{
     return (std::find_if(named_registers.begin(),
                          named_registers.end(),
                          [name](std::remove_reference<decltype(
@@ -106,7 +105,8 @@ static auto is_named(std::map<std::string, std::string> const& named_registers,
 }
 static auto get_name(std::map<std::string, std::string> const& named_registers,
                      std::string name,
-                     Token context) -> std::string {
+                     Token context) -> std::string
+{
     auto it = std::find_if(
         named_registers.begin(),
         named_registers.end(),
@@ -123,7 +123,8 @@ static std::string resolve_register_name(
     const std::map<std::string, std::string>& named_registers,
     Token token,
     std::string name,
-    bool const allow_direct_access = false) {
+    bool const allow_direct_access = false)
+{
     if (name == "\n") {
         throw viua::cg::lex::Invalid_syntax(token,
                                             "expected operand, found newline");
@@ -133,7 +134,8 @@ static std::string resolve_register_name(
     }
     if (name.at(0) == '@' or name.at(0) == '*' or name.at(0) == '%') {
         name = name.substr(1);
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(
             token,
             ("not a valid register accessor: "
@@ -168,11 +170,13 @@ static std::string resolve_register_name(
 }
 static std::string resolve_register_name(
     const std::map<std::string, std::string>& named_registers,
-    Token token) {
+    Token token)
+{
     return resolve_register_name(named_registers, token, token.str());
 }
 
-static void check_timeout_operand(Token token) {
+static void check_timeout_operand(Token token)
+{
     if (token == "\n") {
         throw viua::cg::lex::Invalid_syntax(token, "missing timeout operand");
     }
@@ -183,7 +187,8 @@ static void check_timeout_operand(Token token) {
     }
 }
 
-static auto strip_access_mode_sigil(std::string s) -> std::string {
+static auto strip_access_mode_sigil(std::string s) -> std::string
+{
     return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1)
                                                                  : s);
 }
@@ -195,7 +200,8 @@ static void check_use_of_register_index(
     Registers& registers,
     std::map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
-    bool const allow_direct_access_to_target = true) {
+    bool const allow_direct_access_to_target = true)
+{
     auto resolved_register_name = std::string{};
     try {
         resolved_register_name =
@@ -203,7 +209,8 @@ static void check_use_of_register_index(
                                   tokens.at(i),
                                   register_index,
                                   allow_direct_access_to_target);
-    } catch (viua::cg::lex::Invalid_syntax& e) {
+    }
+    catch (viua::cg::lex::Invalid_syntax& e) {
         e.add(tokens.at(by));
         throw e;
     }
@@ -240,7 +247,8 @@ static void check_use_of_register(
     Registers& registers,
     std::map<std::string, std::string>& named_registers,
     std::string const& message_prefix,
-    bool const allow_direct_access_to_target = true) {
+    bool const allow_direct_access_to_target = true)
+{
     check_use_of_register_index(tokens,
                                 i,
                                 by,
@@ -255,7 +263,8 @@ static void check_use_of_register(
     long unsigned i,
     long unsigned by,
     Registers& registers,
-    std::map<std::string, std::string>& named_registers) {
+    std::map<std::string, std::string>& named_registers)
+{
     check_use_of_register_index(tokens,
                                 i,
                                 by,
@@ -265,7 +274,8 @@ static void check_use_of_register(
                                 "use of empty register");
 }
 
-static void check_defined_but_unused(Registers& registers) {
+static void check_defined_but_unused(Registers& registers)
+{
     for (auto it = registers.begin(); it != registers.end(); ++it) {
         auto const& each = *it;
         if (each.first == "0") {
@@ -283,7 +293,8 @@ static auto in_block_offset(TokenVector const& body_tokens,
                             TokenVector::size_type i,
                             Registers& registers,
                             std::map<std::string, std::string>& named_registers)
-    -> decltype(i) {
+    -> decltype(i)
+{
     auto const& checked_token = body_tokens.at(i);
 
     if (checked_token.str().at(0) == '+') {
@@ -313,21 +324,25 @@ static auto in_block_offset(TokenVector const& body_tokens,
             }
         }
         --i;
-    } else if (checked_token.str().at(0) == '-') {
+    }
+    else if (checked_token.str().at(0) == '-') {
         // FIXME: no support for negative jumps
         // not safe - if SA only jumps forwards it *will* finish analysis
         // but jumping backwards can create endless loops
         i = skip_till_next_line(body_tokens, i);
-    } else if (checked_token.str().at(0) == '.') {
+    }
+    else if (checked_token.str().at(0) == '.') {
         // FIXME: no support for absolute jumps
         // not certain - maybe support for absolute jumps should be removed
         // since they cannot be easily checked by the SA; neither in this check,
         // nor in any other one - they are just ignored
         i = skip_till_next_line(body_tokens, i);
-    } else if (str::isnum(checked_token)) {
+    }
+    else if (str::isnum(checked_token)) {
         // FIXME: no support for non-relative jumps
         i = skip_till_next_line(body_tokens, i);
-    } else {
+    }
+    else {
         auto saved_i = i;
         while (i < body_tokens.size() - 1
                and not(body_tokens.at(i) == ".mark:"
@@ -372,7 +387,8 @@ static void check_block_body(TokenVector const& body_tokens,
 static void erase_register(Registers& registers,
                            std::map<std::string, std::string>& named_registers,
                            Token const& name,
-                           Token const& context) {
+                           Token const& context)
+{
     /*
      * Even if normally an instruction would erase a register, when it is a
      * pointer dereference that is given as the opernad the "move an object"
@@ -386,8 +402,8 @@ static void erase_register(Registers& registers,
 // FIXME this function is duplicated
 static auto get_token_index_of_operand(TokenVector const& tokens,
                                        TokenVector::size_type i,
-                                       int wanted_operand_index)
-    -> decltype(i) {
+                                       int wanted_operand_index) -> decltype(i)
+{
     auto limit = tokens.size();
     while (i < limit and wanted_operand_index > 0) {
         // if (not (tokens.at(i) == "," or
@@ -404,10 +420,12 @@ static auto get_token_index_of_operand(TokenVector const& tokens,
                                             or token == "global");
         if (is_valid_operand_area_token) {
             ++i;
-        } else if (is_valid_operand) {
+        }
+        else if (is_valid_operand) {
             ++i;
             --wanted_operand_index;
-        } else {
+        }
+        else {
             throw viua::cg::lex::Invalid_syntax(
                 tokens.at(i), "invalid token where operand index was expected");
         }
@@ -421,7 +439,8 @@ static void check_block_body(
     Registers& registers,
     std::map<std::string, std::string> named_registers,
     const std::map<std::string, TokenVector>& block_bodies,
-    bool const debug) {
+    bool const debug)
+{
     using TokenIndex = TokenVector::size_type;
 
     for (; i < body_tokens.size(); ++i) {
@@ -483,7 +502,8 @@ static void check_block_body(
                                  registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::Invalid_syntax& e) {
+            }
+            catch (viua::cg::lex::Invalid_syntax& e) {
                 viua::cg::lex::Invalid_syntax base_error{
                     token,
                     ("after entering block "
@@ -491,7 +511,8 @@ static void check_block_body(
                 base_error.add(body_tokens.at(i + 1));
                 throw viua::cg::lex::Traced_syntax_error().append(e).append(
                     base_error);
-            } catch (viua::cg::lex::Traced_syntax_error& e) {
+            }
+            catch (viua::cg::lex::Traced_syntax_error& e) {
                 viua::cg::lex::Invalid_syntax base_error{
                     token,
                     ("after entering block "
@@ -527,7 +548,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vat" or token == "vpop") {
+        }
+        else if (token == "vat" or token == "vpop") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
             TokenIndex index  = source + 2;
@@ -558,7 +580,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vlen") {
+        }
+        else if (token == "vlen") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -574,7 +597,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vpush") {
+        }
+        else if (token == "vpush") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -595,7 +619,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vinsert") {
+        }
+        else if (token == "vinsert") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
             TokenIndex index  = source + 2;
@@ -623,7 +648,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "insert" or token == "structinsert") {
+        }
+        else if (token == "insert" or token == "structinsert") {
             TokenIndex target = i + 1;
             TokenIndex key    = target + 2;
             TokenIndex source = key + 2;
@@ -651,7 +677,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "remove") {
+        }
+        else if (token == "remove") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
             TokenIndex key    = source + 2;
@@ -682,7 +709,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "delete") {
+        }
+        else if (token == "delete") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
             check_use_of_register(body_tokens,
@@ -695,7 +723,8 @@ static void check_block_body(
                 registers, named_registers, body_tokens.at(target), token);
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "throw") {
+        }
+        else if (token == "throw") {
             TokenIndex source = i + 1;
 
             check_use_of_register(body_tokens,
@@ -708,7 +737,8 @@ static void check_block_body(
                 registers, named_registers, body_tokens.at(source), token);
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "isnull") {
+        }
+        else if (token == "isnull") {
             // it makes little sense to statically check "isnull" instruction
             // for accessing null registers as it gracefully handles accessing
             // them; "isnull" instruction is used, for example, to implement
@@ -734,7 +764,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "if") {
+        }
+        else if (token == "if") {
             ++i;
             TokenIndex source = i;
             ++i;  // for register set type specifier
@@ -760,15 +791,18 @@ static void check_block_body(
                                  copied_named_registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::Unused_value& e) {
+            }
+            catch (viua::cg::lex::Unused_value& e) {
                 // do not fail yet, because the value may be used by false
                 // branch save the error for later
                 register_with_unused_value = e.what();
-            } catch (viua::cg::lex::Invalid_syntax const& e) {
+            }
+            catch (viua::cg::lex::Invalid_syntax const& e) {
                 throw viua::cg::lex::Traced_syntax_error().append(e).append(
                     viua::cg::lex::Invalid_syntax(body_tokens.at(i + 1),
                                                   "after taking true branch:"));
-            } catch (viua::cg::lex::Traced_syntax_error& e) {
+            }
+            catch (viua::cg::lex::Traced_syntax_error& e) {
                 throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 1), "after taking true branch:"));
             }
@@ -784,25 +818,29 @@ static void check_block_body(
                                  copied_named_registers,
                                  block_bodies,
                                  debug);
-            } catch (viua::cg::lex::Unused_value& e) {
+            }
+            catch (viua::cg::lex::Unused_value& e) {
                 if (register_with_unused_value == e.what()) {
                     throw viua::cg::lex::Traced_syntax_error().append(e).append(
                         viua::cg::lex::Invalid_syntax(
                             body_tokens.at(i - 1),
                             "after taking either branch at:"));
                 }
-            } catch (viua::cg::lex::Invalid_syntax const& e) {
+            }
+            catch (viua::cg::lex::Invalid_syntax const& e) {
                 throw viua::cg::lex::Traced_syntax_error().append(e).append(
                     viua::cg::lex::Invalid_syntax(
                         body_tokens.at(i + 2), "after taking false branch:"));
-            } catch (viua::cg::lex::Traced_syntax_error& e) {
+            }
+            catch (viua::cg::lex::Traced_syntax_error& e) {
                 throw e.append(viua::cg::lex::Invalid_syntax(
                     body_tokens.at(i + 2), "after taking false branch:"));
             }
             // early return because we already checked both true, and false
             // branches
             return;
-        } else if (token == "echo" or token == "print") {
+        }
+        else if (token == "echo" or token == "print") {
             TokenIndex source = get_token_index_of_operand(body_tokens, i, 1);
 
             check_use_of_register(body_tokens,
@@ -814,7 +852,8 @@ static void check_block_body(
                                   false);
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "not" or token == "bitnot") {
+        }
+        else if (token == "not" or token == "bitnot") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -829,7 +868,8 @@ static void check_block_body(
                 body_tokens.at(target));
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "bits") {
+        }
+        else if (token == "bits") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -838,7 +878,8 @@ static void check_block_body(
                 and (src.at(1) == 'b' or src.at(1) == 'o'
                      or src.at(1) == 'x')) {
                 // literal bit string, FIXME add validation
-            } else {
+            }
+            else {
                 check_use_of_register(
                     body_tokens,
                     source,
@@ -853,8 +894,9 @@ static void check_block_body(
                 body_tokens.at(target));
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "capture" or token == "capturecopy"
-                   or token == "capturemove") {
+        }
+        else if (token == "capture" or token == "capturecopy"
+                 or token == "capturemove") {
             TokenIndex source = i + 4;
 
             // FIXME check if target is not empty
@@ -866,8 +908,9 @@ static void check_block_body(
                                   "closure of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "copy" or token == "ptr" or token == "textlength"
-                   or token == "structkeys") {
+        }
+        else if (token == "copy" or token == "ptr" or token == "textlength"
+                 or token == "structkeys") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -886,7 +929,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "rol" or token == "ror") {
+        }
+        else if (token == "rol" or token == "ror") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -900,7 +944,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "text") {
+        }
+        else if (token == "text") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -921,7 +966,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "send") {
+        }
+        else if (token == "send") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -942,7 +988,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "swap") {
+        }
+        else if (token == "swap") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -961,8 +1008,9 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "itof" or token == "ftoi" or token == "stoi"
-                   or token == "stof") {
+        }
+        else if (token == "itof" or token == "ftoi" or token == "stoi"
+                 or token == "stof") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -974,7 +1022,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vector") {
+        }
+        else if (token == "vector") {
             ++i;  // the "vector" token
 
             TokenIndex target           = i;
@@ -1014,11 +1063,12 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "and" or token == "or" or token == "texteq"
-                   or token == "textat" or token == "textcommonprefix"
-                   or token == "textcommonsuffix" or token == "textconcat"
-                   or token == "atomeq" or token == "bitand" or token == "bitor"
-                   or token == "bitxor" or token == "bitat") {
+        }
+        else if (token == "and" or token == "or" or token == "texteq"
+                 or token == "textat" or token == "textcommonprefix"
+                 or token == "textcommonsuffix" or token == "textconcat"
+                 or token == "atomeq" or token == "bitand" or token == "bitor"
+                 or token == "bitxor" or token == "bitat") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1035,8 +1085,9 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "shl" or token == "shr" or token == "ashl"
-                   or token == "ashr") {
+        }
+        else if (token == "shl" or token == "shr" or token == "ashl"
+                 or token == "ashr") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1058,7 +1109,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "bitset") {
+        }
+        else if (token == "bitset") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1080,7 +1132,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "textsub") {
+        }
+        else if (token == "textsub") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1100,10 +1153,11 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "add" or token == "sub" or token == "mul"
-                   or token == "div" or token == "lt" or token == "lte"
-                   or token == "gt" or token == "gte" or token == "eq"
-                   or token == "wrapadd" or token == "wrapmul") {
+        }
+        else if (token == "add" or token == "sub" or token == "mul"
+                 or token == "div" or token == "lt" or token == "lte"
+                 or token == "gt" or token == "gte" or token == "eq"
+                 or token == "wrapadd" or token == "wrapmul") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -1120,7 +1174,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "self" or token == "draw") {
+        }
+        else if (token == "self" or token == "draw") {
             TokenIndex target = i + 1;
 
             registers.insert(
@@ -1129,7 +1184,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "join") {
+        }
+        else if (token == "join") {
             TokenIndex target  = i + 1;
             TokenIndex source  = target + 2;
             TokenIndex timeout = source + 2;
@@ -1154,7 +1210,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "receive") {
+        }
+        else if (token == "receive") {
             TokenIndex target  = i + 1;
             TokenIndex timeout = target + 2;
 
@@ -1170,8 +1227,9 @@ static void check_block_body(
             }
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "iinc" or token == "idec"
-                   or token == "wrapincrement" or token == "wrapdecrement") {
+        }
+        else if (token == "iinc" or token == "idec" or token == "wrapincrement"
+                 or token == "wrapdecrement") {
             // skip mnemonic
             ++i;
             check_use_of_register(body_tokens,
@@ -1182,7 +1240,8 @@ static void check_block_body(
                                   "use of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "call" or token == "process") {
+        }
+        else if (token == "call" or token == "process") {
             TokenIndex target   = get_token_index_of_operand(body_tokens, i, 1);
             TokenIndex function = target + 2;
 
@@ -1190,7 +1249,8 @@ static void check_block_body(
                 registers.insert(resolve_register_name(named_registers,
                                                        body_tokens.at(target)),
                                  body_tokens.at(target));
-            } else {
+            }
+            else {
                 --function;
             }
             if (body_tokens.at(function).str().at(0) == '%'
@@ -1204,7 +1264,8 @@ static void check_block_body(
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "tailcall" or token == "defer") {
+        }
+        else if (token == "tailcall" or token == "defer") {
             TokenIndex function = i + 1;
 
             if (body_tokens.at(function).str().at(0) == '%'
@@ -1218,7 +1279,8 @@ static void check_block_body(
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "arg") {
+        }
+        else if (token == "arg") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
             if (not(body_tokens.at(target) == "void")) {
@@ -1229,7 +1291,8 @@ static void check_block_body(
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else {
+        }
+        else {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
             std::string reg_original = body_tokens.at(target),
@@ -1255,7 +1318,8 @@ static void check_block_body(
     TokenVector::size_type i,
     Registers& registers,
     const std::map<std::string, TokenVector>& block_bodies,
-    bool const debug) {
+    bool const debug)
+{
     std::map<std::string, std::string> named_registers;
     check_block_body(
         body_tokens, i, registers, named_registers, block_bodies, debug);

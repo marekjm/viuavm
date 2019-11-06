@@ -45,9 +45,7 @@ class IO_request : public Value {
     std::string repr() const override;
     bool boolean() const override;
 
-    auto id() const -> interaction_id_type {
-        return interaction_id;
-    }
+    auto id() const -> interaction_id_type { return interaction_id; }
 
     std::unique_ptr<Value> copy() const override;
 

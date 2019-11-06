@@ -527,12 +527,8 @@ class Process {
 
     auto empty() const -> bool;
 
-    auto pin(bool const x = true) -> void {
-        is_pinned_to_scheduler = x;
-    }
-    auto pinned() const -> bool {
-        return is_pinned_to_scheduler;
-    }
+    auto pin(bool const x = true) -> void { is_pinned_to_scheduler = x; }
+    auto pinned() const -> bool { return is_pinned_to_scheduler; }
 
     auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
         -> void;

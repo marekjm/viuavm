@@ -32,7 +32,8 @@
 using viua::util::memory::load_aligned;
 
 
-auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
+auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string
+{
     auto oss = std::ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
@@ -40,29 +41,34 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
 
     if (type == OT_VOID) {
         oss << "void";
-    } else if (type == OT_REGISTER_INDEX) {
+    }
+    else if (type == OT_REGISTER_INDEX) {
         oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_REGISTER_REFERENCE) {
+    }
+    else if (type == OT_REGISTER_REFERENCE) {
         oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_POINTER) {
+    }
+    else if (type == OT_POINTER) {
         oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_INT) {
+    }
+    else if (type == OT_INT) {
         oss << load_aligned<viua::internals::types::plain_int>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
                                     viua::internals::types::byte>(ptr);
-    } else {
+    }
+    else {
         // FIXME Throw a real exception.
         throw "invalid operand type detected";
     }
@@ -70,7 +76,8 @@ auto disassembler::intop(viua::internals::types::byte* ptr) -> std::string {
     return oss.str();
 }
 auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
-    -> std::string {
+    -> std::string
+{
     auto oss = std::ostringstream{};
 
     auto const type = *reinterpret_cast<OperandType*>(ptr);
@@ -78,7 +85,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
 
     if (type == OT_VOID) {
         oss << "void";
-    } else if (type == OT_REGISTER_INDEX) {
+    }
+    else if (type == OT_REGISTER_INDEX) {
         oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
@@ -106,13 +114,15 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
             if (viua::support::env::get_var("VIUA_DISASM_INVALID_RS_TYPES")
                 == "yes") {
                 oss << "<invalid=" << static_cast<int>(*ptr) << '>';
-            } else {
+            }
+            else {
                 throw "invalid register set detected";
             }
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_REGISTER_REFERENCE) {
+    }
+    else if (type == OT_REGISTER_REFERENCE) {
         oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
@@ -141,7 +151,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_POINTER) {
+    }
+    else if (type == OT_POINTER) {
         oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
         viua::support::pointer::inc<viua::internals::types::register_index,
                                     viua::internals::types::byte>(ptr);
@@ -170,11 +181,13 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
         }
         viua::support::pointer::inc<viua::internals::Register_sets,
                                     viua::internals::types::byte>(ptr);
-    } else if (type == OT_INT) {
+    }
+    else if (type == OT_INT) {
         oss << load_aligned<viua::internals::types::plain_int>(ptr);
         viua::support::pointer::inc<viua::internals::types::plain_int,
                                     viua::internals::types::byte>(ptr);
-    } else {
+    }
+    else {
         throw "invalid operand type detected";
     }
 
@@ -183,7 +196,8 @@ auto disassembler::intop_with_rs_type(viua::internals::types::byte* ptr)
 
 static auto disassemble_bit_string(viua::internals::types::byte* ptr,
                                    viua::internals::types::bits_size const size)
-    -> std::string {
+    -> std::string
+{
     static auto const decodings = std::map<uint8_t, char>{
         {
             0b0000,
@@ -271,12 +285,14 @@ static auto disassemble_bit_string(viua::internals::types::byte* ptr,
 }
 
 static auto decode_timeout(viua::internals::types::byte* ptr)
-    -> viua::internals::types::timeout {
+    -> viua::internals::types::timeout
+{
     return load_aligned<viua::internals::types::timeout>(ptr);
 }
 static auto disassemble_ri_operand(std::ostream& oss,
                                    viua::internals::types::byte* ptr)
-    -> viua::internals::types::byte* {
+    -> viua::internals::types::byte*
+{
     oss << ' ' << disassembler::intop(ptr);
 
     switch (*ptr) {
@@ -307,7 +323,8 @@ static auto disassemble_ri_operand(std::ostream& oss,
 }
 static auto disassemble_ri_operand_with_rs_type(
     std::ostream& oss,
-    viua::internals::types::byte* ptr) -> viua::internals::types::byte* {
+    viua::internals::types::byte* ptr) -> viua::internals::types::byte*
+{
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
     switch (*ptr) {
@@ -337,7 +354,8 @@ static auto disassemble_ri_operand_with_rs_type(
     return ptr;
 }
 auto disassembler::instruction(viua::internals::types::byte* ptr)
-    -> std::tuple<std::string, viua::internals::types::bytecode_size> {
+    -> std::tuple<std::string, viua::internals::types::bytecode_size>
+{
     viua::internals::types::byte* saved_ptr = ptr;
 
     auto const op = OPCODE(*saved_ptr);
@@ -349,23 +367,27 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
              * user code.
              */
             opname = "move";
-        } else if (op == PARAM) {
+        }
+        else if (op == PARAM) {
             /*
              * PARAM is an internal instruction, not visible to the
              * user code.
              */
             opname = "copy";
-        } else if (op == ARG) {
+        }
+        else if (op == ARG) {
             /*
              * ARG is an internal instruction, not visible to the
              * user code.
              */
             opname = "move";
-        } else {
+        }
+        else {
             opname = OP_NAMES.at(op);
         }
         ++ptr;
-    } catch (std::out_of_range const& e) {
+    }
+    catch (std::out_of_range const& e) {
         auto emsg = std::ostringstream{};
         emsg << "could not find name for opcode: " << op;
         throw emsg.str();
@@ -383,13 +405,15 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if (op == TEXT) {
+    }
+    else if (op == TEXT) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         if (OperandType(*ptr) == OT_REGISTER_INDEX
             or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-        } else {
+        }
+        else {
             ++ptr;  // for operand type
             auto const s = std::string{reinterpret_cast<char*>(ptr)};
             oss << ' ' << str::enquote(s);
@@ -397,7 +421,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             ++ptr;  // for null character terminating the C-style string not
                     // included in std::string
         }
-    } else if (op == ATOM) {
+    }
+    else if (op == ATOM) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         auto const s = std::string{reinterpret_cast<char*>(ptr)};
@@ -405,7 +430,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if ((op == CLOSURE) or (op == FUNCTION)) {
+    }
+    else if ((op == CLOSURE) or (op == FUNCTION)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
@@ -414,7 +440,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         ptr += fn_name.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if ((op == CALL) or (op == PROCESS)) {
+    }
+    else if ((op == CALL) or (op == PROCESS)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
@@ -422,34 +449,39 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         if (OperandType(*ptr) == OT_REGISTER_INDEX
             or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-        } else {
+        }
+        else {
             auto const fn_name = std::string{reinterpret_cast<char*>(ptr)};
             oss << fn_name;
             ptr += fn_name.size();
             ++ptr;  // for null character terminating the C-style string not
                     // included in std::string
         }
-    } else if (op == TAILCALL or op == DEFER) {
+    }
+    else if (op == TAILCALL or op == DEFER) {
         oss << ' ';
 
         if (OperandType(*ptr) == OT_REGISTER_INDEX
             or OperandType(*ptr) == OT_POINTER) {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-        } else {
+        }
+        else {
             auto const fn_name = std::string{reinterpret_cast<char*>(ptr)};
             oss << fn_name;
             ptr += fn_name.size();
             ++ptr;  // for null character terminating the C-style string not
                     // included in std::string
         }
-    } else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
+    }
+    else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
         oss << ' ';
         auto const s = std::string{reinterpret_cast<char*>(ptr)};
         oss << s;
         ptr += s.size();
         ++ptr;  // for null character terminating the C-style string not
                 // included in std::string
-    } else if (op == CATCH) {
+    }
+    else if (op == CATCH) {
         oss << ' ';
         auto const type_name = std::string{reinterpret_cast<char*>(ptr)};
         oss << str::enquote(type_name);
@@ -578,7 +610,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
             oss << ' ';
             oss << disassemble_bit_string(ptr, bsz);
             ptr += bsz;
-        } else {
+        }
+        else {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         }
 
@@ -631,10 +664,12 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         if (OperandType(*ptr) == OT_TRUE) {
             oss << ' ' << "true";
             ++ptr;
-        } else if (OperandType(*ptr) == OT_FALSE) {
+        }
+        else if (OperandType(*ptr) == OT_FALSE) {
             oss << ' ' << "false";
             ++ptr;
-        } else {
+        }
+        else {
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         }
 
@@ -731,7 +766,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << ' ';
         if (decode_timeout(ptr)) {
             oss << decode_timeout(ptr) - 1 << "ms";
-        } else {
+        }
+        else {
             oss << "infinity";
         }
         viua::support::pointer::inc<viua::internals::types::timeout,
@@ -746,7 +782,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << ' ';
         if (decode_timeout(ptr)) {
             oss << decode_timeout(ptr) - 1 << "ms";
-        } else {
+        }
+        else {
             oss << "infinity";
         }
         viua::support::pointer::inc<viua::internals::types::timeout,
@@ -780,7 +817,8 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         oss << ' ';
         if (decode_timeout(ptr)) {
             oss << decode_timeout(ptr) - 1 << "ms";
-        } else {
+        }
+        else {
             oss << "infinity";
         }
         viua::support::pointer::inc<viua::internals::types::timeout,

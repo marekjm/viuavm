@@ -25,35 +25,30 @@
 std::string const viua::types::Function::type_name = "Function";
 
 
-viua::types::Function::Function(std::string const& name)
-        : function_name(name) {}
+viua::types::Function::Function(std::string const& name) : function_name(name)
+{
+}
 
 viua::types::Function::~Function() {}
 
 
-std::string viua::types::Function::type() const {
-    return "Function";
-}
+std::string viua::types::Function::type() const { return "Function"; }
 
-std::string viua::types::Function::str() const {
+std::string viua::types::Function::str() const
+{
     std::ostringstream oss;
     oss << "Function: " << function_name;
     return oss.str();
 }
 
-std::string viua::types::Function::repr() const {
-    return str();
-}
+std::string viua::types::Function::repr() const { return str(); }
 
-bool viua::types::Function::boolean() const {
-    return true;
-}
+bool viua::types::Function::boolean() const { return true; }
 
-std::unique_ptr<viua::types::Value> viua::types::Function::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Function::copy() const
+{
     return std::make_unique<viua::types::Function>(function_name);
 }
 
 
-std::string viua::types::Function::name() const {
-    return function_name;
-}
+std::string viua::types::Function::name() const { return function_name; }

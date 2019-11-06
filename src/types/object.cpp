@@ -27,14 +27,11 @@
 
 std::string const viua::types::Object::type_name = "Object";
 
-std::string viua::types::Object::type() const {
-    return object_type_name;
-}
-bool viua::types::Object::boolean() const {
-    return true;
-}
+std::string viua::types::Object::type() const { return object_type_name; }
+bool viua::types::Object::boolean() const { return true; }
 
-std::string viua::types::Object::str() const {
+std::string viua::types::Object::str() const
+{
     std::ostringstream oss;
 
     oss << object_type_name << '#';
@@ -52,7 +49,8 @@ std::string viua::types::Object::str() const {
     return oss.str();
 }
 
-std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Object::copy() const
+{
     auto cp = std::make_unique<viua::types::Object>(object_type_name);
     for (auto const& each : attributes) {
         cp->set(each.first, each.second->copy());
@@ -61,16 +59,19 @@ std::unique_ptr<viua::types::Value> viua::types::Object::copy() const {
 }
 
 void viua::types::Object::set(std::string const& name,
-                              std::unique_ptr<viua::types::Value> object) {
+                              std::unique_ptr<viua::types::Value> object)
+{
     attributes[name] = std::move(object);
 }
 
 void viua::types::Object::insert(std::string const& key,
-                                 std::unique_ptr<viua::types::Value> value) {
+                                 std::unique_ptr<viua::types::Value> value)
+{
     set(key, std::move(value));
 }
 std::unique_ptr<viua::types::Value> viua::types::Object::remove(
-    std::string const& key) {
+    std::string const& key)
+{
     if (not attributes.count(key)) {
         std::ostringstream oss;
         oss << "attribute not found: " << key;

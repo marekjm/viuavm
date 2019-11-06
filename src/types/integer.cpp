@@ -28,60 +28,53 @@ using namespace viua::types;
 
 std::string const viua::types::Integer::type_name = "Integer";
 
-std::string Integer::type() const {
-    return "Integer";
-}
-std::string Integer::str() const {
-    return std::to_string(number);
-}
-bool Integer::boolean() const {
-    return (number != 0);
-}
+std::string Integer::type() const { return "Integer"; }
+std::string Integer::str() const { return std::to_string(number); }
+bool Integer::boolean() const { return (number != 0); }
 
-auto Integer::value() -> decltype(number) {
-    return number;
-}
+auto Integer::value() -> decltype(number) { return number; }
 
-int64_t Integer::increment() {
-    return (++number);
-}
-int64_t Integer::decrement() {
-    return (--number);
-}
+int64_t Integer::increment() { return (++number); }
+int64_t Integer::decrement() { return (--number); }
 
-std::unique_ptr<Value> Integer::copy() const {
+std::unique_ptr<Value> Integer::copy() const
+{
     return std::make_unique<Integer>(number);
 }
 
-auto Integer::as_unsigned() const -> uint64_t {
+auto Integer::as_unsigned() const -> uint64_t
+{
     if (number < 0) {
         throw std::make_unique<viua::types::Exception>("number is negative");
     }
     return static_cast<uint64_t>(number);
 }
 
-auto Integer::as_integer() const -> int64_t {
-    return number;
-}
+auto Integer::as_integer() const -> int64_t { return number; }
 
-auto Integer::as_float() const -> viua::float64 {
+auto Integer::as_float() const -> viua::float64
+{
     return static_cast<viua::float64>(number);
 }
 
 auto Integer::operator+(numeric::Number const& that) const
-    -> std::unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number>
+{
     return std::make_unique<Integer>(number + that.as_integer());
 }
 auto Integer::operator-(numeric::Number const& that) const
-    -> std::unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number>
+{
     return std::make_unique<Integer>(number - that.as_integer());
 }
 auto Integer::operator*(numeric::Number const& that) const
-    -> std::unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number>
+{
     return std::make_unique<Integer>(number * that.as_integer());
 }
 auto Integer::operator/(numeric::Number const& that) const
-    -> std::unique_ptr<numeric::Number> {
+    -> std::unique_ptr<numeric::Number>
+{
     if (that.as_integer() == 0) {
         throw viua::util::exceptions::make_unique_exception<
             viua::runtime::exceptions::Zero_division>();
@@ -90,22 +83,27 @@ auto Integer::operator/(numeric::Number const& that) const
 }
 
 auto Integer::operator<(numeric::Number const& that) const
-    -> std::unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean>
+{
     return std::make_unique<Boolean>(number < that.as_integer());
 }
 auto Integer::operator<=(numeric::Number const& that) const
-    -> std::unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean>
+{
     return std::make_unique<Boolean>(number <= that.as_integer());
 }
 auto Integer::operator>(numeric::Number const& that) const
-    -> std::unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean>
+{
     return std::make_unique<Boolean>(number > that.as_integer());
 }
 auto Integer::operator>=(numeric::Number const& that) const
-    -> std::unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean>
+{
     return std::make_unique<Boolean>(number >= that.as_integer());
 }
 auto Integer::operator==(numeric::Number const& that) const
-    -> std::unique_ptr<Boolean> {
+    -> std::unique_ptr<Boolean>
+{
     return std::make_unique<Boolean>(number == that.as_integer());
 }

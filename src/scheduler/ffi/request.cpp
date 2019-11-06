@@ -26,11 +26,13 @@
 
 
 std::string viua::scheduler::ffi::Foreign_function_call_request::function_name()
-    const {
+    const
+{
     return frame->function_name;
 }
 void viua::scheduler::ffi::Foreign_function_call_request::call(
-    ForeignFunction* callback) {
+    ForeignFunction* callback)
+{
     /* FIXME: second parameter should be a pointer to static registers or
      *        nullptr if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
@@ -55,18 +57,22 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         if (returned and caller_process.trace().size() > 0) {
             *return_register = std::move(returned);
         }
-    } catch (std::unique_ptr<viua::types::Value>& exception) {
+    }
+    catch (std::unique_ptr<viua::types::Value>& exception) {
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
-    } catch (std::unique_ptr<viua::types::Exception>& exception) {
+    }
+    catch (std::unique_ptr<viua::types::Exception>& exception) {
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
     }
 }
 void viua::scheduler::ffi::Foreign_function_call_request::raise(
-    std::unique_ptr<viua::types::Value> object) {
+    std::unique_ptr<viua::types::Value> object)
+{
     caller_process.raise(std::move(object));
 }
-void viua::scheduler::ffi::Foreign_function_call_request::wakeup() {
+void viua::scheduler::ffi::Foreign_function_call_request::wakeup()
+{
     caller_process.wakeup();
 }

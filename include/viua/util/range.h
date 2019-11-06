@@ -28,18 +28,15 @@ template<typename T> class Range {
     std::vector<T> v;
 
   public:
-    Range(T const upper) {
+    Range(T const upper)
+    {
         v.reserve(upper);
         v.resize(upper);
         std::iota(v.begin(), v.end(), T{0});
     }
 
-    auto begin() const -> decltype(v.begin()) {
-        return v.begin();
-    }
-    auto end() const -> decltype(v.end()) {
-        return v.end();
-    }
+    auto begin() const -> decltype(v.begin()) { return v.begin(); }
+    auto end() const -> decltype(v.end()) { return v.end(); }
 };
 }}  // namespace viua::util
 

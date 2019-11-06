@@ -36,7 +36,8 @@ class Try_frame {
 
     std::map<std::string, std::unique_ptr<Catcher>> catchers;
 
-    inline auto ret_address() const -> decltype(return_address) {
+    inline auto ret_address() const -> decltype(return_address)
+    {
         return return_address;
     }
 

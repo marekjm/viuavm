@@ -35,7 +35,8 @@ template<typename T> class vector_view {
     container_type const& vec;
     size_type const offset;
 
-    auto check_offset() const -> void {
+    auto check_offset() const -> void
+    {
         if (offset > vec.size()) {
             throw std::out_of_range{"offset out of range: "
                                     + std::to_string(offset) + " > "
@@ -44,30 +45,27 @@ template<typename T> class vector_view {
     }
 
   public:
-    auto at(size_type const i) const -> T const& {
-        return vec.at(offset + i);
-    }
-    auto size() const -> size_type {
-        return (vec.size() - offset);
-    }
+    auto at(size_type const i) const -> T const& { return vec.at(offset + i); }
+    auto size() const -> size_type { return (vec.size() - offset); }
 
-    auto advance(size_type const n) const -> vector_view<T> {
+    auto advance(size_type const n) const -> vector_view<T>
+    {
         return vector_view<T>{vec, offset + n};
     }
 
-    auto begin() const -> decltype(vec.begin()) {
+    auto begin() const -> decltype(vec.begin())
+    {
         return vec.begin() + static_cast<difference_type>(offset);
     }
-    auto end() const -> decltype(vec.end()) {
-        return vec.end();
-    }
+    auto end() const -> decltype(vec.end()) { return vec.end(); }
 
-    vector_view(container_type const& v, size_type const o)
-            : vec{v}, offset{o} {
+    vector_view(container_type const& v, size_type const o) : vec{v}, offset{o}
+    {
         check_offset();
     }
     vector_view(vector_view<T> const& v, size_type const o)
-            : vec{v.vec}, offset{v.offset + o} {
+            : vec{v.vec}, offset{v.offset + o}
+    {
         check_offset();
     }
 };

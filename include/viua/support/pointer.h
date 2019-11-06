@@ -21,7 +21,8 @@
 #define SUPPORT_POINTER_H
 
 namespace viua { namespace support { namespace pointer {
-template<class T, class S> auto inc(S*& p) -> void {
+template<class T, class S> auto inc(S*& p) -> void
+{
     auto ptr = reinterpret_cast<T*>(p);
     ptr++;
     p = reinterpret_cast<S*>(ptr);

@@ -33,18 +33,21 @@ namespace viua { namespace assertions {
 void assert_typeof(viua::types::Value* object, std::string const& expected);
 
 template<typename T, typename U>
-inline bool any_equal(T const& to_compare, U const& first) {
+inline bool any_equal(T const& to_compare, U const& first)
+{
     return (to_compare == first);
 }
 template<typename T, typename U, typename... R>
-bool any_equal(T const& to_compare, U const& first, R const&... rest) {
+bool any_equal(T const& to_compare, U const& first, R const&... rest)
+{
     return ((to_compare == first) or any_equal(to_compare, rest...));
 }
 
 using Arity = viua::internals::types::register_index;
 
 template<typename... A>
-void assert_arity(const Frame* frame, A const&... valid_arities) {
+void assert_arity(const Frame* frame, A const&... valid_arities)
+{
     Arity arity = frame->arguments->size();
     if (not any_equal(arity, valid_arities...)) {
         auto ex = std::unique_ptr<viua::types::Exception>{};

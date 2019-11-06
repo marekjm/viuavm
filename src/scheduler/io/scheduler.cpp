@@ -31,7 +31,8 @@
 #include <viua/types/io.h>
 
 static auto is_sentinel(
-    std::unique_ptr<viua::scheduler::io::IO_interaction> const& item) -> bool {
+    std::unique_ptr<viua::scheduler::io::IO_interaction> const& item) -> bool
+{
     return (item.get() == nullptr);
 }
 
@@ -40,7 +41,8 @@ void viua::scheduler::io::io_scheduler(
     viua::kernel::Kernel& kernel,
     std::deque<std::unique_ptr<IO_interaction>>& requests,
     std::mutex& io_request_mutex,
-    std::condition_variable& io_request_cv) {
+    std::condition_variable& io_request_cv)
+{
     auto local_interactions = std::deque<std::unique_ptr<IO_interaction>>{};
 
     while (true) {
@@ -173,7 +175,8 @@ void viua::scheduler::io::io_scheduler(
                          ? viua::kernel::Kernel::IO_result::make_success
                          : viua::kernel::Kernel::IO_result::make_error)(
                         std::move(result.result)));
-            } else {
+            }
+            else {
                 kernel.schedule_io(std::move(interaction));
             }
         }

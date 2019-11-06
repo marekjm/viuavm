@@ -44,7 +44,8 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
                               "which cannot be run without prior compilation";
 
 
-static auto display_vm_information(bool const verbose) -> void {
+static auto display_vm_information(bool const verbose) -> void
+{
     auto const full_version = std::string{VERSION} + "." + MICRO;
     auto const proc_schedulers =
         viua::kernel::Kernel::no_of_process_schedulers();
@@ -77,7 +78,8 @@ static auto display_vm_information(bool const verbose) -> void {
     std::cerr << "]\n";
 }
 static bool usage(std::string const program,
-                  std::vector<std::string> const& args) {
+                  std::vector<std::string> const& args)
+{
     bool show_help    = false;
     bool show_version = false;
     bool verbose      = false;
@@ -87,16 +89,20 @@ static bool usage(std::string const program,
         if (option == "--help" or option == "-h") {
             show_help = true;
             continue;
-        } else if (option == "--version" or option == "-V") {
+        }
+        else if (option == "--version" or option == "-V") {
             show_version = true;
             continue;
-        } else if (option == "--verbose" or option == "-v") {
+        }
+        else if (option == "--verbose" or option == "-v") {
             verbose = true;
             continue;
-        } else if (option == "--info" or option == "-i") {
+        }
+        else if (option == "--info" or option == "-i") {
             show_info = true;
             continue;
-        } else if (str::startswith(option, "-")) {
+        }
+        else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
                       << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
@@ -104,7 +110,8 @@ static bool usage(std::string const program,
                       << send_control_seq(ATTR_RESET);
             std::cerr << "\n";
             exit(1);
-        } else {
+        }
+        else {
             // first operand, options processing should stop
             break;
         }
@@ -144,7 +151,8 @@ static bool usage(std::string const program,
     return (show_help or show_version);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // setup command line arguments std::vector
     auto args = std::vector<std::string>{};
     for (int i = 1; i < argc; ++i) {
@@ -176,14 +184,17 @@ int main(int argc, char* argv[]) {
 
     try {
         viua::front::vm::initialise(kernel, filename, args);
-    } catch (std::unique_ptr<viua::types::Exception> const& e) {
+    }
+    catch (std::unique_ptr<viua::types::Exception> const& e) {
         std::cerr << "fatal: kernel initialisation fault: " << e->what()
                   << '\n';
         return 1;
-    } catch (const char* e) {
+    }
+    catch (const char* e) {
         std::cout << "error: " << e << std::endl;
         return 1;
-    } catch (std::string const& e) {
+    }
+    catch (std::string const& e) {
         std::cout << "error: " << e << std::endl;
         return 1;
     }
@@ -191,18 +202,21 @@ int main(int argc, char* argv[]) {
     try {
         // try preloading dynamic libraries specified by environment
         viua::front::vm::preload_libraries(kernel);
-    } catch (std::unique_ptr<viua::types::Exception> const& e) {
+    }
+    catch (std::unique_ptr<viua::types::Exception> const& e) {
         std::cout << "fatal: preload: " << e->what() << std::endl;
         return 1;
     }
 
     try {
         kernel.run();
-    } catch (std::unique_ptr<viua::types::Exception> const& e) {
+    }
+    catch (std::unique_ptr<viua::types::Exception> const& e) {
         std::cout << "VM error: an irrecoverable VM exception occured: "
                   << e->what() << std::endl;
         return 1;
-    } catch (std::exception const& e) {
+    }
+    catch (std::exception const& e) {
         std::cout << "VM error: an irrecoverable host exception occured: "
                   << e.what() << std::endl;
         return 1;

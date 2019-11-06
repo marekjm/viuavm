@@ -26,7 +26,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
-                                 Instruction const& instruction) -> void {
+                                 Instruction const& instruction) -> void
+{
     auto const operand = get_operand<Register_index>(instruction, 0);
 
     auto const max_register_index =

@@ -40,17 +40,20 @@ using viua::assembler::frontend::static_analyser::Register_usage_profile;
 using Verifier = auto (*)(Parsed_source const&, Instructions_block const&)
                      -> void;
 static auto verify_wrapper(Parsed_source const& source, Verifier verifier)
-    -> void {
+    -> void
+{
     for (auto const& fn : source.functions) {
         if (fn.attributes.count("no_sa")) {
             continue;
         }
         try {
             verifier(source, fn);
-        } catch (Invalid_syntax& e) {
+        }
+        catch (Invalid_syntax& e) {
             throw viua::cg::lex::Traced_syntax_error{}.append(e).append(
                 Invalid_syntax{fn.name, ("in function " + fn.name.str())});
-        } catch (Traced_syntax_error& e) {
+        }
+        catch (Traced_syntax_error& e) {
             throw e.append(
                 Invalid_syntax{fn.name, ("in function " + fn.name.str())});
         }
@@ -61,7 +64,8 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto map_names_to_register_indexes(
     Register_usage_profile& register_usage_profile,
-    Instructions_block const& ib) -> void {
+    Instructions_block const& ib) -> void
+{
     for (auto const& line : ib.body) {
         auto directive =
             dynamic_cast<viua::assembler::frontend::parser::Directive*>(
@@ -111,7 +115,8 @@ auto check_register_usage_for_instruction_block_impl(
     Parsed_source const& ps,
     Instructions_block const& ib,
     InstructionIndex i,
-    InstructionIndex mnemonic_counter) -> void {
+    InstructionIndex mnemonic_counter) -> void
+{
     using namespace viua::assembler::frontend::static_analyser::checkers;
 
     std::map<Register, Closure> created_closures;
@@ -515,9 +520,11 @@ auto check_register_usage_for_instruction_block_impl(
                     instruction->tokens,
                     "instruction does not have static analysis implemented");
             }
-        } catch (Invalid_syntax& e) {
+        }
+        catch (Invalid_syntax& e) {
             throw e.add(instruction->tokens.at(0));
-        } catch (Traced_syntax_error& e) {
+        }
+        catch (Traced_syntax_error& e) {
             e.errors.at(0).add(instruction->tokens.at(0));
             throw e;
         }
@@ -535,7 +542,8 @@ auto check_register_usage_for_instruction_block_impl(
 
 static auto check_register_usage_for_instruction_block(
     Parsed_source const& ps,
-    Instructions_block const& ib) -> void {
+    Instructions_block const& ib) -> void
+{
     if (ib.closure) {
         return;
     }
@@ -582,6 +590,7 @@ static auto check_register_usage_for_instruction_block(
             static_cast<InstructionIndex>(-1));
 }
 auto viua::assembler::frontend::static_analyser::check_register_usage(
-    Parsed_source const& src) -> void {
+    Parsed_source const& src) -> void
+{
     verify_wrapper(src, check_register_usage_for_instruction_block);
 }

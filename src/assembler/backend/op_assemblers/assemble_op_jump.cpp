@@ -26,7 +26,8 @@ auto assemble_op_jump(Program& program,
                       std::vector<Token> const& tokens,
                       Token_index const i,
                       viua::internals::types::bytecode_size const& instruction,
-                      std::map<std::string, Token_index> const& marks) -> void {
+                      std::map<std::string, Token_index> const& marks) -> void
+{
     /*  Jump instruction can be written in two forms:
      *
      *      * `jump <index>`

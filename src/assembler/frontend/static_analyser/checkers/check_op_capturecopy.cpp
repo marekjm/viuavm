@@ -26,8 +26,8 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
                           Instruction const& instruction,
-                          std::map<Register, Closure>& created_closures)
-    -> void {
+                          std::map<Register, Closure>& created_closures) -> void
+{
     using viua::internals::Register_sets;
 
     auto closure = get_operand<Register_index>(instruction, 0);

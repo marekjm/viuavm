@@ -23,7 +23,8 @@ namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
 auto assemble_op_text(Program& program,
                       std::vector<Token> const& tokens,
-                      Token_index const i) -> void {
+                      Token_index const i) -> void
+{
     Token_index target = i + 1;
     Token_index source = target + 2;
 
@@ -37,7 +38,8 @@ auto assemble_op_text(Program& program,
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(source)),
                 ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
-    } else {
+    }
+    else {
         program.optext(target_operand, tokens.at(source));
     }
 }

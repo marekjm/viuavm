@@ -27,7 +27,8 @@ namespace static_analyser { namespace checkers {
 auto check_op_throw(Register_usage_profile& register_usage_profile,
                     Parsed_source const& ps,
                     std::map<Register, Closure>& created_closures,
-                    Instruction const& instruction) -> void {
+                    Instruction const& instruction) -> void
+{
     using viua::cg::lex::Invalid_syntax;
     using viua::cg::lex::Traced_syntax_error;
 
@@ -52,10 +53,12 @@ auto check_op_throw(Register_usage_profile& register_usage_profile,
         check_for_unused_registers(register_usage_profile);
         check_closure_instantiations(
             register_usage_profile, ps, created_closures);
-    } catch (Invalid_syntax& e) {
+    }
+    catch (Invalid_syntax& e) {
         throw Traced_syntax_error{}.append(e).append(
             Invalid_syntax{instruction.tokens.at(0), "after a throw here:"});
-    } catch (Traced_syntax_error& e) {
+    }
+    catch (Traced_syntax_error& e) {
         throw e.append(
             Invalid_syntax{instruction.tokens.at(0), "after a throw here:"});
     }

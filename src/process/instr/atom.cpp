@@ -25,7 +25,8 @@
 #include <viua/types/boolean.h>
 
 
-auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -40,7 +41,8 @@ auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opatomeq(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opatomeq(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

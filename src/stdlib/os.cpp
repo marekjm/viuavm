@@ -31,7 +31,8 @@ static void os_system(Frame* frame,
                       viua::kernel::Register_set*,
                       viua::kernel::Register_set*,
                       viua::process::Process*,
-                      viua::kernel::Kernel*) {
+                      viua::kernel::Kernel*)
+{
     if (frame->arguments->at(0) == nullptr) {
         throw std::make_unique<viua::types::Exception>(
             "expected command to launch (string) as parameter 0");
@@ -48,6 +49,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

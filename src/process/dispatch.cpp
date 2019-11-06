@@ -27,7 +27,8 @@
 
 
 auto viua::process::Process::get_trace_line(
-    viua::internals::types::byte const* for_address) const -> std::string {
+    viua::internals::types::byte const* for_address) const -> std::string
+{
     auto trace_line = std::ostringstream{};
 
     trace_line << "[";
@@ -56,7 +57,8 @@ auto viua::process::Process::get_trace_line(
 
     try {
         trace_line << OP_NAMES.at(static_cast<OPCODE>(*for_address));
-    } catch (std::out_of_range& e) {
+    }
+    catch (std::out_of_range& e) {
         trace_line << "<unrecognised instruction byte = "
                    << static_cast<unsigned>(*for_address) << '>';
         return trace_line.str();
@@ -67,7 +69,8 @@ auto viua::process::Process::get_trace_line(
         auto working_address = for_address + 1;
         if (viua::bytecode::decoder::operands::is_void(working_address)) {
             ++working_address;
-        } else {
+        }
+        else {
             working_address +=
                 sizeof(viua::internals::types::byte);  // for opcode type
             working_address += sizeof(viua::internals::types::register_index);
@@ -90,9 +93,10 @@ auto viua::process::Process::get_trace_line(
             trace_line << (stack->back()->deferred_calls.size()
                                ? " before deferred"
                                : " with no deferred");
-        } else if (stack->state_of()
-                   == viua::process::Stack::STATE::
-                       SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+        }
+        else if (stack->state_of()
+                 == viua::process::Stack::STATE::
+                     SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
             trace_line << " after deferred";
         }
     }
@@ -100,7 +104,8 @@ auto viua::process::Process::get_trace_line(
     return trace_line.str();
 }
 auto viua::process::Process::emit_trace_line(
-    viua::internals::types::byte const* for_address) const -> void {
+    viua::internals::types::byte const* for_address) const -> void
+{
     // FIXME conditionally enable duplicate trace lines
     static auto previous_trace_line = std::string{};
     auto const line                 = get_trace_line(for_address);
@@ -113,7 +118,8 @@ auto viua::process::Process::emit_trace_line(
 
 
 auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
-    -> viua::internals::types::byte const* {
+    -> viua::internals::types::byte const*
+{
     /** Dispatches instruction at a pointer to its handler.
      */
     if (tracing_enabled) {

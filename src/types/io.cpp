@@ -29,25 +29,29 @@
 #include <viua/types/string.h>
 
 namespace viua::scheduler::io {
-auto IO_interaction::id() const -> id_type {
-    return assigned_id;
-}
-auto IO_interaction::cancel() -> void {
+auto IO_interaction::id() const -> id_type { return assigned_id; }
+auto IO_interaction::cancel() -> void
+{
     is_cancelled.store(true, std::memory_order_release);
 }
-auto IO_interaction::cancelled() const -> bool {
+auto IO_interaction::cancelled() const -> bool
+{
     return is_cancelled.load(std::memory_order_acquire);
 }
-auto IO_interaction::abort() -> void {
+auto IO_interaction::abort() -> void
+{
     is_aborted.store(true, std::memory_order_release);
 }
-auto IO_interaction::aborted() const -> bool {
+auto IO_interaction::aborted() const -> bool
+{
     return is_aborted.load(std::memory_order_acquire);
 }
-auto IO_interaction::complete() -> void {
+auto IO_interaction::complete() -> void
+{
     is_complete.store(true, std::memory_order_release);
 }
-auto IO_interaction::completed() const -> bool {
+auto IO_interaction::completed() const -> bool
+{
     return is_complete.load(std::memory_order_acquire);
 }
 
@@ -57,13 +61,18 @@ IO_interaction::~IO_interaction() {}
 IO_interaction::Interaction_result::Interaction_result(State const st,
                                                        Status const su,
                                                        result_type r)
-        : state{st}, status{su}, result{std::move(r)} {}
+        : state{st}, status{su}, result{std::move(r)}
+{
+}
 
 IO_read_interaction::IO_read_interaction(id_type const x,
                                          int const fd,
                                          size_t const limit)
-        : IO_interaction(x), file_descriptor{fd}, buffer(limit, '\0') {}
-auto IO_read_interaction::interact() -> Interaction_result {
+        : IO_interaction(x), file_descriptor{fd}, buffer(limit, '\0')
+{
+}
+auto IO_read_interaction::interact() -> Interaction_result
+{
     if (cancelled()) {
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
@@ -95,8 +104,11 @@ auto IO_read_interaction::interact() -> Interaction_result {
 IO_write_interaction::IO_write_interaction(id_type const x,
                                            int const fd,
                                            std::string buf)
-        : IO_interaction(x), file_descriptor{fd}, buffer{std::move(buf)} {}
-auto IO_write_interaction::interact() -> Interaction_result {
+        : IO_interaction(x), file_descriptor{fd}, buffer{std::move(buf)}
+{
+}
+auto IO_write_interaction::interact() -> Interaction_result
+{
     if (cancelled()) {
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
@@ -120,8 +132,11 @@ auto IO_write_interaction::interact() -> Interaction_result {
 }
 
 IO_close_interaction::IO_close_interaction(id_type const x, int const fd)
-        : IO_interaction(x), file_descriptor{fd} {}
-auto IO_close_interaction::interact() -> Interaction_result {
+        : IO_interaction(x), file_descriptor{fd}
+{
+}
+auto IO_close_interaction::interact() -> Interaction_result
+{
     if (cancelled()) {
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
@@ -143,7 +158,8 @@ auto IO_close_interaction::interact() -> Interaction_result {
                               std::make_unique<viua::types::Boolean>(true)};
 }
 
-auto IO_empty_interaction::interact() -> Interaction_result {
+auto IO_empty_interaction::interact() -> Interaction_result
+{
     if (cancelled()) {
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
@@ -160,20 +176,13 @@ auto IO_empty_interaction::interact() -> Interaction_result {
 namespace viua::types {
 std::string const viua::types::IO_port::type_name = "IO_port";
 
-std::string IO_port::type() const {
-    return "IO_port";
-}
-std::string IO_port::str() const {
-    return "";
-}
-std::string IO_port::repr() const {
-    return "";
-}
-bool IO_port::boolean() const {
-    return false;
-}
+std::string IO_port::type() const { return "IO_port"; }
+std::string IO_port::str() const { return ""; }
+std::string IO_port::repr() const { return ""; }
+bool IO_port::boolean() const { return false; }
 
-std::unique_ptr<Value> IO_port::copy() const {
+std::unique_ptr<Value> IO_port::copy() const
+{
     return std::unique_ptr<IO_port>();
 }
 
@@ -183,28 +192,23 @@ IO_port::~IO_port() {}
 
 std::string const viua::types::IO_fd::type_name = "IO_fd";
 
-std::string IO_fd::type() const {
-    return "IO_fd";
-}
-std::string IO_fd::str() const {
+std::string IO_fd::type() const { return "IO_fd"; }
+std::string IO_fd::str() const
+{
     return "IO_fd: " + std::to_string(file_descriptor);
 }
-std::string IO_fd::repr() const {
-    return std::to_string(file_descriptor);
-}
-bool IO_fd::boolean() const {
-    return true;
-}
+std::string IO_fd::repr() const { return std::to_string(file_descriptor); }
+bool IO_fd::boolean() const { return true; }
 
-std::unique_ptr<Value> IO_fd::copy() const {
+std::unique_ptr<Value> IO_fd::copy() const
+{
     throw std::make_unique<viua::types::Exception>("Not_copyable");
 }
 
-auto IO_fd::fd() const -> int {
-    return file_descriptor;
-}
+auto IO_fd::fd() const -> int { return file_descriptor; }
 auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
-    -> std::unique_ptr<IO_request> {
+    -> std::unique_ptr<IO_request>
+{
     using viua::scheduler::io::IO_interaction;
     using viua::scheduler::io::IO_read_interaction;
 
@@ -217,7 +221,8 @@ auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
     return std::make_unique<IO_request>(&k, interaction_id);
 }
 auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
-    -> std::unique_ptr<IO_request> {
+    -> std::unique_ptr<IO_request>
+{
     using viua::scheduler::io::IO_interaction;
     using viua::scheduler::io::IO_write_interaction;
 
@@ -228,7 +233,8 @@ auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
         interaction_id, file_descriptor, std::move(buffer)));
     return std::make_unique<IO_request>(&k, interaction_id);
 }
-auto IO_fd::close(viua::kernel::Kernel& k) -> std::unique_ptr<IO_request> {
+auto IO_fd::close(viua::kernel::Kernel& k) -> std::unique_ptr<IO_request>
+{
     using viua::scheduler::io::IO_close_interaction;
     using viua::scheduler::io::IO_empty_interaction;
     using viua::scheduler::io::IO_interaction;
@@ -245,43 +251,39 @@ auto IO_fd::close(viua::kernel::Kernel& k) -> std::unique_ptr<IO_request> {
                                                          file_descriptor));
     return std::make_unique<IO_request>(&k, interaction_id);
 }
-auto IO_fd::close() -> void {
+auto IO_fd::close() -> void
+{
     if (ownership == Ownership::Owned) {
         ::close(file_descriptor);
     }
 }
 
-IO_fd::IO_fd(int const x, Ownership const o)
-        : file_descriptor{x}, ownership{o} {}
-IO_fd::~IO_fd() {
-    close();
+IO_fd::IO_fd(int const x, Ownership const o) : file_descriptor{x}, ownership{o}
+{
 }
+IO_fd::~IO_fd() { close(); }
 
 
 std::string const viua::types::IO_request::type_name = "IO_request";
 
-std::string IO_request::type() const {
-    return "IO_request";
-}
-std::string IO_request::str() const {
+std::string IO_request::type() const { return "IO_request"; }
+std::string IO_request::str() const
+{
     auto const [a, b] = interaction_id;
     return "<I/O request: " + std::to_string(a) + "." + std::to_string(b) + ">";
 }
-std::string IO_request::repr() const {
-    return "<I/O request>";
-}
-bool IO_request::boolean() const {
-    return true;
-}
+std::string IO_request::repr() const { return "<I/O request>"; }
+bool IO_request::boolean() const { return true; }
 
-std::unique_ptr<Value> IO_request::copy() const {
+std::unique_ptr<Value> IO_request::copy() const
+{
     throw std::make_unique<viua::types::Exception>("IO_request",
                                                    "not copyable");
 }
 
 IO_request::IO_request(viua::kernel::Kernel* k, interaction_id_type const x)
-        : interaction_id{x}, kernel{k} {}
-IO_request::~IO_request() {
-    kernel->cancel_io(id());
+        : interaction_id{x}, kernel{k}
+{
 }
+IO_request::~IO_request() { kernel->cancel_io(id()); }
 }  // namespace viua::types

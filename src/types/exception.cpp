@@ -23,14 +23,16 @@
 std::string const viua::types::Exception::type_name = "Exception";
 
 
-std::string viua::types::Exception::what() const {
+std::string viua::types::Exception::what() const
+{
     /** Stay compatible with standatd exceptions and
      *  provide what() method.
      */
     return cause;
 }
 
-std::string viua::types::Exception::etype() const {
+std::string viua::types::Exception::etype() const
+{
     /** Returns exception type.
      *
      *  Basic type is 'viua::types::Exception' and is returned by the type()
@@ -39,24 +41,24 @@ std::string viua::types::Exception::etype() const {
     return detailed_type;
 }
 
-std::string viua::types::Exception::type() const {
-    return detailed_type;
-}
-std::string viua::types::Exception::str() const {
-    return cause;
-}
-std::string viua::types::Exception::repr() const {
+std::string viua::types::Exception::type() const { return detailed_type; }
+std::string viua::types::Exception::str() const { return cause; }
+std::string viua::types::Exception::repr() const
+{
     return (etype() + ": " + str::enquote(cause));
 }
-bool viua::types::Exception::boolean() const {
-    return true;
-}
+bool viua::types::Exception::boolean() const { return true; }
 
-std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const
+{
     return std::make_unique<Exception>(cause);
 }
 
 viua::types::Exception::Exception(std::string s)
-        : cause(s), detailed_type("Exception") {}
+        : cause(s), detailed_type("Exception")
+{
+}
 viua::types::Exception::Exception(std::string ts, std::string cs)
-        : cause(cs), detailed_type(ts) {}
+        : cause(cs), detailed_type(ts)
+{
+}

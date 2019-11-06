@@ -33,7 +33,8 @@ using viua::bytecode::decoder::operands::fetch_register;
 using viua::bytecode::decoder::operands::fetch_register_index;
 using Register_index = viua::internals::types::register_index;
 
-auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type
+{
     /** Create new frame for function calls.
      */
     auto const arguments = fetch_and_advance_addr<Register_index>(
@@ -47,7 +48,8 @@ auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type
+{
     /** Run param instruction.
      */
     auto const parameter_no_operand_index =
@@ -70,7 +72,8 @@ auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type
+{
     /** Run pamv instruction.
      */
     auto const parameter_no_operand_index =
@@ -93,7 +96,8 @@ auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type
+{
     /** Run arg instruction.
      */
     auto const target =
@@ -115,7 +119,8 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
     if (stack->back()->arguments->isflagged(parameter_no_operand_index,
                                             MOVED)) {
         argument = stack->back()->arguments->pop(parameter_no_operand_index);
-    } else {
+    }
+    else {
         argument =
             stack->back()->arguments->get(parameter_no_operand_index)->copy();
     }
@@ -128,7 +133,8 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type {
 }
 
 auto viua::process::Process::opallocate_registers(Op_address_type addr)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto const [addr_, register_set, no_of_registers] =
         viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
                                                                          this);
@@ -141,7 +147,8 @@ auto viua::process::Process::opallocate_registers(Op_address_type addr)
     return addr_;
 }
 
-auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type
+{
     auto const return_register =
         fetch_optional_and_advance_addr<viua::kernel::Register*>(
             fetch_register, addr, this);
@@ -161,7 +168,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
             stack->frame_new->set_local_register_set(
                 static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
-    } else {
+    }
+    else {
         call_name = fetch_and_advance_addr<std::string>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
@@ -180,8 +188,8 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type {
         addr, call_name, return_register.value_or(nullptr), "");
 }
 
-auto viua::process::Process::optailcall(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
+{
     if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
         stack->register_deferred_calls();
         stack->state_of(
@@ -217,7 +225,8 @@ auto viua::process::Process::optailcall(Op_address_type addr)
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
         }
-    } else {
+    }
+    else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
@@ -246,7 +255,8 @@ auto viua::process::Process::optailcall(Op_address_type addr)
     return adjust_jump_base_for(call_name);
 }
 
-auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type
+{
     auto call_name = std::string{};
     auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
@@ -262,7 +272,8 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
         }
-    } else {
+    }
+    else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
@@ -280,7 +291,8 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type
+{
     if (stack->size() == 0) {
         throw std::make_unique<viua::types::Exception>(
             "no frame on stack: no call to return from");

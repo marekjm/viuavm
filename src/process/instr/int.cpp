@@ -29,7 +29,8 @@
 #include <viua/types/value.h>
 
 
-auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -38,8 +39,8 @@ auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opinteger(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opinteger(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -53,7 +54,8 @@ auto viua::process::Process::opinteger(Op_address_type addr)
     return addr;
 }
 
-auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type
+{
     viua::types::Integer* target{nullptr};
     std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, this);
@@ -63,7 +65,8 @@ auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opidec(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opidec(Op_address_type addr) -> Op_address_type
+{
     viua::types::Integer* target{nullptr};
     std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
         viua::types::Integer>(addr, this);

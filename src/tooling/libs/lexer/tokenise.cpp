@@ -27,42 +27,34 @@
 #include <viua/util/string/ops.h>
 
 namespace viua { namespace tooling { namespace libs { namespace lexer {
-auto Token::line() const -> Position_type {
-    return line_number;
-}
-auto Token::character() const -> Position_type {
-    return character_in_line;
-}
+auto Token::line() const -> Position_type { return line_number; }
+auto Token::character() const -> Position_type { return character_in_line; }
 
-auto Token::str() const -> decltype(content) {
-    return content;
-}
-auto Token::str(std::string s) -> void {
-    content = s;
-}
+auto Token::str() const -> decltype(content) { return content; }
+auto Token::str(std::string s) -> void { content = s; }
 
-auto Token::original() const -> decltype(original_content) {
+auto Token::original() const -> decltype(original_content)
+{
     return original_content;
 }
-auto Token::original(std::string s) -> void {
-    original_content = s;
-}
+auto Token::original(std::string s) -> void { original_content = s; }
 
-auto Token::ends(bool const as_original) const -> Position_type {
+auto Token::ends(bool const as_original) const -> Position_type
+{
     return (character_in_line
             + (as_original ? original_content : content).size());
 }
 
-auto Token::operator==(std::string const& s) const -> bool {
+auto Token::operator==(std::string const& s) const -> bool
+{
     return (content == s);
 }
-auto Token::operator!=(std::string const& s) const -> bool {
+auto Token::operator!=(std::string const& s) const -> bool
+{
     return (content != s);
 }
 
-Token::operator std::string() const {
-    return str();
-}
+Token::operator std::string() const { return str(); }
 
 Token::Token(Position_type const line,
              Position_type const character,
@@ -71,10 +63,13 @@ Token::Token(Position_type const line,
         : content{text}
         , original_content{original.empty() ? text : original}
         , line_number{line}
-        , character_in_line{character} {}
+        , character_in_line{character}
+{
+}
 Token::Token() : Token(0, 0, "", "") {}
 
-auto Token::operator=(Token const& token) -> Token& {
+auto Token::operator=(Token const& token) -> Token&
+{
     content           = token.content;
     original_content  = token.original_content;
     line_number       = token.line_number;
@@ -82,7 +77,8 @@ auto Token::operator=(Token const& token) -> Token& {
     return *this;
 }
 
-auto tokenise(std::string const& source) -> std::vector<Token> {
+auto tokenise(std::string const& source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     std::ostringstream candidate_token;
@@ -145,7 +141,8 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
             if (++hyphens >= 2) {
                 active_comment = true;
             }
-        } else {
+        }
+        else {
             hyphens = 0;
         }
 
@@ -164,7 +161,8 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
                 tokens.emplace_back(line_number, character_in_line, s);
                 character_in_line += (s.size() - 1);
                 i += (s.size() - 1);
-            } else {
+            }
+            else {
                 candidate_token << current_char;
                 tokens.emplace_back(
                     line_number, character_in_line, candidate_token.str());
@@ -183,7 +181,8 @@ auto tokenise(std::string const& source) -> std::vector<Token> {
     return tokens;
 }
 
-template<class T, typename... R> bool adjacent(T first, T second) {
+template<class T, typename... R> bool adjacent(T first, T second)
+{
     if (first.line() != second.line()) {
         return false;
     }
@@ -192,7 +191,8 @@ template<class T, typename... R> bool adjacent(T first, T second) {
     }
     return true;
 }
-template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+template<class T, typename... R> bool adjacent(T first, T second, R... rest)
+{
     if (first.line() != second.line()) {
         return false;
     }
@@ -204,7 +204,8 @@ template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
 static auto match_adjacent(
     std::vector<Token> const& tokens,
     std::remove_reference<decltype(tokens)>::type::size_type i,
-    std::vector<std::string> const& sequence) -> bool {
+    std::vector<std::string> const& sequence) -> bool
+{
     if (i + sequence.size() >= tokens.size()) {
         return false;
     }
@@ -226,7 +227,8 @@ static auto match_adjacent(
 }
 static auto join_tokens(std::vector<Token> const tokens,
                         decltype(tokens)::size_type const from,
-                        decltype(from) const to) -> std::string {
+                        decltype(from) const to) -> std::string
+{
     std::ostringstream joined;
 
     for (auto i = from; i < tokens.size() and i < to; ++i) {
@@ -237,7 +239,8 @@ static auto join_tokens(std::vector<Token> const tokens,
 }
 static auto reduce_token_sequence(std::vector<Token> input_tokens,
                                   std::vector<std::string> const sequence)
-    -> std::vector<Token> {
+    -> std::vector<Token>
+{
     decltype(input_tokens) tokens;
 
     const auto limit = input_tokens.size();
@@ -257,8 +260,8 @@ static auto reduce_token_sequence(std::vector<Token> input_tokens,
     return tokens;
 }
 
-static auto reduce_scoped_names(std::vector<Token> source)
-    -> std::vector<Token> {
+static auto reduce_scoped_names(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     auto const limit = source.size();
@@ -306,7 +309,8 @@ static auto reduce_scoped_names(std::vector<Token> source)
 
     return tokens;
 }
-static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
+static auto reduce_floats(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     for (auto i = decltype(source)::size_type{0}; i < source.size(); ++i) {
@@ -327,7 +331,8 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
                 i += 3;
                 continue;
             }
-        } catch (std::out_of_range const&) {
+        }
+        catch (std::out_of_range const&) {
             // do nothing
         }
         try {
@@ -343,7 +348,8 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
                 i += 2;
                 continue;
             }
-        } catch (std::out_of_range const&) {
+        }
+        catch (std::out_of_range const&) {
             // do nothing
         }
 
@@ -352,8 +358,8 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token> {
 
     return tokens;
 }
-static auto reduce_offset_jumps(std::vector<Token> source)
-    -> std::vector<Token> {
+static auto reduce_offset_jumps(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     for (auto i = decltype(source)::size_type{0}; i < source.size(); ++i) {
@@ -371,7 +377,8 @@ static auto reduce_offset_jumps(std::vector<Token> source)
                 ++i;
                 continue;
             }
-        } catch (std::out_of_range const&) {
+        }
+        catch (std::out_of_range const&) {
             // do nothing
         }
 
@@ -381,7 +388,8 @@ static auto reduce_offset_jumps(std::vector<Token> source)
     return tokens;
 }
 
-auto cook(std::vector<Token> const& source) -> std::vector<Token> {
+auto cook(std::vector<Token> const& source) -> std::vector<Token>
+{
     auto tokens = source;
 
     tokens = strip_spaces(strip_comments(std::move(tokens)));
@@ -414,7 +422,8 @@ auto cook(std::vector<Token> const& source) -> std::vector<Token> {
     return tokens;
 }
 
-auto strip_spaces(std::vector<Token> source) -> std::vector<Token> {
+auto strip_spaces(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
     auto iter   = source.begin();
 
@@ -438,7 +447,8 @@ auto strip_spaces(std::vector<Token> source) -> std::vector<Token> {
 
     return tokens;
 }
-auto strip_comments(std::vector<Token> source) -> std::vector<Token> {
+auto strip_comments(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     auto const comment_marker = std::string{";"};

@@ -25,12 +25,14 @@
 namespace viua { namespace runtime { namespace imports {
 constexpr char const* VIUA_LIBRARY_PATH = "VIUA_LIBRARY_PATH";
 
-auto read_viua_library_path() -> std::vector<std::string> {
+auto read_viua_library_path() -> std::vector<std::string>
+{
     return viua::support::env::get_paths(VIUA_LIBRARY_PATH);
 }
 
 auto find_module(std::string const& module_name)
-    -> std::optional<std::pair<Module_type, std::string>> {
+    -> std::optional<std::pair<Module_type, std::string>>
+{
     auto const module_sep = std::regex{"::"};
     auto bytecode_file =
         std::regex_replace(module_name, module_sep, "/") + ".module";

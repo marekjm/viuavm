@@ -51,11 +51,15 @@ class Foreign_function_call_request {
     Foreign_function_call_request(Frame* fr,
                                   viua::process::Process* cp,
                                   viua::kernel::Kernel* c)
-            : frame(fr), caller_process(*cp), kernel{*c} {}
+            : frame(fr), caller_process(*cp), kernel{*c}
+    {
+    }
     Foreign_function_call_request(std::unique_ptr<Frame> fr,
                                   viua::process::Process& cp,
                                   viua::kernel::Kernel& c)
-            : frame{std::move(fr)}, caller_process{cp}, kernel{c} {}
+            : frame{std::move(fr)}, caller_process{cp}, kernel{c}
+    {
+    }
     ~Foreign_function_call_request() {}
 };
 

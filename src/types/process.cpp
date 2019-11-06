@@ -29,37 +29,37 @@
 
 std::string const viua::types::Process::type_name = "Process";
 
-std::string viua::types::Process::type() const {
-    return "Process";
-}
+std::string viua::types::Process::type() const { return "Process"; }
 
-std::string viua::types::Process::str() const {
+std::string viua::types::Process::str() const
+{
     std::ostringstream oss;
     oss << "Process: " << std::hex << pid().str() << std::dec;
     return oss.str();
 }
 
-std::string viua::types::Process::repr() const {
-    return str();
-}
+std::string viua::types::Process::repr() const { return str(); }
 
-bool viua::types::Process::boolean() const {
+bool viua::types::Process::boolean() const
+{
     // There is no good reason why evaluating process as boolean should return
     // either 'false' or 'true', as there is no meaning to this value.
     return false;
 }
 
-std::unique_ptr<viua::types::Value> viua::types::Process::copy() const {
+std::unique_ptr<viua::types::Value> viua::types::Process::copy() const
+{
     return std::make_unique<Process>(thrd);
 }
 
-viua::process::PID viua::types::Process::pid() const {
-    return saved_pid;
-}
+viua::process::PID viua::types::Process::pid() const { return saved_pid; }
 
 viua::types::Process::Process(viua::process::Process* t)
-        : thrd(t), saved_pid(thrd->pid()) {}
+        : thrd(t), saved_pid(thrd->pid())
+{
+}
 
-auto viua::types::Process::operator==(Process const& that) const -> bool {
+auto viua::types::Process::operator==(Process const& that) const -> bool
+{
     return (saved_pid == that.saved_pid);
 }

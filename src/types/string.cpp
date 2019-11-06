@@ -38,34 +38,27 @@ using namespace viua::types;
 
 std::string const viua::types::String::type_name = "String";
 
-std::string String::type() const {
-    return "String";
-}
-std::string String::str() const {
-    return svalue;
-}
-std::string String::repr() const {
-    return "b" + str::enquote(svalue);
-}
-bool String::boolean() const {
-    return svalue.size() != 0;
-}
+std::string String::type() const { return "String"; }
+std::string String::str() const { return svalue; }
+std::string String::repr() const { return "b" + str::enquote(svalue); }
+bool String::boolean() const { return svalue.size() != 0; }
 
-std::unique_ptr<Value> String::copy() const {
+std::unique_ptr<Value> String::copy() const
+{
     return std::make_unique<String>(svalue);
 }
 
-std::string& String::value() {
-    return svalue;
-}
+std::string& String::value() { return svalue; }
 
-Integer* String::size() {
+Integer* String::size()
+{
     /** Return size of the string.
      */
     return new Integer(static_cast<Integer::underlying_type>(svalue.size()));
 }
 
-String* String::sub(int64_t b, int64_t e) {
+String* String::sub(int64_t b, int64_t e)
+{
     /** Return substring extracted from this object.
      */
     std::string::size_type cut_from, cut_to;
@@ -73,25 +66,29 @@ String* String::sub(int64_t b, int64_t e) {
     // sign-changing
     if (b < 0) {
         cut_from = (svalue.size() - static_cast<unsigned>(-b));
-    } else {
+    }
+    else {
         cut_from = static_cast<decltype(cut_from)>(b);
     }
     if (e < 0) {
         cut_to = (svalue.size() - static_cast<unsigned>(-e) + 1);
-    } else {
+    }
+    else {
         cut_to = static_cast<decltype(cut_to)>(e);
     }
     return new String(svalue.substr(cut_from, cut_to));
 }
 
-String* String::add(String* s) {
+String* String::add(String* s)
+{
     /** Append string to this string.
      */
     svalue += s->value();
     return this;
 }
 
-String* String::join(Vector* v) {
+String* String::join(Vector* v)
+{
     auto s         = std::string{""};
     int vector_len = v->len();
     for (int i = 0; i < vector_len; ++i) {
@@ -108,7 +105,8 @@ void String::stringify(Frame* frame,
                        viua::kernel::Register_set*,
                        viua::kernel::Register_set*,
                        viua::process::Process* process,
-                       viua::kernel::Kernel*) {
+                       viua::kernel::Kernel*)
+{
     if (frame->arguments->size() < 2) {
         throw std::make_unique<viua::types::Exception>("expected 2 parameters");
     }
@@ -119,7 +117,8 @@ void String::represent(Frame* frame,
                        viua::kernel::Register_set*,
                        viua::kernel::Register_set*,
                        viua::process::Process* process,
-                       viua::kernel::Kernel*) {
+                       viua::kernel::Kernel*)
+{
     if (frame->arguments->size() < 2) {
         throw std::make_unique<viua::types::Exception>("expected 2 parameters");
     }
@@ -131,7 +130,8 @@ void String::startswith(Frame* frame,
                         viua::kernel::Register_set*,
                         viua::kernel::Register_set*,
                         viua::process::Process*,
-                        viua::kernel::Kernel*) {
+                        viua::kernel::Kernel*)
+{
     std::string s    = static_cast<String*>(frame->arguments->at(1))->value();
     bool starts_with = false;
 
@@ -153,7 +153,8 @@ void String::endswith(Frame* frame,
                       viua::kernel::Register_set*,
                       viua::kernel::Register_set*,
                       viua::process::Process*,
-                      viua::kernel::Kernel*) {
+                      viua::kernel::Kernel*)
+{
     std::string s  = static_cast<String*>(frame->arguments->at(1))->value();
     bool ends_with = false;
 
@@ -177,7 +178,8 @@ void String::format(Frame* frame,
                     viua::kernel::Register_set*,
                     viua::kernel::Register_set*,
                     viua::process::Process*,
-                    viua::kernel::Kernel*) {
+                    viua::kernel::Kernel*)
+{
     std::regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
     std::string result = svalue;
@@ -198,14 +200,16 @@ void String::format(Frame* frame,
             int index        = -1;
             try {
                 index = stoi(m);
-            } catch (std::invalid_argument const&) {
+            }
+            catch (std::invalid_argument const&) {
                 is_number = false;
             }
             if (is_number) {
                 replacement = static_cast<Vector*>(frame->arguments->at(1))
                                   ->at(index)
                                   ->str();
-            } else {
+            }
+            else {
                 replacement =
                     static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
             }
@@ -222,7 +226,8 @@ void String::substr(Frame* frame,
                     viua::kernel::Register_set*,
                     viua::kernel::Register_set*,
                     viua::process::Process*,
-                    viua::kernel::Kernel*) {
+                    viua::kernel::Kernel*)
+{
     Integer::underlying_type begin = 0;
     Integer::underlying_type end   = -1;
 
@@ -248,7 +253,8 @@ void String::concatenate(Frame* frame,
                          viua::kernel::Register_set*,
                          viua::kernel::Register_set*,
                          viua::process::Process*,
-                         viua::kernel::Kernel*) {
+                         viua::kernel::Kernel*)
+{
     frame->local_register_set->set(
         0,
         std::make_unique<String>(
@@ -260,7 +266,8 @@ void String::join(Frame*,
                   viua::kernel::Register_set*,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
-                  viua::kernel::Kernel*) {
+                  viua::kernel::Kernel*)
+{
     // TODO: implement
 }
 
@@ -268,7 +275,8 @@ void String::size(Frame* frame,
                   viua::kernel::Register_set*,
                   viua::kernel::Register_set*,
                   viua::process::Process*,
-                  viua::kernel::Kernel*) {
+                  viua::kernel::Kernel*)
+{
     frame->local_register_set->set(
         0, std::make_unique<Integer>(static_cast<int>(svalue.size())));
 }

@@ -41,7 +41,8 @@ std::string const OPTION_HELP_SHORT = "-h";
 std::string const OPTION_VERSION    = "--version";
 std::string const OPTION_LEX        = "--lex";
 
-static auto usage(std::vector<std::string> const& args) -> bool {
+static auto usage(std::vector<std::string> const& args) -> bool
+{
     auto help_screen    = (args.size() == 1);
     auto version_screen = false;
     if (std::find(args.begin(), args.end(), OPTION_HELP_LONG) != args.end()) {
@@ -114,7 +115,8 @@ static auto usage(std::vector<std::string> const& args) -> bool {
 }
 
 static auto make_args(int const argc, char const* const argv[])
-    -> std::vector<std::string> {
+    -> std::vector<std::string>
+{
     auto args = std::vector<std::string>{};
     std::copy_n(argv, argc, std::back_inserter(args));
     return args;
@@ -135,7 +137,8 @@ struct Parsed_args {
     std::map<std::string, std::string> options;
 };
 
-static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
+static auto parse_args(std::vector<std::string> const& args) -> Parsed_args
+{
     auto parsed = Parsed_args{};
 
     /*
@@ -149,29 +152,39 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
 
         if (arg == "-o" or arg == "--output") {
             parsed.output_file = args.at(++i);
-        } else if (arg == "--verbose") {
+        }
+        else if (arg == "--verbose") {
             parsed.verbose = true;
-        } else if (arg == "-c") {
+        }
+        else if (arg == "-c") {
             parsed.linkable_module = true;
-        } else if (arg == "-C" or arg == "--verify") {
+        }
+        else if (arg == "-C" or arg == "--verify") {
             parsed.sa_only = true;
-        } else if (arg == "--no-sa") {
+        }
+        else if (arg == "--no-sa") {
             parsed.enabled_sa = false;
-        } else if (arg == "-h" or arg == "--help") {
+        }
+        else if (arg == "-h" or arg == "--help") {
             // do nothing
-        } else if (arg == "--version") {
+        }
+        else if (arg == "--version") {
             // do nothing
-        } else if (arg == OPTION_LEX) {
+        }
+        else if (arg == OPTION_LEX) {
             parsed.lex_only = true;
-        } else if (arg == "--") {
+        }
+        else if (arg == "--") {
             ++i;
             break;
-        } else if (arg.find("--") == 0) {
+        }
+        else if (arg.find("--") == 0) {
             viua::tooling::errors::compile_time::display_error_and_exit(
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Unknown_option,
                 arg);
-        } else if (arg.find("--") != 0) {
+        }
+        else if (arg.find("--") != 0) {
             break;
         }
     }
@@ -195,7 +208,8 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args {
     return parsed;
 }
 
-static auto read_file(std::string const& path) -> std::string {
+static auto read_file(std::string const& path) -> std::string
+{
     std::ifstream in(path, std::ios::in | std::ios::binary);
 
     std::ostringstream source_in;
@@ -211,7 +225,8 @@ using viua::tooling::libs::lexer::Token;
 using token_index_type = std::vector<Token>::size_type;
 static auto display_error_header(
     viua::tooling::errors::compile_time::Error const& error,
-    std::string const& filename) -> std::string {
+    std::string const& filename) -> std::string
+{
     std::ostringstream o;
 
     using viua::util::string::escape_sequences::ATTR_RESET;
@@ -256,7 +271,8 @@ static auto underline_error_token(
     std::vector<Token> const& tokens,
     token_index_type i,
     viua::tooling::errors::compile_time::Error const& error,
-    std::string::size_type const line_no_width) -> void {
+    std::string::size_type const line_no_width) -> void
+{
     /*
      * Indent is needed to align an aside note correctly.
      * The aside note is a additional piece of text that is attached to the
@@ -389,7 +405,8 @@ static auto display_error_line(
     std::vector<Token> const& tokens,
     viua::tooling::errors::compile_time::Error const& error,
     token_index_type i,
-    std::string::size_type const line_no_width) -> token_index_type {
+    std::string::size_type const line_no_width) -> token_index_type
+{
     auto const token_line = error.line();
 
     using viua::util::string::escape_sequences::ATTR_RESET;
@@ -434,7 +451,8 @@ static auto display_context_line(std::ostream& o,
                                  std::vector<Token> const& tokens,
                                  token_index_type i,
                                  std::string::size_type const line_no_width)
-    -> token_index_type {
+    -> token_index_type
+{
     auto const token_line = tokens.at(i).line();
 
     o << "    ";  // message indent, ">>>>" on error lines
@@ -451,7 +469,8 @@ static auto display_context_line(std::ostream& o,
 }
 static auto display_error_location(
     std::vector<Token> const& tokens,
-    viua::tooling::errors::compile_time::Error const& error) -> std::string {
+    viua::tooling::errors::compile_time::Error const& error) -> std::string
+{
     std::ostringstream o;
 
     auto const context_lines = size_t{2};
@@ -478,7 +497,8 @@ static auto display_error_location(
 
         if (each.line() == error.line()) {
             i = display_error_line(o, tokens, error, i, line_no_width);
-        } else {
+        }
+        else {
             i = display_context_line(o, tokens, i, line_no_width);
         }
 
@@ -491,7 +511,8 @@ static auto display_error_in_context(
     std::ostream& o,
     std::vector<Token> const& tokens,
     viua::tooling::errors::compile_time::Error const& error,
-    std::string const& filename) -> void {
+    std::string const& filename) -> void
+{
     o << display_error_header(error, filename);
     o << '\n';
     o << display_error_location(tokens, error);
@@ -499,7 +520,8 @@ static auto display_error_in_context(
 static auto display_error_in_context(
     std::vector<Token> const& tokens,
     viua::tooling::errors::compile_time::Error_wrapper const& error,
-    std::string const& filename) -> void {
+    std::string const& filename) -> void
+{
     std::ostringstream o;
     for (auto const& e : error.errors()) {
         display_error_in_context(o, tokens, e, filename);
@@ -509,7 +531,8 @@ static auto display_error_in_context(
 }
 
 static auto to_json(viua::tooling::libs::lexer::Token const& token)
-    -> std::string {
+    -> std::string
+{
     auto o = std::ostringstream{};
 
     o << '{';
@@ -527,8 +550,8 @@ static auto to_json(viua::tooling::libs::lexer::Token const& token)
     return o.str();
 }
 static auto to_json(
-    std::vector<viua::tooling::libs::lexer::Token> const& tokens)
-    -> std::string {
+    std::vector<viua::tooling::libs::lexer::Token> const& tokens) -> std::string
+{
     auto o = std::ostringstream{};
 
     o << '[' << '\n';
@@ -543,7 +566,8 @@ static auto to_json(
     return o.str();
 }
 
-auto main(int argc, char* argv[]) -> int {
+auto main(int argc, char* argv[]) -> int
+{
     auto const args = make_args(argc, argv);
     if (usage(args)) {
         return 0;
@@ -564,10 +588,12 @@ auto main(int argc, char* argv[]) -> int {
 
     auto const source     = read_file(parsed_args.input_file);
     auto const raw_tokens = viua::tooling::libs::lexer::tokenise(source);
-    auto const tokens     = [&raw_tokens, &parsed_args ]() -> auto {
+    auto const tokens     = [&raw_tokens, &parsed_args ]() -> auto
+    {
         try {
             return viua::tooling::libs::lexer::cook(raw_tokens);
-        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        }
+        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }
@@ -580,12 +606,14 @@ auto main(int argc, char* argv[]) -> int {
     }
 
     auto const cooked_fragments =
-        [&raw_tokens, &tokens, &parsed_args ]() -> auto {
+        [&raw_tokens, &tokens, &parsed_args ]() -> auto
+    {
         try {
             return viua::tooling::libs::parser::cook(
                 parsed_args.input_file,
                 viua::tooling::libs::parser::parse(tokens));
-        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        }
+        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }
@@ -660,7 +688,8 @@ auto main(int argc, char* argv[]) -> int {
     if (parsed_args.enabled_sa) {
         try {
             viua::tooling::libs::static_analyser::analyse(cooked_fragments);
-        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        }
+        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }

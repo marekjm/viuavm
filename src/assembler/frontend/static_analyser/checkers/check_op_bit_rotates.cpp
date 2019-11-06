@@ -25,7 +25,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_bit_rotates(Register_usage_profile& register_usage_profile,
-                          Instruction const& instruction) -> void {
+                          Instruction const& instruction) -> void
+{
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,

@@ -25,7 +25,8 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_move(Register_usage_profile& register_usage_profile,
-                   Instruction const& instruction) -> void {
+                   Instruction const& instruction) -> void
+{
     auto target = get_operand<Register_index>(instruction, 0);
     auto source = get_operand<Register_index>(instruction, 1);
 

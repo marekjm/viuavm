@@ -58,13 +58,15 @@ auto ::assembler::operands::resolve_jump(
         viua::internals::types::bytecode_size addr = 0;
         enum JUMPTYPE jump_type                    = JMP_RELATIVE;
         if (str::isnum(jmp, false)){addr = stoul(jmp);}
-else if (jmp.substr(0, 2) == "0x") {
+else if (jmp.substr(0, 2) == "0x")
+{
     std::stringstream ss;
     ss << std::hex << jmp;
     ss >> addr;
     jump_type = JMP_TO_BYTE;
 }
-else if (jmp[0] == '-') {
+else if (jmp[0] == '-')
+{
     int jump_value = stoi(jmp);
     if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
         // FIXME: move jump verification to assembler::verify namespace
@@ -79,17 +81,17 @@ else if (jmp[0] == '-') {
         (instruction_index
          - static_cast<viua::internals::types::bytecode_size>(-1 * jump_value));
 }
-else if (jmp[0] == '+') {
-    addr = (instruction_index + stoul(jmp.substr(1)));
-}
-else {
+else if (jmp[0] == '+') { addr = (instruction_index + stoul(jmp.substr(1))); }
+else
+{
     try {
         // FIXME: markers map should use
         // viua::internals::types::bytecode_size to avoid the need for
         // casting
         addr =
             static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
-    } catch (std::out_of_range const& e) {
+    }
+    catch (std::out_of_range const& e) {
         throw viua::cg::lex::Invalid_syntax(
             token,
             ("cannot resolve jump to unrecognised marker: "
@@ -105,7 +107,8 @@ return std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(
 
 auto ::assembler::operands::resolve_register(Token const token,
                                              bool const allow_bare_integers)
-    -> std::string {
+    -> std::string
+{
     /*  This function is used to register numbers when a register is accessed,
      * e.g. in `integer` instruction or in `branch` in condition operand.
      *
@@ -126,7 +129,8 @@ auto ::assembler::operands::resolve_register(Token const token,
         // holds an integer (the only value suitable to use as register
         // reference)
         out.str(reg);
-    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+    }
+    else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
          * everything is still nice and simple.
          */
@@ -135,7 +139,8 @@ auto ::assembler::operands::resolve_register(Token const token,
         }
 
         out.str(reg);
-    } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
+    }
+    else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register,
          * everything is still nice and simple.
          */
@@ -144,11 +149,14 @@ auto ::assembler::operands::resolve_register(Token const token,
         }
 
         out.str(reg);
-    } else if (reg == "void") {
+    }
+    else if (reg == "void") {
         out << reg;
-    } else if (allow_bare_integers and str::isnum(reg)) {
+    }
+    else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(
             token,
             ("cannot resolve register operand: "
@@ -158,37 +166,46 @@ auto ::assembler::operands::resolve_register(Token const token,
 }
 
 auto ::assembler::operands::resolve_rs_type(Token const token)
-    -> viua::internals::Register_sets {
+    -> viua::internals::Register_sets
+{
     if (token == "local") {
         return viua::internals::Register_sets::LOCAL;
-    } else if (token == "static") {
+    }
+    else if (token == "static") {
         return viua::internals::Register_sets::STATIC;
-    } else if (token == "global") {
+    }
+    else if (token == "global") {
         return viua::internals::Register_sets::GLOBAL;
-    } else if (token == "arguments") {
+    }
+    else if (token == "arguments") {
         return viua::internals::Register_sets::ARGUMENTS;
-    } else if (token == "parameters") {
+    }
+    else if (token == "parameters") {
         return viua::internals::Register_sets::PARAMETERS;
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(
             token, "invalid register set type name: " + token.str());
     }
 }
 
 static auto timeout_to_int(std::string const& timeout)
-    -> viua::internals::types::timeout {
+    -> viua::internals::types::timeout
+{
     const auto timeout_str_size = timeout.size();
     if (timeout[timeout_str_size - 2] == 'm') {
         return static_cast<viua::internals::types::timeout>(
             stoi(timeout.substr(0, timeout_str_size - 2)));
-    } else {
+    }
+    else {
         return static_cast<viua::internals::types::timeout>(
             (stoi(timeout.substr(0, timeout_str_size - 1)) * 1000));
     }
 }
 
 auto ::assembler::operands::convert_token_to_timeout_operand(
-    viua::cg::lex::Token const token) -> timeout_op {
+    viua::cg::lex::Token const token) -> timeout_op
+{
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
         timeout_milliseconds = timeout_to_int(token);
@@ -230,7 +247,8 @@ auto assemble_instruction(
     std::vector<Token> const& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks)
-    -> viua::internals::types::bytecode_size {
+    -> viua::internals::types::bytecode_size
+{
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -239,206 +257,288 @@ auto assemble_instruction(
 
     if (tokens.at(i) == "nop") {
         program.opnop();
-    } else if (tokens.at(i) == "izero") {
+    }
+    else if (tokens.at(i) == "izero") {
         assemble_single_register_op<&Program::opizero>(program, tokens, i);
-    } else if (tokens.at(i) == "integer") {
+    }
+    else if (tokens.at(i) == "integer") {
         assemble_op_integer(program, tokens, i);
-    } else if (tokens.at(i) == "iinc") {
+    }
+    else if (tokens.at(i) == "iinc") {
         assemble_single_register_op<&Program::opiinc>(program, tokens, i);
-    } else if (tokens.at(i) == "idec") {
+    }
+    else if (tokens.at(i) == "idec") {
         assemble_single_register_op<&Program::opidec>(program, tokens, i);
-    } else if (tokens.at(i) == "float") {
+    }
+    else if (tokens.at(i) == "float") {
         assemble_op_float(program, tokens, i);
-    } else if (tokens.at(i) == "itof") {
+    }
+    else if (tokens.at(i) == "itof") {
         assemble_double_register_op<&Program::opitof>(program, tokens, i);
-    } else if (tokens.at(i) == "ftoi") {
+    }
+    else if (tokens.at(i) == "ftoi") {
         assemble_double_register_op<&Program::opftoi>(program, tokens, i);
-    } else if (tokens.at(i) == "stoi") {
+    }
+    else if (tokens.at(i) == "stoi") {
         assemble_double_register_op<&Program::opstoi>(program, tokens, i);
-    } else if (tokens.at(i) == "stof") {
+    }
+    else if (tokens.at(i) == "stof") {
         assemble_double_register_op<&Program::opstof>(program, tokens, i);
-    } else if (tokens.at(i) == "add") {
+    }
+    else if (tokens.at(i) == "add") {
         assemble_three_register_op<&Program::opadd>(program, tokens, i);
-    } else if (tokens.at(i) == "sub") {
+    }
+    else if (tokens.at(i) == "sub") {
         assemble_three_register_op<&Program::opsub>(program, tokens, i);
-    } else if (tokens.at(i) == "mul") {
+    }
+    else if (tokens.at(i) == "mul") {
         assemble_three_register_op<&Program::opmul>(program, tokens, i);
-    } else if (tokens.at(i) == "div") {
+    }
+    else if (tokens.at(i) == "div") {
         assemble_three_register_op<&Program::opdiv>(program, tokens, i);
-    } else if (tokens.at(i) == "lt") {
+    }
+    else if (tokens.at(i) == "lt") {
         assemble_three_register_op<&Program::oplt>(program, tokens, i);
-    } else if (tokens.at(i) == "lte") {
+    }
+    else if (tokens.at(i) == "lte") {
         assemble_three_register_op<&Program::oplte>(program, tokens, i);
-    } else if (tokens.at(i) == "gt") {
+    }
+    else if (tokens.at(i) == "gt") {
         assemble_three_register_op<&Program::opgt>(program, tokens, i);
-    } else if (tokens.at(i) == "gte") {
+    }
+    else if (tokens.at(i) == "gte") {
         assemble_three_register_op<&Program::opgte>(program, tokens, i);
-    } else if (tokens.at(i) == "eq") {
+    }
+    else if (tokens.at(i) == "eq") {
         assemble_three_register_op<&Program::opeq>(program, tokens, i);
-    } else if (tokens.at(i) == "string") {
+    }
+    else if (tokens.at(i) == "string") {
         viua::assembler::backend::op_assemblers::assemble_op_string(
             program, tokens, i);
-    } else if (tokens.at(i) == "text") {
+    }
+    else if (tokens.at(i) == "text") {
         viua::assembler::backend::op_assemblers::assemble_op_text(
             program, tokens, i);
-    } else if (tokens.at(i) == "texteq") {
+    }
+    else if (tokens.at(i) == "texteq") {
         assemble_three_register_op<&Program::optexteq>(program, tokens, i);
-    } else if (tokens.at(i) == "textat") {
+    }
+    else if (tokens.at(i) == "textat") {
         assemble_three_register_op<&Program::optextat>(program, tokens, i);
-    } else if (tokens.at(i) == "textsub") {
+    }
+    else if (tokens.at(i) == "textsub") {
         assemble_four_register_op<&Program::optextsub>(program, tokens, i);
-    } else if (tokens.at(i) == "textlength") {
+    }
+    else if (tokens.at(i) == "textlength") {
         assemble_double_register_op<&Program::optextlength>(program, tokens, i);
-    } else if (tokens.at(i) == "textcommonprefix") {
+    }
+    else if (tokens.at(i) == "textcommonprefix") {
         assemble_three_register_op<&Program::optextcommonprefix>(
             program, tokens, i);
-    } else if (tokens.at(i) == "textcommonsuffix") {
+    }
+    else if (tokens.at(i) == "textcommonsuffix") {
         assemble_three_register_op<&Program::optextcommonsuffix>(
             program, tokens, i);
-    } else if (tokens.at(i) == "textconcat") {
+    }
+    else if (tokens.at(i) == "textconcat") {
         assemble_three_register_op<&Program::optextconcat>(program, tokens, i);
-    } else if (tokens.at(i) == "vector") {
+    }
+    else if (tokens.at(i) == "vector") {
         viua::assembler::backend::op_assemblers::assemble_op_vector(
             program, tokens, i);
-    } else if (tokens.at(i) == "vinsert") {
+    }
+    else if (tokens.at(i) == "vinsert") {
         assemble_op_vinsert(program, tokens, i);
-    } else if (tokens.at(i) == "vpush") {
+    }
+    else if (tokens.at(i) == "vpush") {
         assemble_double_register_op<&Program::opvpush>(program, tokens, i);
-    } else if (tokens.at(i) == "vpop") {
+    }
+    else if (tokens.at(i) == "vpop") {
         assemble_op_vpop(program, tokens, i);
-    } else if (tokens.at(i) == "vat") {
+    }
+    else if (tokens.at(i) == "vat") {
         assemble_three_register_op<&Program::opvat>(program, tokens, i);
-    } else if (tokens.at(i) == "vlen") {
+    }
+    else if (tokens.at(i) == "vlen") {
         assemble_double_register_op<&Program::opvlen>(program, tokens, i);
-    } else if (tokens.at(i) == "not") {
+    }
+    else if (tokens.at(i) == "not") {
         assemble_double_register_op<&Program::opnot>(program, tokens, i);
-    } else if (tokens.at(i) == "and") {
+    }
+    else if (tokens.at(i) == "and") {
         assemble_three_register_op<&Program::opand>(program, tokens, i);
-    } else if (tokens.at(i) == "or") {
+    }
+    else if (tokens.at(i) == "or") {
         assemble_three_register_op<&Program::opor>(program, tokens, i);
-    } else if (tokens.at(i) == "bits_of_integer") {
+    }
+    else if (tokens.at(i) == "bits_of_integer") {
         assemble_double_register_op<&Program::opbits_of_integer>(
             program, tokens, i);
-    } else if (tokens.at(i) == "integer_of_bits") {
+    }
+    else if (tokens.at(i) == "integer_of_bits") {
         assemble_double_register_op<&Program::opinteger_of_bits>(
             program, tokens, i);
-    } else if (tokens.at(i) == "bits") {
+    }
+    else if (tokens.at(i) == "bits") {
         assemble_op_bits(program, tokens, i);
-    } else if (tokens.at(i) == "bitand") {
+    }
+    else if (tokens.at(i) == "bitand") {
         assemble_three_register_op<&Program::opbitand>(program, tokens, i);
-    } else if (tokens.at(i) == "bitor") {
+    }
+    else if (tokens.at(i) == "bitor") {
         assemble_three_register_op<&Program::opbitor>(program, tokens, i);
-    } else if (tokens.at(i) == "bitnot") {
+    }
+    else if (tokens.at(i) == "bitnot") {
         assemble_double_register_op<&Program::opbitnot>(program, tokens, i);
-    } else if (tokens.at(i) == "bitxor") {
+    }
+    else if (tokens.at(i) == "bitxor") {
         assemble_three_register_op<&Program::opbitxor>(program, tokens, i);
-    } else if (tokens.at(i) == "bitat") {
+    }
+    else if (tokens.at(i) == "bitat") {
         assemble_three_register_op<&Program::opbitat>(program, tokens, i);
-    } else if (tokens.at(i) == "bitset") {
+    }
+    else if (tokens.at(i) == "bitset") {
         assemble_op_bitset(program, tokens, i);
-    } else if (tokens.at(i) == "shl") {
+    }
+    else if (tokens.at(i) == "shl") {
         assemble_bit_shift_instruction<&Program::opshl>(program, tokens, i);
-    } else if (tokens.at(i) == "ashl") {
+    }
+    else if (tokens.at(i) == "ashl") {
         assemble_bit_shift_instruction<&Program::opashl>(program, tokens, i);
-    } else if (tokens.at(i) == "shr") {
+    }
+    else if (tokens.at(i) == "shr") {
         assemble_bit_shift_instruction<&Program::opshr>(program, tokens, i);
-    } else if (tokens.at(i) == "ashr") {
+    }
+    else if (tokens.at(i) == "ashr") {
         assemble_bit_shift_instruction<&Program::opashr>(program, tokens, i);
-    } else if (tokens.at(i) == "rol") {
+    }
+    else if (tokens.at(i) == "rol") {
         assemble_double_register_op<&Program::oprol>(program, tokens, i);
-    } else if (tokens.at(i) == "ror") {
+    }
+    else if (tokens.at(i) == "ror") {
         assemble_double_register_op<&Program::opror>(program, tokens, i);
-    } else if (tokens.at(i) == "wrapincrement") {
+    }
+    else if (tokens.at(i) == "wrapincrement") {
         assemble_increment_instruction<&Program::opwrapincrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "wrapdecrement") {
+    }
+    else if (tokens.at(i) == "wrapdecrement") {
         assemble_increment_instruction<&Program::opwrapdecrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "wrapadd") {
+    }
+    else if (tokens.at(i) == "wrapadd") {
         assemble_arithmetic_instruction<&Program::opwrapadd>(
             program, tokens, i);
-    } else if (tokens.at(i) == "wrapsub") {
+    }
+    else if (tokens.at(i) == "wrapsub") {
         assemble_arithmetic_instruction<&Program::opwrapsub>(
             program, tokens, i);
-    } else if (tokens.at(i) == "wrapmul") {
+    }
+    else if (tokens.at(i) == "wrapmul") {
         assemble_arithmetic_instruction<&Program::opwrapmul>(
             program, tokens, i);
-    } else if (tokens.at(i) == "wrapdiv") {
+    }
+    else if (tokens.at(i) == "wrapdiv") {
         assemble_arithmetic_instruction<&Program::opwrapdiv>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedsincrement") {
+    }
+    else if (tokens.at(i) == "checkedsincrement") {
         assemble_increment_instruction<&Program::opcheckedsincrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedsdecrement") {
+    }
+    else if (tokens.at(i) == "checkedsdecrement") {
         assemble_increment_instruction<&Program::opcheckedsdecrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedsadd") {
+    }
+    else if (tokens.at(i) == "checkedsadd") {
         assemble_arithmetic_instruction<&Program::opcheckedsadd>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedssub") {
+    }
+    else if (tokens.at(i) == "checkedssub") {
         assemble_arithmetic_instruction<&Program::opcheckedssub>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedsmul") {
+    }
+    else if (tokens.at(i) == "checkedsmul") {
         assemble_arithmetic_instruction<&Program::opcheckedsmul>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedsdiv") {
+    }
+    else if (tokens.at(i) == "checkedsdiv") {
         assemble_arithmetic_instruction<&Program::opcheckedsdiv>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkeduincrement") {
+    }
+    else if (tokens.at(i) == "checkeduincrement") {
         assemble_increment_instruction<&Program::opcheckeduincrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedudecrement") {
+    }
+    else if (tokens.at(i) == "checkedudecrement") {
         assemble_increment_instruction<&Program::opcheckedudecrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkeduadd") {
+    }
+    else if (tokens.at(i) == "checkeduadd") {
         assemble_arithmetic_instruction<&Program::opcheckeduadd>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedusub") {
+    }
+    else if (tokens.at(i) == "checkedusub") {
         assemble_arithmetic_instruction<&Program::opcheckedusub>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedumul") {
+    }
+    else if (tokens.at(i) == "checkedumul") {
         assemble_arithmetic_instruction<&Program::opcheckedumul>(
             program, tokens, i);
-    } else if (tokens.at(i) == "checkedudiv") {
+    }
+    else if (tokens.at(i) == "checkedudiv") {
         assemble_arithmetic_instruction<&Program::opcheckedudiv>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingsincrement") {
+    }
+    else if (tokens.at(i) == "saturatingsincrement") {
         assemble_increment_instruction<&Program::opsaturatingsincrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingsdecrement") {
+    }
+    else if (tokens.at(i) == "saturatingsdecrement") {
         assemble_increment_instruction<&Program::opsaturatingsdecrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingsadd") {
+    }
+    else if (tokens.at(i) == "saturatingsadd") {
         assemble_arithmetic_instruction<&Program::opsaturatingsadd>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingssub") {
+    }
+    else if (tokens.at(i) == "saturatingssub") {
         assemble_arithmetic_instruction<&Program::opsaturatingssub>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingsmul") {
+    }
+    else if (tokens.at(i) == "saturatingsmul") {
         assemble_arithmetic_instruction<&Program::opsaturatingsmul>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingsdiv") {
+    }
+    else if (tokens.at(i) == "saturatingsdiv") {
         assemble_arithmetic_instruction<&Program::opsaturatingsdiv>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatinguincrement") {
+    }
+    else if (tokens.at(i) == "saturatinguincrement") {
         assemble_increment_instruction<&Program::opsaturatinguincrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingudecrement") {
+    }
+    else if (tokens.at(i) == "saturatingudecrement") {
         assemble_increment_instruction<&Program::opsaturatingudecrement>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatinguadd") {
+    }
+    else if (tokens.at(i) == "saturatinguadd") {
         assemble_arithmetic_instruction<&Program::opsaturatinguadd>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingusub") {
+    }
+    else if (tokens.at(i) == "saturatingusub") {
         assemble_arithmetic_instruction<&Program::opsaturatingusub>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingumul") {
+    }
+    else if (tokens.at(i) == "saturatingumul") {
         assemble_arithmetic_instruction<&Program::opsaturatingumul>(
             program, tokens, i);
-    } else if (tokens.at(i) == "saturatingudiv") {
+    }
+    else if (tokens.at(i) == "saturatingudiv") {
         assemble_arithmetic_instruction<&Program::opsaturatingudiv>(
             program, tokens, i);
-    } else if (tokens.at(i) == "move") {
+    }
+    else if (tokens.at(i) == "move") {
         Token_index target = i + 1;
         Token_index source = target + 2;
 
@@ -451,7 +551,8 @@ auto assemble_instruction(
                     ::assembler::operands::resolve_register(tokens.at(source)),
                     ::assembler::operands::resolve_rs_type(
                         tokens.at(source + 1))));
-        } else {
+        }
+        else {
             program.opmove(
                 ::assembler::operands::getint_with_rs_type(
                     ::assembler::operands::resolve_register(tokens.at(target)),
@@ -462,115 +563,165 @@ auto assemble_instruction(
                     ::assembler::operands::resolve_rs_type(
                         tokens.at(source + 1))));
         }
-    } else if (tokens.at(i) == "copy") {
+    }
+    else if (tokens.at(i) == "copy") {
         assemble_double_register_op<&Program::opcopy>(program, tokens, i);
-    } else if (tokens.at(i) == "ptr") {
+    }
+    else if (tokens.at(i) == "ptr") {
         assemble_double_register_op<&Program::opptr>(program, tokens, i);
-    } else if (tokens.at(i) == "ptrlive") {
+    }
+    else if (tokens.at(i) == "ptrlive") {
         assemble_double_register_op<&Program::opptrlive>(program, tokens, i);
-    } else if (tokens.at(i) == "swap") {
+    }
+    else if (tokens.at(i) == "swap") {
         assemble_double_register_op<&Program::opswap>(program, tokens, i);
-    } else if (tokens.at(i) == "delete") {
+    }
+    else if (tokens.at(i) == "delete") {
         assemble_single_register_op<&Program::opdelete>(program, tokens, i);
-    } else if (tokens.at(i) == "isnull") {
+    }
+    else if (tokens.at(i) == "isnull") {
         assemble_double_register_op<&Program::opisnull>(program, tokens, i);
-    } else if (tokens.at(i) == "print") {
+    }
+    else if (tokens.at(i) == "print") {
         assemble_single_register_op<&Program::opprint>(program, tokens, i);
-    } else if (tokens.at(i) == "echo") {
+    }
+    else if (tokens.at(i) == "echo") {
         assemble_single_register_op<&Program::opecho>(program, tokens, i);
-    } else if (tokens.at(i) == "capture") {
+    }
+    else if (tokens.at(i) == "capture") {
         assemble_capture_op<&Program::opcapture>(program, tokens, i);
-    } else if (tokens.at(i) == "capturecopy") {
+    }
+    else if (tokens.at(i) == "capturecopy") {
         assemble_capture_op<&Program::opcapturecopy>(program, tokens, i);
-    } else if (tokens.at(i) == "capturemove") {
+    }
+    else if (tokens.at(i) == "capturemove") {
         assemble_capture_op<&Program::opcapturemove>(program, tokens, i);
-    } else if (tokens.at(i) == "closure") {
+    }
+    else if (tokens.at(i) == "closure") {
         assemble_fn_ctor_op<&Program::opclosure>(program, tokens, i);
-    } else if (tokens.at(i) == "function") {
+    }
+    else if (tokens.at(i) == "function") {
         assemble_fn_ctor_op<&Program::opfunction>(program, tokens, i);
-    } else if (tokens.at(i) == "frame") {
+    }
+    else if (tokens.at(i) == "frame") {
         assemble_op_frame(program, tokens, i);
-    } else if (tokens.at(i) == "allocate_registers") {
+    }
+    else if (tokens.at(i) == "allocate_registers") {
         assemble_single_register_op<&Program::opallocate_registers>(
             program, tokens, i);
-    } else if (tokens.at(i) == "call") {
+    }
+    else if (tokens.at(i) == "call") {
         assemble_op_call(program, tokens, i);
-    } else if (tokens.at(i) == "tailcall") {
+    }
+    else if (tokens.at(i) == "tailcall") {
         viua::assembler::backend::op_assemblers::assemble_no_result_call_op<
             &Program::optailcall,
             &Program::optailcall>(program, tokens, i);
-    } else if (tokens.at(i) == "defer") {
+    }
+    else if (tokens.at(i) == "defer") {
         viua::assembler::backend::op_assemblers::
             assemble_no_result_call_op<&Program::opdefer, &Program::opdefer>(
                 program, tokens, i);
-    } else if (tokens.at(i) == "process") {
+    }
+    else if (tokens.at(i) == "process") {
         viua::assembler::backend::op_assemblers::assemble_op_process(
             program, tokens, i);
-    } else if (tokens.at(i) == "self") {
+    }
+    else if (tokens.at(i) == "self") {
         assemble_single_register_op<&Program::opself>(program, tokens, i);
-    } else if (tokens.at(i) == "pideq") {
+    }
+    else if (tokens.at(i) == "pideq") {
         assemble_three_register_op<&Program::oppideq>(program, tokens, i);
-    } else if (tokens.at(i) == "join") {
+    }
+    else if (tokens.at(i) == "join") {
         viua::assembler::backend::op_assemblers::assemble_op_join(
             program, tokens, i);
-    } else if (tokens.at(i) == "send") {
+    }
+    else if (tokens.at(i) == "send") {
         assemble_double_register_op<&Program::opsend>(program, tokens, i);
-    } else if (tokens.at(i) == "receive") {
+    }
+    else if (tokens.at(i) == "receive") {
         viua::assembler::backend::op_assemblers::assemble_op_receive(
             program, tokens, i);
-    } else if (tokens.at(i) == "watchdog") {
+    }
+    else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i + 1));
-    } else if (tokens.at(i) == "if") {
+    }
+    else if (tokens.at(i) == "if") {
         assemble_op_if(program, tokens, i, instruction, marks);
-    } else if (tokens.at(i) == "jump") {
+    }
+    else if (tokens.at(i) == "jump") {
         assemble_op_jump(program, tokens, i, instruction, marks);
-    } else if (tokens.at(i) == "try") {
+    }
+    else if (tokens.at(i) == "try") {
         program.optry();
-    } else if (tokens.at(i) == "catch") {
+    }
+    else if (tokens.at(i) == "catch") {
         program.opcatch(tokens.at(i + 1), tokens.at(i + 2));
-    } else if (tokens.at(i) == "draw") {
+    }
+    else if (tokens.at(i) == "draw") {
         assemble_single_register_op<&Program::opdraw>(program, tokens, i);
-    } else if (tokens.at(i) == "enter") {
+    }
+    else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i + 1));
-    } else if (tokens.at(i) == "throw") {
+    }
+    else if (tokens.at(i) == "throw") {
         assemble_single_register_op<&Program::opthrow>(program, tokens, i);
-    } else if (tokens.at(i) == "leave") {
+    }
+    else if (tokens.at(i) == "leave") {
         program.opleave();
-    } else if (tokens.at(i) == "import") {
+    }
+    else if (tokens.at(i) == "import") {
         program.opimport(tokens.at(i + 1));
-    } else if (tokens.at(i) == "atom") {
+    }
+    else if (tokens.at(i) == "atom") {
         assemble_fn_ctor_op<&Program::opatom>(program, tokens, i);
-    } else if (tokens.at(i) == "atomeq") {
+    }
+    else if (tokens.at(i) == "atomeq") {
         assemble_three_register_op<&Program::opatomeq>(program, tokens, i);
-    } else if (tokens.at(i) == "struct") {
+    }
+    else if (tokens.at(i) == "struct") {
         assemble_single_register_op<&Program::opstruct>(program, tokens, i);
-    } else if (tokens.at(i) == "structinsert") {
+    }
+    else if (tokens.at(i) == "structinsert") {
         assemble_three_register_op<&Program::opstructinsert>(
             program, tokens, i);
-    } else if (tokens.at(i) == "structremove") {
+    }
+    else if (tokens.at(i) == "structremove") {
         assemble_op_structremove(program, tokens, i);
-    } else if (tokens.at(i) == "structat") {
+    }
+    else if (tokens.at(i) == "structat") {
         assemble_op_structat(program, tokens, i);
-    } else if (tokens.at(i) == "structkeys") {
+    }
+    else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
-    } else if (tokens.at(i) == "io_read") {
+    }
+    else if (tokens.at(i) == "io_read") {
         assemble_three_register_op<&Program::op_io_read>(program, tokens, i);
-    } else if (tokens.at(i) == "io_write") {
+    }
+    else if (tokens.at(i) == "io_write") {
         assemble_three_register_op<&Program::op_io_write>(program, tokens, i);
-    } else if (tokens.at(i) == "io_close") {
+    }
+    else if (tokens.at(i) == "io_close") {
         assemble_double_register_op<&Program::op_io_close>(program, tokens, i);
-    } else if (tokens.at(i) == "io_wait") {
+    }
+    else if (tokens.at(i) == "io_wait") {
         viua::assembler::backend::op_assemblers::assemble_op_io_wait(
             program, tokens, i);
-    } else if (tokens.at(i) == "io_cancel") {
+    }
+    else if (tokens.at(i) == "io_cancel") {
         assemble_single_register_op<&Program::op_io_cancel>(program, tokens, i);
-    } else if (tokens.at(i) == "return") {
+    }
+    else if (tokens.at(i) == "return") {
         program.opreturn();
-    } else if (tokens.at(i) == "halt") {
+    }
+    else if (tokens.at(i) == "halt") {
         program.ophalt();
-    } else if (tokens.at(i).str().substr(0, 1) == ".") {
+    }
+    else if (tokens.at(i).str().substr(0, 1) == ".") {
         // do nothing, it's an assembler directive
-    } else {
+    }
+    else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i),
             ("unimplemented instruction: "

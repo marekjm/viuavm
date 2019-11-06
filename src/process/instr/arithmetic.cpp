@@ -43,7 +43,8 @@ using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr
 
 template<typename OpType, OpType action>
 static auto alu_impl(Op_address_type addr, viua::process::Process* process)
-    -> Op_address_type {
+    -> Op_address_type
+{
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, process);
@@ -63,38 +64,47 @@ static auto alu_impl(Op_address_type addr, viua::process::Process* process)
     return addr;
 }
 
-auto viua::process::Process::opadd(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opadd(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<ArithmeticOp, (&Number::operator+)>(addr, this);
 }
 
-auto viua::process::Process::opsub(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opsub(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<ArithmeticOp, (&Number::operator-)>(addr, this);
 }
 
-auto viua::process::Process::opmul(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opmul(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<ArithmeticOp, (&Number::operator*)>(addr, this);
 }
 
-auto viua::process::Process::opdiv(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opdiv(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<ArithmeticOp, (&Number::operator/)>(addr, this);
 }
 
-auto viua::process::Process::oplt(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::oplt(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<LogicOp, (&Number::operator<)>(addr, this);
 }
 
-auto viua::process::Process::oplte(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::oplte(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<LogicOp, (&Number::operator<=)>(addr, this);
 }
 
-auto viua::process::Process::opgt(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opgt(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<LogicOp, ((&Number::operator>))>(addr, this);
 }
 
-auto viua::process::Process::opgte(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opgte(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<LogicOp, (&Number::operator>=)>(addr, this);
 }
 
-auto viua::process::Process::opeq(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opeq(Op_address_type addr) -> Op_address_type
+{
     return alu_impl<LogicOp, (&Number::operator==)>(addr, this);
 }

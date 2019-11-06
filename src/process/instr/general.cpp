@@ -27,7 +27,8 @@
 #include <viua/util/memory.h>
 
 
-auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type
+{
     auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
@@ -35,7 +36,8 @@ auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type {
     return addr;
 }
 
-auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type
+{
     auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);
@@ -44,7 +46,8 @@ auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type {
 }
 
 
-auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
+{
     auto target = Op_address_type{
         stack->jump_base
         + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
@@ -56,7 +59,8 @@ auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type {
     return target;
 }
 
-auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type
+{
     auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
     std::tie(addr, source) =
         viua::bytecode::decoder::operands::fetch_object(addr, this);

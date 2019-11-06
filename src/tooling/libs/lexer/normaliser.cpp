@@ -43,7 +43,8 @@ using index_type = std::vector<Token>::size_type;
  */
 static auto normalise_function_extern_function(std::vector<Token>& tokens,
                                                vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
     using viua::tooling::libs::lexer::classifier::is_id;
@@ -51,7 +52,8 @@ static auto normalise_function_extern_function(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));  // function name
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -62,7 +64,8 @@ static auto normalise_function_extern_function(std::vector<Token>& tokens,
 
     if (auto const& token = source.at(++i); token == "/") {
         tokens.push_back(source.at(i));  // arity separator
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -74,7 +77,8 @@ static auto normalise_function_extern_function(std::vector<Token>& tokens,
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
     if (auto const& token = source.at(++i); is_decimal_integer(token.str())) {
         tokens.push_back(source.at(i));  // arity
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -88,14 +92,16 @@ static auto normalise_function_extern_function(std::vector<Token>& tokens,
 
 static auto normalise_directive_extern_function(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
     return normalise_function_extern_function(tokens, source.advance(1)) + 1;
 }
 
 static auto normalise_directive_extern_block(std::vector<Token>& tokens,
                                              vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -105,7 +111,8 @@ static auto normalise_directive_extern_block(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));  // block name
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -119,7 +126,8 @@ static auto normalise_directive_extern_block(std::vector<Token>& tokens,
 
 static auto normalise_directive_info(std::vector<Token>& tokens,
                                      vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -129,7 +137,8 @@ static auto normalise_directive_info(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));  // key
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -141,7 +150,8 @@ static auto normalise_directive_info(std::vector<Token>& tokens,
     using viua::tooling::libs::lexer::classifier::is_quoted_text;
     if (auto const& token = source.at(++i); is_quoted_text(token.str())) {
         tokens.push_back(source.at(i));  // value
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -155,12 +165,14 @@ static auto normalise_directive_info(std::vector<Token>& tokens,
 
 static auto normalise_attribute_list(std::vector<Token>& tokens,
                                      vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     auto i = std::remove_reference_t<decltype(source)>::size_type{0};
 
     if (auto const& token = source.at(i); token == "[[") {
         tokens.push_back(token);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -175,9 +187,11 @@ static auto normalise_attribute_list(std::vector<Token>& tokens,
     using viua::tooling::libs::lexer::classifier::is_scoped_id;
     if (auto const& token = source.at(i); token == "]]") {
         // do nothing, we deal with it later
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         // do nothing, we deal with it later
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -204,7 +218,8 @@ static auto normalise_attribute_list(std::vector<Token>& tokens,
     while (source.at(++i) != "]]") {
         if (auto const& token = source.at(i); token == ",") {
             tokens.push_back(token);
-        } else {
+        }
+        else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
                 viua::tooling::errors::compile_time::Error{
                     viua::tooling::errors::compile_time::Compile_time_error::
@@ -216,7 +231,8 @@ static auto normalise_attribute_list(std::vector<Token>& tokens,
         if (auto const& token = source.at(++i);
             is_id(token.str()) or is_scoped_id(token.str())) {
             tokens.push_back(token);
-        } else {
+        }
+        else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
                 viua::tooling::errors::compile_time::Error{
                     viua::tooling::errors::compile_time::Compile_time_error::
@@ -236,14 +252,16 @@ static auto normalise_attribute_list(std::vector<Token>& tokens,
 
 static auto normalise_directive_import(std::vector<Token>& tokens,
                                        vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     if (auto const& token = source.at(i); token == "[[") {
         i += normalise_attribute_list(tokens, source.advance(1));
-    } else {
+    }
+    else {
         tokens.push_back(
             Token{token.line(), token.character(), "[[", token.str()});
         tokens.push_back(
@@ -255,7 +273,8 @@ static auto normalise_directive_import(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));  // module name
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -269,7 +288,8 @@ static auto normalise_directive_import(std::vector<Token>& tokens,
 
 static auto normalise_directive_mark(std::vector<Token>& tokens,
                                      vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -279,7 +299,8 @@ static auto normalise_directive_mark(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));  // marker name
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -293,7 +314,8 @@ static auto normalise_directive_mark(std::vector<Token>& tokens,
 
 static auto normalise_directive_name(std::vector<Token>& tokens,
                                      vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -303,7 +325,8 @@ static auto normalise_directive_name(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_decimal_integer(token.str()) or token == "iota") {
         tokens.push_back(source.at(i++));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -317,7 +340,8 @@ static auto normalise_directive_name(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i++));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -334,7 +358,8 @@ static auto normalise_directive_name(std::vector<Token>& tokens,
  * token supplied is a newline or not.
  */
 static auto make_unexpected_token_error(Token const& token, std::string message)
-    -> viua::tooling::errors::compile_time::Error {
+    -> viua::tooling::errors::compile_time::Error
+{
     return viua::tooling::errors::compile_time::Error{
         ((token == "\n") ? viua::tooling::errors::compile_time::
                  Compile_time_error::Unexpected_newline
@@ -349,12 +374,14 @@ static auto make_unexpected_token_error(Token const& token, std::string message)
 
 static auto normalise_register_access(std::vector<Token>& tokens,
                                       vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     using viua::tooling::libs::lexer::classifier::is_access_type_specifier;
     if (auto const& token = source.at(0);
         is_access_type_specifier(token.str())) {
         tokens.push_back(token);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token,
                                         "expected register access specifier"));
@@ -370,7 +397,8 @@ static auto normalise_register_access(std::vector<Token>& tokens,
         is_decimal_integer(register_index.str())
         or is_id(register_index.str())) {
         tokens.push_back(register_index);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 register_index, "expected register index (decimal integer)"));
@@ -380,12 +408,14 @@ static auto normalise_register_access(std::vector<Token>& tokens,
     if (auto const& register_set = source.at(2);
         is_register_set_name(register_set.str())) {
         tokens.push_back(register_set);
-    } else {
+    }
+    else {
         auto e = make_unexpected_token_error(register_set,
                                              "expected register set specifier");
         if (register_set.str().empty() or (register_set.str().at(0) == '\n')) {
             e.aside(source.at(2), "register set specifier missing here");
-        } else {
+        }
+        else {
             auto const likeness_limit =
                 viua::util::string::ops::LevenshteinDistance{4};
             auto const best_match = viua::util::string::ops::levenshtein_best(
@@ -411,7 +441,8 @@ static auto normalise_register_access(std::vector<Token>& tokens,
 
 static auto normalise_ctor_target_register_access(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     if (auto const& access_specifier = source.at(0); access_specifier != "%") {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
@@ -434,7 +465,8 @@ static auto normalise_ctor_target_register_access(
         is_decimal_integer(register_index.str())
         or is_id(register_index.str())) {
         tokens.push_back(register_index);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -447,7 +479,8 @@ static auto normalise_ctor_target_register_access(
     if (auto const& register_set = source.at(2);
         is_register_set_name(register_set.str())) {
         tokens.push_back(register_set);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -461,16 +494,19 @@ static auto normalise_ctor_target_register_access(
 
 static auto normalise_jump_target(std::vector<Token>& tokens,
                                   vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     using viua::tooling::libs::lexer::classifier::is_decimal_integer;
     using viua::tooling::libs::lexer::classifier::is_id;
     if (auto const& token = source.at(0); is_id(token.str())) {
         tokens.push_back(token);
-    } else if (auto const c = token.str().at(0);
-               (c == '+' or c == '-')
-               and is_decimal_integer(token.str().substr(1))) {
+    }
+    else if (auto const c = token.str().at(0);
+             (c == '+' or c == '-')
+             and is_decimal_integer(token.str().substr(1))) {
         tokens.push_back(token);
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -483,7 +519,8 @@ static auto normalise_jump_target(std::vector<Token>& tokens,
 }
 
 static auto normalise_call(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -494,14 +531,17 @@ static auto normalise_call(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else if (token == "void") {
+    }
+    else if (token == "void") {
         tokens.push_back(token);
         ++i;
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         // normalise the token stream by inserting a return-value-specifier
         // token
         tokens.push_back(Token{token.line(), token.character(), "void"});
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -514,12 +554,14 @@ static auto normalise_call(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(i));
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));    // function name
         tokens.push_back(source.at(++i));  // arity separator
         tokens.push_back(source.at(++i));  // arity
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -533,7 +575,8 @@ static auto normalise_call(std::vector<Token>& tokens,
 }
 
 static auto normalise_tailcall(std::vector<Token>& tokens,
-                               vector_view<Token> const& source) -> index_type {
+                               vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -544,12 +587,14 @@ static auto normalise_tailcall(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    }
+    else if (is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(source.at(i));    // function name
         tokens.push_back(source.at(++i));  // arity separator
         tokens.push_back(source.at(++i));  // arity
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -563,7 +608,8 @@ static auto normalise_tailcall(std::vector<Token>& tokens,
 
 static auto normalise_allocate_registers(std::vector<Token>& tokens,
                                          vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -581,7 +627,8 @@ static auto normalise_allocate_registers(std::vector<Token>& tokens,
 
     if (auto const& token = source.at(i); token.str() == "%") {
         i += normalise_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -595,7 +642,8 @@ static auto normalise_allocate_registers(std::vector<Token>& tokens,
 }
 
 static auto normalise_text(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -604,7 +652,8 @@ static auto normalise_text(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -618,11 +667,13 @@ static auto normalise_text(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_quoted_text(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_default(token.str())) {
+    }
+    else if (is_default(token.str())) {
         tokens.push_back(
             Token{token.line(), token.character(), "\"\"", token.str()});
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -635,7 +686,8 @@ static auto normalise_text(std::vector<Token>& tokens,
 }
 
 static auto normalise_atom(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -644,7 +696,8 @@ static auto normalise_atom(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -658,11 +711,13 @@ static auto normalise_atom(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_quoted_text(token.str(), '\'')) {
         tokens.push_back(token);
         ++i;
-    } else if (is_default(token.str())) {
+    }
+    else if (is_default(token.str())) {
         tokens.push_back(
             Token{token.line(), token.character(), "''", token.str()});
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -675,13 +730,15 @@ static auto normalise_atom(std::vector<Token>& tokens,
 }
 
 static auto normalise_izero(std::vector<Token>& tokens,
-                            vector_view<Token> const& source) -> index_type {
+                            vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
     return normalise_ctor_target_register_access(tokens, source.advance(1)) + 1;
 }
 
 static auto normalise_float(std::vector<Token>& tokens,
-                            vector_view<Token> const& source) -> index_type {
+                            vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -690,7 +747,8 @@ static auto normalise_float(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_ctor_target_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -704,11 +762,13 @@ static auto normalise_float(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_float(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_default(token.str())) {
+    }
+    else if (is_default(token.str())) {
         tokens.push_back(
             Token{token.line(), token.character(), "0.0", token.str()});
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -721,7 +781,8 @@ static auto normalise_float(std::vector<Token>& tokens,
 }
 
 static auto normalise_integer(std::vector<Token>& tokens,
-                              vector_view<Token> const& source) -> index_type {
+                              vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -730,7 +791,8 @@ static auto normalise_integer(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_ctor_target_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -744,11 +806,13 @@ static auto normalise_integer(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_decimal_integer(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_default(token.str())) {
+    }
+    else if (is_default(token.str())) {
         tokens.push_back(
             Token{token.line(), token.character(), "0", token.str()});
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -761,7 +825,8 @@ static auto normalise_integer(std::vector<Token>& tokens,
 }
 
 static auto normalise_bits(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -770,7 +835,8 @@ static auto normalise_bits(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_ctor_target_register_access(tokens, source.advance(1));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -787,19 +853,24 @@ static auto normalise_bits(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_binary_integer(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_octal_integer(token.str())) {
+    }
+    else if (is_octal_integer(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_hexadecimal_integer(token.str())) {
+    }
+    else if (is_hexadecimal_integer(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else if (is_default(token.str())) {
+    }
+    else if (is_default(token.str())) {
         tokens.push_back(
             Token{token.line(), token.character(), "0x00", token.str()});
         ++i;
-    } else if (is_access_type_specifier(token.str())) {
+    }
+    else if (is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected bits literal")
                 .comment("binary literal:      0b01")
@@ -811,7 +882,8 @@ static auto normalise_bits(std::vector<Token>& tokens,
 }
 
 static auto normalise_vector(std::vector<Token>& tokens,
-                             vector_view<Token> const& source) -> index_type {
+                             vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -820,13 +892,15 @@ static auto normalise_vector(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
 
@@ -834,7 +908,8 @@ static auto normalise_vector(std::vector<Token>& tokens,
 }
 
 static auto normalise_join(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -844,10 +919,12 @@ static auto normalise_join(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(i));
-    } else if (is_void(token.str())) {
+    }
+    else if (is_void(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token,
                                         "expected register address or void"));
@@ -856,7 +933,8 @@ static auto normalise_join(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected register address"));
     }
@@ -867,7 +945,8 @@ static auto normalise_join(std::vector<Token>& tokens,
         is_timeout_literal(token.str()) or is_default(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected timeout literal")
                 .comment("example timeout duration: `1s', `2500ms'"));
@@ -877,7 +956,8 @@ static auto normalise_join(std::vector<Token>& tokens,
 }
 
 static auto normalise_receive(std::vector<Token>& tokens,
-                              vector_view<Token> const& source) -> index_type {
+                              vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -886,10 +966,12 @@ static auto normalise_receive(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else if (token == "void") {
+    }
+    else if (token == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 token, "expected register access specifier or void"));
@@ -901,7 +983,8 @@ static auto normalise_receive(std::vector<Token>& tokens,
         is_timeout_literal(token.str()) or is_default(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected timeout literal")
                 .comment("example timeout duration: `1s', `2500ms'"));
@@ -911,7 +994,8 @@ static auto normalise_receive(std::vector<Token>& tokens,
 }
 
 static auto normalise_bit_set(std::vector<Token>& tokens,
-                              vector_view<Token> const& source) -> index_type {
+                              vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -920,7 +1004,8 @@ static auto normalise_bit_set(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_ctor_target_register_access(tokens, source.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -933,7 +1018,8 @@ static auto normalise_bit_set(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_ctor_target_register_access(tokens, source.advance(i));
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -946,7 +1032,8 @@ static auto normalise_bit_set(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_boolean_literal(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 token, "expected boolean literal (`true' or `false')"));
@@ -956,7 +1043,8 @@ static auto normalise_bit_set(std::vector<Token>& tokens,
 }
 
 static auto normalise_catch(std::vector<Token>& tokens,
-                            vector_view<Token> const& source) -> index_type {
+                            vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -966,7 +1054,8 @@ static auto normalise_catch(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_quoted_text(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected quoted type to catch")
                 .comment("valid catch: catch \"A_type\" block_name"));
@@ -978,7 +1067,8 @@ static auto normalise_catch(std::vector<Token>& tokens,
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 token, "expected block name (id, or scoped id)"));
@@ -988,7 +1078,8 @@ static auto normalise_catch(std::vector<Token>& tokens,
 }
 
 static auto normalise_enter(std::vector<Token>& tokens,
-                            vector_view<Token> const& source) -> index_type {
+                            vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -999,7 +1090,8 @@ static auto normalise_enter(std::vector<Token>& tokens,
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 token, "expected block name (id, or scoped id)"));
@@ -1009,7 +1101,8 @@ static auto normalise_enter(std::vector<Token>& tokens,
 }
 
 static auto normalise_import(std::vector<Token>& tokens,
-                             vector_view<Token> const& source) -> index_type {
+                             vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1019,7 +1112,8 @@ static auto normalise_import(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); is_quoted_text(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected quoted type to catch")
                 .comment("valid catch: catch \"A_type\" block_name"));
@@ -1029,13 +1123,15 @@ static auto normalise_import(std::vector<Token>& tokens,
 }
 
 static auto normalise_jump(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
     return normalise_jump_target(tokens, source.advance(1)) + 1;
 }
 
 static auto normalise_if(std::vector<Token>& tokens,
-                         vector_view<Token> const& source) -> index_type {
+                         vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1047,13 +1143,15 @@ static auto normalise_if(std::vector<Token>& tokens,
 }
 
 static auto normalise_frame(std::vector<Token>& tokens,
-                            vector_view<Token> const& source) -> index_type {
+                            vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
     try {
         i += normalise_register_access(tokens, source.advance(i));
-    } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+    }
+    catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
         e.errors().back().note("expected `arguments' register set");
         throw;
     }
@@ -1072,7 +1170,8 @@ static auto normalise_frame(std::vector<Token>& tokens,
 
 static auto normalise_any_1_register_instruction(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1083,7 +1182,8 @@ static auto normalise_any_1_register_instruction(
 
 static auto normalise_any_2_register_instruction(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1095,7 +1195,8 @@ static auto normalise_any_2_register_instruction(
 
 static auto normalise_any_3_register_instruction(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1103,7 +1204,8 @@ static auto normalise_any_3_register_instruction(
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
     i += normalise_register_access(tokens, source.advance(i));
@@ -1114,7 +1216,8 @@ static auto normalise_any_3_register_instruction(
 
 static auto normalise_any_4_register_instruction(
     std::vector<Token>& tokens,
-    vector_view<Token> const& source) -> index_type {
+    vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1127,7 +1230,8 @@ static auto normalise_any_4_register_instruction(
 }
 
 static auto normalise_vinsert(std::vector<Token>& tokens,
-                              vector_view<Token> const& source) -> index_type {
+                              vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1137,7 +1241,8 @@ static auto normalise_vinsert(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
 
@@ -1145,7 +1250,8 @@ static auto normalise_vinsert(std::vector<Token>& tokens,
 }
 
 static auto normalise_vpop(std::vector<Token>& tokens,
-                           vector_view<Token> const& source) -> index_type {
+                           vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1153,7 +1259,8 @@ static auto normalise_vpop(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
 
@@ -1162,7 +1269,8 @@ static auto normalise_vpop(std::vector<Token>& tokens,
     if (auto const& token = source.at(i); token.str() == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         i += normalise_register_access(tokens, source.advance(i));
     }
 
@@ -1170,7 +1278,8 @@ static auto normalise_vpop(std::vector<Token>& tokens,
 }
 
 static auto normalise_io_wait(std::vector<Token>& tokens,
-                              vector_view<Token> const& source) -> index_type {
+                              vector_view<Token> const& source) -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
@@ -1179,10 +1288,12 @@ static auto normalise_io_wait(std::vector<Token>& tokens,
     if (auto const& token = source.at(i);
         is_access_type_specifier(token.str())) {
         i += normalise_register_access(tokens, source.advance(1));
-    } else if (token == "void") {
+    }
+    else if (token == "void") {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(
                 token, "expected register access specifier or void"));
@@ -1196,7 +1307,8 @@ static auto normalise_io_wait(std::vector<Token>& tokens,
         is_timeout_literal(token.str()) or is_default(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             make_unexpected_token_error(token, "expected timeout literal")
                 .comment("example timeout duration: `1s', `2500ms'"));
@@ -1207,14 +1319,16 @@ static auto normalise_io_wait(std::vector<Token>& tokens,
 
 static auto normalise_closure_definition(std::vector<Token>& tokens,
                                          vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     if (auto const& token = source.at(i); token == "[[") {
         i += normalise_attribute_list(tokens, source.advance(1));
-    } else {
+    }
+    else {
         tokens.push_back(
             Token{token.line(), token.character(), "[[", token.str()});
         tokens.push_back(
@@ -1228,14 +1342,16 @@ static auto normalise_closure_definition(std::vector<Token>& tokens,
 
 static auto normalise_function_definition(std::vector<Token>& tokens,
                                           vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     if (auto const& token = source.at(i); token == "[[") {
         i += normalise_attribute_list(tokens, source.advance(1));
-    } else {
+    }
+    else {
         tokens.push_back(
             Token{token.line(), token.character(), "[[", token.str()});
         tokens.push_back(
@@ -1249,14 +1365,16 @@ static auto normalise_function_definition(std::vector<Token>& tokens,
 
 static auto normalise_block_definition(std::vector<Token>& tokens,
                                        vector_view<Token> const& source)
-    -> index_type {
+    -> index_type
+{
     tokens.push_back(source.at(0));
 
     auto i = std::remove_reference_t<decltype(source)>::size_type{1};
 
     if (auto const& token = source.at(i); token == "[[") {
         i += normalise_attribute_list(tokens, source.advance(1));
-    } else {
+    }
+    else {
         tokens.push_back(
             Token{token.line(), token.character(), "[[", token.str()});
         tokens.push_back(
@@ -1269,7 +1387,8 @@ static auto normalise_block_definition(std::vector<Token>& tokens,
         is_id(token.str()) or is_scoped_id(token.str())) {
         tokens.push_back(token);
         ++i;
-    } else {
+    }
+    else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -1281,7 +1400,8 @@ static auto normalise_block_definition(std::vector<Token>& tokens,
     return i;
 }
 
-static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
+static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE>
+{
     for (auto const& [opcode, name] : OP_NAMES) {
         if (name == s) {
             return opcode;
@@ -1290,7 +1410,8 @@ static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE> {
     return {};
 }
 
-auto normalise(std::vector<Token> source) -> std::vector<Token> {
+auto normalise(std::vector<Token> source) -> std::vector<Token>
+{
     auto tokens = std::vector<Token>{};
 
     for (auto i = index_type{0}; i < source.size();) {
@@ -1558,27 +1679,37 @@ auto normalise(std::vector<Token> source) -> std::vector<Token> {
         if (token == ".extern_function:") {
             i += normalise_directive_extern_function(tokens,
                                                      vector_view{source, i});
-        } else if (token == ".extern_block:") {
+        }
+        else if (token == ".extern_block:") {
             i += normalise_directive_extern_block(tokens,
                                                   vector_view{source, i});
-        } else if (token == ".closure:") {
+        }
+        else if (token == ".closure:") {
             i += normalise_closure_definition(tokens, vector_view{source, i});
-        } else if (token == ".function:") {
+        }
+        else if (token == ".function:") {
             i += normalise_function_definition(tokens, vector_view{source, i});
-        } else if (token == ".end") {
+        }
+        else if (token == ".end") {
             tokens.push_back(token);
             ++i;
-        } else if (token == ".block:") {
+        }
+        else if (token == ".block:") {
             i += normalise_block_definition(tokens, vector_view{source, i});
-        } else if (token == ".info:") {
+        }
+        else if (token == ".info:") {
             i += normalise_directive_info(tokens, vector_view{source, i});
-        } else if (token == ".import:") {
+        }
+        else if (token == ".import:") {
             i += normalise_directive_import(tokens, vector_view{source, i});
-        } else if (token == ".mark:") {
+        }
+        else if (token == ".mark:") {
             i += normalise_directive_mark(tokens, vector_view{source, i});
-        } else if (token == ".name:") {
+        }
+        else if (token == ".name:") {
             i += normalise_directive_name(tokens, vector_view{source, i});
-        } else {
+        }
+        else {
             auto e = viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Unexpected_token,

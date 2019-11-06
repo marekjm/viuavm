@@ -34,28 +34,29 @@ using viua::util::memory::load_aligned;
 
 
 auto Program::bytecode() const
-    -> std::unique_ptr<viua::internals::types::byte[]> {
+    -> std::unique_ptr<viua::internals::types::byte[]>
+{
     auto tmp = std::make_unique<viua::internals::types::byte[]>(bytes);
     std::copy_n(program.get(), size(), tmp.get());
     return tmp;
 }
 
 auto Program::fill(std::unique_ptr<viua::internals::types::byte[]> code)
-    -> Program& {
+    -> Program&
+{
     program  = std::move(code);
     addr_ptr = program.get();
     return (*this);
 }
 
 
-auto Program::size() const -> uint64_t {
-    return bytes;
-}
+auto Program::size() const -> uint64_t { return bytes; }
 
 using Token = viua::cg::lex::Token;
 auto Program::calculate_jumps(
     std::vector<std::tuple<uint64_t, uint64_t>> const jump_positions,
-    std::vector<Token> const& tokens) -> Program& {
+    std::vector<Token> const& tokens) -> Program&
+{
     for (auto const& jmp : jump_positions) {
         auto const [position, offset] = jmp;
 
@@ -72,7 +73,8 @@ auto Program::calculate_jumps(
     return (*this);
 }
 
-auto Program::jumps() const -> std::vector<uint64_t> {
+auto Program::jumps() const -> std::vector<uint64_t>
+{
     auto jmps = std::vector<uint64_t>{};
     for (auto const jmp : branches) {
         jmps.push_back(static_cast<uint64_t>(jmp - program.get()));
@@ -80,7 +82,8 @@ auto Program::jumps() const -> std::vector<uint64_t> {
     return jmps;
 }
 
-Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts} {
+Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts}
+{
     program = std::make_unique<viua::internals::types::byte[]>(bytes);
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP
      * instructions) is a safe way to prevent many hiccups.
@@ -89,7 +92,8 @@ Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts} {
     addr_ptr = program.get();
 }
 Program::Program(Program const& that)
-        : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
+        : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({})
+{
     program = std::make_unique<viua::internals::types::byte[]>(bytes);
     std::copy_n(program.get(), bytes, that.program.get());
     addr_ptr = program.get() + (that.addr_ptr - that.program.get());

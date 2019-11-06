@@ -26,7 +26,8 @@
 #include <viua/types/reference.h>
 
 
-auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register *target = nullptr, *source = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -37,7 +38,8 @@ auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -50,7 +52,8 @@ auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -63,8 +66,8 @@ auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opptrlive(Op_address_type addr)
-    -> Op_address_type {
+auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -77,7 +80,8 @@ auto viua::process::Process::opptrlive(Op_address_type addr)
 
     return addr;
 }
-auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register *target = nullptr, *source = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -88,7 +92,8 @@ auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register* target = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -101,7 +106,8 @@ auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type {
 
     return addr;
 }
-auto viua::process::Process::opisnull(Op_address_type addr) -> Op_address_type {
+auto viua::process::Process::opisnull(Op_address_type addr) -> Op_address_type
+{
     viua::kernel::Register *target = nullptr, *source = nullptr;
     std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);

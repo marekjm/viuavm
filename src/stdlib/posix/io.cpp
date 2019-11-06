@@ -31,7 +31,8 @@
 
 
 namespace viua { namespace stdlib { namespace posix { namespace io {
-template<typename T> auto memset(T& value, int const c) -> void {
+template<typename T> auto memset(T& value, int const c) -> void
+{
     ::memset(&value, c, sizeof(std::remove_reference_t<T>));
 }
 
@@ -39,7 +40,8 @@ static auto open(Frame* frame,
                  viua::kernel::Register_set*,
                  viua::kernel::Register_set*,
                  viua::process::Process*,
-                 viua::kernel::Kernel*) -> void {
+                 viua::kernel::Kernel*) -> void
+{
     auto const fd = ::open(frame->arguments->get(0)->str().c_str(), 0);
     if (fd == -1) {
         throw std::make_unique<viua::types::Exception>("Unknown_errno");
@@ -56,6 +58,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

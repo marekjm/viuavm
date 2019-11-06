@@ -28,10 +28,12 @@
 
 
 // Helper functions for checking if a container contains an item.
-template<typename T> auto in(std::vector<T> v, T item) -> bool {
+template<typename T> auto in(std::vector<T> v, T item) -> bool
+{
     return (std::find(v.begin(), v.end(), item) != v.end());
 }
-template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool {
+template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool
+{
     return (m.count(key) == 1);
 }
 

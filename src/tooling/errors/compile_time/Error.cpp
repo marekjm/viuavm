@@ -24,39 +24,49 @@ namespace viua { namespace tooling { namespace errors { namespace compile_time {
 Error::Error(Compile_time_error const e,
              viua::tooling::libs::lexer::Token t,
              std::string m)
-        : cause{e}, main_token{t}, message{m} {}
+        : cause{e}, main_token{t}, message{m}
+{
+}
 
-auto Error::line() const -> viua::tooling::libs::lexer::Token::Position_type {
+auto Error::line() const -> viua::tooling::libs::lexer::Token::Position_type
+{
     return main_token.line();
 }
 auto Error::character() const
-    -> viua::tooling::libs::lexer::Token::Position_type {
+    -> viua::tooling::libs::lexer::Token::Position_type
+{
     return main_token.character();
 }
 
-auto Error::note(std::string n) -> Error& {
+auto Error::note(std::string n) -> Error&
+{
     attached_notes.emplace_back(std::move(n));
     return *this;
 }
 
-auto Error::notes() const -> std::vector<std::string> const& {
+auto Error::notes() const -> std::vector<std::string> const&
+{
     return attached_notes;
 }
 
-auto Error::comment(std::string n) -> Error& {
+auto Error::comment(std::string n) -> Error&
+{
     attached_comments.emplace_back(std::move(n));
     return *this;
 }
 
-auto Error::comments() const -> std::vector<std::string> const& {
+auto Error::comments() const -> std::vector<std::string> const&
+{
     return attached_comments;
 }
 
-auto Error::add(viua::tooling::libs::lexer::Token const token) -> Error& {
+auto Error::add(viua::tooling::libs::lexer::Token const token) -> Error&
+{
     tokens.push_back(token);
     return *this;
 }
-auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool {
+auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool
+{
     if (token.line() == main_token.line()
         and token.character() >= main_token.character()
         and token.ends(true) <= main_token.ends(true)) {
@@ -74,21 +84,21 @@ auto Error::match(viua::tooling::libs::lexer::Token const token) const -> bool {
     return false;
 }
 
-auto Error::aside(std::string a) -> Error& {
+auto Error::aside(std::string a) -> Error&
+{
     aside_note  = a;
     aside_token = main_token;
     return *this;
 }
-auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a)
-    -> Error& {
+auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a) -> Error&
+{
     aside_note  = a;
     aside_token = t;
     return *this;
 }
-auto Error::aside() const -> std::string {
-    return aside_note;
-}
-auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool {
+auto Error::aside() const -> std::string { return aside_note; }
+auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool
+{
     if (token.line() == aside_token.line()
         and token.character() == aside_token.character()) {
         return true;
@@ -103,19 +113,20 @@ auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool {
     return false;
 }
 
-auto Error::str() const -> std::string {
-    return message;
-}
-auto Error::what() const -> std::string {
+auto Error::str() const -> std::string { return message; }
+auto Error::what() const -> std::string
+{
     if (auto s = viua::tooling::errors::compile_time::display_error(cause);
         s.empty()) {
         return message;
-    } else {
+    }
+    else {
         return s + (message.empty() ? "" : (": " + message));
     }
 }
 
-auto Error::empty() const -> bool {
+auto Error::empty() const -> bool
+{
     return (cause == Compile_time_error::Empty_error) and message.empty();
 }
 }}}}  // namespace viua::tooling::errors::compile_time

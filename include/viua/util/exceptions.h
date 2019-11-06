@@ -7,7 +7,8 @@
 namespace viua { namespace util { namespace exceptions {
 template<typename Ex, typename... Ts>
 auto make_unique_exception(Ts&&... args)
-    -> std::unique_ptr<viua::types::Exception> {
+    -> std::unique_ptr<viua::types::Exception>
+{
     auto e  = std::make_unique<Ex>(std::forward<Ts>(args)...);
     auto ex = std::unique_ptr<viua::types::Exception>{};
     ex.reset(e.release());

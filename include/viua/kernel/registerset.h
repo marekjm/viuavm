@@ -100,7 +100,8 @@ class Register_set {
     mask_type getmask(viua::internals::types::register_index);
 
     void drop();
-    inline viua::internals::types::register_index size() {
+    inline viua::internals::types::register_index size()
+    {
         return registerset_size;
     }
 

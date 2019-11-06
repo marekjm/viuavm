@@ -27,7 +27,6 @@ namespace viua {
     namespace tooling {
         namespace libs {
             namespace static_analyser {
-
 struct Analyser_state {
     std::set<std::string> functions_called;
 };

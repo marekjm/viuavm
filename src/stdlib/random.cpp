@@ -31,7 +31,8 @@
 #include <viua/types/integer.h>
 
 
-static auto getrandom() -> long double {
+static auto getrandom() -> long double
+{
     /** Return random float between 0.0 and 1.0.
      *
      *  This is a utility function exposed to Viua.
@@ -51,7 +52,8 @@ static auto random_drandom(Frame* frame,
                            viua::kernel::Register_set*,
                            viua::kernel::Register_set*,
                            viua::process::Process*,
-                           viua::kernel::Kernel*) -> void {
+                           viua::kernel::Kernel*) -> void
+{
     /*
      * Return random integer.
      *
@@ -73,7 +75,8 @@ static auto random_durandom(Frame* frame,
                             viua::kernel::Register_set*,
                             viua::kernel::Register_set*,
                             viua::process::Process*,
-                            viua::kernel::Kernel*) -> void {
+                            viua::kernel::Kernel*) -> void
+{
     /*
      * Return random integer.
      *
@@ -97,7 +100,8 @@ static auto random_random(Frame* frame,
                           viua::kernel::Register_set*,
                           viua::kernel::Register_set*,
                           viua::process::Process*,
-                          viua::kernel::Kernel*) -> void {
+                          viua::kernel::Kernel*) -> void
+{
     /*
      * Return random float from range between 0.0 and 1.0.
      */
@@ -111,7 +115,8 @@ static auto random_randint(Frame* frame,
                            viua::kernel::Register_set*,
                            viua::kernel::Register_set*,
                            viua::process::Process*,
-                           viua::kernel::Kernel*) -> void {
+                           viua::kernel::Kernel*) -> void
+{
     /*
      * Return random integer from selected range.
      *
@@ -138,6 +143,4 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() {
-    return functions;
-}
+extern "C" const Foreign_function_spec* exports() { return functions; }

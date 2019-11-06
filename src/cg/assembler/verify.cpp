@@ -39,7 +39,8 @@ using Token       = viua::cg::lex::Token;
 
 static bool is_defined(std::string function_name,
                        std::vector<std::string> const& function_names,
-                       std::vector<std::string> const& function_signatures) {
+                       std::vector<std::string> const& function_signatures)
+{
     bool is_undefined =
         (find(function_names.begin(), function_names.end(), function_name)
          == function_names.end());
@@ -55,7 +56,8 @@ static bool is_defined(std::string function_name,
 void assembler::verify::function_calls_are_defined(
     std::vector<Token> const& tokens,
     std::vector<std::string> const& function_names,
-    std::vector<std::string> const& function_signatures) {
+    std::vector<std::string> const& function_signatures)
+{
     std::ostringstream report("");
     auto line = std::string{};
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
@@ -78,7 +80,8 @@ void assembler::verify::function_calls_are_defined(
                          + " undefined function " + function_name.str()));
                 }
             }
-        } else if (token == "watchdog") {
+        }
+        else if (token == "watchdog") {
             auto function_name = tokens.at(i + 1);
             if (not is_defined(
                     function_name, function_names, function_signatures)) {
@@ -86,7 +89,8 @@ void assembler::verify::function_calls_are_defined(
                     function_name,
                     "watchdog from undefined function " + function_name.str());
             }
-        } else if (token == "call" or token == "process") {
+        }
+        else if (token == "call" or token == "process") {
             Token function_name = tokens.at(i + 2);
             if (tokens.at(i + 1) != "void") {
                 function_name = tokens.at(i + 3);
@@ -109,7 +113,8 @@ void assembler::verify::function_calls_are_defined(
 void assembler::verify::callable_creations(
     std::vector<Token> const& tokens,
     std::vector<std::string> const& function_names,
-    std::vector<std::string> const& function_signatures) {
+    std::vector<std::string> const& function_signatures)
+{
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0;
          i < tokens.size();
          ++i) {
