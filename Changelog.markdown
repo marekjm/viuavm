@@ -27,7 +27,7 @@ There are several categories of change:
 
 ----
 
-# From 0.9.0 to 0.9.1
+# From 0.9.0 to 0.10.0
 
 - feature: bit manipulation instructions (and, or, xor; arithmetic and logical shifts;
   rotates), and bit literals (binary, octal, and hexadecimal)
