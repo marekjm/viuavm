@@ -84,16 +84,15 @@ auto viua::process::Process::op_io_write(Op_address_type addr)
 
 auto viua::process::Process::op_io_close(Op_address_type addr)
     -> Op_address_type {
-    // fetch the dummy request value
-    viua::kernel::Register* dummy_request = nullptr;
-    std::tie(addr, dummy_request) =
+    viua::kernel::Register* target = nullptr;
+    std::tie(addr, target) =
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::IO_port* port = nullptr;
     std::tie(addr, port) = viua::bytecode::decoder::operands::fetch_object_of<
         std::remove_pointer<decltype(port)>::type>(addr, this);
 
-    port->close();
+    *target = port->close(attached_scheduler->kernel());
 
     return addr;
 }

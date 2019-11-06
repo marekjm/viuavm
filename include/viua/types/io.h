@@ -77,7 +77,8 @@ class IO_port : public Value {
     virtual auto write(viua::kernel::Kernel&, std::unique_ptr<Value>)
         -> std::unique_ptr<IO_request> = 0;
 
-    virtual auto close() -> void = 0;
+    virtual auto close(viua::kernel::Kernel&)
+        -> std::unique_ptr<IO_request> = 0;
 
     IO_port();
     ~IO_port();
@@ -114,7 +115,10 @@ class IO_fd : public IO_port {
         -> std::unique_ptr<IO_request> override;
     auto write(viua::kernel::Kernel&, std::unique_ptr<Value>)
         -> std::unique_ptr<IO_request> override;
-    auto close() -> void override;
+    auto close(viua::kernel::Kernel&)
+        -> std::unique_ptr<IO_request> override;
+
+    auto close() -> void;
 
     IO_fd(int const, Ownership const = Ownership::Owned);
     ~IO_fd();

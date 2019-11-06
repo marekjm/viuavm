@@ -119,6 +119,31 @@ auto IO_write_interaction::interact() -> Interaction_result {
                                   buffer.substr(static_cast<size_t>(n)))};
 }
 
+IO_close_interaction::IO_close_interaction(id_type const x,
+                                           int const fd)
+        : IO_interaction(x), file_descriptor{fd} {}
+auto IO_close_interaction::interact() -> Interaction_result {
+    if (cancelled()) {
+        return Interaction_result{IO_interaction::State::Complete,
+                                  IO_interaction::Status::Cancelled,
+                                  std::make_unique<viua::types::Exception>(
+                                      "IO_cancel", "I/O cancelled")};
+    }
+
+    auto const n = ::close(file_descriptor);
+
+    if (n == -1) {
+        auto const saved_errno = errno;
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Error,
+            std::make_unique<viua::types::Integer>(saved_errno)};
+    }
+    return Interaction_result{IO_interaction::State::Complete,
+                              IO_interaction::Status::Success,
+                              std::make_unique<viua::types::Boolean>(true)};
+}
+
 auto IO_empty_interaction::interact() -> Interaction_result {
     if (cancelled()) {
         return Interaction_result{IO_interaction::State::Complete,
@@ -202,6 +227,24 @@ auto IO_fd::write(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
     auto buffer = x->str();
     k.schedule_io(std::make_unique<IO_write_interaction>(
         interaction_id, file_descriptor, std::move(buffer)));
+    return std::make_unique<IO_request>(&k, interaction_id);
+}
+auto IO_fd::close(viua::kernel::Kernel& k) -> std::unique_ptr<IO_request> {
+    using viua::scheduler::io::IO_interaction;
+    using viua::scheduler::io::IO_close_interaction;
+    using viua::scheduler::io::IO_empty_interaction;
+
+    auto const interaction_id =
+        IO_interaction::id_type{file_descriptor, counter++};
+
+    if (ownership == Ownership::Borrowed) {
+        k.schedule_io(std::make_unique<IO_empty_interaction>(
+            interaction_id));
+        return std::make_unique<IO_request>(&k, interaction_id);
+    }
+
+    k.schedule_io(std::make_unique<IO_close_interaction>(
+        interaction_id, file_descriptor));
     return std::make_unique<IO_request>(&k, interaction_id);
 }
 auto IO_fd::close() -> void {
