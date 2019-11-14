@@ -105,6 +105,8 @@ void viua::scheduler::io::io_scheduler(
             FD_ZERO(&readfds);
             FD_ZERO(&writefds);
 
+            auto always_ready = false;
+
             switch (work.kind()) {
             case IO_kind::Input:
                 FD_SET(*work.fd(), &readfds);
@@ -112,10 +114,15 @@ void viua::scheduler::io::io_scheduler(
             case IO_kind::Output:
                 FD_SET(*work.fd(), &writefds);
                 break;
+            case IO_kind::Close:
+                always_ready = true;
+                break;
             default:
                 /*
-                 * Doing nothing is harmless in this situation.
+                 * Just set it for both modes, to be on the safe side.
                  */
+                FD_SET(*work.fd(), &readfds);
+                FD_SET(*work.fd(), &writefds);
                 break;
             }
 
@@ -136,7 +143,7 @@ void viua::scheduler::io::io_scheduler(
                 kernel.schedule_io(std::move(interaction));
                 continue;
             }
-            if (s == 0) {
+            if (s == 0 and (not always_ready)) {
                 if constexpr ((false)) {
                     std::cerr << ("[io][id=" + std::to_string(scheduler_id)
                                   + "] select(3) returned 0 for "
@@ -156,6 +163,9 @@ void viua::scheduler::io::io_scheduler(
                 break;
             case IO_kind::Output:
                 is_ready = FD_ISSET(*work.fd(), &writefds);
+                break;
+            case IO_kind::Close:
+                is_ready = true;
                 break;
             default:
                 /* It is safe to do nothing in this case. */

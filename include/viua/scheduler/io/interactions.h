@@ -27,6 +27,7 @@ namespace viua { namespace scheduler { namespace io {
 enum class IO_kind : uint8_t {
     Input,
     Output,
+    Close,
 };
 
 struct IO_interaction {
@@ -153,26 +154,7 @@ struct IO_close_interaction : public IO_interaction {
     std::optional<fd_type> fd() const override { return file_descriptor; }
     IO_kind kind() const override
     {
-        /*
-         * Why is closing considered an input operation?
-         *
-         * There is no good answer to this question. The VM treats closing as
-         * an input operation because select(2) should return when a file
-         * descriptor is ready for reading regardless of whether the read(2)
-         * call would succeed or not. And calling read(2) on a closed file
-         * descriptor would immediately return an error and set errno to EBADF
-         * since it is not open for reading.
-         *
-         * I don't know how good this solution is as I could not find anything
-         * truly useful or decisive when looking for an answer to the question:
-         *
-         *      Is close(2) considered input or output operation, when
-         *      considered from select(2)'s point of view?
-         *
-         * I guess it does not really matter, since both read(2) and write(2)
-         * should just return EBADF for closed file descriptors.
-         */
-        return IO_kind::Input;
+        return IO_kind::Close;
     }
 
     IO_close_interaction(id_type const, int const);
