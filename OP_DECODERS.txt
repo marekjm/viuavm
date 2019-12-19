@@ -1,0 +1,12 @@
+add:
+sub:
+mul:
+div:
+lt:
+lte:
+gt:
+gte:
+eq:
+    fetch_register          # output
+    fetch_object_of<Number>
+    fetch_object_of<Number>
