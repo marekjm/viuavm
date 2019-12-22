@@ -1,3 +1,11 @@
+bits_literal: 0b00000000
+            | 0xdeadbeef
+
+bool_literal: true
+            | false
+
+--------------------------------------------------------------------------------
+
 add:
 sub:
 mul:
@@ -7,6 +15,58 @@ lte:
 gt:
 gte:
 eq:
-    fetch_register          # output
+    fetch_register
     fetch_object_of<Number>
     fetch_object_of<Number>
+
+atom:
+    fetch_register
+    fetch_primitive_string
+
+atomeq:
+    fetch_register
+    fetch_object_of<Atom>
+    fetch_object_of<Atom>
+
+bits_of_integer:
+    fetch_register
+    fetch_object_of<Integer>
+
+integer_of_bits:
+    fetch_register
+    fetch_object_of<Bits>
+
+bits:
+    fetch_register
+    fetch_object_of<Integer> | bits_literal
+
+bitand:
+bitor:
+bitxor:
+    fetch_register
+    fetch_object_of<Bits>
+    fetch_object_of<Bits>
+
+bitnot:
+    fetch_register
+    fetch_object_of<Bits>
+
+bitat:
+    fetch_register
+    fetch_object_of<Bits>
+    fetch_object_of<Integer>
+
+bitset:
+    fetch_object_of<Bits>
+    fetch_object_of<Integer>
+    bool_literal | fetch_object_of<Boolean>
+
+
+--------------------------------------------------------------------------------
+
+fetch_register: fetch a value allowing r/w access to a register
+fetch_object_of<>: fetcha value of a certain type from a register
+
+These two are encoded in the bytecode the same way (as a value access form). The
+only difference is how they are interpreted at runtime. A constraint is that the
+`fetch_register` can not use pointer-dereference access type.
