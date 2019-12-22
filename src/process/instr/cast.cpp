@@ -36,8 +36,8 @@ auto viua::process::Process::opitof(Op_address_type addr) -> Op_address_type
         viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Integer* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+    std::tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<
+        viua::types::Integer>(addr, this);
 
     *target = std::make_unique<viua::types::Float>(source->as_float());
 
@@ -52,7 +52,8 @@ auto viua::process::Process::opftoi(Op_address_type addr) -> Op_address_type
 
     viua::types::Float* source = nullptr;
     std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Float>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Float>(
+            addr, this);
 
     *target = std::make_unique<viua::types::Integer>(source->as_integer());
 
@@ -67,9 +68,10 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type
 
     viua::types::String* source = nullptr;
     std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(
+            addr, this);
 
-    auto result_integer = int{0};
+    auto result_integer        = int{0};
     auto const supplied_string = source->value();
     try {
         result_integer = std::stoi(supplied_string);
@@ -96,10 +98,11 @@ auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type
 
     viua::types::String* source = nullptr;
     std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(
+            addr, this);
 
     auto const supplied_string = source->value();
-    auto const convert_from = std::stod(supplied_string);
+    auto const convert_from    = std::stod(supplied_string);
     *target = std::make_unique<viua::types::Float>(convert_from);
 
     return addr;

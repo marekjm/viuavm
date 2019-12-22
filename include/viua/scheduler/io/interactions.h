@@ -152,10 +152,7 @@ struct IO_close_interaction : public IO_interaction {
     auto interact() -> Interaction_result override;
 
     std::optional<fd_type> fd() const override { return file_descriptor; }
-    IO_kind kind() const override
-    {
-        return IO_kind::Close;
-    }
+    IO_kind kind() const override { return IO_kind::Close; }
 
     IO_close_interaction(id_type const, int const);
 };
