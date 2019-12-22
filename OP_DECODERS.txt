@@ -6,6 +6,9 @@ bool_literal: true
 
 --------------------------------------------------------------------------------
 
++ means output register with new value created
+~ means mutated register
+
 add:
 sub:
 mul:
@@ -15,51 +18,88 @@ lte:
 gt:
 gte:
 eq:
-    fetch_register
+    +fetch_register
     fetch_object_of<Number>
     fetch_object_of<Number>
 
 atom:
-    fetch_register
+    +fetch_register
     fetch_primitive_string
 
 atomeq:
-    fetch_register
+    +fetch_register
     fetch_object_of<Atom>
     fetch_object_of<Atom>
 
 bits_of_integer:
-    fetch_register
+    +fetch_register
     fetch_object_of<Integer>
 
 integer_of_bits:
-    fetch_register
+    +fetch_register
     fetch_object_of<Bits>
 
 bits:
-    fetch_register
+    +fetch_register
     fetch_object_of<Integer> | bits_literal
 
 bitand:
 bitor:
 bitxor:
-    fetch_register
+    +fetch_register
     fetch_object_of<Bits>
     fetch_object_of<Bits>
 
 bitnot:
-    fetch_register
+    +fetch_register
     fetch_object_of<Bits>
 
 bitat:
-    fetch_register
+    +fetch_register
     fetch_object_of<Bits>
     fetch_object_of<Integer>
 
 bitset:
-    fetch_object_of<Bits>
+    ~fetch_object_of<Bits>
     fetch_object_of<Integer>
     bool_literal | fetch_object_of<Boolean>
+
+shl:
+shr:
+ashl:
+ashr:
+    +fetch_register | void
+    fetch_object_of<Bits>
+    fetch_object_of<Integer>
+
+rol:
+ror:
+    ~fetch_object_of<Bits>
+    fetch_object_of<Integer>
+
+wrapincrement:
+wrapdecrement:
+checkedsincrement:
+checkedsdecrement:
+saturatingsincrement:
+saturatingsdecrement:
+    ~fetch_object_of<Bits>
+
+wrapadd:
+wrapsub:
+wrapmul:
+wrapdiv:
+checkedsadd:
+checkedssub:
+checkedsmul:
+checkedsdiv:
+saturatingsadd:
+saturatingssub:
+saturatingsmul:
+saturatingsdiv:
+    +fetch_register
+    fetch_object_of<Bits>
+    fetch_object_of<Bits>
 
 
 --------------------------------------------------------------------------------
