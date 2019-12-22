@@ -6,6 +6,8 @@ bool_literal: true
 
 --------------------------------------------------------------------------------
 
+> means output register with no new value created
+< means input register with value removed
 + means output register with new value created
 ~ means mutated register
 
@@ -111,13 +113,58 @@ or:
     fetch_object
     fetch_object
 
+frame:
+    fetch_register_index # used to indicate a number of argument registers to
+                         # allocate, not as a real address
+    fetch_register_index # unused
+
+param:
+    +fetch_register_index
+    fetch_register
+
+pamv:
+    +fetch_register_index
+    <fetch_register
+
+arg:
+    >fetch_register | void
+    <fetch_register_index
+
+allocate_registers:
+    fetch_register       # used to indicate how many registers should be
+                         # allocated, not as a real address
+
+call:
+    +fetch_register | void
+    fetch_register | string_literal
+
+tailcall:
+defer:
+    fetch_register | string_literal
+
+return:
+    none
 
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
 fetch_object_of<>: fetch a value of a certain type from a register
 fetch_object: fetch a value of any type from register
+fetch_register_index: fetch a register index (but no access type or set)
 
-These two are encoded in the bytecode the same way (as a value access form). The
+All these are encoded in the bytecode the same way (as a value access form). The
 only difference is how they are interpreted at runtime. A constraint is that the
 `fetch_register` can not use pointer-dereference access type.
+
+--------------------------------------------------------------------------------
+
+string_literal
+
+A string literal may represent a byte string, an atom, a text string (a sequence
+of Unicode codepoints encoded in UTF-8), or a symbol name (function, module,
+block, exception). They are all encoded the same way: as a null-terminated byte
+string, and the only difference is how they are interpreted at runtime.
+
+Note: string literals should be represented as length-prefixed binary data, as a
+byte string *may* contain zero character. Byte strings are for arbitrary
+strings, and text should be used to hold textual data.
