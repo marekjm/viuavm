@@ -18,7 +18,7 @@
 ;
 
 .function: watchdog_process/1
-    allocate_registers %9 local
+    allocate_registers %6 local
 
     .name: %iota death_message
     .name: %iota exception
@@ -39,10 +39,7 @@
     print (string %message local "<<<") local
 
     .name: %iota i
-    vat %i local %params local (integer %iota local 1) local
-    copy %i local *i local
-    vat %message local %params local (integer %iota local 0) local
-    frame ^[(copy %0 arguments *message local) (copy %1 arguments (iinc %i local) local)]
+    frame ^[(move %0 arguments (integer %iota local 42) local) (move %1 arguments (integer %iota local 1) local)]
     process void a_division_executing_process/2
 
     return

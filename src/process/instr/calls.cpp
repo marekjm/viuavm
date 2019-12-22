@@ -114,16 +114,7 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type
         throw std::make_unique<viua::types::Exception>(oss.str());
     }
 
-    std::unique_ptr<viua::types::Value> argument;
-
-    if (stack->back()->arguments->isflagged(parameter_no_operand_index,
-                                            MOVED)) {
-        argument = stack->back()->arguments->pop(parameter_no_operand_index);
-    }
-    else {
-        argument =
-            stack->back()->arguments->get(parameter_no_operand_index)->copy();
-    }
+    auto argument = stack->back()->arguments->pop(parameter_no_operand_index);
 
     if (target) {
         *target.value() = std::move(argument);

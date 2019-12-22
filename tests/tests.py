@@ -2893,7 +2893,7 @@ class WatchdogTests(unittest.TestCase):
         runTestReturnsUnorderedLines(self, 'restarting_process.asm', [
             "process [  main  ]: 'main' exiting",
             "Hello World (from detached process)!",
-            "[WARNING] process 'Function: a_division_executing_process/2[42, 0]' killed by >>>cannot divide by zero<<<",
+            "[WARNING] process 'Function: a_division_executing_process/2[]' killed by >>>cannot divide by zero<<<",
             "42 / 1 = 42",
             "Hello World (from detached process) after a runaway exception!",
             "process [detached]: 'a_detached_concurrent_process' exiting",
