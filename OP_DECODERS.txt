@@ -145,6 +145,22 @@ defer:
 return:
     none
 
+itof:
+    +fetch_register
+    fetch_object_of<Integer>
+
+ftoi:
+    +fetch_register
+    fetch_object_of<Float>
+
+stoi:
+    +fetch_register
+    fetch_object_of<String>
+
+stof:
+    +fetch_register
+    fetch_object_of<String>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
