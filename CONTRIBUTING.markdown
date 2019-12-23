@@ -28,8 +28,9 @@ The development environment is also assumed to have the usual \*NIX tools (awk, 
 
 Testing is regularly performed only on Linux.
 Compilation on on various BSD distributions should also work.
-Compilation on other operating systems is not tested, but contributors with access to
-Microsoft, Apple, or other exotic operating systems are welcome to try and compile the code, to see if it runs.
+Compilation on other operating systems is not tested, but contributors with
+access to Microsoft, Apple, or other exotic operating systems are welcome to try
+and compile the code to see if it runs.
 
 
 ### Typical "from clone to first run"
@@ -57,15 +58,16 @@ In the `scripts/` directory, you can find scripts that are used during developme
 ## Git workflow
 
 Each feature and fix is developed in a separate branch.
-Bugs which are discovered during development of a certain feature,
-may be fixed in the same branch as their parent issue.
-This is also true for small features.
+Bugs which are discovered during development of a certain feature, may be fixed
+in the same branch as their parent issue. This is also true for small features.
 
 **Branch structure:**
 
-- `master`: master branch - contains stable, working version of VM code,
-- `devel`: development branch - all fixes and features are first merged here,
-- `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes),
+- `master`: master branch - contains stable, working version of VM code
+- `devel`: development branch - all fixes and features are first merged here
+- `issue-{hash}-{slug}` or `issue-{slug}`: for issue branches
+
+Issues are tracked using the `issue` tool: https://git.sr.ht/~maelkum/issue
 
 ----
 
@@ -85,32 +87,34 @@ If you're fixing a bug:
 If you're implementing a feature:
 
 - provide a positive test (i.e. feature working as intended and performing its function)
-- provide a negative test (i.e. feature generating an error)
+- provide a negative test (i.e. feature generating an error) if applicable
 - put comments in the code samples the tests use
 
-In both cases your code must pass the tests on both x86\_64 and 64 bit ARM (if you don't have an ARM CPU around
-mention it when submitting a pull request and I'll test on ARM myself).
-Your code must also run clean under Valgrind, which implies:
+In both cases your code must pass the tests on x86\_64 on Linux.
+
+Your code must run clean under Valgrind, which implies:
 
 - no memory leaks
 - no hangs due to multithreading
 - no unprotected reads/writes to memory
 
-Remember - if your code normally runs OK, but behaves strangely under Valgrind it's most
-probably a sign that there's a problem with your code.
+Remember - if your code normally runs OK, but behaves strangely under Valgrind
+it's most probably a sign that there's a problem with your code.
+
+Your code must compile warning-free under both GCC and Clang.
 
 
 ### Vulnerabilities
 
 Vulnerabilities are considered bugs, and the standard way of submission applies.
-A GitHub issue should be opened with a description of how to exploit the VM, and
-a possible fix preventing the exploit.
+An issue should be opened with a description of how to exploit the VM, and a
+possible fix preventing the exploit.
 
 
 ### Coding standard
 
-When submitting a patch make sure that it is formatted according to the coding standard:
-It is described [here](CODING_STYLE.markdown).
+When submitting a patch make sure that it is formatted according to the coding
+standard. It is described [here](CODING_STYLE.markdown).
 
 ----
 
@@ -127,41 +131,16 @@ If you're interested in writing documentation have a go at it.
 
 > Talk is cheap, show me the code.
 
-The VM will be no good, if no code runs on it.
-If you have written something that runs on the VM (a short program solving your problem, or
-a Rosetta Code task) submit a pull request.
-Your sample should contain appropriate copyright notice pointing to you, and
-be published under GNU GPL v3 or any later version of the GPL.
-
-
-**Data structures**
-
-Viua uses only the C++ standard library data structures.
-However, if you are capable of writing efficient, reliable, concurrent data structures feel welcome
-to share your knowlegde and experience, and improve the VM.
-
-Most sought-after would be:
-
-- multiple-producer single-consumer queue (for message queues),
-- data structure for mapping types to their ancestors (e.g. map from string to vector of strings),
-- multi-version map (for storing multiple versions of loaded bytecode modules for code hot-swapping)
-
-If you have other ideas, feel free to suggest them.
-
-Note that *all* data structures used by the VM kernel *must* support parallel access so either use locks, or
-atomic operations but ensure that your data structure is safe to use in parallel environment.
-
-
-**Bytecode format**
-
-Currently, debugging information embedded in bytecode is limited.
-If you have an idea how to embed debugging symbols in bytecode, and
-want to have a go at implementing such a functionality feel free to.
+The VM will be no good, if no code runs on it. If you have written something
+that runs on the VM (a short program solving your problem, or a Rosetta Code
+task) submit a pull request.  Your sample should contain appropriate copyright
+notice pointing to you, and be published under GNU GPL v3 or any later version
+of the GPL.
 
 
 **Overall hardening**
 
 If you can set-up Coverity (I seem unable to), it would be a great help.
-Otherwise, if you can spot memory access bugs, multithreading bugs, use ASan, TSan, or
-other sanitisers - don't hesitate and attack the VM as hard as you can.
+Otherwise, if you can spot memory access bugs, multithreading bugs, use ASan,
+TSan, or other sanitisers - don't hesitate and attack the VM as hard as you can.
 After all, the more bugs you find - the more bugs will be fixed.
