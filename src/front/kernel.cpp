@@ -47,7 +47,8 @@ static auto display_vm_information(bool const verbose) -> void
     {
         auto const proc_schedulers =
             viua::kernel::Kernel::no_of_process_schedulers();
-        auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
+        auto const ffi_schedulers =
+            viua::kernel::Kernel::no_of_ffi_schedulers();
         auto const io_schedulers  = viua::kernel::Kernel::no_of_io_schedulers();
         auto const cpus_available = std::thread::hardware_concurrency();
 
@@ -140,17 +141,16 @@ static bool usage(std::string const program,
         std::cout << "    " << program << " [option...] <executable>\n"
                   << std::endl;
         std::cout << "OPTIONS:\n";
-        std::cout
-            << "    "
-            << "-V, --version            - show version\n"
-            << "    "
-            << "-h, --help               - display this message\n"
-            << "    "
-            << "-v, --verbose            - show verbose output\n"
-            << "    "
-            << "-i, --info               - show information about VM "
-               "configuration (number of schedulers, "
-               "version etc.)\n";
+        std::cout << "    "
+                  << "-V, --version            - show version\n"
+                  << "    "
+                  << "-h, --help               - display this message\n"
+                  << "    "
+                  << "-v, --verbose            - show verbose output\n"
+                  << "    "
+                  << "-i, --info               - show information about VM "
+                     "configuration (number of schedulers, "
+                     "version etc.)\n";
     }
 
     return (show_help or show_version);
