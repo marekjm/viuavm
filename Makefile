@@ -238,7 +238,12 @@ endif
 
 # Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
 # CXX_EXTRA_FLAGS are meant to be supplied on the command line.
-CXXFLAGS=-std=$(CXX_STANDARD) $(COMPILER_FLAGS) $(SANITISER_FLAGS) $(CXX_EXTRA_FLAGS)
+CXXFLAGS=\
+		 -std=$(CXX_STANDARD) \
+		 -DVIUA_VM_COMMIT="\"$(shell git rev-parse HEAD)\"" \
+		 $(COMPILER_FLAGS) \
+		 $(SANITISER_FLAGS) \
+		 $(CXX_EXTRA_FLAGS)
 
 # By default, the VM is compiled using no optimisations.
 # This makes for shorter compile times, but prevents speed-testing the VM.
@@ -521,7 +526,8 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/value.o \
 				   build/types/vector.o
 
-build/bin/vm/kernel: build/front/kernel.o \
+build/bin/vm/kernel: \
+	build/front/kernel.o \
 	build/kernel/kernel.o \
 	build/scheduler/process.o \
 	build/front/vm.o \

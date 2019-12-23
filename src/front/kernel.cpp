@@ -40,50 +40,51 @@ using viua::assembler::util::pretty_printer::COLOR_FG_WHITE;
 using viua::assembler::util::pretty_printer::send_control_seq;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file "
-                              "which cannot be run without prior compilation";
-
-
 static auto display_vm_information(bool const verbose) -> void
 {
-    auto const full_version = std::string{VERSION} + "." + MICRO;
-    auto const proc_schedulers =
-        viua::kernel::Kernel::no_of_process_schedulers();
-    auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
-    auto const io_schedulers  = viua::kernel::Kernel::no_of_io_schedulers();
-    auto const cpus_available = std::thread::hardware_concurrency();
+    std::ostringstream o;
 
-    std::cerr << "Viua VM " << full_version << " [";
+    {
+        auto const proc_schedulers =
+            viua::kernel::Kernel::no_of_process_schedulers();
+        auto const ffi_schedulers = viua::kernel::Kernel::no_of_ffi_schedulers();
+        auto const io_schedulers  = viua::kernel::Kernel::no_of_io_schedulers();
+        auto const cpus_available = std::thread::hardware_concurrency();
 
-    if (verbose) {
-        std::cerr << "hardware=";
+        o << "[";
+
+        if (verbose) {
+            o << "hardware=";
+        }
+        o << cpus_available << ':';
+
+        if (verbose) {
+            o << "proc=";
+        }
+        o << proc_schedulers << ':';
+
+        if (verbose) {
+            o << "ffi=";
+        }
+        o << ffi_schedulers << ':';
+
+        if (verbose) {
+            o << "io=";
+        }
+        o << io_schedulers;
+
+        o << "]";
     }
-    std::cerr << cpus_available << ':';
 
-    if (verbose) {
-        std::cerr << "proc=";
-    }
-    std::cerr << proc_schedulers << ':';
-
-    if (verbose) {
-        std::cerr << "ffi=";
-    }
-    std::cerr << ffi_schedulers << ':';
-
-    if (verbose) {
-        std::cerr << "io=";
-    }
-    std::cerr << io_schedulers;
-
-    std::cerr << "]\n";
+    std::cout << o.str() + "\n";
 }
 static bool usage(std::string const program,
                   std::vector<std::string> const& args)
 {
-    bool show_help    = false;
-    bool show_version = false;
-    bool verbose      = false;
-    bool show_info    = false;
+    auto show_help    = false;
+    auto show_version = false;
+    auto verbose      = false;
+    auto show_info    = false;
 
     for (auto option : args) {
         if (option == "--help" or option == "-h") {
@@ -126,7 +127,13 @@ static bool usage(std::string const program,
         std::cout << "Viua VM kernel version ";
     }
     if (show_help or show_version) {
-        std::cout << VERSION << '.' << MICRO << "\n";
+        std::cout << VERSION << '.' << MICRO;
+    }
+    if (show_help or (show_version and verbose)) {
+        std::cout << " (" << VIUA_VM_COMMIT << ")";
+    }
+    if (show_help or show_version) {
+        std::cout << "\n";
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";
@@ -143,9 +150,7 @@ static bool usage(std::string const program,
             << "    "
             << "-i, --info               - show information about VM "
                "configuration (number of schedulers, "
-               "version etc.)\n"
-            << "    "
-            << "    --json               - same as --info but in JSON format\n";
+               "version etc.)\n";
     }
 
     return (show_help or show_version);

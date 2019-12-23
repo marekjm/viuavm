@@ -64,10 +64,16 @@ static bool usage(const char* program,
                   bool verbose)
 {
     if (show_help or (show_version and verbose)) {
-        std::cout << "Viua VM assembler, version ";
+        std::cout << "Viua VM assembler version ";
     }
     if (show_help or show_version) {
-        std::cout << VERSION << '.' << MICRO << std::endl;
+        std::cout << VERSION << '.' << MICRO;
+    }
+    if (show_help or (show_version and verbose)) {
+        std::cout << " (" << VIUA_VM_COMMIT << ")";
+    }
+    if (show_help or show_version) {
+        std::cout << "\n";
     }
     if (show_help) {
         std::cout << "\nUSAGE:\n";

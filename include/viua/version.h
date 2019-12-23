@@ -33,9 +33,7 @@
 #ifndef VIUA_VERSION_H
 #define VIUA_VERSION_H
 
-#pragma once
-
-const char* VERSION = "0.9.0";
-const char* MICRO   = "2592";
+constexpr auto VERSION = "0.9.0";
+constexpr auto MICRO   = "2592";
 
 #endif
