@@ -33,8 +33,7 @@ auto assemble_op_vinsert(Program& program,
     if (tokens.at(position) == "void") {
         position_op = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(position)));
-    }
-    else {
+    } else {
         position_op = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(position)),
             ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));

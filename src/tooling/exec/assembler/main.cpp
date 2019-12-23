@@ -152,39 +152,29 @@ static auto parse_args(std::vector<std::string> const& args) -> Parsed_args
 
         if (arg == "-o" or arg == "--output") {
             parsed.output_file = args.at(++i);
-        }
-        else if (arg == "--verbose") {
+        } else if (arg == "--verbose") {
             parsed.verbose = true;
-        }
-        else if (arg == "-c") {
+        } else if (arg == "-c") {
             parsed.linkable_module = true;
-        }
-        else if (arg == "-C" or arg == "--verify") {
+        } else if (arg == "-C" or arg == "--verify") {
             parsed.sa_only = true;
-        }
-        else if (arg == "--no-sa") {
+        } else if (arg == "--no-sa") {
             parsed.enabled_sa = false;
-        }
-        else if (arg == "-h" or arg == "--help") {
+        } else if (arg == "-h" or arg == "--help") {
             // do nothing
-        }
-        else if (arg == "--version") {
+        } else if (arg == "--version") {
             // do nothing
-        }
-        else if (arg == OPTION_LEX) {
+        } else if (arg == OPTION_LEX) {
             parsed.lex_only = true;
-        }
-        else if (arg == "--") {
+        } else if (arg == "--") {
             ++i;
             break;
-        }
-        else if (arg.find("--") == 0) {
+        } else if (arg.find("--") == 0) {
             viua::tooling::errors::compile_time::display_error_and_exit(
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Unknown_option,
                 arg);
-        }
-        else if (arg.find("--") != 0) {
+        } else if (arg.find("--") != 0) {
             break;
         }
     }
@@ -497,8 +487,7 @@ static auto display_error_location(
 
         if (each.line() == error.line()) {
             i = display_error_line(o, tokens, error, i, line_no_width);
-        }
-        else {
+        } else {
             i = display_context_line(o, tokens, i, line_no_width);
         }
 
@@ -592,8 +581,7 @@ auto main(int argc, char* argv[]) -> int
     {
         try {
             return viua::tooling::libs::lexer::cook(raw_tokens);
-        }
-        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }
@@ -612,8 +600,7 @@ auto main(int argc, char* argv[]) -> int
             return viua::tooling::libs::parser::cook(
                 parsed_args.input_file,
                 viua::tooling::libs::parser::parse(tokens));
-        }
-        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }
@@ -688,8 +675,7 @@ auto main(int argc, char* argv[]) -> int
     if (parsed_args.enabled_sa) {
         try {
             viua::tooling::libs::static_analyser::analyse(cooked_fragments);
-        }
-        catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
+        } catch (viua::tooling::errors::compile_time::Error_wrapper const& e) {
             display_error_in_context(raw_tokens, e, parsed_args.input_file);
             exit(1);
         }

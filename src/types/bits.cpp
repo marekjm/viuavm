@@ -166,8 +166,7 @@ static auto binary_shr(std::vector<bool> v,
             }
             v.at(index_to_set)   = v.at(index_of_value);
             v.at(index_of_value) = padding;
-        }
-        else {
+        } else {
             if (index_to_set_in_shifted < n) {
                 shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
             }
@@ -204,8 +203,7 @@ static auto binary_shl(std::vector<bool> v, decltype(v)::size_type const n)
             }
             v.at(index_to_set)   = v.at(index_of_value);
             v.at(index_of_value) = false;
-        }
-        else {
+        } else {
             if (index_to_set_in_shifted < n) {
                 shifted.at(index_to_set_in_shifted) = v.at(index_to_set);
             }
@@ -229,8 +227,7 @@ static auto binary_increment(std::vector<bool> const& v)
          ++i) {
         if (v.at(i)) {
             incremented.at(i) = false;
-        }
-        else {
+        } else {
             incremented.at(i) = true;
             carry             = false;
         }
@@ -249,8 +246,7 @@ static auto binary_decrement(std::vector<bool> const& v)
             decremented.at(i) = false;
             borrow            = false;
             break;
-        }
-        else {
+        } else {
             decremented.at(i) = true;
             borrow            = true;
         }
@@ -274,8 +270,7 @@ static auto binary_lte(std::vector<bool> lhs, std::vector<bool> rhs) -> bool
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
             // definitely lhs < rhs
             return true;
-        }
-        else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
             // totally lhs > rhs
             return false;
         }
@@ -293,8 +288,7 @@ static auto binary_lt
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
             // definitely lhs < rhs
             return true;
-        }
-        else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
             // totally lhs > rhs
             return false;
         }
@@ -489,8 +483,7 @@ static auto signed_increment(std::vector<bool> v) -> std::vector<bool>
          ++i) {
         if (v.at(i)) {
             incremented.at(i) = false;
-        }
-        else {
+        } else {
             incremented.at(i) = true;
             carry             = false;
         }
@@ -511,8 +504,7 @@ static auto signed_decrement(std::vector<bool> v) -> std::vector<bool>
         if (v.at(i)) {
             decremented.at(i) = false;
             break;
-        }
-        else {
+        } else {
             decremented.at(i) = true;
         }
     }
@@ -533,8 +525,7 @@ static auto absolute(std::vector<bool> const& v) -> std::vector<bool>
 {
     if (binary_is_negative(v)) {
         return take_twos_complement(v);
-    }
-    else {
+    } else {
         return v;
     }
 }
@@ -562,8 +553,7 @@ static auto signed_lt(std::vector<bool> lhs, std::vector<bool> rhs)
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
             // definitely lhs < rhs
             return true;
-        }
-        else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
             // totally lhs > rhs
             return false;
         }
@@ -676,8 +666,7 @@ static auto signed_sub(std::vector<bool> const& lhs,
     try {
         rhs_used = take_twos_complement(
             binary_expand(rhs, std::max(lhs.size(), rhs.size())));
-    }
-    catch (std::unique_ptr<Exception>&) {
+    } catch (std::unique_ptr<Exception>&) {
         throw std::make_unique<Exception>(
             "CheckedArithmeticSubtractionSignedOverflow");
     }
@@ -687,8 +676,7 @@ static auto signed_sub(std::vector<bool> const& lhs,
             signed_add(binary_expand(lhs, std::max(lhs.size(), rhs.size())),
                        rhs_used),
             lhs.size());
-    }
-    catch (std::unique_ptr<Exception>&) {
+    } catch (std::unique_ptr<Exception>&) {
         throw std::make_unique<Exception>(
             "CheckedArithmeticSubtractionSignedOverflow");
     }
@@ -811,8 +799,7 @@ static auto signed_mul(std::vector<bool> const& lhs,
             try {
                 lhs_abs = absolute(lhs);
                 rhs_abs = absolute(rhs);
-            }
-            catch (std::unique_ptr<Exception>&) {
+            } catch (std::unique_ptr<Exception>&) {
                 /*
                  * This is why we need separate lhs_abs and rhs_abs variables
                  * initialised under a try: because they can throw exceptions on
@@ -885,8 +872,7 @@ static auto signed_div(std::vector<bool> const& dividend,
         if (negative_quotinent) {
             quotinent = take_twos_complement(quotinent);
         }
-    }
-    catch (std::unique_ptr<Exception>&) {
+    } catch (std::unique_ptr<Exception>&) {
         throw std::make_unique<Exception>(
             "CheckedArithmeticDivisionSignedOverflow");
     }
@@ -964,8 +950,7 @@ static auto signed_increment(std::vector<bool> v) -> std::vector<bool>
          ++i) {
         if (v.at(i)) {
             incremented.at(i) = false;
-        }
-        else {
+        } else {
             incremented.at(i) = true;
             carry             = false;
         }
@@ -989,8 +974,7 @@ static auto signed_decrement(std::vector<bool> v) -> std::vector<bool>
         if (v.at(i)) {
             decremented.at(i) = false;
             break;
-        }
-        else {
+        } else {
             decremented.at(i) = true;
         }
     }
@@ -1026,8 +1010,7 @@ static auto signed_lt(std::vector<bool> lhs, std::vector<bool> rhs)
         if (lhs.at(i - 1) < rhs.at(i - 1)) {
             // definitely lhs < rhs
             return true;
-        }
-        else if (lhs.at(i - 1) > rhs.at(i - 1)) {
+        } else if (lhs.at(i - 1) > rhs.at(i - 1)) {
             // totally lhs > rhs
             return false;
         }
@@ -1039,8 +1022,7 @@ static auto absolute(std::vector<bool> const& v) -> std::vector<bool>
 {
     if (binary_is_negative(v)) {
         return take_twos_complement(v);
-    }
-    else {
+    } else {
         return v;
     }
 }
@@ -1146,8 +1128,7 @@ static auto signed_sub(std::vector<bool> lhs, std::vector<bool> rhs)
     try {
         rhs_used = take_twos_complement(
             binary_expand(rhs, std::max(lhs.size(), rhs.size())));
-    }
-    catch (std::unique_ptr<Exception>&) {
+    } catch (std::unique_ptr<Exception>&) {
         throw std::make_unique<Exception>(
             "SaturatingArithmeticSubtractionSignedOverflow");
     }
@@ -1161,8 +1142,7 @@ static auto signed_sub(std::vector<bool> lhs, std::vector<bool> rhs)
             r = signed_increment(r);
         }
         return r;
-    }
-    catch (std::unique_ptr<Exception>&) {
+    } catch (std::unique_ptr<Exception>&) {
         throw std::make_unique<Exception>(
             "SaturatingArithmeticSubtractionSignedOverflow");
     }
@@ -1285,8 +1265,7 @@ static auto signed_mul(std::vector<bool> const& lhs,
             try {
                 lhs_abs = absolute(lhs);
                 rhs_abs = absolute(rhs);
-            }
-            catch (Exception* e) {
+            } catch (Exception* e) {
                 /*
                  * This is why we need separate lhs_abs and rhs_abs variables
                  * initialised under a try: because they can throw exceptions on
@@ -1324,8 +1303,7 @@ static auto signed_mul(std::vector<bool> const& lhs,
     if (result_should_be_negative != binary_is_negative(result)) {
         if (result_should_be_negative) {
             result = signed_make_min(lhs.size());
-        }
-        else {
+        } else {
             result = signed_make_max(lhs.size());
         }
     }

@@ -30,8 +30,7 @@ auto assemble_op_tailcall(Program& program,
         program.optailcall(assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(i + 1)),
             ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
-    }
-    else {
+    } else {
         program.optailcall(tokens.at(i + 1));
     }
 }

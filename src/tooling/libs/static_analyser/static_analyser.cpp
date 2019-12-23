@@ -225,8 +225,7 @@ struct Frame_representation {
 Frame_representation::Frame_representation(
     viua::internals::types::register_index const size)
         : allocated_parameters{size}
-{
-}
+{}
 
 struct Body_line {
     using size_type = decltype(
@@ -237,8 +236,7 @@ struct Body_line {
 
     Body_line(size_type const s, size_type const i)
             : source_line{s}, instruction{i}
-    {
-    }
+    {}
     Body_line(Body_line const&) = default;
     Body_line(Body_line&&)      = default;
     auto operator=(Body_line const&) -> Body_line& = delete;
@@ -359,10 +357,12 @@ static auto analyse_single_arm(
             auto const& instruction = *static_cast<Instruction const*>(line);
 
             switch (instruction.opcode) {
-            case NOP: {
+            case NOP:
+            {
                 break;
             }
-            case IZERO: {
+            case IZERO:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -380,7 +380,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case INTEGER: {
+            case INTEGER:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -403,7 +404,8 @@ static auto analyse_single_arm(
                 break;
             }
             case IINC:
-            case IDEC: {
+            case IDEC:
+            {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -455,8 +457,7 @@ static auto analyse_single_arm(
                 if (target_operand.known()) {
                     if (instruction.opcode == IINC) {
                         target_operand.of(target_operand.of() + 1);
-                    }
-                    else {
+                    } else {
                         target_operand.of(target_operand.of() - 1);
                     }
                 }
@@ -472,7 +473,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case FLOAT: {
+            case FLOAT:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -493,7 +495,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case ITOF: {
+            case ITOF:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -556,7 +559,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case FTOI: {
+            case FTOI:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -619,7 +623,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STOI: {
+            case STOI:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -682,7 +687,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STOF: {
+            case STOF:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -745,7 +751,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITS_OF_INTEGER: {
+            case BITS_OF_INTEGER:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -802,7 +809,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case INTEGER_OF_BITS: {
+            case INTEGER_OF_BITS:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -862,7 +870,8 @@ static auto analyse_single_arm(
             case ADD:
             case SUB:
             case MUL:
-            case DIV: {
+            case DIV:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -965,7 +974,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TEXT: {
+            case TEXT:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -984,7 +994,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case MOVE: {
+            case MOVE:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -1011,8 +1022,7 @@ static auto analyse_single_arm(
                         return static_cast<values::Pointer const&>(
                                    wrapper.value())
                             .of();
-                    }
-                    else {
+                    } else {
                         return wrapper;
                     }
                 };
@@ -1056,8 +1066,7 @@ static auto analyse_single_arm(
                     }
                     spawned_frame->filled_parameters.emplace(
                         dest.index, instruction.token(0));
-                }
-                else {
+                } else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -1088,7 +1097,8 @@ static auto analyse_single_arm(
             case LTE:
             case GT:
             case GTE:
-            case EQ: {
+            case EQ:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -1120,11 +1130,9 @@ static auto analyse_single_arm(
                     auto const r = rhs_operand.of();
                     if (l < r) {
                         msg << "less than";
-                    }
-                    else if (l > r) {
+                    } else if (l > r) {
                         msg << "greater than";
-                    }
-                    else {
+                    } else {
                         msg << "equal to";
                     }
                     msg << " right-hand side";
@@ -1197,7 +1205,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRING: {
+            case STRING:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -1217,7 +1226,8 @@ static auto analyse_single_arm(
                 break;
             }
             case STREQ:
-            case TEXTEQ: {
+            case TEXTEQ:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -1252,7 +1262,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TEXTAT: {
+            case TEXTAT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& index = *static_cast<Register_address const*>(
@@ -1291,7 +1302,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TEXTSUB: {
+            case TEXTSUB:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& from = *static_cast<Register_address const*>(
@@ -1339,7 +1351,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TEXTLENGTH: {
+            case TEXTLENGTH:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -1372,15 +1385,18 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TEXTCOMMONPREFIX: {
+            case TEXTCOMMONPREFIX:
+            {
                 // FIXME TODO
                 break;
             }
-            case TEXTCOMMONSUFFIX: {
+            case TEXTCOMMONSUFFIX:
+            {
                 // FIXME TODO
                 break;
             }
-            case TEXTCONCAT: {
+            case TEXTCONCAT:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -1419,7 +1435,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case VECTOR: {
+            case VECTOR:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -1618,7 +1635,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case VINSERT: {
+            case VINSERT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -1678,8 +1696,7 @@ static auto analyse_single_arm(
                                     .type_of(source_index, source.register_set)
                                     .value())
                                 .of());
-                    }
-                    else {
+                    } else {
                         wrapper.of(function_state.type_of(source_index,
                                                           source.register_set));
                     }
@@ -1696,7 +1713,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case VPUSH: {
+            case VPUSH:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -1746,8 +1764,7 @@ static auto analyse_single_arm(
                                     .type_of(source_index, source.register_set)
                                     .value())
                                 .of());
-                    }
-                    else {
+                    } else {
                         wrapper.of(function_state.type_of(source_index,
                                                           source.register_set));
                     }
@@ -1764,7 +1781,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case VPOP: {
+            case VPOP:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -1789,12 +1807,10 @@ static auto analyse_single_arm(
                                           index,
                                           index_index,
                                           index_type_signature);
-                }
-                else if (instruction.operands.at(2)->type()
-                         == parser::Operand_type::Void) {
+                } else if (instruction.operands.at(2)->type()
+                           == parser::Operand_type::Void) {
                     // do nothing
-                }
-                else {
+                } else {
                     // do nothing, errors should be handled in earlier stages
                 }
 
@@ -1819,18 +1835,17 @@ static auto analyse_single_arm(
                                 .value())
                             .of(),
                         std::move(defining_tokens));
-                }
-                else if (instruction.operands.at(0)->type()
-                         == parser::Operand_type::Void) {
+                } else if (instruction.operands.at(0)->type()
+                           == parser::Operand_type::Void) {
                     // do nothing
-                }
-                else {
+                } else {
                     // do nothing, errors should be handled in earlier stages
                 }
 
                 break;
             }
-            case VAT: {
+            case VAT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& index = *static_cast<Register_address const*>(
@@ -1878,8 +1893,7 @@ static auto analyse_single_arm(
                                         .value())
                                     .of())),
                         std::move(defining_tokens));
-                }
-                else {
+                } else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -1896,7 +1910,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case VLEN: {
+            case VLEN:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -1927,11 +1942,13 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BOOL: {
+            case BOOL:
+            {
                 // not implemented
                 break;
             }
-            case NOT: {
+            case NOT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 throw_if_empty(function_state, source);
@@ -1955,7 +1972,8 @@ static auto analyse_single_arm(
                 break;
             }
             case AND:
-            case OR: {
+            case OR:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 throw_if_empty(function_state, lhs);
@@ -1982,7 +2000,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITS: {
+            case BITS:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2001,7 +2020,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITNOT: {
+            case BITNOT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -2033,7 +2053,8 @@ static auto analyse_single_arm(
             }
             case BITAND:
             case BITOR:
-            case BITXOR: {
+            case BITXOR:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const lhs_index = throw_if_empty(function_state, lhs);
@@ -2068,7 +2089,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITSWIDTH: {
+            case BITSWIDTH:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -2098,7 +2120,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITAT: {
+            case BITAT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& index = *static_cast<Register_address const*>(
@@ -2137,7 +2160,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case BITSET: {
+            case BITSET:
+            {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
                 auto const target_index =
@@ -2168,7 +2192,8 @@ static auto analyse_single_arm(
             case SHL:
             case SHR:
             case ASHL:
-            case ASHR: {
+            case ASHR:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -2210,7 +2235,8 @@ static auto analyse_single_arm(
                 break;
             }
             case ROL:
-            case ROR: {
+            case ROR:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2245,7 +2271,8 @@ static auto analyse_single_arm(
             case BITALT:
             case BITALTE:
             case BITAGT:
-            case BITAGTE: {
+            case BITAGTE:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -2289,7 +2316,8 @@ static auto analyse_single_arm(
             case SATURATINGSINCREMENT:
             case SATURATINGSDECREMENT:
             case SATURATINGUINCREMENT:
-            case SATURATINGUDECREMENT: {
+            case SATURATINGUDECREMENT:
+            {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2332,7 +2360,8 @@ static auto analyse_single_arm(
             case SATURATINGUADD:
             case SATURATINGUSUB:
             case SATURATINGUMUL:
-            case SATURATINGUDIV: {
+            case SATURATINGUDIV:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -2373,7 +2402,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case COPY: {
+            case COPY:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -2400,8 +2430,7 @@ static auto analyse_single_arm(
                         return static_cast<values::Pointer const&>(
                                    wrapper.value())
                             .of();
-                    }
-                    else {
+                    } else {
                         return wrapper;
                     }
                 };
@@ -2445,8 +2474,7 @@ static auto analyse_single_arm(
                     }
                     spawned_frame->filled_parameters.emplace(
                         dest.index, instruction.token(0));
-                }
-                else {
+                } else {
                     function_state.define_register(
                         dest_index,
                         dest.register_set,
@@ -2457,7 +2485,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case PTR: {
+            case PTR:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -2490,7 +2519,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case PTRLIVE: {
+            case PTRLIVE:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -2522,7 +2552,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case SWAP: {
+            case SWAP:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
                 auto const source_index =
@@ -2611,7 +2642,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case DELETE: {
+            case DELETE:
+            {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2641,13 +2673,15 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case ISNULL: {
+            case ISNULL:
+            {
                 // FIXME do nothing, but later add a warning that such-and-such
                 // instruction is not covered by static analyser
                 break;
             }
             case PRINT:
-            case ECHO: {
+            case ECHO:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2664,11 +2698,13 @@ static auto analyse_single_arm(
             }
             case CAPTURE:
             case CAPTURECOPY:
-            case CAPTUREMOVE: {
+            case CAPTUREMOVE:
+            {
                 // FIXME TODO
                 break;
             }
-            case CLOSURE: {
+            case CLOSURE:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2707,7 +2743,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case FUNCTION: {
+            case FUNCTION:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2747,7 +2784,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case FRAME: {
+            case FRAME:
+            {
                 if (spawned_frame) {
                     auto error =
                         viua::tooling::errors::compile_time::Error_wrapper{}
@@ -2776,14 +2814,16 @@ static auto analyse_single_arm(
             }
             case PARAM:
             case PAMV:
-            case ARG: {
+            case ARG:
+            {
                 /*
                  * These instructions are not available to user
                  * code. Instead, `move` and `copy` are used.
                  */
                 break;
             }
-            case ALLOCATE_REGISTERS: {
+            case ALLOCATE_REGISTERS:
+            {
                 /*
                  * Register allocation is handled before the analyser begins
                  * its work so it is not checked here.
@@ -2797,13 +2837,17 @@ static auto analyse_single_arm(
                         line->token(0),
                         "cannot reallocate register set"});
             }
-            case CALL: {
+            case CALL:
+            {
             }
-            case TAILCALL: {
+            case TAILCALL:
+            {
             }
-            case DEFER: {
+            case DEFER:
+            {
             }
-            case PROCESS: {
+            case PROCESS:
+            {
                 if (not spawned_frame) {
                     throw viua::tooling::errors::compile_time::Error_wrapper{}
                         .append(viua::tooling::errors::compile_time::Error{
@@ -2888,7 +2932,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case SELF: {
+            case SELF:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -2906,7 +2951,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case PIDEQ: {
+            case PIDEQ:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -2941,7 +2987,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case JOIN: {
+            case JOIN:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
 
@@ -2972,7 +3019,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case SEND: {
+            case SEND:
+            {
                 auto const& target = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3008,7 +3056,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case RECEIVE: {
+            case RECEIVE:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3027,7 +3076,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case WATCHDOG: {
+            case WATCHDOG:
+            {
                 auto const called_function_name =
                     instruction.operands.at(0)->tokens().at(0).str()
                     + instruction.operands.at(0)->tokens().at(1).str()
@@ -3072,7 +3122,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case JUMP: {
+            case JUMP:
+            {
                 auto target = decltype(i){0};
 
                 if (instruction.operands.at(0)->type()
@@ -3087,9 +3138,8 @@ static auto analyse_single_arm(
                              : (i - std::stoul(jump_offset.value.substr(1))));
                     std::cerr << "  jumping to (offset): " << jump_offset.value
                               << " (instruction " << target << ')' << '\n';
-                }
-                else if (instruction.operands.at(0)->type()
-                         == Operand_type::Jump_label) {
+                } else if (instruction.operands.at(0)->type()
+                           == Operand_type::Jump_label) {
                     using viua::tooling::libs::parser::Jump_label;
 
                     auto const& jump_label = *static_cast<Jump_label const*>(
@@ -3111,8 +3161,8 @@ static auto analyse_single_arm(
                                        annotated_body,
                                        label_map,
                                        target);
-                }
-                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                } catch (
+                    viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(viua::tooling::errors::compile_time::Error{
                         viua::tooling::errors::compile_time::
                             Compile_time_error::Empty_error,
@@ -3134,7 +3184,8 @@ static auto analyse_single_arm(
                  */
                 return arm_result;
             }
-            case IF: {
+            case IF:
+            {
                 auto true_arm_result = Arm_result{};
 
                 try {
@@ -3155,9 +3206,8 @@ static auto analyse_single_arm(
                         std::cerr
                             << "  jumping to (offset): " << jump_offset.value
                             << " (instruction " << target << ')' << '\n';
-                    }
-                    else if (instruction.operands.at(1)->type()
-                             == Operand_type::Jump_label) {
+                    } else if (instruction.operands.at(1)->type()
+                               == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
                         auto const& jump_label =
@@ -3181,8 +3231,8 @@ static auto analyse_single_arm(
                                                          annotated_body,
                                                          label_map,
                                                          target);
-                }
-                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                } catch (
+                    viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(
                         viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::
@@ -3211,9 +3261,8 @@ static auto analyse_single_arm(
                         std::cerr
                             << "  jumping to (offset): " << jump_offset.value
                             << " (instruction " << target << ')' << '\n';
-                    }
-                    else if (instruction.operands.at(2)->type()
-                             == Operand_type::Jump_label) {
+                    } else if (instruction.operands.at(2)->type()
+                               == Operand_type::Jump_label) {
                         using viua::tooling::libs::parser::Jump_label;
 
                         auto const& jump_label =
@@ -3244,8 +3293,8 @@ static auto analyse_single_arm(
                         annotated_body,
                         label_map,
                         target);
-                }
-                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                } catch (
+                    viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(
                         viua::tooling::errors::compile_time::Error{
                             viua::tooling::errors::compile_time::
@@ -3258,7 +3307,8 @@ static auto analyse_single_arm(
 
                 return arm_result;
             }
-            case THROW: {
+            case THROW:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3282,7 +3332,8 @@ static auto analyse_single_arm(
                  */
                 return arm_result;
             }
-            case CATCH: {
+            case CATCH:
+            {
                 if (not spawned_catch_frame) {
                     auto const name_of_the_block =
                         instruction.operands.at(1)->tokens().at(0);
@@ -3297,7 +3348,8 @@ static auto analyse_single_arm(
                 }
                 break;
             }
-            case DRAW: {
+            case DRAW:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3318,7 +3370,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case TRY: {
+            case TRY:
+            {
                 if (spawned_catch_frame) {
                     auto error =
                         viua::tooling::errors::compile_time::Error_wrapper{}
@@ -3341,7 +3394,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case ENTER: {
+            case ENTER:
+            {
                 spawned_catch_frame = false;
 
                 auto const& block_name_token =
@@ -3381,8 +3435,8 @@ static auto analyse_single_arm(
                                        0);
 
                     std::cerr << "left block:     " << block_name << '\n';
-                }
-                catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+                } catch (
+                    viua::tooling::errors::compile_time::Error_wrapper& e) {
                     e.append(viua::tooling::errors::compile_time::Error{
                         viua::tooling::errors::compile_time::
                             Compile_time_error::Empty_error,
@@ -3393,16 +3447,19 @@ static auto analyse_single_arm(
                 }
                 break;
             }
-            case LEAVE: {
+            case LEAVE:
+            {
                 return arm_result;
             }
-            case IMPORT: {
+            case IMPORT:
+            {
                 /*
                  * This instruction does not touch any registers.
                  */
                 break;
             }
-            case ATOM: {
+            case ATOM:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3420,7 +3477,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case ATOMEQ: {
+            case ATOMEQ:
+            {
                 auto const& lhs = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const& rhs = *static_cast<Register_address const*>(
@@ -3452,8 +3510,7 @@ static auto analyse_single_arm(
                     auto const r = rhs_operand.of();
                     if (l == r) {
                         msg << "always";
-                    }
-                    else {
+                    } else {
                         msg << "never";
                     }
                     msg << " be equal to the right-hand side";
@@ -3508,7 +3565,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRUCT: {
+            case STRUCT:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
 
@@ -3526,7 +3584,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRUCTINSERT: {
+            case STRUCTINSERT:
+            {
                 auto const& dest = *static_cast<Register_address const*>(
                     instruction.operands.at(0).get());
                 auto const dest_index = throw_if_empty(function_state, dest);
@@ -3584,7 +3643,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRUCTREMOVE: {
+            case STRUCTREMOVE:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -3628,8 +3688,7 @@ static auto analyse_single_arm(
                         dest.register_set,
                         struct_value.field(key_value.of()).value(),
                         std::move(defining_tokens));
-                }
-                else {
+                } else {
                     function_state.define_register(
                         function_state.resolve_index(dest),
                         dest.register_set,
@@ -3641,7 +3700,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRUCTAT: {
+            case STRUCTAT:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -3687,8 +3747,7 @@ static auto analyse_single_arm(
                             std::make_unique<values::Pointer>(
                                 struct_value.field(key_value.of()).value())),
                         std::move(defining_tokens));
-                }
-                else {
+                } else {
                     function_state.define_register(
                         function_state.resolve_index(dest),
                         dest.register_set,
@@ -3702,7 +3761,8 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case STRUCTKEYS: {
+            case STRUCTKEYS:
+            {
                 auto const& source = *static_cast<Register_address const*>(
                     instruction.operands.at(1).get());
                 auto const source_index =
@@ -3738,19 +3798,22 @@ static auto analyse_single_arm(
             case IO_WRITE:
             case IO_CLOSE:
             case IO_WAIT:
-            case IO_CANCEL: {
+            case IO_CANCEL:
+            {
                 // FIXME add static analysis for I/O instructions
                 break;
             }
             case RETURN:
-            case HALT: {
+            case HALT:
+            {
                 /*
                  * These instructions just cause the analysis to stop as they
                  * halt function's execution.
                  */
                 return arm_result;
             }
-            default: {
+            default:
+            {
                 // FIXME do nothing, but later add a warning that such-and-such
                 // instruction is not covered by static analyser
                 break;
@@ -3817,8 +3880,7 @@ static auto analyse_single_function(
     if (fn.head().function_name == "main") {
         if (fn.head().arity == 0) {
             // no arguments passed
-        }
-        else if (fn.head().arity == 1) {
+        } else if (fn.head().arity == 1) {
             function_state.define_register(
                 0,
                 viua::internals::Register_sets::PARAMETERS,
@@ -3826,8 +3888,7 @@ static auto analyse_single_function(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
                 fn.head().tokens());
-        }
-        else if (fn.head().arity == 2) {
+        } else if (fn.head().arity == 2) {
             function_state.define_register(
                 0,
                 viua::internals::Register_sets::PARAMETERS,
@@ -3840,8 +3901,7 @@ static auto analyse_single_function(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
                 fn.head().tokens());
-        }
-        else {
+        } else {
             using viua::tooling::errors::compile_time::Compile_time_error;
             auto error =
                 viua::tooling::errors::compile_time::Error_wrapper{}.append(
@@ -3854,8 +3914,7 @@ static auto analyse_single_function(
                               "function"));
             throw error;
         }
-    }
-    else {
+    } else {
         using arity_type = viua::internals::types::register_index;
         for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
             function_state.define_register(
@@ -3932,8 +3991,7 @@ static auto analyse_single_function(
                                  .note("defined here"));
                 throw error;
             }
-        }
-        catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+        } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Empty_error,
@@ -3966,8 +4024,7 @@ static auto analyse_functions(
     for (auto const& [name, fn] : functions) {
         try {
             analyse_single_function(fn, fragments, analyser_state);
-        }
-        catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
+        } catch (viua::tooling::errors::compile_time::Error_wrapper& e) {
             e.append(viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
                     Empty_error,

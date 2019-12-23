@@ -64,8 +64,7 @@ Token::Token(Position_type const line,
         , original_content{original.empty() ? text : original}
         , line_number{line}
         , character_in_line{character}
-{
-}
+{}
 Token::Token() : Token(0, 0, "", "") {}
 
 auto Token::operator=(Token const& token) -> Token&
@@ -141,8 +140,7 @@ auto tokenise(std::string const& source) -> std::vector<Token>
             if (++hyphens >= 2) {
                 active_comment = true;
             }
-        }
-        else {
+        } else {
             hyphens = 0;
         }
 
@@ -161,8 +159,7 @@ auto tokenise(std::string const& source) -> std::vector<Token>
                 tokens.emplace_back(line_number, character_in_line, s);
                 character_in_line += (s.size() - 1);
                 i += (s.size() - 1);
-            }
-            else {
+            } else {
                 candidate_token << current_char;
                 tokens.emplace_back(
                     line_number, character_in_line, candidate_token.str());
@@ -331,8 +328,7 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token>
                 i += 3;
                 continue;
             }
-        }
-        catch (std::out_of_range const&) {
+        } catch (std::out_of_range const&) {
             // do nothing
         }
         try {
@@ -348,8 +344,7 @@ static auto reduce_floats(std::vector<Token> source) -> std::vector<Token>
                 i += 2;
                 continue;
             }
-        }
-        catch (std::out_of_range const&) {
+        } catch (std::out_of_range const&) {
             // do nothing
         }
 
@@ -377,8 +372,7 @@ static auto reduce_offset_jumps(std::vector<Token> source) -> std::vector<Token>
                 ++i;
                 continue;
             }
-        }
-        catch (std::out_of_range const&) {
+        } catch (std::out_of_range const&) {
             // do nothing
         }
 

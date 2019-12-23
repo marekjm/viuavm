@@ -185,8 +185,7 @@ void viua::scheduler::io::io_scheduler(
                          ? viua::kernel::Kernel::IO_result::make_success
                          : viua::kernel::Kernel::IO_result::make_error)(
                         std::move(result.result)));
-            }
-            else {
+            } else {
                 kernel.schedule_io(std::move(interaction));
             }
         }

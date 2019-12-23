@@ -44,17 +44,14 @@ auto check_op_enter(Register_usage_profile& register_usage_profile,
     try {
         check_register_usage_for_instruction_block_impl(
             register_usage_profile, ps, ps.block(block_name), 0, 0);
-    }
-    catch (std::out_of_range const& e) {
+    } catch (std::out_of_range const& e) {
         throw Invalid_syntax{label->tokens.at(0),
                              "reference to undefined block: "
                                  + label->tokens.at(0).str()};
-    }
-    catch (Invalid_syntax& e) {
+    } catch (Invalid_syntax& e) {
         throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
             label->tokens.at(0), "after entering block " + block_name});
-    }
-    catch (Traced_syntax_error& e) {
+    } catch (Traced_syntax_error& e) {
         throw e.append(Invalid_syntax{label->tokens.at(0),
                                       "after entering block " + block_name});
     }

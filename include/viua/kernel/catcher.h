@@ -32,8 +32,7 @@ class Catcher {
 
     Catcher(std::string const& type_name, std::string const& catching_block)
             : caught_type(type_name), catcher_name(catching_block)
-    {
-    }
+    {}
 };
 
 

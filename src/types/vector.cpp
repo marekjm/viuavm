@@ -44,17 +44,15 @@ void viua::types::Vector::insert(long int index,
         oss << "positive vector index out of range: index = " << index
             << ", size = " << internal_object.size();
         throw make_unique_exception<Out_of_range_exception>(oss.str());
-    }
-    else if (index < 0
-             and static_cast<decltype(internal_object)::size_type>(-index)
-                     > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<Out_of_range_exception>(
             "negative vector index out of range");
     }
     if (index < 0) {
         offset = (static_cast<decltype(index)>(internal_object.size()) + index);
-    }
-    else {
+    } else {
         offset = index;
     }
 
@@ -75,24 +73,21 @@ std::unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index)
     if (internal_object.size() == 0) {
         throw make_unique_exception<Out_of_range_exception>(
             "empty vector index out of range");
-    }
-    else if (index > 0
-             and static_cast<decltype(internal_object)::size_type>(index)
-                     >= internal_object.size()) {
+    } else if (index > 0
+               and static_cast<decltype(internal_object)::size_type>(index)
+                       >= internal_object.size()) {
         throw make_unique_exception<Out_of_range_exception>(
             "positive vector index out of range");
-    }
-    else if (index < 0
-             and static_cast<decltype(internal_object)::size_type>(-index)
-                     > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<Out_of_range_exception>(
             "negative vector index out of range");
     }
 
     if (index < 0) {
         offset = (static_cast<decltype(index)>(internal_object.size()) + index);
-    }
-    else {
+    } else {
         offset = index;
     }
 
@@ -110,24 +105,21 @@ viua::types::Value* viua::types::Vector::at(long int index)
     if (internal_object.size() == 0) {
         throw make_unique_exception<Out_of_range_exception>(
             "empty vector index out of range");
-    }
-    else if (index > 0
-             and static_cast<decltype(internal_object)::size_type>(index)
-                     >= internal_object.size()) {
+    } else if (index > 0
+               and static_cast<decltype(internal_object)::size_type>(index)
+                       >= internal_object.size()) {
         throw make_unique_exception<Out_of_range_exception>(
             "positive vector index out of range");
-    }
-    else if (index < 0
-             and static_cast<decltype(internal_object)::size_type>(-index)
-                     > internal_object.size()) {
+    } else if (index < 0
+               and static_cast<decltype(internal_object)::size_type>(-index)
+                       > internal_object.size()) {
         throw make_unique_exception<Out_of_range_exception>(
             "negative vector index out of range");
     }
 
     if (index < 0) {
         offset = (static_cast<decltype(index)>(internal_object.size()) + index);
-    }
-    else {
+    } else {
         offset = index;
     }
 

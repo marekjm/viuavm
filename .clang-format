@@ -21,7 +21,21 @@ AlwaysBreakTemplateDeclarations: false
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBinaryOperators: NonAssignment
-BreakBeforeBraces: Stroustrup
+# BreakBeforeBraces: Stroustrup
+BreakBeforeBraces: Custom
+BraceWrapping:
+    SplitEmptyFunction: false
+    AfterCaseLabel: true
+    AfterClass: false
+    AfterControlStatement: false
+    AfterEnum: false
+    AfterFunction: true
+    AfterNamespace: false
+    AfterStruct: false
+    AfterUnion: false
+    AfterExternBlock: true
+    BeforeCatch: false
+    BeforeElse: false
 BreakBeforeInheritanceComma: true
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma

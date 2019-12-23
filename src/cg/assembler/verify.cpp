@@ -80,8 +80,7 @@ void assembler::verify::function_calls_are_defined(
                          + " undefined function " + function_name.str()));
                 }
             }
-        }
-        else if (token == "watchdog") {
+        } else if (token == "watchdog") {
             auto function_name = tokens.at(i + 1);
             if (not is_defined(
                     function_name, function_names, function_signatures)) {
@@ -89,8 +88,7 @@ void assembler::verify::function_calls_are_defined(
                     function_name,
                     "watchdog from undefined function " + function_name.str());
             }
-        }
-        else if (token == "call" or token == "process") {
+        } else if (token == "call" or token == "process") {
             Token function_name = tokens.at(i + 2);
             if (tokens.at(i + 1) != "void") {
                 function_name = tokens.at(i + 3);

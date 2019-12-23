@@ -159,8 +159,7 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type
             stack->frame_new->set_local_register_set(
                 static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
-    }
-    else {
+    } else {
         call_name = fetch_and_advance_addr<std::string>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
@@ -216,8 +215,7 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
         }
-    }
-    else {
+    } else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }
@@ -263,8 +261,7 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type
             stack->back()->local_register_set.reset(
                 static_cast<viua::types::Closure*>(fn)->give());
         }
-    }
-    else {
+    } else {
         call_name = fetch_and_advance_addr<decltype(call_name)>(
             viua::bytecode::decoder::operands::fetch_atom, addr, this);
     }

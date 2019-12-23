@@ -38,8 +38,7 @@ auto assemble_op_text(Program& program,
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(source)),
                 ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
-    }
-    else {
+    } else {
         program.optext(target_operand, tokens.at(source));
     }
 }

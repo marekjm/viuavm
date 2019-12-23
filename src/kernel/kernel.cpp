@@ -53,8 +53,7 @@
 
 viua::kernel::Mailbox::Mailbox(Mailbox&& that)
         : messages(std::move(that.messages))
-{
-}
+{}
 
 auto viua::kernel::Mailbox::send(std::unique_ptr<viua::types::Value> message)
     -> void
@@ -313,8 +312,7 @@ auto viua::kernel::Kernel::get_entry_point_of_block(std::string const& name)
     if (block_addresses.count(name)) {
         entry_point = (bytecode.get() + block_addresses.at(name));
         module_base = bytecode.get();
-    }
-    else {
+    } else {
         auto const lf = linked_blocks.at(name);
         entry_point   = lf.second;
         module_base   = linked_modules.at(lf.first).second.get();
@@ -333,8 +331,7 @@ auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
     if (function_addresses.count(name)) {
         entry_point = (bytecode.get() + function_addresses.at(name));
         module_base = bytecode.get();
-    }
-    else {
+    } else {
         auto const lf = linked_functions.at(name);
         entry_point   = lf.second;
         module_base   = linked_modules.at(lf.first).second.get();
@@ -479,8 +476,7 @@ auto viua::kernel::Kernel::record_process_result(
     if (done_process->terminated()) {
         process_results.at(done_process->pid())
             .raise(done_process->transfer_active_exception());
-    }
-    else {
+    } else {
         process_results.at(done_process->pid())
             .resolve(done_process->get_return_value());
     }
@@ -630,8 +626,7 @@ viua::kernel::Kernel::IO_result::IO_result(
         , is_complete{true}
         , is_cancelled{false}
         , is_successful{ok}
-{
-}
+{}
 auto viua::kernel::Kernel::IO_result::make_success(
     std::unique_ptr<viua::types::Value> x) -> IO_result
 {

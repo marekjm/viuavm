@@ -25,8 +25,7 @@ Error::Error(Compile_time_error const e,
              viua::tooling::libs::lexer::Token t,
              std::string m)
         : cause{e}, main_token{t}, message{m}
-{
-}
+{}
 
 auto Error::line() const -> viua::tooling::libs::lexer::Token::Position_type
 {
@@ -119,8 +118,7 @@ auto Error::what() const -> std::string
     if (auto s = viua::tooling::errors::compile_time::display_error(cause);
         s.empty()) {
         return message;
-    }
-    else {
+    } else {
         return s + (message.empty() ? "" : (": " + message));
     }
 }

@@ -37,8 +37,7 @@ auto assemble_op_bits(Program& program,
                 ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
             ::assembler::operands::convert_token_to_bitstring_operand(
                 tokens.at(lhs)));
-    }
-    else {
+    } else {
         program.opbits(
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(target)),

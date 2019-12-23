@@ -31,8 +31,7 @@
 
 
 viua::process::PID::PID(const viua::process::Process* p) : associated_process(p)
-{
-}
+{}
 bool viua::process::PID::operator==(viua::process::PID const& that) const
 {
     return (associated_process == that.associated_process);

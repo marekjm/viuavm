@@ -42,18 +42,16 @@ static auto size_of_register_index_operand_with_rs_type(
         or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    }
-    else if (auto const sigil = tokens.at(i).str().at(0);
-             (sigil == '%' or sigil == '@' or sigil == '*')
-             and str::isnum(tokens.at(i).str().substr(1))) {
+    } else if (auto const sigil = tokens.at(i).str().at(0);
+               (sigil == '%' or sigil == '@' or sigil == '*')
+               and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
         ++i;  // for register set specifier
-    }
-    else {
+    } else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
     }
@@ -75,16 +73,14 @@ static auto size_of_register_index_operand(TokenVector const& tokens,
         or tokens.at(i) == "false") {
         calculated_size += sizeof(viua::internals::types::byte);
         ++i;
-    }
-    else if (auto const sigil = tokens.at(i).str().at(0);
-             (sigil == '%' or sigil == '@' or sigil == '*')
-             and str::isnum(tokens.at(i).str().substr(1))) {
+    } else if (auto const sigil = tokens.at(i).str().at(0);
+               (sigil == '%' or sigil == '@' or sigil == '*')
+               and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::Register_sets);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
-    }
-    else {
+    } else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
     }
@@ -405,8 +401,7 @@ static auto size_of_text(TokenVector const& tokens, TokenVector::size_type i)
         std::tie(size_increment, i) =
             size_of_register_index_operand_with_rs_type(tokens, i);
         calculated_size += size_increment;
-    }
-    else {
+    } else {
         ++calculated_size;  // for operand type
         calculated_size +=
             tokens.at(i++).str().size() + 1 - 2;  // +1 for null terminator, -2
@@ -518,16 +513,13 @@ static auto size_of_bits(TokenVector const& tokens, TokenVector::size_type i)
         std::tie(size_increment, i) =
             size_of_register_index_operand_with_rs_type(tokens, i);
         calculated_size += size_increment;
-    }
-    else if (tokens.at(i).str().at(1) == 'b') {
+    } else if (tokens.at(i).str().at(1) == 'b') {
         std::tie(size_increment, i) = size_of_binary_literal_operand(tokens, i);
         calculated_size += size_increment;
-    }
-    else if (tokens.at(i).str().at(1) == 'o') {
+    } else if (tokens.at(i).str().at(1) == 'o') {
         std::tie(size_increment, i) = size_of_octal_literal_operand(tokens, i);
         calculated_size += size_increment;
-    }
-    else if (tokens.at(i).str().at(1) == 'x') {
+    } else if (tokens.at(i).str().at(1) == 'x') {
         std::tie(size_increment, i) =
             size_of_hexadecimal_literal_operand(tokens, i);
         calculated_size += size_increment;
@@ -771,8 +763,7 @@ static auto size_of_call(TokenVector const& tokens, TokenVector::size_type i)
         std::tie(size_increment, i) =
             size_of_register_index_operand_with_rs_type(tokens, i);
         calculated_size += size_increment;
-    }
-    else {
+    } else {
         calculated_size += tokens.at(i).str().size() + 1;
         ++i;
     }
@@ -792,8 +783,7 @@ static auto size_of_tailcall(TokenVector const& tokens,
         std::tie(size_increment, i) =
             size_of_register_index_operand_with_rs_type(tokens, i);
         calculated_size += size_increment;
-    }
-    else {
+    } else {
         calculated_size += tokens.at(i).str().size() + 1;
         ++i;
     }
@@ -854,8 +844,7 @@ static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::types::timeout);
         ++i;
-    }
-    else {
+    } else {
         throw viua::cg::lex::Invalid_syntax(tokens.at(i),
                                             "invalid timeout token in 'join'");
     }
@@ -875,8 +864,7 @@ static auto size_of_receive(TokenVector const& tokens, TokenVector::size_type i)
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::types::timeout);
         ++i;
-    }
-    else {
+    } else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), "invalid timeout token in 'receive'");
     }
@@ -1028,8 +1016,7 @@ static auto size_of_io_wait(TokenVector const& tokens, TokenVector::size_type i)
         calculated_size += sizeof(viua::internals::types::byte);
         calculated_size += sizeof(viua::internals::types::timeout);
         ++i;
-    }
-    else {
+    } else {
         throw viua::cg::lex::Invalid_syntax(
             tokens.at(i), "invalid timeout token in 'io_wait'");
     }
@@ -1104,549 +1091,413 @@ auto calculate_bytecode_size_of_first_n_instructions2(
         if (tokens.at(i) == "nop") {
             ++i;
             std::tie(increase, i) = size_of_nop(tokens, i);
-        }
-        else if (tokens.at(i) == "izero") {
+        } else if (tokens.at(i) == "izero") {
             ++i;
             std::tie(increase, i) = size_of_izero(tokens, i);
-        }
-        else if (tokens.at(i) == "integer") {
+        } else if (tokens.at(i) == "integer") {
             ++i;
             std::tie(increase, i) = size_of_istore(tokens, i);
-        }
-        else if (tokens.at(i) == "iinc") {
+        } else if (tokens.at(i) == "iinc") {
             ++i;
             std::tie(increase, i) = size_of_iinc(tokens, i);
-        }
-        else if (tokens.at(i) == "idec") {
+        } else if (tokens.at(i) == "idec") {
             ++i;
             std::tie(increase, i) = size_of_idec(tokens, i);
-        }
-        else if (tokens.at(i) == "float") {
+        } else if (tokens.at(i) == "float") {
             ++i;
             std::tie(increase, i) = size_of_fstore(tokens, i);
-        }
-        else if (tokens.at(i) == "itof") {
+        } else if (tokens.at(i) == "itof") {
             ++i;
             std::tie(increase, i) = size_of_itof(tokens, i);
-        }
-        else if (tokens.at(i) == "ftoi") {
+        } else if (tokens.at(i) == "ftoi") {
             ++i;
             std::tie(increase, i) = size_of_ftoi(tokens, i);
-        }
-        else if (tokens.at(i) == "stoi") {
+        } else if (tokens.at(i) == "stoi") {
             ++i;
             std::tie(increase, i) = size_of_stoi(tokens, i);
-        }
-        else if (tokens.at(i) == "stof") {
+        } else if (tokens.at(i) == "stof") {
             ++i;
             std::tie(increase, i) = size_of_stof(tokens, i);
-        }
-        else if (tokens.at(i) == "add") {
+        } else if (tokens.at(i) == "add") {
             ++i;
             std::tie(increase, i) = size_of_add(tokens, i);
-        }
-        else if (tokens.at(i) == "sub") {
+        } else if (tokens.at(i) == "sub") {
             ++i;
             std::tie(increase, i) = size_of_sub(tokens, i);
-        }
-        else if (tokens.at(i) == "mul") {
+        } else if (tokens.at(i) == "mul") {
             ++i;
             std::tie(increase, i) = size_of_mul(tokens, i);
-        }
-        else if (tokens.at(i) == "div") {
+        } else if (tokens.at(i) == "div") {
             ++i;
             std::tie(increase, i) = size_of_div(tokens, i);
-        }
-        else if (tokens.at(i) == "lt") {
+        } else if (tokens.at(i) == "lt") {
             ++i;
             std::tie(increase, i) = size_of_lt(tokens, i);
-        }
-        else if (tokens.at(i) == "lte") {
+        } else if (tokens.at(i) == "lte") {
             ++i;
             std::tie(increase, i) = size_of_lte(tokens, i);
-        }
-        else if (tokens.at(i) == "gt") {
+        } else if (tokens.at(i) == "gt") {
             ++i;
             std::tie(increase, i) = size_of_gt(tokens, i);
-        }
-        else if (tokens.at(i) == "gte") {
+        } else if (tokens.at(i) == "gte") {
             ++i;
             std::tie(increase, i) = size_of_gte(tokens, i);
-        }
-        else if (tokens.at(i) == "eq") {
+        } else if (tokens.at(i) == "eq") {
             ++i;
             std::tie(increase, i) = size_of_eq(tokens, i);
-        }
-        else if (tokens.at(i) == "string") {
+        } else if (tokens.at(i) == "string") {
             ++i;
             std::tie(increase, i) = size_of_string(tokens, i);
-        }
-        else if (tokens.at(i) == "text") {
+        } else if (tokens.at(i) == "text") {
             ++i;
             std::tie(increase, i) = size_of_text(tokens, i);
-        }
-        else if (tokens.at(i) == "texteq") {
+        } else if (tokens.at(i) == "texteq") {
             ++i;
             std::tie(increase, i) = size_of_texteq(tokens, i);
-        }
-        else if (tokens.at(i) == "textat") {
+        } else if (tokens.at(i) == "textat") {
             ++i;
             std::tie(increase, i) = size_of_textat(tokens, i);
-        }
-        else if (tokens.at(i) == "textsub") {
+        } else if (tokens.at(i) == "textsub") {
             ++i;
             std::tie(increase, i) = size_of_textsub(tokens, i);
-        }
-        else if (tokens.at(i) == "textlength") {
+        } else if (tokens.at(i) == "textlength") {
             ++i;
             std::tie(increase, i) = size_of_textlength(tokens, i);
-        }
-        else if (tokens.at(i) == "textcommonprefix") {
+        } else if (tokens.at(i) == "textcommonprefix") {
             ++i;
             std::tie(increase, i) = size_of_textcommonprefix(tokens, i);
-        }
-        else if (tokens.at(i) == "textcommonsuffix") {
+        } else if (tokens.at(i) == "textcommonsuffix") {
             ++i;
             std::tie(increase, i) = size_of_textcommonsuffix(tokens, i);
-        }
-        else if (tokens.at(i) == "textconcat") {
+        } else if (tokens.at(i) == "textconcat") {
             ++i;
             std::tie(increase, i) = size_of_textconcat(tokens, i);
-        }
-        else if (tokens.at(i) == "streq") {
+        } else if (tokens.at(i) == "streq") {
             ++i;
             std::tie(increase, i) = size_of_streq(tokens, i);
-        }
-        else if (tokens.at(i) == "vector") {
+        } else if (tokens.at(i) == "vector") {
             ++i;
             std::tie(increase, i) = size_of_vec(tokens, i);
-        }
-        else if (tokens.at(i) == "vinsert") {
+        } else if (tokens.at(i) == "vinsert") {
             ++i;
             std::tie(increase, i) = size_of_vinsert(tokens, i);
-        }
-        else if (tokens.at(i) == "vpush") {
+        } else if (tokens.at(i) == "vpush") {
             ++i;
             std::tie(increase, i) = size_of_vpush(tokens, i);
-        }
-        else if (tokens.at(i) == "vpop") {
+        } else if (tokens.at(i) == "vpop") {
             ++i;
             std::tie(increase, i) = size_of_vpop(tokens, i);
-        }
-        else if (tokens.at(i) == "vat") {
+        } else if (tokens.at(i) == "vat") {
             ++i;
             std::tie(increase, i) = size_of_vat(tokens, i);
-        }
-        else if (tokens.at(i) == "vlen") {
+        } else if (tokens.at(i) == "vlen") {
             ++i;
             std::tie(increase, i) = size_of_vlen(tokens, i);
-        }
-        else if (tokens.at(i) == "bool") {
+        } else if (tokens.at(i) == "bool") {
             ++i;
             std::tie(increase, i) = size_of_bool(tokens, i);
-        }
-        else if (tokens.at(i) == "not") {
+        } else if (tokens.at(i) == "not") {
             ++i;
             std::tie(increase, i) = size_of_not(tokens, i);
-        }
-        else if (tokens.at(i) == "and") {
+        } else if (tokens.at(i) == "and") {
             ++i;
             std::tie(increase, i) = size_of_and(tokens, i);
-        }
-        else if (tokens.at(i) == "or") {
+        } else if (tokens.at(i) == "or") {
             ++i;
             std::tie(increase, i) = size_of_or(tokens, i);
-        }
-        else if (tokens.at(i) == "bits_of_integer") {
+        } else if (tokens.at(i) == "bits_of_integer") {
             ++i;
             std::tie(increase, i) = size_of_bits_of_integer(tokens, i);
-        }
-        else if (tokens.at(i) == "integer_of_bits") {
+        } else if (tokens.at(i) == "integer_of_bits") {
             ++i;
             std::tie(increase, i) = size_of_integer_of_bits(tokens, i);
-        }
-        else if (tokens.at(i) == "bits") {
+        } else if (tokens.at(i) == "bits") {
             ++i;
             std::tie(increase, i) = size_of_bits(tokens, i);
-        }
-        else if (tokens.at(i) == "bitand") {
+        } else if (tokens.at(i) == "bitand") {
             ++i;
             std::tie(increase, i) = size_of_bitand(tokens, i);
-        }
-        else if (tokens.at(i) == "bitor") {
+        } else if (tokens.at(i) == "bitor") {
             ++i;
             std::tie(increase, i) = size_of_bitor(tokens, i);
-        }
-        else if (tokens.at(i) == "bitnot") {
+        } else if (tokens.at(i) == "bitnot") {
             ++i;
             std::tie(increase, i) = size_of_bitnot(tokens, i);
-        }
-        else if (tokens.at(i) == "bitxor") {
+        } else if (tokens.at(i) == "bitxor") {
             ++i;
             std::tie(increase, i) = size_of_bitxor(tokens, i);
-        }
-        else if (tokens.at(i) == "bitat") {
+        } else if (tokens.at(i) == "bitat") {
             ++i;
             std::tie(increase, i) = size_of_bitat(tokens, i);
-        }
-        else if (tokens.at(i) == "bitset") {
+        } else if (tokens.at(i) == "bitset") {
             ++i;
             std::tie(increase, i) = size_of_bitset(tokens, i);
-        }
-        else if (tokens.at(i) == "shl") {
+        } else if (tokens.at(i) == "shl") {
             ++i;
             std::tie(increase, i) = size_of_shl(tokens, i);
-        }
-        else if (tokens.at(i) == "shr") {
+        } else if (tokens.at(i) == "shr") {
             ++i;
             std::tie(increase, i) = size_of_shr(tokens, i);
-        }
-        else if (tokens.at(i) == "ashl") {
+        } else if (tokens.at(i) == "ashl") {
             ++i;
             std::tie(increase, i) = size_of_ashl(tokens, i);
-        }
-        else if (tokens.at(i) == "ashr") {
+        } else if (tokens.at(i) == "ashr") {
             ++i;
             std::tie(increase, i) = size_of_ashr(tokens, i);
-        }
-        else if (tokens.at(i) == "rol") {
+        } else if (tokens.at(i) == "rol") {
             ++i;
             std::tie(increase, i) = size_of_rol(tokens, i);
-        }
-        else if (tokens.at(i) == "ror") {
+        } else if (tokens.at(i) == "ror") {
             ++i;
             std::tie(increase, i) = size_of_ror(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapincrement") {
+        } else if (tokens.at(i) == "wrapincrement") {
             ++i;
             std::tie(increase, i) = size_of_wrapincrement(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapdecrement") {
+        } else if (tokens.at(i) == "wrapdecrement") {
             ++i;
             std::tie(increase, i) = size_of_wrapdecrement(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapadd") {
+        } else if (tokens.at(i) == "wrapadd") {
             ++i;
             std::tie(increase, i) = size_of_wrapadd(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapsub") {
+        } else if (tokens.at(i) == "wrapsub") {
             ++i;
             std::tie(increase, i) = size_of_wrapsub(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapmul") {
+        } else if (tokens.at(i) == "wrapmul") {
             ++i;
             std::tie(increase, i) = size_of_wrapmul(tokens, i);
-        }
-        else if (tokens.at(i) == "wrapdiv") {
+        } else if (tokens.at(i) == "wrapdiv") {
             ++i;
             std::tie(increase, i) = size_of_wrapdiv(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedsincrement") {
+        } else if (tokens.at(i) == "checkedsincrement") {
             ++i;
             std::tie(increase, i) = size_of_checkedsincrement(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedsdecrement") {
+        } else if (tokens.at(i) == "checkedsdecrement") {
             ++i;
             std::tie(increase, i) = size_of_checkedsdecrement(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedsadd") {
+        } else if (tokens.at(i) == "checkedsadd") {
             ++i;
             std::tie(increase, i) = size_of_checkedsadd(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedssub") {
+        } else if (tokens.at(i) == "checkedssub") {
             ++i;
             std::tie(increase, i) = size_of_checkedssub(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedsmul") {
+        } else if (tokens.at(i) == "checkedsmul") {
             ++i;
             std::tie(increase, i) = size_of_checkedsmul(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedsdiv") {
+        } else if (tokens.at(i) == "checkedsdiv") {
             ++i;
             std::tie(increase, i) = size_of_checkedsdiv(tokens, i);
-        }
-        else if (tokens.at(i) == "checkeduincrement") {
+        } else if (tokens.at(i) == "checkeduincrement") {
             ++i;
             std::tie(increase, i) = size_of_checkeduincrement(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedudecrement") {
+        } else if (tokens.at(i) == "checkedudecrement") {
             ++i;
             std::tie(increase, i) = size_of_checkedudecrement(tokens, i);
-        }
-        else if (tokens.at(i) == "checkeduadd") {
+        } else if (tokens.at(i) == "checkeduadd") {
             ++i;
             std::tie(increase, i) = size_of_checkeduadd(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedusub") {
+        } else if (tokens.at(i) == "checkedusub") {
             ++i;
             std::tie(increase, i) = size_of_checkedusub(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedumul") {
+        } else if (tokens.at(i) == "checkedumul") {
             ++i;
             std::tie(increase, i) = size_of_checkedumul(tokens, i);
-        }
-        else if (tokens.at(i) == "checkedudiv") {
+        } else if (tokens.at(i) == "checkedudiv") {
             ++i;
             std::tie(increase, i) = size_of_checkedudiv(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingsincrement") {
+        } else if (tokens.at(i) == "saturatingsincrement") {
             ++i;
             std::tie(increase, i) = size_of_saturatingsincrement(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingsdecrement") {
+        } else if (tokens.at(i) == "saturatingsdecrement") {
             ++i;
             std::tie(increase, i) = size_of_saturatingsdecrement(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingsadd") {
+        } else if (tokens.at(i) == "saturatingsadd") {
             ++i;
             std::tie(increase, i) = size_of_saturatingsadd(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingssub") {
+        } else if (tokens.at(i) == "saturatingssub") {
             ++i;
             std::tie(increase, i) = size_of_saturatingssub(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingsmul") {
+        } else if (tokens.at(i) == "saturatingsmul") {
             ++i;
             std::tie(increase, i) = size_of_saturatingsmul(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingsdiv") {
+        } else if (tokens.at(i) == "saturatingsdiv") {
             ++i;
             std::tie(increase, i) = size_of_saturatingsdiv(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatinguincrement") {
+        } else if (tokens.at(i) == "saturatinguincrement") {
             ++i;
             std::tie(increase, i) = size_of_saturatinguincrement(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingudecrement") {
+        } else if (tokens.at(i) == "saturatingudecrement") {
             ++i;
             std::tie(increase, i) = size_of_saturatingudecrement(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatinguadd") {
+        } else if (tokens.at(i) == "saturatinguadd") {
             ++i;
             std::tie(increase, i) = size_of_saturatinguadd(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingusub") {
+        } else if (tokens.at(i) == "saturatingusub") {
             ++i;
             std::tie(increase, i) = size_of_saturatingusub(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingumul") {
+        } else if (tokens.at(i) == "saturatingumul") {
             ++i;
             std::tie(increase, i) = size_of_saturatingumul(tokens, i);
-        }
-        else if (tokens.at(i) == "saturatingudiv") {
+        } else if (tokens.at(i) == "saturatingudiv") {
             ++i;
             std::tie(increase, i) = size_of_saturatingudiv(tokens, i);
-        }
-        else if (tokens.at(i) == "move") {
+        } else if (tokens.at(i) == "move") {
             ++i;
             std::tie(increase, i) = size_of_move(tokens, i);
-        }
-        else if (tokens.at(i) == "copy") {
+        } else if (tokens.at(i) == "copy") {
             ++i;
             std::tie(increase, i) = size_of_copy(tokens, i);
-        }
-        else if (tokens.at(i) == "ptr") {
+        } else if (tokens.at(i) == "ptr") {
             ++i;
             std::tie(increase, i) = size_of_ptr(tokens, i);
-        }
-        else if (tokens.at(i) == "ptrlive") {
+        } else if (tokens.at(i) == "ptrlive") {
             ++i;
             std::tie(increase, i) = size_of_ptrlive(tokens, i);
-        }
-        else if (tokens.at(i) == "swap") {
+        } else if (tokens.at(i) == "swap") {
             ++i;
             std::tie(increase, i) = size_of_swap(tokens, i);
-        }
-        else if (tokens.at(i) == "delete") {
+        } else if (tokens.at(i) == "delete") {
             ++i;
             std::tie(increase, i) = size_of_delete(tokens, i);
-        }
-        else if (tokens.at(i) == "isnull") {
+        } else if (tokens.at(i) == "isnull") {
             ++i;
             std::tie(increase, i) = size_of_isnull(tokens, i);
-        }
-        else if (tokens.at(i) == "print") {
+        } else if (tokens.at(i) == "print") {
             ++i;
             std::tie(increase, i) = size_of_print(tokens, i);
-        }
-        else if (tokens.at(i) == "echo") {
+        } else if (tokens.at(i) == "echo") {
             ++i;
             std::tie(increase, i) = size_of_echo(tokens, i);
-        }
-        else if (tokens.at(i) == "capture") {
+        } else if (tokens.at(i) == "capture") {
             ++i;
             std::tie(increase, i) = size_of_capture(tokens, i);
-        }
-        else if (tokens.at(i) == "capturecopy") {
+        } else if (tokens.at(i) == "capturecopy") {
             ++i;
             std::tie(increase, i) = size_of_capturecopy(tokens, i);
-        }
-        else if (tokens.at(i) == "capturemove") {
+        } else if (tokens.at(i) == "capturemove") {
             ++i;
             std::tie(increase, i) = size_of_capturemove(tokens, i);
-        }
-        else if (tokens.at(i) == "closure") {
+        } else if (tokens.at(i) == "closure") {
             ++i;
             std::tie(increase, i) = size_of_closure(tokens, i);
-        }
-        else if (tokens.at(i) == "function") {
+        } else if (tokens.at(i) == "function") {
             ++i;
             std::tie(increase, i) = size_of_function(tokens, i);
-        }
-        else if (tokens.at(i) == "frame") {
+        } else if (tokens.at(i) == "frame") {
             ++i;
             std::tie(increase, i) = size_of_frame(tokens, i);
-        }
-        else if (tokens.at(i) == "call") {
+        } else if (tokens.at(i) == "call") {
             ++i;
             std::tie(increase, i) = size_of_call(tokens, i);
-        }
-        else if (tokens.at(i) == "tailcall") {
+        } else if (tokens.at(i) == "tailcall") {
             ++i;
             std::tie(increase, i) = size_of_tailcall(tokens, i);
-        }
-        else if (tokens.at(i) == "defer") {
+        } else if (tokens.at(i) == "defer") {
             ++i;
             std::tie(increase, i) = size_of_defer(tokens, i);
-        }
-        else if (tokens.at(i) == "arg") {
+        } else if (tokens.at(i) == "arg") {
             ++i;
             std::tie(increase, i) = size_of_arg(tokens, i);
-        }
-        else if (tokens.at(i) == "allocate_registers") {
+        } else if (tokens.at(i) == "allocate_registers") {
             ++i;
             std::tie(increase, i) =
                 size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
-        }
-        else if (tokens.at(i) == "process") {
+        } else if (tokens.at(i) == "process") {
             ++i;
             std::tie(increase, i) = size_of_process(tokens, i);
-        }
-        else if (tokens.at(i) == "self") {
+        } else if (tokens.at(i) == "self") {
             ++i;
             std::tie(increase, i) = size_of_self(tokens, i);
-        }
-        else if (tokens.at(i) == "pideq") {
+        } else if (tokens.at(i) == "pideq") {
             ++i;
             std::tie(increase, i) = size_of_pideq(tokens, i);
-        }
-        else if (tokens.at(i) == "join") {
+        } else if (tokens.at(i) == "join") {
             ++i;
             std::tie(increase, i) = size_of_join(tokens, i);
-        }
-        else if (tokens.at(i) == "send") {
+        } else if (tokens.at(i) == "send") {
             ++i;
             std::tie(increase, i) = size_of_send(tokens, i);
-        }
-        else if (tokens.at(i) == "receive") {
+        } else if (tokens.at(i) == "receive") {
             ++i;
             std::tie(increase, i) = size_of_receive(tokens, i);
-        }
-        else if (tokens.at(i) == "watchdog") {
+        } else if (tokens.at(i) == "watchdog") {
             ++i;
             std::tie(increase, i) = size_of_watchdog(tokens, i);
-        }
-        else if (tokens.at(i) == "jump") {
+        } else if (tokens.at(i) == "jump") {
             ++i;
             std::tie(increase, i) = size_of_jump(tokens, i);
-        }
-        else if (tokens.at(i) == "if") {
+        } else if (tokens.at(i) == "if") {
             ++i;
             std::tie(increase, i) = size_of_if(tokens, i);
-        }
-        else if (tokens.at(i) == "throw") {
+        } else if (tokens.at(i) == "throw") {
             ++i;
             std::tie(increase, i) = size_of_throw(tokens, i);
-        }
-        else if (tokens.at(i) == "catch") {
+        } else if (tokens.at(i) == "catch") {
             ++i;
             std::tie(increase, i) = size_of_catch(tokens, i);
-        }
-        else if (tokens.at(i) == "draw") {
+        } else if (tokens.at(i) == "draw") {
             ++i;
             std::tie(increase, i) = size_of_pull(tokens, i);
-        }
-        else if (tokens.at(i) == "try") {
+        } else if (tokens.at(i) == "try") {
             ++i;
             std::tie(increase, i) = size_of_try(tokens, i);
-        }
-        else if (tokens.at(i) == "enter") {
+        } else if (tokens.at(i) == "enter") {
             ++i;
             std::tie(increase, i) = size_of_enter(tokens, i);
-        }
-        else if (tokens.at(i) == "leave") {
+        } else if (tokens.at(i) == "leave") {
             ++i;
             std::tie(increase, i) = size_of_leave(tokens, i);
-        }
-        else if (tokens.at(i) == "import") {
+        } else if (tokens.at(i) == "import") {
             ++i;
             std::tie(increase, i) = size_of_import(tokens, i);
-        }
-        else if (tokens.at(i) == "atom") {
+        } else if (tokens.at(i) == "atom") {
             ++i;
             std::tie(increase, i) = size_of_atom(tokens, i);
-        }
-        else if (tokens.at(i) == "atomeq") {
+        } else if (tokens.at(i) == "atomeq") {
             ++i;
             std::tie(increase, i) = size_of_atomeq(tokens, i);
-        }
-        else if (tokens.at(i) == "struct") {
+        } else if (tokens.at(i) == "struct") {
             ++i;
             std::tie(increase, i) = size_of_struct(tokens, i);
-        }
-        else if (tokens.at(i) == "structinsert") {
+        } else if (tokens.at(i) == "structinsert") {
             ++i;
             std::tie(increase, i) = size_of_structinsert(tokens, i);
-        }
-        else if (tokens.at(i) == "structremove") {
+        } else if (tokens.at(i) == "structremove") {
             ++i;
             std::tie(increase, i) = size_of_structremove(tokens, i);
-        }
-        else if (tokens.at(i) == "structat") {
+        } else if (tokens.at(i) == "structat") {
             ++i;
             std::tie(increase, i) = size_of_structat(tokens, i);
-        }
-        else if (tokens.at(i) == "structkeys") {
+        } else if (tokens.at(i) == "structkeys") {
             ++i;
             std::tie(increase, i) = size_of_structkeys(tokens, i);
-        }
-        else if (tokens.at(i) == "insert") {
+        } else if (tokens.at(i) == "insert") {
             ++i;
             std::tie(increase, i) = size_of_insert(tokens, i);
-        }
-        else if (tokens.at(i) == "remove") {
+        } else if (tokens.at(i) == "remove") {
             ++i;
             std::tie(increase, i) = size_of_remove(tokens, i);
-        }
-        else if (tokens.at(i) == "io_read") {
+        } else if (tokens.at(i) == "io_read") {
             ++i;
             std::tie(increase, i) = size_of_io_read(tokens, i);
-        }
-        else if (tokens.at(i) == "io_write") {
+        } else if (tokens.at(i) == "io_write") {
             ++i;
             std::tie(increase, i) = size_of_io_write(tokens, i);
-        }
-        else if (tokens.at(i) == "io_close") {
+        } else if (tokens.at(i) == "io_close") {
             ++i;
             std::tie(increase, i) = size_of_io_close(tokens, i);
-        }
-        else if (tokens.at(i) == "io_wait") {
+        } else if (tokens.at(i) == "io_wait") {
             ++i;
             std::tie(increase, i) = size_of_io_wait(tokens, i);
-        }
-        else if (tokens.at(i) == "io_cancel") {
+        } else if (tokens.at(i) == "io_cancel") {
             ++i;
             std::tie(increase, i) = size_of_io_cancel(tokens, i);
-        }
-        else if (tokens.at(i) == "return") {
+        } else if (tokens.at(i) == "return") {
             ++i;
             std::tie(increase, i) = size_of_return(tokens, i);
-        }
-        else if (tokens.at(i) == "halt") {
+        } else if (tokens.at(i) == "halt") {
             ++i;
             std::tie(increase, i) = size_of_halt(tokens, i);
-        }
-        else {
+        } else {
             throw viua::cg::lex::Invalid_syntax(
                 tokens.at(i),
                 ("failed to calculate size of: " + tokens.at(i).str()));

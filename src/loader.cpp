@@ -67,8 +67,7 @@ void Loader::calculate_function_sizes()
             uint64_t a = function_addresses[name];
             uint64_t b = function_addresses[functions[i + 1]];
             el_size    = (b - a);
-        }
-        else {
+        } else {
             uint64_t a = function_addresses[name];
             uint64_t b = size;
             el_size    = (b - a);

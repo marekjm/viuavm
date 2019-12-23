@@ -104,8 +104,7 @@ static auto extract_register_index(Op_address_type ip,
 
         // FIXME extract RS type
         ip += sizeof(viua::internals::Register_sets);
-    }
-    else {
+    } else {
         throw std::make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
             "OT_REGISTER_REFERENCE"
@@ -145,8 +144,7 @@ static auto extract_register_type_and_index(Op_address_type ip,
 
         register_type = extract<viua::internals::Register_sets>(ip);
         ip += sizeof(viua::internals::Register_sets);
-    }
-    else {
+    } else {
         throw std::make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_INDEX, "
             "OT_REGISTER_REFERENCE"
@@ -217,8 +215,7 @@ auto viua::bytecode::decoder::operands::fetch_timeout(Op_address_type ip,
     if (ot == OT_INT) {
         aligned_read(value) = ip;
         ip += sizeof(decltype(value));
-    }
-    else {
+    } else {
         throw std::make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected O_INT");
     }
@@ -282,12 +279,10 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(
         // FIXME plain_int (as encoded in bytecode) is 32 bits, but in-program
         // integer is 64 bits
         value = static_cast<decltype(value)>(i->as_integer());
-    }
-    else if (ot == OT_INT) {
+    } else if (ot == OT_INT) {
         aligned_read(value) = ip;
         ip += sizeof(decltype(value));
-    }
-    else {
+    } else {
         throw std::make_unique<viua::types::Exception>(
             "decoded invalid operand type: expected OT_REGISTER_REFERENCE, "
             "OT_INT");

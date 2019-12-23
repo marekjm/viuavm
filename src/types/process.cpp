@@ -56,8 +56,7 @@ viua::process::PID viua::types::Process::pid() const { return saved_pid; }
 
 viua::types::Process::Process(viua::process::Process* t)
         : thrd(t), saved_pid(thrd->pid())
-{
-}
+{}
 
 auto viua::types::Process::operator==(Process const& that) const -> bool
 {

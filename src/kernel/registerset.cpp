@@ -32,8 +32,7 @@ void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o)
 {
     if (dynamic_cast<viua::types::Reference*>(value.get())) {
         static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
-    }
-    else {
+    } else {
         value = std::move(o);
     }
 }
@@ -95,8 +94,7 @@ viua::kernel::Register::Register() : value(nullptr), mask(0) {}
 
 viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o)
         : value(std::move(o)), mask(0)
-{
-}
+{}
 
 viua::kernel::Register::Register(Register&& that)
         : value(std::move(that.value)), mask(that.mask)
@@ -162,8 +160,7 @@ void viua::kernel::Register_set::set(
     if (dynamic_cast<viua::types::Reference*>(registers.at(index).get())) {
         static_cast<viua::types::Reference*>(registers.at(index).get())
             ->rebind(object.release());
-    }
-    else {
+    } else {
         registers.at(index).reset(std::move(object));
     }
 }

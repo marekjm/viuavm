@@ -33,8 +33,7 @@ auto assemble_op_process(Program& program,
         --fn;
         ret = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(target)));
-    }
-    else {
+    } else {
         ret = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));

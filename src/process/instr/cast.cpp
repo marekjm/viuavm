@@ -75,12 +75,10 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type
     auto const supplied_string = source->value();
     try {
         result_integer = std::stoi(supplied_string);
-    }
-    catch (std::out_of_range const& e) {
+    } catch (std::out_of_range const& e) {
         throw std::make_unique<viua::types::Exception>("out of range: "
                                                        + supplied_string);
-    }
-    catch (std::invalid_argument const& e) {
+    } catch (std::invalid_argument const& e) {
         throw std::make_unique<viua::types::Exception>("invalid argument: "
                                                        + supplied_string);
     }

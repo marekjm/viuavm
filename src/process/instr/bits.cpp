@@ -98,8 +98,7 @@ auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type
         addr += sizeof(bits_size);
         *target = std::make_unique<viua::types::Bits>(bits_size, addr);
         addr += bits_size;
-    }
-    else {
+    } else {
         viua::types::Integer* n = nullptr;
         std::tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Integer>(addr, this);
@@ -231,12 +230,10 @@ auto viua::process::Process::opbitset(Op_address_type addr) -> Op_address_type
     if (ot == OT_TRUE) {
         ++addr;  // for operand type
         value = true;
-    }
-    else if (ot == OT_FALSE) {
+    } else if (ot == OT_FALSE) {
         ++addr;  // for operand type
         value = false;
-    }
-    else {
+    } else {
         viua::types::Boolean* x = nullptr;
         std::tie(addr, x) = viua::bytecode::decoder::operands::fetch_object_of<
             viua::types::Boolean>(addr, this);
@@ -260,8 +257,7 @@ static auto execute_bit_shift_instruction(viua::process::Process* process,
     auto target = dumb_ptr<viua::kernel::Register>{nullptr};
     if (viua::bytecode::decoder::operands::is_void(addr)) {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
-    }
-    else {
+    } else {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, process);
     }

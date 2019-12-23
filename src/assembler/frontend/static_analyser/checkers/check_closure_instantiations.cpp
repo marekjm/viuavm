@@ -64,16 +64,14 @@ auto check_closure_instantiations(
                 fn,
                 0,
                 static_cast<InstructionIndex>(-1));
-        }
-        catch (Invalid_syntax& e) {
+        } catch (Invalid_syntax& e) {
             throw Traced_syntax_error{}
                 .append(e)
                 .append(Invalid_syntax{fn.name, "in a closure defined here:"})
                 .append(Invalid_syntax{
                     register_usage_profile.defined_where(each.first),
                     "when instantiated here:"});
-        }
-        catch (Traced_syntax_error& e) {
+        } catch (Traced_syntax_error& e) {
             throw e
                 .append(Invalid_syntax{fn.name, "in a closure defined here:"})
                 .append(Invalid_syntax{

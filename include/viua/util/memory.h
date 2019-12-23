@@ -78,8 +78,7 @@ template<class T> class maybe_unique_ptr {
 
     maybe_unique_ptr(T* ptr = nullptr, bool own = true)
             : owns_pointer(own), pointer(ptr)
-    {
-    }
+    {}
     ~maybe_unique_ptr() { delete_if_owned(); }
 };
 

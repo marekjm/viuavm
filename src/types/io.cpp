@@ -62,15 +62,13 @@ IO_interaction::Interaction_result::Interaction_result(State const st,
                                                        Status const su,
                                                        result_type r)
         : state{st}, status{su}, result{std::move(r)}
-{
-}
+{}
 
 IO_read_interaction::IO_read_interaction(id_type const x,
                                          int const fd,
                                          size_t const limit)
         : IO_interaction(x), file_descriptor{fd}, buffer(limit, '\0')
-{
-}
+{}
 auto IO_read_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
@@ -105,8 +103,7 @@ IO_write_interaction::IO_write_interaction(id_type const x,
                                            int const fd,
                                            std::string buf)
         : IO_interaction(x), file_descriptor{fd}, buffer{std::move(buf)}
-{
-}
+{}
 auto IO_write_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
@@ -133,8 +130,7 @@ auto IO_write_interaction::interact() -> Interaction_result
 
 IO_close_interaction::IO_close_interaction(id_type const x, int const fd)
         : IO_interaction(x), file_descriptor{fd}
-{
-}
+{}
 auto IO_close_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
@@ -259,8 +255,7 @@ auto IO_fd::close() -> void
 }
 
 IO_fd::IO_fd(int const x, Ownership const o) : file_descriptor{x}, ownership{o}
-{
-}
+{}
 IO_fd::~IO_fd() { close(); }
 
 
@@ -283,7 +278,6 @@ std::unique_ptr<Value> IO_request::copy() const
 
 IO_request::IO_request(viua::kernel::Kernel* k, interaction_id_type const x)
         : interaction_id{x}, kernel{k}
-{
-}
+{}
 IO_request::~IO_request() { kernel->cancel_io(id()); }
 }  // namespace viua::types

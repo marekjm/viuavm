@@ -342,8 +342,7 @@ auto Function_state::assume_type(
         }
         if (wrapper.value().type() == Value_type::Vector) {
             wrapper = static_cast<values::Vector const&>(wrapper.value()).of();
-        }
-        else if (wrapper.value().type() == Value_type::Pointer) {
+        } else if (wrapper.value().type() == Value_type::Pointer) {
             wrapper = static_cast<values::Pointer const&>(wrapper.value()).of();
         }
         ++i;
@@ -414,7 +413,8 @@ static auto to_string(values::Value_wrapper const& value) -> std::string
     case values::Value_type::Function:
         return "function#" + std::to_string(value.index()) + " of "
                + static_cast<values::Function const&>(value.value()).of();
-    case values::Value_type::Atom: {
+    case values::Value_type::Atom:
+    {
         auto const& atom = static_cast<values::Atom const&>(value.value());
         return "atom#" + std::to_string(value.index())
                + (atom.known() ? (" of " + atom.of()) : "");
@@ -481,8 +481,7 @@ Function_state::Function_state(
     std::vector<viua::tooling::libs::lexer::Token> location)
         : local_registers_allocated{limit}
         , local_registers_allocated_where{std::move(location)}
-{
-}
+{}
 
 Function_state::Function_state(Function_state&& that)
         : local_registers_allocated{std::move(that.local_registers_allocated)}

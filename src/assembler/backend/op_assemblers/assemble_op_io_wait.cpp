@@ -40,8 +40,7 @@ auto assemble_op_io_wait(Program& program,
         source_operand = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(source)),
             ::assembler::operands::resolve_rs_type(tokens.at(source + 1)));
-    }
-    else {
+    } else {
         target_operand = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));

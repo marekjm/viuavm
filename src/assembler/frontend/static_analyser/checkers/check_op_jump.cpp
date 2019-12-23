@@ -47,35 +47,30 @@ auto check_op_jump(Register_usage_profile& register_usage_profile,
             try {
                 check_register_usage_for_instruction_block_impl(
                     register_usage_profile, ps, ib, i, mnemonic_counter);
-            }
-            catch (Invalid_syntax& e) {
+            } catch (Invalid_syntax& e) {
                 throw Traced_syntax_error{}.append(e).append(
                     Invalid_syntax{instruction.tokens.at(0),
                                    "after a jump here:"}
                         .add(instruction.operands.at(0)->tokens.at(0)));
-            }
-            catch (Traced_syntax_error& e) {
+            } catch (Traced_syntax_error& e) {
                 throw e.append(
                     Invalid_syntax{instruction.tokens.at(0),
                                    "after a jump here:"}
                         .add(instruction.operands.at(0)->tokens.at(0)));
             }
         }
-    }
-    else if (auto label = dynamic_cast<Label*>(target); label) {
+    } else if (auto label = dynamic_cast<Label*>(target); label) {
         auto jump_target = ib.marker_map.at(label->tokens.at(0));
         jump_target      = get_line_index_of_instruction(jump_target, ib);
         if (jump_target > i) {
             check_register_usage_for_instruction_block_impl(
                 register_usage_profile, ps, ib, jump_target, mnemonic_counter);
         }
-    }
-    else if (str::ishex(target->tokens.at(0))) {
+    } else if (str::ishex(target->tokens.at(0))) {
         // FIXME Disassembler outputs '0x...' hexadecimal targets for if and
         // jump instructions. Do not check them now, but this should be fixed in
         // the future.
-    }
-    else {
+    } else {
         throw Invalid_syntax(target->tokens.at(0),
                              "invalid operand for jump instruction");
     }

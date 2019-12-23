@@ -38,8 +38,7 @@ auto assemble_op_bitset(Program& program,
                 ::assembler::operands::resolve_register(tokens.at(lhs)),
                 ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
             (tokens.at(rhs) == "true"));
-    }
-    else {
+    } else {
         program.opbitset(
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(target)),

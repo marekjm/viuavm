@@ -40,8 +40,7 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
         std::tie(addr, o) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
         s = o->str();
-    }
-    else {
+    } else {
         ++addr;  // for operand type
         std::tie(addr, s) =
             viua::bytecode::decoder::operands::fetch_primitive_string(addr,
@@ -86,8 +85,7 @@ static auto convert_signed_integer_to_text_size_type(
     if (signed_index < 0) {
         index = (text->size()
                  - static_cast<viua::types::Text::size_type>(-signed_index));
-    }
-    else {
+    } else {
         index = static_cast<viua::types::Text::size_type>(signed_index);
     }
     return index;

@@ -41,8 +41,7 @@ auto assemble_op_structremove(Program& program,
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(key)),
                 ::assembler::operands::resolve_rs_type(tokens.at(key + 1))));
-    }
-    else {
+    } else {
         program.opstructremove(
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(target)),

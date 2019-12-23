@@ -238,8 +238,7 @@ class Kernel {
                 , is_complete{that.is_complete}
                 , is_cancelled{that.is_cancelled}
                 , is_successful{that.is_successful}
-        {
-        }
+        {}
         auto operator=(IO_result&& that) -> IO_result& = delete;
 
         static auto make_success(std::unique_ptr<viua::types::Value>)

@@ -145,8 +145,7 @@ static void display_results(std::string const& filename,
         try {
             std::cout << viua::cg::tools::calculate_bytecode_size2(tokens)
                       << std::endl;
-        }
-        catch (Invalid_syntax const& e) {
+        } catch (Invalid_syntax const& e) {
             std::cerr << filename << ':' << e.line_number << ':'
                       << e.character_in_line;
             std::cerr << ": error: invalid syntax: "
@@ -172,35 +171,28 @@ int main(int argc, char* argv[])
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        }
-        else if (option == "--version" or option == "-V") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        }
-        else if (option == "--verbose" or option == "-v") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
-        }
-        else if (option == "--size") {
+        } else if (option == "--size") {
             DISPLAY_SIZE = true;
             continue;
-        }
-        else if (option == "--raw") {
+        } else if (option == "--raw") {
             DISPLAY_RAW     = true;
             MANUAL_REDUCING = true;
             continue;
-        }
-        else if (option == "--ws") {
+        } else if (option == "--ws") {
             REDUCE_WHITESPACE = true;
             MANUAL_REDUCING   = true;
             continue;
-        }
-        else if (option == "--dirs") {
+        } else if (option == "--dirs") {
             REDUCE_DIRECTIVES = true;
             MANUAL_REDUCING   = true;
             continue;
-        }
-        else if (str::startswith(option, "-")) {
+        } else if (str::startswith(option, "-")) {
             std::cerr << "error: unknown option: " << option << std::endl;
             return 1;
         }
@@ -267,8 +259,7 @@ int main(int argc, char* argv[])
                 tokens = reduce_mark_directive(tokens);
             }
         }
-    }
-    catch (Invalid_syntax const& e) {
+    } catch (Invalid_syntax const& e) {
         auto const message = std::string{e.what()};
         std::cerr << filename << ':' << e.line_number + 1 << ':'
                   << e.character_in_line + 1 << ": error: "

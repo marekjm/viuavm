@@ -31,8 +31,7 @@ std::string stringify_function_invocation(const Frame* frame)
         auto optr = frame->arguments->at(i);
         if (optr == nullptr) {
             oss << "<moved or void>";
-        }
-        else {
+        } else {
             oss << optr->repr();
         }
         if (i < (frame->arguments->size() - 1)) {

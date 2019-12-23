@@ -36,8 +36,7 @@ auto assemble_op_vpop(Program& program,
         --position;
         target_op = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(target)));
-    }
-    else {
+    } else {
         target_op = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
@@ -50,8 +49,7 @@ auto assemble_op_vpop(Program& program,
     if (tokens.at(position) == "void") {
         position_op = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(position)));
-    }
-    else {
+    } else {
         position_op = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(position)),
             ::assembler::operands::resolve_rs_type(tokens.at(position + 1)));

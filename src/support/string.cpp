@@ -200,8 +200,7 @@ auto sub(std::string const& s, std::string::size_type b, long int e)
     auto end = std::string::size_type{0};
     if (e < 0) {
         end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1);
-    }
-    else {
+    } else {
         end = static_cast<std::string::size_type>(e);
     }
 
@@ -302,8 +301,7 @@ auto extract(std::string const& s) -> std::string
         if (s[i] == quote and ((backs % 2) != 0)) {
             backs = 0;
             continue;
-        }
-        else if (s[i] == quote and ((backs % 2) == 0)) {
+        } else if (s[i] == quote and ((backs % 2) == 0)) {
             break;
         }
         if (s[i] == '\\') {
@@ -339,8 +337,7 @@ auto lshare(std::string const& s, std::string const& w)
          ++i) {
         if (s[i] == w[i]) {
             ++share;
-        }
-        else {
+        } else {
             break;
         }
     }

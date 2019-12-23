@@ -67,8 +67,7 @@ class Arity_exception : public viua::types::Exception {
 
     Arity_exception(decltype(got_arity) a, decltype(valid_arities) v)
             : got_arity(a), valid_arities(v)
-    {
-    }
+    {}
     ~Arity_exception() {}
 };
 
@@ -95,8 +94,7 @@ class Type_exception : public viua::types::Exception {
     std::string what() const override { return str(); }
 
     Type_exception(decltype(expected) e, decltype(got) g) : expected(e), got(g)
-    {
-    }
+    {}
     ~Type_exception() {}
 };
 

@@ -48,12 +48,10 @@ static auto verify_wrapper(Parsed_source const& source, Verifier verifier)
         }
         try {
             verifier(source, fn);
-        }
-        catch (Invalid_syntax& e) {
+        } catch (Invalid_syntax& e) {
             throw viua::cg::lex::Traced_syntax_error{}.append(e).append(
                 Invalid_syntax{fn.name, ("in function " + fn.name.str())});
-        }
-        catch (Traced_syntax_error& e) {
+        } catch (Traced_syntax_error& e) {
             throw e.append(
                 Invalid_syntax{fn.name, ("in function " + fn.name.str())});
         }
@@ -520,11 +518,9 @@ auto check_register_usage_for_instruction_block_impl(
                     instruction->tokens,
                     "instruction does not have static analysis implemented");
             }
-        }
-        catch (Invalid_syntax& e) {
+        } catch (Invalid_syntax& e) {
             throw e.add(instruction->tokens.at(0));
-        }
-        catch (Traced_syntax_error& e) {
+        } catch (Traced_syntax_error& e) {
             e.errors.at(0).add(instruction->tokens.at(0));
             throw e;
         }

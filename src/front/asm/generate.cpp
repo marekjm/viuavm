@@ -132,8 +132,7 @@ static auto strip_attributes(std::vector<viua::cg::lex::Token> const& tokens)
         if (each == "[[") {
             in_attributes = true;
             continue;
-        }
-        else if (each == "]]") {
+        } else if (each == "]]") {
             in_attributes = false;
             continue;
         }
@@ -174,8 +173,7 @@ static auto map_invocable_addresses(
         try {
             starting_instruction += viua::cg::tools::calculate_bytecode_size2(
                 blocks.tokens.at(name));
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw("could not find block '" + name + "'");
         }
     }
@@ -249,8 +247,7 @@ static auto write_code_blocks_section(
             block_bodies_size_so_far +=
                 viua::cg::tools::calculate_bytecode_size2(
                     blocks.tokens.at(name));
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw("could not find block '" + name
                   + "' during address table write");
         }
@@ -370,8 +367,7 @@ static auto generate_entry_function(
                  + 2 * sizeof(viua::internals::types::byte)
                  + 2 * sizeof(viua::internals::Register_sets)
                  + 2 * sizeof(viua::internals::types::register_index);
-    }
-    else if (main_function == "main/2") {
+    } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
         entry_function_tokens.emplace_back(0, 0, "%16");
@@ -428,8 +424,7 @@ static auto generate_entry_function(
                  + 2 * sizeof(viua::internals::types::byte)
                  + 2 * sizeof(viua::internals::Register_sets)
                  + 2 * sizeof(viua::internals::types::register_index);
-    }
-    else {
+    } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
         // FIXME: should custom main function be allowed?
@@ -565,8 +560,7 @@ auto generate(std::vector<Token> const& tokens,
         function_addresses =
             map_invocable_addresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
-    }
-    catch (std::string const& e) {
+    } catch (std::string const& e) {
         throw("bytecode size calculation failed: " + e);
     }
 
@@ -610,8 +604,7 @@ auto generate(std::vector<Token> const& tokens,
     for (auto const& lnk : static_imports) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
-        }
-        else {
+        } else {
             throw("requested to link module '" + lnk + "' more than once");
         }
     }
@@ -949,8 +942,7 @@ auto generate(std::vector<Token> const& tokens,
                 std::cout << std::endl;
             }
             throw "more than one candidate for main function";
-        }
-        else if (main_function_found.size() == 0) {
+        } else if (main_function_found.size() == 0) {
             throw "main function is not defined";
         }
         main_function = main_function_found[0];
@@ -1133,25 +1125,20 @@ auto generate(std::vector<Token> const& tokens,
                 std::cout << " (" << fun_bytes << " bytes at byte "
                           << block_bodies_section_size << ')' << std::endl;
             }
-        }
-        catch (std::string const& e) {
+        } catch (std::string const& e) {
             throw("failed block size count (during pre-assembling): " + e);
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw("in block '" + name + "': " + e.what());
         }
 
         auto blok = Program{fun_bytes};
         try {
             assemble(blok, strip_attributes(blocks.tokens.at(name)));
-        }
-        catch (std::string const& e) {
+        } catch (std::string const& e) {
             throw("in block '" + name + "': " + e);
-        }
-        catch (const char*& e) {
+        } catch (const char*& e) {
             throw("in block '" + name + "': " + e);
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw("in block '" + name + "': " + e.what());
         }
 
@@ -1198,31 +1185,26 @@ auto generate(std::vector<Token> const& tokens,
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size2(
                 functions.tokens.at(name));
-        }
-        catch (std::string const& e) {
+        } catch (std::string const& e) {
             throw("failed function size count (during pre-assembling): " + e);
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw e.what();
         }
 
         auto func = Program{fun_bytes};
         try {
             assemble(func, strip_attributes(functions.tokens.at(name)));
-        }
-        catch (std::string const& e) {
+        } catch (std::string const& e) {
             auto const msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
-        }
-        catch (const char*& e) {
+        } catch (const char*& e) {
             auto const msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             auto const msg =
                 ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
                  + send_control_seq(ATTR_RESET) + "': " + e.what());
@@ -1265,8 +1247,7 @@ auto generate(std::vector<Token> const& tokens,
     out.write(VIUA_MAGIC_NUMBER, sizeof(char) * 5);
     if (flags.as_lib) {
         out.put(static_cast<Viua_binary_type>(VIUA_LINKABLE));
-    }
-    else {
+    } else {
         out.put(static_cast<Viua_binary_type>(VIUA_EXECUTABLE));
     }
 
@@ -1462,8 +1443,7 @@ auto generate(std::vector<Token> const& tokens,
             std::vector<viua::internals::types::bytecode_size>{};
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
-        }
-        catch (std::out_of_range const& e) {
+        } catch (std::out_of_range const& e) {
             throw("[linker] could not find jumptable for '" + lib_name
                   + "' (maybe not loaded?)");
         }

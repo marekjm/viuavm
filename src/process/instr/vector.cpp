@@ -104,8 +104,7 @@ auto viua::process::Process::opvinsert(Op_address_type addr) -> Op_address_type
         auto const source = fetch_and_advance_addr<viua::types::Value*>(
             viua::bytecode::decoder::operands::fetch_object, addr, this);
         object = source->copy();
-    }
-    else {
+    } else {
         auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
             viua::bytecode::decoder::operands::fetch_register, addr, this);
         object = source->give();
@@ -119,8 +118,7 @@ auto viua::process::Process::opvinsert(Op_address_type addr) -> Op_address_type
             viua::bytecode::decoder::operands::fetch_object_of<
                 viua::types::Integer>(addr, this);
         position_operand_index = index_operand->as_integer();
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -143,8 +141,7 @@ auto viua::process::Process::opvpush(Op_address_type addr) -> Op_address_type
         std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
         object = source->copy();
-    }
-    else {
+    } else {
         viua::kernel::Register* source = nullptr;
         std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -164,8 +161,7 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type
     if (not void_target) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -182,8 +178,7 @@ auto viua::process::Process::opvpop(Op_address_type addr) -> Op_address_type
             viua::bytecode::decoder::operands::fetch_object_of<
                 viua::types::Integer>(addr, this);
         position_operand_index = index_operand->as_integer();
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 

@@ -151,12 +151,10 @@ template<typename T> class vector_view {
 
     vector_view(const decltype(vec) v, const decltype(offset) o)
             : vec(v), offset(o)
-    {
-    }
+    {}
     vector_view(const vector_view<T>& v, const decltype(offset) o)
             : vec(v.vec), offset(v.offset + o)
-    {
-    }
+    {}
 };
 
 auto parse_attribute_value(const vector_view<viua::cg::lex::Token> tokens,

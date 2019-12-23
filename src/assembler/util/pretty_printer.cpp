@@ -36,14 +36,11 @@ auto viua::assembler::util::pretty_printer::send_control_seq(
     if (env_color_flag == "default") {
         // do nothing; the default is to colorise when printing to teminal and
         // do not colorise otherwise
-    }
-    else if (env_color_flag == "never") {
+    } else if (env_color_flag == "never") {
         colorise = false;
-    }
-    else if (env_color_flag == "always") {
+    } else if (env_color_flag == "always") {
         colorise = true;
-    }
-    else {
+    } else {
         // unknown value, do nothing
     }
 
@@ -260,8 +257,7 @@ auto viua::assembler::util::pretty_printer::display_error_location(
         if (tokens.at(i).line() >= context_before) {
             if (tokens.at(i).line() == error.line()) {
                 i = display_error_line(tokens, error, i, line_no_width);
-            }
-            else {
+            } else {
                 i = display_context_line(tokens, error, i, line_no_width);
             }
             continue;

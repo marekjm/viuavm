@@ -105,8 +105,7 @@ auto decode_line_tokens(std::vector<std::string> const& tokens)
 
     if (invert) {
         decoded_lines.insert(decoded_lines.begin(), main_line);
-    }
-    else {
+    } else {
         decoded_lines.emplace_back(main_line);
     }
 

@@ -66,14 +66,12 @@ String* String::sub(int64_t b, int64_t e)
     // sign-changing
     if (b < 0) {
         cut_from = (svalue.size() - static_cast<unsigned>(-b));
-    }
-    else {
+    } else {
         cut_from = static_cast<decltype(cut_from)>(b);
     }
     if (e < 0) {
         cut_to = (svalue.size() - static_cast<unsigned>(-e) + 1);
-    }
-    else {
+    } else {
         cut_to = static_cast<decltype(cut_to)>(e);
     }
     return new String(svalue.substr(cut_from, cut_to));
@@ -200,16 +198,14 @@ void String::format(Frame* frame,
             int index        = -1;
             try {
                 index = stoi(m);
-            }
-            catch (std::invalid_argument const&) {
+            } catch (std::invalid_argument const&) {
                 is_number = false;
             }
             if (is_number) {
                 replacement = static_cast<Vector*>(frame->arguments->at(1))
                                   ->at(index)
                                   ->str();
-            }
-            else {
+            } else {
                 replacement =
                     static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
             }

@@ -41,16 +41,13 @@ auto viua::process::Process::register_at(
 {
     if (rs == viua::internals::Register_sets::LOCAL) {
         return stack->back()->local_register_set->register_at(i);
-    }
-    else if (rs == viua::internals::Register_sets::STATIC) {
+    } else if (rs == viua::internals::Register_sets::STATIC) {
         ensure_static_registers(stack->back()->function_name);
         return static_registers.at(stack->back()->function_name)
             ->register_at(i);
-    }
-    else if (rs == viua::internals::Register_sets::GLOBAL) {
+    } else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
-    }
-    else {
+    } else {
         throw std::make_unique<viua::types::Exception>(
             "unsupported register set type");
     }
@@ -63,8 +60,7 @@ void viua::process::Process::ensure_static_registers(std::string function_name)
      */
     try {
         static_registers.at(function_name);
-    }
-    catch (std::out_of_range const& e) {
+    } catch (std::out_of_range const& e) {
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] =
@@ -197,8 +193,7 @@ auto viua::process::Process::tick() -> Op_address_type
         default:
             break;
         }
-    }
-    catch (std::unique_ptr<viua::types::Exception>& e) {
+    } catch (std::unique_ptr<viua::types::Exception>& e) {
         /*
          * All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -209,8 +204,7 @@ auto viua::process::Process::tick() -> Op_address_type
          * block) they will terminate execution later.
          */
         stack->thrown = std::move(e);
-    }
-    catch (std::unique_ptr<viua::types::Value>& e) {
+    } catch (std::unique_ptr<viua::types::Value>& e) {
         /*
          * All values can be thrown as exceptions, so Values must also be
          * caught.

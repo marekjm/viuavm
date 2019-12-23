@@ -57,8 +57,7 @@ auto viua::process::Process::get_trace_line(
 
     try {
         trace_line << OP_NAMES.at(static_cast<OPCODE>(*for_address));
-    }
-    catch (std::out_of_range& e) {
+    } catch (std::out_of_range& e) {
         trace_line << "<unrecognised instruction byte = "
                    << static_cast<unsigned>(*for_address) << '>';
         return trace_line.str();
@@ -69,8 +68,7 @@ auto viua::process::Process::get_trace_line(
         auto working_address = for_address + 1;
         if (viua::bytecode::decoder::operands::is_void(working_address)) {
             ++working_address;
-        }
-        else {
+        } else {
             working_address +=
                 sizeof(viua::internals::types::byte);  // for opcode type
             working_address += sizeof(viua::internals::types::register_index);
@@ -93,10 +91,9 @@ auto viua::process::Process::get_trace_line(
             trace_line << (stack->back()->deferred_calls.size()
                                ? " before deferred"
                                : " with no deferred");
-        }
-        else if (stack->state_of()
-                 == viua::process::Stack::STATE::
-                     SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+        } else if (stack->state_of()
+                   == viua::process::Stack::STATE::
+                       SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
             trace_line << " after deferred";
         }
     }

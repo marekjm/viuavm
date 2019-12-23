@@ -58,13 +58,11 @@ Extern_function::Extern_function(std::string fn, uint64_t const a)
         : Fragment{Fragment_type::Extern_function}
         , function_name{std::move(fn)}
         , arity{a}
-{
-}
+{}
 
 Extern_block::Extern_block(std::string bn)
         : Fragment{Fragment_type::Extern_block}, block_name{std::move(bn)}
-{
-}
+{}
 
 End_directive::End_directive() : Fragment{Fragment_type::End_directive} {}
 
@@ -75,8 +73,7 @@ Function_head::Function_head(std::string fn,
         , function_name{std::move(fn)}
         , arity{a}
         , attributes{std::move(attrs)}
-{
-}
+{}
 
 Closure_head::Closure_head(std::string fn,
                            uint64_t const a,
@@ -85,34 +82,29 @@ Closure_head::Closure_head(std::string fn,
         , function_name{std::move(fn)}
         , arity{a}
         , attributes{std::move(attrs)}
-{
-}
+{}
 
 Block_head::Block_head(std::string bn, std::set<std::string> attrs)
         : Fragment{Fragment_type::Block_head}
         , name{std::move(bn)}
         , attributes{std::move(attrs)}
-{
-}
+{}
 
 Import_directive::Import_directive(std::string bn, std::set<std::string> attrs)
         : Fragment{Fragment_type::Import_directive}
         , module_name{std::move(bn)}
         , attributes{std::move(attrs)}
-{
-}
+{}
 
 Info_directive::Info_directive(std::string k, std::string v)
         : Fragment{Fragment_type::Info_directive}
         , key{std::move(k)}
         , value{std::move(v)}
-{
-}
+{}
 
 Mark_directive::Mark_directive(std::string m)
         : Fragment{Fragment_type::Mark_directive}, mark{std::move(m)}
-{
-}
+{}
 
 Name_directive::Name_directive(viua::internals::types::register_index const ri,
                                bool const i,
@@ -121,8 +113,7 @@ Name_directive::Name_directive(viua::internals::types::register_index const ri,
         , register_index{ri}
         , iota{i}
         , name{std::move(n)}
-{
-}
+{}
 
 auto Operand::type() const -> Operand_type { return operand_type; }
 
@@ -150,38 +141,31 @@ Register_address::Register_address(
         , name{n}
         , register_set{rs}
         , access{as}
-{
-}
+{}
 
 Integer_literal::Integer_literal(viua::types::Integer::underlying_type const x)
         : Operand{Operand_type::Integer_literal}, n{x}
-{
-}
+{}
 
 Float_literal::Float_literal(viua::types::Float::underlying_type const x)
         : Operand{Operand_type::Float_literal}, n{x}
-{
-}
+{}
 
 Text_literal::Text_literal(std::string s)
         : Operand{Operand_type::Text_literal}, text{std::move(s)}
-{
-}
+{}
 
 Atom_literal::Atom_literal(std::string s)
         : Operand{Operand_type::Atom_literal}, text{std::move(s)}
-{
-}
+{}
 
 Bits_literal::Bits_literal(std::string s)
         : Operand{Operand_type::Bits_literal}, text{std::move(s)}
-{
-}
+{}
 
 Boolean_literal::Boolean_literal(bool const v)
         : Operand{Operand_type::Boolean_literal}, value{v}
-{
-}
+{}
 
 Void::Void() : Operand{Operand_type::Void} {}
 
@@ -189,38 +173,31 @@ Function_name::Function_name(std::string fn, uint64_t const a)
         : Operand{Operand_type::Function_name}
         , function_name{std::move(fn)}
         , arity{a}
-{
-}
+{}
 
 Block_name::Block_name(std::string bn)
         : Operand{Operand_type::Block_name}, name{std::move(bn)}
-{
-}
+{}
 
 Module_name::Module_name(std::string bn)
         : Operand{Operand_type::Module_name}, name{std::move(bn)}
-{
-}
+{}
 
 Timeout_literal::Timeout_literal(std::string s)
         : Operand{Operand_type::Timeout_literal}, value{std::move(s)}
-{
-}
+{}
 
 Jump_offset::Jump_offset(std::string s)
         : Operand{Operand_type::Jump_offset}, value{std::move(s)}
-{
-}
+{}
 
 Jump_label::Jump_label(std::string s)
         : Operand{Operand_type::Jump_label}, value{std::move(s)}
-{
-}
+{}
 
 Instruction::Instruction(OPCODE const o)
         : Fragment{Fragment_type::Instruction}, opcode{o}
-{
-}
+{}
 
 static auto parse_extern_function_directive(
     std::vector<std::unique_ptr<Fragment>>& fragments,
@@ -649,8 +626,7 @@ static auto parse_any_3_register_with_void_target_instruction(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
     i += parse_register_address(*frag, tokens.advance(i));
@@ -705,8 +681,7 @@ static auto parse_op_vinsert(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -733,8 +708,7 @@ static auto parse_op_vpop(
 
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -742,8 +716,7 @@ static auto parse_op_vpop(
 
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -858,8 +831,7 @@ static auto parse_op_bits(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         auto lit = std::make_unique<Bits_literal>(tokens.at(i).str());
         lit->add(tokens.at(i++));
         frag->operands.push_back(std::move(lit));
@@ -885,16 +857,14 @@ static auto parse_op_vector(
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
     using viua::tooling::libs::lexer::classifier::is_void;
     if (auto const& token = tokens.at(i); is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         i += parse_register_address(*frag, tokens.advance(i));
     }
 
@@ -911,11 +881,9 @@ static auto string_to_boolean(std::string const& s) -> bool
 {
     if (s == "true") {
         return true;
-    }
-    else if (s == "false") {
+    } else if (s == "false") {
         return false;
-    }
-    else {
+    } else {
         throw std::domain_error{s};
     }
 }
@@ -958,8 +926,7 @@ static auto parse_op_call(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else if (is_void(token.str())) {
+    } else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -969,11 +936,9 @@ static auto parse_op_call(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -1003,8 +968,7 @@ static auto parse_op_function(
     if (auto const& token = tokens.at(i);
         is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(i));
-    }
-    else {
+    } else {
         throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
             viua::tooling::errors::compile_time::Error{
                 viua::tooling::errors::compile_time::Compile_time_error::
@@ -1034,8 +998,7 @@ static auto parse_op_tailcall(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(1));
-    }
-    else if (is_id(token.str()) or is_scoped_id(token.str())) {
+    } else if (is_id(token.str()) or is_scoped_id(token.str())) {
         i += parse_function_name(*frag, tokens.advance(1));
     }
 
@@ -1059,8 +1022,7 @@ static auto parse_join(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else if (is_void(token.str())) {
+    } else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1090,8 +1052,7 @@ static auto parse_receive(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else if (is_void(token.str())) {
+    } else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1116,10 +1077,9 @@ static auto parse_jump_target(
         auto label = std::make_unique<Jump_label>(token.str());
         label->add(tokens.at(i++));
         instruction.operands.push_back(std::move(label));
-    }
-    else if (auto const c = token.str().at(0);
-             (c == '+' or c == '-')
-             and is_decimal_integer(token.str().substr(1))) {
+    } else if (auto const c = token.str().at(0);
+               (c == '+' or c == '-')
+               and is_decimal_integer(token.str().substr(1))) {
         auto offset = std::make_unique<Jump_offset>(token.str());
         offset->add(tokens.at(i++));
         instruction.operands.push_back(std::move(offset));
@@ -1239,8 +1199,7 @@ static auto parse_op_io_wait(
     if (auto const& token = tokens.at(i);
         is_access_type_specifier(token.str())) {
         i += parse_register_address(*frag, tokens.advance(i));
-    }
-    else if (is_void(token.str())) {
+    } else if (is_void(token.str())) {
         i += parse_void(*frag, tokens.advance(i));
     }
 
@@ -1530,39 +1489,29 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
         if (token == ".extern_function:") {
             i += parse_extern_function_directive(fragments,
                                                  vector_view{tokens, i});
-        }
-        else if (token == ".extern_block:") {
+        } else if (token == ".extern_block:") {
             i +=
                 parse_extern_block_directive(fragments, vector_view{tokens, i});
-        }
-        else if (token == ".function:") {
+        } else if (token == ".function:") {
             i += parse_function_head<Function_head>(fragments,
                                                     vector_view{tokens, i});
-        }
-        else if (token == ".closure:") {
+        } else if (token == ".closure:") {
             i += parse_function_head<Closure_head>(fragments,
                                                    vector_view{tokens, i});
-        }
-        else if (token == ".block:") {
+        } else if (token == ".block:") {
             i += parse_block_head(fragments, vector_view{tokens, i});
-        }
-        else if (token == ".end") {
+        } else if (token == ".end") {
             fragments.push_back(std::make_unique<End_directive>());
             fragments.back()->add(tokens.at(i++));
-        }
-        else if (token == ".info:") {
+        } else if (token == ".info:") {
             i += parse_info_directive(fragments, vector_view{tokens, i});
-        }
-        else if (token == ".import:") {
+        } else if (token == ".import:") {
             i += parse_import_directive(fragments, vector_view{tokens, i});
-        }
-        else if (token == ".name:") {
+        } else if (token == ".name:") {
             i += parse_name_directive(fragments, vector_view{tokens, i});
-        }
-        else if (token == ".mark:") {
+        } else if (token == ".mark:") {
             i += parse_mark_directive(fragments, vector_view{tokens, i});
-        }
-        else {
+        } else {
             throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
                 make_unexpected_token_error(token,
                                             "cannot be reduced by any rule"));
@@ -1600,8 +1549,7 @@ auto Cooked_block::body() const -> body_type
 }
 
 Cooked_fragments::Cooked_fragments(std::string f_n) : file_name{std::move(f_n)}
-{
-}
+{}
 
 auto cook(std::string file_name,
           std::vector<std::unique_ptr<Fragment>> fragments) -> Cooked_fragments
@@ -1614,31 +1562,36 @@ auto cook(std::string file_name,
 
     for (auto& each : fragments) {
         switch (each->type()) {
-        case Fragment_type::Extern_function: {
+        case Fragment_type::Extern_function:
+        {
             auto t = std::unique_ptr<Extern_function>{};
             t.reset(static_cast<Extern_function*>(each.release()));
             cooked.extern_function_fragments.push_back(std::move(t));
             break;
         }
-        case Fragment_type::Extern_block: {
+        case Fragment_type::Extern_block:
+        {
             auto t = std::unique_ptr<Extern_block>{};
             t.reset(static_cast<Extern_block*>(each.release()));
             cooked.extern_block_fragments.push_back(std::move(t));
             break;
         }
-        case Fragment_type::Info_directive: {
+        case Fragment_type::Info_directive:
+        {
             auto t = std::unique_ptr<Info_directive>{};
             t.reset(static_cast<Info_directive*>(each.release()));
             cooked.info_fragments.push_back(std::move(t));
             break;
         }
-        case Fragment_type::Import_directive: {
+        case Fragment_type::Import_directive:
+        {
             auto t = std::unique_ptr<Import_directive>{};
             t.reset(static_cast<Import_directive*>(each.release()));
             cooked.import_fragments.push_back(std::move(t));
             break;
         }
-        case Fragment_type::End_directive: {
+        case Fragment_type::End_directive:
+        {
             if (function) {
                 auto const& fn =
                     *static_cast<Function_head*>(function->lines.at(0).get());
@@ -1646,27 +1599,25 @@ auto cook(std::string file_name,
                                           + std::to_string(fn.arity)] =
                     std::move(*function);
                 function = nullptr;
-            }
-            else if (closure) {
+            } else if (closure) {
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
                 cooked.closure_fragments[fn.function_name + '/'
                                          + std::to_string(fn.arity)] =
                     std::move(*closure);
                 closure = nullptr;
-            }
-            else if (block) {
+            } else if (block) {
                 auto const& bl =
                     *static_cast<Block_head*>(block->lines.at(0).get());
                 cooked.block_fragments[bl.name] = std::move(*block);
                 block                           = nullptr;
-            }
-            else {
+            } else {
                 // do nothing
             }
             break;
         }
-        case Fragment_type::Function_head: {
+        case Fragment_type::Function_head:
+        {
             if (function) {
                 // FIXME Use some better error, maybe Unended_function?
                 auto const& fn = function->head();
@@ -1683,8 +1634,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (closure) {
+            } else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1699,8 +1649,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (block) {
+            } else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1712,14 +1661,14 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else {
+            } else {
                 function = std::make_unique<Cooked_function>();
                 function->lines.push_back(std::move(each));
             }
             break;
         }
-        case Fragment_type::Closure_head: {
+        case Fragment_type::Closure_head:
+        {
             if (function) {
                 // FIXME Use some better error, maybe Unended_function?
                 auto const& fn =
@@ -1735,8 +1684,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (closure) {
+            } else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1751,8 +1699,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (block) {
+            } else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1765,14 +1712,14 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else {
+            } else {
                 closure = std::make_unique<Cooked_closure>();
                 closure->lines.push_back(std::move(each));
             }
             break;
         }
-        case Fragment_type::Block_head: {
+        case Fragment_type::Block_head:
+        {
             if (function) {
                 // FIXME Use some better error, maybe Unended_function?
                 auto const& fn =
@@ -1788,8 +1735,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (closure) {
+            } else if (closure) {
                 // FIXME Use some better error, maybe Unended_closure?
                 auto const& fn =
                     *static_cast<Closure_head*>(closure->lines.at(0).get());
@@ -1804,8 +1750,7 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else if (block) {
+            } else if (block) {
                 // FIXME Use some better error, maybe Unended_block?
                 auto const& fn =
                     *static_cast<Function_head*>(block->lines.at(0).get());
@@ -1818,28 +1763,27 @@ auto cook(std::string file_name,
                             Compile_time_error::Unexpected_token,
                         each->token(0),
                         "expected `.end' here:"});
-            }
-            else {
+            } else {
                 block = std::make_unique<Cooked_block>();
                 block->lines.push_back(std::move(each));
             }
             break;
         }
-        case Fragment_type::Instruction: {
+        case Fragment_type::Instruction:
+        {
         }
-        case Fragment_type::Name_directive: {
+        case Fragment_type::Name_directive:
+        {
         }
-        case Fragment_type::Mark_directive: {
+        case Fragment_type::Mark_directive:
+        {
             if (function) {
                 function->lines.push_back(std::move(each));
-            }
-            else if (closure) {
+            } else if (closure) {
                 closure->lines.push_back(std::move(each));
-            }
-            else if (block) {
+            } else if (block) {
                 block->lines.push_back(std::move(each));
-            }
-            else {
+            } else {
                 // FIXME Use some better error, maybe `Orphaned_instruction` for
                 // instructions outside of blocks and `Out_of_context_directive`
                 // for names and marks?
@@ -1850,7 +1794,8 @@ auto cook(std::string file_name,
             }
             break;
         }
-        default: {
+        default:
+        {
             // FIXME Use some better error, maybe Unexpected_fragment?
             throw viua::tooling::errors::compile_time::Error_wrapper{}.append(
                 make_unexpected_token_error(each->token(0),

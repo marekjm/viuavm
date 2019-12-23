@@ -38,67 +38,77 @@ auto Value::clone(Value const& value, Value_wrapper::map_type& values)
     auto cloned = std::unique_ptr<Value>{};
 
     switch (value.type()) {
-    case Value_type::Integer: {
+    case Value_type::Integer:
+    {
         auto x = static_cast<Integer const&>(value);
         if (x.known()) {
             cloned = std::make_unique<Integer>(x.of());
-        }
-        else {
+        } else {
             cloned = std::make_unique<Integer>();
         }
         break;
     }
-    case Value_type::Float: {
+    case Value_type::Float:
+    {
         cloned = std::make_unique<Float>();
         break;
     }
-    case Value_type::Vector: {
+    case Value_type::Vector:
+    {
         cloned = std::make_unique<Vector>(
             static_cast<Vector const&>(value).of().rebind(values));
         break;
     }
-    case Value_type::String: {
+    case Value_type::String:
+    {
         cloned = std::make_unique<String>();
         break;
     }
-    case Value_type::Text: {
+    case Value_type::Text:
+    {
         cloned = std::make_unique<Text>();
         break;
     }
-    case Value_type::Pointer: {
+    case Value_type::Pointer:
+    {
         cloned = std::make_unique<Pointer>(
             static_cast<Pointer const&>(value).of().rebind(values));
         break;
     }
-    case Value_type::Boolean: {
+    case Value_type::Boolean:
+    {
         cloned = std::make_unique<Boolean>();
         break;
     }
-    case Value_type::Bits: {
+    case Value_type::Bits:
+    {
         cloned = std::make_unique<Bits>();
         break;
     }
-    case Value_type::Closure: {
+    case Value_type::Closure:
+    {
         cloned =
             std::make_unique<Closure>(static_cast<Closure const&>(value).of());
         break;
     }
-    case Value_type::Function: {
+    case Value_type::Function:
+    {
         cloned = std::make_unique<Function>(
             static_cast<Function const&>(value).of());
         break;
     }
-    case Value_type::Atom: {
+    case Value_type::Atom:
+    {
         auto x = static_cast<Atom const&>(value);
         if (x.known()) {
             cloned = std::make_unique<Atom>(x.of());
-        }
-        else {
+        } else {
             cloned = std::make_unique<Atom>();
         }
         break;
     }
-    case Value_type::Struct: {
+    case Value_type::Struct:
+    {
         auto cloned_struct = std::make_unique<Struct>();
         auto x             = static_cast<Struct const&>(value);
         for (auto const& each : x.fields()) {
@@ -106,11 +116,13 @@ auto Value::clone(Value const& value, Value_wrapper::map_type& values)
         }
         break;
     }
-    case Value_type::Pid: {
+    case Value_type::Pid:
+    {
         cloned = std::make_unique<Pid>();
         break;
     }
-    case Value_type::Value: {
+    case Value_type::Value:
+    {
         cloned = std::make_unique<Value>(Value_type::Value);
         break;
     }
@@ -133,16 +145,14 @@ auto Integer::of(int const x) -> void { n = x; }
 Float::Float() : Value{Value_type::Float} {}
 
 Vector::Vector(Value_wrapper v) : Value{Value_type::Vector}, contained_type{v}
-{
-}
+{}
 
 auto Vector::of() const -> Value_wrapper const& { return contained_type; }
 auto Vector::of(Value_wrapper v) -> void { contained_type = v; }
 
 Pointer::Pointer(Value_wrapper v)
         : Value{Value_type::Pointer}, contained_type{v}
-{
-}
+{}
 
 auto Pointer::of() const -> Value_wrapper const& { return contained_type; }
 auto Pointer::of(Value_wrapper v) -> void { contained_type = v; }
@@ -194,13 +204,11 @@ auto Struct::field(std::string key, Value_wrapper value) -> void
 Pid::Pid() : Value{Value_type::Pid} {}
 
 Value_wrapper::Value_wrapper(index_type const v, map_type& m) : i{v}, values{&m}
-{
-}
+{}
 
 Value_wrapper::Value_wrapper(Value_wrapper const& that)
         : i{that.i}, values{that.values}
-{
-}
+{}
 
 auto Value_wrapper::operator=(Value_wrapper const& that) -> Value_wrapper&
 {
@@ -236,8 +244,7 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type>
         if (wrappers.back()->value().type() == Value_type::Vector) {
             wrappers.push_back(
                 &static_cast<Vector const&>(wrappers.back()->value()).of());
-        }
-        else {
+        } else {
             wrappers.push_back(
                 &static_cast<Pointer const&>(wrappers.back()->value()).of());
         }

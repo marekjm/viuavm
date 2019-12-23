@@ -84,11 +84,9 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                           << "> " << last->local_register_set->get(r)->str()
                           << "\n";
             }
-        }
-        else if (not last->local_register_set.owns()) {
+        } else if (not last->local_register_set.owns()) {
             std::cerr << "  this frame did not own its registers\n";
-        }
-        else {
+        } else {
             std::cerr << "  no registers were allocated for this frame\n";
         }
 
@@ -110,22 +108,18 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                     if (ptr->expired()) {
                         std::cerr << "<ExpiredPointer>"
                                   << "\n";
-                    }
-                    else {
+                    } else {
                         std::cerr << '<' << ptr->type() << ">\n";
                     }
-                }
-                else {
+                } else {
                     std::cerr << '<' << last->arguments->get(r)->type() << "> "
                               << last->arguments->get(r)->str() << "\n";
                 }
             }
-        }
-        else {
+        } else {
             std::cerr << "  no arguments were passed to this frame\n";
         }
-    }
-    else {
+    } else {
         std::cerr << "no stack trace available\n";
     }
 }
@@ -166,11 +160,9 @@ static auto print_stack_trace_json(viua::process::Process& process) -> void
     }
     if (to == "stdout") {
         std::cout << oss.str() << "\n";
-    }
-    else if (to == "stderr") {
+    } else if (to == "stderr") {
         std::cerr << oss.str() << "\n";
-    }
-    else {
+    } else {
         std::cerr << oss.str() << "\n";
     }
 }
@@ -184,11 +176,9 @@ static void print_stack_trace(viua::process::Process& process)
 
     if (stack_trace_print_type == "default") {
         print_stack_trace_default(process);
-    }
-    else if (stack_trace_print_type == "json") {
+    } else if (stack_trace_print_type == "json") {
         print_stack_trace_json(process);
-    }
-    else {
+    } else {
         print_stack_trace_default(process);
     }
 }
@@ -219,8 +209,7 @@ auto Process_scheduler::empty() const -> bool
 
 Process_scheduler::Process_scheduler(viua::kernel::Kernel& k, id_type const x)
         : assigned_id{x}, attached_kernel{k}
-{
-}
+{}
 
 Process_scheduler::~Process_scheduler() {}
 
@@ -301,8 +290,7 @@ auto Process_scheduler::give_up_processes()
         process_queue.pop_front();
         if (proc->pinned()) {
             saved.push_back(std::move(proc));
-        }
-        else {
+        } else {
             given_up.push_back(std::move(proc));
         }
     }
@@ -548,8 +536,7 @@ auto Process_scheduler::operator()() -> void
                 attached_kernel.delete_mailbox(a_process->pid());
                 attached_kernel.notify_about_process_death();
                 continue;
-            }
-            else {
+            } else {
                 if (a_process->trace().at(0)->function_name
                     == a_process->watchdog()) {
                     /*
@@ -618,8 +605,7 @@ auto Process_scheduler::operator()() -> void
                     static_cast<viua::types::Integer*>(ret.get());
                 exit_code = (ret ? static_cast<int>(ret_int->as_integer()) : 0);
             }
-        }
-        else {
+        } else {
             push(std::move(a_process));
         }
 

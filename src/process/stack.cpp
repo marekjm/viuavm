@@ -41,8 +41,7 @@ viua::process::Stack::Stack(std::string fn,
         , global_register_set(gs)
         , return_value(nullptr)
         , attached_scheduler(sch)
-{
-}
+{}
 
 auto viua::process::Stack::set_return_value() -> void
 {
@@ -285,8 +284,7 @@ auto viua::process::Stack::unwind() -> void
         // During the first call unwinding changes stack state to suspended to
         // let the VM run stacks of deferred calls.
         unwind_to(tframe, handler_found_for_type);
-    }
-    else {
+    } else {
         // No catcher has been found so we can just unwind the stack and
         // be done with the exception.
         parent_process->stacks_order.push(this);

@@ -57,8 +57,7 @@ auto viua::process::Process::opstructinsert(Op_address_type addr)
         std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_object(addr, this);
         struct_operand->insert(*key, source->copy());
-    }
-    else {
+    } else {
         viua::kernel::Register* source = nullptr;
         std::tie(addr, source) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -77,8 +76,7 @@ auto viua::process::Process::opstructremove(Op_address_type addr)
     if (not void_target) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -108,8 +106,7 @@ auto viua::process::Process::opstructat(Op_address_type addr) -> Op_address_type
     if (not void_target) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 

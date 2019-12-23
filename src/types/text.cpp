@@ -63,15 +63,12 @@ auto viua::types::Text::parse(std::string s) -> decltype(text)
 
         if ((UTF8_1ST_ROW_NORMALISER & each) == UTF8_1ST_ROW) {
             // do nothing
-        }
-        else if ((UTF8_2ND_ROW_NORMALISER & each) == UTF8_2ND_ROW) {
+        } else if ((UTF8_2ND_ROW_NORMALISER & each) == UTF8_2ND_ROW) {
             ss[1] = s.at(i + 1);
-        }
-        else if ((UTF8_3RD_ROW_NORMALISER & each) == UTF8_3RD_ROW) {
+        } else if ((UTF8_3RD_ROW_NORMALISER & each) == UTF8_3RD_ROW) {
             ss[1] = s.at(i + 1);
             ss[2] = s.at(i + 2);
-        }
-        else if ((UTF8_4TH_ROW_NORMALISER & each) == UTF8_4TH_ROW) {
+        } else if ((UTF8_4TH_ROW_NORMALISER & each) == UTF8_4TH_ROW) {
             ss[1] = s.at(i + 1);
             ss[2] = s.at(i + 2);
             ss[3] = s.at(i + 3);
@@ -79,25 +76,22 @@ auto viua::types::Text::parse(std::string s) -> decltype(text)
 
         if ((UTF8_1ST_ROW_NORMALISER & ss[0]) == UTF8_1ST_ROW) {
             // do nothing
-        }
-        else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW
-                 and is_continuation_byte(ss[1])) {
+        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW
+                   and is_continuation_byte(ss[1])) {
             ++i;
-        }
-        else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW
-                 and is_continuation_byte(ss[1])
-                 and is_continuation_byte(ss[2])) {
+        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])) {
             ++i;
             ++i;
-        }
-        else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW
-                 and is_continuation_byte(ss[1]) and is_continuation_byte(ss[2])
-                 and is_continuation_byte(ss[3])) {
+        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW
+                   and is_continuation_byte(ss[1])
+                   and is_continuation_byte(ss[2])
+                   and is_continuation_byte(ss[3])) {
             ++i;
             ++i;
             ++i;
-        }
-        else {
+        } else {
             throw std::domain_error(s);
         }
 

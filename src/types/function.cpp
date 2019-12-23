@@ -26,8 +26,7 @@ std::string const viua::types::Function::type_name = "Function";
 
 
 viua::types::Function::Function(std::string const& name) : function_name(name)
-{
-}
+{}
 
 viua::types::Function::~Function() {}
 

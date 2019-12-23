@@ -39,8 +39,7 @@ auto Register::operator==(Register const& that) const -> bool
 
 Register::Register(viua::assembler::frontend::parser::Register_index const& ri)
         : index(ri.index), register_set(ri.rss)
-{
-}
+{}
 
 auto to_string(Register const& r) -> std::string
 {

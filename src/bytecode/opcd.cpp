@@ -49,8 +49,7 @@ int main()
         auto mnemonic     = std::string{"??"};
         if (OP_NAMES.count(opcode)) {
             mnemonic = OP_NAMES.at(opcode);
-        }
-        else {
+        } else {
             continue;
         }
 

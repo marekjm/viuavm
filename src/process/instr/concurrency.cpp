@@ -40,8 +40,7 @@ auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type
     if (not target_is_void) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -58,8 +57,7 @@ auto viua::process::Process::opprocess(Op_address_type addr) -> Op_address_type
             throw std::make_unique<viua::types::Exception>(
                 "cannot spawn a process from closure");
         }
-    }
-    else {
+    } else {
         tie(addr, call_name) =
             viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
@@ -98,8 +96,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     if (not target_is_void) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -120,8 +117,7 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
         waiting_until  = (std::chrono::steady_clock::now()
                          + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
-    }
-    else if (not timeout and not timeout_active) {
+    } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
         timeout_active      = true;
     }
@@ -131,16 +127,14 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
         if (attached_scheduler->is_terminated(thrd->pid())) {
             stack->thrown =
                 attached_scheduler->transfer_exception_of(thrd->pid());
-        }
-        else {
+        } else {
             auto result = attached_scheduler->transfer_result_of(thrd->pid());
             if (not target_is_void) {
                 *target = std::move(result);
             }
         }
-    }
-    else if (timeout_active and (not wait_until_infinity)
-             and (waiting_until < std::chrono::steady_clock::now())) {
+    } else if (timeout_active and (not wait_until_infinity)
+               and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active      = false;
         wait_until_infinity = false;
         stack->thrown =
@@ -182,8 +176,7 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
     if (not target_is_void) {
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);
-    }
-    else {
+    } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
@@ -195,8 +188,7 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         waiting_until  = (std::chrono::steady_clock::now()
                          + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
-    }
-    else if (not timeout and not timeout_active) {
+    } else if (not timeout and not timeout_active) {
         wait_until_infinity = true;
         timeout_active      = true;
     }
@@ -213,8 +205,7 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         timeout_active      = false;
         wait_until_infinity = false;
         return_addr         = addr;
-    }
-    else {
+    } else {
         if (is_hidden) {
             suspend();
         }

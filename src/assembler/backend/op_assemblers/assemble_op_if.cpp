@@ -58,8 +58,7 @@ auto assemble_op_if(Program& program,
         std::tie(addrf_target, addrf_jump_type) =
             ::assembler::operands::resolve_jump(
                 tokens.at(i + 4), marks, instruction);
-    }
-    else {
+    } else {
         addrf_jump_type = JMP_RELATIVE;
         addrf_target    = instruction + 1;
     }

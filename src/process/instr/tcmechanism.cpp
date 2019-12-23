@@ -68,8 +68,7 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type
          * Catching thrown objects into a void register will just discard them.
          */
         stack->caught.reset(nullptr);
-    }
-    else {
+    } else {
         viua::kernel::Register* target = nullptr;
         std::tie(addr, target) =
             viua::bytecode::decoder::operands::fetch_register(addr, this);

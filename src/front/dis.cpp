@@ -122,49 +122,38 @@ int main(int argc, char* argv[])
         option = std::string(argv[i]);
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
-        }
-        else if (option == "--version" or option == "-V") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
-        }
-        else if (option == "--verbose" or option == "-v") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
-        }
-        else if (option == "--debug") {
+        } else if (option == "--debug") {
             DEBUG = true;
-        }
-        else if ((option == "--with-entry") or (option == "-e")) {
+        } else if ((option == "--with-entry") or (option == "-e")) {
             DISASSEMBLE_ENTRY = true;
-        }
-        else if ((option == "--info") or (option == "-i")) {
+        } else if ((option == "--info") or (option == "-i")) {
             INCLUDE_INFO = true;
-        }
-        else if ((option == "--line-by-line") or (option == "-L")) {
+        } else if ((option == "--line-by-line") or (option == "-L")) {
             LINE_BY_LINE = true;
-        }
-        else if (option == "--function" or option == "-F") {
+        } else if (option == "--function" or option == "-F") {
             if (i < argc - 1) {
                 SELECTED_FUNCTION = std::string(argv[++i]);
-            }
-            else {
+            } else {
                 std::cout << "error: option '" << argv[i]
                           << "' requires an argument: function name"
                           << std::endl;
                 exit(1);
             }
             continue;
-        }
-        else if (option == "--out" or option == "-o") {
+        } else if (option == "--out" or option == "-o") {
             if (i < argc - 1) {
                 disasmname = std::string(argv[++i]);
-            }
-            else {
+            } else {
                 std::cout << "error: option '" << argv[i]
                           << "' requires an argument: filename" << std::endl;
                 exit(1);
             }
             continue;
-        }
-        else if (str::startswith(option, "-")) {
+        } else if (str::startswith(option, "-")) {
             std::cerr << send_control_seq(COLOR_FG_RED) << "error"
                       << send_control_seq(ATTR_RESET);
             std::cerr << ": unknown option: ";
@@ -172,8 +161,7 @@ int main(int argc, char* argv[])
                       << send_control_seq(ATTR_RESET);
             std::cerr << std::endl;
             return 1;
-        }
-        else {
+        } else {
             args.emplace_back(argv[i]);
         }
     }
@@ -202,8 +190,7 @@ int main(int argc, char* argv[])
 
     try {
         loader.executable();
-    }
-    catch (std::string const& e) {
+    } catch (std::string const& e) {
         std::cout << e << std::endl;
         return 1;
     }
@@ -240,8 +227,7 @@ int main(int argc, char* argv[])
             long unsigned a = block_address_mapping[name];
             long unsigned b = block_address_mapping[blocks[i + 1]];
             el_size         = (b - a);
-        }
-        else {
+        } else {
             long unsigned a = block_address_mapping[name];
             long unsigned b = function_address_mapping[functions[0]];
             el_size         = (b - a);
@@ -368,8 +354,7 @@ int main(int argc, char* argv[])
                 }
                 (DEBUG ? std::cout : oss) << "    " << instruction << '\n';
                 j += size;
-            }
-            catch (std::out_of_range const& e) {
+            } catch (std::out_of_range const& e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? std::cout : oss)
                     << "disassembly terminated after throwing "
@@ -377,8 +362,7 @@ int main(int argc, char* argv[])
                 (DEBUG ? std::cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
-            }
-            catch (std::string const& e) {
+            } catch (std::string const& e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? std::cout : oss)
                     << "disassembly terminated after throwing "
@@ -386,8 +370,7 @@ int main(int argc, char* argv[])
                 (DEBUG ? std::cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
-            }
-            catch (const char* e) {
+            } catch (const char* e) {
                 (DEBUG ? std::cout : oss) << "\n---- ERROR ----\n\n";
                 (DEBUG ? std::cout : oss)
                     << "disassembly terminated after throwing "
@@ -441,8 +424,7 @@ int main(int argc, char* argv[])
         std::ofstream out(disasmname);
         out << assembly_code.str();
         out.close();
-    }
-    else {
+    } else {
         std::cout << assembly_code.str();
     }
 

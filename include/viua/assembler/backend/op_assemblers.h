@@ -160,8 +160,7 @@ auto assemble_no_result_call_op(Program& program,
         (program.*op_value)(::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(i + 1)),
             ::assembler::operands::resolve_rs_type(tokens.at(i + 2))));
-    }
-    else {
+    } else {
         (program.*op_name)(tokens.at(i + 1));
     }
 }
@@ -200,8 +199,7 @@ auto assemble_bit_shift_instruction(Program& program,
         --rhs;
         ret = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(target)));
-    }
-    else {
+    } else {
         ret = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));

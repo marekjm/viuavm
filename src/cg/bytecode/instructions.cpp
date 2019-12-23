@@ -29,35 +29,29 @@ int_op::int_op()
         : type(Integer_operand_type::PLAIN)
         , rs_type(viua::internals::Register_sets::LOCAL)
         , value(0)
-{
-}
+{}
 int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
         : type(t), rs_type(viua::internals::Register_sets::LOCAL), value(n)
-{
-}
+{}
 int_op::int_op(Integer_operand_type t,
                viua::internals::Register_sets rst,
                viua::internals::types::plain_int n)
         : type(t), rs_type(rst), value(n)
-{
-}
+{}
 int_op::int_op(viua::internals::types::plain_int n)
         : type(Integer_operand_type::PLAIN)
         , rs_type(viua::internals::Register_sets::LOCAL)
         , value(n)
-{
-}
+{}
 
 timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
 timeout_op::timeout_op(Integer_operand_type t,
                        viua::internals::types::timeout n)
         : type(t), value(n)
-{
-}
+{}
 timeout_op::timeout_op(viua::internals::types::timeout n)
         : type(Integer_operand_type::PLAIN), value(n)
-{
-}
+{}
 
 
 static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
@@ -85,11 +79,9 @@ static auto insert_ri_operand(viua::internals::types::byte* addr_ptr, int_op op)
      */
     if (op.type == Integer_operand_type::POINTER_DEREFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_POINTER;
-    }
-    else if (op.type == Integer_operand_type::REGISTER_REFERENCE) {
+    } else if (op.type == Integer_operand_type::REGISTER_REFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
-    }
-    else {
+    } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     viua::support::pointer::inc<OperandType, viua::internals::types::byte>(
@@ -111,8 +103,7 @@ static auto insert_bool_operand(viua::internals::types::byte* addr_ptr, bool op)
 {
     if (op) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_TRUE;
-    }
-    else {
+    } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_FALSE;
     }
     viua::support::pointer::inc<OperandType, viua::internals::types::byte>(

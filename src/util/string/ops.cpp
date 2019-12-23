@@ -61,8 +61,7 @@ auto extract(std::string const& s) -> std::string
         if (s[i] == quote and ((backs % 2) != 0)) {
             backs = 0;
             continue;
-        }
-        else if (s[i] == quote and ((backs % 2) == 0)) {
+        } else if (s[i] == quote and ((backs % 2) == 0)) {
             break;
         }
         if (s[i] == '\\') {

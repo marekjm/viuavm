@@ -59,8 +59,7 @@ auto assemble_op_call(Program& program,
         --fn;
         ret = ::assembler::operands::getint(
             ::assembler::operands::resolve_register(tokens.at(target)));
-    }
-    else {
+    } else {
         ret = ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
@@ -72,8 +71,7 @@ auto assemble_op_call(Program& program,
             ::assembler::operands::getint_with_rs_type(
                 ::assembler::operands::resolve_register(tokens.at(fn)),
                 ::assembler::operands::resolve_rs_type(tokens.at(fn + 1))));
-    }
-    else {
+    } else {
         program.opcall(ret, tokens.at(fn));
     }
 }
