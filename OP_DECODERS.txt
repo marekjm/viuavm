@@ -173,6 +173,31 @@ function:
     +fetch_register
     string_literal
 
+process:
+    +fetch_register | void
+    fetch_object_of<Function> | string_literal
+
+join:
+    +fetch_register | void
+    fetch_object_of<Process>
+    fetch_timeout
+
+send:
+    fetch_object_of<Process>
+    <fetch_register
+
+receive:
+    +fetch_register | void
+    fetch_timeout
+
+self:
+    +fetch_register
+
+pideq:
+    +fetch_register
+    fetch_object_of<Process>
+    fetch_object_of<Process>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
