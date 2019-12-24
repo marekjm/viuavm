@@ -190,6 +190,9 @@ receive:
     +fetch_register | void
     fetch_timeout
 
+watchdog:
+    string_literal
+
 self:
     +fetch_register
 
