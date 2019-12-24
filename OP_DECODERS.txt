@@ -161,6 +161,18 @@ stof:
     +fetch_register
     fetch_object_of<String>
 
+capture:
+capturecopy:
+capturemove:
+    ~fetch_object_of<Closure>
+    fetch_register_index
+    fetch_register
+
+closure:
+function:
+    +fetch_register
+    string_literal
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
