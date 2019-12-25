@@ -290,6 +290,25 @@ structkeys:
     +fetch_register
     fetch_object_of<Struct>
 
+try:
+    none
+
+catch:
+    string_literal
+    string_literal
+
+draw:
+    >fetch_register | void
+
+enter:
+    string_literal
+
+throw:
+    <fetch_register
+
+leave:
+    none
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
