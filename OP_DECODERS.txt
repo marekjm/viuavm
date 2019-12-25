@@ -335,6 +335,34 @@ textlength:
     +fetch_register
     fetch_object_of<Text>
 
+vector:
+    +fetch_register
+    fetch_register  # begin pack
+    fetch_register  # pack size
+
+vinsert:
+    ~fetch_object_of<Vector>
+    fetch_register
+    fetch_object_of<Integer> | void
+
+vpush:
+    ~fetch_object_of<Vector>
+    fetch_register
+
+vpop:
+    >fetch_register | void
+    ~fetch_object_of<Vector>
+    fetch_object_of<Integer> | void
+
+vat:
+    +fetch_register
+    fetch_object_of<Vector>
+    fetch_object_of<Integer>
+
+vlen:
+    +fetch_register
+    fetch_object_of<Vector>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
