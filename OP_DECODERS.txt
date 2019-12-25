@@ -237,6 +237,33 @@ io_cancel:
 import:
     string_literal  # a fetch_object_of<String> overload would be needed
 
+move:
+    >fetch_register
+    <fetch_register
+
+copy:
+    +fetch_register
+    fetch_register
+
+ptr:
+    +fetch_register
+    fetch_register
+
+ptrlive:
+    +fetch_register
+    fetch_object_of<Pointer>
+
+swap:
+    <>fetch_register
+    <>fetch_register
+
+delete:
+    <fetch_register
+
+isnull:
+    +fetch_register
+    fetch_register
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
