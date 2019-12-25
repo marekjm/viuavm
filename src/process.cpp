@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,12 +28,228 @@
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/io.h>
+#include <viua/types/pointer.h>
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
 
 // Provide storage for static member.
 viua::internals::types::register_index const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
+
+auto viua::process::Decoder_adapter::fetch_slot(Op_address_type& addr) const
+    -> viua::bytecode::codec::Register_access
+{
+    auto [next_addr, reg] = decoder.decode_register(addr);
+
+    addr = next_addr;
+
+    return reg;
+}
+
+auto viua::process::Decoder_adapter::fetch_register(
+    Op_address_type& addr,
+    Process& proc,
+    bool const pointers_allowed) const -> viua::kernel::Register*
+{
+    auto const reg = fetch_slot(addr);
+
+    using viua::bytecode::codec::Access_specifier;
+
+    if ((not pointers_allowed)
+        and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
+        // This should never happen - assembler should catch such situations.
+        throw std::make_unique<viua::types::Exception>(
+            "Invalid_access", "pointer dereference not allowed");
+    }
+
+    auto index = std::get<1>(reg);
+    auto slot  = proc.register_at(
+        index, static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+
+    if (std::get<2>(reg) == Access_specifier::Register_indirect) {
+        auto const i =
+            static_cast<viua::types::Integer*>(slot->get())->as_integer();
+        if (i < 0) {
+            throw std::make_unique<viua::types::Exception>(
+                "Invalid_register_index", "registers cannot be negative");
+        }
+        return proc.register_at(
+            static_cast<viua::bytecode::codec::register_index_type>(i),
+            static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+    }
+
+    return slot;
+}
+
+auto viua::process::Decoder_adapter::fetch_register_or_void(
+    Op_address_type& addr,
+    Process& proc,
+    bool const pointers_allowed) const -> std::optional<viua::kernel::Register*>
+{
+    auto const ot = static_cast<OperandType>(*addr);
+    if (ot == OT_VOID) {
+        ++addr;
+        return {};
+    }
+
+    return fetch_register(addr, proc, pointers_allowed);
+}
+
+auto viua::process::Decoder_adapter::fetch_tagged_register(
+    Op_address_type& addr,
+    Process& proc,
+    bool const pointers_allowed) const
+    -> std::pair<viua::internals::Register_sets, viua::kernel::Register*>
+{
+    auto const reg = fetch_slot(addr);
+
+    using viua::bytecode::codec::Access_specifier;
+
+    if ((not pointers_allowed)
+        and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
+        // This should never happen - assembler should catch such situations.
+        throw std::make_unique<viua::types::Exception>(
+            "Invalid_access", "pointer dereference not allowed");
+    }
+
+    auto index = std::get<1>(reg);
+    auto slot  = proc.register_at(
+        index, static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+
+    if (std::get<2>(reg) == Access_specifier::Register_indirect) {
+        auto const i =
+            static_cast<viua::types::Integer*>(slot->get())->as_integer();
+        if (i < 0) {
+            throw std::make_unique<viua::types::Exception>(
+                "Invalid_register_index", "registers cannot be negative");
+        }
+        return {
+            static_cast<viua::internals::Register_sets>(std::get<0>(reg)),
+            proc.register_at(
+                static_cast<viua::bytecode::codec::register_index_type>(i),
+                static_cast<viua::internals::Register_sets>(std::get<0>(reg)))};
+    }
+
+    return {static_cast<viua::internals::Register_sets>(std::get<0>(reg)),
+            slot};
+}
+
+auto viua::process::Decoder_adapter::fetch_register_index(
+    Op_address_type& addr) const -> viua::bytecode::codec::register_index_type
+{
+    return std::get<1>(fetch_slot(addr));
+}
+
+auto viua::process::Decoder_adapter::fetch_tagged_register_index(
+    Op_address_type& addr) const
+    -> std::pair<viua::internals::Register_sets,
+                 viua::bytecode::codec::register_index_type>
+{
+    auto const slot = fetch_slot(addr);
+    return {static_cast<viua::internals::Register_sets>(std::get<0>(slot)),
+            std::get<1>(slot)};
+}
+
+auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
+                                                 Process& proc) const
+    -> viua::types::Value*
+{
+    auto [next_addr, reg] = decoder.decode_register(addr);
+
+    addr = next_addr;
+
+    auto slot = proc.register_at(
+        std::get<1>(reg),
+        static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+
+    using viua::bytecode::codec::Access_specifier;
+
+    if (std::get<2>(reg) == Access_specifier::Register_indirect) {
+        auto const i =
+            static_cast<viua::types::Integer*>(slot->get())->as_integer();
+        if (i < 0) {
+            throw std::make_unique<viua::types::Exception>(
+                "Invalid_register_index", "registers cannot be negative");
+        }
+        slot = proc.register_at(
+            static_cast<viua::bytecode::codec::register_index_type>(i),
+            static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+    }
+
+    auto value = slot->get();
+    if (not value) {
+        throw std::make_unique<viua::types::Exception>(
+            "read from null register: " + std::to_string(std::get<1>(reg)));
+    }
+
+    if (auto ref = dynamic_cast<viua::types::Reference*>(value)) {
+        value = ref->points_to();
+    }
+    if (std::get<2>(reg) == Access_specifier::Pointer_dereference) {
+        auto const pointer = dynamic_cast<viua::types::Pointer*>(value);
+        if (pointer == nullptr) {
+            throw std::make_unique<viua::types::Exception>(
+                "Not_a_pointer",
+                "dereferenced value is not a pointer: " + value->type());
+        }
+        value = pointer->to(&proc);
+    }
+    if (auto pointer = dynamic_cast<viua::types::Pointer*>(value)) {
+        pointer->authenticate(&proc);
+    }
+
+    return value;
+}
+
+auto viua::process::Decoder_adapter::fetch_string(Op_address_type& addr) const
+    -> std::string
+{
+    auto [next_addr, s] = decoder.decode_string(addr);
+
+    addr = next_addr;
+
+    return s;
+}
+
+auto viua::process::Decoder_adapter::fetch_timeout(Op_address_type& addr) const
+    -> viua::internals::types::timeout
+{
+    auto [next_addr, t] = decoder.decode_timeout(addr);
+
+    addr = next_addr;
+
+    return t;
+}
+
+auto viua::process::Decoder_adapter::fetch_float(Op_address_type& addr) const
+    -> double
+{
+    auto [next_addr, v] = decoder.decode_f64(addr);
+
+    addr = next_addr;
+
+    return v;
+}
+
+auto viua::process::Decoder_adapter::fetch_i32(Op_address_type& addr) const
+    -> int32_t
+{
+    auto [next_addr, v] = decoder.decode_i32(addr);
+
+    addr = next_addr;
+
+    return v;
+}
+
+auto viua::process::Decoder_adapter::fetch_address(Op_address_type& addr) const
+    -> uint64_t
+{
+    auto [next_addr, v] = decoder.decode_address(addr);
+
+    addr = next_addr;
+
+    return v;
+}
 
 auto viua::process::Process::register_at(
     viua::internals::types::register_index i,
@@ -460,9 +676,11 @@ void viua::process::Process::migrate_to(viua::scheduler::Process_scheduler* sch)
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
                                 viua::scheduler::Process_scheduler* sch,
                                 viua::process::Process* pt,
-                                bool const enable_tracing)
+                                bool const enable_tracing,
+                                viua::process::Decoder_adapter const& da)
         : tracing_enabled(enable_tracing)
         , attached_scheduler(sch)
+        , decoder{da}
         , parent_process(pt)
         , global_register_set(nullptr)
         , stack(nullptr)

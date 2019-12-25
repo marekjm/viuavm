@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -55,9 +55,9 @@ enum class Register_sets : types::registerset_type_marker {
      *
      *      Most subroutines are parametrized: the caller passes arguments that
      *      influence the subroutine's behaviour, or provide it with data on
-     * which to operate. Arguments are also called actual parameters. They are
-     *      mapped to the subroutine's formal parameters at the time a call
-     * occurs.
+     *      which to operate. Arguments are also called actual parameters. They
+     *      are mapped to the subroutine's formal parameters at the time a call
+     *      occurs.
      *
      * This can be found on page 427, in the introduction to Chapter 8
      * "Subroutines and Control Abstraction". The ISBN for the book is

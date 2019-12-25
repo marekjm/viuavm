@@ -31,7 +31,6 @@
 
 using viua::process::Op_address_type;
 using viua::util::memory::aligned_read;
-using viua::util::memory::load_aligned;
 
 
 template<class T>

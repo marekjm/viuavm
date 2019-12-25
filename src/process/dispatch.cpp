@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017, 2019 Marek Marecki
+ *  Copyright (C) 2015-2017, 2019, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <sstream>
-#include <viua/bytecode/decoder/operands.h>
+#include <viua/bytecode/codec/main.h>
 #include <viua/bytecode/maps.h>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
@@ -66,7 +66,7 @@ auto viua::process::Process::get_trace_line(
     if (static_cast<OPCODE>(*for_address) == CALL
         or static_cast<OPCODE>(*for_address) == PROCESS) {
         auto working_address = for_address + 1;
-        if (viua::bytecode::decoder::operands::is_void(working_address)) {
+        if (viua::bytecode::codec::main::is_void(working_address)) {
             ++working_address;
         } else {
             working_address +=

@@ -535,6 +535,7 @@ build/bin/vm/kernel: \
 	build/assert.o \
 	build/process.o \
 	build/process/stack.o \
+	build/bytecode/codec/main.o \
 	build/pid.o \
 	build/process/dispatch.o \
 	build/scheduler/ffi/request.o \

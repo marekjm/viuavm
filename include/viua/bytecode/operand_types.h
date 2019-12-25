@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -61,9 +61,9 @@ enum OperandType : uint8_t {
 
 namespace viua { namespace internals {
 enum class Access_specifier {
-    DIRECT,
-    REGISTER_INDIRECT,
-    POINTER_DEREFERENCE,
+    DIRECT              = 0,
+    REGISTER_INDIRECT   = 1,
+    POINTER_DEREFERENCE = 2,
 };
 
 using ValueTypesType = uint32_t;

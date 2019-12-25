@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -30,12 +30,14 @@
 #include <stack>
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/codec/main.h>
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/tryframe.h>
 #include <viua/pid.h>
 #include <viua/scheduler/io/interactions.h>
+#include <viua/types/exception.h>
 #include <viua/types/value.h>
 
 
@@ -184,6 +186,82 @@ class Stack {
     static uint16_t const MAX_STACK_SIZE = 8192;
 };
 
+struct Decoder_adapter {
+    viua::bytecode::codec::main::Decoder decoder;
+
+    template<typename T>
+    auto fetch_value_of(Op_address_type& addr, Process& proc) const -> T*
+    {
+        auto value = fetch_value(addr, proc);
+
+        auto converted = dynamic_cast<T*>(value);
+        if (converted == nullptr) {
+            // FIXME don't use the old generic-exception type
+            throw std::make_unique<viua::types::Exception>(
+                ("fetched invalid type: expected '" + T::type_name
+                 + "' but got '" + value->type() + "'")
+                /* "Invalid_type" */
+                /* , "expected " + T::type_name + ", got " + value->type() */
+            );
+        }
+
+        return converted;
+    }
+
+    template<typename T>
+    auto fetch_value_of_or_void(Op_address_type& addr, Process& proc) const
+        -> std::optional<T*>
+    {
+        auto r = fetch_register_or_void(addr, proc);
+        if (not r.has_value()) {
+            return {};
+        }
+
+        auto value     = (*r)->get();
+        auto converted = dynamic_cast<T*>(value);
+        if (converted == nullptr) {
+            // FIXME don't use the old generic-exception type
+            throw std::make_unique<viua::types::Exception>(
+                ("fetched invalid type: expected '" + T::type_name
+                 + "' but got '" + value->type() + "'")
+                /* "Invalid_type" */
+                /* , "expected " + T::type_name + ", got " + value->type() */
+            );
+        }
+
+        return converted;
+    }
+
+  private:
+    auto fetch_slot(Op_address_type&) const
+        -> viua::bytecode::codec::Register_access;
+
+  public:
+    auto fetch_register(Op_address_type&, Process&, bool const = false) const
+        -> viua::kernel::Register*;
+    auto fetch_register_or_void(Op_address_type&,
+                                Process&,
+                                bool const = false) const
+        -> std::optional<viua::kernel::Register*>;
+    auto fetch_tagged_register(Op_address_type&,
+                               Process&,
+                               bool const = false) const
+        -> std::pair<viua::internals::Register_sets, viua::kernel::Register*>;
+    auto fetch_register_index(Op_address_type&) const
+        -> viua::bytecode::codec::register_index_type;
+    auto fetch_tagged_register_index(Op_address_type&) const
+        -> std::pair<viua::internals::Register_sets,
+                     viua::bytecode::codec::register_index_type>;
+    auto fetch_value(Op_address_type&, Process&) const -> viua::types::Value*;
+
+    auto fetch_string(Op_address_type&) const -> std::string;
+    auto fetch_timeout(Op_address_type&) const
+        -> viua::internals::types::timeout;
+    auto fetch_float(Op_address_type&) const -> double;
+    auto fetch_i32(Op_address_type&) const -> int32_t;
+    auto fetch_address(Op_address_type&) const -> uint64_t;
+};
+
 class Process {
 #ifdef AS_DEBUG_HEADER
   public:
@@ -207,6 +285,10 @@ class Process {
     viua::scheduler::Process_scheduler* attached_scheduler;
     std::atomic<bool> is_pinned_to_scheduler = false;
 
+  public:
+    Decoder_adapter const decoder;
+
+  private:
     /*
      * Parent process of this process.
      * May be null if this process has been detached.
@@ -537,7 +619,8 @@ class Process {
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,
-            bool const = false);
+            bool const             = false,
+            Decoder_adapter const& = Decoder_adapter{});
     ~Process();
 
     static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =
