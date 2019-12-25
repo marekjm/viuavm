@@ -20,8 +20,6 @@
 #ifndef VIUA_CPU_FRAME_H
 #define VIUA_CPU_FRAME_H
 
-#pragma once
-
 #include <memory>
 #include <string>
 #include <vector>

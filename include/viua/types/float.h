@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_FLOAT_H
 #define VIUA_TYPES_FLOAT_H
 
-#pragma once
-
 #include <ios>
 #include <sstream>
 #include <string>

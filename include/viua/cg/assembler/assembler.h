@@ -20,8 +20,6 @@
 #ifndef VIUA_ASSEMBLER_H
 #define VIUA_ASSEMBLER_H
 
-#pragma once
-
 
 #include <map>
 #include <regex>

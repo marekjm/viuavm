@@ -20,8 +20,6 @@
 #ifndef VIUA_PRINTUTILS
 #define VIUA_PRINTUTILS
 
-#pragma once
-
 #include <string>
 #include <viua/kernel/frame.h>
 

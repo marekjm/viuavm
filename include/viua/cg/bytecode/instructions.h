@@ -20,8 +20,6 @@
 #ifndef VIUA_CG_BYTECODE_INSTRUCTIONS_H
 #define VIUA_CG_BYTECODE_INSTRUCTIONS_H
 
-#pragma once
-
 #include <string>
 #include <tuple>
 #include <vector>

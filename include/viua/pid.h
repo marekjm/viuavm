@@ -20,8 +20,6 @@
 #ifndef VIUA_PID_H
 #define VIUA_PID_H
 
-#pragma once
-
 #include <string>
 
 

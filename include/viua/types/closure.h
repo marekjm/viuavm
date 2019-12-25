@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPE_CLOSURE_H
 #define VIUA_TYPE_CLOSURE_H
 
-#pragma once
-
 #include <memory>
 #include <string>
 #include <viua/bytecode/bytetypedef.h>

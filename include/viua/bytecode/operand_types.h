@@ -22,8 +22,6 @@
 
 #include <stdint.h>
 
-#pragma once
-
 enum OperandType : uint8_t {
     OT_REGISTER_INDEX,      // register index
     OT_REGISTER_REFERENCE,  // register reference (indirect register index)

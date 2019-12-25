@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_VALUE_H
 #define VIUA_TYPES_VALUE_H
 
-#pragma once
-
 #include <memory>
 #include <sstream>
 #include <string>

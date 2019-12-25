@@ -20,8 +20,6 @@
 #ifndef VIUA_DISASSEMBLER_H
 #define VIUA_DISASSEMBLER_H
 
-#pragma once
-
 #include <algorithm>
 #include <string>
 #include <tuple>

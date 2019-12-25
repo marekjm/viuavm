@@ -20,8 +20,6 @@
 #ifndef VIUA_BYTECODE_BYTETYPEDEF_H
 #define VIUA_BYTECODE_BYTETYPEDEF_H
 
-#pragma once
-
 #include <stdint.h>
 
 namespace viua { namespace internals {

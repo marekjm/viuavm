@@ -20,8 +20,6 @@
 #ifndef VIUA_BYTECODE_OPCODES_H
 #define VIUA_BYTECODE_OPCODES_H
 
-#pragma once
-
 #include <viua/bytecode/bytetypedef.h>
 
 enum OPCODE : viua::internals::types::byte {

@@ -24,9 +24,6 @@
 #include <memory>
 
 
-#pragma once
-
-
 namespace viua { namespace util { namespace memory {
 template<typename T>
 using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr

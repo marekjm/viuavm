@@ -20,8 +20,6 @@
 #ifndef VIUA_EXMODULE_H
 #define VIUA_EXMODULE_H
 
-#pragma once
-
 #include <functional>
 #include <string>
 #include <vector>

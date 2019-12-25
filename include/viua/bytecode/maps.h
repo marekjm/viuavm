@@ -20,8 +20,6 @@
 #ifndef VIUA_BYTECODE_MAPS_H
 #define VIUA_BYTECODE_MAPS_H
 
-#pragma once
-
 #include <cstdint>
 #include <map>
 #include <set>

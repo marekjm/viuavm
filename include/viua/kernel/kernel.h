@@ -20,8 +20,6 @@
 #ifndef VIUA_CPU_H
 #define VIUA_CPU_H
 
-#pragma once
-
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>

@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_EXCEPTION_H
 #define VIUA_TYPES_EXCEPTION_H
 
-#pragma once
-
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/support/string.h>

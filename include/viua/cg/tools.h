@@ -20,8 +20,6 @@
 #ifndef VIUA_CG_TOOLS_H
 #define VIUA_CG_TOOLS_H
 
-#pragma once
-
 #include <cstdint>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>

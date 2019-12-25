@@ -20,8 +20,6 @@
 #ifndef VIUA_REGISTERSET_H
 #define VIUA_REGISTERSET_H
 
-#pragma once
-
 #include <memory>
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>

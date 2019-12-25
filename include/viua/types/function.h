@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPE_FUNCTION_H
 #define VIUA_TYPE_FUNCTION_H
 
-#pragma once
-
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>

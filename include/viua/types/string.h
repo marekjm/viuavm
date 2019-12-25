@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_STRING_H
 #define VIUA_TYPES_STRING_H
 
-#pragma once
-
 #include <string>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>

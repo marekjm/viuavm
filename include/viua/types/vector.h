@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPE_VECTOR_H
 #define VIUA_TYPE_VECTOR_H
 
-#pragma once
-
 #include <string>
 #include <vector>
 #include <viua/types/value.h>

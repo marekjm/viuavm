@@ -17,10 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUPPORT_STRING_H
-#define SUPPORT_STRING_H
-
-#pragma once
+#ifndef VIUA_SUPPORT_STRING_H
+#define VIUA_SUPPORT_STRING_H
 
 #include <sstream>
 #include <string>

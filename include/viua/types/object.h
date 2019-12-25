@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_OBJECT_H
 #define VIUA_TYPES_OBJECT_H
 
-#pragma once
-
 #include <map>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>

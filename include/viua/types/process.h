@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_PROCESS_H
 #define VIUA_TYPES_PROCESS_H
 
-#pragma once
-
 #include <memory>
 #include <string>
 #include <viua/kernel/frame.h>

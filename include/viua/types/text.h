@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_TEXT_H
 #define VIUA_TYPES_TEXT_H
 
-#pragma once
-
 #include <string>
 #include <vector>
 #include <viua/kernel/frame.h>

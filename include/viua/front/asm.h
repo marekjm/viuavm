@@ -20,8 +20,6 @@
 #ifndef VIUA_FRONT_ASM_H
 #define VIUA_FRONT_ASM_H
 
-#pragma once
-
 #include <map>
 #include <string>
 #include <vector>

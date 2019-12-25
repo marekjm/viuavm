@@ -20,8 +20,6 @@
 #ifndef VIUA_CG_LEX_H
 #define VIUA_CG_LEX_H
 
-#pragma once
-
 #include <string>
 #include <vector>
 

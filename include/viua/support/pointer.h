@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUPPORT_POINTER_H
-#define SUPPORT_POINTER_H
+#ifndef VIUA_SUPPORT_POINTER_H
+#define VIUA_SUPPORT_POINTER_H
 
 namespace viua { namespace support { namespace pointer {
 template<class T, class S> auto inc(S*& p) -> void

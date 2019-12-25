@@ -17,10 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUPPORT_ENV_H
-#define SUPPORT_ENV_H
-
-#pragma once
+#ifndef VIUA_SUPPORT_ENV_H
+#define VIUA_SUPPORT_ENV_H
 
 #include <string>
 #include <sys/stat.h>

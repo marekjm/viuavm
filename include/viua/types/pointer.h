@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_POINTER_H
 #define VIUA_TYPES_POINTER_H
 
-#pragma once
-
 #include <vector>
 #include <viua/kernel/frame.h>
 #include <viua/types/value.h>

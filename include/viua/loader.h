@@ -20,9 +20,6 @@
 #ifndef VIUA_LOADER_H
 #define VIUA_LOADER_H
 
-#pragma once
-
-
 #include <cstdint>
 #include <fstream>
 #include <map>

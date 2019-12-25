@@ -20,8 +20,6 @@
 #ifndef VIUA_CPU_CATCHER_H
 #define VIUA_CPU_CATCHER_H
 
-#pragma once
-
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 

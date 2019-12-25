@@ -20,8 +20,6 @@
 #ifndef VIUA_ASSERT_H
 #define VIUA_ASSERT_H
 
-#pragma once
-
 #include <memory>
 #include <string>
 #include <viua/exceptions.h>

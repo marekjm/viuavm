@@ -20,8 +20,6 @@
 #ifndef VIUA_EXCEPTIONS_H
 #define VIUA_EXCEPTIONS_H
 
-#pragma once
-
 #include <sstream>
 #include <string>
 #include <vector>

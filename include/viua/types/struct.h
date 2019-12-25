@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_STRUCT_H
 #define VIUA_TYPES_STRUCT_H
 
-#pragma once
-
 #include <map>
 #include <string>
 #include <vector>

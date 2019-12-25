@@ -20,8 +20,6 @@
 #ifndef VIUA_MACHINE_H
 #define VIUA_MACHINE_H
 
-#pragma once
-
 #define VIUA_VM_DEBUG_LOG 0
 
 

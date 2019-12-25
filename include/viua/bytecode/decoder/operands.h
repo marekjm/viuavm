@@ -20,8 +20,6 @@
 #ifndef VIUA_BYTECODE_DECODER_OPERANDS_H
 #define VIUA_BYTECODE_DECODER_OPERANDS_H
 
-#pragma once
-
 #include <functional>
 #include <memory>
 #include <optional>

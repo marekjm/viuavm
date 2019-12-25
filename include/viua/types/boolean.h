@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_BOOLEAN_H
 #define VIUA_TYPES_BOOLEAN_H
 
-#pragma once
-
 #include <sstream>
 #include <string>
 #include <viua/types/value.h>

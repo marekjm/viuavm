@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_NUMBER_H
 #define VIUA_TYPES_NUMBER_H
 
-#pragma once
-
 #include <cstdint>
 #include <sstream>
 #include <string>

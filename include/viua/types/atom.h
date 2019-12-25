@@ -20,8 +20,6 @@
 #ifndef VIUA_TYPES_ATOM_H
 #define VIUA_TYPES_ATOM_H
 
-#pragma once
-
 #include <viua/types/value.h>
 
 
