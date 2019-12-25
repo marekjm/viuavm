@@ -268,6 +268,28 @@ string:
     +fetch_register
     string_literal
 
+struct:
+    +fetch_register
+
+structinsert:
+    ~fetch_object_of<Struct>
+    fetch_object_of<Atom>
+    <fetch_register | fetch_object
+
+structremove:
+    >fetch_register | void
+    ~fetch_object_of<Struct>
+    fetch_object_of<Atom>
+
+structat:
+    +fetch_register | void
+    fetch_object_of<Struct>
+    fetch_object_of<Atom>
+
+structkeys:
+    +fetch_register
+    fetch_object_of<Struct>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
