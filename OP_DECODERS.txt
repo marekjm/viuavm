@@ -216,6 +216,24 @@ iinc:
 idec:
     ~fetch_object_of<Integer>
 
+io_read:
+io_write:
+    +fetch_register
+    fetch_register
+    fetch_register
+
+io_close:
+    +fetch_register
+    fetch_object_of<IO_port>
+
+io_wait:
+    +fetch_register | void
+    fetch_object_of<IO_request>
+    fetch_timeout
+
+io_cancel:
+    ~fetch_object_of<IO_request>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
