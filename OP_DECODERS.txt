@@ -264,6 +264,10 @@ isnull:
     +fetch_register
     fetch_register
 
+string:
+    +fetch_register
+    string_literal
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
