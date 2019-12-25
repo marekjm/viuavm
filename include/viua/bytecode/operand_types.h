@@ -126,13 +126,6 @@ enum class Value_types : ValueTypesType {
 
     STRUCT = 1 << 13,
 
-    /*
-     * Object type.
-     * Used by 'class', 'derive', 'new', etc. instructions.
-     * FIXME DEPRECATED
-     */
-    OBJECT = 1 << 14,
-
     POINTER = 1 << 15,
 
     IO_REQUEST   = 1 << 16,

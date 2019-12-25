@@ -329,10 +329,6 @@ auto const value_type_names = std::map<Value_types, std::string>{
         "struct",
     },
     {
-        Value_types::OBJECT,
-        "object",
-    },
-    {
         Value_types::IO_REQUEST,
         "I/O request",
     },
