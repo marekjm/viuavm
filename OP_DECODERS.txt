@@ -234,6 +234,9 @@ io_wait:
 io_cancel:
     ~fetch_object_of<IO_request>
 
+import:
+    string_literal  # a fetch_object_of<String> overload would be needed
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
