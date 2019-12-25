@@ -201,6 +201,21 @@ pideq:
     fetch_object_of<Process>
     fetch_object_of<Process>
 
+float:
+    +fetch_register
+    float_literal
+
+izero:
+    +fetch_register
+
+integer:
+    +fetch_register
+    integer_literal
+
+iinc:
+idec:
+    ~fetch_object_of<Integer>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
