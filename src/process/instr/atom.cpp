@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,7 +18,6 @@
  */
 
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/process.h>
 #include <viua/support/string.h>
 #include <viua/types/atom.h>
@@ -27,13 +26,8 @@
 
 auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    auto s = std::string{};
-    std::tie(addr, s) =
-        viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto s      = decoder.fetch_string(addr);
 
     *target = std::make_unique<viua::types::Atom>(str::strdecode(s));
 
@@ -43,15 +37,9 @@ auto viua::process::Process::opatom(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::opatomeq(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Atom *first = nullptr, *second = nullptr;
-    std::tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<
-        std::remove_pointer<decltype(first)>::type>(addr, this);
-    std::tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<
-        std::remove_pointer<decltype(second)>::type>(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto first  = decoder.fetch_value_of<viua::types::Atom>(addr, *this);
+    auto second = decoder.fetch_value_of<viua::types::Atom>(addr, *this);
 
     *target = std::make_unique<viua::types::Boolean>(*first == *second);
 

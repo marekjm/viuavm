@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -29,48 +28,35 @@
 
 auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type
 {
-    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
-    std::cout << source->str();
+    std::cout << decoder.fetch_value(addr, *this)->str();
     return addr;
 }
 
 auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type
 {
-    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
-    std::cout << source->str() + '\n';
+    std::cout << decoder.fetch_value(addr, *this)->str() + "\n";
     return addr;
 }
 
 
 auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
 {
-    auto target = Op_address_type{
-        stack->jump_base
-        + viua::bytecode::decoder::operands::extract_primitive_uint64(addr,
-                                                                      this)};
+    auto const target = stack->jump_base + decoder.fetch_address(addr);
+
     if (target == addr) {
         throw std::make_unique<viua::types::Exception>(
             "aborting: JUMP instruction pointing to itself");
     }
+
     return target;
 }
 
 auto viua::process::Process::opif(Op_address_type addr) -> Op_address_type
 {
-    auto source = viua::util::memory::dumb_ptr<viua::types::Value>{nullptr};
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto const source = decoder.fetch_value(addr, *this)->boolean();
 
-    auto addr_true  = viua::internals::types::bytecode_size{0};
-    auto addr_false = viua::internals::types::bytecode_size{0};
-    std::tie(addr, addr_true) =
-        viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
-    std::tie(addr, addr_false) =
-        viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
+    auto addr_true  = decoder.fetch_address(addr);
+    auto addr_false = decoder.fetch_address(addr);
 
-    return (stack->jump_base + (source->boolean() ? addr_true : addr_false));
+    return (stack->jump_base + (source ? addr_true : addr_false));
 }

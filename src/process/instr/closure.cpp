@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2018, 2019 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <memory>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/kernel/registerset.h>
@@ -31,24 +30,13 @@
 #include <viua/types/reference.h>
 #include <viua/types/value.h>
 
-using viua::bytecode::decoder::operands::fetch_and_advance_addr;
-using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
-using Register_index = viua::internals::types::register_index;
-
 
 auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type
 {
-    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
-        viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Closure>,
-        addr,
-        this);
-
-    auto const target_register = fetch_and_advance_addr<Register_index>(
-        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
-
-    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
-        viua::bytecode::decoder::operands::fetch_register, addr, this);
+    auto const target =
+        decoder.fetch_value_of<viua::types::Closure>(addr, *this);
+    auto const target_register = decoder.fetch_register_index(addr);
+    auto const source          = decoder.fetch_register(addr, *this);
 
     if (target_register >= target->rs()->size()) {
         throw std::make_unique<viua::types::Exception>(
@@ -79,17 +67,10 @@ auto viua::process::Process::opcapture(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::opcapturecopy(Op_address_type addr)
     -> Op_address_type
 {
-    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
-        viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Closure>,
-        addr,
-        this);
-
-    auto const target_register = fetch_and_advance_addr<Register_index>(
-        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
-
-    auto const source = fetch_and_advance_addr<viua::types::Value*>(
-        viua::bytecode::decoder::operands::fetch_object, addr, this);
+    auto const target =
+        decoder.fetch_value_of<viua::types::Closure>(addr, *this);
+    auto const target_register = decoder.fetch_register_index(addr);
+    auto const source          = decoder.fetch_value(addr, *this);
 
     if (target_register >= target->rs()->size()) {
         throw std::make_unique<viua::types::Exception>(
@@ -105,17 +86,10 @@ auto viua::process::Process::opcapturecopy(Op_address_type addr)
 auto viua::process::Process::opcapturemove(Op_address_type addr)
     -> Op_address_type
 {
-    auto const target = fetch_and_advance_addr<viua::types::Closure*>(
-        viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Closure>,
-        addr,
-        this);
-
-    auto const target_register = fetch_and_advance_addr<Register_index>(
-        viua::bytecode::decoder::operands::fetch_register_index, addr, this);
-
-    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
-        viua::bytecode::decoder::operands::fetch_register, addr, this);
+    auto const target =
+        decoder.fetch_value_of<viua::types::Closure>(addr, *this);
+    auto const target_register = decoder.fetch_register_index(addr);
+    auto const source          = decoder.fetch_register(addr, *this);
 
     if (target_register >= target->rs()->size()) {
         throw std::make_unique<viua::types::Exception>(
@@ -130,13 +104,8 @@ auto viua::process::Process::opcapturemove(Op_address_type addr)
 
 auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type
 {
-    /** Create a closure from a function.
-     */
-    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
-        viua::bytecode::decoder::operands::fetch_register, addr, this);
-
-    auto const function_name = fetch_and_advance_addr<std::string>(
-        viua::bytecode::decoder::operands::fetch_atom, addr, this);
+    auto const target        = decoder.fetch_register(addr, *this);
+    auto const function_name = decoder.fetch_string(addr);
 
     auto rs = std::make_unique<viua::kernel::Register_set>(
         std::max(stack->back()->local_register_set->size(),
@@ -151,17 +120,8 @@ auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::opfunction(Op_address_type addr) -> Op_address_type
 {
-    /** Create function object in a register.
-     *
-     *  Such objects can be used to call functions, and
-     *  are can be used to pass functions as parameters and
-     *  return them from other functions.
-     */
-    auto const target = fetch_and_advance_addr<viua::kernel::Register*>(
-        viua::bytecode::decoder::operands::fetch_register, addr, this);
-
-    auto const function_name = fetch_and_advance_addr<std::string>(
-        viua::bytecode::decoder::operands::fetch_atom, addr, this);
+    auto const target        = decoder.fetch_register(addr, *this);
+    auto const function_name = decoder.fetch_string(addr);
 
     *target = std::make_unique<viua::types::Function>(function_name);
 

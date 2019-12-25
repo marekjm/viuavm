@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,7 +18,6 @@
  */
 
 #include <memory>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -28,11 +27,8 @@
 
 auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register *target = nullptr, *source = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_register(addr, *this);
 
     *target = std::move(*source);
 
@@ -40,13 +36,8 @@ auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Value* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto target       = decoder.fetch_register(addr, *this);
+    auto const source = decoder.fetch_value(addr, *this);
 
     *target = source->copy();
 
@@ -54,13 +45,8 @@ auto viua::process::Process::opcopy(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Value* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_value(addr, *this);
 
     *target = source->pointer(this);
 
@@ -68,13 +54,8 @@ auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Pointer* source = nullptr;
-    std::tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Pointer>(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_value_of<viua::types::Pointer>(addr, *this);
 
     *target = std::make_unique<viua::types::Boolean>(not source->expired());
 
@@ -82,11 +63,8 @@ auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register *target = nullptr, *source = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_register(addr, *this);
 
     target->swap(*source);
 
@@ -94,9 +72,7 @@ auto viua::process::Process::opswap(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
 
     if (target->empty()) {
         throw std::make_unique<viua::types::Exception>(
@@ -108,11 +84,8 @@ auto viua::process::Process::opdelete(Op_address_type addr) -> Op_address_type
 }
 auto viua::process::Process::opisnull(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register *target = nullptr, *source = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_register(addr, *this);
 
     *target = std::make_unique<viua::types::Boolean>(source->empty());
 

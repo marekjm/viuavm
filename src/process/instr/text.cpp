@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,7 +18,6 @@
  */
 
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/process.h>
 #include <viua/support/string.h>
 #include <viua/types/boolean.h>
@@ -29,24 +28,12 @@
 
 auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
 
-    auto s  = std::string{};
-    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
-    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        viua::types::Value* o = nullptr;
-        std::tie(addr, o) =
-            viua::bytecode::decoder::operands::fetch_object(addr, this);
-        s = o->str();
-    } else {
-        ++addr;  // for operand type
-        std::tie(addr, s) =
-            viua::bytecode::decoder::operands::fetch_primitive_string(addr,
-                                                                      this);
-        s = str::strdecode(s);
-    }
+    auto ot      = viua::bytecode::codec::main::get_operand_type(addr);
+    auto const s = (ot == OT_REGISTER_INDEX or ot == OT_POINTER)
+                       ? decoder.fetch_value(addr, *this)->str()
+                       : str::strdecode(decoder.fetch_string(++addr));
 
     *target = std::make_unique<viua::types::Text>(s);
 
@@ -56,19 +43,11 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::optexteq(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
 
-    viua::types::Text *first = nullptr, *second = nullptr;
-    std::tie(addr, first) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-    std::tie(addr, second) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-
-    *target = std::make_unique<viua::types::Boolean>(*first == *second);
+    *target = std::make_unique<viua::types::Boolean>(*lhs == *rhs);
 
     return addr;
 }
@@ -78,9 +57,6 @@ static auto convert_signed_integer_to_text_size_type(
     const viua::types::Text* text,
     const int64_t signed_index) -> viua::types::Text::size_type
 {
-    /*
-     *  Cast jugglery to satisfy Clang++ with -Wsign-conversion enabled.
-     */
     viua::types::Text::size_type index = 0;
     if (signed_index < 0) {
         index = (text->size()
@@ -93,24 +69,14 @@ static auto convert_signed_integer_to_text_size_type(
 
 auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto text   = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto index  = decoder.fetch_value_of<viua::types::Integer>(addr, *this);
 
-    viua::types::Text* source_text = nullptr;
-    std::tie(addr, source_text) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
+    auto working_index =
+        convert_signed_integer_to_text_size_type(text, index->as_integer());
 
-    viua::types::Integer* index = nullptr;
-    std::tie(addr, index) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Integer>(addr, this);
-
-    auto working_index = convert_signed_integer_to_text_size_type(
-        source_text, index->as_integer());
-
-    *target =
-        std::make_unique<viua::types::Text>(source_text->at(working_index));
+    *target = std::make_unique<viua::types::Text>(text->at(working_index));
 
     return addr;
 }
@@ -118,22 +84,11 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::optextsub(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Text* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-
-    viua::types::Integer *first_index = nullptr, *last_index = nullptr;
-    std::tie(addr, first_index) =
-        viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Integer>(addr, this);
-    std::tie(addr, last_index) =
-        viua::bytecode::decoder::operands::fetch_object_of<
-            viua::types::Integer>(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto first_index =
+        decoder.fetch_value_of<viua::types::Integer>(addr, *this);
+    auto last_index = decoder.fetch_value_of<viua::types::Integer>(addr, *this);
 
     auto working_first_index = convert_signed_integer_to_text_size_type(
         source, first_index->as_integer());
@@ -150,14 +105,8 @@ auto viua::process::Process::optextsub(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::optextlength(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Text* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto source = decoder.fetch_value_of<viua::types::Text>(addr, *this);
 
     *target = std::make_unique<viua::types::Integer>(source->signed_size());
 
@@ -168,19 +117,9 @@ auto viua::process::Process::optextlength(Op_address_type addr)
 auto viua::process::Process::optextcommonprefix(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Text* lhs = nullptr;
-    std::tie(addr, lhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-
-    viua::types::Text* rhs = nullptr;
-    std::tie(addr, rhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
 
     *target = std::make_unique<viua::types::Integer>(
         static_cast<int64_t>(lhs->common_prefix(*rhs)));
@@ -192,19 +131,9 @@ auto viua::process::Process::optextcommonprefix(Op_address_type addr)
 auto viua::process::Process::optextcommonsuffix(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Text* lhs = nullptr;
-    std::tie(addr, lhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-
-    viua::types::Text* rhs = nullptr;
-    std::tie(addr, rhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
 
     *target = std::make_unique<viua::types::Integer>(
         static_cast<int64_t>(lhs->common_suffix(*rhs)));
@@ -216,19 +145,9 @@ auto viua::process::Process::optextcommonsuffix(Op_address_type addr)
 auto viua::process::Process::optextconcat(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Text* lhs = nullptr;
-    std::tie(addr, lhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
-
-    viua::types::Text* rhs = nullptr;
-    std::tie(addr, rhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(
-            addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::Text>(addr, *this);
 
     *target = std::make_unique<viua::types::Text>((*lhs) + (*rhs));
 

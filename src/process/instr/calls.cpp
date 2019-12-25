@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018, 2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,7 +18,6 @@
  */
 
 #include <memory>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
@@ -27,21 +26,14 @@
 #include <viua/types/integer.h>
 #include <viua/types/reference.h>
 
-using viua::bytecode::decoder::operands::fetch_and_advance_addr;
-using viua::bytecode::decoder::operands::fetch_optional_and_advance_addr;
-using viua::bytecode::decoder::operands::fetch_register;
-using viua::bytecode::decoder::operands::fetch_register_index;
-using Register_index = viua::internals::types::register_index;
-
 auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type
 {
     /** Create new frame for function calls.
      */
-    auto const arguments = fetch_and_advance_addr<Register_index>(
-        fetch_register_index, addr, this);
+    auto const arguments = decoder.fetch_register_index(addr);
 
     // FIXME: ignore number of local registers, but it is still encoded
-    fetch_and_advance_addr<Register_index>(fetch_register_index, addr, this);
+    decoder.fetch_register_index(addr);
 
     request_new_frame(arguments);
 
@@ -52,12 +44,8 @@ auto viua::process::Process::opparam(Op_address_type addr) -> Op_address_type
 {
     /** Run param instruction.
      */
-    auto const parameter_no_operand_index =
-        fetch_and_advance_addr<Register_index>(
-            fetch_register_index, addr, this);
-
-    auto const source = fetch_and_advance_addr<viua::types::Value*>(
-        viua::bytecode::decoder::operands::fetch_object, addr, this);
+    auto const parameter_no_operand_index = decoder.fetch_register_index(addr);
+    auto const source                     = decoder.fetch_value(addr, *this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
         throw std::make_unique<viua::types::Exception>(
@@ -76,11 +64,8 @@ auto viua::process::Process::oppamv(Op_address_type addr) -> Op_address_type
 {
     /** Run pamv instruction.
      */
-    auto const parameter_no_operand_index =
-        fetch_and_advance_addr<Register_index>(
-            fetch_register_index, addr, this);
-    auto const source = fetch_and_advance_addr<viua::kernel::Register*>(
-        fetch_register, addr, this);
+    auto const parameter_no_operand_index = decoder.fetch_register_index(addr);
+    auto const source                     = decoder.fetch_register(addr, *this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
         throw std::make_unique<viua::types::Exception>(
@@ -100,12 +85,8 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type
 {
     /** Run arg instruction.
      */
-    auto const target =
-        fetch_optional_and_advance_addr<viua::kernel::Register*>(
-            fetch_register, addr, this);
-    auto const parameter_no_operand_index =
-        fetch_and_advance_addr<Register_index>(
-            fetch_register_index, addr, this);
+    auto const target = decoder.fetch_register_or_void(addr, *this);
+    auto const parameter_no_operand_index = decoder.fetch_register_index(addr);
 
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
         auto oss = std::ostringstream{};
@@ -126,32 +107,24 @@ auto viua::process::Process::oparg(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::opallocate_registers(Op_address_type addr)
     -> Op_address_type
 {
-    auto const [addr_, register_set, no_of_registers] =
-        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr,
-                                                                         this);
-    static_cast<void>(register_set);
+    auto const no_of_registers = decoder.fetch_register_index(addr);
 
     auto allocated =
         std::make_unique<viua::kernel::Register_set>(no_of_registers);
     stack->back()->set_local_register_set(std::move(allocated));
 
-    return addr_;
+    return addr;
 }
 
 auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type
 {
-    auto const return_register =
-        fetch_optional_and_advance_addr<viua::kernel::Register*>(
-            fetch_register, addr, this);
+    auto const return_register = decoder.fetch_register_or_void(addr, *this);
 
     auto call_name = std::string{};
-    auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto ot        = viua::bytecode::codec::main::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        auto const fn = fetch_and_advance_addr<viua::types::Function*>(
-            viua::bytecode::decoder::operands::fetch_object_of<
-                viua::types::Function>,
-            addr,
-            this);
+        auto const fn =
+            decoder.fetch_value_of<viua::types::Function>(addr, *this);
 
         call_name = fn->name();
 
@@ -160,8 +133,7 @@ auto viua::process::Process::opcall(Op_address_type addr) -> Op_address_type
                 static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
     } else {
-        call_name = fetch_and_advance_addr<std::string>(
-            viua::bytecode::decoder::operands::fetch_atom, addr, this);
+        call_name = decoder.fetch_string(addr);
     }
 
     auto const is_native  = attached_scheduler->is_native_function(call_name);
@@ -201,13 +173,10 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
     stack->state_of(viua::process::Stack::STATE::RUNNING);
 
     auto call_name = std::string{};
-    auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto ot        = viua::bytecode::codec::main::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        auto const fn = fetch_and_advance_addr<viua::types::Function*>(
-            viua::bytecode::decoder::operands::fetch_object_of<
-                viua::types::Function>,
-            addr,
-            this);
+        auto const fn =
+            decoder.fetch_value_of<viua::types::Function>(addr, *this);
 
         call_name = fn->name();
 
@@ -216,8 +185,7 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
                 static_cast<viua::types::Closure*>(fn)->give());
         }
     } else {
-        call_name = fetch_and_advance_addr<decltype(call_name)>(
-            viua::bytecode::decoder::operands::fetch_atom, addr, this);
+        call_name = decoder.fetch_string(addr);
     }
 
     auto const is_native  = attached_scheduler->is_native_function(call_name);
@@ -247,13 +215,10 @@ auto viua::process::Process::optailcall(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type
 {
     auto call_name = std::string{};
-    auto ot        = viua::bytecode::decoder::operands::get_operand_type(addr);
+    auto ot        = viua::bytecode::codec::main::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        auto const fn = fetch_and_advance_addr<viua::types::Function*>(
-            viua::bytecode::decoder::operands::fetch_object_of<
-                viua::types::Function>,
-            addr,
-            this);
+        auto const fn =
+            decoder.fetch_value_of<viua::types::Function>(addr, *this);
 
         call_name = fn->name();
 
@@ -262,8 +227,7 @@ auto viua::process::Process::opdefer(Op_address_type addr) -> Op_address_type
                 static_cast<viua::types::Closure*>(fn)->give());
         }
     } else {
-        call_name = fetch_and_advance_addr<decltype(call_name)>(
-            viua::bytecode::decoder::operands::fetch_atom, addr, this);
+        call_name = decoder.fetch_string(addr);
     }
 
     auto const is_native  = attached_scheduler->is_native_function(call_name);
@@ -308,7 +272,7 @@ auto viua::process::Process::opreturn(Op_address_type addr) -> Op_address_type
     addr = stack->back()->ret_address();
 
     std::unique_ptr<viua::types::Value> returned;
-    viua::kernel::Register* return_register = stack->back()->return_register;
+    auto return_register = stack->back()->return_register;
     if (return_register != nullptr) {
         returned = std::move(stack->return_value);
     }

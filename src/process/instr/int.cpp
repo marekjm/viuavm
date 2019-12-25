@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,7 +21,6 @@
 #include <memory>
 #include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -31,47 +30,29 @@
 
 auto viua::process::Process::opizero(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    *target = std::make_unique<viua::types::Integer>(0);
+    *decoder.fetch_register(addr, *this) =
+        std::make_unique<viua::types::Integer>(0);
     return addr;
 }
 
 auto viua::process::Process::opinteger(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target      = decoder.fetch_register(addr, *this);
+    auto const value = decoder.fetch_i32(addr);
 
-    int integer = 0;
-    std::tie(addr, integer) =
-        viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
-
-    *target = std::make_unique<viua::types::Integer>(integer);
+    *target = std::make_unique<viua::types::Integer>(value);
 
     return addr;
 }
 
 auto viua::process::Process::opiinc(Op_address_type addr) -> Op_address_type
 {
-    viua::types::Integer* target{nullptr};
-    std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Integer>(addr, this);
-
-    target->increment();
-
+    decoder.fetch_value_of<viua::types::Integer>(addr, *this)->increment();
     return addr;
 }
 
 auto viua::process::Process::opidec(Op_address_type addr) -> Op_address_type
 {
-    viua::types::Integer* target{nullptr};
-    std::tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<
-        viua::types::Integer>(addr, this);
-
-    target->decrement();
-
+    decoder.fetch_value_of<viua::types::Integer>(addr, *this)->decrement();
     return addr;
 }

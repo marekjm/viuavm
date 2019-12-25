@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2016-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,7 +22,6 @@
 #include <memory>
 #include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -45,19 +44,9 @@ template<typename OpType, OpType action>
 static auto alu_impl(Op_address_type addr, viua::process::Process* process)
     -> Op_address_type
 {
-    auto target = dumb_ptr<viua::kernel::Register>{nullptr};
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, process);
-
-    auto lhs = dumb_ptr<Number>{nullptr};
-    std::tie(addr, lhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<Number>(addr,
-                                                                   process);
-
-    auto rhs = dumb_ptr<Number>{nullptr};
-    std::tie(addr, rhs) =
-        viua::bytecode::decoder::operands::fetch_object_of<Number>(addr,
-                                                                   process);
+    auto target = process->decoder.fetch_register(addr, *process);
+    auto lhs    = process->decoder.fetch_value_of<Number>(addr, *process);
+    auto rhs    = process->decoder.fetch_value_of<Number>(addr, *process);
 
     *target = (lhs->*action)(*rhs);
 

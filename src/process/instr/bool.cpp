@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,7 +19,6 @@
 
 #include <functional>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
@@ -28,13 +27,8 @@
 
 auto viua::process::Process::opnot(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::Value* source = nullptr;
-    std::tie(addr, source) =
-        viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto target       = decoder.fetch_register(addr, *this);
+    auto const source = decoder.fetch_value(addr, *this);
 
     *target = std::make_unique<viua::types::Boolean>(not source->boolean());
 
@@ -46,18 +40,12 @@ template<typename Oper>
 static auto binary_logical_op(Addr_type addr, viua::process::Process* proc)
     -> Addr_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, proc);
-
-    viua::types::Value *first = nullptr, *second = nullptr;
-    std::tie(addr, first) =
-        viua::bytecode::decoder::operands::fetch_object(addr, proc);
-    std::tie(addr, second) =
-        viua::bytecode::decoder::operands::fetch_object(addr, proc);
+    auto target    = proc->decoder.fetch_register(addr, *proc);
+    auto const lhs = proc->decoder.fetch_value(addr, *proc);
+    auto const rhs = proc->decoder.fetch_value(addr, *proc);
 
     *target = std::make_unique<viua::types::Boolean>(
-        Oper{}(first->boolean(), second->boolean()));
+        Oper{}(lhs->boolean(), rhs->boolean()));
 
     return addr;
 }

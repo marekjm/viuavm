@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+;   Copyright (C) 2015-2018, 2020 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -40,13 +40,13 @@
     allocate_registers %5 local
 
     frame ^[(copy %0 arguments (string %1 local "Hello concurrent World! (1)") local)]
-    process %3 local print_lazy/1
+    process %2 local print_lazy/1
 
-    frame ^[(copy %0 arguments (string %2 local "Hello concurrent World! (2)") local)]
+    frame ^[(copy %0 arguments (string %3 local "Hello concurrent World! (2)") local)]
     process %4 local print_eager/1
 
     ; join processes
-    join void %3 local
+    join void %2 local
     join void %4 local
 
     izero %0 local

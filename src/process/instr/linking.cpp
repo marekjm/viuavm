@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2018, 2019 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,6 @@
 #include <cstdlib>
 #include <dlfcn.h>
 #include <sys/stat.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
@@ -29,11 +28,6 @@
 
 auto viua::process::Process::opimport(Op_address_type addr) -> Op_address_type
 {
-    /** Run import instruction.
-     */
-    auto module = std::string{};
-    std::tie(addr, module) =
-        viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    attached_scheduler->load_module(module);
+    attached_scheduler->load_module(decoder.fetch_string(addr));
     return addr;
 }

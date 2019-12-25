@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2019 Marek Marecki
+ *  Copyright (C) 2019, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,6 @@
 #include <iostream>
 #include <memory>
 #include <unistd.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/process.h>
 #include <viua/scheduler/process.h>
 #include <viua/types/integer.h>
@@ -30,17 +29,9 @@
 
 auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::kernel::Register* porty = nullptr;
-    std::tie(addr, porty) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::kernel::Register* limity = nullptr;
-    std::tie(addr, limity) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto porty  = decoder.fetch_register(addr, *this);
+    auto limity = decoder.fetch_register(addr, *this);
 
     if (dynamic_cast<viua::types::Integer*>(porty->get())) {
         auto port = std::make_unique<viua::types::IO_fd>(
@@ -58,17 +49,9 @@ auto viua::process::Process::op_io_read(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::op_io_write(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::kernel::Register* porty = nullptr;
-    std::tie(addr, porty) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    auto data = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    std::tie(addr, data) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto porty  = decoder.fetch_register(addr, *this);
+    auto data   = decoder.fetch_register(addr, *this);
 
     if (dynamic_cast<viua::types::Integer*>(porty->get())) {
         auto port = std::make_unique<viua::types::IO_fd>(
@@ -86,13 +69,8 @@ auto viua::process::Process::op_io_write(Op_address_type addr)
 auto viua::process::Process::op_io_close(Op_address_type addr)
     -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    viua::types::IO_port* port = nullptr;
-    std::tie(addr, port) = viua::bytecode::decoder::operands::fetch_object_of<
-        std::remove_pointer<decltype(port)>::type>(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
+    auto port   = decoder.fetch_value_of<viua::types::IO_port>(addr, *this);
 
     *target = port->close(attached_scheduler->kernel());
 
@@ -115,24 +93,9 @@ auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
      */
     auto return_addr = Op_address_type{addr - 1};
 
-    auto target = viua::util::memory::dumb_ptr<viua::kernel::Register>{nullptr};
-    auto const target_is_void =
-        viua::bytecode::decoder::operands::is_void(addr);
-    if (not target_is_void) {
-        std::tie(addr, target) =
-            viua::bytecode::decoder::operands::fetch_register(addr, this);
-    } else {
-        addr = viua::bytecode::decoder::operands::fetch_void(addr);
-    }
-
-    viua::types::IO_request* request = nullptr;
-    std::tie(addr, request) =
-        viua::bytecode::decoder::operands::fetch_object_of<
-            std::remove_pointer<decltype(request)>::type>(addr, this);
-
-    viua::internals::types::timeout timeout = 0;
-    std::tie(addr, timeout) =
-        viua::bytecode::decoder::operands::fetch_timeout(addr, this);
+    auto target  = decoder.fetch_register_or_void(addr, *this);
+    auto request = decoder.fetch_value_of<viua::types::IO_request>(addr, *this);
+    auto const timeout = decoder.fetch_timeout(addr);
 
     if (timeout and not timeout_active) {
         waiting_until  = (std::chrono::steady_clock::now()
@@ -146,7 +109,7 @@ auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
     if (attached_scheduler->io_complete(request->id())) {
         auto result = attached_scheduler->io_result(request->id());
         if (target) {
-            *target = std::move(result);
+            **target = std::move(result);
         }
 
         timeout_active      = false;
@@ -169,12 +132,8 @@ auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
 auto viua::process::Process::op_io_cancel(Op_address_type addr)
     -> Op_address_type
 {
-    viua::types::IO_request* request = nullptr;
-    std::tie(addr, request) =
-        viua::bytecode::decoder::operands::fetch_object_of<
-            std::remove_pointer<decltype(request)>::type>(addr, this);
-
-    cancel_io(request->id());
+    cancel_io(
+        decoder.fetch_value_of<viua::types::IO_request>(addr, *this)->id());
 
     return addr;
 }

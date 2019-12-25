@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2018 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,7 +18,6 @@
  */
 
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/decoder/operands.h>
 #include <viua/kernel/kernel.h>
 #include <viua/support/string.h>
 #include <viua/types/boolean.h>
@@ -29,15 +28,10 @@
 
 auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type
 {
-    viua::kernel::Register* target = nullptr;
-    std::tie(addr, target) =
-        viua::bytecode::decoder::operands::fetch_register(addr, this);
+    auto target = decoder.fetch_register(addr, *this);
 
     ++addr;  // for operand type
-
-    auto s = std::string{};
-    std::tie(addr, s) =
-        viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+    auto const s = decoder.fetch_string(addr);
 
     *target = std::make_unique<viua::types::String>(str::strdecode(s));
 
