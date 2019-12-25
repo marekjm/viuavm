@@ -26,7 +26,7 @@ eq:
 
 atom:
     +fetch_register
-    fetch_primitive_string
+    string_literal
 
 atomeq:
     +fetch_register
@@ -43,7 +43,7 @@ integer_of_bits:
 
 bits:
     +fetch_register
-    fetch_object_of<Integer> | bits_literal
+    bits_literal | fetch_object_of<Integer>
 
 bitand:
 bitor:
@@ -70,7 +70,7 @@ shl:
 shr:
 ashl:
 ashr:
-    +fetch_register | void
+    void | +fetch_register
     fetch_object_of<Bits>
     fetch_object_of<Integer>
 
@@ -127,7 +127,7 @@ pamv:
     <fetch_register
 
 arg:
-    >fetch_register | void
+    void | >fetch_register
     <fetch_register_index
 
 allocate_registers:
@@ -135,12 +135,12 @@ allocate_registers:
                          # allocated, not as a real address
 
 call:
-    +fetch_register | void
-    fetch_register | string_literal
+    void | +fetch_register
+    string_literal | fetch_register
 
 tailcall:
 defer:
-    fetch_register | string_literal
+    string_literal | fetch_register
 
 return:
     none
@@ -174,11 +174,11 @@ function:
     string_literal
 
 process:
-    +fetch_register | void
-    fetch_object_of<Function> | string_literal
+    void | +fetch_register
+    string_literal | fetch_object_of<Function>
 
 join:
-    +fetch_register | void
+    void | +fetch_register
     fetch_object_of<Process>
     fetch_timeout
 
@@ -187,7 +187,7 @@ send:
     <fetch_register
 
 receive:
-    +fetch_register | void
+    void | +fetch_register
     fetch_timeout
 
 watchdog:
@@ -227,7 +227,7 @@ io_close:
     fetch_object_of<IO_port>
 
 io_wait:
-    +fetch_register | void
+    void | +fetch_register
     fetch_object_of<IO_request>
     fetch_timeout
 
@@ -277,12 +277,12 @@ structinsert:
     <fetch_register | fetch_object
 
 structremove:
-    >fetch_register | void
+    void | >fetch_register
     ~fetch_object_of<Struct>
     fetch_object_of<Atom>
 
 structat:
-    +fetch_register | void
+    void | +fetch_register
     fetch_object_of<Struct>
     fetch_object_of<Atom>
 
@@ -298,7 +298,7 @@ catch:
     string_literal
 
 draw:
-    >fetch_register | void
+    void | >fetch_register
 
 enter:
     string_literal
@@ -343,7 +343,7 @@ vector:
 vinsert:
     ~fetch_object_of<Vector>
     fetch_register
-    fetch_object_of<Integer> | void
+    void | fetch_object_of<Integer>
 
 vpush:
     ~fetch_object_of<Vector>
@@ -352,7 +352,7 @@ vpush:
 vpop:
     >fetch_register | void
     ~fetch_object_of<Vector>
-    fetch_object_of<Integer> | void
+    void | fetch_object_of<Integer>
 
 vat:
     +fetch_register
