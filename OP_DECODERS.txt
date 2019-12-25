@@ -309,6 +309,32 @@ throw:
 leave:
     none
 
+text:
+    +fetch_register
+    string_literal | fetch_object
+
+texteq:
+textcommonprefix:
+textcommonsuffix:
+textconcat:
+    +fetch_register
+    fetch_object_of<Text>
+    fetch_object_of<Text>
+
+textat:
+    +fetch_register
+    fetch_object_of<Text>
+    fetch_object_of<Integer>
+
+textsub:
+    +fetch_register
+    fetch_object_of<Integer>
+    fetch_object_of<Integer>
+
+textlength:
+    +fetch_register
+    fetch_object_of<Text>
+
 --------------------------------------------------------------------------------
 
 fetch_register: fetch a value allowing r/w access to a register
