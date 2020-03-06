@@ -27,6 +27,8 @@ notify-send --urgency normal --expire-time 4000 'Viua VM recompilation engine' "
 
 OUTPUT_FILE=/tmp/viuavm_compile
 STATUS_FILE=/tmp/viuavm_compile_exit_status
+OK_NOTIF_FILE=/tmp/viuavm_compile_success_notification
+ERR_NOTIF_FILE=/tmp/viuavm_compile_error_notification
 
 # Pipe all the output to file (to allow parsing) *AND* to stdout so that you can see what
 # happened without having to open the log file.
@@ -36,6 +38,8 @@ ELAPSED=$(tail -n 1 $OUTPUT_FILE)
 # Notify the developer about success or failure of the build.
 if [[ $(cat $STATUS_FILE) -eq 0 ]]; then
     notify-send --urgency normal --expire-time 4000 'Viua VM recompilation engine' "Recompiled code\n$ELAPSED"
+    dd if=/dev/urandom count=1 2>/dev/null | sha1sum > $OK_NOTIF_FILE
 else
     notify-send --urgency critical --expire-time 5000 'Viua VM recompilation engine' "Compilation failed\n$ELAPSED"
+    dd if=/dev/urandom count=1 2>/dev/null | sha1sum > $ERR_NOTIF_FILE
 fi
