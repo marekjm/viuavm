@@ -12,7 +12,7 @@
  *  |                 ||    |      |    |       \          ||       |  |       |
  *  |_________________||____|      |____|        \_________||_______|  |_______|
  *
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -33,7 +33,7 @@
 #ifndef VIUA_VERSION_H
 #define VIUA_VERSION_H
 
-constexpr auto VERSION = "0.9.0";
-constexpr auto MICRO   = "2592";
+constexpr auto VERSION = "0.10.0";
+constexpr auto MICRO   = "0";
 
 #endif
