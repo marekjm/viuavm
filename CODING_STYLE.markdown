@@ -21,11 +21,15 @@ Class, struct, and enum names
 
     struct A_type;
     class TCP_IP_packet;
-    class XML_HTTP_request;
     enum class An_enum;
 
+    struct scope_guard;
+    class big_endian;
+
 Always use `Snake_case` with capitalised first word; this avoids unreadable
-messes such as `TCPIPPacket`, or inconsistencies such as `XMLHttpRequest`.
+messes such as `TCPIPPacket`. For utility classes (i.e. those that could be used
+outside of the VM's codebase as they are general purpose) can follow the style
+used by the C++ standard library.
 
 Namespace names
 ---------------
@@ -43,7 +47,8 @@ Variable and parameter names
     auto tcp_ip_packet = TCP_IP_packet{};
     auto const listening_port = int{4242};
 
-Always use all-lowercase `snake_case`.
+Always use all-lowercase `snake_case`. Follow the "Almost Always Auto" rule.
+Make as many variables constant as possible.
 
 Constant names
 --------------
@@ -97,6 +102,36 @@ Use one declaration per line, unless using destructuring bindings.
 
     // also good
     auto [ x, y ] = some_fn();
+
+
+Copyright information
+---------------------
+
+Always add a copyright note at the top of any file.
+
+List years in which a change was made to the file. If there are only two years in
+which the file has been changed - list them explicitly:
+
+    Copyright (C) 2019, 2020 John Doe <john.doe@example.com>
+
+Longer periods can be abbreviated; instead of "2017, 2018, 2019, 2020" you can
+write the copyright note like this:
+
+    Copyright (C) 2017-2020 John Doe <john.doe@example.com>
+
+You can mix and match:
+
+    Copyright (C) 2015, 2017-2020 John Doe <john.doe@example.com>
+    Copyright (C) 2016 Jane Doe <jane.doe@example.com>
+
+Or write it in several lines:
+
+    Copyright (C) 2017-2020 John Doe <john.doe@example.com>
+    Copyright (C) 2016 Jane Doe <jane.doe@example.com>
+    Copyright (C) 2015 John Doe <john.doe@example.com>
+
+Most recent change on top. In case several people made a change in the same
+year, use alphabetic ordering.
 
 ----
 

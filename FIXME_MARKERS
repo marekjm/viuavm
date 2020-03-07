@@ -1,0 +1,31 @@
+Always leave a FIXME with a comment what *exactly* do you want to be fixed here.
+I guarantee you won't remember what you meant by an empty FIXME.
+
+There are several FIXME marks to be used in the codebase. DO NOT use any other
+way of marking places for fixing or you will make it unnecessarily hard to grep
+for them.
+
+The list if markers is:
+
+- TODO: for things to do, e.g. small features or improvements
+- FIXME: for bugs and cleanups
+
+You can tag FIXME markers with these tags:
+
+- URGENT: for bugs and cleanups that need immediate attention
+- BRAINDAMAGE: for serious fuck-ups or bugs, or places where the design is so
+  bad that it gives you brain damage
+
+ALWAYS use a single line-style comment for FIXME marks, even if you need several
+lines to explain what needs to be done. Leave a signature and a date - code gets
+moved around and "blame" tools sometimes show different people than the original
+author.
+
+A good example of a FIXME mark:
+
+    // FIXME This line causes the code to go *kaboom* if the process is asleep
+    // due to the fact that a bar is fooed in that state. (John Doe; 2020-01-01)
+
+A bad example of a FIXME mark:
+
+    // FIXME

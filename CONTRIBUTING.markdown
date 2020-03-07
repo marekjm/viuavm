@@ -38,8 +38,8 @@ and compile the code to see if it runs.
 ```
 $ git clone --branch devel --recursive git@github.com:marekjm/viuavm.git
 $ cd viuavm/
-$ make -j 4
-$ make test     # this assumes that you have Python 3.x and Valgrind installed
+$ make -j
+$ make test
 ```
 
 If the above sequence of commands can be run without problems on your system then
