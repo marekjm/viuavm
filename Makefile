@@ -550,7 +550,6 @@ build/bin/vm/kernel: \
 	build/support/string.o \
 	build/support/env.o \
 	$(VIUA_INSTR_FILES_O) \
-	build/bytecode/decoder/operands.o \
 	$(VIUA_TYPES_FILES_O) \
 	build/cg/disassembler/disassembler.o \
 	build/assembler/util/pretty_printer.o \
