@@ -240,7 +240,7 @@ endif
 # CXX_EXTRA_FLAGS are meant to be supplied on the command line.
 CXXFLAGS=\
 		 -std=$(CXX_STANDARD) \
-		 -DVIUA_VM_COMMIT="\"$(shell git rev-parse HEAD)\"" \
+		 -DVIUA_VM_COMMIT="\"$(shell ./scripts/get_head_commit.sh)\"" \
 		 $(COMPILER_FLAGS) \
 		 $(SANITISER_FLAGS) \
 		 $(CXX_EXTRA_FLAGS)
