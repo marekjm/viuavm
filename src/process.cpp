@@ -211,6 +211,16 @@ auto viua::process::Decoder_adapter::fetch_string(Op_address_type& addr) const
     return s;
 }
 
+auto viua::process::Decoder_adapter::fetch_bits_string(
+    Op_address_type& addr) const -> std::vector<uint8_t>
+{
+    auto [next_addr, s] = decoder.decode_bits_string(addr);
+
+    addr = next_addr;
+
+    return s;
+}
+
 auto viua::process::Decoder_adapter::fetch_timeout(Op_address_type& addr) const
     -> viua::internals::types::timeout
 {
@@ -235,6 +245,16 @@ auto viua::process::Decoder_adapter::fetch_i32(Op_address_type& addr) const
     -> int32_t
 {
     auto [next_addr, v] = decoder.decode_i32(addr);
+
+    addr = next_addr;
+
+    return v;
+}
+
+auto viua::process::Decoder_adapter::fetch_bool(Op_address_type& addr) const
+    -> bool
+{
+    auto [next_addr, v] = decoder.decode_bool(addr);
 
     addr = next_addr;
 

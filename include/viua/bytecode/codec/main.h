@@ -22,7 +22,9 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <viua/bytecode/codec.h>
+#include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
 
 namespace viua { namespace bytecode { namespace codec { namespace main {
@@ -30,19 +32,44 @@ auto get_operand_type(uint8_t const* const) -> OperandType;
 auto is_void(uint8_t const* const) -> bool;
 
 struct Decoder {
+    auto decode_opcode(uint8_t const*) const
+        -> std::pair<uint8_t const*, OPCODE>;
+
     auto decode_register(uint8_t const*) const
         -> std::pair<uint8_t const*, Register_access>;
 
     auto decode_string(uint8_t const*) const
         -> std::pair<uint8_t const*, std::string>;
+    auto decode_bits_string(uint8_t const*) const
+        -> std::pair<uint8_t const*, std::vector<uint8_t>>;
     auto decode_timeout(uint8_t const*) const
         -> std::pair<uint8_t const*, timeout_type>;
 
     auto decode_f64(uint8_t const*) const -> std::pair<uint8_t const*, double>;
     auto decode_i32(uint8_t const*) const -> std::pair<uint8_t const*, int32_t>;
+    auto decode_bool(uint8_t const*) const -> std::pair<uint8_t const*, bool>;
 
     auto decode_address(uint8_t const*) const
         -> std::pair<uint8_t const*, uint64_t>;
+};
+
+struct Encoder {
+    auto encode_opcode(uint8_t*, OPCODE const) const -> uint8_t*;
+
+    auto encode_register(uint8_t*, Register_access const) const -> uint8_t*;
+    auto encode_void(uint8_t*) const -> uint8_t*;
+
+    auto encode_string(uint8_t*, std::string const) const -> uint8_t*;
+    auto encode_raw_string(uint8_t*, std::string const) const -> uint8_t*;
+    auto encode_bits_string(uint8_t*, std::vector<uint8_t> const) const
+        -> uint8_t*;
+    auto encode_timeout(uint8_t*, timeout_type const) const -> uint8_t*;
+
+    auto encode_f64(uint8_t*, double const) const -> uint8_t*;
+    auto encode_i32(uint8_t*, int32_t const) const -> uint8_t*;
+    auto encode_bool(uint8_t*, bool const) const -> uint8_t*;
+
+    auto encode_address(uint8_t*, uint64_t const) const -> uint8_t*;
 };
 }}}}  // namespace viua::bytecode::codec::main
 

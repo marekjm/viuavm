@@ -26,11 +26,11 @@
 
 
 namespace viua { namespace cg { namespace tools {
-auto calculate_bytecode_size_of_first_n_instructions2(
+auto calculate_bytecode_size_of_first_n_instructions(
     std::vector<viua::cg::lex::Token> const& tokens,
     std::remove_reference<decltype(tokens)>::type::size_type const limit)
     -> viua::internals::types::bytecode_size;
-auto calculate_bytecode_size2(std::vector<viua::cg::lex::Token> const&)
+auto calculate_bytecode_size(std::vector<viua::cg::lex::Token> const&)
     -> viua::internals::types::bytecode_size;
 }}}  // namespace viua::cg::tools
 

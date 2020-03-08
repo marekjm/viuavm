@@ -79,11 +79,8 @@ auto viua::process::Process::opbits(Op_address_type addr) -> Op_address_type
 
     auto ot = viua::bytecode::codec::main::get_operand_type(addr);
     if (ot == OT_BITS) {
-        ++addr;  // for operand type
-        auto bits_size = load_aligned<viua::internals::types::bits_size>(addr);
-        addr += sizeof(bits_size);
-        *target = std::make_unique<viua::types::Bits>(bits_size, addr);
-        addr += bits_size;
+        auto data = decoder.fetch_bits_string(addr);
+        *target   = std::make_unique<viua::types::Bits>(std::move(data));
     } else {
         auto n  = decoder.fetch_value_of<viua::types::Integer>(addr, *this);
         *target = std::make_unique<viua::types::Bits>(n->as_unsigned());
@@ -161,12 +158,8 @@ auto viua::process::Process::opbitset(Op_address_type addr) -> Op_address_type
 
     bool value = false;
     auto ot    = viua::bytecode::codec::main::get_operand_type(addr);
-    if (ot == OT_TRUE) {
-        ++addr;  // for operand type
-        value = true;
-    } else if (ot == OT_FALSE) {
-        ++addr;  // for operand type
-        value = false;
+    if (ot & OperandType::OT_BOOL) {
+        value = decoder.fetch_bool(addr);
     } else {
         auto const x =
             decoder.fetch_value_of<viua::types::Boolean>(addr, *this);

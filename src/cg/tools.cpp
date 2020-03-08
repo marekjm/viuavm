@@ -1042,7 +1042,7 @@ static auto size_of_halt(TokenVector const&, TokenVector::size_type i)
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 
-auto calculate_bytecode_size_of_first_n_instructions2(
+auto calculate_bytecode_size_of_first_n_instructions(
     TokenVector const& tokens,
     const std::remove_reference<decltype(tokens)>::type::size_type
         instructions_counter) -> bytecode_size_type
@@ -1514,9 +1514,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
 
     return bytes;
 }
-auto calculate_bytecode_size2(TokenVector const& tokens) -> bytecode_size_type
+auto calculate_bytecode_size(TokenVector const& tokens) -> bytecode_size_type
 {
-    return calculate_bytecode_size_of_first_n_instructions2(tokens,
-                                                            tokens.size());
+    return calculate_bytecode_size_of_first_n_instructions(tokens,
+                                                           tokens.size());
 }
 }}}  // namespace viua::cg::tools

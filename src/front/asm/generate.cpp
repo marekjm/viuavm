@@ -171,7 +171,7 @@ static auto map_invocable_addresses(
     for (auto const& name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
-            starting_instruction += viua::cg::tools::calculate_bytecode_size2(
+            starting_instruction += viua::cg::tools::calculate_bytecode_size(
                 blocks.tokens.at(name));
         } catch (std::out_of_range const& e) {
             throw("could not find block '" + name + "'");
@@ -245,7 +245,7 @@ static auto write_code_blocks_section(
          */
         try {
             block_bodies_size_so_far +=
-                viua::cg::tools::calculate_bytecode_size2(
+                viua::cg::tools::calculate_bytecode_size(
                     blocks.tokens.at(name));
         } catch (std::out_of_range const& e) {
             throw("could not find block '" + name
@@ -559,7 +559,7 @@ auto generate(std::vector<Token> const& tokens,
         block_addresses = map_invocable_addresses(starting_instruction, blocks);
         function_addresses =
             map_invocable_addresses(starting_instruction, functions);
-        bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
+        bytes = viua::cg::tools::calculate_bytecode_size(tokens);
     } catch (std::string const& e) {
         throw("bytecode size calculation failed: " + e);
     }
@@ -1119,7 +1119,7 @@ auto generate(std::vector<Token> const& tokens,
         }
         auto fun_bytes = viua::internals::types::bytecode_size{0};
         try {
-            fun_bytes = viua::cg::tools::calculate_bytecode_size2(
+            fun_bytes = viua::cg::tools::calculate_bytecode_size(
                 blocks.tokens.at(name));
             if (flags.verbose) {
                 std::cout << " (" << fun_bytes << " bytes at byte "
@@ -1183,7 +1183,7 @@ auto generate(std::vector<Token> const& tokens,
 
         auto fun_bytes = viua::internals::types::bytecode_size{0};
         try {
-            fun_bytes = viua::cg::tools::calculate_bytecode_size2(
+            fun_bytes = viua::cg::tools::calculate_bytecode_size(
                 functions.tokens.at(name));
         } catch (std::string const& e) {
             throw("failed function size count (during pre-assembling): " + e);

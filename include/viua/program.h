@@ -26,9 +26,40 @@
 #include <tuple>
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/cg/bytecode/instructions.h>
+#include <viua/bytecode/codec/main.h>
 #include <viua/cg/lex.h>
 
+
+enum class Integer_operand_type {
+    PLAIN = 0,
+    INDEX,
+    REGISTER_REFERENCE,
+    POINTER_DEREFERENCE,
+    VOID,
+};
+
+struct int_op {
+    Integer_operand_type type;
+    viua::internals::Register_sets rs_type;
+    viua::internals::types::plain_int value;
+
+    int_op();
+    int_op(Integer_operand_type, viua::internals::types::plain_int = 0);
+    int_op(Integer_operand_type,
+           viua::internals::Register_sets,
+           viua::internals::types::plain_int = 0);
+    int_op(viua::internals::types::plain_int);
+};
+struct timeout_op {
+    Integer_operand_type type;
+    viua::internals::types::timeout value;
+
+    timeout_op();
+    timeout_op(Integer_operand_type, viua::internals::types::timeout = 0);
+    timeout_op(viua::internals::types::timeout);
+};
+using byte_op = std::tuple<bool, viua::internals::types::byte>;
+using float_op = std::tuple<bool, float>;
 
 enum JUMPTYPE {
     JMP_RELATIVE = 0,
@@ -56,6 +87,8 @@ class Program {
      * offsets change.
      */
     std::vector<viua::internals::types::byte*> branches;
+
+    viua::bytecode::codec::main::Encoder encoder;
 
   public:
     // instruction insertion interface

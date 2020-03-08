@@ -17,7 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cstdint>
 #include <cstring>
+#include <string>
+#include <vector>
 #include <viua/bytecode/codec/main.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/util/memory.h>
@@ -72,6 +76,23 @@ auto Decoder::decode_string(uint8_t const* addr) const
     return {addr + s.size() + 1, std::move(s)};
 }
 
+auto Decoder::decode_bits_string(uint8_t const* addr) const
+    -> std::pair<uint8_t const*, std::vector<uint8_t>>
+{
+    ++addr;  // FIXME skip operand type, assume it's correct (OT_BITS)
+
+    auto const size = viua::util::memory::load_aligned<uint64_t>(addr);
+    addr += sizeof(decltype(size));
+
+    auto data = std::vector<uint8_t>{};
+    data.reserve(size);
+    std::copy(addr, addr + size, std::back_inserter(data));
+    std::reverse(data.begin(), data.end());
+    addr += size;
+
+    return {addr, std::move(data)};
+}
+
 auto Decoder::decode_timeout(uint8_t const* addr) const
     -> std::pair<uint8_t const*, timeout_type>
 {
@@ -112,6 +133,14 @@ auto Decoder::decode_i32(uint8_t const* addr) const
         addr += sizeof(v);
     }
 
+    return {addr, v};
+}
+
+auto Decoder::decode_bool(uint8_t const* addr) const
+    -> std::pair<uint8_t const*, bool>
+{
+    auto v = (static_cast<OperandType>(*addr) == OT_TRUE);
+    ++addr;
     return {addr, v};
 }
 

@@ -27,10 +27,13 @@
 
 auto viua::process::Process::opmove(Op_address_type addr) -> Op_address_type
 {
-    auto target = decoder.fetch_register(addr, *this);
+    auto target = decoder.fetch_register_or_void(addr, *this);
     auto source = decoder.fetch_register(addr, *this);
 
-    *target = std::move(*source);
+    auto value = std::move(*source);
+    if (target.has_value()) {
+        **target = std::move(value);
+    }
 
     return addr;
 }
