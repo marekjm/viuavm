@@ -1574,9 +1574,6 @@ auto normalise(std::vector<Token> source) -> std::vector<Token>
                         token,
                         "unimplemented or deprecated instruction found in user "
                         "code"});
-            case PARAM:
-            case PAMV:
-            case ARG:
             default:
                 throw viua::tooling::errors::compile_time::Error_wrapper{}
                     .append(viua::tooling::errors::compile_time::Error{

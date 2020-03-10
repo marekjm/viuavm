@@ -350,27 +350,7 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     auto const op = OPCODE(*saved_ptr);
     auto opname   = std::string{};
     try {
-        if (op == PAMV) {
-            /*
-             * PAMV is an internal instruction, not visible to the
-             * user code.
-             */
-            opname = "move";
-        } else if (op == PARAM) {
-            /*
-             * PARAM is an internal instruction, not visible to the
-             * user code.
-             */
-            opname = "copy";
-        } else if (op == ARG) {
-            /*
-             * ARG is an internal instruction, not visible to the
-             * user code.
-             */
-            opname = "move";
-        } else {
-            opname = OP_NAMES.at(op);
-        }
+        opname = OP_NAMES.at(op);
         ++ptr;
     } catch (std::out_of_range const& e) {
         auto emsg = std::ostringstream{};
@@ -542,12 +522,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
     case FRAME:
         ptr = disassemble_ri_operand(oss, ptr);
         ptr = disassemble_ri_operand(oss, ptr);
-        break;
-    case ARG:
-    case PARAM:
-    case PAMV:
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
         break;
     case SEND:
     case ITOF:

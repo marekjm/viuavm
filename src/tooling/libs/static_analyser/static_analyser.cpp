@@ -2812,16 +2812,6 @@ static auto analyse_single_arm(
 
                 break;
             }
-            case PARAM:
-            case PAMV:
-            case ARG:
-            {
-                /*
-                 * These instructions are not available to user
-                 * code. Instead, `move` and `copy` are used.
-                 */
-                break;
-            }
             case ALLOCATE_REGISTERS:
             {
                 /*

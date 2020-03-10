@@ -507,12 +507,6 @@ auto check_register_usage_for_instruction_block_impl(
             case BOOL:
                 // FIXME "bool" opcode is not even implemented
                 break;
-            case ARG:
-            case PARAM:
-            case PAMV:
-                throw invalid_syntax(
-                    instruction->tokens,
-                    "instruction internal to the VM found in user code");
             default:
                 throw invalid_syntax(
                     instruction->tokens,
