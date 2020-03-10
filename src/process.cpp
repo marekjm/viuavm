@@ -263,6 +263,10 @@ auto viua::process::Process::register_at(
             ->register_at(i);
     } else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
+    } else if (rs == viua::internals::Register_sets::PARAMETERS) {
+        return stack->back()->arguments->register_at(i);
+    } else if (rs == viua::internals::Register_sets::ARGUMENTS) {
+        return stack->frame_new->arguments->register_at(i);
     } else {
         throw std::make_unique<viua::types::Exception>(
             "unsupported register set type");
