@@ -361,21 +361,21 @@ static auto generate_entry_function(
     if (main_function == "main/0") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%0");
-        entry_function_tokens.emplace_back(0, 0, "%16");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::internals::types::byte)
+                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
-        entry_function_tokens.emplace_back(0, 0, "%16");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::internals::types::byte)
+                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "izero");
         entry_function_tokens.emplace_back(0, 0, "%0");
@@ -430,12 +430,12 @@ static auto generate_entry_function(
         // FIXME: should custom main function be allowed?
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%1");
-        entry_function_tokens.emplace_back(0, 0, "%16");
+        entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::internals::types::byte)
+                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "copy");
         entry_function_tokens.emplace_back(0, 0, "%0");

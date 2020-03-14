@@ -1018,11 +1018,10 @@ auto Program::opfunction(int_op const reg, std::string const& fn) -> Program&
     return (*this);
 }
 
-auto Program::opframe(int_op const args, int_op const locals) -> Program&
+auto Program::opframe(int_op const args) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FRAME);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(args, Integer_operand_type::INDEX));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(locals, Integer_operand_type::INDEX));
     return (*this);
 }
 

@@ -521,7 +521,6 @@ auto disassembler::instruction(viua::internals::types::byte* ptr)
         break;
     case FRAME:
         ptr = disassemble_ri_operand(oss, ptr);
-        ptr = disassemble_ri_operand(oss, ptr);
         break;
     case SEND:
     case ITOF:
