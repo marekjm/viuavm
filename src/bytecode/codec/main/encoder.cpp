@@ -59,11 +59,6 @@ auto Encoder::encode_register(uint8_t* addr, Register_access const ra) const
     }
 
     {
-        aligned_write(addr) = index;
-        addr += sizeof(index);
-    }
-
-    {
         using set_type = std::underlying_type_t<viua::internals::Register_sets>;
         switch (set) {
         case Register_set::Global:
@@ -94,6 +89,11 @@ auto Encoder::encode_register(uint8_t* addr, Register_access const ra) const
             assert(0);
         }
         addr += sizeof(set_type);
+    }
+
+    {
+        aligned_write(addr) = index;
+        addr += sizeof(index);
     }
 
     return addr;

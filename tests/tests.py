@@ -2010,13 +2010,13 @@ class AssemblerStaticAnalysisErrorTestsForNewSA(unittest.TestCase):
 
     def test_register_index_outside_of_defined_range(self):
         runTestFailsToAssembleDetailed(self, 'register_index_outside_of_defined_range.asm', [
-            '21:24: error: register index outside of defined range (max allowed register index is 4294967294)',
+            '21:24: error: register index outside of defined range (max allowed register index is 65535)',
             '20:12: error: in function main/0',
         ])
 
     def test_cannot_allocate_more_than_x_registers(self):
         runTestFailsToAssembleDetailed(self, 'cannot_allocate_more_than_x_registers.asm', [
-            '21:24: error: cannot allocate more than 4294967294 local registers',
+            '21:24: error: register index outside of defined range (max allowed register index is 65535)',
             '20:12: error: in function main/0',
         ])
 

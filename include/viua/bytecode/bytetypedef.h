@@ -28,7 +28,7 @@ typedef uint8_t byte;
 using Op_address_type = byte const*;
 
 typedef uint64_t bytecode_size;
-typedef uint32_t register_index;
+typedef uint16_t register_index;
 
 typedef uint32_t schedulers_count;
 typedef uint64_t processes_count;

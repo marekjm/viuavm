@@ -138,18 +138,33 @@ auto viua::assembler::frontend::parser::parse_operand(
         ri->add(tokens.at(i));  // add index token
 
         if (str::isnum(tok.substr(1), false)) {
+            constexpr auto max_allowed =
+                std::numeric_limits<viua::bytecode::codec::register_index_type>::max();
             try {
+                /*
+                 * We check the string value here since it is not susceptible to
+                 * wraparound. If we checked the index value we would access a
+                 * value that was potentially tainted by wraparound - which could
+                 * lead to a false sense of security here, and weird error
+                 * messages like "cannot access register 0 with 0 allocated"
+                 * while the underlined source clearly states 65536.
+                 *
+                 * Let's use std::stoull() to get an uint64_t. The range on this
+                 * type is sufficiently large that it would be unusual to exceed
+                 * it.
+                 */
+                auto const actual_tried = std::stoull(tok.substr(1));
+                if (actual_tried > max_allowed) {
+                    throw std::out_of_range{"tried to allocate too many registers"};
+                }
                 ri->index =
-                    static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
+                    static_cast<decltype(ri->index)>(actual_tried);
             } catch (std::out_of_range&) {
                 throw Invalid_syntax{
                     tokens.at(0),
                     "register index outside of defined range (max allowed "
                     "register index is "
-                        + std::to_string(
-                            std::numeric_limits<
-                                viua::internals::types::register_index>::max()
-                            - 1)
+                        + std::to_string(max_allowed)
                         + ')'};
             }
             ri->resolved = true;

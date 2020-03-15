@@ -39,7 +39,7 @@ auto check_for_unused_registers(
     if (limit.value() == 0) {
         return;
     }
-    for (auto i = limit.value() - 1;
+    for (auto i = viua::bytecode::codec::register_index_type(limit.value() - 1);
          i > viua::internals::types::register_index{0};
          --i) {
         auto index  = viua::assembler::frontend::parser::Register_index{};

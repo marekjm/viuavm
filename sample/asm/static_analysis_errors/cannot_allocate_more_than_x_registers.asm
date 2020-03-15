@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    allocate_registers %4294967295 local
+    allocate_registers %65536 local
 
     izero %0 local
     return

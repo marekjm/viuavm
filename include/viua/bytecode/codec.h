@@ -80,7 +80,7 @@ enum class Register_set : uint8_t {
     Closure_local,
 };
 
-using register_index_type = uint32_t;
+using register_index_type = uint16_t;
 using timeout_type        = uint32_t;
 
 enum class Access_specifier {

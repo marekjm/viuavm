@@ -20,7 +20,9 @@
 .function: boolean/1
     allocate_registers %2 local
 
-    move %0 local (not (not (move %1 local %0 parameters) local) local) local
+    move %1 local %0 parameters
+    not (not %1 local) local
+    move %0 local %1 local
     return
 .end
 

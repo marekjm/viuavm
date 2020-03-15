@@ -53,7 +53,7 @@ struct Operand {
 
 struct Register_index : public Operand {
     viua::internals::Access_specifier as;
-    viua::internals::types::register_index index;
+    viua::bytecode::codec::register_index_type index;
     viua::internals::Register_sets rss;
     bool resolved = false;
 };

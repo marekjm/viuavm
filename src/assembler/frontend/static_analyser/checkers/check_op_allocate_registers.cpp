@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <limits>
 #include <string>
 #include <viua/assembler/frontend/static_analyser.h>
@@ -28,17 +29,11 @@ namespace static_analyser { namespace checkers {
 auto check_op_allocate_registers(Register_usage_profile& register_usage_profile,
                                  Instruction const& instruction) -> void
 {
+    /*
+     * No error checking here, as the register range is verified at parse time.
+     * Here we only get registers in valid range, i.e. [0, 65535].
+     */
     auto const operand = get_operand<Register_index>(instruction, 0);
-
-    auto const max_register_index =
-        std::numeric_limits<viua::internals::types::register_index>::max() - 1;
-    if (operand->index > max_register_index) {
-        throw invalid_syntax(instruction.operands.at(0)->tokens,
-                             "cannot allocate more than "
-                                 + std::to_string(max_register_index)
-                                 + " local registers");
-    }
-
     register_usage_profile.allocated_registers(operand->index);
     register_usage_profile.allocated_where(operand->tokens.at(0));
 }
