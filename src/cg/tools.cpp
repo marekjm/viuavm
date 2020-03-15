@@ -135,26 +135,6 @@ static auto size_of_instruction_with_two_ri_operands_with_rs_types(
 
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
-static auto size_of_instruction_with_two_ri_operands(TokenVector const& tokens,
-                                                     TokenVector::size_type i)
-    -> std::tuple<bytecode_size_type, decltype(i)>
-{
-    auto calculated_size = bytecode_size_type{
-        sizeof(viua::internals::types::byte)};  // start with the size of a
-                                                // single opcode
-
-    auto size_increment = decltype(calculated_size){0};
-
-    // for target register
-    std::tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-    calculated_size += size_increment;
-
-    // for source register
-    std::tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-    calculated_size += size_increment;
-
-    return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
-}
 static auto size_of_instruction_with_three_ri_operands_with_rs_types(
     TokenVector const& tokens,
     TokenVector::size_type i) -> std::tuple<bytecode_size_type, decltype(i)>
@@ -744,7 +724,7 @@ static auto size_of_function(TokenVector const& tokens,
 
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
-static auto size_of_frame = size_of_instruction_with_two_ri_operands;
+static auto size_of_frame = size_of_instruction_with_one_ri_operand_with_rs_type;
 static auto size_of_call(TokenVector const& tokens, TokenVector::size_type i)
     -> std::tuple<bytecode_size_type, decltype(i)>
 {
@@ -1042,7 +1022,7 @@ static auto size_of_halt(TokenVector const&, TokenVector::size_type i)
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
 }
 
-auto calculate_bytecode_size_of_first_n_instructions2(
+auto calculate_bytecode_size_of_first_n_instructions(
     TokenVector const& tokens,
     const std::remove_reference<decltype(tokens)>::type::size_type
         instructions_counter) -> bytecode_size_type
@@ -1514,9 +1494,9 @@ auto calculate_bytecode_size_of_first_n_instructions2(
 
     return bytes;
 }
-auto calculate_bytecode_size2(TokenVector const& tokens) -> bytecode_size_type
+auto calculate_bytecode_size(TokenVector const& tokens) -> bytecode_size_type
 {
-    return calculate_bytecode_size_of_first_n_instructions2(tokens,
-                                                            tokens.size());
+    return calculate_bytecode_size_of_first_n_instructions(tokens,
+                                                           tokens.size());
 }
 }}}  // namespace viua::cg::tools

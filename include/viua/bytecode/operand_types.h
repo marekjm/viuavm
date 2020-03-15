@@ -23,40 +23,29 @@
 #include <stdint.h>
 
 enum OperandType : uint8_t {
-    OT_REGISTER_INDEX,      // register index
-    OT_REGISTER_REFERENCE,  // register reference (indirect register index)
-    OT_REGISTER_INDEX_ANNOTATED,  // register index with an annotation from
-                                  // which register set it should be taken
+    OT_REGISTER_INDEX     = 1,  // register index
+    OT_REGISTER_REFERENCE = 2,  // register reference (indirect register index)
+    OT_REGISTER_INDEX_ANNOTATED = 3,  // register index with an annotation from
+                                      // which register set it should be taken
 
-    OT_POINTER,  // index of register containing a pointer that
-                 // should be dereferenced (should be decoded to
-                 // dereferenced value)
+    OT_POINTER = 4,  // index of register containing a pointer that
+                     // should be dereferenced (should be decoded to
+                     // dereferenced value)
 
-    OT_ATOM,    // null-terminated ASCII string
-    OT_TEXT,    // UTF-8 encoded Unicode string, null-terminated
-    OT_STRING,  // size-prefixed byte string
-    OT_BITS,    // size-prefixed bit string
+    OT_ATOM   = 5,  // null-terminated ASCII string
+    OT_TEXT   = 6,  // UTF-8 encoded Unicode string, null-terminated
+    OT_STRING = 7,  // size-prefixed byte string
+    OT_BITS   = 8,  // size-prefixed bit string
 
-    OT_INT,    // unlimited size signed integer
-    OT_INT8,   // 8bit signed integer
-    OT_INT16,  // 16bit signed integer
-    OT_INT32,  // 32bit signed integer
-    OT_INT64,  // 64bit signed integer
+    OT_INT = 9,  // unlimited size signed integer
 
-    OT_UINT,    // unlimited size unsigned integer
-    OT_UINT8,   // 8bit unsigned integer
-    OT_UINT16,  // 16bit unsigned integer
-    OT_UINT32,  // 32bit unsigned integer
-    OT_UINT64,  // 64bit unsigned integer
+    OT_FLOAT = 10,  // unlimited precision floating point number
 
-    OT_FLOAT,    // unlimited precision floating point number
-    OT_FLOAT32,  // 32bit floating point number
-    OT_FLOAT64,  // 64bit floating point number
+    OT_VOID = 11,  // encodes the abstract concept of "nothing"
 
-    OT_VOID,  // encodes the abstract concept of "nothing"
-
-    OT_TRUE,   // encodes literal true
-    OT_FALSE,  // encodes literal false
+    OT_BOOL  = 128,
+    OT_TRUE  = 12 | OT_BOOL,  // encodes literal true
+    OT_FALSE = 13 | OT_BOOL,  // encodes literal false
 };
 
 namespace viua { namespace internals {

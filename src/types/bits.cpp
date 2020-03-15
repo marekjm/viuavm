@@ -1635,22 +1635,23 @@ viua::types::Bits::Bits(size_type i)
     }
 }
 
-viua::types::Bits::Bits(size_type const size, uint8_t const* const source)
+viua::types::Bits::Bits(std::vector<uint8_t> const data)
 {
-    underlying_array.reserve(size * 8);
-    for (auto i = size * 8; i; --i) {
+    auto const bits_size = (data.size() * 8);
+    underlying_array.reserve(bits_size);
+    for (auto i = bits_size; i; --i) {
         underlying_array.push_back(false);
     }
-    uint8_t const one = 1;
-    for (size_type byte_index = 0; byte_index < size; ++byte_index) {
-        auto const a_byte = *(source + byte_index);
+
+    constexpr auto const one = uint8_t{1};
+    for (auto byte_index = size_type{0}; byte_index < data.size();
+         ++byte_index) {
+        auto const a_byte = data.at(byte_index);
 
         for (auto i = 0u; i < 8; ++i) {
             auto const mask =
                 static_cast<std::remove_const_t<decltype(one)>>(one << i);
-            underlying_array.at((size * 8) - 1
-                                - ((byte_index * 8) + (7u - i))) =
-                (a_byte & mask);
+            underlying_array.at((byte_index * 8) + i) = (a_byte & mask);
         }
     }
 }

@@ -335,15 +335,10 @@ enum OPCODE : viua::internals::types::byte {
     // Opcodes related to functions.
     FRAME,  // create new frame (required before param and pamv) for future
             // function call
-    PARAM,  // copy object from a register to parameter register
-            // (pass-by-value),
-    PAMV,   // move object from a register to parameter register (pass-by-move),
     CALL,   // call given function with parameters set in parameter register,
     TAILCALL,  // perform a tail call to a function
     DEFER,  // call a function just after the frame it was called in is popped
             // off the stack
-    ARG,  // move an object from argument register to a normal register (inside
-          // a function call),
     ALLOCATE_REGISTERS,  // allocates specified number of registers
 
     PROCESS,   // spawn a process (call a function and run it in a different

@@ -1448,17 +1448,6 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
                 i += parse_any_1_register_instruction(fragments,
                                                       vector_view{tokens, i});
                 break;
-            case PARAM:
-            case PAMV:
-            case ARG:
-                throw viua::tooling::errors::compile_time::Error_wrapper{}
-                    .append(viua::tooling::errors::compile_time::Error{
-                        // FIXME make a special error code for internal
-                        // instructions in user code
-                        viua::tooling::errors::compile_time::
-                            Compile_time_error::Unexpected_token,
-                        token,
-                        "internal instruction found in user code"});
             case STREQ:
             case BOOL:
             case BITSEQ:

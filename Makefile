@@ -535,7 +535,7 @@ build/bin/vm/kernel: \
 	build/assert.o \
 	build/process.o \
 	build/process/stack.o \
-	build/bytecode/codec/main.o \
+	build/bytecode/codec/main/decoder.o \
 	build/pid.o \
 	build/process/dispatch.o \
 	build/scheduler/ffi/request.o \
@@ -599,7 +599,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/cg/assembler/verify.o \
 	build/cg/assembler/static_analysis.o \
 	build/cg/assembler/utils.o \
-	build/cg/bytecode/instructions.o \
+	build/bytecode/codec/main/encoder.o \
 	build/loader.o \
 	build/support/string.o \
 	build/support/env.o \

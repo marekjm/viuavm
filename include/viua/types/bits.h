@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,6 +20,7 @@
 #ifndef VIUA_TYPES_BITS_H
 #define VIUA_TYPES_BITS_H
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -94,7 +95,7 @@ class Bits : public viua::types::Value {
     Bits(std::vector<bool>&&);
     Bits(std::vector<bool> const&);
     Bits(const size_type);
-    Bits(const size_type, const uint8_t*);
+    Bits(std::vector<uint8_t> const);
 };
 }}  // namespace viua::types
 

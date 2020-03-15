@@ -60,12 +60,14 @@ auto Program::calculate_jumps(
     for (auto const& jmp : jump_positions) {
         auto const [position, offset] = jmp;
 
-        // usually beware of the reinterpret_cast<>'s but here we *know* what
-        // we're doing we *know* that this location points to uint64_t even if
-        // it is stored inside the viua::internals::types::byte array
+        /*
+         * Usually beware of the reinterpret_cast<> but here we *know* what we
+         * are doing. We *know* that this location points to uint64_t even if it
+         * is stored inside the viua::internals::types::byte array.
+         */
         auto const ptr = reinterpret_cast<uint64_t*>(program.get() + position);
         auto const adjustment =
-            viua::cg::tools::calculate_bytecode_size_of_first_n_instructions2(
+            viua::cg::tools::calculate_bytecode_size_of_first_n_instructions(
                 tokens, load_aligned<uint64_t>(ptr));
         aligned_write(ptr) = (offset + adjustment);
     }
@@ -85,7 +87,9 @@ auto Program::jumps() const -> std::vector<uint64_t>
 Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts}
 {
     program = std::make_unique<viua::internals::types::byte[]>(bytes);
-    /* Filling bytecode with zeroes (which are interpreted by kernel as NOP
+
+    /*
+     * Filling bytecode with zeroes (which are interpreted by kernel as NOP
      * instructions) is a safe way to prevent many hiccups.
      */
     std::fill_n(program.get(), bytes, viua::internals::types::byte{0});

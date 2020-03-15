@@ -32,9 +32,6 @@ auto viua::process::Process::opframe(Op_address_type addr) -> Op_address_type
      */
     auto const arguments = decoder.fetch_register_index(addr);
 
-    // FIXME: ignore number of local registers, but it is still encoded
-    decoder.fetch_register_index(addr);
-
     request_new_frame(arguments);
 
     return addr;

@@ -26,12 +26,9 @@ auto assemble_op_frame(Program& program,
                        Token_index const i) -> void
 {
     Token_index target = i + 1;
-    Token_index source = target + 1;
 
     program.opframe(
         ::assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(target))),
-        ::assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(source))));
+            ::assembler::operands::resolve_register(tokens.at(target))));
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

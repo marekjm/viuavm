@@ -353,7 +353,7 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
-                        or opcode == FRAME or opcode == PARAM or opcode == PAMV
+                        or opcode == FRAME
                         or opcode == MOVE or opcode == COPY)) {
                     continue;
                 }
@@ -378,7 +378,9 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
                     continue;
                 }
 
-                if (opcode == PARAM or opcode == PAMV) {
+                auto const& first_operand = *instruction->operands.at(0);
+                if ((opcode == MOVE or opcode == COPY)
+                    and (first_operand.tokens.size() >= 3 and first_operand.tokens.at(2) == "arguments")) {
                     unsigned long slot_index = 0;
                     bool detected_slot_index = false;
 

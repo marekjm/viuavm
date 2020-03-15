@@ -162,12 +162,9 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {FUNCTION, "function"},
 
     {FRAME, "frame"},
-    {PARAM, "param"},
-    {PAMV, "pamv"},
     {CALL, "call"},
     {TAILCALL, "tailcall"},
     {DEFER, "defer"},
-    {ARG, "arg"},
     {ALLOCATE_REGISTERS, "allocate_registers"},
     {PROCESS, "process"},
     {SELF, "self"},

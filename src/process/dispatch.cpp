@@ -375,15 +375,6 @@ auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
     case FRAME:
         addr = opframe(addr + 1);
         break;
-    case PARAM:
-        addr = opparam(addr + 1);
-        break;
-    case PAMV:
-        addr = oppamv(addr + 1);
-        break;
-    case ARG:
-        addr = oparg(addr + 1);
-        break;
     case ALLOCATE_REGISTERS:
         addr = opallocate_registers(addr + 1);
         break;

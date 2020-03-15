@@ -24,7 +24,7 @@
 #include <tuple>
 
 namespace viua { namespace bytecode { namespace codec {
-enum class Operand_type {
+enum class Operand_type : uint8_t {
     /*
      * Void operands are used when the instruction should receive "nothing"
      * in an operand. For example, when a return value of a call should be

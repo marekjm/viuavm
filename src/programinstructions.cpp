@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,157 +17,266 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
 #include <viua/bytecode/opcodes.h>
 #include <viua/program.h>
 #include <viua/support/pointer.h>
 
 
+int_op::int_op()
+        : type(Integer_operand_type::PLAIN)
+        , rs_type(viua::internals::Register_sets::LOCAL)
+        , value(0)
+{}
+int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
+        : type(t), rs_type(viua::internals::Register_sets::LOCAL), value(n)
+{}
+int_op::int_op(Integer_operand_type t,
+               viua::internals::Register_sets rst,
+               viua::internals::types::plain_int n)
+        : type(t), rs_type(rst), value(n)
+{}
+int_op::int_op(viua::internals::types::plain_int n)
+        : type(Integer_operand_type::PLAIN)
+        , rs_type(viua::internals::Register_sets::LOCAL)
+        , value(n)
+{}
+
+timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
+timeout_op::timeout_op(Integer_operand_type t,
+                       viua::internals::types::timeout n)
+        : type(t), value(n)
+{}
+timeout_op::timeout_op(viua::internals::types::timeout n)
+        : type(Integer_operand_type::PLAIN), value(n)
+{}
+
+
 auto Program::opnop() -> Program&
 {
-    addr_ptr = cg::bytecode::opnop(addr_ptr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::NOP);
     return (*this);
+}
+
+static auto ra_of_intop(int_op const x, std::optional<Integer_operand_type> const alt_type = std::nullopt)
+    -> viua::bytecode::codec::Register_access
+{
+    using namespace viua::bytecode::codec;
+
+    Access_specifier access = Access_specifier::Direct;
+    auto const xt = (alt_type.has_value() ? *alt_type : x.type);
+    switch (xt) {
+    case Integer_operand_type::INDEX:
+        access = Access_specifier::Direct;
+        break;
+    case Integer_operand_type::REGISTER_REFERENCE:
+        access = Access_specifier::Register_indirect;
+        break;
+    case Integer_operand_type::POINTER_DEREFERENCE:
+        access = Access_specifier::Pointer_dereference;
+        break;
+    case Integer_operand_type::PLAIN:
+    case Integer_operand_type::VOID:
+    default:
+        assert(0);
+    }
+
+    return Register_access{static_cast<Register_set>(x.rs_type),
+                           static_cast<register_index_type>(x.value),
+                           access};
 }
 
 auto Program::opizero(int_op const regno) -> Program&
 {
-    addr_ptr = cg::bytecode::opizero(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IZERO);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
     return (*this);
 }
 
 auto Program::opinteger(int_op const regno, int_op const i) -> Program&
 {
-    addr_ptr = cg::bytecode::opinteger(addr_ptr, regno, i);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::INTEGER);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
+    addr_ptr = encoder.encode_i32(addr_ptr, i.value);
     return (*this);
 }
 
 auto Program::opiinc(int_op const regno) -> Program&
 {
-    addr_ptr = cg::bytecode::opiinc(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IINC);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
     return (*this);
 }
 
 auto Program::opidec(int_op const regno) -> Program&
 {
-    addr_ptr = cg::bytecode::opidec(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IDEC);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
     return (*this);
 }
 
 auto Program::opfloat(int_op const regno,
                       viua::internals::types::plain_float const f) -> Program&
 {
-    addr_ptr = cg::bytecode::opfloat(addr_ptr, regno, f);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FLOAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
+    addr_ptr = encoder.encode_f64(addr_ptr, f);
     return (*this);
 }
 
 auto Program::opitof(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opitof(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ITOF);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opftoi(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opftoi(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FTOI);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opstoi(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opstoi(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STOI);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opstof(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opstof(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STOF);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opadd(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opsub(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opsub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opmul(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opmul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::MUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opdiv(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opdiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::oplt(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::oplt(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::LT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::oplte(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::oplte(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::LTE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opgt(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opgt(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::GT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opgte(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opgte(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::GTE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opeq(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opeq(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opstring(int_op const reg, std::string const s) -> Program&
 {
-    addr_ptr = cg::bytecode::opstring(addr_ptr, reg, s);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRING);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(reg));
+    addr_ptr = encoder.encode_string(addr_ptr, s.substr(1, s.size() - 2));
     return (*this);
 }
 
 auto Program::optext(int_op const reg, std::string const s) -> Program&
 {
-    addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(reg));
+    addr_ptr = encoder.encode_string(addr_ptr, s.substr(1, s.size() - 2));
     return (*this);
 }
 
 auto Program::optext(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::optext(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::optexteq(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTEQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -175,7 +284,10 @@ auto Program::optextat(int_op const target,
                        int_op const source,
                        int_op const index) -> Program&
 {
-    addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(index));
     return (*this);
 }
 auto Program::optextsub(int_op const target,
@@ -183,261 +295,386 @@ auto Program::optextsub(int_op const target,
                         int_op const begin_index,
                         int_op const end_index) -> Program&
 {
-    addr_ptr = cg::bytecode::optextsub(
-        addr_ptr, target, source, begin_index, end_index);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(begin_index));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(end_index));
     return (*this);
 }
 auto Program::optextlength(int_op const target, int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::optextlength(addr_ptr, target, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTLENGTH);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 auto Program::optextcommonprefix(int_op const target,
                                  int_op const lhs,
                                  int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::optextcommonprefix(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTCOMMONPREFIX);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 auto Program::optextcommonsuffix(int_op const target,
                                  int_op const lhs,
                                  int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::optextcommonsuffix(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTCOMMONSUFFIX);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 auto Program::optextconcat(int_op const target,
                            int_op const lhs,
                            int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::optextconcat(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXTCONCAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
-auto Program::opvector(int_op const index,
+auto Program::opvector(int_op const target,
                        int_op const pack_start_index,
                        int_op const pack_length) -> Program&
 {
-    addr_ptr =
-        cg::bytecode::opvector(addr_ptr, index, pack_start_index, pack_length);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VECTOR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(pack_start_index, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(pack_length, Integer_operand_type::INDEX));
     return (*this);
 }
 
 auto Program::opvinsert(int_op const vec, int_op const src, int_op const dst)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opvinsert(addr_ptr, vec, src, dst);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VINSERT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(vec));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
+    if (dst.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    }
     return (*this);
 }
 
 auto Program::opvpush(int_op const vec, int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opvpush(addr_ptr, vec, src);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VPUSH);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(vec));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
-auto Program::opvpop(int_op const vec, int_op const dst, int_op const pos)
+auto Program::opvpop(int_op const dst, int_op const vec, int_op const pos)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opvpop(addr_ptr, vec, dst, pos);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VPOP);
+    if (dst.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(vec));
+    if (pos.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(pos));
+    }
     return (*this);
 }
 
 auto Program::opvat(int_op const vec, int_op const dst, int_op const at)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opvat(addr_ptr, vec, dst, at);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(vec));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(at));
     return (*this);
 }
 
 auto Program::opvlen(int_op const vec, int_op const reg) -> Program&
 {
-    addr_ptr = cg::bytecode::opvlen(addr_ptr, vec, reg);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VLEN);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(vec));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(reg));
     return (*this);
 }
 
 auto Program::opnot(int_op const target, int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opnot(addr_ptr, target, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::NOT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
-auto Program::opand(int_op const regr, int_op const rega, int_op const regb)
+auto Program::opand(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opand(addr_ptr, regr, rega, regb);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::AND);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
-auto Program::opor(int_op const regr, int_op const rega, int_op const regb)
+auto Program::opor(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opor(addr_ptr, regr, rega, regb);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::OR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbits_of_integer(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opbits_of_integer(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITS_OF_INTEGER);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opinteger_of_bits(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opinteger_of_bits(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::INTEGER_OF_BITS);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
 auto Program::opbits(int_op const target, int_op const count) -> Program&
 {
-    addr_ptr = cg::bytecode::opbits(addr_ptr, target, count);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITS);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(count));
     return (*this);
 }
 
 auto Program::opbits(int_op const target, std::vector<uint8_t> const bit_string)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbits(addr_ptr, target, bit_string);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITS);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_bits_string(addr_ptr, bit_string);
     return (*this);
 }
 
 auto Program::opbitand(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitand(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITAND);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbitor(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitor(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITOR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbitnot(int_op const target, int_op const lhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opbitnot(addr_ptr, target, lhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITNOT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
     return (*this);
 }
 
 auto Program::opbitxor(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitxor(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITXOR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbitat(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitat(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbitset(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITSET);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opbitset(int_op const target, int_op const lhs, bool const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::BITSET);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_bool(addr_ptr, rhs);
     return (*this);
 }
 
 auto Program::opshl(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opshl(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SHL);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opshr(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opshr(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SHR);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opashl(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opashl(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ASHL);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opashr(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opashr(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ASHR);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::oprol(int_op const target, int_op const count) -> Program&
 {
-    addr_ptr = cg::bytecode::oprol(addr_ptr, target, count);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ROL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(count));
     return (*this);
 }
 
 auto Program::opror(int_op const target, int_op const count) -> Program&
 {
-    addr_ptr = cg::bytecode::opror(addr_ptr, target, count);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ROR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(count));
     return (*this);
 }
 
 auto Program::opwrapincrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapincrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPINCREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opwrapdecrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapdecrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPDECREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opwrapadd(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opwrapsub(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapsub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opwrapmul(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapmul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPMUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opwrapdiv(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opwrapdiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WRAPDIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opcheckedsincrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedsincrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSINCREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opcheckedsdecrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedsdecrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSDECREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
@@ -445,7 +682,10 @@ auto Program::opcheckedsadd(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedsadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -453,7 +693,10 @@ auto Program::opcheckedssub(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedssub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -461,7 +704,10 @@ auto Program::opcheckedsmul(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedsmul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSMUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -469,19 +715,24 @@ auto Program::opcheckedsdiv(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedsdiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDSDIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opcheckeduincrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckeduincrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUINCREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opcheckedudecrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedudecrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUDECREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
@@ -489,7 +740,10 @@ auto Program::opcheckeduadd(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckeduadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -497,7 +751,10 @@ auto Program::opcheckedusub(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedusub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -505,7 +762,10 @@ auto Program::opcheckedumul(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedumul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUMUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -513,19 +773,24 @@ auto Program::opcheckedudiv(int_op const target,
                             int_op const lhs,
                             int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opcheckedudiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CHECKEDUDIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opsaturatingsincrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingsincrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSINCREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opsaturatingsdecrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingsdecrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSDECREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
@@ -533,7 +798,10 @@ auto Program::opsaturatingsadd(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingsadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -541,7 +809,10 @@ auto Program::opsaturatingssub(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingssub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -549,7 +820,10 @@ auto Program::opsaturatingsmul(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingsmul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSMUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -557,19 +831,24 @@ auto Program::opsaturatingsdiv(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingsdiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGSDIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
 auto Program::opsaturatinguincrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatinguincrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUINCREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::opsaturatingudecrement(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingudecrement(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUDECREMENT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
@@ -577,7 +856,10 @@ auto Program::opsaturatinguadd(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatinguadd(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUADD);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -585,7 +867,10 @@ auto Program::opsaturatingusub(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingusub(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUSUB);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -593,7 +878,10 @@ auto Program::opsaturatingumul(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingumul(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUMUL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -601,174 +889,240 @@ auto Program::opsaturatingudiv(int_op const target,
                                int_op const lhs,
                                int_op const rhs) -> Program&
 {
-    addr_ptr = cg::bytecode::opsaturatingudiv(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SATURATINGUDIV);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
-auto Program::opmove(int_op const a, int_op const b) -> Program&
+auto Program::opmove(int_op const dst, int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opmove(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::MOVE);
+    if (dst.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
-auto Program::opcopy(int_op const a, int_op const b) -> Program&
+auto Program::opcopy(int_op const dst, int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opcopy(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::COPY);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
-auto Program::opptr(int_op const a, int_op const b) -> Program&
+auto Program::opptr(int_op const dst, int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opptr(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PTR);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
 auto Program::opptrlive(int_op const target, int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opptrlive(addr_ptr, target, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PTRLIVE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
 auto Program::opswap(int_op const a, int_op const b) -> Program&
 {
-    addr_ptr = cg::bytecode::opswap(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SWAP);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(a));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(b));
     return (*this);
 }
 
-auto Program::opdelete(int_op const reg) -> Program&
+auto Program::opdelete(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opdelete(addr_ptr, reg);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DELETE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
-auto Program::opisnull(int_op const a, int_op const b) -> Program&
+auto Program::opisnull(int_op const dst, int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opisnull(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ISNULL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(dst));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
-auto Program::opprint(int_op const reg) -> Program&
+auto Program::opprint(int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opprint(addr_ptr, reg);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PRINT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
-auto Program::opecho(int_op const reg) -> Program&
+auto Program::opecho(int_op const src) -> Program&
 {
-    addr_ptr = cg::bytecode::opecho(addr_ptr, reg);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ECHO);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(src));
     return (*this);
 }
 
 auto Program::opcapture(int_op const target_closure,
                         int_op const target_register,
-                        int_op const source_register) -> Program&
+                        int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opcapture(
-        addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTURE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
 auto Program::opcapturecopy(int_op const target_closure,
                             int_op const target_register,
-                            int_op const source_register) -> Program&
+                            int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opcapturecopy(
-        addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTURECOPY);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
 auto Program::opcapturemove(int_op const target_closure,
                             int_op const target_register,
-                            int_op const source_register) -> Program&
+                            int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opcapturemove(
-        addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTUREMOVE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
 auto Program::opclosure(int_op const reg, std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opclosure(addr_ptr, reg, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CLOSURE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(reg));
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
 auto Program::opfunction(int_op const reg, std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FUNCTION);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(reg));
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
-auto Program::opframe(int_op const a, int_op const b) -> Program&
+auto Program::opframe(int_op const args) -> Program&
 {
-    addr_ptr = cg::bytecode::opframe(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FRAME);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(args, Integer_operand_type::INDEX));
     return (*this);
 }
 
-auto Program::opallocate_registers(int_op const a) -> Program&
+auto Program::opallocate_registers(int_op const size) -> Program&
 {
-    addr_ptr = cg::bytecode::opallocate_registers(addr_ptr, a);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ALLOCATE_REGISTERS);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(size));
     return (*this);
 }
 
-auto Program::opcall(int_op const reg, std::string const& fn_name) -> Program&
+auto Program::opcall(int_op const ret, std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opcall(addr_ptr, reg, fn_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CALL);
+    if (ret.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ret));
+    }
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
-auto Program::opcall(int_op const reg, int_op const fn) -> Program&
+auto Program::opcall(int_op const ret, int_op const fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opcall(addr_ptr, reg, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CALL);
+    if (ret.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ret));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(fn));
     return (*this);
 }
 
-auto Program::optailcall(std::string const& fn_name) -> Program&
+auto Program::optailcall(std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::optailcall(addr_ptr, fn_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TAILCALL);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
 auto Program::optailcall(int_op const fn) -> Program&
 {
-    addr_ptr = cg::bytecode::optailcall(addr_ptr, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TAILCALL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(fn));
     return (*this);
 }
 
-auto Program::opdefer(std::string const& fn_name) -> Program&
+auto Program::opdefer(std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DEFER);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
 auto Program::opdefer(int_op const fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DEFER);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(fn));
     return (*this);
 }
 
-auto Program::opprocess(int_op const ref, std::string const& fn_name)
+auto Program::opprocess(int_op const ret, std::string const& fn)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PROCESS);
+    if (ret.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ret));
+    }
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
-auto Program::opprocess(int_op const reg, int_op const fn) -> Program&
+auto Program::opprocess(int_op const ret, int_op const fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opprocess(addr_ptr, reg, fn);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PROCESS);
+    if (ret.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ret));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(fn));
     return (*this);
 }
 
 auto Program::opself(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opself(addr_ptr, target);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SELF);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::oppideq(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::oppideq(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PIDEQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
@@ -776,25 +1130,41 @@ auto Program::opjoin(int_op const target,
                      int_op const source,
                      timeout_op const timeout) -> Program&
 {
-    addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source, timeout);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::JOIN);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
+    addr_ptr = encoder.encode_timeout(addr_ptr, timeout.value);
     return (*this);
 }
 
 auto Program::opsend(int_op const target, int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opsend(addr_ptr, target, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::SEND);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
-auto Program::opreceive(int_op const ref, timeout_op const timeout) -> Program&
+auto Program::opreceive(int_op const target, timeout_op const timeout) -> Program&
 {
-    addr_ptr = cg::bytecode::opreceive(addr_ptr, ref, timeout);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::RECEIVE);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_timeout(addr_ptr, timeout.value);
     return (*this);
 }
 
-auto Program::opwatchdog(std::string const& fn_name) -> Program&
+auto Program::opwatchdog(std::string const& fn) -> Program&
 {
-    addr_ptr = cg::bytecode::opwatchdog(addr_ptr, fn_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::WATCHDOG);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, fn);
     return (*this);
 }
 
@@ -805,11 +1175,12 @@ auto Program::opjump(viua::internals::types::bytecode_size const addr,
         branches.push_back((addr_ptr + 1));
     }
 
-    addr_ptr = cg::bytecode::opjump(addr_ptr, addr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::JUMP);
+    addr_ptr = encoder.encode_address(addr_ptr, addr);
     return (*this);
 }
 
-auto Program::opif(int_op const regc,
+auto Program::opif(int_op const condition,
                    viua::internals::types::bytecode_size const addr_truth,
                    enum JUMPTYPE const absolute_truth,
                    viua::internals::types::bytecode_size const addr_false,
@@ -834,69 +1205,84 @@ auto Program::opif(int_op const regc,
         branches.push_back(jump_position_in_bytecode);
     }
 
-    addr_ptr = cg::bytecode::opif(addr_ptr, regc, addr_truth, addr_false);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IF);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(condition));
+    addr_ptr = encoder.encode_address(addr_ptr, addr_truth);
+    addr_ptr = encoder.encode_address(addr_ptr, addr_false);
     return (*this);
 }
 
 auto Program::optry() -> Program&
 {
-    addr_ptr = cg::bytecode::optry(addr_ptr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TRY);
     return (*this);
 }
 
-auto Program::opcatch(std::string const type_name, std::string const block_name)
+auto Program::opcatch(std::string const tag, std::string const block_name)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opcatch(addr_ptr, type_name, block_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CATCH);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, tag.substr(1, (tag.size() - 2)));
+    addr_ptr = encoder.encode_raw_string(addr_ptr, block_name);
     return (*this);
 }
 
-auto Program::opdraw(int_op const regno) -> Program&
+auto Program::opdraw(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opdraw(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DRAW);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
 auto Program::openter(std::string const block_name) -> Program&
 {
-    addr_ptr = cg::bytecode::openter(addr_ptr, block_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ENTER);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, block_name);
     return (*this);
 }
 
-auto Program::opthrow(int_op const regno) -> Program&
+auto Program::opthrow(int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opthrow(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::THROW);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
 auto Program::opleave() -> Program&
 {
-    addr_ptr = cg::bytecode::opleave(addr_ptr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::LEAVE);
     return (*this);
 }
 
 auto Program::opimport(std::string const module_name) -> Program&
 {
-    addr_ptr = cg::bytecode::opimport(addr_ptr, module_name);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IMPORT);
+    addr_ptr = encoder.encode_raw_string(addr_ptr, module_name);
     return (*this);
 }
 
-auto Program::opatom(int_op const reg, std::string const& s) -> Program&
+auto Program::opatom(int_op const target, std::string const& a) -> Program&
 {
-    addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ATOM);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_raw_string(addr_ptr, a.substr(1, (a.size() - 2)));
     return (*this);
 }
 
 auto Program::opatomeq(int_op const target, int_op const lhs, int_op const rhs)
     -> Program&
 {
-    addr_ptr = cg::bytecode::opatomeq(addr_ptr, target, lhs, rhs);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::ATOMEQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
     return (*this);
 }
 
-auto Program::opstruct(int_op const regno) -> Program&
+auto Program::opstruct(int_op const target) -> Program&
 {
-    addr_ptr = cg::bytecode::opstruct(addr_ptr, regno);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     return (*this);
 }
 
@@ -904,7 +1290,10 @@ auto Program::opstructinsert(int_op const target,
                              int_op const key,
                              int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opstructinsert(addr_ptr, target, key, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCTINSERT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(key));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
@@ -912,7 +1301,14 @@ auto Program::opstructremove(int_op const target,
                              int_op const key,
                              int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opstructremove(addr_ptr, target, key, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCTREMOVE);
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(key));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
@@ -920,13 +1316,18 @@ auto Program::opstructat(int_op const target,
                          int_op const key,
                          int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opstructat(addr_ptr, target, key, source);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCTAT);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(key));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
-auto Program::opstructkeys(int_op const a, int_op const b) -> Program&
+auto Program::opstructkeys(int_op const target, int_op const source) -> Program&
 {
-    addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCTKEYS);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
 
@@ -934,7 +1335,10 @@ auto Program::op_io_read(int_op const req,
                          int_op const port,
                          int_op const limit) -> Program&
 {
-    addr_ptr = cg::bytecode::op_io_read(addr_ptr, req, port, limit);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IO_READ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(req));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(port));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(limit));
     return (*this);
 }
 
@@ -942,13 +1346,18 @@ auto Program::op_io_write(int_op const req,
                           int_op const port,
                           int_op const payload) -> Program&
 {
-    addr_ptr = cg::bytecode::op_io_write(addr_ptr, req, port, payload);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IO_WRITE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(req));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(port));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(payload));
     return (*this);
 }
 
 auto Program::op_io_close(int_op const req, int_op const port) -> Program&
 {
-    addr_ptr = cg::bytecode::op_io_close(addr_ptr, req, port);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IO_CLOSE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(req));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(port));
     return (*this);
 }
 
@@ -956,24 +1365,32 @@ auto Program::op_io_wait(int_op const result,
                          int_op const req,
                          timeout_op limit) -> Program&
 {
-    addr_ptr = cg::bytecode::op_io_wait(addr_ptr, result, req, limit);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IO_WAIT);
+    if (result.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(result));
+    }
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(req));
+    addr_ptr = encoder.encode_timeout(addr_ptr, limit.value);
     return (*this);
 }
 
 auto Program::op_io_cancel(int_op const req) -> Program&
 {
-    addr_ptr = cg::bytecode::op_io_cancel(addr_ptr, req);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::IO_CANCEL);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(req));
     return (*this);
 }
 
 auto Program::opreturn() -> Program&
 {
-    addr_ptr = cg::bytecode::opreturn(addr_ptr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::RETURN);
     return (*this);
 }
 
 auto Program::ophalt() -> Program&
 {
-    addr_ptr = cg::bytecode::ophalt(addr_ptr);
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::HALT);
     return (*this);
 }

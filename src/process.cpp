@@ -211,6 +211,16 @@ auto viua::process::Decoder_adapter::fetch_string(Op_address_type& addr) const
     return s;
 }
 
+auto viua::process::Decoder_adapter::fetch_bits_string(
+    Op_address_type& addr) const -> std::vector<uint8_t>
+{
+    auto [next_addr, s] = decoder.decode_bits_string(addr);
+
+    addr = next_addr;
+
+    return s;
+}
+
 auto viua::process::Decoder_adapter::fetch_timeout(Op_address_type& addr) const
     -> viua::internals::types::timeout
 {
@@ -241,6 +251,16 @@ auto viua::process::Decoder_adapter::fetch_i32(Op_address_type& addr) const
     return v;
 }
 
+auto viua::process::Decoder_adapter::fetch_bool(Op_address_type& addr) const
+    -> bool
+{
+    auto [next_addr, v] = decoder.decode_bool(addr);
+
+    addr = next_addr;
+
+    return v;
+}
+
 auto viua::process::Decoder_adapter::fetch_address(Op_address_type& addr) const
     -> uint64_t
 {
@@ -263,6 +283,10 @@ auto viua::process::Process::register_at(
             ->register_at(i);
     } else if (rs == viua::internals::Register_sets::GLOBAL) {
         return global_register_set->register_at(i);
+    } else if (rs == viua::internals::Register_sets::PARAMETERS) {
+        return stack->back()->arguments->register_at(i);
+    } else if (rs == viua::internals::Register_sets::ARGUMENTS) {
+        return stack->frame_new->arguments->register_at(i);
     } else {
         throw std::make_unique<viua::types::Exception>(
             "unsupported register set type");

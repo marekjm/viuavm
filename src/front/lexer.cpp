@@ -143,7 +143,7 @@ static void display_results(std::string const& filename,
 {
     if (DISPLAY_SIZE) {
         try {
-            std::cout << viua::cg::tools::calculate_bytecode_size2(tokens)
+            std::cout << viua::cg::tools::calculate_bytecode_size(tokens)
                       << std::endl;
         } catch (Invalid_syntax const& e) {
             std::cerr << filename << ':' << e.line_number << ':'
