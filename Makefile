@@ -726,6 +726,7 @@ build/bin/vm/parser: build/front/parser.o \
 build/bin/vm/dis: build/front/dis.o \
 	build/loader.o \
 	build/cg/disassembler/disassembler.o \
+	build/bytecode/codec/main/decoder.o \
 	build/support/pointer.o \
 	build/support/string.o \
 	build/support/env.o \

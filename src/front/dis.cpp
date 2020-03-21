@@ -335,14 +335,16 @@ int main(int argc, char* argv[])
             getline(std::cin, dummy);
         }
 
+        viua::bytecode::codec::main::Decoder decoder;
         auto opname            = std::string{};
         bool disasm_terminated = false;
-        for (unsigned j = 0; j < el_size;) {
+        for (viua::internals::types::bytecode_size j = 0; j < el_size;) {
             auto instruction = std::string{};
             try {
-                unsigned size;
+                auto size = viua::internals::types::bytecode_size{};
                 tie(instruction, size) = disassembler::instruction(
-                    (bytecode.get() + element_address_mapping[name] + j));
+                    decoder
+                    , (bytecode.get() + element_address_mapping[name] + j));
                 if (DEBUG) {
                     if (j != 0) {
                         (DEBUG ? std::cout : oss) << '\n';

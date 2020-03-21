@@ -124,8 +124,9 @@ auto assemble_capture_op(Program& program,
         ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(target)),
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-        ::assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(inside_index))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(inside_index)),
+            viua::internals::Register_sets::CLOSURE_LOCAL),
         ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(source)),
             ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));

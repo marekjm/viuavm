@@ -24,6 +24,8 @@
 #include <string>
 #include <tuple>
 
+#include <viua/bytecode/codec/main.h>
+
 
 // Helper functions for checking if a container contains an item.
 template<typename T> auto in(std::vector<T> v, T item) -> bool
@@ -36,9 +38,9 @@ template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool
 }
 
 namespace disassembler {
-auto intop(viua::internals::types::byte*) -> std::string;
-auto intop_with_rs_type(viua::internals::types::byte*) -> std::string;
-auto instruction(viua::internals::types::byte*)
+using Decoder_type = viua::bytecode::codec::main::Decoder;
+
+auto instruction(Decoder_type const&, viua::internals::types::byte const*)
     -> std::tuple<std::string, viua::internals::types::bytecode_size>;
 }  // namespace disassembler
 

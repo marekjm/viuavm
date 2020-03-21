@@ -20,12 +20,21 @@
 #ifndef VIUA_SUPPORT_POINTER_H
 #define VIUA_SUPPORT_POINTER_H
 
+#include <type_traits>
+
+
 namespace viua { namespace support { namespace pointer {
 template<class T, class S> auto inc(S*& p) -> void
 {
-    auto ptr = reinterpret_cast<T*>(p);
-    ptr++;
-    p = reinterpret_cast<S*>(ptr);
+    if constexpr (std::is_const_v<S>) {
+        auto ptr = reinterpret_cast<T const*>(p);
+        ptr++;
+        p = reinterpret_cast<S*>(ptr);
+    } else {
+        auto ptr = reinterpret_cast<T*>(p);
+        ptr++;
+        p = reinterpret_cast<S*>(ptr);
+    }
 }
 }}}  // namespace viua::support::pointer
 
