@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
@@ -65,11 +66,12 @@ auto Program::calculate_jumps(
          * are doing. We *know* that this location points to uint64_t even if it
          * is stored inside the viua::internals::types::byte array.
          */
-        auto const ptr = reinterpret_cast<uint64_t*>(program.get() + position);
+        auto const ptr = (program.get() + position);
+        auto const n_instructions = be64toh(load_aligned<uint64_t>(ptr));
         auto const adjustment =
             viua::cg::tools::calculate_bytecode_size_of_first_n_instructions(
-                tokens, load_aligned<uint64_t>(ptr));
-        aligned_write(ptr) = (offset + adjustment);
+                tokens, n_instructions);
+        aligned_write(ptr) = htobe64(offset + adjustment);
     }
 
     return (*this);

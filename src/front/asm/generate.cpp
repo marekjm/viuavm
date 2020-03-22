@@ -1448,13 +1448,16 @@ auto generate(std::vector<Token> const& tokens,
                   + "' (maybe not loaded?)");
         }
 
-        viua::internals::types::bytecode_size jmp, jmp_target;
+        viua::internals::types::bytecode_size jmp;
         for (auto i = decltype(linked_jumptable)::size_type{0};
              i < linked_jumptable.size();
              ++i) {
             jmp                      = linked_jumptable[i];
-            aligned_read(jmp_target) = (linked_bytecode + jmp);
-            aligned_write(linked_bytecode + jmp) += bytes_offset;
+
+            using viua::util::memory::load_aligned;
+            auto const loaded_target = be64toh(load_aligned<uint64_t>(linked_bytecode + jmp));
+            auto const offset_target = (loaded_target + bytes_offset);
+            aligned_write(linked_bytecode + jmp) = htobe64(offset_target);
         }
 
         for (auto i = decltype(linked_size){0}; i < linked_size; ++i) {

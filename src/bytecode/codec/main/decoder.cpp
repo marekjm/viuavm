@@ -155,6 +155,6 @@ auto Decoder::decode_address(uint8_t const* addr) const
         addr += sizeof(v);
     }
 
-    return {addr, v};
+    return {addr, be64toh(v)};
 }
 }}}}  // namespace viua::bytecode::codec::main

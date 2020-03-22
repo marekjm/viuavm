@@ -183,7 +183,8 @@ auto Encoder::encode_timeout(uint8_t* addr, timeout_type const value) const -> u
 
 auto Encoder::encode_address(uint8_t* addr, uint64_t const dest) const -> uint8_t*
 {
-    aligned_write(addr) = dest;
+    auto const bedest = htobe64(dest);
+    aligned_write(addr) = bedest;
     addr += sizeof(uint64_t);
     return addr;
 }

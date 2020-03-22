@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
