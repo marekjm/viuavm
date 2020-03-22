@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
 #include <cassert>
 #include <cstdint>
 #include <string>
@@ -92,7 +93,7 @@ auto Encoder::encode_register(uint8_t* addr, Register_access const ra) const
     }
 
     {
-        aligned_write(addr) = index;
+        aligned_write(addr) = htobe16(index);
         addr += sizeof(index);
     }
 
@@ -118,7 +119,7 @@ auto Encoder::encode_i32(uint8_t* addr, int32_t const n) const -> uint8_t*
     *addr = OT_INT;
     addr += sizeof(OT_INT);
 
-    aligned_write(addr) = n;
+    aligned_write(addr) = static_cast<int32_t>(htobe32(static_cast<uint32_t>(n)));
     addr += sizeof(int32_t);
 
     return addr;
@@ -174,7 +175,7 @@ auto Encoder::encode_timeout(uint8_t* addr, timeout_type const value) const -> u
     *addr = OT_INT;
     ++addr;
 
-    aligned_write(addr) = value;
+    aligned_write(addr) = htobe32(value);
     addr += sizeof(timeout_type);
 
     return addr;

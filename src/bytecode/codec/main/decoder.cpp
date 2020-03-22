@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <endian.h>
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -65,7 +66,7 @@ auto Decoder::decode_register(uint8_t const* addr) const
         addr += sizeof(index);
     }
 
-    return {addr, Register_access{register_set, index, access_type}};
+    return {addr, Register_access{register_set, be16toh(index), access_type}};
 }
 
 auto Decoder::decode_string(uint8_t const* addr) const
@@ -105,7 +106,7 @@ auto Decoder::decode_timeout(uint8_t const* addr) const
         addr += sizeof(t);
     }
 
-    return {addr, t};
+    return {addr, be32toh(t)};
 }
 
 auto Decoder::decode_f64(uint8_t const* addr) const
@@ -133,7 +134,7 @@ auto Decoder::decode_i32(uint8_t const* addr) const
         addr += sizeof(v);
     }
 
-    return {addr, v};
+    return {addr, static_cast<int32_t>(be32toh(static_cast<uint32_t>(v)))};
 }
 
 auto Decoder::decode_bool(uint8_t const* addr) const
