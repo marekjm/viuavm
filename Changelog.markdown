@@ -27,6 +27,12 @@ There are several categories of change:
 
 ----
 
+# From 0.10.0 to 0.10.1
+
+- bic: integers are stored in big-endian order in bytecode
+
+----
+
 # From 0.9.0 to 0.10.0
 
 - feature: bit manipulation instructions (and, or, xor; arithmetic and logical shifts;
