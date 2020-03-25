@@ -73,7 +73,7 @@ auto viua::process::Process::get_trace_line(
                 sizeof(viua::internals::types::byte);  // for opcode type
             working_address += sizeof(viua::internals::types::register_index);
             working_address +=
-                sizeof(viua::internals::types::registerset_type_marker);
+                sizeof(viua::bytecode::codec::Register_set);
         }
         trace_line
             << ' '
