@@ -259,7 +259,7 @@ Note the lack of a colon at the end of the token.
 %% DELIMITING FUNCTION BODIES
 \section{end}
 
-\heading{PARAMETERS}
+\heading{Parameters}
 \section{begin}
 
 In Viua, functions do not declare the types of parameters they take; they only declare their own arity.
@@ -269,16 +269,16 @@ regard to the type (thanks to type inference).
 This means that types are not preserved across function boundaries.
 This is a deficiency that will be fixed somewhen in the future (FIXME).
 
-\heading{PASSING PARAMETERS}
+\heading{PASSING Parameters}
 
 Parameters are passed into the function using either \instruction{copy} or \instruction{move} instruction
 with a register in the `arguments` register set as a destination.
 
-\heading{EXTRACTING ARGUMENTS}
+\heading{EXTRACTING Arguments}
 
 Arguments are extracted using the \instruction{arg} instruction.
 
-\heading{ARGUMENTS REGISTER SET}
+\heading{Arguments REGISTER SET}
 
 Parameters passed to a function become its arguments and are stored in a special register set.
 The size of this register set depends on the function's arity - if the function takes 2 parameters, then the
@@ -289,7 +289,7 @@ The lifetime of this register set begins just after the \instruction{frame} inst
 and ends just after the \instruction{return} instruction causes the call frame containing it to be popped off
 the stack.
 
-%% PARAMETERS
+%% Parameters
 \section{end}
 
 \heading{RETURN VALUES}

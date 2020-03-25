@@ -28,7 +28,7 @@ auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
                           Instruction const& instruction,
                           std::map<Register, Closure>& created_closures) -> void
 {
-    using viua::internals::Register_sets;
+    using viua::bytecode::codec::Register_set;
 
     auto closure = get_operand<Register_index>(instruction, 0);
     if (not closure) {
@@ -63,7 +63,7 @@ auto check_op_capturecopy(Register_usage_profile& register_usage_profile,
 
     auto val         = Register{};
     val.index        = index->index;
-    val.register_set = Register_sets::LOCAL;
+    val.register_set = viua::bytecode::codec::Register_set::Local;
     val.value_type   = register_usage_profile.at(*source).second.value_type;
     created_closures.at(Register{*closure}).define(val, index->tokens.at(0));
 }

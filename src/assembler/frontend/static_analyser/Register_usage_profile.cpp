@@ -40,7 +40,7 @@ auto Register_usage_profile::erase_arguments(Token const t) -> void
                  std::back_inserter(args_regs),
                  [](Register const& r) -> bool {
                      return r.register_set
-                            == viua::internals::Register_sets::ARGUMENTS;
+                            == viua::bytecode::codec::Register_set::Arguments;
                  });
     for (auto const& each : args_regs) {
         erase(each, t);
@@ -52,11 +52,11 @@ auto Register_usage_profile::define(Register const r,
                                     Token const t,
                                     bool const allow_overwrites) -> void
 {
-    using viua::internals::Register_sets;
+    using viua::bytecode::codec::Register_set;
     if ((not in_bounds(r))
-        and !(r.register_set == Register_sets::GLOBAL
-              or r.register_set == Register_sets::STATIC
-              or r.register_set == Register_sets::PARAMETERS)) {
+        and !(r.register_set == viua::bytecode::codec::Register_set::Global
+              or r.register_set == viua::bytecode::codec::Register_set::Static
+              or r.register_set == viua::bytecode::codec::Register_set::Parameters)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -88,11 +88,11 @@ auto Register_usage_profile::define(Register const r,
                                     Token const register_set,
                                     bool const allow_overwrites) -> void
 {
-    using viua::internals::Register_sets;
+    using viua::bytecode::codec::Register_set;
     if ((not in_bounds(r))
-        and !(r.register_set == Register_sets::GLOBAL
-              or r.register_set == Register_sets::STATIC
-              or r.register_set == Register_sets::PARAMETERS)) {
+        and !(r.register_set == viua::bytecode::codec::Register_set::Global
+              or r.register_set == viua::bytecode::codec::Register_set::Static
+              or r.register_set == viua::bytecode::codec::Register_set::Parameters)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such

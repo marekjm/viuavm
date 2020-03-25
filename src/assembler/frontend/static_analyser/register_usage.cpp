@@ -567,7 +567,7 @@ static auto check_register_usage_for_instruction_block(
              function_arity))) {
         auto val         = Register{};
         val.index        = each;
-        val.register_set = viua::internals::Register_sets::PARAMETERS;
+        val.register_set = viua::bytecode::codec::Register_set::Parameters;
         register_usage_profile.define(val, ib.name);
     }
 

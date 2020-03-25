@@ -36,7 +36,7 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
             .note("expected register index");
     }
     if ((not target)
-        and source->rss != viua::internals::Register_sets::PARAMETERS) {
+        and source->rss != viua::bytecode::codec::Register_set::Parameters) {
         throw invalid_syntax(instruction.operands.at(0)->tokens,
                              "invalid operand")
             .note("expected register index");
@@ -46,7 +46,7 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
         if (target->as
             == viua::internals::Access_specifier::REGISTER_INDIRECT) {
             auto r = *target;
-            r.rss  = viua::internals::Register_sets::LOCAL;
+            r.rss  = viua::bytecode::codec::Register_set::Local;
             check_use_of_register(register_usage_profile, r);
             assert_type_of_register<viua::internals::Value_types::INTEGER>(
                 register_usage_profile, r);

@@ -28,21 +28,21 @@ namespace viua {
     namespace tooling {
         namespace libs {
             namespace static_analyser {
-static auto to_string(viua::internals::Register_sets const rs) -> std::string
+static auto to_string(viua::bytecode::codec::Register_set const rs) -> std::string
 {
-    using viua::internals::Register_sets;
+    using viua::bytecode::codec::Register_set;
     switch (rs) {
-    case Register_sets::GLOBAL:
+    case viua::bytecode::codec::Register_set::Global:
         return "global";
-    case Register_sets::LOCAL:
+    case viua::bytecode::codec::Register_set::Local:
         return "local";
-    case Register_sets::STATIC:
+    case viua::bytecode::codec::Register_set::Static:
         return "static";
-    case Register_sets::ARGUMENTS:
+    case viua::bytecode::codec::Register_set::Arguments:
         return "arguments";
-    case Register_sets::PARAMETERS:
+    case viua::bytecode::codec::Register_set::Parameters:
         return "parameters";
-    case Register_sets::CLOSURE_LOCAL:
+    case viua::bytecode::codec::Register_set::Closure_local:
         return "closure_local";
     default:
         return "<unknown>";
@@ -1030,7 +1030,7 @@ static auto analyse_single_arm(
                 auto const dest_index = function_state.resolve_index(dest);
 
                 if (dest.register_set
-                    == viua::internals::Register_sets::ARGUMENTS) {
+                    == viua::bytecode::codec::Register_set::Arguments) {
                     if (not spawned_frame) {
                         auto error =
                             viua::tooling::errors::compile_time::Error_wrapper{}
@@ -2438,7 +2438,7 @@ static auto analyse_single_arm(
                 auto const dest_index = function_state.resolve_index(dest);
 
                 if (dest.register_set
-                    == viua::internals::Register_sets::ARGUMENTS) {
+                    == viua::bytecode::codec::Register_set::Arguments) {
                     if (not spawned_frame) {
                         auto error =
                             viua::tooling::errors::compile_time::Error_wrapper{}
@@ -3873,7 +3873,7 @@ static auto analyse_single_function(
         } else if (fn.head().arity == 1) {
             function_state.define_register(
                 0,
-                viua::internals::Register_sets::PARAMETERS,
+                viua::bytecode::codec::Register_set::Parameters,
                 function_state.make_wrapper(std::make_unique<values::Vector>(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
@@ -3881,12 +3881,12 @@ static auto analyse_single_function(
         } else if (fn.head().arity == 2) {
             function_state.define_register(
                 0,
-                viua::internals::Register_sets::PARAMETERS,
+                viua::bytecode::codec::Register_set::Parameters,
                 function_state.make_wrapper(std::make_unique<values::String>()),
                 fn.head().tokens());
             function_state.define_register(
                 1,
-                viua::internals::Register_sets::PARAMETERS,
+                viua::bytecode::codec::Register_set::Parameters,
                 function_state.make_wrapper(std::make_unique<values::Vector>(
                     function_state.make_wrapper(
                         std::make_unique<values::String>()))),
@@ -3909,7 +3909,7 @@ static auto analyse_single_function(
         for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
             function_state.define_register(
                 i,
-                viua::internals::Register_sets::PARAMETERS,
+                viua::bytecode::codec::Register_set::Parameters,
                 function_state.make_wrapper(
                     std::make_unique<values::Value>(values::Value_type::Value)),
                 fn.head().tokens());
@@ -3937,7 +3937,7 @@ static auto analyse_single_function(
             Register_address{0,
                              false,
                              false,
-                             viua::internals::Register_sets::LOCAL,
+                             viua::bytecode::codec::Register_set::Local,
                              viua::internals::Access_specifier::DIRECT};
         target.add(fn.head().tokens().at(0));
         target.add(fn.head().tokens().at(0));

@@ -365,7 +365,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::bytecode::codec::Register_set)
                  + sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
@@ -374,7 +374,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::bytecode::codec::Register_set)
                  + sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "izero");
@@ -383,7 +383,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::bytecode::codec::Register_set)
                  + sizeof(viua::internals::types::register_index);
 
         // pop first element on the list of aruments
@@ -397,7 +397,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + 3 * sizeof(viua::internals::types::byte)
-                 + 3 * sizeof(viua::internals::Register_sets)
+                 + 3 * sizeof(viua::bytecode::codec::Register_set)
                  + 3 * sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
@@ -409,7 +409,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
+                 + 2 * sizeof(viua::bytecode::codec::Register_set)
                  + 2 * sizeof(viua::internals::types::register_index);
 
         // second parameter for main/2 is the vector with the rest
@@ -422,7 +422,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
+                 + 2 * sizeof(viua::bytecode::codec::Register_set)
                  + 2 * sizeof(viua::internals::types::register_index);
     } else {
         // this is for default main function, i.e. `main/1` or
@@ -434,7 +434,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::Register_sets)
+                 + sizeof(viua::bytecode::codec::Register_set)
                  + sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "copy");
@@ -445,7 +445,7 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte)
                  + 2 * sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::Register_sets)
+                 + 2 * sizeof(viua::bytecode::codec::Register_set)
                  + 2 * sizeof(viua::internals::types::register_index);
     }
 
@@ -456,7 +456,7 @@ static auto generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte)
              + sizeof(viua::internals::types::byte)
-             + sizeof(viua::internals::Register_sets)
+             + sizeof(viua::bytecode::codec::Register_set)
              + sizeof(viua::internals::types::register_index);
     bytes += main_function.size() + 1;
 
@@ -469,7 +469,7 @@ static auto generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte)
              + 2 * sizeof(viua::internals::types::byte)
-             + 2 * sizeof(viua::internals::Register_sets)
+             + 2 * sizeof(viua::bytecode::codec::Register_set)
              + 2 * sizeof(viua::internals::types::register_index);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
@@ -1078,7 +1078,7 @@ auto generate(std::vector<Token> const& tokens,
 
 
     /////////////////////////////////////////////////////////
-    // GENERATE BYTECODE OF LOCAL FUNCTIONS AND BLOCKS
+    // GENERATE BYTECODE OF Local FUNCTIONS AND BLOCKS
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
@@ -1378,7 +1378,7 @@ auto generate(std::vector<Token> const& tokens,
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
-    // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
+    // WRITE BYTECODE OF Local BLOCKS TO BYTECODE BUFFER
     for (auto const& name : blocks.names) {
         // linked blocks are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name)
@@ -1398,7 +1398,7 @@ auto generate(std::vector<Token> const& tokens,
 
 
     ///////////////////////////////////////////////////////
-    // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
+    // WRITE BYTECODE OF Local FUNCTIONS TO BYTECODE BUFFER
     for (auto const& name : functions.names) {
         // linked functions are to be inserted later
         if (find(static_linked_function_names.begin(),

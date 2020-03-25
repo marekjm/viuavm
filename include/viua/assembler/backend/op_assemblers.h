@@ -126,7 +126,7 @@ auto assemble_capture_op(Program& program,
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
         ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(inside_index)),
-            viua::internals::Register_sets::CLOSURE_LOCAL),
+            viua::bytecode::codec::Register_set::Closure_local),
         ::assembler::operands::getint_with_rs_type(
             ::assembler::operands::resolve_register(tokens.at(source)),
             ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
@@ -178,7 +178,7 @@ auto assemble_parameter_op(Program& program,
     (program
      .*op)(::assembler::operands::getint_with_rs_type(
                ::assembler::operands::resolve_register(tokens.at(target)),
-               viua::internals::Register_sets::ARGUMENTS),
+               viua::bytecode::codec::Register_set::Arguments),
            ::assembler::operands::getint_with_rs_type(
                ::assembler::operands::resolve_register(tokens.at(source)),
                ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));

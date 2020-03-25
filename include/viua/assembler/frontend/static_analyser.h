@@ -40,9 +40,9 @@ auto verify_jumps_are_in_range(parser::Parsed_source const&) -> void;
 auto verify(parser::Parsed_source const&) -> void;
 
 struct Register {
-    viua::internals::types::register_index index{0};
-    viua::internals::Register_sets register_set =
-        viua::internals::Register_sets::LOCAL;
+    viua::bytecode::codec::register_index_type index{0};
+    viua::bytecode::codec::Register_set register_set =
+        viua::bytecode::codec::Register_set::Local;
     viua::internals::Value_types value_type =
         viua::internals::Value_types::UNDEFINED;
     std::pair<bool, viua::cg::lex::Token> inferred = {false, {}};
@@ -182,7 +182,7 @@ using viua::assembler::frontend::parser::Instructions_block;
 using viua::assembler::frontend::parser::Parsed_source;
 using InstructionIndex = Instructions_block::size_type;
 
-auto to_string(viua::internals::Register_sets const) -> std::string;
+auto to_string(viua::bytecode::codec::Register_set const) -> std::string;
 auto to_string(viua::internals::Value_types const) -> std::string;
 
 template<typename T>
@@ -229,8 +229,8 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
     using viua::cg::lex::Traced_syntax_error;
     using viua::internals::Value_types;
 
-    if (register_index.rss == viua::internals::Register_sets::GLOBAL
-        or register_index.rss == viua::internals::Register_sets::STATIC) {
+    if (register_index.rss == viua::bytecode::codec::Register_set::Global
+        or register_index.rss == viua::bytecode::codec::Register_set::Static) {
         return expected_type;
     }
 

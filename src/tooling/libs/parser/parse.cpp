@@ -133,7 +133,7 @@ Register_address::Register_address(
     viua::internals::types::register_index const ri,
     bool const i,
     bool const n,
-    viua::internals::Register_sets const rs,
+    viua::bytecode::codec::Register_set const rs,
     viua::internals::Access_specifier const as)
         : Operand{Operand_type::Register_address}
         , index{ri}
@@ -418,33 +418,33 @@ static auto string_to_opcode(std::string const& s) -> std::optional<OPCODE>
 }
 
 static auto string_to_register_set(std::string const& s)
-    -> viua::internals::Register_sets
+    -> viua::bytecode::codec::Register_set
 {
-    using viua::internals::Register_sets;
-    static auto const mapping = std::map<std::string, Register_sets>{
+    using viua::bytecode::codec::Register_set;
+    static auto const mapping = std::map<std::string, viua::bytecode::codec::Register_set>{
         {
             "local",
-            Register_sets::LOCAL,
+            viua::bytecode::codec::Register_set::Local,
         },
         {
             "static",
-            Register_sets::STATIC,
+            viua::bytecode::codec::Register_set::Static,
         },
         {
             "global",
-            Register_sets::GLOBAL,
+            viua::bytecode::codec::Register_set::Global,
         },
         {
             "arguments",
-            Register_sets::ARGUMENTS,
+            viua::bytecode::codec::Register_set::Arguments,
         },
         {
             "parameters",
-            Register_sets::PARAMETERS,
+            viua::bytecode::codec::Register_set::Parameters,
         },
         {
             "closure_local",
-            Register_sets::CLOSURE_LOCAL,
+            viua::bytecode::codec::Register_set::Closure_local,
         },
     };
     return mapping.at(s);

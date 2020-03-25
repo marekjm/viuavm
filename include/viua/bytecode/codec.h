@@ -24,7 +24,7 @@
 #include <tuple>
 
 namespace viua { namespace bytecode { namespace codec {
-enum class Operand_type : uint8_t {
+enum class Operand_typex : uint8_t {
     /*
      * Void operands are used when the instruction should receive "nothing"
      * in an operand. For example, when a return value of a call should be
@@ -75,8 +75,21 @@ enum class Register_set : uint8_t {
     Global = 0,
     Local,
     Static,
-    Arguments,
-    Parameters,
+    /*
+     * As described in "Programming Language Pragmatics" by Michael L. Scott:
+     *
+     *      Most subroutines are parametrized: the caller passes arguments that
+     *      influence the subroutine's behaviour, or provide it with data on
+     *      which to operate. Arguments are also called actual parameters. They
+     *      are mapped to the subroutine's formal parameters at the time a call
+     *      occurs.
+     *
+     * This can be found on page 427, in the introduction to Chapter 8
+     * "Subroutines and Control Abstraction". The ISBN for the book is
+     * 1-55860-442-1.
+     */
+    Arguments,   // actual parameters: what is passed to a function call
+    Parameters,  // formal parameters: what the function body sees
     Closure_local,
 };
 

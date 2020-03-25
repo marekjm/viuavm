@@ -54,7 +54,7 @@ struct Operand {
 struct Register_index : public Operand {
     viua::internals::Access_specifier as;
     viua::bytecode::codec::register_index_type index;
-    viua::internals::Register_sets rss;
+    viua::bytecode::codec::Register_set rss;
     bool resolved = false;
 };
 struct Instruction_block_name : public Operand {

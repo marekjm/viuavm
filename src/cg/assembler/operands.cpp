@@ -107,7 +107,7 @@ auto assembler::operands::getint(std::string const& s,
 
 auto assembler::operands::getint_with_rs_type(
     std::string const& s,
-    viua::internals::Register_sets const rs_type,
+    viua::bytecode::codec::Register_set const rs_type,
     bool const allow_bare_integers) -> int_op
 {
     if (s.size() == 0) {

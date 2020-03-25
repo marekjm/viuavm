@@ -141,7 +141,7 @@ Valid register indexes start with zero (0) and end with K, where K is the size o
 set to be accessed minus 1.
 For example, for a local register set with size 16 valid indexes span from 0 to 15.
 
-\heading{GLOBAL REGISTER SET}{ref=registers:register_sets:global}
+\heading{Global REGISTER SET}{ref=registers:register_sets:global}
 \section{begin}
 
 Global register set is allocated per-process.
@@ -157,10 +157,10 @@ exception).
 Contents of the global register set are destructed in order, beginning with values in the lowest-indexed
 registers (i.e. the value in global register 1 is destructed before the value in global register 2, etc.).
 
-%% GLOBAL REGISTER SET
+%% Global REGISTER SET
 \section{end}
 
-\heading{STATIC REGISTER SET}{ref=registers:register_sets:static}
+\heading{Static REGISTER SET}{ref=registers:register_sets:static}
 \section{begin}
 
 Static register set is allocated per-function per-process.
@@ -187,10 +187,10 @@ Since any call to a function may be the first one, access to static registers sh
 be guarded by the \instruction{isnull} instruction (described in section
 \ref{opcode:isnull}).
 
-%% STATIC REGISTER SET
+%% Static REGISTER SET
 \section{end}
 
-\heading{LOCAL REGISTER SET}{ref=registers:register_sets:local}
+\heading{Local REGISTER SET}{ref=registers:register_sets:local}
 \section{begin}
 
 A local register set is accessible only inside a single call frame.
@@ -274,10 +274,10 @@ Consider this sample code, as an example:
 \dedent{}
 \break
 
-%% LOCAL REGISTER SET
+%% Local REGISTER SET
 \section{end}
 
-\heading{ARGUMENTS REGISTER SET}{ref=registers:register_sets:arguments}
+\heading{Arguments REGISTER SET}{ref=registers:register_sets:arguments}
 \section{begin}
 
 \heading{LIFETIME}{noise=true}
@@ -292,10 +292,10 @@ only when the target register address points to a register in the arguments regi
 This register set is write-only - no operations may be performed directly on it, except
 for setting arguments for the next function call.
 
-%% ARGUMENTS REGISTER SET
+%% Arguments REGISTER SET
 \section{end}
 
-\heading{PARAMETERS REGISTER SET}{ref=registers:register_sets:parameters}
+\heading{Parameters REGISTER SET}{ref=registers:register_sets:parameters}
 \section{begin}
 
 \heading{LIFETIME}{noise=true}
@@ -314,7 +314,7 @@ only when the source register address points to a register in the parameters reg
 This register set is read-only and no operations may be performed directly on it, except
 for fetching the parameters from it.
 
-%% PARAMETERS REGISTER SET
+%% Parameters REGISTER SET
 \section{end}
 
 %% DIRECT ACCESS REGISTER SETS

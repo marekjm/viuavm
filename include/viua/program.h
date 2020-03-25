@@ -40,13 +40,13 @@ enum class Integer_operand_type {
 
 struct int_op {
     Integer_operand_type type;
-    viua::internals::Register_sets rs_type;
+    viua::bytecode::codec::Register_set rs_type;
     viua::internals::types::plain_int value;
 
     int_op();
     int_op(Integer_operand_type, viua::internals::types::plain_int = 0);
     int_op(Integer_operand_type,
-           viua::internals::Register_sets,
+           viua::bytecode::codec::Register_set,
            viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };

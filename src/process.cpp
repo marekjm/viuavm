@@ -64,7 +64,7 @@ auto viua::process::Decoder_adapter::fetch_register(
 
     auto index = std::get<1>(reg);
     auto slot  = proc.register_at(
-        index, static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+        index, static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
 
     if (std::get<2>(reg) == Access_specifier::Register_indirect) {
         auto const i =
@@ -75,7 +75,7 @@ auto viua::process::Decoder_adapter::fetch_register(
         }
         return proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
-            static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+            static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
     }
 
     return slot;
@@ -99,7 +99,7 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
     Op_address_type& addr,
     Process& proc,
     bool const pointers_allowed) const
-    -> std::pair<viua::internals::Register_sets, viua::kernel::Register*>
+    -> std::pair<viua::bytecode::codec::Register_set, viua::kernel::Register*>
 {
     auto const reg = fetch_slot(addr);
 
@@ -114,7 +114,7 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
 
     auto index = std::get<1>(reg);
     auto slot  = proc.register_at(
-        index, static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+        index, static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
 
     if (std::get<2>(reg) == Access_specifier::Register_indirect) {
         auto const i =
@@ -124,13 +124,13 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
                 "Invalid_register_index", "registers cannot be negative");
         }
         return {
-            static_cast<viua::internals::Register_sets>(std::get<0>(reg)),
+            static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)),
             proc.register_at(
                 static_cast<viua::bytecode::codec::register_index_type>(i),
-                static_cast<viua::internals::Register_sets>(std::get<0>(reg)))};
+                static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)))};
     }
 
-    return {static_cast<viua::internals::Register_sets>(std::get<0>(reg)),
+    return {static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)),
             slot};
 }
 
@@ -142,11 +142,11 @@ auto viua::process::Decoder_adapter::fetch_register_index(
 
 auto viua::process::Decoder_adapter::fetch_tagged_register_index(
     Op_address_type& addr) const
-    -> std::pair<viua::internals::Register_sets,
+    -> std::pair<viua::bytecode::codec::Register_set,
                  viua::bytecode::codec::register_index_type>
 {
     auto const slot = fetch_slot(addr);
-    return {static_cast<viua::internals::Register_sets>(std::get<0>(slot)),
+    return {static_cast<viua::bytecode::codec::Register_set>(std::get<0>(slot)),
             std::get<1>(slot)};
 }
 
@@ -160,7 +160,7 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
 
     auto slot = proc.register_at(
         std::get<1>(reg),
-        static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+        std::get<0>(reg));
 
     using viua::bytecode::codec::Access_specifier;
 
@@ -173,7 +173,7 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
         }
         slot = proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
-            static_cast<viua::internals::Register_sets>(std::get<0>(reg)));
+            std::get<0>(reg));
     }
 
     auto value = slot->get();
@@ -273,19 +273,19 @@ auto viua::process::Decoder_adapter::fetch_address(Op_address_type& addr) const
 
 auto viua::process::Process::register_at(
     viua::internals::types::register_index i,
-    viua::internals::Register_sets rs) -> viua::kernel::Register*
+    viua::bytecode::codec::Register_set rs) -> viua::kernel::Register*
 {
-    if (rs == viua::internals::Register_sets::LOCAL) {
+    if (rs == viua::bytecode::codec::Register_set::Local) {
         return stack->back()->local_register_set->register_at(i);
-    } else if (rs == viua::internals::Register_sets::STATIC) {
+    } else if (rs == viua::bytecode::codec::Register_set::Static) {
         ensure_static_registers(stack->back()->function_name);
         return static_registers.at(stack->back()->function_name)
             ->register_at(i);
-    } else if (rs == viua::internals::Register_sets::GLOBAL) {
+    } else if (rs == viua::bytecode::codec::Register_set::Global) {
         return global_register_set->register_at(i);
-    } else if (rs == viua::internals::Register_sets::PARAMETERS) {
+    } else if (rs == viua::bytecode::codec::Register_set::Parameters) {
         return stack->back()->arguments->register_at(i);
-    } else if (rs == viua::internals::Register_sets::ARGUMENTS) {
+    } else if (rs == viua::bytecode::codec::Register_set::Arguments) {
         return stack->frame_new->arguments->register_at(i);
     } else {
         throw std::make_unique<viua::types::Exception>(

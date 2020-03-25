@@ -46,7 +46,7 @@ static auto size_of_register_index_operand_with_rs_type(
                (sigil == '%' or sigil == '@' or sigil == '*')
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::Register_sets);
+        calculated_size += sizeof(viua::bytecode::codec::Register_set);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
 
@@ -77,7 +77,7 @@ static auto size_of_register_index_operand(TokenVector const& tokens,
                (sigil == '%' or sigil == '@' or sigil == '*')
                and str::isnum(tokens.at(i).str().substr(1))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::Register_sets);
+        calculated_size += sizeof(viua::bytecode::codec::Register_set);
         calculated_size += sizeof(viua::internals::types::register_index);
         ++i;
     } else {

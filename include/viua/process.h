@@ -246,11 +246,11 @@ struct Decoder_adapter {
     auto fetch_tagged_register(Op_address_type&,
                                Process&,
                                bool const = false) const
-        -> std::pair<viua::internals::Register_sets, viua::kernel::Register*>;
+        -> std::pair<viua::bytecode::codec::Register_set, viua::kernel::Register*>;
     auto fetch_register_index(Op_address_type&) const
         -> viua::bytecode::codec::register_index_type;
     auto fetch_tagged_register_index(Op_address_type&) const
-        -> std::pair<viua::internals::Register_sets,
+        -> std::pair<viua::bytecode::codec::Register_set,
                      viua::bytecode::codec::register_index_type>;
     auto fetch_value(Op_address_type&, Process&) const -> viua::types::Value*;
 
@@ -564,7 +564,7 @@ class Process {
     auto tick() -> Op_address_type;
 
     auto register_at(viua::internals::types::register_index,
-                     viua::internals::Register_sets) -> viua::kernel::Register*;
+                     viua::bytecode::codec::Register_set) -> viua::kernel::Register*;
 
     bool joinable() const;
     void join();

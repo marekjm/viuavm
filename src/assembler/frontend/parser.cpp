@@ -29,7 +29,7 @@ using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 using viua::internals::Access_specifier;
-using viua::internals::Register_sets;
+using viua::bytecode::codec::Register_set;
 
 
 // This value is completely arbitrary.
@@ -188,15 +188,15 @@ auto viua::assembler::frontend::parser::parse_operand(
             throw Invalid_syntax{tokens.at(i),
                                  "current register set is illegal"};
         } else if (tokens.at(i) == "local") {
-            ri->rss = Register_sets::LOCAL;
+            ri->rss = viua::bytecode::codec::Register_set::Local;
         } else if (tokens.at(i) == "static") {
-            ri->rss = Register_sets::STATIC;
+            ri->rss = viua::bytecode::codec::Register_set::Static;
         } else if (tokens.at(i) == "global") {
-            ri->rss = Register_sets::GLOBAL;
+            ri->rss = viua::bytecode::codec::Register_set::Global;
         } else if (tokens.at(i) == "parameters") {
-            ri->rss = Register_sets::PARAMETERS;
+            ri->rss = viua::bytecode::codec::Register_set::Parameters;
         } else if (tokens.at(i) == "arguments") {
-            ri->rss = Register_sets::ARGUMENTS;
+            ri->rss = viua::bytecode::codec::Register_set::Arguments;
         } else {
             /*
              * This is just for 'arg' instruction's special-case, where

@@ -10,7 +10,7 @@ Being moved does not affect the value moved between registers in any way.
 Any value that is present in the destination register when this instruction
 is executed is deleted before the move is performed.
 
-\heading{PASSING ARGUMENTS}{noise=true}
+\heading{PASSING Arguments}{noise=true}
 
 A special form of this instruction (where the destination register set
 is "arguments") is used to pass arguments by move to a function:
@@ -27,7 +27,7 @@ is "arguments") is used to pass arguments by move to a function:
 
 The arguments register set is described in section \ref{registers:register_sets:arguments}.
 
-\heading{OBTAINING PARAMETERS}{noise=true}
+\heading{OBTAINING Parameters}{noise=true}
 
 Another special form of this instruction (where the source register set
 is "parameters") is used to extract parameters passed to a function:

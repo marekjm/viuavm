@@ -52,7 +52,7 @@ auto check_closure_instantiations(
                      function_arity))) {
             auto val         = Register{};
             val.index        = i;
-            val.register_set = viua::internals::Register_sets::PARAMETERS;
+            val.register_set = viua::bytecode::codec::Register_set::Parameters;
             closure_register_usage_profile.define(val, fn.name);
         }
 

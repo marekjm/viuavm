@@ -38,30 +38,30 @@ using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 
-using viua::internals::Register_sets;
-auto register_set_names = std::map<Register_sets, std::string>{
+using viua::bytecode::codec::Register_set;
+auto register_set_names = std::map<viua::bytecode::codec::Register_set, std::string>{
     {
-        Register_sets::GLOBAL,
+        viua::bytecode::codec::Register_set::Global,
         "global",
     },
     {
-        Register_sets::STATIC,
+        viua::bytecode::codec::Register_set::Static,
         "static",
     },
     {
-        Register_sets::LOCAL,
+        viua::bytecode::codec::Register_set::Local,
         "local",
     },
     {
-        Register_sets::ARGUMENTS,
+        viua::bytecode::codec::Register_set::Arguments,
         "arguments",
     },
     {
-        Register_sets::PARAMETERS,
+        viua::bytecode::codec::Register_set::Parameters,
         "parameters",
     },
 };
-auto to_string(Register_sets const register_set_id) -> std::string
+auto to_string(viua::bytecode::codec::Register_set const register_set_id) -> std::string
 {
     return register_set_names.at(register_set_id);
 }
@@ -137,7 +137,7 @@ static auto maybe_mistyped_register_set_helper(
     Register_usage_profile& rup,
     viua::assembler::frontend::parser::Register_index r,
     Traced_syntax_error& error,
-    Register_sets rs_id) -> bool
+    viua::bytecode::codec::Register_set rs_id) -> bool
 {
     if (r.rss != rs_id) {
         auto val         = Register{};
@@ -163,11 +163,11 @@ static auto maybe_mistyped_register_set(
     Traced_syntax_error& error) -> void
 {
     if (maybe_mistyped_register_set_helper(
-            rup, r, error, Register_sets::LOCAL)) {
+            rup, r, error, viua::bytecode::codec::Register_set::Local)) {
         return;
     }
     if (maybe_mistyped_register_set_helper(
-            rup, r, error, Register_sets::STATIC)) {
+            rup, r, error, viua::bytecode::codec::Register_set::Static)) {
         return;
     }
 }
@@ -178,7 +178,7 @@ auto check_use_of_register(Register_usage_profile& rup,
                            bool const allow_parameters) -> void
 {
     check_if_name_resolved(rup, r);
-    if (r.rss == Register_sets::GLOBAL) {
+    if (r.rss == viua::bytecode::codec::Register_set::Global) {
         /*
          * Do not check global register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -187,7 +187,7 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
-    if (r.rss == Register_sets::STATIC) {
+    if (r.rss == viua::bytecode::codec::Register_set::Static) {
         /*
          * Do not check static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -196,7 +196,7 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
-    if ((r.rss == Register_sets::ARGUMENTS) and not allow_arguments) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Arguments) and not allow_arguments) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of arguments register set"}
@@ -205,7 +205,7 @@ auto check_use_of_register(Register_usage_profile& rup,
                       "register of `copy` and `move` instructions when a frame "
                       "is allocated"));
     }
-    if ((r.rss == Register_sets::PARAMETERS) and not allow_parameters) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Parameters) and not allow_parameters) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of parameters register set"}
@@ -215,7 +215,7 @@ auto check_use_of_register(Register_usage_profile& rup,
     }
 
     // FIXME check in bound-ness of register sets other than local
-    if ((not rup.in_bounds(r)) and r.rss == Register_sets::LOCAL) {
+    if ((not rup.in_bounds(r)) and r.rss == viua::bytecode::codec::Register_set::Local) {
         throw Traced_syntax_error{}
             .append(Invalid_syntax{
                 r.tokens.at(0),

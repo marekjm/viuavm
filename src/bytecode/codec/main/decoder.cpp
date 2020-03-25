@@ -54,11 +54,8 @@ auto Decoder::decode_register(uint8_t const* addr) const
         }
     }
 
-    auto register_set = Register_set::Local;
-    {
-        std::memcpy(&register_set, addr, sizeof(register_set));
-        addr += sizeof(register_set);
-    }
+    auto register_set = static_cast<Register_set>(*addr);
+    ++addr;
 
     auto index = register_index_type{0};
     {

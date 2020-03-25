@@ -160,18 +160,18 @@ auto ::assembler::operands::resolve_register(Token const token,
 }
 
 auto ::assembler::operands::resolve_rs_type(Token const token)
-    -> viua::internals::Register_sets
+    -> viua::bytecode::codec::Register_set
 {
     if (token == "local") {
-        return viua::internals::Register_sets::LOCAL;
+        return viua::bytecode::codec::Register_set::Local;
     } else if (token == "static") {
-        return viua::internals::Register_sets::STATIC;
+        return viua::bytecode::codec::Register_set::Static;
     } else if (token == "global") {
-        return viua::internals::Register_sets::GLOBAL;
+        return viua::bytecode::codec::Register_set::Global;
     } else if (token == "arguments") {
-        return viua::internals::Register_sets::ARGUMENTS;
+        return viua::bytecode::codec::Register_set::Arguments;
     } else if (token == "parameters") {
-        return viua::internals::Register_sets::PARAMETERS;
+        return viua::bytecode::codec::Register_set::Parameters;
     } else {
         throw viua::cg::lex::Invalid_syntax(
             token, "invalid register set type name: " + token.str());

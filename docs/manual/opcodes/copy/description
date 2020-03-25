@@ -6,7 +6,7 @@ The source register must not be empty when this instruction is issued.
 The copy of the value is made before the value in destination register is deleted.
 This ensures that in case of failure, the instruction will modify less state.
 
-\heading{PASSING ARGUMENTS}{noise=true}
+\heading{PASSING Arguments}{noise=true}
 
 A special form of this instruction (where the destination register set
 is "arguments") is used to pass arguments by copy to a function:

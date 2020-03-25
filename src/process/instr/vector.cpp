@@ -67,7 +67,7 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type
     // Check the pack_size, because if it's zero then it doesn't matter what
     // register set is used because there will be no packing.
     if (pack_size
-        and (pack_start_rs != viua::internals::Register_sets::LOCAL)) {
+        and (pack_start_rs != viua::bytecode::codec::Register_set::Local)) {
         throw std::make_unique<viua::types::Exception>(
             "packing vector from non-local register set is not allowed: "
             + std::to_string(static_cast<uint64_t>(pack_start_rs)) + " "

@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <viua/bytecode/codec.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/operand_types.h>
@@ -171,13 +172,13 @@ struct Register_address : public Operand {
     viua::internals::types::register_index const index;
     bool const iota;
     bool const name;
-    viua::internals::Register_sets const register_set;
+    viua::bytecode::codec::Register_set const register_set;
     viua::internals::Access_specifier const access;
 
     Register_address(viua::internals::types::register_index const,
                      bool const,
                      bool const,
-                     viua::internals::Register_sets const,
+                     viua::bytecode::codec::Register_set const,
                      viua::internals::Access_specifier const);
 };
 

@@ -44,7 +44,7 @@ auto check_for_unused_registers(
          --i) {
         auto index  = viua::assembler::frontend::parser::Register_index{};
         index.index = i;
-        index.rss   = viua::internals::Register_sets::LOCAL;
+        index.rss   = viua::bytecode::codec::Register_set::Local;
         auto const slot =
             viua::assembler::frontend::static_analyser::Register{index};
 

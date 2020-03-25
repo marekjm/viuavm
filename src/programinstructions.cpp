@@ -25,20 +25,20 @@
 
 int_op::int_op()
         : type(Integer_operand_type::PLAIN)
-        , rs_type(viua::internals::Register_sets::LOCAL)
+        , rs_type(viua::bytecode::codec::Register_set::Local)
         , value(0)
 {}
 int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
-        : type(t), rs_type(viua::internals::Register_sets::LOCAL), value(n)
+        : type(t), rs_type(viua::bytecode::codec::Register_set::Local), value(n)
 {}
 int_op::int_op(Integer_operand_type t,
-               viua::internals::Register_sets rst,
+               viua::bytecode::codec::Register_set rst,
                viua::internals::types::plain_int n)
         : type(t), rs_type(rst), value(n)
 {}
 int_op::int_op(viua::internals::types::plain_int n)
         : type(Integer_operand_type::PLAIN)
-        , rs_type(viua::internals::Register_sets::LOCAL)
+        , rs_type(viua::bytecode::codec::Register_set::Local)
         , value(n)
 {}
 
@@ -1193,7 +1193,7 @@ auto Program::opif(int_op const condition,
     jump_position_in_bytecode +=
         sizeof(viua::internals::types::byte);  // for operand-type marker
     jump_position_in_bytecode +=
-        sizeof(viua::internals::Register_sets);  // for rs-type marker
+        sizeof(viua::bytecode::codec::Register_set);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {

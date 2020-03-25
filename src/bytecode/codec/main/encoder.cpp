@@ -60,36 +60,9 @@ auto Encoder::encode_register(uint8_t* addr, Register_access const ra) const
     }
 
     {
-        using set_type = std::underlying_type_t<viua::internals::Register_sets>;
-        switch (set) {
-        case Register_set::Global:
-            *addr =
-                static_cast<set_type>(viua::internals::Register_sets::GLOBAL);
-            break;
-        case Register_set::Local:
-            *addr =
-                static_cast<set_type>(viua::internals::Register_sets::LOCAL);
-            break;
-        case Register_set::Static:
-            *addr =
-                static_cast<set_type>(viua::internals::Register_sets::STATIC);
-            break;
-        case Register_set::Arguments:
-            *addr = static_cast<set_type>(
-                viua::internals::Register_sets::ARGUMENTS);
-            break;
-        case Register_set::Parameters:
-            *addr = static_cast<set_type>(
-                viua::internals::Register_sets::PARAMETERS);
-            break;
-        case Register_set::Closure_local:
-            *addr = static_cast<set_type>(
-                viua::internals::Register_sets::CLOSURE_LOCAL);
-            break;
-        default:
-            assert(0);
-        }
-        addr += sizeof(set_type);
+        using set_type = std::underlying_type_t<Register_set>;
+        *addr = static_cast<set_type>(set);
+        ++addr;
     }
 
     {
