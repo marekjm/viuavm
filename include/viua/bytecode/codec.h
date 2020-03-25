@@ -94,7 +94,10 @@ enum class Register_set : uint8_t {
 };
 
 using register_index_type = uint16_t;
-using timeout_type        = uint32_t;
+
+using plain_int_type = int32_t;
+using plain_float_type = double;
+using timeout_type = uint32_t;
 
 enum class Access_specifier {
     Direct              = 0,

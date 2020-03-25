@@ -41,22 +41,22 @@ enum class Integer_operand_type {
 struct int_op {
     Integer_operand_type type;
     viua::bytecode::codec::Register_set rs_type;
-    viua::internals::types::plain_int value;
+    viua::bytecode::codec::plain_int_type value;
 
     int_op();
-    int_op(Integer_operand_type, viua::internals::types::plain_int = 0);
+    int_op(Integer_operand_type, viua::bytecode::codec::plain_int_type = 0);
     int_op(Integer_operand_type,
            viua::bytecode::codec::Register_set,
-           viua::internals::types::plain_int = 0);
-    int_op(viua::internals::types::plain_int);
+           viua::bytecode::codec::plain_int_type = 0);
+    int_op(viua::bytecode::codec::plain_int_type);
 };
 struct timeout_op {
     Integer_operand_type type;
-    viua::internals::types::timeout value;
+    viua::bytecode::codec::timeout_type value;
 
     timeout_op();
-    timeout_op(Integer_operand_type, viua::internals::types::timeout = 0);
-    timeout_op(viua::internals::types::timeout);
+    timeout_op(Integer_operand_type, viua::bytecode::codec::timeout_type = 0);
+    timeout_op(viua::bytecode::codec::timeout_type);
 };
 using byte_op = std::tuple<bool, viua::internals::types::byte>;
 using float_op = std::tuple<bool, float>;
@@ -99,7 +99,7 @@ class Program {
     auto opiinc(int_op const) -> Program&;
     auto opidec(int_op const) -> Program&;
 
-    auto opfloat(int_op const, viua::internals::types::plain_float const)
+    auto opfloat(int_op const, viua::bytecode::codec::plain_float_type const)
         -> Program&;
 
     auto opitof(int_op const, int_op const) -> Program&;

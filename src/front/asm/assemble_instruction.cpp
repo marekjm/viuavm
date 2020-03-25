@@ -179,14 +179,14 @@ auto ::assembler::operands::resolve_rs_type(Token const token)
 }
 
 static auto timeout_to_int(std::string const& timeout)
-    -> viua::internals::types::timeout
+    -> viua::bytecode::codec::timeout_type
 {
     const auto timeout_str_size = timeout.size();
     if (timeout[timeout_str_size - 2] == 'm') {
-        return static_cast<viua::internals::types::timeout>(
+        return static_cast<viua::bytecode::codec::timeout_type>(
             stoi(timeout.substr(0, timeout_str_size - 2)));
     } else {
-        return static_cast<viua::internals::types::timeout>(
+        return static_cast<viua::bytecode::codec::timeout_type>(
             (stoi(timeout.substr(0, timeout_str_size - 1)) * 1000));
     }
 }
@@ -194,7 +194,7 @@ static auto timeout_to_int(std::string const& timeout)
 auto ::assembler::operands::convert_token_to_timeout_operand(
     viua::cg::lex::Token const token) -> timeout_op
 {
-    viua::internals::types::timeout timeout_milliseconds = 0;
+    viua::bytecode::codec::timeout_type timeout_milliseconds = 0;
     if (token != "infinity") {
         timeout_milliseconds = timeout_to_int(token);
         ++timeout_milliseconds;

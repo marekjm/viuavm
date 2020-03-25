@@ -28,15 +28,15 @@ int_op::int_op()
         , rs_type(viua::bytecode::codec::Register_set::Local)
         , value(0)
 {}
-int_op::int_op(Integer_operand_type t, viua::internals::types::plain_int n)
+int_op::int_op(Integer_operand_type t, viua::bytecode::codec::plain_int_type n)
         : type(t), rs_type(viua::bytecode::codec::Register_set::Local), value(n)
 {}
 int_op::int_op(Integer_operand_type t,
                viua::bytecode::codec::Register_set rst,
-               viua::internals::types::plain_int n)
+               viua::bytecode::codec::plain_int_type n)
         : type(t), rs_type(rst), value(n)
 {}
-int_op::int_op(viua::internals::types::plain_int n)
+int_op::int_op(viua::bytecode::codec::plain_int_type n)
         : type(Integer_operand_type::PLAIN)
         , rs_type(viua::bytecode::codec::Register_set::Local)
         , value(n)
@@ -44,10 +44,10 @@ int_op::int_op(viua::internals::types::plain_int n)
 
 timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
 timeout_op::timeout_op(Integer_operand_type t,
-                       viua::internals::types::timeout n)
+                       viua::bytecode::codec::timeout_type n)
         : type(t), value(n)
 {}
-timeout_op::timeout_op(viua::internals::types::timeout n)
+timeout_op::timeout_op(viua::bytecode::codec::timeout_type n)
         : type(Integer_operand_type::PLAIN), value(n)
 {}
 
@@ -116,7 +116,7 @@ auto Program::opidec(int_op const regno) -> Program&
 }
 
 auto Program::opfloat(int_op const regno,
-                      viua::internals::types::plain_float const f) -> Program&
+                      viua::bytecode::codec::plain_float_type const f) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FLOAT);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));

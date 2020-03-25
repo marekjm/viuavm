@@ -257,7 +257,7 @@ struct Decoder_adapter {
     auto fetch_string(Op_address_type&) const -> std::string;
     auto fetch_bits_string(Op_address_type&) const -> std::vector<uint8_t>;
     auto fetch_timeout(Op_address_type&) const
-        -> viua::internals::types::timeout;
+        -> viua::bytecode::codec::timeout_type;
     auto fetch_float(Op_address_type&) const -> double;
     auto fetch_i32(Op_address_type&) const -> int32_t;
     auto fetch_bool(Op_address_type&) const -> bool;

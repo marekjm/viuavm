@@ -222,7 +222,7 @@ auto viua::process::Decoder_adapter::fetch_bits_string(
 }
 
 auto viua::process::Decoder_adapter::fetch_timeout(Op_address_type& addr) const
-    -> viua::internals::types::timeout
+    -> viua::bytecode::codec::timeout_type
 {
     auto [next_addr, t] = decoder.decode_timeout(addr);
 

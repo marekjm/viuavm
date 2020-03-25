@@ -35,11 +35,6 @@ typedef uint64_t processes_count;
 
 typedef uint16_t process_time_slice_type;
 
-typedef int32_t plain_int;
-typedef double plain_float;
-
-typedef uint32_t timeout;
-
 typedef uint64_t bits_size;
 }  // namespace types
 }}  // namespace viua::internals

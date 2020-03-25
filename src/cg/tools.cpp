@@ -300,7 +300,7 @@ static auto size_of_istore(TokenVector const& tokens, TokenVector::size_type i)
         size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
 
     calculated_size += sizeof(viua::internals::types::byte);
-    calculated_size += sizeof(viua::internals::types::plain_int);
+    calculated_size += sizeof(viua::bytecode::codec::plain_int_type);
     ++i;
 
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
@@ -321,7 +321,7 @@ static auto size_of_fstore(TokenVector const& tokens, TokenVector::size_type i)
     std::tie(size_increment, i) = size_of_register_index_operand(tokens, i);
     calculated_size += size_increment;
 
-    calculated_size += sizeof(viua::internals::types::plain_float);
+    calculated_size += sizeof(viua::bytecode::codec::plain_float_type);
     ++i;
 
     return std::tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
@@ -822,7 +822,7 @@ static auto size_of_join(TokenVector const& tokens, TokenVector::size_type i)
 
     if (str::is_timeout_literal(tokens.at(i))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::types::timeout);
+        calculated_size += sizeof(viua::bytecode::codec::timeout_type);
         ++i;
     } else {
         throw viua::cg::lex::Invalid_syntax(tokens.at(i),
@@ -842,7 +842,7 @@ static auto size_of_receive(TokenVector const& tokens, TokenVector::size_type i)
 
     if (str::is_timeout_literal(tokens.at(i))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::types::timeout);
+        calculated_size += sizeof(viua::bytecode::codec::timeout_type);
         ++i;
     } else {
         throw viua::cg::lex::Invalid_syntax(
@@ -994,7 +994,7 @@ static auto size_of_io_wait(TokenVector const& tokens, TokenVector::size_type i)
 
     if (str::is_timeout_literal(tokens.at(i))) {
         calculated_size += sizeof(viua::internals::types::byte);
-        calculated_size += sizeof(viua::internals::types::timeout);
+        calculated_size += sizeof(viua::bytecode::codec::timeout_type);
         ++i;
     } else {
         throw viua::cg::lex::Invalid_syntax(
