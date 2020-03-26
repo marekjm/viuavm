@@ -2714,8 +2714,9 @@ class ExternalModulesTests(unittest.TestCase):
         runTest(self, 'many_hello_world.asm', expected_output, 0, output_processing_function=lambda _: sorted(_.strip().splitlines()))
 
     def testLongRunningFunctionBlocksOneScheduler(self):
-        # expected output must be sorted because it is not defined in what order the messages will be printed if
-        # there is more than one FFI or VP scheduler running
+        # expected output must be sorted because it is not defined in what order
+        # the messages will be printed if there is more than one FFI or PROC
+        # scheduler running
         expected_output = sorted([
             'sleeper::lazy_print/0: sleep for 5ms',
             'Hello Joe!',
@@ -2725,7 +2726,6 @@ class ExternalModulesTests(unittest.TestCase):
             'Hello Guido!',
             'Hello Dennis!',
             'Hello Bram!',
-            'Hello Herb!',
             'Hello Anthony!',
             'Hello Alan!',
             'Hello Ada!',

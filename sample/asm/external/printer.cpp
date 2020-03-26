@@ -35,7 +35,8 @@ static auto printer_print(Frame* frame, viua::kernel::Register_set*, viua::kerne
 
 
 const Foreign_function_spec functions[] = {
-    {"printer::print/1", &printer_print}, {nullptr, nullptr},
+    {"printer::print/1", &printer_print},
+    {nullptr, nullptr},
 };
 
 extern "C" const Foreign_function_spec* exports() { return functions; }
