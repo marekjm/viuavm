@@ -47,7 +47,7 @@ class Closure : public Function {
     auto release() -> viua::kernel::Register_set*;
     auto give() -> std::unique_ptr<viua::kernel::Register_set>;
     auto empty() const -> bool;
-    auto set(viua::internals::types::register_index const,
+    auto set(viua::bytecode::codec::register_index_type const,
              std::unique_ptr<viua::types::Value>) -> void;
 
     Closure(std::string const&, std::unique_ptr<viua::kernel::Register_set>);

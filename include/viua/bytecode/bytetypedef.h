@@ -24,11 +24,9 @@
 
 namespace viua { namespace internals {
 namespace types {
-typedef uint8_t byte;
-using Op_address_type = byte const*;
+using Op_address_type = uint8_t const*;
 
 typedef uint64_t bytecode_size;
-typedef uint16_t register_index;
 
 typedef uint32_t schedulers_count;
 typedef uint64_t processes_count;

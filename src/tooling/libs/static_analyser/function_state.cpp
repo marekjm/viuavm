@@ -35,7 +35,7 @@ auto Function_state::make_wrapper(std::unique_ptr<values::Value> v)
 }
 
 auto Function_state::rename_register(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     std::string name,
     viua::tooling::libs::parser::Name_directive directive) -> void
 {
@@ -100,7 +100,7 @@ auto Function_state::rename_register(
 }
 
 auto Function_state::iota(viua::tooling::libs::lexer::Token token)
-    -> viua::internals::types::register_index
+    -> viua::bytecode::codec::register_index_type
 {
     if (iota_value >= local_registers_allocated) {
         throw viua::tooling::errors::compile_time::Error_wrapper{}
@@ -125,7 +125,7 @@ auto Function_state::iota(viua::tooling::libs::lexer::Token token)
 }
 
 auto Function_state::define_register(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set,
     values::Value_wrapper value,
     std::vector<viua::tooling::libs::lexer::Token> location) -> void
@@ -136,21 +136,21 @@ auto Function_state::define_register(
 }
 
 auto Function_state::defined(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const -> bool
 {
     return defined_registers.count(std::make_pair(index, register_set));
 }
 
 auto Function_state::defined_at(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const
     -> std::vector<viua::tooling::libs::lexer::Token> const&
 {
     return defined_where.at(std::make_pair(index, register_set));
 }
 
-auto Function_state::type_of(viua::internals::types::register_index const index,
+auto Function_state::type_of(viua::bytecode::codec::register_index_type const index,
                              viua::bytecode::codec::Register_set const register_set)
     const -> values::Value_wrapper
 {
@@ -158,7 +158,7 @@ auto Function_state::type_of(viua::internals::types::register_index const index,
 }
 
 auto Function_state::mutate_register(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set,
     std::vector<viua::tooling::libs::lexer::Token> location) -> void
 {
@@ -170,14 +170,14 @@ auto Function_state::mutate_register(
 }
 
 auto Function_state::mutated(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const -> bool
 {
     return mutated_where.count(std::make_pair(index, register_set));
 }
 
 auto Function_state::mutated_at(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const
     -> decltype(mutated_where)::mapped_type const&
 {
@@ -185,7 +185,7 @@ auto Function_state::mutated_at(
 }
 
 auto Function_state::erase_register(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set,
     std::vector<viua::tooling::libs::lexer::Token> location) -> void
 {
@@ -196,14 +196,14 @@ auto Function_state::erase_register(
 }
 
 auto Function_state::erased(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const -> bool
 {
     return erased_registers.count(std::make_pair(index, register_set));
 }
 
 auto Function_state::erased_at(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set) const
     -> std::vector<viua::tooling::libs::lexer::Token> const&
 {
@@ -212,7 +212,7 @@ auto Function_state::erased_at(
 
 auto Function_state::resolve_index(
     viua::tooling::libs::parser::Register_address const& address)
-    -> viua::internals::types::register_index
+    -> viua::bytecode::codec::register_index_type
 {
     if (address.iota) {
         return iota(address.tokens().at(1));
@@ -246,7 +246,7 @@ auto Function_state::resolve_index(
 }
 
 auto Function_state::type_matches(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set,
     std::vector<values::Value_type> const type_signature) const -> bool
 {
@@ -312,7 +312,7 @@ auto Function_state::fill_type(
     }
 }
 auto Function_state::assume_type(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     viua::bytecode::codec::Register_set const register_set,
     std::vector<values::Value_type> const type_signature) -> bool
 {
@@ -471,13 +471,13 @@ auto Function_state::clone() const -> Function_state
 }
 
 auto Function_state::local_capacity() const
-    -> viua::internals::types::register_index
+    -> viua::bytecode::codec::register_index_type
 {
     return local_registers_allocated;
 }
 
 Function_state::Function_state(
-    viua::internals::types::register_index const limit,
+    viua::bytecode::codec::register_index_type const limit,
     std::vector<viua::tooling::libs::lexer::Token> location)
         : local_registers_allocated{limit}
         , local_registers_allocated_where{std::move(location)}

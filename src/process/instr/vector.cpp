@@ -27,7 +27,7 @@
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
 
-using Register_index = viua::internals::types::register_index;
+using Register_index = viua::bytecode::codec::register_index_type;
 
 auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type
 {

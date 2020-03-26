@@ -33,7 +33,7 @@
 #include <viua/types/reference.h>
 
 // Provide storage for static member.
-viua::internals::types::register_index const
+viua::bytecode::codec::register_index_type const
     viua::process::Process::DEFAULT_REGISTER_SIZE;
 
 auto viua::process::Decoder_adapter::fetch_slot(Op_address_type& addr) const
@@ -272,7 +272,7 @@ auto viua::process::Decoder_adapter::fetch_address(Op_address_type& addr) const
 }
 
 auto viua::process::Process::register_at(
-    viua::internals::types::register_index i,
+    viua::bytecode::codec::register_index_type i,
     viua::bytecode::codec::Register_set rs) -> viua::kernel::Register*
 {
     if (rs == viua::bytecode::codec::Register_set::Local) {
@@ -309,7 +309,7 @@ void viua::process::Process::ensure_static_registers(std::string function_name)
 }
 
 Frame* viua::process::Process::request_new_frame(
-    viua::internals::types::register_index const arguments_size)
+    viua::bytecode::codec::register_index_type const arguments_size)
 {
     return stack->prepare_frame(arguments_size);
 }

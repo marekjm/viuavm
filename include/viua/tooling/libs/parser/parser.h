@@ -117,11 +117,11 @@ struct Info_directive : public Fragment {
 };
 
 struct Name_directive : public Fragment {
-    viua::internals::types::register_index const register_index;
+    viua::bytecode::codec::register_index_type const register_index;
     bool const iota;
     std::string const name;
 
-    Name_directive(viua::internals::types::register_index const,
+    Name_directive(viua::bytecode::codec::register_index_type const,
                    bool const,
                    std::string);
 };
@@ -169,13 +169,13 @@ class Operand {
 };
 
 struct Register_address : public Operand {
-    viua::internals::types::register_index const index;
+    viua::bytecode::codec::register_index_type const index;
     bool const iota;
     bool const name;
     viua::bytecode::codec::Register_set const register_set;
     viua::internals::Access_specifier const access;
 
-    Register_address(viua::internals::types::register_index const,
+    Register_address(viua::bytecode::codec::register_index_type const,
                      bool const,
                      bool const,
                      viua::bytecode::codec::Register_set const,

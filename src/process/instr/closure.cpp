@@ -109,7 +109,7 @@ auto viua::process::Process::opclosure(Op_address_type addr) -> Op_address_type
 
     auto rs = std::make_unique<viua::kernel::Register_set>(
         std::max(stack->back()->local_register_set->size(),
-                 viua::internals::types::register_index{16}));
+                 viua::bytecode::codec::register_index_type{16}));
     auto closure =
         std::make_unique<viua::types::Closure>(function_name, std::move(rs));
 

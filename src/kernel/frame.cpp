@@ -35,7 +35,7 @@ auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
 }
 
 Frame::Frame(uint8_t const* const ra,
-             viua::internals::types::register_index const argsize)
+             viua::bytecode::codec::register_index_type const argsize)
         : return_address{ra}
         , arguments{nullptr}
         , local_register_set{nullptr}

@@ -121,7 +121,7 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register&
 
 
 void viua::kernel::Register_set::put(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     std::unique_ptr<viua::types::Value> object)
 {
     if (index >= registerset_size) {
@@ -132,7 +132,7 @@ void viua::kernel::Register_set::put(
 }
 
 std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     /** Pop an object from the register.
      */
@@ -145,7 +145,7 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
 }
 
 void viua::kernel::Register_set::set(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     std::unique_ptr<viua::types::Value> object)
 {
     /** Put object inside register specified by given index.
@@ -166,7 +166,7 @@ void viua::kernel::Register_set::set(
 }
 
 viua::types::Value* viua::kernel::Register_set::get(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     /** Fetch object from register specified by given index.
      *
@@ -188,7 +188,7 @@ viua::types::Value* viua::kernel::Register_set::get(
 }
 
 viua::types::Value* viua::kernel::Register_set::at(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     /** Fetch object from register specified by given index.
      *
@@ -204,7 +204,7 @@ viua::types::Value* viua::kernel::Register_set::at(
 }
 
 viua::kernel::Register* viua::kernel::Register_set::register_at(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     if (index >= registerset_size) {
         std::ostringstream emsg;
@@ -216,8 +216,8 @@ viua::kernel::Register* viua::kernel::Register_set::register_at(
 
 
 void viua::kernel::Register_set::move(
-    viua::internals::types::register_index src,
-    viua::internals::types::register_index dst)
+    viua::bytecode::codec::register_index_type src,
+    viua::bytecode::codec::register_index_type dst)
 {
     /** Move an object from src register to dst register.
      *
@@ -236,8 +236,8 @@ void viua::kernel::Register_set::move(
 }
 
 void viua::kernel::Register_set::swap(
-    viua::internals::types::register_index src,
-    viua::internals::types::register_index dst)
+    viua::bytecode::codec::register_index_type src,
+    viua::bytecode::codec::register_index_type dst)
 {
     /** Swap objects in src and dst registers.
      *
@@ -256,7 +256,7 @@ void viua::kernel::Register_set::swap(
 }
 
 void viua::kernel::Register_set::empty(
-    viua::internals::types::register_index here)
+    viua::bytecode::codec::register_index_type here)
 {
     /** Empty a register.
      *
@@ -271,7 +271,7 @@ void viua::kernel::Register_set::empty(
 }
 
 void viua::kernel::Register_set::free(
-    viua::internals::types::register_index here)
+    viua::bytecode::codec::register_index_type here)
 {
     /** Free an object inside a register.
      *
@@ -291,7 +291,7 @@ void viua::kernel::Register_set::free(
 
 
 void viua::kernel::Register_set::flag(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     mask_type filter)
 {
     /** Enable masks specified by filter for register at given index.
@@ -312,7 +312,7 @@ void viua::kernel::Register_set::flag(
 }
 
 void viua::kernel::Register_set::unflag(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     mask_type filter)
 {
     /** Disable masks specified by filter for register at given index.
@@ -333,7 +333,7 @@ void viua::kernel::Register_set::unflag(
 }
 
 void viua::kernel::Register_set::clear(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     /** Clear masks for given register.
      *
@@ -347,7 +347,7 @@ void viua::kernel::Register_set::clear(
 }
 
 bool viua::kernel::Register_set::isflagged(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     mask_type filter)
 {
     if (index >= registerset_size) {
@@ -359,7 +359,7 @@ bool viua::kernel::Register_set::isflagged(
 }
 
 void viua::kernel::Register_set::setmask(
-    viua::internals::types::register_index index,
+    viua::bytecode::codec::register_index_type index,
     mask_type mask)
 {
     /** Set mask for a register.
@@ -380,7 +380,7 @@ void viua::kernel::Register_set::setmask(
 }
 
 mask_type viua::kernel::Register_set::getmask(
-    viua::internals::types::register_index index)
+    viua::bytecode::codec::register_index_type index)
 {
     /** Get mask of a register.
      *
@@ -428,7 +428,7 @@ std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy()
 }
 
 viua::kernel::Register_set::Register_set(
-    viua::internals::types::register_index sz)
+    viua::bytecode::codec::register_index_type sz)
         : registerset_size(sz)
 {
     /** Create register set with specified size.

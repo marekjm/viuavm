@@ -176,12 +176,12 @@ auto Register_usage_profile::erased_where(Register const r) const -> Token
 }
 
 auto Register_usage_profile::allocated_registers(
-    viua::internals::types::register_index const n) -> void
+    viua::bytecode::codec::register_index_type const n) -> void
 {
     no_of_allocated_registers = n;
 }
 auto Register_usage_profile::allocated_registers() const
-    -> std::optional<viua::internals::types::register_index>
+    -> std::optional<viua::bytecode::codec::register_index_type>
 {
     return no_of_allocated_registers;
 }

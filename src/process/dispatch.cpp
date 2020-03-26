@@ -71,7 +71,7 @@ auto viua::process::Process::get_trace_line(
         } else {
             working_address +=
                 sizeof(uint8_t);  // for opcode type
-            working_address += sizeof(viua::internals::types::register_index);
+            working_address += sizeof(viua::bytecode::codec::register_index_type);
             working_address +=
                 sizeof(viua::bytecode::codec::Register_set);
         }

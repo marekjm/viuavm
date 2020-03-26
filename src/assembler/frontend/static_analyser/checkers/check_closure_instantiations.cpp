@@ -48,7 +48,7 @@ auto check_closure_instantiations(
         auto const function_arity =
             std::stoul(fn.name.str().substr(fn.name.str().rfind('/') + 1));
         for (auto const i : viua::util::Range(
-                 static_cast<viua::internals::types::register_index>(
+                 static_cast<viua::bytecode::codec::register_index_type>(
                      function_arity))) {
             auto val         = Register{};
             val.index        = i;

@@ -76,7 +76,7 @@ auto viua::types::Closure::empty() const -> bool
 }
 
 void viua::types::Closure::set(
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     std::unique_ptr<viua::types::Value> object)
 {
     local_register_set->set(index, std::move(object));

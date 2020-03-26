@@ -169,7 +169,7 @@ class Stack {
     auto register_deferred_calls_from(Frame*) -> void;
     auto register_deferred_calls(bool const = true) -> void;
 
-    auto prepare_frame(viua::internals::types::register_index const) -> Frame*;
+    auto prepare_frame(viua::bytecode::codec::register_index_type const) -> Frame*;
     auto push_prepared_frame() -> void;
 
     auto adjust_jump_base_for_block(std::string const&)
@@ -355,7 +355,7 @@ class Process {
      *  function calls.
      */
     auto request_new_frame(
-        viua::internals::types::register_index const arguments_size = 0)
+        viua::bytecode::codec::register_index_type const arguments_size = 0)
         -> Frame*;
     auto request_new_try_frame() -> Try_frame*;
     auto push_frame() -> void;
@@ -563,7 +563,7 @@ class Process {
     auto dispatch(Op_address_type) -> Op_address_type;
     auto tick() -> Op_address_type;
 
-    auto register_at(viua::internals::types::register_index,
+    auto register_at(viua::bytecode::codec::register_index_type,
                      viua::bytecode::codec::Register_set) -> viua::kernel::Register*;
 
     bool joinable() const;
@@ -625,7 +625,7 @@ class Process {
             Decoder_adapter const& = Decoder_adapter{});
     ~Process();
 
-    static viua::internals::types::register_index const DEFAULT_REGISTER_SIZE =
+    static viua::bytecode::codec::register_index_type const DEFAULT_REGISTER_SIZE =
         255;
 };
 }}  // namespace viua::process

@@ -41,7 +41,7 @@ bool any_equal(T const& to_compare, U const& first, R const&... rest)
     return ((to_compare == first) or any_equal(to_compare, rest...));
 }
 
-using Arity = viua::internals::types::register_index;
+using Arity = viua::bytecode::codec::register_index_type;
 
 template<typename... A>
 void assert_arity(const Frame* frame, A const&... valid_arities)

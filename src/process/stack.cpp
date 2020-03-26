@@ -128,7 +128,7 @@ auto viua::process::Stack::pop() -> std::unique_ptr<Frame>
     std::unique_ptr<Frame> frame{std::move(frames.back())};
     frames.pop_back();
 
-    for (viua::internals::types::register_index i = 0;
+    for (viua::bytecode::codec::register_index_type i = 0;
          i < frame->arguments->size();
          ++i) {
         if (frame->arguments->at(i) != nullptr
@@ -299,7 +299,7 @@ auto viua::process::Stack::unwind() -> void
 }
 
 auto viua::process::Stack::prepare_frame(
-    viua::internals::types::register_index const arguments_size) -> Frame*
+    viua::bytecode::codec::register_index_type const arguments_size) -> Frame*
 {
     if (frame_new) {
         throw "requested new frame while last one is unused";

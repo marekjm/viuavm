@@ -201,24 +201,24 @@ class IO_request : public Value {
 }  // namespace values
 
 class Function_state {
-    viua::internals::types::register_index const local_registers_allocated = 0;
+    viua::bytecode::codec::register_index_type const local_registers_allocated = 0;
     std::vector<viua::tooling::libs::lexer::Token>
         local_registers_allocated_where;
 
-    std::map<viua::internals::types::register_index,
+    std::map<viua::bytecode::codec::register_index_type,
              viua::tooling::libs::parser::Name_directive>
         register_renames;
-    std::map<std::string, viua::internals::types::register_index>
+    std::map<std::string, viua::bytecode::codec::register_index_type>
         register_name_to_index;
-    std::map<viua::internals::types::register_index, std::string>
+    std::map<viua::bytecode::codec::register_index_type, std::string>
         register_index_to_name;
 
-    viua::internals::types::register_index iota_value = 1;
+    viua::bytecode::codec::register_index_type iota_value = 1;
 
     std::vector<std::unique_ptr<values::Value>> assigned_values;
 
     using Register_address_type =
-        std::pair<viua::internals::types::register_index,
+        std::pair<viua::bytecode::codec::register_index_type,
                   viua::bytecode::codec::Register_set>;
     std::map<Register_address_type, values::Value_wrapper> defined_registers;
     std::map<Register_address_type,
@@ -235,48 +235,48 @@ class Function_state {
   public:
     auto make_wrapper(std::unique_ptr<values::Value>) -> values::Value_wrapper;
 
-    auto rename_register(viua::internals::types::register_index const,
+    auto rename_register(viua::bytecode::codec::register_index_type const,
                          std::string,
                          viua::tooling::libs::parser::Name_directive) -> void;
 
-    auto define_register(viua::internals::types::register_index const,
+    auto define_register(viua::bytecode::codec::register_index_type const,
                          viua::bytecode::codec::Register_set const,
                          values::Value_wrapper,
                          std::vector<viua::tooling::libs::lexer::Token>)
         -> void;
-    auto defined(viua::internals::types::register_index const,
+    auto defined(viua::bytecode::codec::register_index_type const,
                  viua::bytecode::codec::Register_set const) const -> bool;
-    auto defined_at(viua::internals::types::register_index const,
+    auto defined_at(viua::bytecode::codec::register_index_type const,
                     viua::bytecode::codec::Register_set const) const
         -> std::vector<viua::tooling::libs::lexer::Token> const&;
-    auto type_of(viua::internals::types::register_index const,
+    auto type_of(viua::bytecode::codec::register_index_type const,
                  viua::bytecode::codec::Register_set const) const
         -> values::Value_wrapper;
-    auto mutate_register(viua::internals::types::register_index const,
+    auto mutate_register(viua::bytecode::codec::register_index_type const,
                          viua::bytecode::codec::Register_set const,
                          std::vector<viua::tooling::libs::lexer::Token>)
         -> void;
-    auto mutated(viua::internals::types::register_index const,
+    auto mutated(viua::bytecode::codec::register_index_type const,
                  viua::bytecode::codec::Register_set const) const -> bool;
-    auto mutated_at(viua::internals::types::register_index const,
+    auto mutated_at(viua::bytecode::codec::register_index_type const,
                     viua::bytecode::codec::Register_set const) const
         -> decltype(mutated_where)::mapped_type const&;
-    auto erase_register(viua::internals::types::register_index const,
+    auto erase_register(viua::bytecode::codec::register_index_type const,
                         viua::bytecode::codec::Register_set const,
                         std::vector<viua::tooling::libs::lexer::Token>) -> void;
-    auto erased(viua::internals::types::register_index const,
+    auto erased(viua::bytecode::codec::register_index_type const,
                 viua::bytecode::codec::Register_set const) const -> bool;
-    auto erased_at(viua::internals::types::register_index const,
+    auto erased_at(viua::bytecode::codec::register_index_type const,
                    viua::bytecode::codec::Register_set const) const
         -> std::vector<viua::tooling::libs::lexer::Token> const&;
 
     auto iota(viua::tooling::libs::lexer::Token)
-        -> viua::internals::types::register_index;
+        -> viua::bytecode::codec::register_index_type;
 
     auto resolve_index(viua::tooling::libs::parser::Register_address const&)
-        -> viua::internals::types::register_index;
+        -> viua::bytecode::codec::register_index_type;
 
-    auto type_matches(viua::internals::types::register_index const,
+    auto type_matches(viua::bytecode::codec::register_index_type const,
                       viua::bytecode::codec::Register_set const,
                       std::vector<values::Value_type> const) const -> bool;
 
@@ -286,16 +286,16 @@ class Function_state {
                    std::vector<values::Value_type>::size_type const) -> void;
 
   public:
-    auto assume_type(viua::internals::types::register_index const,
+    auto assume_type(viua::bytecode::codec::register_index_type const,
                      viua::bytecode::codec::Register_set const,
                      std::vector<values::Value_type> const) -> bool;
 
     auto dump(std::ostream&) const -> void;
     auto clone() const -> Function_state;
 
-    auto local_capacity() const -> viua::internals::types::register_index;
+    auto local_capacity() const -> viua::bytecode::codec::register_index_type;
 
-    Function_state(viua::internals::types::register_index const,
+    Function_state(viua::bytecode::codec::register_index_type const,
                    std::vector<viua::tooling::libs::lexer::Token>);
     Function_state(Function_state const&) = delete;
     Function_state(Function_state&&);

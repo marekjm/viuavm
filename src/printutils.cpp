@@ -27,7 +27,7 @@ std::string stringify_function_invocation(const Frame* frame)
     std::ostringstream oss;
     oss << frame->function_name << '/' << frame->arguments->size();
     oss << '(';
-    for (auto i = viua::internals::types::register_index{0}; i < frame->arguments->size(); ++i) {
+    for (auto i = viua::bytecode::codec::register_index_type{0}; i < frame->arguments->size(); ++i) {
         auto optr = frame->arguments->at(i);
         if (optr == nullptr) {
             oss << "<moved or void>";

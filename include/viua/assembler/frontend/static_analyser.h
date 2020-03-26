@@ -117,15 +117,15 @@ class Register_usage_profile {
      */
     std::set<Register> maybe_unused_registers;
 
-    std::optional<viua::internals::types::register_index>
+    std::optional<viua::bytecode::codec::register_index_type>
         no_of_allocated_registers;
     std::optional<viua::cg::lex::Token> where_registers_were_allocated;
 
     auto fresh(Register const) const -> bool;
 
   public:
-    std::map<std::string, viua::internals::types::register_index> name_to_index;
-    std::map<viua::internals::types::register_index, std::string> index_to_name;
+    std::map<std::string, viua::bytecode::codec::register_index_type> name_to_index;
+    std::map<viua::bytecode::codec::register_index_type, std::string> index_to_name;
 
     auto define(Register const r,
                 viua::cg::lex::Token const t,
@@ -154,10 +154,10 @@ class Register_usage_profile {
     auto erased(Register const r) const -> bool;
     auto erased_where(Register const r) const -> viua::cg::lex::Token;
 
-    auto allocated_registers(viua::internals::types::register_index const)
+    auto allocated_registers(viua::bytecode::codec::register_index_type const)
         -> void;
     auto allocated_registers() const
-        -> std::optional<viua::internals::types::register_index>;
+        -> std::optional<viua::bytecode::codec::register_index_type>;
     auto allocated_where(viua::cg::lex::Token const&) -> void;
     auto allocated_where() const -> std::optional<viua::cg::lex::Token>;
 

@@ -1194,7 +1194,7 @@ auto Program::opif(int_op const condition,
         sizeof(uint8_t);  // for operand-type marker
     jump_position_in_bytecode +=
         sizeof(viua::bytecode::codec::Register_set);  // for rs-type marker
-    jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
+    jump_position_in_bytecode += sizeof(viua::bytecode::codec::register_index_type);
 
     if (absolute_truth != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);

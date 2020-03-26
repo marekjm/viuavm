@@ -82,7 +82,7 @@ auto map_names_to_register_indexes(
             idx = idx.substr(1);
         }
         auto index =
-            static_cast<viua::internals::types::register_index>(stoul(idx));
+            static_cast<viua::bytecode::codec::register_index_type>(stoul(idx));
         auto name = directive->operands.at(1);
 
         if (str::is_register_set_name(name)) {
@@ -563,7 +563,7 @@ static auto check_register_usage_for_instruction_block(
     auto const function_arity =
         std::stoul(ib.name.str().substr(ib.name.str().rfind('/') + 1));
     for (auto const each :
-         viua::util::Range(static_cast<viua::internals::types::register_index>(
+         viua::util::Range(static_cast<viua::bytecode::codec::register_index_type>(
              function_arity))) {
         auto val         = Register{};
         val.index        = each;

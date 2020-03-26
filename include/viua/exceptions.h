@@ -23,6 +23,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <viua/bytecode/codec.h>
 #include <viua/types/exception.h>
 #include <viua/util/exceptions.h>
 
@@ -34,7 +35,7 @@ class Out_of_range_exception : public viua::types::Exception {
 };
 
 class Arity_exception : public viua::types::Exception {
-    viua::internals::types::register_index got_arity;
+    viua::bytecode::codec::register_index_type got_arity;
     std::vector<decltype(got_arity)> valid_arities;
 
   public:

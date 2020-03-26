@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <vector>
-#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/codec.h>
 #include <viua/types/value.h>
 
 typedef uint8_t mask_type;
@@ -65,47 +65,47 @@ class Register {
 };
 
 class Register_set {
-    viua::internals::types::register_index registerset_size;
+    viua::bytecode::codec::register_index_type registerset_size;
     std::vector<Register> registers;
 
   public:
     // basic access to registers
-    void put(viua::internals::types::register_index,
+    void put(viua::bytecode::codec::register_index_type,
              std::unique_ptr<viua::types::Value>);
     std::unique_ptr<viua::types::Value> pop(
-        viua::internals::types::register_index);
-    void set(viua::internals::types::register_index,
+        viua::bytecode::codec::register_index_type);
+    void set(viua::bytecode::codec::register_index_type,
              std::unique_ptr<viua::types::Value>);
-    viua::types::Value* get(viua::internals::types::register_index);
-    viua::types::Value* at(viua::internals::types::register_index);
+    viua::types::Value* get(viua::bytecode::codec::register_index_type);
+    viua::types::Value* at(viua::bytecode::codec::register_index_type);
 
-    Register* register_at(viua::internals::types::register_index);
+    Register* register_at(viua::bytecode::codec::register_index_type);
 
     // register modifications
-    void move(viua::internals::types::register_index,
-              viua::internals::types::register_index);
-    void swap(viua::internals::types::register_index,
-              viua::internals::types::register_index);
-    void empty(viua::internals::types::register_index);
-    void free(viua::internals::types::register_index);
+    void move(viua::bytecode::codec::register_index_type,
+              viua::bytecode::codec::register_index_type);
+    void swap(viua::bytecode::codec::register_index_type,
+              viua::bytecode::codec::register_index_type);
+    void empty(viua::bytecode::codec::register_index_type);
+    void free(viua::bytecode::codec::register_index_type);
 
     // mask inspection and manipulation
-    void flag(viua::internals::types::register_index, mask_type);
-    void unflag(viua::internals::types::register_index, mask_type);
-    void clear(viua::internals::types::register_index);
-    bool isflagged(viua::internals::types::register_index, mask_type);
-    void setmask(viua::internals::types::register_index, mask_type);
-    mask_type getmask(viua::internals::types::register_index);
+    void flag(viua::bytecode::codec::register_index_type, mask_type);
+    void unflag(viua::bytecode::codec::register_index_type, mask_type);
+    void clear(viua::bytecode::codec::register_index_type);
+    bool isflagged(viua::bytecode::codec::register_index_type, mask_type);
+    void setmask(viua::bytecode::codec::register_index_type, mask_type);
+    mask_type getmask(viua::bytecode::codec::register_index_type);
 
     void drop();
-    inline viua::internals::types::register_index size()
+    inline viua::bytecode::codec::register_index_type size()
     {
         return registerset_size;
     }
 
     std::unique_ptr<Register_set> copy();
 
-    Register_set(viua::internals::types::register_index sz);
+    Register_set(viua::bytecode::codec::register_index_type sz);
     ~Register_set();
 };
 }}  // namespace viua::kernel

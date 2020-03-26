@@ -51,7 +51,7 @@ class Frame {
                                 bool const receives_ownership = true) -> void;
 
     Frame(uint8_t const* const,
-          viua::internals::types::register_index const);
+          viua::bytecode::codec::register_index_type const);
     Frame(Frame const&) = delete;
     Frame(Frame&&)      = delete;
     auto operator=(Frame const&) = delete;

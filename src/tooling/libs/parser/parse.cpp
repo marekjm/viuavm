@@ -106,7 +106,7 @@ Mark_directive::Mark_directive(std::string m)
         : Fragment{Fragment_type::Mark_directive}, mark{std::move(m)}
 {}
 
-Name_directive::Name_directive(viua::internals::types::register_index const ri,
+Name_directive::Name_directive(viua::bytecode::codec::register_index_type const ri,
                                bool const i,
                                std::string n)
         : Fragment{Fragment_type::Name_directive}
@@ -130,7 +130,7 @@ auto Operand::tokens() const -> decltype(operand_tokens) const&
 Operand::Operand(Operand_type const o) : operand_type{o} {}
 
 Register_address::Register_address(
-    viua::internals::types::register_index const ri,
+    viua::bytecode::codec::register_index_type const ri,
     bool const i,
     bool const n,
     viua::bytecode::codec::Register_set const rs,
@@ -321,7 +321,7 @@ static auto parse_name_directive(
     auto i = index_type{0};
 
     auto const is_iota = (tokens.at(1) == "iota");
-    auto const index   = static_cast<viua::internals::types::register_index>(
+    auto const index   = static_cast<viua::bytecode::codec::register_index_type>(
         is_iota ? 0 : std::stoul(tokens.at(1).str()));
 
     auto frag =
@@ -494,7 +494,7 @@ static auto parse_register_address(
 
     auto const is_iota = (tokens.at(1) == "iota");
     auto const is_name = is_id(tokens.at(1).str());
-    auto const index   = static_cast<viua::internals::types::register_index>(
+    auto const index   = static_cast<viua::bytecode::codec::register_index_type>(
         (is_iota or is_name) ? 0 : std::stoul(tokens.at(1).str()));
     auto const register_set = string_to_register_set(tokens.at(2).str());
     auto access             = string_to_access_type(tokens.at(0).str());

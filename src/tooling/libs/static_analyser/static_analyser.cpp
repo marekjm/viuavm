@@ -125,7 +125,7 @@ static auto maybe_with_pointer(viua::internals::Access_specifier const access,
 static auto throw_if_empty(
     Function_state& function_state,
     viua::tooling::libs::parser::Register_address const& address)
-    -> viua::internals::types::register_index
+    -> viua::bytecode::codec::register_index_type
 {
     auto const address_index = function_state.resolve_index(address);
     if (not function_state.defined(address_index, address.register_set)) {
@@ -161,7 +161,7 @@ static auto throw_if_empty(
 static auto throw_if_invalid_type(
     Function_state& function_state,
     viua::tooling::libs::parser::Register_address const& address,
-    viua::internals::types::register_index const index,
+    viua::bytecode::codec::register_index_type const index,
     std::vector<values::Value_type> const type_signature) -> void
 {
     if (not function_state.assume_type(
@@ -215,15 +215,15 @@ template<typename T> auto int_range(T const n) -> std::vector<T>
 }
 
 struct Frame_representation {
-    viua::internals::types::register_index const allocated_parameters;
-    std::map<viua::internals::types::register_index,
+    viua::bytecode::codec::register_index_type const allocated_parameters;
+    std::map<viua::bytecode::codec::register_index_type,
              viua::tooling::libs::lexer::Token>
         filled_parameters;
 
-    Frame_representation(viua::internals::types::register_index const);
+    Frame_representation(viua::bytecode::codec::register_index_type const);
 };
 Frame_representation::Frame_representation(
-    viua::internals::types::register_index const size)
+    viua::bytecode::codec::register_index_type const size)
         : allocated_parameters{size}
 {}
 
@@ -3905,7 +3905,7 @@ static auto analyse_single_function(
             throw error;
         }
     } else {
-        using arity_type = viua::internals::types::register_index;
+        using arity_type = viua::bytecode::codec::register_index_type;
         for (auto i = arity_type{0}; i < fn.head().arity; ++i) {
             function_state.define_register(
                 i,
