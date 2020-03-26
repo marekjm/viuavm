@@ -43,7 +43,7 @@ class Loader {
     std::string path;
 
     viua::internals::types::bytecode_size size;
-    std::unique_ptr<viua::internals::types::byte[]> bytecode;
+    std::unique_ptr<uint8_t[]> bytecode;
 
     std::vector<viua::internals::types::bytecode_size> jumps;
 
@@ -84,7 +84,7 @@ class Loader {
     Loader& executable();
 
     viua::internals::types::bytecode_size get_bytecode_size();
-    std::unique_ptr<viua::internals::types::byte[]> get_bytecode();
+    std::unique_ptr<uint8_t[]> get_bytecode();
 
     std::vector<viua::internals::types::bytecode_size> get_jumps();
 

@@ -22,7 +22,7 @@
 
 #include <viua/bytecode/bytetypedef.h>
 
-enum OPCODE : viua::internals::types::byte {
+enum OPCODE : uint8_t {
     NOP = 0,  // do nothing
 
     // integer instructions

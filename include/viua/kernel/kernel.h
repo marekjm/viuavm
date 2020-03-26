@@ -134,7 +134,7 @@ class Kernel {
      * Bytecode pointer is a pointer to program's code. Size and executable
      * offset are metadata exported from bytecode dump.
      */
-    std::unique_ptr<viua::internals::types::byte[]> bytecode;
+    std::unique_ptr<uint8_t[]> bytecode;
     viua::internals::types::bytecode_size bytecode_size;
     viua::internals::types::bytecode_size executable_offset;
 
@@ -145,13 +145,13 @@ class Kernel {
     std::map<std::string, viua::internals::types::bytecode_size>
         block_addresses;
 
-    std::map<std::string, std::pair<std::string, viua::internals::types::byte*>>
+    std::map<std::string, std::pair<std::string, uint8_t*>>
         linked_functions;
-    std::map<std::string, std::pair<std::string, viua::internals::types::byte*>>
+    std::map<std::string, std::pair<std::string, uint8_t*>>
         linked_blocks;
     std::map<std::string,
              std::pair<viua::internals::types::bytecode_size,
-                       std::unique_ptr<viua::internals::types::byte[]>>>
+                       std::unique_ptr<uint8_t[]>>>
         linked_modules;
 
     int return_code;
@@ -295,7 +295,7 @@ class Kernel {
      *      * tell the Kernel where to start execution,
      *      * kick the Kernel so it starts running,
      */
-    Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
+    Kernel& load(std::unique_ptr<uint8_t[]>);
     Kernel& bytes(viua::internals::types::bytecode_size);
 
     Kernel& mapfunction(std::string const&,

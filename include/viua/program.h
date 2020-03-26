@@ -58,7 +58,7 @@ struct timeout_op {
     timeout_op(Integer_operand_type, viua::bytecode::codec::timeout_type = 0);
     timeout_op(viua::bytecode::codec::timeout_type);
 };
-using byte_op = std::tuple<bool, viua::internals::types::byte>;
+using byte_op = std::tuple<bool, uint8_t>;
 using float_op = std::tuple<bool, float>;
 
 enum JUMPTYPE {
@@ -70,7 +70,7 @@ enum JUMPTYPE {
 
 class Program {
     // byte array containing bytecode
-    std::unique_ptr<viua::internals::types::byte[]> program;
+    std::unique_ptr<uint8_t[]> program;
     // size of the bytecode
     viua::internals::types::bytecode_size bytes;
 
@@ -79,14 +79,14 @@ class Program {
      *  Methods implementing generation of specific bytecodes always
      *  append bytes to this pointer.
      */
-    viua::internals::types::byte* addr_ptr;
+    uint8_t* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
      *  Jumps must be recalculated because each function is compiled separately
      * with jump offset 0, but when they are assembled into a single binary the
      * offsets change.
      */
-    std::vector<viua::internals::types::byte*> branches;
+    std::vector<uint8_t*> branches;
 
     viua::bytecode::codec::main::Encoder encoder;
 
@@ -279,8 +279,8 @@ class Program {
         std::vector<viua::cg::lex::Token> const&) -> Program&;
     auto jumps() const -> std::vector<viua::internals::types::bytecode_size>;
 
-    auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
-    auto fill(std::unique_ptr<viua::internals::types::byte[]>) -> Program&;
+    auto bytecode() const -> std::unique_ptr<uint8_t[]>;
+    auto fill(std::unique_ptr<uint8_t[]>) -> Program&;
 
     auto size() const -> viua::internals::types::bytecode_size;
 

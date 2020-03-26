@@ -291,13 +291,13 @@ static auto disassemble_address(std::ostream& oss, Decoder_type const& decoder, 
 static auto disassemble_ri_operand_with_rs_type(
     std::ostream& oss,
     Decoder_type const& decoder,
-    viua::internals::types::byte const* ptr) -> viua::internals::types::byte const*
+    uint8_t const* ptr) -> uint8_t const*
 {
     auto const [ s, next_ptr ] = disassembler::intop_with_rs_type(decoder, ptr);
     oss << ' ' << s;
     return next_ptr;
 }
-auto instruction(Decoder_type const& decoder, viua::internals::types::byte const* ptr)
+auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     -> std::tuple<std::string, viua::internals::types::bytecode_size>
 {
     auto saved_ptr = ptr;

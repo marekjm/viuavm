@@ -363,28 +363,28 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + sizeof(uint8_t)
                  + sizeof(viua::bytecode::codec::Register_set)
-                 + sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::bytecode::codec::register_index_type);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
         entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + sizeof(uint8_t)
                  + sizeof(viua::bytecode::codec::Register_set)
-                 + sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::bytecode::codec::register_index_type);
 
         entry_function_tokens.emplace_back(0, 0, "izero");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + sizeof(uint8_t)
                  + sizeof(viua::bytecode::codec::Register_set)
-                 + sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::bytecode::codec::register_index_type);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -395,10 +395,10 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + 3 * sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + 3 * sizeof(uint8_t)
                  + 3 * sizeof(viua::bytecode::codec::Register_set)
-                 + 3 * sizeof(viua::internals::types::register_index);
+                 + 3 * sizeof(viua::bytecode::codec::register_index_type);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "copy");
@@ -407,10 +407,10 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + 2 * sizeof(uint8_t)
                  + 2 * sizeof(viua::bytecode::codec::Register_set)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + 2 * sizeof(viua::bytecode::codec::register_index_type);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -420,10 +420,10 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + 2 * sizeof(uint8_t)
                  + 2 * sizeof(viua::bytecode::codec::Register_set)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + 2 * sizeof(viua::bytecode::codec::register_index_type);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -432,10 +432,10 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "arguments");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + sizeof(uint8_t)
                  + sizeof(viua::bytecode::codec::Register_set)
-                 + sizeof(viua::internals::types::register_index);
+                 + sizeof(viua::bytecode::codec::register_index_type);
 
         entry_function_tokens.emplace_back(0, 0, "copy");
         entry_function_tokens.emplace_back(0, 0, "%0");
@@ -443,10 +443,10 @@ static auto generate_entry_function(
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte)
-                 + 2 * sizeof(viua::internals::types::byte)
+        bytes += sizeof(uint8_t)
+                 + 2 * sizeof(uint8_t)
                  + 2 * sizeof(viua::bytecode::codec::Register_set)
-                 + 2 * sizeof(viua::internals::types::register_index);
+                 + 2 * sizeof(viua::bytecode::codec::register_index_type);
     }
 
     entry_function_tokens.emplace_back(0, 0, "call");
@@ -454,10 +454,10 @@ static auto generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte)
-             + sizeof(viua::internals::types::byte)
+    bytes += sizeof(uint8_t)
+             + sizeof(uint8_t)
              + sizeof(viua::bytecode::codec::Register_set)
-             + sizeof(viua::internals::types::register_index);
+             + sizeof(viua::bytecode::codec::register_index_type);
     bytes += main_function.size() + 1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
@@ -467,14 +467,14 @@ static auto generate_entry_function(
     entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte)
-             + 2 * sizeof(viua::internals::types::byte)
+    bytes += sizeof(uint8_t)
+             + 2 * sizeof(uint8_t)
              + 2 * sizeof(viua::bytecode::codec::Register_set)
-             + 2 * sizeof(viua::internals::types::register_index);
+             + 2 * sizeof(viua::bytecode::codec::register_index_type);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte);
+    bytes += sizeof(uint8_t);
 
     functions.tokens[ENTRY_FUNCTION_NAME] = entry_function_tokens;
 
@@ -570,7 +570,7 @@ auto generate(std::vector<Token> const& tokens,
     auto linked_libs_bytecode = std::vector<
         std::tuple<std::string,
                    viua::internals::types::bytecode_size,
-                   std::unique_ptr<viua::internals::types::byte[]>>>{};
+                   std::unique_ptr<uint8_t[]>>>{};
     auto linked_function_names        = std::vector<std::string>{};
     auto static_linked_function_names = std::vector<std::string>{};
     auto static_linked_block_names    = std::vector<std::string>{};
@@ -1085,11 +1085,11 @@ auto generate(std::vector<Token> const& tokens,
     auto functions_bytecode =
         std::map<std::string,
                  std::tuple<viua::internals::types::bytecode_size,
-                            std::unique_ptr<viua::internals::types::byte[]>>>{};
+                            std::unique_ptr<uint8_t[]>>>{};
     auto block_bodies_bytecode =
         std::map<std::string,
                  std::tuple<viua::internals::types::bytecode_size,
-                            std::unique_ptr<viua::internals::types::byte[]>>>{};
+                            std::unique_ptr<uint8_t[]>>>{};
     auto functions_section_size    = viua::internals::types::bytecode_size{0};
     auto block_bodies_section_size = viua::internals::types::bytecode_size{0};
 
@@ -1374,7 +1374,7 @@ auto generate(std::vector<Token> const& tokens,
     bwrite(out, bytes);
 
     auto program_bytecode =
-        std::make_unique<viua::internals::types::byte[]>(bytes);
+        std::make_unique<uint8_t[]>(bytes);
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////

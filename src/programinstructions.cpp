@@ -1189,9 +1189,9 @@ auto Program::opif(int_op const condition,
     auto jump_position_in_bytecode = addr_ptr;
 
     jump_position_in_bytecode +=
-        sizeof(viua::internals::types::byte);  // for opcode
+        sizeof(uint8_t);  // for opcode
     jump_position_in_bytecode +=
-        sizeof(viua::internals::types::byte);  // for operand-type marker
+        sizeof(uint8_t);  // for operand-type marker
     jump_position_in_bytecode +=
         sizeof(viua::bytecode::codec::Register_set);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);

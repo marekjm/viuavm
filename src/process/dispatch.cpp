@@ -27,7 +27,7 @@
 
 
 auto viua::process::Process::get_trace_line(
-    viua::internals::types::byte const* for_address) const -> std::string
+    uint8_t const* for_address) const -> std::string
 {
     auto trace_line = std::ostringstream{};
 
@@ -70,7 +70,7 @@ auto viua::process::Process::get_trace_line(
             ++working_address;
         } else {
             working_address +=
-                sizeof(viua::internals::types::byte);  // for opcode type
+                sizeof(uint8_t);  // for opcode type
             working_address += sizeof(viua::internals::types::register_index);
             working_address +=
                 sizeof(viua::bytecode::codec::Register_set);
@@ -101,7 +101,7 @@ auto viua::process::Process::get_trace_line(
     return trace_line.str();
 }
 auto viua::process::Process::emit_trace_line(
-    viua::internals::types::byte const* for_address) const -> void
+    uint8_t const* for_address) const -> void
 {
     // FIXME conditionally enable duplicate trace lines
     static auto previous_trace_line = std::string{};
@@ -114,8 +114,8 @@ auto viua::process::Process::emit_trace_line(
 }
 
 
-auto viua::process::Process::dispatch(viua::internals::types::byte const* addr)
-    -> viua::internals::types::byte const*
+auto viua::process::Process::dispatch(uint8_t const* addr)
+    -> uint8_t const*
 {
     /** Dispatches instruction at a pointer to its handler.
      */

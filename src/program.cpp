@@ -35,14 +35,14 @@ using viua::util::memory::load_aligned;
 
 
 auto Program::bytecode() const
-    -> std::unique_ptr<viua::internals::types::byte[]>
+    -> std::unique_ptr<uint8_t[]>
 {
-    auto tmp = std::make_unique<viua::internals::types::byte[]>(bytes);
+    auto tmp = std::make_unique<uint8_t[]>(bytes);
     std::copy_n(program.get(), size(), tmp.get());
     return tmp;
 }
 
-auto Program::fill(std::unique_ptr<viua::internals::types::byte[]> code)
+auto Program::fill(std::unique_ptr<uint8_t[]> code)
     -> Program&
 {
     program  = std::move(code);
@@ -64,7 +64,7 @@ auto Program::calculate_jumps(
         /*
          * Usually beware of the reinterpret_cast<> but here we *know* what we
          * are doing. We *know* that this location points to uint64_t even if it
-         * is stored inside the viua::internals::types::byte array.
+         * is stored inside the uint8_t array.
          */
         auto const ptr = (program.get() + position);
         auto const n_instructions = be64toh(load_aligned<uint64_t>(ptr));
@@ -88,19 +88,19 @@ auto Program::jumps() const -> std::vector<uint64_t>
 
 Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts}
 {
-    program = std::make_unique<viua::internals::types::byte[]>(bytes);
+    program = std::make_unique<uint8_t[]>(bytes);
 
     /*
      * Filling bytecode with zeroes (which are interpreted by kernel as NOP
      * instructions) is a safe way to prevent many hiccups.
      */
-    std::fill_n(program.get(), bytes, viua::internals::types::byte{0});
+    std::fill_n(program.get(), bytes, uint8_t{0});
     addr_ptr = program.get();
 }
 Program::Program(Program const& that)
         : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({})
 {
-    program = std::make_unique<viua::internals::types::byte[]>(bytes);
+    program = std::make_unique<uint8_t[]>(bytes);
     std::copy_n(program.get(), bytes, that.program.get());
     addr_ptr = program.get() + (that.addr_ptr - that.program.get());
 

@@ -40,7 +40,7 @@ template<typename K, typename V> auto in(std::map<K, V> m, K key) -> bool
 namespace disassembler {
 using Decoder_type = viua::bytecode::codec::main::Decoder;
 
-auto instruction(Decoder_type const&, viua::internals::types::byte const*)
+auto instruction(Decoder_type const&, uint8_t const*)
     -> std::tuple<std::string, viua::internals::types::bytecode_size>;
 }  // namespace disassembler
 

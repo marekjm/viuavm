@@ -34,7 +34,7 @@ auto Frame::set_local_register_set(viua::kernel::Register_set* const rs,
     local_register_set.reset(rs, receives_ownership);
 }
 
-Frame::Frame(viua::internals::types::byte const* const ra,
+Frame::Frame(uint8_t const* const ra,
              viua::internals::types::register_index const argsize)
         : return_address{ra}
         , arguments{nullptr}

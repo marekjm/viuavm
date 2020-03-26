@@ -229,7 +229,7 @@ void Loader::load_blocks_map(std::ifstream& in)
 void Loader::load_bytecode(std::ifstream& in)
 {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
-    bytecode = std::make_unique<viua::internals::types::byte[]>(size);
+    bytecode = std::make_unique<uint8_t[]>(size);
     in.read(reinterpret_cast<char*>(bytecode.get()),
             static_cast<std::streamsize>(size));
 }
@@ -284,9 +284,9 @@ Loader& Loader::executable()
 }
 
 uint64_t Loader::get_bytecode_size() { return size; }
-auto Loader::get_bytecode() -> std::unique_ptr<viua::internals::types::byte[]>
+auto Loader::get_bytecode() -> std::unique_ptr<uint8_t[]>
 {
-    auto copy = std::make_unique<viua::internals::types::byte[]>(size);
+    auto copy = std::make_unique<uint8_t[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }

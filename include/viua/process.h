@@ -275,9 +275,9 @@ class Process {
      * regarding executed code.
      */
     bool const tracing_enabled;
-    auto get_trace_line(viua::internals::types::byte const*) const
+    auto get_trace_line(uint8_t const*) const
         -> std::string;
-    auto emit_trace_line(viua::internals::types::byte const*) const -> void;
+    auto emit_trace_line(uint8_t const*) const -> void;
 
     /*
      * Pointer to scheduler the process is currently bound to.

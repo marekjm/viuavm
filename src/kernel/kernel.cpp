@@ -127,7 +127,7 @@ auto viua::kernel::Process_result::transfer_result()
 
 
 viua::kernel::Kernel& viua::kernel::Kernel::load(
-    std::unique_ptr<viua::internals::types::byte[]> bc)
+    std::unique_ptr<uint8_t[]> bc)
 {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will
@@ -211,14 +211,14 @@ void viua::kernel::Kernel::load_bytecode_module(
     Loader loader(module_path);
     loader.load();
 
-    std::unique_ptr<viua::internals::types::byte[]> lnk_btcd{
+    std::unique_ptr<uint8_t[]> lnk_btcd{
         loader.get_bytecode()};
 
     auto const fn_names = loader.get_functions();
     auto const fn_addrs = loader.get_function_addresses();
     for (auto const& fn_linkname : fn_names) {
         linked_functions[fn_linkname] =
-            std::pair<std::string, viua::internals::types::byte*>(
+            std::pair<std::string, uint8_t*>(
                 module_name, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
     }
 
@@ -226,13 +226,13 @@ void viua::kernel::Kernel::load_bytecode_module(
     auto const bl_addrs = loader.get_block_addresses();
     for (auto const& bl_linkname : bl_names) {
         linked_blocks[bl_linkname] =
-            std::pair<std::string, viua::internals::types::byte*>(
+            std::pair<std::string, uint8_t*>(
                 module_name, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
     }
 
     linked_modules[std::string{module_name}] =
         std::pair<viua::internals::types::bytecode_size,
-                  std::unique_ptr<viua::internals::types::byte[]>>(
+                  std::unique_ptr<uint8_t[]>>(
             loader.get_bytecode_size(), std::move(lnk_btcd));
 }
 void viua::kernel::Kernel::load_native_module(
