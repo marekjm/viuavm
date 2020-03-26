@@ -420,28 +420,28 @@ auto viua::kernel::Kernel::notify_about_process_death() -> void
     --running_processes;
 }
 auto viua::kernel::Kernel::process_count() const
-    -> viua::internals::types::processes_count
+    -> size_t
 {
     return running_processes;
 }
 
 auto viua::kernel::Kernel::create_mailbox(const viua::process::PID pid)
-    -> viua::internals::types::processes_count
+    -> size_t
 {
     std::unique_lock<std::mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
-    cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
+    std::cerr << "[kernel:mailbox:create] pid = " << pid.get() << std::endl;
 #endif
     mailboxes.emplace(pid, Mailbox{});
     return ++running_processes;
 }
 auto viua::kernel::Kernel::delete_mailbox(const viua::process::PID pid)
-    -> viua::internals::types::processes_count
+    -> size_t
 {
     std::unique_lock<std::mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
-    cerr << "[kernel:mailbox:delete] pid = " << pid.get()
-         << ", queued messages = " << mailboxes[pid].size() << endl;
+    std::cerr << "[kernel:mailbox:delete] pid = " << pid.get()
+         << ", queued messages = " << mailboxes[pid].size() << std::endl;
 #endif
     mailboxes.erase(pid);
     return --running_processes;
@@ -641,43 +641,38 @@ auto viua::kernel::Kernel::IO_result::make_error(
 int viua::kernel::Kernel::exit() const { return return_code; }
 
 static auto no_of_schedulers(
-    const char* env_name,
-    viua::internals::types::schedulers_count default_limit)
-    -> viua::internals::types::schedulers_count
+    std::string const env_name,
+    size_t const default_limit)
+    -> size_t
 {
-    decltype(default_limit) limit = default_limit;
-    char* env_limit               = getenv(env_name);
-    if (env_limit != nullptr) {
-        int raw_limit = std::stoi(env_limit);
+    if (auto const env_limit = getenv(env_name.c_str()); env_limit != nullptr) {
+        auto const raw_limit = std::stoi(env_limit);
         if (raw_limit > 0) {
-            limit = static_cast<decltype(limit)>(raw_limit);
+            return static_cast<size_t>(raw_limit);
         }
     }
-    return limit;
+    return default_limit;
 }
 auto viua::kernel::Kernel::no_of_process_schedulers()
-    -> viua::internals::types::schedulers_count
+    -> size_t
 {
     auto const default_value = std::thread::hardware_concurrency();
-    using viua::internals::types::schedulers_count;
     return no_of_schedulers("VIUA_PROC_SCHEDULERS",
-                            static_cast<schedulers_count>(default_value));
+                            static_cast<size_t>(default_value));
 }
 auto viua::kernel::Kernel::no_of_ffi_schedulers()
-    -> viua::internals::types::schedulers_count
+    -> size_t
 {
     auto const default_value = (std::thread::hardware_concurrency() / 2);
-    using viua::internals::types::schedulers_count;
     return no_of_schedulers("VIUA_FFI_SCHEDULERS",
-                            static_cast<schedulers_count>(default_value));
+                            static_cast<size_t>(default_value));
 }
 auto viua::kernel::Kernel::no_of_io_schedulers()
-    -> viua::internals::types::schedulers_count
+    -> size_t
 {
     auto const default_value = (std::thread::hardware_concurrency() / 2);
-    using viua::internals::types::schedulers_count;
     return no_of_schedulers("VIUA_IO_SCHEDULERS",
-                            static_cast<schedulers_count>(default_value));
+                            static_cast<size_t>(default_value));
 }
 auto viua::kernel::Kernel::is_tracing_enabled() -> bool
 {

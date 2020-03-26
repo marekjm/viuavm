@@ -161,7 +161,7 @@ class Kernel {
      * schedulers and other things (e.g. if there are no processes we can shut
      * down).
      */
-    std::atomic<viua::internals::types::processes_count> running_processes{0};
+    std::atomic<size_t> running_processes{0};
 
     /*
      * VIRTUAL PROCESS SCHEDULING
@@ -330,12 +330,12 @@ class Kernel {
     auto notify_about_process_spawned(viua::scheduler::Process_scheduler*)
         -> void;
     auto notify_about_process_death() -> void;
-    auto process_count() const -> viua::internals::types::processes_count;
+    auto process_count() const -> size_t;
 
     auto create_mailbox(const viua::process::PID)
-        -> viua::internals::types::processes_count;
+        -> size_t;
     auto delete_mailbox(const viua::process::PID)
-        -> viua::internals::types::processes_count;
+        -> size_t;
 
     auto create_result_slot_for(viua::process::PID) -> void;
     auto detach_process(const viua::process::PID) -> void;
@@ -362,11 +362,11 @@ class Kernel {
         -> std::unique_ptr<viua::types::Value>;
 
     auto static no_of_process_schedulers()
-        -> viua::internals::types::schedulers_count;
+        -> size_t;
     auto static no_of_ffi_schedulers()
-        -> viua::internals::types::schedulers_count;
+        -> size_t;
     auto static no_of_io_schedulers()
-        -> viua::internals::types::schedulers_count;
+        -> size_t;
     auto static is_tracing_enabled() -> bool;
 
     int run();
