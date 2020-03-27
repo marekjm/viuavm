@@ -379,7 +379,7 @@ class Process {
     std::atomic_bool finished;
     std::atomic_bool is_joinable;
     std::atomic_bool is_suspended;
-    viua::internals::types::process_time_slice_type process_priority;
+    uint16_t process_priority;
     std::mutex process_mtx;
 
     /*  viua::process::Process identifier.
