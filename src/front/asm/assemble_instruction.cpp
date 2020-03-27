@@ -49,13 +49,13 @@ using viua::assembler::backend::op_assemblers::Token_index;
 auto ::assembler::operands::resolve_jump(
     Token token,
     std::map<std::string, std::vector<Token>::size_type> const& marks,
-    viua::internals::types::bytecode_size instruction_index)
-    -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> {
+    viua::bytecode::codec::bytecode_size_type instruction_index)
+    -> std::tuple<viua::bytecode::codec::bytecode_size_type, enum JUMPTYPE> {
         /*  This function is used to resolve jumps in `jump` and `branch`
          * instructions.
          */
         std::string jmp                            = token.str();
-        viua::internals::types::bytecode_size addr = 0;
+        viua::bytecode::codec::bytecode_size_type addr = 0;
         enum JUMPTYPE jump_type                    = JMP_RELATIVE;
         if (str::isnum(jmp, false)){addr = stoul(jmp);}
 else if (jmp.substr(0, 2) == "0x")
@@ -79,17 +79,17 @@ else if (jmp[0] == '-')
     }
     addr =
         (instruction_index
-         - static_cast<viua::internals::types::bytecode_size>(-1 * jump_value));
+         - static_cast<viua::bytecode::codec::bytecode_size_type>(-1 * jump_value));
 }
 else if (jmp[0] == '+') { addr = (instruction_index + stoul(jmp.substr(1))); }
 else
 {
     try {
         // FIXME: markers map should use
-        // viua::internals::types::bytecode_size to avoid the need for
+        // viua::bytecode::codec::bytecode_size_type to avoid the need for
         // casting
         addr =
-            static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
+            static_cast<viua::bytecode::codec::bytecode_size_type>(marks.at(jmp));
     } catch (std::out_of_range const& e) {
         throw viua::cg::lex::Invalid_syntax(
             token,
@@ -99,7 +99,7 @@ else
 }
 
 // FIXME: check if the jump is within the size of bytecode
-return std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(
+return std::tuple<viua::bytecode::codec::bytecode_size_type, enum JUMPTYPE>(
     addr,
     jump_type);
 }
@@ -230,12 +230,12 @@ using viua::assembler::backend::op_assemblers::assemble_op_vpop;
 namespace viua { namespace front { namespace assembler {
 auto assemble_instruction(
     Program& program,
-    viua::internals::types::bytecode_size& instruction,
-    viua::internals::types::bytecode_size i,
+    viua::bytecode::codec::bytecode_size_type& instruction,
+    viua::bytecode::codec::bytecode_size_type i,
     std::vector<Token> const& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks)
-    -> viua::internals::types::bytecode_size
+    -> viua::bytecode::codec::bytecode_size_type
 {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and

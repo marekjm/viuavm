@@ -25,7 +25,7 @@ namespace op_assemblers {
 auto assemble_op_if(Program& program,
                     std::vector<Token> const& tokens,
                     Token_index const i,
-                    viua::internals::types::bytecode_size const& instruction,
+                    viua::bytecode::codec::bytecode_size_type const& instruction,
                     std::map<std::string, Token_index> const& marks) -> void
 {
     /*  If branch is given three operands, it means its full, three-operands
@@ -49,7 +49,7 @@ auto assemble_op_if(Program& program,
     Token if_true   = tokens.at(i + 3);
     Token if_false  = tokens.at(i + 4);
 
-    viua::internals::types::bytecode_size addrt_target, addrf_target;
+    viua::bytecode::codec::bytecode_size_type addrt_target, addrf_target;
     enum JUMPTYPE addrt_jump_type, addrf_jump_type;
     std::tie(addrt_target, addrt_jump_type) =
         ::assembler::operands::resolve_jump(

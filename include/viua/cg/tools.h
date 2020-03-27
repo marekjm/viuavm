@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/codec.h>
 #include <viua/cg/lex.h>
 
 
@@ -29,9 +30,9 @@ namespace viua { namespace cg { namespace tools {
 auto calculate_bytecode_size_of_first_n_instructions(
     std::vector<viua::cg::lex::Token> const& tokens,
     std::remove_reference<decltype(tokens)>::type::size_type const limit)
-    -> viua::internals::types::bytecode_size;
+    -> viua::bytecode::codec::bytecode_size_type;
 auto calculate_bytecode_size(std::vector<viua::cg::lex::Token> const&)
-    -> viua::internals::types::bytecode_size;
+    -> viua::bytecode::codec::bytecode_size_type;
 }}}  // namespace viua::cg::tools
 
 

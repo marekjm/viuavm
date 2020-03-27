@@ -20,7 +20,7 @@
 #include <iostream>
 #include <math.h>
 #include <tuple>
-#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/codec.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tools.h>
 #include <viua/support/string.h>
@@ -28,7 +28,7 @@
 
 using viua::cg::lex::Token;
 using TokenVector        = std::vector<Token>;
-using bytecode_size_type = viua::internals::types::bytecode_size;
+using bytecode_size_type = viua::bytecode::codec::bytecode_size_type;
 
 
 namespace viua { namespace cg { namespace tools {

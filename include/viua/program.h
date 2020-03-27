@@ -72,7 +72,7 @@ class Program {
     // byte array containing bytecode
     std::unique_ptr<uint8_t[]> program;
     // size of the bytecode
-    viua::internals::types::bytecode_size bytes;
+    viua::bytecode::codec::bytecode_size_type bytes;
 
     /** Current address inside bytecode array.
      *  Used during bytecode generation.
@@ -233,12 +233,12 @@ class Program {
     auto opsend(int_op const, int_op const) -> Program&;
     auto opreceive(int_op const, timeout_op) -> Program&;
     auto opwatchdog(std::string const&) -> Program&;
-    auto opjump(viua::internals::types::bytecode_size const,
+    auto opjump(viua::bytecode::codec::bytecode_size_type const,
                 enum JUMPTYPE const) -> Program&;
     auto opif(int_op const,
-              viua::internals::types::bytecode_size const,
+              viua::bytecode::codec::bytecode_size_type const,
               enum JUMPTYPE const,
-              viua::internals::types::bytecode_size const,
+              viua::bytecode::codec::bytecode_size_type const,
               enum JUMPTYPE const) -> Program&;
 
     auto optry() -> Program&;
@@ -274,17 +274,17 @@ class Program {
      * must know size of the program.
      */
     auto calculate_jumps(
-        std::vector<std::tuple<viua::internals::types::bytecode_size,
-                               viua::internals::types::bytecode_size>> const,
+        std::vector<std::tuple<viua::bytecode::codec::bytecode_size_type,
+                               viua::bytecode::codec::bytecode_size_type>> const,
         std::vector<viua::cg::lex::Token> const&) -> Program&;
-    auto jumps() const -> std::vector<viua::internals::types::bytecode_size>;
+    auto jumps() const -> std::vector<viua::bytecode::codec::bytecode_size_type>;
 
     auto bytecode() const -> std::unique_ptr<uint8_t[]>;
     auto fill(std::unique_ptr<uint8_t[]>) -> Program&;
 
-    auto size() const -> viua::internals::types::bytecode_size;
+    auto size() const -> viua::bytecode::codec::bytecode_size_type;
 
-    Program(viua::internals::types::bytecode_size const bts = 2);
+    Program(viua::bytecode::codec::bytecode_size_type const bts = 2);
     Program(Program const& that);
     Program(Program&&) = delete;
     auto operator=(Program const&) -> Program& = delete;

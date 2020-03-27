@@ -135,14 +135,14 @@ class Kernel {
      * offset are metadata exported from bytecode dump.
      */
     std::unique_ptr<uint8_t[]> bytecode;
-    viua::internals::types::bytecode_size bytecode_size;
-    viua::internals::types::bytecode_size executable_offset;
+    viua::bytecode::codec::bytecode_size_type bytecode_size;
+    viua::bytecode::codec::bytecode_size_type executable_offset;
 
     /*  Function and block names mapped to bytecode addresses.
      */
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         function_addresses;
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         block_addresses;
 
     std::map<std::string, std::pair<std::string, uint8_t*>>
@@ -150,7 +150,7 @@ class Kernel {
     std::map<std::string, std::pair<std::string, uint8_t*>>
         linked_blocks;
     std::map<std::string,
-             std::pair<viua::internals::types::bytecode_size,
+             std::pair<viua::bytecode::codec::bytecode_size_type,
                        std::unique_ptr<uint8_t[]>>>
         linked_modules;
 
@@ -296,11 +296,11 @@ class Kernel {
      *      * kick the Kernel so it starts running,
      */
     Kernel& load(std::unique_ptr<uint8_t[]>);
-    Kernel& bytes(viua::internals::types::bytecode_size);
+    Kernel& bytes(viua::bytecode::codec::bytecode_size_type);
 
     Kernel& mapfunction(std::string const&,
-                        viua::internals::types::bytecode_size);
-    Kernel& mapblock(std::string const&, viua::internals::types::bytecode_size);
+                        viua::bytecode::codec::bytecode_size_type);
+    Kernel& mapblock(std::string const&, viua::bytecode::codec::bytecode_size_type);
 
     Kernel& register_external_function(std::string const&, ForeignFunction*);
     Kernel& remove_external_function(std::string);

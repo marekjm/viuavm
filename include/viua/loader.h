@@ -27,12 +27,11 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/codec.h>
 #include <viua/machine.h>
 
-typedef std::tuple<std::vector<std::string>,
-                   std::map<std::string, viua::internals::types::bytecode_size>>
-    IdToAddressMapping;
+using IdToAddressMapping = std::tuple<std::vector<std::string>,
+                   std::map<std::string, viua::bytecode::codec::bytecode_size_type>>;
 
 template<class T> void readinto(std::ifstream& in, T* object)
 {
@@ -42,10 +41,10 @@ template<class T> void readinto(std::ifstream& in, T* object)
 class Loader {
     std::string path;
 
-    viua::internals::types::bytecode_size size;
+    viua::bytecode::codec::bytecode_size_type size;
     std::unique_ptr<uint8_t[]> bytecode;
 
-    std::vector<viua::internals::types::bytecode_size> jumps;
+    std::vector<viua::bytecode::codec::bytecode_size_type> jumps;
 
     std::map<std::string, std::string> meta_information;
 
@@ -54,16 +53,16 @@ class Loader {
 
     std::vector<std::string> dynamic_linked_modules;
 
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         function_addresses;
-    std::map<std::string, viua::internals::types::bytecode_size> function_sizes;
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type> function_sizes;
     std::vector<std::string> functions;
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         block_addresses;
     std::vector<std::string> blocks;
 
     IdToAddressMapping loadmap(char*,
-                               viua::internals::types::bytecode_size const&);
+                               viua::bytecode::codec::bytecode_size_type const&);
     void calculate_function_sizes();
 
     void load_magic_number(std::ifstream&);
@@ -83,23 +82,23 @@ class Loader {
     Loader& load();
     Loader& executable();
 
-    viua::internals::types::bytecode_size get_bytecode_size();
+    viua::bytecode::codec::bytecode_size_type get_bytecode_size();
     std::unique_ptr<uint8_t[]> get_bytecode();
 
-    std::vector<viua::internals::types::bytecode_size> get_jumps();
+    std::vector<viua::bytecode::codec::bytecode_size_type> get_jumps();
 
     std::map<std::string, std::string> get_meta_information();
 
     std::vector<std::string> get_external_signatures();
     std::vector<std::string> get_external_block_signatures();
 
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
     get_function_addresses();
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
     get_function_sizes();
     std::vector<std::string> get_functions();
 
-    std::map<std::string, viua::internals::types::bytecode_size>
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
     get_block_addresses();
     std::vector<std::string> get_blocks();
 

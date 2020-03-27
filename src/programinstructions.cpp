@@ -1168,7 +1168,7 @@ auto Program::opwatchdog(std::string const& fn) -> Program&
     return (*this);
 }
 
-auto Program::opjump(viua::internals::types::bytecode_size const addr,
+auto Program::opjump(viua::bytecode::codec::bytecode_size_type const addr,
                      enum JUMPTYPE const is_absolute) -> Program&
 {
     if (is_absolute != JMP_TO_BYTE) {
@@ -1181,9 +1181,9 @@ auto Program::opjump(viua::internals::types::bytecode_size const addr,
 }
 
 auto Program::opif(int_op const condition,
-                   viua::internals::types::bytecode_size const addr_truth,
+                   viua::bytecode::codec::bytecode_size_type const addr_truth,
                    enum JUMPTYPE const absolute_truth,
-                   viua::internals::types::bytecode_size const addr_false,
+                   viua::bytecode::codec::bytecode_size_type const addr_false,
                    enum JUMPTYPE const absolute_false) -> Program&
 {
     auto jump_position_in_bytecode = addr_ptr;
@@ -1199,7 +1199,7 @@ auto Program::opif(int_op const condition,
     if (absolute_truth != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);
     }
-    jump_position_in_bytecode += sizeof(viua::internals::types::bytecode_size);
+    jump_position_in_bytecode += sizeof(viua::bytecode::codec::bytecode_size_type);
 
     if (absolute_false != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);

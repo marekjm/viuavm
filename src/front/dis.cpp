@@ -338,10 +338,10 @@ int main(int argc, char* argv[])
         viua::bytecode::codec::main::Decoder decoder;
         auto opname            = std::string{};
         bool disasm_terminated = false;
-        for (viua::internals::types::bytecode_size j = 0; j < el_size;) {
+        for (viua::bytecode::codec::bytecode_size_type j = 0; j < el_size;) {
             auto instruction = std::string{};
             try {
-                auto size = viua::internals::types::bytecode_size{};
+                auto size = viua::bytecode::codec::bytecode_size_type{};
                 tie(instruction, size) = disassembler::instruction(
                     decoder
                     , (bytecode.get() + element_address_mapping[name] + j));

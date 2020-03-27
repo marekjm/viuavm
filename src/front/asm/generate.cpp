@@ -108,7 +108,7 @@ static auto compile(
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
-    auto instruction = viua::internals::types::bytecode_size{0};
+    auto instruction = viua::bytecode::codec::bytecode_size_type{0};
     for (auto i = decltype(tokens.size()){0}; i < tokens.size();) {
         i = viua::front::assembler::assemble_instruction(
             program, instruction, i, tokens, marks);
@@ -163,11 +163,11 @@ static void assemble(Program& program, std::vector<Token> const& tokens)
 
 
 static auto map_invocable_addresses(
-    viua::internals::types::bytecode_size& starting_instruction,
+    viua::bytecode::codec::bytecode_size_type& starting_instruction,
     viua::front::assembler::Invocables const& blocks)
-    -> std::map<std::string, viua::internals::types::bytecode_size>
+    -> std::map<std::string, viua::bytecode::codec::bytecode_size_type>
 {
-    std::map<std::string, viua::internals::types::bytecode_size> addresses;
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type> addresses;
     for (auto const& name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
@@ -184,10 +184,10 @@ static auto write_code_blocks_section(
     std::ofstream& out,
     viua::front::assembler::Invocables const& blocks,
     std::vector<std::string> const& linked_block_names,
-    viua::internals::types::bytecode_size block_bodies_size_so_far = 0)
-    -> viua::internals::types::bytecode_size
+    viua::bytecode::codec::bytecode_size_type block_bodies_size_so_far = 0)
+    -> viua::bytecode::codec::bytecode_size_type
 {
-    viua::internals::types::bytecode_size block_ids_section_size = 0;
+    viua::bytecode::codec::bytecode_size_type block_ids_section_size = 0;
 
     for (std::string name : blocks.names) {
         /*
@@ -208,7 +208,7 @@ static auto write_code_blocks_section(
          * Increase size of the block IDs section by size of address of
          * the block.
          */
-        block_ids_section_size += sizeof(viua::internals::types::bytecode_size);
+        block_ids_section_size += sizeof(viua::bytecode::codec::bytecode_size_type);
     }
 
     /*
@@ -235,7 +235,7 @@ static auto write_code_blocks_section(
          * This address is used at runtime to resolve offset from the beginning
          * of the loaded module at which the block's instructions begin.
          */
-        // FIXME: use uncasted viua::internals::types::bytecode_size
+        // FIXME: use uncasted viua::bytecode::codec::bytecode_size_type
         bwrite(out, block_bodies_size_so_far);
 
         /*
@@ -344,13 +344,13 @@ static void check_main_function(std::string const& main_function,
 }
 
 static auto generate_entry_function(
-    viua::internals::types::bytecode_size bytes,
-    std::map<std::string, viua::internals::types::bytecode_size>
+    viua::bytecode::codec::bytecode_size_type bytes,
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         function_addresses,
     viua::front::assembler::Invocables& functions,
     std::string const& main_function,
-    viua::internals::types::bytecode_size starting_instruction)
-    -> viua::internals::types::bytecode_size
+    viua::bytecode::codec::bytecode_size_type starting_instruction)
+    -> viua::bytecode::codec::bytecode_size_type
 {
     auto entry_function_tokens = std::vector<Token>{};
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
@@ -494,7 +494,7 @@ auto generate(std::vector<Token> const& tokens,
 {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
-    auto bytes = viua::internals::types::bytecode_size{0};
+    auto bytes = viua::bytecode::codec::bytecode_size_type{0};
 
 
     /////////////////////////
@@ -547,14 +547,14 @@ auto generate(std::vector<Token> const& tokens,
     // MAP FUNCTIONS TO ADDRESSES AND
     // MAP BLOCKS TO ADDRESSES AND
     // SET STARTING INSTRUCTION
-    auto starting_instruction = viua::internals::types::bytecode_size{
+    auto starting_instruction = viua::bytecode::codec::bytecode_size_type{
         0};  // the bytecode offset to first
              // executable instruction
 
     auto function_addresses =
-        std::map<std::string, viua::internals::types::bytecode_size>{};
+        std::map<std::string, viua::bytecode::codec::bytecode_size_type>{};
     auto block_addresses =
-        std::map<std::string, viua::internals::types::bytecode_size>{};
+        std::map<std::string, viua::bytecode::codec::bytecode_size_type>{};
     try {
         block_addresses = map_invocable_addresses(starting_instruction, blocks);
         function_addresses =
@@ -569,7 +569,7 @@ auto generate(std::vector<Token> const& tokens,
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     auto linked_libs_bytecode = std::vector<
         std::tuple<std::string,
-                   viua::internals::types::bytecode_size,
+                   viua::bytecode::codec::bytecode_size_type,
                    std::unique_ptr<uint8_t[]>>>{};
     auto linked_function_names        = std::vector<std::string>{};
     auto static_linked_function_names = std::vector<std::string>{};
@@ -579,7 +579,7 @@ auto generate(std::vector<Token> const& tokens,
     auto linked_block_names           = std::vector<std::string>{};
     auto linked_libs_jumptables =
         std::map<std::string,
-                 std::vector<viua::internals::types::bytecode_size>>{};
+                 std::vector<viua::bytecode::codec::bytecode_size_type>>{};
 
     // map of symbol names to name of the module the symbol came from
     auto symbol_sources = std::map<std::string, std::string>{};
@@ -962,7 +962,7 @@ auto generate(std::vector<Token> const& tokens,
 
     auto current_link_offset = bytes;
     auto linked_module_offsets =
-        std::map<std::string, viua::internals::types::bytecode_size>{};
+        std::map<std::string, viua::bytecode::codec::bytecode_size_type>{};
     for (auto lnk : links) {
         auto loader = Loader{lnk};
         loader.load();
@@ -994,7 +994,7 @@ auto generate(std::vector<Token> const& tokens,
     }
 
     {
-        std::map<viua::internals::types::bytecode_size, std::string>
+        std::map<viua::bytecode::codec::bytecode_size_type, std::string>
             address_of_fn;
         for (auto const& [name, addr] : function_addresses) {
             if (not address_of_fn.insert({addr, name}).second) {
@@ -1015,7 +1015,7 @@ auto generate(std::vector<Token> const& tokens,
         }
     }
     {
-        std::map<viua::internals::types::bytecode_size, std::string>
+        std::map<viua::bytecode::codec::bytecode_size_type, std::string>
             address_of_bl;
         for (auto const& [name, addr] : block_addresses) {
             if (not address_of_bl.insert({addr, name}).second) {
@@ -1074,7 +1074,7 @@ auto generate(std::vector<Token> const& tokens,
 
     ////////////////////
     // CREATE JUMP TABLE
-    auto jump_table = std::vector<viua::internals::types::bytecode_size>{};
+    auto jump_table = std::vector<viua::bytecode::codec::bytecode_size_type>{};
 
 
     /////////////////////////////////////////////////////////
@@ -1084,18 +1084,18 @@ auto generate(std::vector<Token> const& tokens,
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
     auto functions_bytecode =
         std::map<std::string,
-                 std::tuple<viua::internals::types::bytecode_size,
+                 std::tuple<viua::bytecode::codec::bytecode_size_type,
                             std::unique_ptr<uint8_t[]>>>{};
     auto block_bodies_bytecode =
         std::map<std::string,
-                 std::tuple<viua::internals::types::bytecode_size,
+                 std::tuple<viua::bytecode::codec::bytecode_size_type,
                             std::unique_ptr<uint8_t[]>>>{};
-    auto functions_section_size    = viua::internals::types::bytecode_size{0};
-    auto block_bodies_section_size = viua::internals::types::bytecode_size{0};
+    auto functions_section_size    = viua::bytecode::codec::bytecode_size_type{0};
+    auto block_bodies_section_size = viua::bytecode::codec::bytecode_size_type{0};
 
     auto jump_positions =
-        std::vector<std::tuple<viua::internals::types::bytecode_size,
-                               viua::internals::types::bytecode_size>>{};
+        std::vector<std::tuple<viua::bytecode::codec::bytecode_size_type,
+                               viua::bytecode::codec::bytecode_size_type>>{};
 
     for (auto const& name : blocks.names) {
         // do not generate bytecode for blocks that were linked
@@ -1117,7 +1117,7 @@ auto generate(std::vector<Token> const& tokens,
                       << send_control_seq(ATTR_RESET);
             std::cout << '"';
         }
-        auto fun_bytes = viua::internals::types::bytecode_size{0};
+        auto fun_bytes = viua::bytecode::codec::bytecode_size_type{0};
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size(
                 blocks.tokens.at(name));
@@ -1145,8 +1145,8 @@ auto generate(std::vector<Token> const& tokens,
         auto jumps = blok.jumps();
 
         auto local_jumps =
-            std::vector<std::tuple<viua::internals::types::bytecode_size,
-                                   viua::internals::types::bytecode_size>>{};
+            std::vector<std::tuple<viua::bytecode::codec::bytecode_size_type,
+                                   viua::bytecode::codec::bytecode_size_type>>{};
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
@@ -1157,7 +1157,7 @@ auto generate(std::vector<Token> const& tokens,
         // store generated bytecode fragment for future use (we must not yet
         // write it to the file to conform to bytecode format)
         block_bodies_bytecode[name] =
-            std::tuple<viua::internals::types::bytecode_size, decltype(btcode)>(
+            std::tuple<viua::bytecode::codec::bytecode_size_type, decltype(btcode)>(
                 blok.size(), std::move(btcode));
 
         // extend jump table with jumps from current block
@@ -1181,7 +1181,7 @@ auto generate(std::vector<Token> const& tokens,
             continue;
         }
 
-        auto fun_bytes = viua::internals::types::bytecode_size{0};
+        auto fun_bytes = viua::bytecode::codec::bytecode_size_type{0};
         try {
             fun_bytes = viua::cg::tools::calculate_bytecode_size(
                 functions.tokens.at(name));
@@ -1214,10 +1214,10 @@ auto generate(std::vector<Token> const& tokens,
         auto jumps = func.jumps();
 
         auto local_jumps =
-            std::vector<std::tuple<viua::internals::types::bytecode_size,
-                                   viua::internals::types::bytecode_size>>{};
+            std::vector<std::tuple<viua::bytecode::codec::bytecode_size_type,
+                                   viua::bytecode::codec::bytecode_size_type>>{};
         for (auto i = decltype(jumps)::size_type{0}; i < jumps.size(); ++i) {
-            viua::internals::types::bytecode_size jmp = jumps[i];
+            viua::bytecode::codec::bytecode_size_type jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
         }
         func.calculate_jumps(local_jumps, functions.tokens.at(name));
@@ -1227,12 +1227,12 @@ auto generate(std::vector<Token> const& tokens,
         // store generated bytecode fragment for future use (we must not yet
         // write it to the file to conform to bytecode format)
         functions_bytecode[name] =
-            std::tuple<viua::internals::types::bytecode_size, decltype(btcode)>{
+            std::tuple<viua::bytecode::codec::bytecode_size_type, decltype(btcode)>{
                 func.size(), std::move(btcode)};
 
         // extend jump table with jumps from current function
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
-            viua::internals::types::bytecode_size jmp = jumps[i];
+            viua::bytecode::codec::bytecode_size_type jmp = jumps[i];
             jump_table.emplace_back(jmp + functions_section_size);
         }
 
@@ -1256,7 +1256,7 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE META-INFORMATION MAP
     auto meta_information_map =
         viua::assembler::frontend::gather_meta_information(tokens);
-    viua::internals::types::bytecode_size meta_information_map_size = 0;
+    viua::bytecode::codec::bytecode_size_type meta_information_map_size = 0;
     for (auto each : meta_information_map) {
         meta_information_map_size +=
             (each.first.size() + each.second.size() + 2);
@@ -1273,10 +1273,10 @@ auto generate(std::vector<Token> const& tokens,
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
     if (flags.as_lib) {
-        viua::internals::types::bytecode_size total_jumps = jump_table.size();
+        viua::bytecode::codec::bytecode_size_type total_jumps = jump_table.size();
         bwrite(out, total_jumps);
 
-        viua::internals::types::bytecode_size jmp;
+        viua::bytecode::codec::bytecode_size_type jmp;
         for (decltype(total_jumps) i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
             bwrite(out, jmp);
@@ -1287,7 +1287,7 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL FUNCTION SIGNATURES
     {
-        viua::internals::types::bytecode_size signatures_section_size = 0;
+        viua::bytecode::codec::bytecode_size_type signatures_section_size = 0;
         for (auto const& each : functions.signatures) {
             signatures_section_size += (each.size() + 1);  // +1 for null byte
                                                            // after each
@@ -1303,7 +1303,7 @@ auto generate(std::vector<Token> const& tokens,
     /////////////////////////////////////////////////////////////
     // WRITE EXTERNAL BLOCK SIGNATURES
     {
-        viua::internals::types::bytecode_size signatures_section_size = 0;
+        viua::bytecode::codec::bytecode_size_type signatures_section_size = 0;
         for (auto const& each : blocks.signatures) {
             signatures_section_size += (each.size() + 1);  // +1 for null byte
                                                            // after each
@@ -1320,7 +1320,7 @@ auto generate(std::vector<Token> const& tokens,
     // WRITE DYNAMIC IMPORTS SECTION
     {
         auto dynamic_imports_section_size =
-            viua::internals::types::bytecode_size{0};
+            viua::bytecode::codec::bytecode_size_type{0};
         for (auto const& each : dynamic_imports) {
             auto const& module_name = each.first;
             dynamic_imports_section_size +=
@@ -1349,12 +1349,12 @@ auto generate(std::vector<Token> const& tokens,
 
     /////////////////////////////////////////////////////////////
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
-    viua::internals::types::bytecode_size functions_size_so_far =
+    viua::bytecode::codec::bytecode_size_type functions_size_so_far =
         write_code_blocks_section(out, blocks, linked_block_names);
     for (auto const& name : static_linked_block_names) {
         strwrite(out, name);
         // mapped address must come after name
-        viua::internals::types::bytecode_size address = block_addresses[name];
+        viua::bytecode::codec::bytecode_size_type address = block_addresses[name];
         bwrite(out, address);
     }
 
@@ -1363,7 +1363,7 @@ auto generate(std::vector<Token> const& tokens,
     for (auto const& name : static_linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
-        viua::internals::types::bytecode_size address =
+        viua::bytecode::codec::bytecode_size_type address =
             function_addresses[name];
         bwrite(out, address);
     }
@@ -1375,7 +1375,7 @@ auto generate(std::vector<Token> const& tokens,
 
     auto program_bytecode =
         std::make_unique<uint8_t[]>(bytes);
-    viua::internals::types::bytecode_size program_bytecode_used = 0;
+    viua::bytecode::codec::bytecode_size_type program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF Local BLOCKS TO BYTECODE BUFFER
@@ -1390,7 +1390,7 @@ auto generate(std::vector<Token> const& tokens,
         auto const fun_bytecode =
             std::get<1>(block_bodies_bytecode[name]).get();
 
-        for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
+        for (viua::bytecode::codec::bytecode_size_type i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
@@ -1411,7 +1411,7 @@ auto generate(std::vector<Token> const& tokens,
         auto const fun_size     = std::get<0>(functions_bytecode[name]);
         auto const fun_bytecode = std::get<1>(functions_bytecode[name]).get();
 
-        for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
+        for (viua::bytecode::codec::bytecode_size_type i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
@@ -1440,7 +1440,7 @@ auto generate(std::vector<Token> const& tokens,
         }
 
         auto linked_jumptable =
-            std::vector<viua::internals::types::bytecode_size>{};
+            std::vector<viua::bytecode::codec::bytecode_size_type>{};
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (std::out_of_range const& e) {
@@ -1448,7 +1448,7 @@ auto generate(std::vector<Token> const& tokens,
                   + "' (maybe not loaded?)");
         }
 
-        viua::internals::types::bytecode_size jmp;
+        viua::bytecode::codec::bytecode_size_type jmp;
         for (auto i = decltype(linked_jumptable)::size_type{0};
              i < linked_jumptable.size();
              ++i) {

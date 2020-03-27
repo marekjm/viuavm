@@ -25,7 +25,7 @@ namespace op_assemblers {
 auto assemble_op_jump(Program& program,
                       std::vector<Token> const& tokens,
                       Token_index const i,
-                      viua::internals::types::bytecode_size const& instruction,
+                      viua::bytecode::codec::bytecode_size_type const& instruction,
                       std::map<std::string, Token_index> const& marks) -> void
 {
     /*  Jump instruction can be written in two forms:
@@ -42,7 +42,7 @@ auto assemble_op_jump(Program& program,
      * and if it is not found throw an exception about unrecognised marker
      * being used.
      */
-    viua::internals::types::bytecode_size jump_target;
+    viua::bytecode::codec::bytecode_size_type jump_target;
     enum JUMPTYPE jump_type;
     std::tie(jump_target, jump_type) = ::assembler::operands::resolve_jump(
         tokens.at(i + 1), marks, instruction);

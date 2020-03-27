@@ -143,7 +143,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::load(
 }
 
 viua::kernel::Kernel& viua::kernel::Kernel::bytes(
-    viua::internals::types::bytecode_size sz)
+    viua::bytecode::codec::bytecode_size_type sz)
 {
     /*  Set bytecode size, so the viua::kernel::Kernel can stop execution even
      * if it doesn't reach HALT instruction but reaches bytecode address out of
@@ -155,7 +155,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
     std::string const& name,
-    viua::internals::types::bytecode_size address)
+    viua::bytecode::codec::bytecode_size_type address)
 {
     /** Maps function name to bytecode address.
      */
@@ -165,7 +165,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(
 
 viua::kernel::Kernel& viua::kernel::Kernel::mapblock(
     std::string const& name,
-    viua::internals::types::bytecode_size address)
+    viua::bytecode::codec::bytecode_size_type address)
 {
     /** Maps block name to bytecode address.
      */
@@ -231,7 +231,7 @@ void viua::kernel::Kernel::load_bytecode_module(
     }
 
     linked_modules[std::string{module_name}] =
-        std::pair<viua::internals::types::bytecode_size,
+        std::pair<viua::bytecode::codec::bytecode_size_type,
                   std::unique_ptr<uint8_t[]>>(
             loader.get_bytecode_size(), std::move(lnk_btcd));
 }

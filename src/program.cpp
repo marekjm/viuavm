@@ -86,7 +86,7 @@ auto Program::jumps() const -> std::vector<uint64_t>
     return jmps;
 }
 
-Program::Program(viua::internals::types::bytecode_size const bts) : bytes{bts}
+Program::Program(viua::bytecode::codec::bytecode_size_type const bts) : bytes{bts}
 {
     program = std::make_unique<uint8_t[]>(bytes);
 

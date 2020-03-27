@@ -298,7 +298,7 @@ static auto disassemble_ri_operand_with_rs_type(
     return next_ptr;
 }
 auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
-    -> std::tuple<std::string, viua::internals::types::bytecode_size>
+    -> std::tuple<std::string, viua::bytecode::codec::bytecode_size_type>
 {
     auto saved_ptr = ptr;
 
@@ -566,9 +566,9 @@ auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     }
     // we already *know* that the result will not be negative
     auto const increase =
-        static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
+        static_cast<viua::bytecode::codec::bytecode_size_type>(ptr - saved_ptr);
 
-    return std::tuple<std::string, viua::internals::types::bytecode_size>(
+    return std::tuple<std::string, viua::bytecode::codec::bytecode_size_type>(
         oss.str(), increase);
 }
 }

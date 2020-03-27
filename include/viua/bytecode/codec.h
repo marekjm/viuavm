@@ -101,6 +101,8 @@ using timeout_type = uint32_t;
 
 using bits_size_type = uint64_t;
 
+using bytecode_size_type = uint64_t;
+
 enum class Access_specifier {
     Direct              = 0,
     Register_indirect   = 1,

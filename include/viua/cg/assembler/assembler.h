@@ -38,8 +38,8 @@ auto resolve_rs_type(viua::cg::lex::Token const)
 auto resolve_jump(
     viua::cg::lex::Token const,
     std::map<std::string, std::vector<viua::cg::lex::Token>::size_type> const&,
-    viua::internals::types::bytecode_size)
-    -> std::tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>;
+    viua::bytecode::codec::bytecode_size_type)
+    -> std::tuple<viua::bytecode::codec::bytecode_size_type, enum JUMPTYPE>;
 auto convert_token_to_timeout_operand(viua::cg::lex::Token const) -> timeout_op;
 
 auto getint(std::string const& s, bool const = false) -> int_op;

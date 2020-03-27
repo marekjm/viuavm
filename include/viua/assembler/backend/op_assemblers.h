@@ -266,12 +266,12 @@ auto assemble_op_call(Program&, std::vector<Token> const&, Token_index const)
 auto assemble_op_if(Program&,
                     std::vector<Token> const&,
                     Token_index const,
-                    viua::internals::types::bytecode_size const&,
+                    viua::bytecode::codec::bytecode_size_type const&,
                     std::map<std::string, Token_index> const&) -> void;
 auto assemble_op_jump(Program&,
                       std::vector<Token> const&,
                       Token_index const,
-                      viua::internals::types::bytecode_size const&,
+                      viua::bytecode::codec::bytecode_size_type const&,
                       std::map<std::string, Token_index> const&) -> void;
 auto assemble_op_structremove(Program&,
                               std::vector<Token> const&,

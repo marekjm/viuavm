@@ -47,12 +47,12 @@ auto decode_line(std::string const&) -> std::vector<std::vector<std::string>>;
 
 auto assemble_instruction(
     Program& program,
-    viua::internals::types::bytecode_size& instruction,
-    viua::internals::types::bytecode_size i,
+    viua::bytecode::codec::bytecode_size_type& instruction,
+    viua::bytecode::codec::bytecode_size_type i,
     std::vector<viua::cg::lex::Token> const& tokens,
     std::map<std::string,
              std::remove_reference<decltype(tokens)>::type::size_type>& marks)
-    -> viua::internals::types::bytecode_size;
+    -> viua::bytecode::codec::bytecode_size_type;
 auto generate(std::vector<viua::cg::lex::Token> const&,
               Invocables&,
               Invocables&,

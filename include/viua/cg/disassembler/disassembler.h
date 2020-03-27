@@ -41,7 +41,7 @@ namespace disassembler {
 using Decoder_type = viua::bytecode::codec::main::Decoder;
 
 auto instruction(Decoder_type const&, uint8_t const*)
-    -> std::tuple<std::string, viua::internals::types::bytecode_size>;
+    -> std::tuple<std::string, viua::bytecode::codec::bytecode_size_type>;
 }  // namespace disassembler
 
 
