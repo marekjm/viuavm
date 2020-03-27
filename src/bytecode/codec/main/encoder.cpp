@@ -135,7 +135,7 @@ auto Encoder::encode_bits_string(uint8_t* addr,
     ++addr;
 
     aligned_write(addr) = data.size();
-    addr += sizeof(viua::internals::types::bits_size);
+    addr += sizeof(viua::bytecode::codec::bits_size_type);
 
     std::copy(data.rbegin(), data.rend(), addr);
     addr += data.size();

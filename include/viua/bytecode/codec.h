@@ -99,6 +99,8 @@ using plain_int_type = int32_t;
 using plain_float_type = double;
 using timeout_type = uint32_t;
 
+using bits_size_type = uint64_t;
+
 enum class Access_specifier {
     Direct              = 0,
     Register_indirect   = 1,

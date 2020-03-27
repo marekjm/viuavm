@@ -231,7 +231,7 @@ static auto size_of_binary_literal_operand(TokenVector const& tokens,
 {
     auto calculated_size =
         bytecode_size_type{sizeof(uint8_t)};
-    calculated_size += sizeof(viua::internals::types::bits_size);
+    calculated_size += sizeof(viua::bytecode::codec::bits_size_type);
 
     auto const literal = tokens.at(i).str().substr(2);
     ++i;
@@ -255,7 +255,7 @@ static auto size_of_octal_literal_operand(TokenVector const& tokens,
 {
     auto calculated_size =
         bytecode_size_type{sizeof(uint8_t)};
-    calculated_size += sizeof(viua::internals::types::bits_size);
+    calculated_size += sizeof(viua::bytecode::codec::bits_size_type);
 
     auto literal = tokens.at(i).str();
     ++i;
@@ -275,7 +275,7 @@ static auto size_of_hexadecimal_literal_operand(TokenVector const& tokens,
 {
     auto calculated_size =
         bytecode_size_type{sizeof(uint8_t)};
-    calculated_size += sizeof(viua::internals::types::bits_size);
+    calculated_size += sizeof(viua::bytecode::codec::bits_size_type);
 
     auto literal = tokens.at(i).str();
     ++i;

@@ -29,8 +29,6 @@ using Op_address_type = uint8_t const*;
 typedef uint64_t bytecode_size;
 
 typedef uint16_t process_time_slice_type;
-
-typedef uint64_t bits_size;
 }  // namespace types
 }}  // namespace viua::internals
 
