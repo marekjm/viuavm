@@ -48,7 +48,7 @@ auto is_down_arrow(std::vector<char> const buf) -> bool
 
 auto set_cursor_position(int const line, int const column) -> void
 {
-    std::cout << ("\033[" + std::to_string(line + 1) + ";" + std::to_string(column + 1) + "f");
+    std::cout << ("\033[" + std::to_string(line + 1) + ";" + std::to_string(column + 1) + "H");
 }
 auto get_cursor_position() -> std::pair<int, int>
 {
@@ -116,7 +116,7 @@ auto main(int argc, char** argv) -> int
     fcntl(0, fcntl(0, F_GETFD) | O_NONBLOCK);
 
     set_cursor_position(0, 0);
-    std::cout << "\n";
+    std::cout << "at 0,0\n";
     set_cursor_position(0, 0);
 
     struct cursor_position_t {
@@ -159,14 +159,18 @@ auto main(int argc, char** argv) -> int
         */
         if (is_down_arrow(v)) {
             ++cursor_position.line;
-            set_cursor_position(cursor_position.line, cursor_position.column);
-            std::cout << "[" << cursor_position.line << "/" << cursor_position.column << "]\n";
+            std::cout << "\033[1BHello";
+            set_cursor_position(cursor_position.line, 0);
+            /* set_cursor_position(cursor_position.line, cursor_position.column); */
+            /* std::cout << "[" << cursor_position.line << "/" << cursor_position.column << "]\033["; */
             continue;
         }
         if (is_up_arrow(v)) {
             --cursor_position.line;
-            set_cursor_position(cursor_position.line, cursor_position.column);
-            std::cout << "[" << cursor_position.line << "/" << cursor_position.column << "]\n";
+            std::cout << "\033[1AHello";
+            set_cursor_position(cursor_position.line, 0);
+            /* set_cursor_position(cursor_position.line, cursor_position.column); */
+            /* std::cout << "[" << cursor_position.line << "/" << cursor_position.column << "]\033["; */
             continue;
         }
 
