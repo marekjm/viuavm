@@ -44,12 +44,14 @@
 
     return
 .end
-.function: print_entries/1
-    allocate_registers %6 local
+.function: print_entries/2
+    allocate_registers %7 local
 
     .name: 5 highlight
+    .name: 6 tmp
 
     move %1 local %0 parameters
+    move %highlight local %1 parameters
 
     integer %2 local 0
     vlen %3 local %1 local
@@ -61,8 +63,8 @@
     vat %4 local %1 local %2 local
     frame %2
     copy %0 arguments *4 local
-    not %highlight local %2 local
-    move %1 arguments %highlight local
+    eq %tmp local %2 local %highlight local
+    copy %1 arguments %tmp local
     call void print_entry/2
 
     iinc %2 local
@@ -72,20 +74,23 @@
     return
 .end
 
-.function: tree_view_display_actor_impl/1
-    allocate_registers %10 local
+.function: [[no_sa]] tree_view_display_actor_impl/1
+    allocate_registers %12 local
 
     .name: iota state
     .name: iota message
     .name: iota key
     .name: iota tag_shutdown
     .name: iota tag_data
+    .name: iota tag_ptr_down
+    .name: iota tag_ptr_up
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
     .name: iota control_sequence
 
     move %state local %0 parameters
+    print %state local
 
     receive %message local infinity
     
@@ -102,11 +107,32 @@
 
     .mark: check_tag_data
     atomeq %tmp local *got_tag local %tag_data local
-    if %tmp local +1 the_end
+    if %tmp local +1 check_tag_pointer_down
     structremove %entries local %message local %tag_data local
     structinsert %state local %tag_data local %entries local
+    jump printing_sequence
+
+    .mark: check_tag_pointer_down
+    atom %tag_ptr_down local 'pointer_down'
+    atomeq %tmp local *got_tag local %tag_ptr_down local
+    if %tmp local +1 check_tag_pointer_up
+    atom %tmp local 'pointer'
+    structat %tmp local %state local %tmp local
+    iinc *tmp local
+    ; FIXME this jump breaks the bytecode and is apprently compiled as a
+    ; self-jump
+    jump printing_sequence
 
     .mark: check_tag_pointer_up
+    atom %tag_ptr_up local 'pointer_up'
+    atomeq %tmp local *got_tag local %tag_ptr_up local
+    if %tmp local +1 the_end
+    atom %tmp local 'pointer'
+    structat %tmp local %state local %tmp local
+    idec *tmp local
+    ; FIXME this jump breaks the bytecode and is apprently compiled as a
+    ; self-jump
+    ; jump printing_sequence
 
     .mark: printing_sequence
     string %control_sequence "\033[2J"
@@ -116,9 +142,12 @@
 
     structat %entries local %state local %tag_data local
 
-    frame %1
+    frame %2
     copy %0 arguments *entries local
-    call void print_entries/1
+    atom %tmp local 'pointer'
+    structat %tmp local %state local %tmp local
+    copy %1 arguments *tmp local
+    call void print_entries/2
 
     .mark: the_end
     frame %1
@@ -239,7 +268,7 @@
     return
 .end
 .function: input_actor_impl/1
-    allocate_registers %8 local
+    allocate_registers %10 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -249,6 +278,8 @@
 
     .name: iota c_quit
     .name: iota c_refresh
+    .name: iota c_pointer_down
+    .name: iota c_pointer_up
 
     move %tree_view_actor local %0 parameters
 
@@ -268,11 +299,18 @@
 
     string %c_quit local "q"
     streq %c_quit local %buf local %c_quit local
-    if %c_quit local the_end +1
-    
     string %c_refresh local "r"
     streq %c_refresh local %buf local %c_refresh local
-    if %c_refresh local refresh_display happy_loopin
+    string %c_pointer_down local "j"
+    streq %c_pointer_down local %buf local %c_pointer_down local
+    string %c_pointer_up local "k"
+    streq %c_pointer_up local %buf local %c_pointer_up local
+
+    if %c_quit local the_end +1
+    if %c_refresh local refresh_display +1
+    if %c_pointer_down local move_pointer_down +1
+    if %c_pointer_up local move_pointer_up +1
+    jump happy_loopin
 
     .mark: refresh_display
     frame %1
@@ -283,6 +321,22 @@
     frame %1
     move %0 arguments %tmp local
     call %tmp local make_data_message/1
+    send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: move_pointer_down
+
+    frame %0
+    call %tmp make_pointer_down_message/0
+    send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: move_pointer_up
+
+    frame %0
+    call %tmp make_pointer_up_message/0
     send %tree_view_actor local %tmp local
 
     jump happy_loopin
