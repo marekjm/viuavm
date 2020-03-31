@@ -127,20 +127,34 @@
     move %0 arguments %state local
     tailcall tree_view_display_actor_impl/1
 .end
+.function: make_tagged_message_impl/1
+    allocate_registers %4 local
+
+    .name: iota message
+    .name: iota tag
+    .name: iota key
+
+    move %tag local %0 parameters
+
+    struct %message local
+    atom %key local 'tag'
+    structinsert %message local %key local %tag local
+
+    move %0 local %message local
+    return
+.end
 .function: make_data_message/1
     allocate_registers %5 local
 
     .name: iota message
-    .name: iota tag_data
+    .name: iota tag
     .name: iota data
     .name: iota key
 
-    struct %message local
-
-    ; insert the tag field: { tag: 'data' }
-    atom %key local 'tag'
-    atom %tag_data local 'data'
-    structinsert %message local %key local %tag_data local
+    atom %tag local 'data'
+    frame %1
+    move %0 arguments %tag local
+    call %message local make_tagged_message_impl/1
 
     ; insert the data field: { tag: 'data', data: ... }
     atom %key local 'data'
@@ -151,20 +165,14 @@
     return
 .end
 .function: make_shutdown_message/0
-    allocate_registers %4 local
+    allocate_registers %2 local
 
-    .name: iota message
-    .name: iota tag_shutdown
-    .name: iota key
+    .name: iota tag
+    atom %tag local 'shutdown'
 
-    struct %message local
-
-    ; insert the tag field: { tag: 'shutdown' }
-    atom %key local 'tag'
-    atom %tag_shutdown local 'shutdown'
-    structinsert %message local %key local %tag_shutdown local
-
-    move %0 local %message local
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
     return
 .end
 
