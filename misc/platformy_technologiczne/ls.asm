@@ -1,6 +1,7 @@
 .import: [[dynamic]] std::os
 
 .signature: std::os::lsdir/1
+.signature: std::os::system/1
 
 .function: print_entry/2
     allocate_registers %7 local
@@ -216,12 +217,33 @@
     return
 .end
 
+.function: return_tty_to_sanity/0
+    allocate_registers %2 local
+
+    .name: iota command
+
+    string %command local "stty sane"
+    frame %1
+    move %0 arguments %command local
+    call void std::os::system/1
+
+    string %command local "stty cooked"
+    frame %1
+    move %0 arguments %command local
+    call void std::os::system/1
+
+    return
+.end
+
 .function: main/2
     allocate_registers %4 local
 
     .name: iota directory
     .name: iota tree_view_actor
     .name: iota tmp
+
+    frame %0
+    defer return_tty_to_sanity/0
 
     move %directory local %1 parameters
     if %directory local +1 use_default_directory
