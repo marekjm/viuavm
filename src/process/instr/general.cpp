@@ -18,8 +18,10 @@
  */
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -44,8 +46,13 @@ auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
     auto const target = stack->jump_base + decoder.fetch_address(addr);
 
     if (target == addr) {
-        throw std::make_unique<viua::types::Exception>(
-            "aborting: JUMP instruction pointing to itself");
+        auto const bad_byte = static_cast<uint64_t>(target - stack->jump_base);
+
+        auto o = std::ostringstream{};
+        o << "aborting: JUMP instruction pointing to itself at byte ";
+        o << bad_byte << " (" << std::hex << "0x" << std::setw(4)
+            << std::setfill('0') << bad_byte << ")";
+        throw std::make_unique<viua::types::Exception>(o.str());
     }
 
     return target;
