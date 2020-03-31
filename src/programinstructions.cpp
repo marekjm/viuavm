@@ -254,6 +254,16 @@ auto Program::opstring(int_op const reg, std::string const s) -> Program&
     return (*this);
 }
 
+auto Program::opstreq(int_op const target, int_op const lhs, int_op const rhs)
+    -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STREQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
+    return (*this);
+}
+
 auto Program::optext(int_op const reg, std::string const s) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXT);

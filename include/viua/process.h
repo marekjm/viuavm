@@ -422,6 +422,7 @@ class Process {
     auto opeq(Op_address_type) -> Op_address_type;
 
     auto opstring(Op_address_type) -> Op_address_type;
+    auto opstreq(Op_address_type) -> Op_address_type;
 
     auto optext(Op_address_type) -> Op_address_type;
     auto optexteq(Op_address_type) -> Op_address_type;

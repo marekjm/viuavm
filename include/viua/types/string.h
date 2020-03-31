@@ -59,6 +59,8 @@ class String : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
+    auto operator==(String const&) const -> bool;
+
     std::string& value();
 
     Integer* size();

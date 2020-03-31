@@ -48,6 +48,11 @@ std::unique_ptr<Value> String::copy() const
     return std::make_unique<String>(svalue);
 }
 
+auto viua::types::String::operator==(viua::types::String const& other) const -> bool
+{
+    return (svalue == other.svalue);
+}
+
 std::string& String::value() { return svalue; }
 
 Integer* String::size()

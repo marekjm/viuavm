@@ -37,3 +37,14 @@ auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type
 
     return addr;
 }
+
+auto viua::process::Process::opstreq(Op_address_type addr) -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::String>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::String>(addr, *this);
+
+    *target = std::make_unique<viua::types::Boolean>(*lhs == *rhs);
+
+    return addr;
+}

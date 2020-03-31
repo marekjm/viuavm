@@ -119,6 +119,7 @@ class Program {
     auto opeq(int_op const, int_op const, int_op const) -> Program&;
 
     auto opstring(int_op const, std::string const) -> Program&;
+    auto opstreq(int_op const, int_op const, int_op const) -> Program&;
 
     auto optext(int_op const, std::string const) -> Program&;
     auto optext(int_op const, int_op const) -> Program&;

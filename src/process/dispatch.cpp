@@ -180,6 +180,9 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
     case STRING:
         addr = opstring(addr + 1);
         break;
+    case STREQ:
+        addr = opstreq(addr + 1);
+        break;
     case TEXT:
         addr = optext(addr + 1);
         break;
@@ -480,7 +483,6 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
     case IO_CANCEL:
         addr = op_io_cancel(addr + 1);
         break;
-    case STREQ:
     case BOOL:
     case BITSWIDTH:
     case BITSEQ:

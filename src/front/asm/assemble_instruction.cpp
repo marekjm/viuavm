@@ -284,6 +284,8 @@ auto assemble_instruction(
     } else if (tokens.at(i) == "string") {
         viua::assembler::backend::op_assemblers::assemble_op_string(
             program, tokens, i);
+    } else if (tokens.at(i) == "streq") {
+        assemble_three_register_op<&Program::opstreq>(program, tokens, i);
     } else if (tokens.at(i) == "text") {
         viua::assembler::backend::op_assemblers::assemble_op_text(
             program, tokens, i);
