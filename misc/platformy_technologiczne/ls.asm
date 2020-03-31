@@ -55,7 +55,7 @@
 .end
 
 .function: tree_view_display_actor_impl/1
-    allocate_registers %7 local
+    allocate_registers %8 local
 
     .name: iota message
     .name: iota key
@@ -63,6 +63,7 @@
     .name: iota tag_data
     .name: iota got_tag
     .name: iota tmp
+    .name: iota control_sequence
 
     receive %message local infinity
     
@@ -79,6 +80,11 @@
     atomeq %tmp local *got_tag local %tag_data local
     if %tmp local +1 the_end
     structat %tmp local %message local %tag_data local
+
+    string %control_sequence "\033[2J"
+    echo %control_sequence local
+    string %control_sequence "\033[0;0H"
+    echo %control_sequence local
 
     frame %1
     copy %0 arguments *tmp local
@@ -165,7 +171,7 @@
     process %tree_view_actor local tree_view_display_actor/0
 
     frame %1
-    move %0 arguments %directory local
+    copy %0 arguments %directory local
     call %tmp local std::os::lsdir/1
     frame %1
     move %0 arguments %tmp local
