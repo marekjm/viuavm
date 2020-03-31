@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -342,17 +343,22 @@ int main(int argc, char* argv[])
             auto instruction = std::string{};
             try {
                 auto size = viua::bytecode::codec::bytecode_size_type{};
-                tie(instruction, size) = disassembler::instruction(
-                    decoder
-                    , (bytecode.get() + element_address_mapping[name] + j));
+                auto const at_ptr = (bytecode.get() + element_address_mapping[name] + j);
+                auto const at_byte_index = static_cast<uint64_t>(at_ptr - bytecode.get());
+                std::tie(instruction, size) = disassembler::instruction(
+                    decoder, at_ptr);
                 if (DEBUG) {
                     if (j != 0) {
                         (DEBUG ? std::cout : oss) << '\n';
                     }
                     (DEBUG ? std::cout : oss)
                         << "    ; size: " << size << " bytes\n";
-                    (DEBUG ? std::cout : oss) << "    ; address: 0x" << std::hex
-                                              << j << std::dec << '\n';
+                    (DEBUG ? std::cout : oss) << "    ; relative address: 0x"
+                        << std::hex << std::setw(4) << std::setfill('0') << j
+                        << std::dec << '\n';
+                    (DEBUG ? std::cout : oss) << "    ; absolute address: 0x"
+                        << std::hex << std::setw(4) << std::setfill('0')
+                        << at_byte_index << std::dec << '\n';
                 }
                 (DEBUG ? std::cout : oss) << "    " << instruction << '\n';
                 j += size;
