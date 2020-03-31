@@ -238,7 +238,7 @@
 
     return
 .end
-.function: input_actor/1
+.function: input_actor_impl/1
     allocate_registers %8 local
 
     .name: iota tree_view_actor
@@ -300,6 +300,27 @@
     frame %1
     move %0 arguments %tree_view_actor local
     tailcall input_actor/1
+.end
+.function: input_actor/1
+    allocate_registers %2 local
+
+    .name: iota tree_view_actor
+    .name: iota tmp
+
+    ;string %tmp local "stty raw"
+    ;frame %1
+    ;move %0 arguments %tmp local
+    ;call void std::os::system/1
+
+    ;string %tmp local "stty -echo"
+    ;frame %1
+    ;move %0 arguments %tmp local
+    ;call void std::os::system/1
+
+    frame %1
+    move %tree_view_actor local %0 parameters
+    move %0 arguments %tree_view_actor local
+    tailcall input_actor_impl/1
 .end
 
 .function: return_tty_to_sanity/0
