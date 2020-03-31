@@ -2,15 +2,18 @@
 
 .signature: std::os::lsdir/1
 
-.function: print_entry/1
-    allocate_registers %5 local
+.function: print_entry/2
+    allocate_registers %7 local
 
     .name: iota entry
     .name: iota path
     .name: iota status
     .name: iota key
+    .name: iota control_sequence
+    .name: iota highlight
 
     move %entry local %0 parameters
+    move %highlight local %1 parameters
 
     atom %key local 'path'
     structat %path local %entry local %key local
@@ -19,19 +22,31 @@
     structat %status local %entry local %key local
     if *status local +1 is_a_regular_file
     text %status local "⇛ "
-    jump print_the_path
+    jump print_path_part
 
     .mark: is_a_regular_file
     text %status local "  "
     
-    .mark: print_the_path
+    .mark: print_path_part
     echo %status local
+
+    if %highlight local +1 print_the_path
+    string %control_sequence "\033[1m"
+    echo %control_sequence local
+    string %control_sequence "\033[4m"
+    echo %control_sequence local
+
+    .mark: print_the_path
     print *path local
+    string %control_sequence "\033[0m"
+    echo %control_sequence local
 
     return
 .end
 .function: print_entries/1
-    allocate_registers %5 local
+    allocate_registers %6 local
+
+    .name: 5 highlight
 
     move %1 local %0 parameters
 
@@ -43,9 +58,11 @@
     if %4 local +1 the_end
 
     vat %4 local %1 local %2 local
-    frame %1
+    frame %2
     copy %0 arguments *4 local
-    call void print_entry/1
+    not %highlight local %2 local
+    move %1 arguments %highlight local
+    call void print_entry/2
 
     iinc %2 local
     jump entry_printing_loop
