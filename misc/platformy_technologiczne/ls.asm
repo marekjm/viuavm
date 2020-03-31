@@ -100,7 +100,7 @@
 
     string %control_sequence "\033[2J"
     echo %control_sequence local
-    string %control_sequence "\033[0;0H"
+    string %control_sequence "\033[1;1H"
     echo %control_sequence local
 
     frame %1
