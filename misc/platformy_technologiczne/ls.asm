@@ -254,6 +254,9 @@
 
     print %directory local
 
+    ;
+    ; launch worker actors
+    ;
     frame %0
     process %tree_view_actor local tree_view_display_actor/0
 
@@ -269,6 +272,9 @@
     io_read %tmp local %tmp local %tmp local
     io_wait void %tmp local infinity
 
+    ;
+    ; set up initial directory listting
+    ;
     frame %1
     copy %0 arguments %directory local
     call %tmp local std::os::lsdir/1
@@ -277,10 +283,16 @@
     call %tmp local make_data_message/1
     send %tree_view_actor local %tmp local
 
+    ;
+    ; shut down worker actors
+    ;
     frame %0
     call %tmp local make_shutdown_message/0
     send %tree_view_actor local %tmp local
 
+    ;
+    ; join worker actors
+    ;
     join void %tree_view_actor local
 
     izero %0 local
