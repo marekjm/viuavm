@@ -388,6 +388,11 @@
     join void %tree_view_actor local
     join void %input_actor local
 
+    string %tmp "\033[2J"
+    echo %tmp local
+    string %tmp "\033[1;1H"
+    echo %tmp local
+
     izero %0 local
     return
 .end
