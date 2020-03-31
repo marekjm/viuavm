@@ -96,6 +96,8 @@
 
     atomeq %tmp local *got_tag local %tag_shutdown local
     if %tmp local +1 check_tag_data
+    text %tmp "tree_view_display_actor_impl shutting down"
+    print %tmp local
     return
 
     .mark: check_tag_data
@@ -237,14 +239,16 @@
     return
 .end
 .function: input_actor/1
-    allocate_registers %6 local
+    allocate_registers %8 local
 
     .name: iota tree_view_actor
     .name: iota tmp
     .name: iota stdin
     .name: iota buf
     .name: iota req
-    ;.name: iota input_available
+
+    .name: iota c_quit
+    .name: iota c_refresh
 
     move %tree_view_actor local %0 parameters
 
@@ -260,39 +264,41 @@
 
     integer %buf local 1
     io_read %req local %stdin local %buf local
-    text %tmp local "waiting..."
-    print %tmp local
-    io_wait void %req local infinity
-    text %tmp local "THX"
-    print %tmp local
+    io_wait %buf local %req local infinity
 
-    frame %1
-    string %tmp local "./misc"
-    copy %0 arguments %tmp local
-    call %tmp local std::os::lsdir/1
+    print %buf local
 
-    frame %1
-    move %0 arguments %tmp local
-    call %tmp local make_data_message/1
-    send %tree_view_actor local %tmp local
+    string %c_quit local "q"
+    streq %c_quit local %buf local %c_quit local
+    if %c_quit local the_end +1
+    
+    ;string %c_refresh local "r"
+    ;streq %c_refresh local %buf local %c_refresh local
+    ;if %c_refresh local refresh_display the_end
 
-    ; integer %buf local 1
-    ; print %stdin local
-    ; print %buf local
-    ; io_read %req local %stdin local %buf local
-    ; text %tmp local "waiting..."
-    ; print %tmp local
-    ; io_wait void %req local infinity
-    ; text %tmp local "KTHX BYE"
-    ; print %tmp local
+    ;.mark: refresh_display
+    ;frame %1
+    ;string %tmp local "./misc"
+    ;copy %0 arguments %tmp local
+    ;call %tmp local std::os::lsdir/1
 
+    ;frame %1
+    ;move %0 arguments %tmp local
+    ;call %tmp local make_data_message/1
+    ;send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: the_end
     frame %0
     call %tmp local make_shutdown_message/0
     send %tree_view_actor local %tmp local
 
+    text %tmp "input_actor shutting down"
+    print %tmp local
     return
 
-    .mark: the_end
+    .mark: happy_loopin
     frame %1
     move %0 arguments %tree_view_actor local
     tailcall input_actor/1
