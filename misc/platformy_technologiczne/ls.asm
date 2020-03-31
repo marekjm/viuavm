@@ -257,14 +257,38 @@
 
     .mark: await_input_stage
     integer %stdin local 0
+
     integer %buf local 1
     io_read %req local %stdin local %buf local
-
     text %tmp local "waiting..."
     print %tmp local
     io_wait void %req local infinity
-    text %tmp local "KTHX BYE"
+    text %tmp local "THX"
     print %tmp local
+
+    frame %1
+    string %tmp local "./misc"
+    copy %0 arguments %tmp local
+    call %tmp local std::os::lsdir/1
+
+    frame %1
+    move %0 arguments %tmp local
+    call %tmp local make_data_message/1
+    send %tree_view_actor local %tmp local
+
+    ; integer %buf local 1
+    ; print %stdin local
+    ; print %buf local
+    ; io_read %req local %stdin local %buf local
+    ; text %tmp local "waiting..."
+    ; print %tmp local
+    ; io_wait void %req local infinity
+    ; text %tmp local "KTHX BYE"
+    ; print %tmp local
+
+    frame %0
+    call %tmp local make_shutdown_message/0
+    send %tree_view_actor local %tmp local
 
     return
 
@@ -332,17 +356,6 @@
     move %0 arguments %tmp local
     call %tmp local make_data_message/1
     send %tree_view_actor local %tmp local
-
-    ;
-    ; shut down worker actors
-    ;
-    frame %0
-    call %tmp local make_shutdown_message/0
-    send %tree_view_actor local %tmp local
-
-    ;frame %0
-    ;call %tmp local make_shutdown_message/0
-    ;send %input_actor local %tmp local
 
     ;
     ; join worker actors
