@@ -30,22 +30,10 @@
 
     return
 .end
-
-.function: main/2
+.function: print_entries/1
     allocate_registers %5 local
 
-    move %1 local %1 parameters
-    if %1 local +1 use_default_directory
-    vpop %1 local %1 local void
-    jump +2
-    .mark: use_default_directory
-    string %1 local "."
-
-    print %1 local
-
-    frame %1
-    move %0 arguments %1 local
-    call %1 local std::os::lsdir/1
+    move %1 local %0 parameters
 
     integer %2 local 0
     vlen %3 local %1 local
@@ -63,6 +51,118 @@
     jump entry_printing_loop
 
     .mark: the_end
+    return
+.end
+
+.function: tree_view_display_actor/0
+    allocate_registers %7 local
+
+    .name: iota message
+    .name: iota key
+    .name: iota tag_shutdown
+    .name: iota tag_data
+    .name: iota got_tag
+    .name: iota tmp
+
+    receive %message local infinity
+    
+    atom %tag_shutdown local 'shutdown'
+    atom %tag_data local 'data'
+    atom %key local 'tag'
+    structat %got_tag local %message local %key local
+
+    atomeq %tmp local *got_tag local %tag_shutdown local
+    if %tmp local +1 check_tag_data
+    return
+
+    .mark: check_tag_data
+    atomeq %tmp local *got_tag local %tag_data local
+    if %tmp local +1 the_end
+    structat %tmp local %message local %tag_data local
+
+    frame %1
+    copy %0 arguments *tmp local
+    call void print_entries/1
+
+    .mark: the_end
+    frame %0
+    tailcall tree_view_display_actor/0
+.end
+.function: make_data_message/1
+    allocate_registers %5 local
+
+    .name: iota message
+    .name: iota tag_data
+    .name: iota data
+    .name: iota key
+
+    struct %message local
+
+    ; insert the tag field: { tag: 'data' }
+    atom %key local 'tag'
+    atom %tag_data local 'data'
+    structinsert %message local %key local %tag_data local
+
+    ; insert the data field: { tag: 'data', data: ... }
+    atom %key local 'data'
+    move %data local %0 parameters
+    structinsert %message local %key local %data local
+
+    move %0 local %message local
+    return
+.end
+.function: make_shutdown_message/0
+    allocate_registers %4 local
+
+    .name: iota message
+    .name: iota tag_shutdown
+    .name: iota key
+
+    struct %message local
+
+    ; insert the tag field: { tag: 'shutdown' }
+    atom %key local 'tag'
+    atom %tag_shutdown local 'shutdown'
+    structinsert %message local %key local %tag_shutdown local
+
+    move %0 local %message local
+    return
+.end
+
+.function: main/2
+    allocate_registers %4 local
+
+    .name: iota directory
+    .name: iota tree_view_actor
+    .name: iota tmp
+
+    move %directory local %1 parameters
+    if %directory local +1 use_default_directory
+    vpop %directory local %directory local void
+    jump +2
+    .mark: use_default_directory
+    string %directory local "."
+
+    print %directory local
+
+    frame %0
+    process %tree_view_actor local tree_view_display_actor/0
+
+    frame %1
+    move %0 arguments %directory local
+    call %tmp local std::os::lsdir/1
+    frame %1
+    move %0 arguments %tmp local
+    call %tmp local make_data_message/1
+    send %tree_view_actor local %tmp local
+
+    ;integer %tmp local 1
+    ;io_read %tmp local %tmp local %tmp local
+    ;io_wait void %tmp local infinity
+
+    frame %0
+    call %tmp local make_shutdown_message/0
+    send %tree_view_actor local %tmp local
 
     izero %0 local
     return
