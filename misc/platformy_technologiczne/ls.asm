@@ -39,7 +39,7 @@
 
     .mark: print_the_path
     print *path local
-    string %control_sequence "\033[0m"
+    string %control_sequence "\033[0m\r"
     echo %control_sequence local
 
     return
@@ -302,20 +302,20 @@
     tailcall input_actor/1
 .end
 .function: input_actor/1
-    allocate_registers %2 local
+    allocate_registers %3 local
 
     .name: iota tree_view_actor
     .name: iota tmp
 
-    ;string %tmp local "stty raw"
-    ;frame %1
-    ;move %0 arguments %tmp local
-    ;call void std::os::system/1
+    string %tmp local "stty raw"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
 
-    ;string %tmp local "stty -echo"
-    ;frame %1
-    ;move %0 arguments %tmp local
-    ;call void std::os::system/1
+    string %tmp local "stty -echo"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
 
     frame %1
     move %tree_view_actor local %0 parameters
