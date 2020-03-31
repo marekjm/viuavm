@@ -1230,7 +1230,11 @@ auto Program::opcatch(std::string const tag, std::string const block_name)
 auto Program::opdraw(int_op const target) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DRAW);
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
     return (*this);
 }
 
