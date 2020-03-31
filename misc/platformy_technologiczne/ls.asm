@@ -217,6 +217,63 @@
     return
 .end
 
+.function: time_to_shut_down/0
+    allocate_registers %1 local
+
+    integer %0 local 0
+    not %0 local
+
+    try
+    catch "Exception" .block: catch_me
+        draw void
+        not %0 local
+        leave
+    .end
+    enter .block: try_receiving
+        receive void 0ms
+        leave
+    .end
+
+    return
+.end
+.function: input_actor/1
+    allocate_registers %6 local
+
+    .name: iota tree_view_actor
+    .name: iota tmp
+    .name: iota stdin
+    .name: iota buf
+    .name: iota req
+    ;.name: iota input_available
+
+    move %tree_view_actor local %0 parameters
+
+    frame %0
+    call %tmp local time_to_shut_down/0
+    if %tmp local +1 await_input_stage
+    text %tmp local "time to shut down"
+    print %tmp local
+    return
+
+    .mark: await_input_stage
+    integer %stdin local 0
+    integer %buf local 1
+    io_read %req local %stdin local %buf local
+
+    text %tmp local "waiting..."
+    print %tmp local
+    io_wait void %req local infinity
+    text %tmp local "KTHX BYE"
+    print %tmp local
+
+    return
+
+    .mark: the_end
+    frame %1
+    move %0 arguments %tree_view_actor local
+    tailcall input_actor/1
+.end
+
 .function: return_tty_to_sanity/0
     allocate_registers %2 local
 
@@ -234,12 +291,12 @@
 
     return
 .end
-
 .function: main/2
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: iota directory
     .name: iota tree_view_actor
+    .name: iota input_actor
     .name: iota tmp
 
     frame %0
@@ -261,16 +318,9 @@
     process %tree_view_actor local tree_view_display_actor/0
 
     frame %1
-    copy %0 arguments %directory local
-    call %tmp local std::os::lsdir/1
-    frame %1
-    move %0 arguments %tmp local
-    call %tmp local make_data_message/1
-    send %tree_view_actor local %tmp local
-
-    integer %tmp local 1
-    io_read %tmp local %tmp local %tmp local
-    io_wait void %tmp local infinity
+    copy %0 arguments %tree_view_actor local
+    process %input_actor local input_actor/1
+    ; process void input_actor/1
 
     ;
     ; set up initial directory listting
@@ -290,10 +340,15 @@
     call %tmp local make_shutdown_message/0
     send %tree_view_actor local %tmp local
 
+    ;frame %0
+    ;call %tmp local make_shutdown_message/0
+    ;send %input_actor local %tmp local
+
     ;
     ; join worker actors
     ;
     join void %tree_view_actor local
+    join void %input_actor local
 
     izero %0 local
     return
