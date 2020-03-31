@@ -266,26 +266,24 @@
     io_read %req local %stdin local %buf local
     io_wait %buf local %req local infinity
 
-    print %buf local
-
     string %c_quit local "q"
     streq %c_quit local %buf local %c_quit local
     if %c_quit local the_end +1
     
-    ;string %c_refresh local "r"
-    ;streq %c_refresh local %buf local %c_refresh local
-    ;if %c_refresh local refresh_display the_end
+    string %c_refresh local "r"
+    streq %c_refresh local %buf local %c_refresh local
+    if %c_refresh local refresh_display happy_loopin
 
-    ;.mark: refresh_display
-    ;frame %1
-    ;string %tmp local "./misc"
-    ;copy %0 arguments %tmp local
-    ;call %tmp local std::os::lsdir/1
+    .mark: refresh_display
+    frame %1
+    string %tmp local "./misc"
+    copy %0 arguments %tmp local
+    call %tmp local std::os::lsdir/1
 
-    ;frame %1
-    ;move %0 arguments %tmp local
-    ;call %tmp local make_data_message/1
-    ;send %tree_view_actor local %tmp local
+    frame %1
+    move %0 arguments %tmp local
+    call %tmp local make_data_message/1
+    send %tree_view_actor local %tmp local
 
     jump happy_loopin
 
