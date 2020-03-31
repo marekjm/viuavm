@@ -72,15 +72,19 @@
 .end
 
 .function: tree_view_display_actor_impl/1
-    allocate_registers %8 local
+    allocate_registers %10 local
 
+    .name: iota state
     .name: iota message
     .name: iota key
     .name: iota tag_shutdown
     .name: iota tag_data
     .name: iota got_tag
+    .name: iota entries
     .name: iota tmp
     .name: iota control_sequence
+
+    move %state local %0 parameters
 
     receive %message local infinity
     
@@ -96,19 +100,26 @@
     .mark: check_tag_data
     atomeq %tmp local *got_tag local %tag_data local
     if %tmp local +1 the_end
-    structat %tmp local %message local %tag_data local
+    structremove %entries local %message local %tag_data local
+    structinsert %state local %tag_data local %entries local
 
+    .mark: check_tag_pointer_up
+
+    .mark: printing_sequence
     string %control_sequence "\033[2J"
     echo %control_sequence local
     string %control_sequence "\033[1;1H"
     echo %control_sequence local
 
+    structat %entries local %state local %tag_data local
+
     frame %1
-    copy %0 arguments *tmp local
+    copy %0 arguments *entries local
     call void print_entries/1
 
     .mark: the_end
-    frame %0
+    frame %1
+    move %0 arguments %state local
     tailcall tree_view_display_actor_impl/1
 .end
 .function: tree_view_display_actor/0
@@ -116,12 +127,19 @@
 
     .name: iota state
     .name: iota key
-    .name: iota pointer_value
+    .name: iota value
 
     struct %state local
+
+    ; pointer is the index of item that should be highlighted
     atom %key local 'pointer'
-    izero %pointer_value local 0
-    structinsert %state local %key local %pointer_value local
+    izero %value local 0
+    structinsert %state local %key local %value local
+
+    ; data is the list of items to display
+    atom %key local 'data'
+    vector %value local
+    structinsert %state local %key local %value local
 
     frame %1
     move %0 arguments %state local
@@ -175,6 +193,28 @@
     call %0 local make_tagged_message_impl/1
     return
 .end
+.function: make_pointer_up_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'pointer_up'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
+.function: make_pointer_down_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'pointer_down'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
 
 .function: main/2
     allocate_registers %4 local
@@ -203,13 +243,23 @@
     call %tmp local make_data_message/1
     send %tree_view_actor local %tmp local
 
-    ;integer %tmp local 1
-    ;io_read %tmp local %tmp local %tmp local
-    ;io_wait void %tmp local infinity
+    integer %tmp local 1
+    io_read %tmp local %tmp local %tmp local
+    io_wait void %tmp local infinity
+
+    frame %1
+    copy %0 arguments %directory local
+    call %tmp local std::os::lsdir/1
+    frame %1
+    move %0 arguments %tmp local
+    call %tmp local make_data_message/1
+    send %tree_view_actor local %tmp local
 
     frame %0
     call %tmp local make_shutdown_message/0
     send %tree_view_actor local %tmp local
+
+    join void %tree_view_actor local
 
     izero %0 local
     return
