@@ -18,6 +18,9 @@
  */
 
 #include <iomanip>
+#include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <viua/util/string/ops.h>
@@ -86,45 +89,46 @@ auto strencode(std::string const& s) -> std::string
      *
      */
     auto encoded = std::ostringstream{};
-    auto c       = char{};
-    auto escape  = bool{false};
+    auto c       = std::string{};
+    auto escape  = false;
+
     for (auto i = std::string::size_type{0}; i < s.size(); ++i) {
         switch (s[i]) {
         case '\\':
             escape = true;
-            c      = '\\';
+            c      = "\\";
             break;
         case '\a':
             escape = true;
-            c      = 'a';
+            c      = "a";
             break;
         case '\b':
             escape = true;
-            c      = 'b';
+            c      = "b";
             break;
         case '\f':
             escape = true;
-            c      = 'f';
+            c      = "f";
             break;
         case '\n':
             escape = true;
-            c      = 'n';
+            c      = "n";
             break;
         case '\r':
             escape = true;
-            c      = 'r';
+            c      = "r";
             break;
         case '\t':
             escape = true;
-            c      = 't';
+            c      = "t";
             break;
         case '\v':
             escape = true;
-            c      = 'v';
+            c      = "v";
             break;
         default:
             escape = false;
-            c      = s[i];
+            c      = c[i];
         }
         if (escape) {
             encoded << '\\';
@@ -132,6 +136,92 @@ auto strencode(std::string const& s) -> std::string
         encoded << c;
     }
     return encoded.str();
+}
+
+auto strdecode(std::string const s) -> std::string
+{
+    auto decoded = std::ostringstream{};
+
+    for (auto i = size_t{0}; i < s.size(); ++i) {
+        auto const each = s.at(i);
+        if (each != '\\') {
+            decoded << each;
+            continue;
+        }
+
+        if ((i + 1) >= s.size()) {
+            continue;
+        }
+        auto const next = s.at(++i);
+
+        auto const simple = std::map<char, char>{
+            { 'a', '\a' },
+            { 'b', '\b' },
+            { 'f', '\f' },
+            { 'n', '\n' },
+            { 'r', '\r' },
+            { 't', '\t' },
+            { 'v', '\v' },
+        };
+        if (simple.count(next)) {
+            decoded << simple.at(next);
+            continue;
+        }
+
+        auto const octals = std::set<char>{
+              '0'
+            , '1'
+            , '2'
+            , '3'
+            , '4'
+            , '5'
+            , '6'
+            , '7'
+        };
+        auto const o = [octals, s, i](size_t const n) -> bool
+        {
+            return octals.count(s.at(i + n));
+        };
+        if ((i + 2) < s.size() and o(0) and o(1) and o(2)) {
+            auto const digits = s.substr(i, 3);
+            auto const n = std::stoi(digits, nullptr, 8);
+            decoded << static_cast<char>(n);
+            i += 2;
+            continue;
+        }
+
+        auto const hexadecimals = std::set<char>{
+              '0'
+            , '1'
+            , '2'
+            , '3'
+            , '4'
+            , '5'
+            , '6'
+            , '7'
+            , '8'
+            , '9'
+            , 'a'
+            , 'b'
+            , 'c'
+            , 'd'
+            , 'e'
+            , 'f'
+        };
+        auto const h = [hexadecimals, s, i](size_t const n) -> bool
+        {
+            return hexadecimals.count(s.at(i + n));
+        };
+        if ((i + 2) < s.size() and next == 'x' and h(1) and h(2)) {
+            auto const digits = '0' + s.substr(i, 4);
+            auto const n = std::stoi(digits, nullptr, 16);
+            decoded << static_cast<char>(n);
+            i += 2;
+            continue;
+        }
+    }
+
+    return decoded.str();
 }
 
 auto quoted(std::string const& s) -> std::string

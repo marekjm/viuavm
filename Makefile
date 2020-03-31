@@ -549,6 +549,7 @@ build/bin/vm/kernel: \
 	build/support/pointer.o \
 	build/support/string.o \
 	build/support/env.o \
+	build/util/string/ops.o \
 	$(VIUA_INSTR_FILES_O) \
 	$(VIUA_TYPES_FILES_O) \
 	build/cg/disassembler/disassembler.o \
