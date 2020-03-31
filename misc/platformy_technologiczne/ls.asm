@@ -54,7 +54,7 @@
     return
 .end
 
-.function: tree_view_display_actor/0
+.function: tree_view_display_actor_impl/1
     allocate_registers %7 local
 
     .name: iota message
@@ -86,7 +86,23 @@
 
     .mark: the_end
     frame %0
-    tailcall tree_view_display_actor/0
+    tailcall tree_view_display_actor_impl/1
+.end
+.function: tree_view_display_actor/0
+    allocate_registers %4 local
+
+    .name: iota state
+    .name: iota key
+    .name: iota pointer_value
+
+    struct %state local
+    atom %key local 'pointer'
+    izero %pointer_value local 0
+    structinsert %state local %key local %pointer_value local
+
+    frame %1
+    move %0 arguments %state local
+    tailcall tree_view_display_actor_impl/1
 .end
 .function: make_data_message/1
     allocate_registers %5 local
