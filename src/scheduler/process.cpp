@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -399,6 +400,9 @@ template<typename T> struct deferred {
 auto Process_scheduler::launch() -> void
 {
     scheduler_thread = std::thread([this] { (*this)(); });
+    pthread_setname_np(
+        scheduler_thread.native_handle()
+        , ("proc." + std::to_string(assigned_id)).c_str());
 }
 auto Process_scheduler::operator()() -> void
 {

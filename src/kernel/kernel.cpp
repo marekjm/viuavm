@@ -789,6 +789,9 @@ viua::kernel::Kernel::Kernel()
             &foreign_functions_mutex,
             &foreign_call_queue_mutex,
             &foreign_call_queue_condition));
+        pthread_setname_np(
+              foreign_call_workers.back()->native_handle()
+            , ("ffi." + std::to_string(ffi_schedulers_limit - i)).c_str());
     }
 
     auto const io_schedulers_limit = no_of_io_schedulers();
