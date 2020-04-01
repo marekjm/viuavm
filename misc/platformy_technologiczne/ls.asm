@@ -129,8 +129,32 @@
     return
 .end
 
+.function: open_with/2
+    allocate_registers %4 local
+
+    .name: iota executable
+    .name: iota file
+    .name: iota tmp
+
+    move %executable local %0 parameters
+    move %file local %1 parameters
+
+    text %executable local %executable local
+    text %file local %file local
+    text %tmp local " "
+
+    textconcat %tmp local %executable local %tmp local
+    textconcat %tmp local %tmp local %file local
+
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    return
+.end
+
 .function: tree_view_display_actor_impl/1
-    allocate_registers %13 local
+    allocate_registers %14 local
 
     .name: 0 r0
     .name: iota state
@@ -141,6 +165,7 @@
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
     .name: iota tag_esc
+    .name: iota tag_open
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -157,6 +182,7 @@
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
     atom %tag_esc local 'esc'
+    atom %tag_open local 'open'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -165,12 +191,14 @@
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
     atomeq %tag_esc local *got_tag local %tag_esc local
+    atomeq %tag_open local *got_tag local %tag_open local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_data local stage_data +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
     if %tag_esc local stage_esc +1
+    if %tag_open local stage_open +1
     jump the_end
 
     .mark: stage_shutdown
@@ -183,6 +211,22 @@
     atom %key local 'data'
     structremove %entries local %message local %key local
     structinsert %state local %key local %entries local
+    jump printing_sequence
+
+    .mark: stage_open
+    atom %key local 'executable'
+    structremove %tmp local %message local %key local
+
+    frame %2
+    move %0 arguments %tmp local
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
+    atom %key local 'data'
+    structat %entries local %state local %key local
+    vat %tmp local *entries local *tmp local
+    copy %1 arguments *tmp local
+    call void open_with/2
+
     jump printing_sequence
 
     .mark: stage_ptr_down
