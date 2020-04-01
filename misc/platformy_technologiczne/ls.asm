@@ -74,9 +74,65 @@
     return
 .end
 
+.function: max/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota lhs
+    .name: iota rhs
+
+    move %lhs local %0 parameters
+    move %rhs local %1 parameters
+
+    lt %r0 local %lhs local %rhs local
+    if %r0 local +1 +3
+    move %r0 local %rhs local
+    jump the_end
+    move %r0 local %lhs local
+
+    .mark: the_end
+    return
+.end
+.function: min/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota lhs
+    .name: iota rhs
+
+    move %lhs local %0 parameters
+    move %rhs local %1 parameters
+
+    gt %r0 local %lhs local %rhs local
+    if %r0 local +1 +3
+    move %r0 local %rhs local
+    jump the_end
+    move %r0 local %lhs local
+
+    .mark: the_end
+    return
+.end
+.function: lower_bound_to_zero/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota n
+
+    move %n local %0 parameters
+    izero %r0 local
+
+    frame %2
+    move %0 arguments %r0 local
+    move %1 arguments %n local
+    call %r0 local max/2
+
+    return
+.end
+
 .function: tree_view_display_actor_impl/1
     allocate_registers %13 local
 
+    .name: 0 r0
     .name: iota state
     .name: iota message
     .name: iota key
@@ -152,10 +208,17 @@
     atom %key local 'data'
     structat %entries local %state local %key local
 
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
+    frame %1
+    copy %0 arguments *tmp local
+    call %tmp local lower_bound_to_zero/1
+    structinsert %state local %key local %tmp local
+
     frame %2
     copy %0 arguments *entries local
-    atom %tmp local 'pointer'
-    structat %tmp local %state local %tmp local
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
     copy %1 arguments *tmp local
     call void print_entries/2
 
