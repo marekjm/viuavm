@@ -74,7 +74,7 @@
     return
 .end
 
-.function: [[no_sa]] tree_view_display_actor_impl/1
+.function: tree_view_display_actor_impl/1
     allocate_registers %13 local
 
     .name: iota state
