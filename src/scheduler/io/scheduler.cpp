@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
 #include <chrono>
 #include <condition_variable>
 #include <iostream>
@@ -43,6 +44,8 @@ void viua::scheduler::io::io_scheduler(
     std::mutex& io_request_mutex,
     std::condition_variable& io_request_cv)
 {
+    pthread_setname_np(pthread_self(), ("io." + std::to_string(scheduler_id)).c_str());
+
     auto local_interactions = std::deque<std::unique_ptr<IO_interaction>>{};
 
     while (true) {
