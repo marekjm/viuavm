@@ -628,6 +628,11 @@ class Process {
 
     static viua::bytecode::codec::register_index_type const DEFAULT_REGISTER_SIZE =
         255;
+
+    inline auto current_stack() -> Stack&
+    {
+        return *stack;
+    }
 };
 }}  // namespace viua::process
 

@@ -18,6 +18,7 @@
  */
 
 #include <iomanip>
+#include <iostream>
 #include <mutex>
 #include <viua/kernel/kernel.h>
 #include <viua/machine.h>
@@ -56,6 +57,11 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
               << (ex ? ex->what() : thrown_object->str()) << "\n";
     std::cerr << "\n";
 
+    auto const ex_addr =
+        ((process.current_stack().instruction_pointer - 1) - process.current_stack().jump_base);
+    std::cerr << "exception address: 0x"
+        << std::hex << std::setw(4) << std::setfill('0') << ex_addr << std::dec
+        << " (byte " << ex_addr << ")\n";
     std::cerr << "frame details:\n";
 
     if (trace.size()) {
