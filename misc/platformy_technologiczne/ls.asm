@@ -208,11 +208,22 @@
     atom %key local 'data'
     structat %entries local %state local %key local
 
+    ;
+    ; make sure pointer does not exceed bounds
+    ;
     atom %key local 'pointer'
     structat %tmp local %state local %key local
     frame %1
     copy %0 arguments *tmp local
     call %tmp local lower_bound_to_zero/1
+
+    frame %2 local
+    move %0 arguments %tmp local
+    vlen %tmp local *entries local
+    idec %tmp local
+    move %1 arguments %tmp local
+    call %tmp local min/2
+
     structinsert %state local %key local %tmp local
 
     frame %2
