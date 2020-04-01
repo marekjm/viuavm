@@ -75,7 +75,7 @@
 .end
 
 .function: [[no_sa]] tree_view_display_actor_impl/1
-    allocate_registers %12 local
+    allocate_registers %13 local
 
     .name: iota state
     .name: iota message
@@ -84,6 +84,7 @@
     .name: iota tag_data
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
+    .name: iota tag_esc
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -93,40 +94,48 @@
     print %state local
 
     receive %message local infinity
+    print %message local
     
     atom %tag_shutdown local 'shutdown'
     atom %tag_data local 'data'
+    atom %tag_ptr_down local 'pointer_down'
+    atom %tag_ptr_up local 'pointer_up'
+    atom %tag_esc local 'esc'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
-    atomeq %tmp local *got_tag local %tag_shutdown local
-    if %tmp local +1 check_tag_data
+    atomeq %tag_shutdown local *got_tag local %tag_shutdown local
+    atomeq %tag_data local *got_tag local %tag_data local
+    atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
+    atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
+    atomeq %tag_esc local *got_tag local %tag_esc local
+
+    if %tag_shutdown local stage_shutdown +1
+    if %tag_data local stage_data +1
+    if %tag_ptr_down local stage_ptr_down +1
+    if %tag_ptr_up local stage_ptr_up +1
+    if %tag_esc local stage_esc +1
+    jump the_end
+
+    .mark: stage_shutdown
+    .mark: stage_esc
     text %tmp "tree_view_display_actor_impl shutting down"
     print %tmp local
     return
 
-    .mark: check_tag_data
-    atomeq %tmp local *got_tag local %tag_data local
-    if %tmp local +1 check_tag_pointer_down
-    structremove %entries local %message local %tag_data local
-    structinsert %state local %tag_data local %entries local
+    .mark: stage_data
+    atom %key local 'data'
+    structremove %entries local %message local %key local
+    structinsert %state local %key local %entries local
     jump printing_sequence
 
-    .mark: check_tag_pointer_down
-    atom %tag_ptr_down local 'pointer_down'
-    atomeq %tmp local *got_tag local %tag_ptr_down local
-    if %tmp local +1 check_tag_pointer_up
+    .mark: stage_ptr_down
     atom %tmp local 'pointer'
     structat %tmp local %state local %tmp local
     iinc *tmp local
-    ; FIXME this jump breaks the bytecode and is apprently compiled as a
-    ; self-jump
     jump printing_sequence
 
-    .mark: check_tag_pointer_up
-    atom %tag_ptr_up local 'pointer_up'
-    atomeq %tmp local *got_tag local %tag_ptr_up local
-    if %tmp local +1 the_end
+    .mark: stage_ptr_up
     atom %tmp local 'pointer'
     structat %tmp local %state local %tmp local
     idec *tmp local
@@ -140,7 +149,8 @@
     string %control_sequence "\033[1;1H"
     echo %control_sequence local
 
-    structat %entries local %state local %tag_data local
+    atom %key local 'data'
+    structat %entries local %state local %key local
 
     frame %2
     copy %0 arguments *entries local
