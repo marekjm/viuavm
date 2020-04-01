@@ -471,7 +471,17 @@
     integer %stdin local 0
     integer %buf local 1
     io_read %req local %stdin local %buf local
-    io_wait %buf local %req local infinity
+
+    try
+    catch "Exception" .block: no_input_available
+        draw void
+        string %buf local "r"
+        leave
+    .end
+    enter .block: wait_for_some_input
+        io_wait %buf local %req local infinity
+        leave
+    .end
 
     move %r0 local %buf local
     return
