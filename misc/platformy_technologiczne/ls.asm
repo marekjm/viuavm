@@ -460,14 +460,28 @@
 
     return
 .end
-.function: input_actor_impl/1
-    allocate_registers %11 local
+.function: input_actor_await_io/0
+    allocate_registers %4 local
 
-    .name: iota tree_view_actor
-    .name: iota tmp
+    .name: 0 r0
     .name: iota stdin
     .name: iota buf
     .name: iota req
+
+    integer %stdin local 0
+    integer %buf local 1
+    io_read %req local %stdin local %buf local
+    io_wait %buf local %req local infinity
+
+    move %r0 local %buf local
+    return
+.end
+.function: input_actor_impl/1
+    allocate_registers %9 local
+
+    .name: iota tree_view_actor
+    .name: iota tmp
+    .name: iota buf
 
     .name: iota c_quit
     .name: iota c_refresh
@@ -485,11 +499,8 @@
     return
 
     .mark: await_input_stage
-    integer %stdin local 0
-
-    integer %buf local 1
-    io_read %req local %stdin local %buf local
-    io_wait %buf local %req local infinity
+    frame %0
+    call %buf local input_actor_await_io/0
 
     string %c_quit local "q"
     streq %c_quit local %buf local %c_quit local
