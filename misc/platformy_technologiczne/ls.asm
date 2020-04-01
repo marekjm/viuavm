@@ -331,6 +331,27 @@
     call %0 local make_tagged_message_impl/1
     return
 .end
+.function: make_open_message/1
+    allocate_registers %5 local
+
+    .name: iota message
+    .name: iota tag
+    .name: iota executable
+    .name: iota key
+
+    atom %tag local 'open'
+    frame %1
+    move %0 arguments %tag local
+    call %message local make_tagged_message_impl/1
+
+    ; insert the data field: { tag: 'open', executable: ... }
+    atom %key local 'executable'
+    move %executable local %0 parameters
+    structinsert %message local %key local %executable local
+
+    move %0 local %message local
+    return
+.end
 
 .function: time_to_shut_down/0
     allocate_registers %1 local
@@ -351,8 +372,52 @@
 
     return
 .end
+.function: make_tty_raw/0
+    allocate_registers %2 local
+
+    .name: iota tmp
+
+    string %tmp local "stty raw"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    string %tmp local "stty -echo"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    return
+.end
+.function: prepare_and_send_open_message/1
+    allocate_registers %7 local
+
+    .name: iota stdin
+    .name: iota buf
+    .name: iota req
+    .name: iota message
+    .name: iota dst
+    .name: iota tmp
+
+    integer %stdin local 0
+    integer %buf local 128
+    io_read %req local %stdin local %buf local
+
+    text %tmp local "\ropen with: "
+    echo %tmp local
+    io_wait %buf local %req local infinity
+
+    frame %1
+    move %0 arguments %buf local
+    call %message local make_open_message/1
+
+    move %dst local %0 parameters
+    send %dst local %message local
+
+    return
+.end
 .function: input_actor_impl/1
-    allocate_registers %10 local
+    allocate_registers %11 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -364,6 +429,7 @@
     .name: iota c_refresh
     .name: iota c_pointer_down
     .name: iota c_pointer_up
+    .name: iota c_open
 
     move %tree_view_actor local %0 parameters
 
@@ -389,11 +455,14 @@
     streq %c_pointer_down local %buf local %c_pointer_down local
     string %c_pointer_up local "k"
     streq %c_pointer_up local %buf local %c_pointer_up local
+    string %c_open local "o"
+    streq %c_open local %buf local %c_open local
 
     if %c_quit local the_end +1
     if %c_refresh local refresh_display +1
     if %c_pointer_down local move_pointer_down +1
     if %c_pointer_up local move_pointer_up +1
+    if %c_open local open_item +1
     jump happy_loopin
 
     .mark: refresh_display
@@ -425,6 +494,20 @@
 
     jump happy_loopin
 
+    .mark: open_item
+
+    frame %0
+    call void return_tty_to_sanity/0
+
+    frame %1
+    copy %0 arguments %tree_view_actor local
+    call void prepare_and_send_open_message/1
+
+    frame %0
+    call void make_tty_raw/0
+
+    jump happy_loopin
+
     .mark: the_end
     frame %0
     call %tmp local make_shutdown_message/0
@@ -440,20 +523,12 @@
     tailcall input_actor/1
 .end
 .function: input_actor/1
-    allocate_registers %3 local
+    allocate_registers %2 local
 
     .name: iota tree_view_actor
-    .name: iota tmp
 
-    string %tmp local "stty raw"
-    frame %1
-    move %0 arguments %tmp local
-    call void std::os::system/1
-
-    string %tmp local "stty -echo"
-    frame %1
-    move %0 arguments %tmp local
-    call void std::os::system/1
+    frame %0
+    call void make_tty_raw/0
 
     frame %1
     move %tree_view_actor local %0 parameters
