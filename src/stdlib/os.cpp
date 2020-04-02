@@ -46,6 +46,8 @@ static void os_system(Frame* frame,
     }
     auto const command = frame->arguments->get(0)->str();
     auto const ret     = system(command.c_str());
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(0,
                                    std::make_unique<viua::types::Integer>(ret));
 }
