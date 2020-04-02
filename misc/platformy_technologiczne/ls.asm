@@ -460,6 +460,30 @@
 
     return
 .end
+.function: input_actor_await_io_handle_cancellation/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota req
+
+    draw void
+
+    move %req local %0 parameters
+
+    io_cancel %req local
+
+    try
+    catch "IO_cancel" .block: catch_cancelled
+        draw void
+        leave
+    .end
+    enter .block: wait_for_cancelled
+        io_wait void %req local infinity
+        leave
+    .end
+
+    return
+.end
 .function: input_actor_await_io/0
     allocate_registers %4 local
 
@@ -474,12 +498,15 @@
 
     try
     catch "Exception" .block: no_input_available
-        draw void
-        string %buf local "r"
+        frame %1
+        move %0 arguments %req local
+        call void input_actor_await_io_handle_cancellation/1
+
+        string %buf local "_"
         leave
     .end
     enter .block: wait_for_some_input
-        io_wait %buf local %req local infinity
+        io_wait %buf local %req local 1s
         leave
     .end
 
@@ -585,7 +612,7 @@
     .mark: happy_loopin
     frame %1
     move %0 arguments %tree_view_actor local
-    tailcall input_actor/1
+    tailcall input_actor_impl/1
 .end
 .function: input_actor/1
     allocate_registers %2 local
