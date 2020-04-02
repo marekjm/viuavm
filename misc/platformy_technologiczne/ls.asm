@@ -646,11 +646,10 @@
     return
 .end
 .function: main/2
-    allocate_registers %5 local
+    allocate_registers %4 local
 
     .name: iota directory
     .name: iota tree_view_actor
-    .name: iota input_actor
     .name: iota tmp
 
     frame %0
@@ -673,8 +672,7 @@
 
     frame %1
     copy %0 arguments %tree_view_actor local
-    process %input_actor local input_actor/1
-    ; process void input_actor/1
+    process void input_actor/1
 
     ;
     ; set up initial directory listting
@@ -691,7 +689,6 @@
     ; join worker actors
     ;
     join void %tree_view_actor local
-    join void %input_actor local
 
     string %tmp "\033[2J"
     echo %tmp local
