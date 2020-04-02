@@ -162,15 +162,38 @@
 
     return
 .end
+.function: refresh_view/1
+    allocate_registers %3 local
 
+    .name: 0 r0
+    .name: iota state
+    .name: iota tmp
+
+    move %state local %0 parameters
+
+    frame %1
+    atom %tmp 'cwd'
+    structat %tmp local %state local %tmp local
+    copy %0 arguments *tmp local
+    call %tmp local std::os::lsdir/1
+
+    frame %1
+    move %0 arguments %tmp local
+    call %tmp local make_data_message/1
+    self %r0 local
+    send %r0 local %tmp local
+
+    return
+.end
 .function: tree_view_display_actor_impl/1
-    allocate_registers %15 local
+    allocate_registers %16 local
 
     .name: 0 r0
     .name: iota state
     .name: iota message
     .name: iota key
     .name: iota tag_shutdown
+    .name: iota tag_refresh
     .name: iota tag_data
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
@@ -189,6 +212,7 @@
     print %message local
     
     atom %tag_shutdown local 'shutdown'
+    atom %tag_refresh local 'refresh'
     atom %tag_data local 'data'
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
@@ -199,6 +223,7 @@
     structat %got_tag local %message local %key local
 
     atomeq %tag_shutdown local *got_tag local %tag_shutdown local
+    atomeq %tag_refresh local *got_tag local %tag_refresh local
     atomeq %tag_data local *got_tag local %tag_data local
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
@@ -207,6 +232,7 @@
     atomeq %tag_enter local *got_tag local %tag_enter local
 
     if %tag_shutdown local stage_shutdown +1
+    if %tag_refresh local stage_refresh +1
     if %tag_data local stage_data +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
@@ -227,6 +253,19 @@
     structremove %entries local %message local %key local
     structinsert %state local %key local %entries local
     jump printing_sequence
+
+    .mark: stage_refresh
+    frame %1
+    copy %0 arguments %state local
+    call void refresh_view/1
+
+    ; We can't just jump to the 'the_end' label or the static analyser will
+    ; complain about unused registers... If we put the two non-using branches
+    ; one after the other. If we put a branch that uses the register between the
+    ; two non-using ones then all is good.
+    ;
+    ; Nice code you have there - sooo reliable.
+    jump the_end
 
     .mark: stage_exec
     atom %key local 'executable'
@@ -297,12 +336,15 @@
     move %0 arguments %state local
     tailcall tree_view_display_actor_impl/1
 .end
-.function: tree_view_display_actor/0
-    allocate_registers %4 local
+.function: tree_view_display_actor/1
+    allocate_registers %5 local
 
+    .name: iota directory
     .name: iota state
     .name: iota key
     .name: iota value
+
+    move %directory local %0 parameters
 
     struct %state local
 
@@ -315,6 +357,10 @@
     atom %key local 'data'
     vector %value local
     structinsert %state local %key local %value local
+
+    ; the current directory to list
+    atom %key local 'cwd'
+    structinsert %state local %key local %directory local
 
     frame %1
     move %0 arguments %state local
@@ -416,6 +462,17 @@
 
     .name: iota tag
     atom %tag local 'enter_dir'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
+.function: make_refresh_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'refresh'
 
     frame %1
     move %0 arguments %tag local
@@ -592,14 +649,9 @@
     jump happy_loopin
 
     .mark: refresh_display
-    frame %1
-    string %tmp local "./misc"
-    copy %0 arguments %tmp local
-    call %tmp local std::os::lsdir/1
 
-    frame %1
-    move %0 arguments %tmp local
-    call %tmp local make_data_message/1
+    frame %0
+    call %tmp make_refresh_message/0
     send %tree_view_actor local %tmp local
 
     jump happy_loopin
@@ -709,8 +761,9 @@
     ;
     ; launch worker actors
     ;
-    frame %0
-    process %tree_view_actor local tree_view_display_actor/0
+    frame %1
+    copy %0 arguments %directory local
+    process %tree_view_actor local tree_view_display_actor/1
 
     frame %1
     copy %0 arguments %tree_view_actor local
