@@ -38,3 +38,16 @@ auto viua::types::Boolean::copy() const -> std::unique_ptr<viua::types::Value>
 }
 
 viua::types::Boolean::Boolean(bool const v) : b(v) {}
+
+auto viua::types::Boolean::make(bool const v) -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(v);
+}
+auto viua::types::Boolean::make_true() -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(true);
+}
+auto viua::types::Boolean::make_false() -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(false);
+}
