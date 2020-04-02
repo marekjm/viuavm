@@ -164,7 +164,7 @@
 .end
 
 .function: tree_view_display_actor_impl/1
-    allocate_registers %14 local
+    allocate_registers %15 local
 
     .name: 0 r0
     .name: iota state
@@ -176,6 +176,7 @@
     .name: iota tag_ptr_up
     .name: iota tag_esc
     .name: iota tag_exec
+    .name: iota tag_enter
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -193,6 +194,7 @@
     atom %tag_ptr_up local 'pointer_up'
     atom %tag_esc local 'esc'
     atom %tag_exec local 'exec'
+    atom %tag_enter local 'enter_dir'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -202,6 +204,7 @@
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
     atomeq %tag_esc local *got_tag local %tag_esc local
     atomeq %tag_exec local *got_tag local %tag_exec local
+    atomeq %tag_enter local *got_tag local %tag_enter local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_data local stage_data +1
@@ -209,6 +212,8 @@
     if %tag_ptr_up local stage_ptr_up +1
     if %tag_esc local stage_esc +1
     if %tag_exec local stage_exec +1
+    ;if %tag_enter local stage_enter +1
+    if %tag_enter local stage_ptr_down +1
     jump the_end
 
     .mark: stage_shutdown
@@ -406,6 +411,17 @@
     move %0 local %message local
     return
 .end
+.function: make_enter_dir_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'enter_dir'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
 
 .function: time_to_shut_down/0
     allocate_registers %1 local
@@ -521,7 +537,7 @@
     return
 .end
 .function: input_actor_impl/1
-    allocate_registers %9 local
+    allocate_registers %10 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -532,6 +548,7 @@
     .name: iota c_pointer_down
     .name: iota c_pointer_up
     .name: iota c_exec
+    .name: iota c_enter
 
     move %tree_view_actor local %0 parameters
 
@@ -547,6 +564,8 @@
     call %buf local input_actor_await_io/0
 
     string %c_quit local "q"
+    ;string %c_quit local "\0x71"
+    ;print %c_quit local
     streq %c_quit local %buf local %c_quit local
     string %c_refresh local "r"
     streq %c_refresh local %buf local %c_refresh local
@@ -554,14 +573,22 @@
     streq %c_pointer_down local %buf local %c_pointer_down local
     string %c_pointer_up local "k"
     streq %c_pointer_up local %buf local %c_pointer_up local
-    string %c_exec local "e"
+    string %c_exec local "x"
     streq %c_exec local %buf local %c_exec local
+    string %c_enter local "e"
+    streq %c_enter local %buf local %c_enter local
 
     if %c_quit local the_end +1
     if %c_refresh local refresh_display +1
     if %c_pointer_down local move_pointer_down +1
     if %c_pointer_up local move_pointer_up +1
     if %c_exec local exec_item +1
+    if %c_enter local enter_dir +1
+
+    text %tmp local "input not recognised"
+    print %tmp local
+    print %buf local
+
     jump happy_loopin
 
     .mark: refresh_display
@@ -604,6 +631,14 @@
 
     frame %0
     call void make_tty_raw/0
+
+    jump happy_loopin
+
+    .mark: enter_dir
+
+    frame %0
+    call %tmp make_enter_dir_message/0
+    send %tree_view_actor local %tmp local
 
     jump happy_loopin
 
