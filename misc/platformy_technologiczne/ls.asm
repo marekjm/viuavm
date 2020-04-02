@@ -237,8 +237,7 @@
     copy %1 arguments *tmp local
     call void exec_with/2
 
-    ;jump printing_sequence
-    jump the_end
+    jump printing_sequence
 
     .mark: stage_ptr_down
     atom %tmp local 'pointer'
