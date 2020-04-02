@@ -185,6 +185,48 @@
 
     return
 .end
+.function: enter_item/1
+    allocate_registers %7 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota key
+    .name: iota item
+    .name: iota is_directory
+    .name: iota new_cwd
+    .name: iota tmp
+
+    move %state local %0 parameters
+
+    atom %key local 'data'
+    structat %tmp local *state local %key local
+
+    atom %key local 'pointer'
+    structat %item local *state local %key local
+
+    vat %item local *tmp local *item local
+
+    atom %key local 'is_directory'
+    structat %is_directory local *item local %key local
+    ; dereference the pointer and copy the boolean so we can use it directly
+    copy %is_directory local *is_directory local
+
+    if %is_directory local +1 the_end
+
+    atom %key local 'path'
+    structat %new_cwd local *item local %key local
+
+    atom %key local 'cwd'
+    structinsert *state local %key local *new_cwd local
+
+    frame %0
+    call %tmp local make_refresh_message/0
+    self %r0 local
+    send %r0 local %tmp local
+
+    .mark: the_end
+    return
+.end
 .function: tree_view_display_actor_impl/1
     allocate_registers %16 local
 
@@ -238,8 +280,7 @@
     if %tag_ptr_up local stage_ptr_up +1
     if %tag_esc local stage_esc +1
     if %tag_exec local stage_exec +1
-    ;if %tag_enter local stage_enter +1
-    if %tag_enter local stage_ptr_down +1
+    if %tag_enter local stage_enter +1
     jump the_end
 
     .mark: stage_shutdown
@@ -280,6 +321,14 @@
     vat %tmp local *entries local *tmp local
     copy %1 arguments *tmp local
     call void exec_with/2
+
+    jump printing_sequence
+
+    .mark: stage_enter
+    frame %1
+    ptr %tmp local %state local
+    copy %0 arguments %tmp local
+    call void enter_item/1
 
     jump printing_sequence
 
