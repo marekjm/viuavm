@@ -132,19 +132,29 @@
 .function: exec_with/2
     allocate_registers %5 local
 
+    .name: 0 r0
     .name: iota executable
     .name: iota file
+    .name: iota path
     .name: iota tmp
 
     move %executable local %0 parameters
     move %file local %1 parameters
 
     text %executable local %executable local
-    text %file local %file local
+    textlength %tmp local %executable
+    idec %tmp local
+    izero %r0 local
+    textsub %executable local %executable local %r0 local %tmp local
+
+    atom %path local 'path'
+    structat %path local %file local %path local
+    text %path local *path local
+
     text %tmp local " "
 
     textconcat %tmp local %executable local %tmp local
-    textconcat %tmp local %tmp local %file local
+    textconcat %tmp local %tmp local %path local
 
     frame %1
     move %0 arguments %tmp local
