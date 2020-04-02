@@ -18,13 +18,20 @@
  */
 
 #include <cstdlib>
+#include <filesystem>
 #include <memory>
 #include <string>
+#include <vector>
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
+#include <viua/types/string.h>
+#include <viua/types/vector.h>
+#include <viua/types/struct.h>
+#include <viua/types/boolean.h>
+#include <viua/types/value.h>
 
 
 static void os_system(Frame* frame,
@@ -43,9 +50,35 @@ static void os_system(Frame* frame,
                                    std::make_unique<viua::types::Integer>(ret));
 }
 
+static void os_lsdir(Frame* frame,
+                     viua::kernel::Register_set*,
+                     viua::kernel::Register_set*,
+                     viua::process::Process*,
+                     viua::kernel::Kernel*)
+{
+    auto const path = frame->arguments->at(0)->str();
+
+    auto entries = std::make_unique<viua::types::Vector>();
+
+    for (auto const& each : std::filesystem::directory_iterator{path}) {
+        auto entry = std::make_unique<viua::types::Struct>();
+        entry->insert("path", std::make_unique<viua::types::String>(each.path()));
+        entry->insert("is_directory",
+            viua::types::Boolean::make(std::filesystem::is_directory(each.status())));
+        entry->insert("is_regular_file",
+            viua::types::Boolean::make(std::filesystem::is_regular_file(each.status())));
+        entries->push(std::move(entry));
+    }
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0, std::move(entries));
+}
+
 
 const Foreign_function_spec functions[] = {
     {"std::os::system/1", &os_system},
+    {"std::os::lsdir/1", &os_lsdir},
     {nullptr, nullptr},
 };
 
