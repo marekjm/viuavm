@@ -129,8 +129,8 @@
     return
 .end
 
-.function: open_with/2
-    allocate_registers %4 local
+.function: exec_with/2
+    allocate_registers %5 local
 
     .name: iota executable
     .name: iota file
@@ -165,7 +165,7 @@
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
     .name: iota tag_esc
-    .name: iota tag_open
+    .name: iota tag_exec
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -182,7 +182,7 @@
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
     atom %tag_esc local 'esc'
-    atom %tag_open local 'open'
+    atom %tag_exec local 'exec'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -191,14 +191,14 @@
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
     atomeq %tag_esc local *got_tag local %tag_esc local
-    atomeq %tag_open local *got_tag local %tag_open local
+    atomeq %tag_exec local *got_tag local %tag_exec local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_data local stage_data +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
     if %tag_esc local stage_esc +1
-    if %tag_open local stage_open +1
+    if %tag_exec local stage_exec +1
     jump the_end
 
     .mark: stage_shutdown
@@ -213,7 +213,7 @@
     structinsert %state local %key local %entries local
     jump printing_sequence
 
-    .mark: stage_open
+    .mark: stage_exec
     atom %key local 'executable'
     structremove %tmp local %message local %key local
 
@@ -225,9 +225,10 @@
     structat %entries local %state local %key local
     vat %tmp local *entries local *tmp local
     copy %1 arguments *tmp local
-    call void open_with/2
+    call void exec_with/2
 
-    jump printing_sequence
+    ;jump printing_sequence
+    jump the_end
 
     .mark: stage_ptr_down
     atom %tmp local 'pointer'
@@ -375,7 +376,7 @@
     call %0 local make_tagged_message_impl/1
     return
 .end
-.function: make_open_message/1
+.function: make_exec_message/1
     allocate_registers %5 local
 
     .name: iota message
@@ -383,12 +384,12 @@
     .name: iota executable
     .name: iota key
 
-    atom %tag local 'open'
+    atom %tag local 'exec'
     frame %1
     move %0 arguments %tag local
     call %message local make_tagged_message_impl/1
 
-    ; insert the data field: { tag: 'open', executable: ... }
+    ; insert the data field: { tag: 'exec', executable: ... }
     atom %key local 'executable'
     move %executable local %0 parameters
     structinsert %message local %key local %executable local
@@ -433,27 +434,24 @@
 
     return
 .end
-.function: prepare_and_send_open_message/1
-    allocate_registers %7 local
+.function: prepare_and_send_exec_message/1
+    allocate_registers %6 local
 
     .name: iota stdin
     .name: iota buf
     .name: iota req
     .name: iota message
     .name: iota dst
-    .name: iota tmp
 
     integer %stdin local 0
     integer %buf local 128
     io_read %req local %stdin local %buf local
 
-    text %tmp local "\ropen with: "
-    echo %tmp local
     io_wait %buf local %req local infinity
 
     frame %1
     move %0 arguments %buf local
-    call %message local make_open_message/1
+    call %message local make_exec_message/1
 
     move %dst local %0 parameters
     send %dst local %message local
@@ -524,7 +522,7 @@
     .name: iota c_refresh
     .name: iota c_pointer_down
     .name: iota c_pointer_up
-    .name: iota c_open
+    .name: iota c_exec
 
     move %tree_view_actor local %0 parameters
 
@@ -547,14 +545,14 @@
     streq %c_pointer_down local %buf local %c_pointer_down local
     string %c_pointer_up local "k"
     streq %c_pointer_up local %buf local %c_pointer_up local
-    string %c_open local "o"
-    streq %c_open local %buf local %c_open local
+    string %c_exec local "e"
+    streq %c_exec local %buf local %c_exec local
 
     if %c_quit local the_end +1
     if %c_refresh local refresh_display +1
     if %c_pointer_down local move_pointer_down +1
     if %c_pointer_up local move_pointer_up +1
-    if %c_open local open_item +1
+    if %c_exec local exec_item +1
     jump happy_loopin
 
     .mark: refresh_display
@@ -586,14 +584,14 @@
 
     jump happy_loopin
 
-    .mark: open_item
+    .mark: exec_item
 
     frame %0
     call void return_tty_to_sanity/0
 
     frame %1
     copy %0 arguments %tree_view_actor local
-    call void prepare_and_send_open_message/1
+    call void prepare_and_send_exec_message/1
 
     frame %0
     call void make_tty_raw/0
