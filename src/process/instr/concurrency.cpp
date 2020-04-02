@@ -130,8 +130,11 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
     auto target = decoder.fetch_register_or_void(addr, *this);
 
     auto const timeout = decoder.fetch_timeout(addr);
+    auto const immediate_timeout = (timeout == 1);
 
-    if (timeout and not timeout_active) {
+    if (immediate_timeout) {
+        // do nothing
+    } else if (timeout and not timeout_active) {
         waiting_until  = (std::chrono::steady_clock::now()
                          + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
@@ -156,8 +159,12 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         if (is_hidden) {
             suspend();
         }
-        if (timeout_active and (not wait_until_infinity)
-            and (waiting_until < std::chrono::steady_clock::now())) {
+
+        auto const timeout_passed = (
+                timeout_active
+            and (not wait_until_infinity)
+            and (waiting_until < std::chrono::steady_clock::now()));
+        if (timeout_passed or immediate_timeout) {
             timeout_active      = false;
             wait_until_infinity = false;
             stack->thrown =
