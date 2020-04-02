@@ -4,10 +4,9 @@
 *.bin
 *.out
 
+core.*
 *.pdf
-
 *~
-*\#
 
 .*
 
@@ -21,7 +20,6 @@ contrib/*
 !contrib/example/
 
 build/assembler/*
-
 build/bin/vm/*
 build/bin/run/*
 
