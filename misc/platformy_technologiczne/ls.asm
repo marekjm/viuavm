@@ -774,6 +774,14 @@
     .name: iota message
     .name: iota dst
 
+    text %buf local "\rexec with: "
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
+
+    frame %0
+    call void return_tty_to_sanity/0
+
     integer %stdin local 0
     integer %buf local 128
     io_read %req local %stdin local %buf local
@@ -915,9 +923,6 @@
     jump happy_loopin
 
     .mark: exec_item
-
-    frame %0
-    call void return_tty_to_sanity/0
 
     frame %1
     copy %0 arguments %tree_view_actor local
