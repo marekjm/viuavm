@@ -295,6 +295,29 @@
     move %r0 local %entries local
     return
 .end
+.function: print_top_line/1
+    allocate_registers %5 local
+
+    .name: iota state
+    .name: iota key
+    .name: iota cwd
+    .name: iota tmp
+
+    move %state local %0 parameters
+
+    atom %key local 'cwd'
+    structat %cwd local *state local %key local
+    text %cwd local *cwd local
+
+    text %tmp local "["
+    textconcat %cwd local %tmp local %cwd local
+    text %tmp local "]\r"
+    textconcat %cwd local %cwd local %tmp local
+
+    print %cwd local
+
+    return
+.end
 .function: tree_view_display_actor_impl/1
     allocate_registers %16 local
 
@@ -461,6 +484,11 @@
     ;
     ; present the data on the screen
     ;
+    frame %1 local
+    ptr %tmp local %state local
+    move %0 arguments %tmp local
+    call void print_top_line/1
+
     frame %2
     move %0 arguments %entries local
     atom %key local 'pointer'
