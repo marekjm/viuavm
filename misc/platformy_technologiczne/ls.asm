@@ -229,6 +229,48 @@
     .mark: the_end
     return
 .end
+.function: exec_item/2
+    allocate_registers %7 local
+
+    .name: 0 r0
+    .name: iota message
+    .name: iota state
+    .name: iota key
+    .name: iota executable
+    .name: iota entry
+    .name: iota i
+
+    move %message local %0 parameters
+    move %state local %1 parameters
+
+    atom %key local 'executable'
+    structremove %executable local %message local %key local
+
+    atom %key local 'pointer'
+    structat %i local %state local %key local
+
+    atom %key local 'data'
+    structat %entry local %state local %key local
+    vat %entry local *entry local *i local
+
+    frame %2
+    move %0 arguments %executable local
+    copy %1 arguments *entry local
+    call void exec_with/2
+
+    ;
+    ; Send the input actor a message to let it know that it may assume control
+    ; over standard input stream again. This is neede because for executing
+    ; external commands we want tty to be in cooked and sane state and to let
+    ; them reign over the standard input, which would be impossible if the input
+    ; actor was running.
+    ;
+    atom %key local 'input_actor'
+    structat %i local %state local %key local
+    send *i local %i local
+
+    return
+.end
 .function: enter_parent_dir/1
     allocate_registers %6 local
 
@@ -437,18 +479,10 @@
     jump the_end
 
     .mark: stage_exec
-    atom %key local 'executable'
-    structremove %tmp local %message local %key local
-
     frame %2
-    move %0 arguments %tmp local
-    atom %key local 'pointer'
-    structat %tmp local %state local %key local
-    atom %key local 'data'
-    structat %entries local %state local %key local
-    vat %tmp local *entries local *tmp local
-    copy %1 arguments *tmp local
-    call void exec_with/2
+    move %0 arguments %message local
+    copy %1 arguments %state local
+    call void exec_item/2
 
     jump printing_sequence
 
@@ -547,12 +581,15 @@
     tailcall tree_view_display_actor_impl/1
 .end
 .function: tree_view_display_actor/1
-    allocate_registers %5 local
+    allocate_registers %6 local
 
     .name: iota directory
+    .name: iota input_actor
     .name: iota state
     .name: iota key
     .name: iota value
+
+    receive %input_actor local 60s
 
     move %directory local %0 parameters
 
@@ -571,6 +608,10 @@
     ; the current directory to list
     atom %key local 'cwd'
     structinsert %state local %key local %directory local
+
+    ; the current directory to list
+    atom %key local 'input_actor'
+    structinsert %state local %key local %input_actor local
 
     frame %1
     move %0 arguments %state local
@@ -702,23 +743,9 @@
     return
 .end
 
-.function: time_to_shut_down/0
-    allocate_registers %1 local
-
-    integer %0 local 0
-    not %0 local
-
-    try
-    catch "Exception" .block: catch_me
-        draw void
-        not %0 local
-        leave
-    .end
-    enter .block: try_receiving
-        receive void 0ms
-        leave
-    .end
-
+.function: await_any_message/0
+    allocate_registers %0 local
+    receive void infinity
     return
 .end
 .function: make_tty_raw/0
@@ -832,13 +859,6 @@
 
     move %tree_view_actor local %0 parameters
 
-    frame %0
-    call %tmp local time_to_shut_down/0
-    if %tmp local +1 await_input_stage
-    text %tmp local "time to shut down"
-    print %tmp local
-    return
-
     .mark: await_input_stage
     frame %0
     call %buf local input_actor_await_io/0
@@ -902,6 +922,9 @@
     frame %1
     copy %0 arguments %tree_view_actor local
     call void prepare_and_send_exec_message/1
+
+    frame %0 local
+    call void await_any_message/0
 
     frame %0
     call void make_tty_raw/0
@@ -970,11 +993,12 @@
     return
 .end
 .function: main/2
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: 0 r0
     .name: iota directory
     .name: iota tree_view_actor
+    .name: iota input_actor
     .name: iota tmp
 
     frame %0
@@ -1000,7 +1024,10 @@
 
     frame %1
     copy %0 arguments %tree_view_actor local
-    process void input_actor/1
+    process %input_actor local input_actor/1
+
+    copy %tmp local %input_actor local
+    send %tree_view_actor local %tmp local
 
     ;
     ; set up initial directory listting
@@ -1016,6 +1043,7 @@
     ;
     ; join worker actors
     ;
+    join void %input_actor local
     join void %tree_view_actor local
 
     string %tmp "\033[2J"
