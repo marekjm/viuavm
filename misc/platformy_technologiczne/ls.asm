@@ -475,6 +475,36 @@
 
     return
 .end
+.function: print_bottom_line/1
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota key
+    .name: iota file
+    .name: iota tmp
+    .name: iota status_line
+
+    move %state local %0 parameters
+
+    atom %key local 'pointer'
+    structremove %file local %state local %key local
+    atom %key local 'data'
+    structremove %tmp local %state local %key local
+    vat %file local %tmp local %file local
+    text %file local *file local
+
+    text %status_line local "[status: "
+    textconcat %status_line local %status_line local %file local
+    text %tmp local "]\r"
+    textconcat %status_line local %status_line local %tmp local
+
+    echo %status_line local
+    string %status_line local "\033[1A"
+    print %status_line
+
+    return
+.end
 .function: tree_view_display_actor_impl/1
     allocate_registers %19 local
 
@@ -499,10 +529,8 @@
     .name: iota control_sequence
 
     move %state local %0 parameters
-    print %state local
 
     receive %message local infinity
-    print %message local
     
     atom %tag_shutdown local 'shutdown'
     atom %tag_refresh local 'refresh'
@@ -680,6 +708,10 @@
     structat %tmp local %state local %key local
     copy %1 arguments *tmp local
     call void print_entries/2
+
+    frame %1 local
+    copy %0 arguments %state local
+    call void print_bottom_line/1
 
     .mark: the_end
     frame %1
