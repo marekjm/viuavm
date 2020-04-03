@@ -229,6 +229,39 @@
     .mark: the_end
     return
 .end
+.function: enter_parent_dir/1
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota key
+    .name: iota cwd
+    .name: iota up
+    .name: iota tmp
+
+    move %state local %0 parameters
+
+    atom %key local 'cwd'
+    structat %cwd local *state local %key local
+
+    text %cwd local *cwd local
+    text %up "/.."
+    textconcat %cwd local %cwd local %up local
+
+    frame %1
+    move %0 arguments %cwd local
+    call %cwd local std::os::fs::path::lexically_normal/1
+
+    structinsert *state local %key local %cwd local
+
+    frame %0
+    call %tmp local make_refresh_message/0
+    self %r0 local
+    send %r0 local %tmp local
+
+    .mark: the_end
+    return
+.end
 .function: remove_base_from_entries_impl/3
     allocate_registers %9 local
 
@@ -319,7 +352,7 @@
     return
 .end
 .function: tree_view_display_actor_impl/1
-    allocate_registers %16 local
+    allocate_registers %17 local
 
     .name: 0 r0
     .name: iota state
@@ -333,6 +366,7 @@
     .name: iota tag_esc
     .name: iota tag_exec
     .name: iota tag_enter
+    .name: iota tag_go_up
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -352,6 +386,7 @@
     atom %tag_esc local 'esc'
     atom %tag_exec local 'exec'
     atom %tag_enter local 'enter_dir'
+    atom %tag_go_up local 'go_up'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -363,6 +398,7 @@
     atomeq %tag_esc local *got_tag local %tag_esc local
     atomeq %tag_exec local *got_tag local %tag_exec local
     atomeq %tag_enter local *got_tag local %tag_enter local
+    atomeq %tag_go_up local *got_tag local %tag_go_up local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_refresh local stage_refresh +1
@@ -372,6 +408,7 @@
     if %tag_esc local stage_esc +1
     if %tag_exec local stage_exec +1
     if %tag_enter local stage_enter +1
+    if %tag_go_up local stage_go_up +1
     jump the_end
 
     .mark: stage_shutdown
@@ -420,6 +457,14 @@
     ptr %tmp local %state local
     copy %0 arguments %tmp local
     call void enter_item/1
+
+    jump printing_sequence
+
+    .mark: stage_go_up
+    frame %1
+    ptr %tmp local %state local
+    move %0 arguments %tmp local
+    call void enter_parent_dir/1
 
     jump printing_sequence
 
@@ -531,6 +576,7 @@
     move %0 arguments %state local
     tailcall tree_view_display_actor_impl/1
 .end
+
 .function: make_tagged_message_impl/1
     allocate_registers %4 local
 
@@ -638,6 +684,17 @@
 
     .name: iota tag
     atom %tag local 'refresh'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
+.function: make_go_up_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'go_up'
 
     frame %1
     move %0 arguments %tag local
@@ -759,7 +816,7 @@
     return
 .end
 .function: input_actor_impl/1
-    allocate_registers %10 local
+    allocate_registers %11 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -771,6 +828,7 @@
     .name: iota c_pointer_up
     .name: iota c_exec
     .name: iota c_enter
+    .name: iota c_go_up
 
     move %tree_view_actor local %0 parameters
 
@@ -799,6 +857,8 @@
     streq %c_exec local %buf local %c_exec local
     string %c_enter local "e"
     streq %c_enter local %buf local %c_enter local
+    string %c_go_up local "u"
+    streq %c_go_up local %buf local %c_go_up local
 
     if %c_quit local the_end +1
     if %c_refresh local refresh_display +1
@@ -806,6 +866,7 @@
     if %c_pointer_up local move_pointer_up +1
     if %c_exec local exec_item +1
     if %c_enter local enter_dir +1
+    if %c_go_up local go_up +1
 
     jump happy_loopin
 
@@ -851,6 +912,14 @@
 
     frame %0
     call %tmp make_enter_dir_message/0
+    send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: go_up
+
+    frame %0
+    call %tmp make_go_up_message/0
     send %tree_view_actor local %tmp local
 
     jump happy_loopin
