@@ -421,7 +421,7 @@
     atom %key local 'data'
     structremove %entries local %message local %key local
     structinsert %state local %key local %entries local
-    jump printing_sequence
+    jump pointer_bounds_check
 
     .mark: stage_refresh
     frame %1
