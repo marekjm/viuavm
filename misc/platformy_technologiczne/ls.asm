@@ -304,6 +304,78 @@
     .mark: the_end
     return
 .end
+.function: touch_item/2
+    allocate_registers %8 local
+
+    .name: 0 r0
+    .name: iota message
+    .name: iota state
+    .name: iota key
+    .name: iota name
+    .name: iota cwd
+    .name: iota slash
+    .name: iota command
+
+    move %message local %0 parameters
+    move %state local %1 parameters
+
+    atom %key local 'value'
+    structremove %name local %message local %key local
+    text %name local %name local
+
+    atom %key local 'cwd'
+    structremove %cwd local %state local %key local
+    text %cwd local %cwd local
+
+    text %command local "touch "
+    text %slash local "/"
+    textconcat %command local %command local %cwd local
+    textconcat %command local %command local %slash local
+    textconcat %command local %command local %name local
+
+    frame %1
+    move %0 arguments %command local
+    call void std::os::system/1
+
+    .mark: the_end
+    return
+.end
+.function: mkdir_item/2
+    allocate_registers %8 local
+
+    .name: 0 r0
+    .name: iota message
+    .name: iota state
+    .name: iota key
+    .name: iota name
+    .name: iota cwd
+    .name: iota slash
+    .name: iota command
+
+    move %message local %0 parameters
+    move %state local %1 parameters
+
+    atom %key local 'value'
+    structremove %name local %message local %key local
+    text %name local %name local
+
+    atom %key local 'cwd'
+    structremove %cwd local %state local %key local
+    text %cwd local %cwd local
+
+    text %command local "mkdir -p "
+    text %slash local "/"
+    textconcat %command local %command local %cwd local
+    textconcat %command local %command local %slash local
+    textconcat %command local %command local %name local
+
+    frame %1
+    move %0 arguments %command local
+    call void std::os::system/1
+
+    .mark: the_end
+    return
+.end
 .function: remove_base_from_entries_impl/3
     allocate_registers %9 local
 
@@ -394,7 +466,7 @@
     return
 .end
 .function: tree_view_display_actor_impl/1
-    allocate_registers %17 local
+    allocate_registers %19 local
 
     .name: 0 r0
     .name: iota state
@@ -409,6 +481,8 @@
     .name: iota tag_exec
     .name: iota tag_enter
     .name: iota tag_go_up
+    .name: iota tag_touch
+    .name: iota tag_mkdir
     .name: iota got_tag
     .name: iota entries
     .name: iota tmp
@@ -429,6 +503,8 @@
     atom %tag_exec local 'exec'
     atom %tag_enter local 'enter_dir'
     atom %tag_go_up local 'go_up'
+    atom %tag_touch local 'touch'
+    atom %tag_mkdir local 'mkdir'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -441,6 +517,8 @@
     atomeq %tag_exec local *got_tag local %tag_exec local
     atomeq %tag_enter local *got_tag local %tag_enter local
     atomeq %tag_go_up local *got_tag local %tag_go_up local
+    atomeq %tag_touch local *got_tag local %tag_touch local
+    atomeq %tag_mkdir local *got_tag local %tag_mkdir local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_refresh local stage_refresh +1
@@ -451,6 +529,8 @@
     if %tag_exec local stage_exec +1
     if %tag_enter local stage_enter +1
     if %tag_go_up local stage_go_up +1
+    if %tag_touch local stage_touch +1
+    if %tag_mkdir local stage_mkdir +1
     jump the_end
 
     .mark: stage_shutdown
@@ -485,6 +565,22 @@
     call void exec_item/2
 
     jump printing_sequence
+
+    .mark: stage_touch
+    frame %2
+    move %0 arguments %message local
+    copy %1 arguments %state local
+    call void touch_item/2
+
+    jump the_end
+
+    .mark: stage_mkdir
+    frame %2
+    move %0 arguments %message local
+    copy %1 arguments %state local
+    call void mkdir_item/2
+
+    jump the_end
 
     .mark: stage_enter
     frame %1
@@ -742,6 +838,48 @@
     call %0 local make_tagged_message_impl/1
     return
 .end
+.function: make_touch_message/1
+    allocate_registers %5 local
+
+    .name: iota message
+    .name: iota tag
+    .name: iota value
+    .name: iota key
+
+    atom %tag local 'touch'
+    frame %1
+    move %0 arguments %tag local
+    call %message local make_tagged_message_impl/1
+
+    ; insert the data field: { tag: 'touch', value: ... }
+    atom %key local 'value'
+    move %value local %0 parameters
+    structinsert %message local %key local %value local
+
+    move %0 local %message local
+    return
+.end
+.function: make_mkdir_message/1
+    allocate_registers %5 local
+
+    .name: iota message
+    .name: iota tag
+    .name: iota value
+    .name: iota key
+
+    atom %tag local 'mkdir'
+    frame %1
+    move %0 arguments %tag local
+    call %message local make_tagged_message_impl/1
+
+    ; insert the data field: { tag: 'mkdir', value: ... }
+    atom %key local 'value'
+    move %value local %0 parameters
+    structinsert %message local %key local %value local
+
+    move %0 local %message local
+    return
+.end
 
 .function: await_any_message/0
     allocate_registers %0 local
@@ -791,6 +929,70 @@
     frame %1
     move %0 arguments %buf local
     call %message local make_exec_message/1
+
+    move %dst local %0 parameters
+    send %dst local %message local
+
+    return
+.end
+.function: prepare_and_send_touch_message/1
+    allocate_registers %6 local
+
+    .name: iota stdin
+    .name: iota buf
+    .name: iota req
+    .name: iota message
+    .name: iota dst
+
+    text %buf local "\rfile name: "
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
+
+    frame %0
+    call void return_tty_to_sanity/0
+
+    integer %stdin local 0
+    integer %buf local 128
+    io_read %req local %stdin local %buf local
+
+    io_wait %buf local %req local infinity
+
+    frame %1
+    move %0 arguments %buf local
+    call %message local make_touch_message/1
+
+    move %dst local %0 parameters
+    send %dst local %message local
+
+    return
+.end
+.function: prepare_and_send_mkdir_message/1
+    allocate_registers %6 local
+
+    .name: iota stdin
+    .name: iota buf
+    .name: iota req
+    .name: iota message
+    .name: iota dst
+
+    text %buf local "\rdirectory name: "
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
+
+    frame %0
+    call void return_tty_to_sanity/0
+
+    integer %stdin local 0
+    integer %buf local 128
+    io_read %req local %stdin local %buf local
+
+    io_wait %buf local %req local infinity
+
+    frame %1
+    move %0 arguments %buf local
+    call %message local make_mkdir_message/1
 
     move %dst local %0 parameters
     send %dst local %message local
@@ -851,7 +1053,7 @@
     return
 .end
 .function: input_actor_impl/1
-    allocate_registers %11 local
+    allocate_registers %13 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -864,6 +1066,8 @@
     .name: iota c_exec
     .name: iota c_enter
     .name: iota c_go_up
+    .name: iota c_touch
+    .name: iota c_mkdir
 
     move %tree_view_actor local %0 parameters
 
@@ -887,6 +1091,10 @@
     streq %c_enter local %buf local %c_enter local
     string %c_go_up local "u"
     streq %c_go_up local %buf local %c_go_up local
+    string %c_touch local "t"
+    streq %c_touch local %buf local %c_touch local
+    string %c_mkdir local "m"
+    streq %c_mkdir local %buf local %c_mkdir local
 
     if %c_quit local the_end +1
     if %c_refresh local refresh_display +1
@@ -895,6 +1103,8 @@
     if %c_exec local exec_item +1
     if %c_enter local enter_dir +1
     if %c_go_up local go_up +1
+    if %c_touch local touch +1
+    if %c_mkdir local mkdir +1
 
     jump happy_loopin
 
@@ -930,6 +1140,28 @@
 
     frame %0 local
     call void await_any_message/0
+
+    frame %0
+    call void make_tty_raw/0
+
+    jump happy_loopin
+
+    .mark: touch
+
+    frame %1
+    copy %0 arguments %tree_view_actor local
+    call void prepare_and_send_touch_message/1
+
+    frame %0
+    call void make_tty_raw/0
+
+    jump happy_loopin
+
+    .mark: mkdir
+
+    frame %1
+    copy %0 arguments %tree_view_actor local
+    call void prepare_and_send_mkdir_message/1
 
     frame %0
     call void make_tty_raw/0
