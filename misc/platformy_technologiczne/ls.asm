@@ -3,6 +3,7 @@
 .signature: std::os::lsdir/1
 .signature: std::os::system/1
 .signature: std::os::fs::path::lexically_normal/1
+.signature: std::os::fs::path::lexically_relative/2
 
 .function: print_entry/2
     allocate_registers %7 local
@@ -228,6 +229,72 @@
     .mark: the_end
     return
 .end
+.function: remove_base_from_entries_impl/3
+    allocate_registers %9 local
+
+    .name: 0 r0
+    .name: iota counter
+    .name: iota entries
+    .name: iota base
+    .name: iota limit
+    .name: iota each
+    .name: iota key
+    .name: iota path
+    .name: iota tmp
+
+    move %counter local %0 parameters
+    move %entries local %1 parameters
+    move %base local %2 parameters
+    vlen %limit local *entries local
+
+    lt %tmp local %counter local %limit local
+    if %tmp local +1 the_end
+
+    vat %each local *entries local %counter local
+
+    atom %key local 'path'
+    structat %path local *each local %key local
+
+    frame %2
+    copy %0 arguments *path local
+    copy %1 arguments %base local
+    call %path local std::os::fs::path::lexically_relative/2
+
+    structinsert *each local %key local %path local
+
+    iinc %counter local
+
+    frame %3
+    move %0 arguments %counter local
+    move %1 arguments %entries local
+    move %2 arguments %base local
+    tailcall remove_base_from_entries_impl/3
+
+    .mark: the_end
+    return
+.end
+.function: remove_base_from_entries/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota entries
+    .name: iota base
+
+    move %entries local %0 parameters
+    move %base local %1 parameters
+
+    izero %r0 local
+
+    frame %3
+    move %0 arguments %r0 local
+    ptr %r0 local %entries local
+    move %1 arguments %r0 local
+    move %2 arguments %base local
+    call remove_base_from_entries_impl/3
+
+    move %r0 local %entries local
+    return
+.end
 .function: tree_view_display_actor_impl/1
     allocate_registers %16 local
 
@@ -375,16 +442,30 @@
     string %control_sequence "\033[1;1H"
     echo %control_sequence local
 
-    frame %2
+    ;
+    ; normalise paths used in entries
+    ;
+    frame %2 local
 
     atom %key local 'data'
     structat %entries local %state local %key local
     copy %0 arguments *entries local
 
+    atom %key local 'cwd'
+    structat %tmp local %state local %key local
+    copy %1 arguments *tmp local
+    delete %tmp local
+
+    call %entries local remove_base_from_entries/2
+
+    ;
+    ; present the data on the screen
+    ;
+    frame %2
+    move %0 arguments %entries local
     atom %key local 'pointer'
     structat %tmp local %state local %key local
     copy %1 arguments *tmp local
-
     call void print_entries/2
 
     .mark: the_end
