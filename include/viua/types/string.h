@@ -20,6 +20,7 @@
 #ifndef VIUA_TYPES_STRING_H
 #define VIUA_TYPES_STRING_H
 
+#include <memory>
 #include <string>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
@@ -118,6 +119,7 @@ class String : public Value {
                       viua::kernel::Kernel*);
 
     String(std::string s = "");
+    static auto make(std::string = "") -> std::unique_ptr<String>;
 };
 }}  // namespace viua::types
 

@@ -283,3 +283,8 @@ void String::size(Frame* frame,
 }
 
 String::String(std::string s) : svalue(s) {}
+
+auto String::make(std::string s) -> std::unique_ptr<String>
+{
+    return std::make_unique<String>(std::move(s));
+}
