@@ -77,10 +77,43 @@ static void os_lsdir(Frame* frame,
     frame->local_register_set->set(0, std::move(entries));
 }
 
+static void os_fs_path_lexically_normal(Frame* frame,
+                     viua::kernel::Register_set*,
+                     viua::kernel::Register_set*,
+                     viua::process::Process*,
+                     viua::kernel::Kernel*)
+{
+    auto const path = frame->arguments->at(0)->str();
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    using viua::types::String;
+    frame->local_register_set->set(0,
+        String::make(std::filesystem::path{path}.lexically_normal()));
+}
+
+static void os_fs_path_lexically_relative(Frame* frame,
+                     viua::kernel::Register_set*,
+                     viua::kernel::Register_set*,
+                     viua::process::Process*,
+                     viua::kernel::Kernel*)
+{
+    auto const path = frame->arguments->at(0)->str();
+    auto const base = frame->arguments->at(1)->str();
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    using viua::types::String;
+    frame->local_register_set->set(0,
+        String::make(std::filesystem::path{path}.lexically_relative(base)));
+}
+
 
 const Foreign_function_spec functions[] = {
     {"std::os::system/1", &os_system},
     {"std::os::lsdir/1", &os_lsdir},
+    {"std::os::fs::path::lexically_normal/1", &os_fs_path_lexically_normal},
+    {"std::os::fs::path::lexically_relative/2", &os_fs_path_lexically_relative},
     {nullptr, nullptr},
 };
 
