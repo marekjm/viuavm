@@ -337,6 +337,11 @@
     move %0 arguments %command local
     call void std::os::system/1
 
+    frame %0
+    call %command local make_refresh_message/0
+    self %r0 local
+    send %r0 local %command local
+
     .mark: the_end
     return
 .end
@@ -372,6 +377,11 @@
     frame %1
     move %0 arguments %command local
     call void std::os::system/1
+
+    frame %0
+    call %command local make_refresh_message/0
+    self %r0 local
+    send %r0 local %command local
 
     .mark: the_end
     return
