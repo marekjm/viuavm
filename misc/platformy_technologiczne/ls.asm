@@ -2,6 +2,7 @@
 
 .signature: std::os::lsdir/1
 .signature: std::os::system/1
+.signature: std::os::fs::path::lexically_normal/1
 
 .function: print_entry/2
     allocate_registers %7 local
@@ -691,10 +692,6 @@
     if %c_exec local exec_item +1
     if %c_enter local enter_dir +1
 
-    text %tmp local "input not recognised"
-    print %tmp local
-    print %buf local
-
     jump happy_loopin
 
     .mark: refresh_display
@@ -791,6 +788,7 @@
 .function: main/2
     allocate_registers %4 local
 
+    .name: 0 r0
     .name: iota directory
     .name: iota tree_view_actor
     .name: iota tmp
@@ -805,7 +803,9 @@
     .mark: use_default_directory
     string %directory local "."
 
-    print %directory local
+    frame %1
+    move %0 arguments %directory local
+    call %directory local std::os::fs::path::lexically_normal/1
 
     ;
     ; launch worker actors
