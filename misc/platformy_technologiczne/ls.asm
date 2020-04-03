@@ -337,7 +337,7 @@
     atom %tmp local 'pointer'
     structat %tmp local %state local %tmp local
     iinc *tmp local
-    jump printing_sequence
+    jump pointer_bounds_check
 
     .mark: stage_ptr_up
     atom %tmp local 'pointer'
@@ -347,18 +347,13 @@
     ; self-jump
     ; jump printing_sequence
 
-    .mark: printing_sequence
-    string %control_sequence "\033[2J"
-    echo %control_sequence local
-    string %control_sequence "\033[1;1H"
-    echo %control_sequence local
-
-    atom %key local 'data'
-    structat %entries local %state local %key local
-
+    .mark: pointer_bounds_check
     ;
     ; make sure pointer does not exceed bounds
     ;
+    atom %key local 'data'
+    structat %entries local %state local %key local
+
     atom %key local 'pointer'
     structat %tmp local %state local %key local
     frame %1
@@ -374,11 +369,22 @@
 
     structinsert %state local %key local %tmp local
 
+    .mark: printing_sequence
+    string %control_sequence "\033[2J"
+    echo %control_sequence local
+    string %control_sequence "\033[1;1H"
+    echo %control_sequence local
+
     frame %2
+
+    atom %key local 'data'
+    structat %entries local %state local %key local
     copy %0 arguments *entries local
+
     atom %key local 'pointer'
     structat %tmp local %state local %key local
     copy %1 arguments *tmp local
+
     call void print_entries/2
 
     .mark: the_end
