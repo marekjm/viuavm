@@ -162,6 +162,11 @@
     move %0 arguments %tmp local
     call void std::os::system/1
 
+    frame %0
+    call %tmp local make_refresh_message/0
+    self %r0 local
+    send %r0 local %tmp local
+
     return
 .end
 .function: refresh_view/1
