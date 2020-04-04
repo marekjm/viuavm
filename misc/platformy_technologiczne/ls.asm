@@ -954,6 +954,10 @@
     .name: iota message
     .name: iota dst
 
+    string %buf "\033[2K"
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
     text %buf local "\rexec with: "
     print %buf local
     string %buf "\033[2A"
@@ -986,6 +990,10 @@
     .name: iota message
     .name: iota dst
 
+    string %buf "\033[2K"
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
     text %buf local "\rfile name: "
     print %buf local
     string %buf "\033[2A"
@@ -1018,6 +1026,10 @@
     .name: iota message
     .name: iota dst
 
+    string %buf "\033[2K"
+    print %buf local
+    string %buf "\033[2A"
+    print %buf local
     text %buf local "\rdirectory name: "
     print %buf local
     string %buf "\033[2A"
