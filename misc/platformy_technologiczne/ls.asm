@@ -6,77 +6,6 @@
 .signature: std::os::fs::path::lexically_normal/1
 .signature: std::os::fs::path::lexically_relative/2
 
-.function: print_entry/2
-    allocate_registers %7 local
-
-    .name: iota entry
-    .name: iota path
-    .name: iota status
-    .name: iota key
-    .name: iota control_sequence
-    .name: iota highlight
-
-    move %entry local %0 parameters
-    move %highlight local %1 parameters
-
-    atom %key local 'path'
-    structat %path local %entry local %key local
-
-    atom %key local 'is_directory'
-    structat %status local %entry local %key local
-    if *status local +1 is_a_regular_file
-    text %status local "⇛ "
-    jump print_path_part
-
-    .mark: is_a_regular_file
-    text %status local "  "
-    
-    .mark: print_path_part
-    echo %status local
-
-    if %highlight local +1 print_the_path
-    string %control_sequence "\033[1m"
-    echo %control_sequence local
-    string %control_sequence "\033[4m"
-    echo %control_sequence local
-
-    .mark: print_the_path
-    print *path local
-    string %control_sequence "\033[0m\r"
-    echo %control_sequence local
-
-    return
-.end
-.function: print_entries/2
-    allocate_registers %7 local
-
-    .name: 5 highlight
-    .name: 6 tmp
-
-    move %1 local %0 parameters
-    move %highlight local %1 parameters
-
-    integer %2 local 0
-    vlen %3 local %1 local
-
-    .mark: entry_printing_loop
-    lt %4 local %2 local %3 local
-    if %4 local +1 the_end
-
-    vat %4 local %1 local %2 local
-    frame %2
-    copy %0 arguments *4 local
-    eq %tmp local %2 local %highlight local
-    copy %1 arguments %tmp local
-    call void print_entry/2
-
-    iinc %2 local
-    jump entry_printing_loop
-
-    .mark: the_end
-    return
-.end
-
 .function: max/2
     allocate_registers %3 local
 
@@ -132,44 +61,6 @@
     return
 .end
 
-.function: exec_with/2
-    allocate_registers %5 local
-
-    .name: 0 r0
-    .name: iota executable
-    .name: iota file
-    .name: iota path
-    .name: iota tmp
-
-    move %executable local %0 parameters
-    move %file local %1 parameters
-
-    text %executable local %executable local
-    textlength %tmp local %executable
-    idec %tmp local
-    izero %r0 local
-    textsub %executable local %executable local %r0 local %tmp local
-
-    atom %path local 'path'
-    structat %path local %file local %path local
-    text %path local *path local
-
-    text %tmp local " "
-
-    textconcat %tmp local %executable local %tmp local
-    textconcat %tmp local %tmp local %path local
-
-    frame %1
-    move %0 arguments %tmp local
-    call void std::os::system/1
-
-    frame %0
-    call %tmp local make_refresh_message/0
-    self %r0 local
-    send %r0 local %tmp local
-
-    return
-.end
 .function: refresh_view/1
     allocate_registers %3 local
 
@@ -233,6 +124,44 @@
     send %r0 local %tmp local
 
     .mark: the_end
+    return
+.end
+.function: exec_with/2
+    allocate_registers %5 local
+
+    .name: 0 r0
+    .name: iota executable
+    .name: iota file
+    .name: iota path
+    .name: iota tmp
+
+    move %executable local %0 parameters
+    move %file local %1 parameters
+
+    text %executable local %executable local
+    textlength %tmp local %executable
+    idec %tmp local
+    izero %r0 local
+    textsub %executable local %executable local %r0 local %tmp local
+
+    atom %path local 'path'
+    structat %path local %file local %path local
+    text %path local *path local
+
+    text %tmp local " "
+
+    textconcat %tmp local %executable local %tmp local
+    textconcat %tmp local %tmp local %path local
+
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    frame %0
+    call %tmp local make_refresh_message/0
+    self %r0 local
+    send %r0 local %tmp local
+
     return
 .end
 .function: exec_item/2
@@ -392,6 +321,7 @@
     .mark: the_end
     return
 .end
+
 .function: remove_base_from_entries_impl/3
     allocate_registers %9 local
 
@@ -552,6 +482,76 @@
     string %status_line local "\033[1A"
     print %status_line
 
+    return
+.end
+.function: print_entry/2
+    allocate_registers %7 local
+
+    .name: iota entry
+    .name: iota path
+    .name: iota status
+    .name: iota key
+    .name: iota control_sequence
+    .name: iota highlight
+
+    move %entry local %0 parameters
+    move %highlight local %1 parameters
+
+    atom %key local 'path'
+    structat %path local %entry local %key local
+
+    atom %key local 'is_directory'
+    structat %status local %entry local %key local
+    if *status local +1 is_a_regular_file
+    text %status local "⇛ "
+    jump print_path_part
+
+    .mark: is_a_regular_file
+    text %status local "  "
+    
+    .mark: print_path_part
+    echo %status local
+
+    if %highlight local +1 print_the_path
+    string %control_sequence "\033[1m"
+    echo %control_sequence local
+    string %control_sequence "\033[4m"
+    echo %control_sequence local
+
+    .mark: print_the_path
+    print *path local
+    string %control_sequence "\033[0m\r"
+    echo %control_sequence local
+
+    return
+.end
+.function: print_entries/2
+    allocate_registers %7 local
+
+    .name: 5 highlight
+    .name: 6 tmp
+
+    move %1 local %0 parameters
+    move %highlight local %1 parameters
+
+    integer %2 local 0
+    vlen %3 local %1 local
+
+    .mark: entry_printing_loop
+    lt %4 local %2 local %3 local
+    if %4 local +1 the_end
+
+    vat %4 local %1 local %2 local
+    frame %2
+    copy %0 arguments *4 local
+    eq %tmp local %2 local %highlight local
+    copy %1 arguments %tmp local
+    call void print_entry/2
+
+    iinc %2 local
+    jump entry_printing_loop
+
+    .mark: the_end
     return
 .end
 .function: tree_view_display_actor_impl/1
@@ -977,23 +977,6 @@
     receive void infinity
     return
 .end
-.function: make_tty_raw/0
-    allocate_registers %2 local
-
-    .name: iota tmp
-
-    string %tmp local "stty raw"
-    frame %1
-    move %0 arguments %tmp local
-    call void std::os::system/1
-
-    string %tmp local "stty -echo"
-    frame %1
-    move %0 arguments %tmp local
-    call void std::os::system/1
-
-    return
-.end
 .function: prepare_and_send_exec_message/1
     allocate_registers %6 local
 
@@ -1315,6 +1298,23 @@
     tailcall input_actor_impl/1
 .end
 
+.function: make_tty_raw/0
+    allocate_registers %2 local
+
+    .name: iota tmp
+
+    string %tmp local "stty raw"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    string %tmp local "stty -echo"
+    frame %1
+    move %0 arguments %tmp local
+    call void std::os::system/1
+
+    return
+.end
 .function: return_tty_to_sanity/0
     allocate_registers %2 local
 
@@ -1332,6 +1332,7 @@
 
     return
 .end
+
 .function: main/2
     allocate_registers %5 local
 
