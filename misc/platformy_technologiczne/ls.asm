@@ -1,11 +1,24 @@
+; Potrzebujemy zaimportować moduł "std::os" dający nam dostęp do niektórych
+; funkcji udostępnianych przez system operacyjny.
+;
+; W tym celu używamy dyrektywy ".import:" żeby dołączyć ten moduł do naszego.
+; Jako, że "std::os" jest modułem napisanym w języku C++ konieczne jest użycie
+; atrybutu "dynamic" żeby wykonać linkowanie na etapie uruchomienia. Niemożliwe
+; jest statyczne linkowanie modułów, które nie są skompilowane do bytecode'u
+; Viua VM.
 .import: [[dynamic]] std::os
 
+
+; Deklaracje używanych funkcji z modułu std::os. Są potrzebne ponieważ assembler
+; nie umie odczytać tablicy symboli z plików ELF.
 .signature: std::os::lsdir/1
 .signature: std::os::system/1
 .signature: std::os::exec_pipe_stdout/1
 .signature: std::os::fs::path::lexically_normal/1
 .signature: std::os::fs::path::lexically_relative/2
 
+
+; Funkcje pomocnicze.
 .function: max/2
     allocate_registers %3 local
 
@@ -61,6 +74,11 @@
     return
 .end
 
+
+; Funkcje wykonujące żądane akcje, np. utworzenie pliku. Każda operacja jest
+; umieszczona w osobnej funkcje żeby ułatwić manipulację kodem oraz ułatwić
+; pracę podsystemowi analizy statycznej (bez tego czasem zwracał dużo fałszywych
+; alarmów).
 .function: refresh_view/1
     allocate_registers %3 local
 
@@ -322,6 +340,9 @@
     return
 .end
 
+
+; Funkcje odpowiedzialne za wyświetlanie interfejsu użytkownika. Używane przez
+; aktora implementujacego wyjście interfejsu użytkownika.
 .function: remove_base_from_entries_impl/3
     allocate_registers %9 local
 
@@ -554,6 +575,12 @@
     .mark: the_end
     return
 .end
+
+
+; Implementacja aktora zajmującego się wyjściem interfejsu użytkownika czyli
+; prezentacją wyników działania programu. Jest to aktor, który przetwarza
+; wiadomości otrzymane od aktora odpowiedzialnego za pobieranie eventów z
+; klawiatury i odpowiednio modyfikuje to co widzi użytkownik.
 .function: tree_view_display_actor_impl/1
     allocate_registers %19 local
 
@@ -805,6 +832,8 @@
     tailcall tree_view_display_actor_impl/1
 .end
 
+
+; Funkcje pomocnicze do tworzenia różnych wiadomości.
 .function: make_tagged_message_impl/1
     allocate_registers %4 local
 
@@ -972,6 +1001,16 @@
     return
 .end
 
+
+; Implementacja aktora przetwarzającego wejście od użytkownika. Konsola jest
+; utrzymywana głównie w trybie "raw" żeby klawisze wciskane przez użytkownika
+; dostępne były od razu, a nie dopiero po wprowadzeniu znaku nowej linii tak
+; jak w trybie "cooked". Tryb "cooked" jest używany kiedy program wymaga od
+; użytkownika wprowadzenia większej ilości znaków, np. podania nazwy pliku.
+;
+; Aktor zamienia surowy input od użytkownika na wiadomości (struktury), które
+; następnie wysyła do aktora zajmującego się reagowaniem na działania
+; użytkownika i prezentacją interfejsu.
 .function: await_any_message/0
     allocate_registers %0 local
     receive void infinity
@@ -1298,6 +1337,8 @@
     tailcall input_actor_impl/1
 .end
 
+
+; Funkcje pomocnicze do zarządzania stanem konsoli.
 .function: make_tty_raw/0
     allocate_registers %2 local
 
@@ -1333,18 +1374,36 @@
     return
 .end
 
+
+; Główna funkcja programu - wywoływana jako pierwsza.
 .function: main/2
+    ; Jako pierwszą operację należy zaalokować ilość rejestrów, które funkcja
+    ; będzie potrzebowała do wykonania swojej pracy. W tym przypadku
+    ; potrzebujemy 5 rejestrów lokalnych.
     allocate_registers %5 local
 
+    ; Następnie za pomocą dyrektywy ".name:" (.name: <index> <name>) nazywamy
+    ; rejestry żeby wygodniej było nimi operować.
+    ;
+    ; Rejestr 0 jest traktowany specjalnie - pobierana jest z niego wartość
+    ; zwracana z funkcji. Słowo kluczowe "iota" (ewaluujące na etapie kompilacji
+    ; do liczb całkowitych od 1 do N, i zwiększające się o 1 za każdym
+    ; wystąpieniem) jest używane do nazwania pozostałych rejestrów.
     .name: 0 r0
     .name: iota directory
     .name: iota tree_view_actor
     .name: iota input_actor
     .name: iota tmp
 
+    ; Tworzymy ramkę wywołania z 0 ilością rejestrów na parametry faktyczne
+    ; (ang. actual parameters, arguments), a następnie zgłaszamy wywołanie
+    ; odroczone (ang. deferred) do wykonania w momencie wyjścia z obecnej
+    ; funkcji.
     frame %0
     defer return_tty_to_sanity/0
 
+    ; Przesuwamy (move) wartość z 1 rejestru parametrów formalnych (ang. formal
+    ; parameters) i obrabiamy ją tak żeby nadawała się do użytku dla nas.
     move %directory local %1 parameters
     if %directory local +1 use_default_directory
     vpop %directory local %directory local void
@@ -1356,9 +1415,9 @@
     move %0 arguments %directory local
     call %directory local std::os::fs::path::lexically_normal/1
 
-    ;
-    ; launch worker actors
-    ;
+    ; Uruchamiamy aktory robocze i zapisujemy ich identyfikatory PID.
+    ; Uruchomienie aktora jest składniowo identyczne do wywołania funkcji, a
+    ; różni sie jedynie użyciem instrukcji "process" zamiast "call".
     frame %1
     copy %0 arguments %directory local
     process %tree_view_actor local tree_view_display_actor/1
@@ -1367,12 +1426,16 @@
     copy %0 arguments %tree_view_actor local
     process %input_actor local input_actor/1
 
+    ; Wysyłamy PID aktora odpowiadającego za przetwarzanie wejścia (IO) do
+    ; aktora odpowiedzialnego za prezentację interfejsu (UI). Jest to potrzebne
+    ; ponieważ aktor UI potrzebuje czasem zatrzymać działanie aktora IO żeby
+    ; oddać kontrolę nad strumieniem wejścia wywoływanym programom zewnętrznym
+    ; jak np. edytorowi tekstu podczas podglądu plików.
     copy %tmp local %input_actor local
     send %tree_view_actor local %tmp local
 
-    ;
-    ; set up initial directory listting
-    ;
+    ; Listujemy katalog startowy i wysyłamy te dane do aktora UI. Na dobry
+    ; początek żeby coś było widać.
     frame %1
     copy %0 arguments %directory local
     call %tmp local std::os::lsdir/1
@@ -1381,12 +1444,13 @@
     call %tmp local make_data_message/1
     send %tree_view_actor local %tmp local
 
-    ;
-    ; join worker actors
-    ;
+    ; Nasza praca w funkcji main jest skończona więc jedynie oczekujemy na
+    ; zakończenie pracy przez aktory robocze.
     join void %input_actor local
     join void %tree_view_actor local
 
+    ; Czyszczenie konsoli i ustawienie kursora w lewym górnym rogu. Czyścimy
+    ; warsztat po zakończonej pracy.
     string %tmp "\033[2J"
     echo %tmp local
     string %tmp "\033[1;1H"
