@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,7 +17,12 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include <cstdlib>
+#include <array>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -50,6 +55,70 @@ static void os_system(Frame* frame,
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(0,
                                    std::make_unique<viua::types::Integer>(ret));
+}
+
+static void os_exec_pipe_stdout(Frame* frame,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
+                      viua::process::Process*,
+                      viua::kernel::Kernel*)
+{
+    if (frame->arguments->at(0) == nullptr) {
+        throw std::make_unique<viua::types::Exception>(
+            "expected command to launch (vector of string) as parameter 0");
+    }
+
+    // "/usr/bin/stat", "--printf", "%a/%A %s byte(s), %F, %b blocks of %B", "capture.cpp"
+    auto args = std::vector<std::string>{};
+    auto argv = std::vector<char*>{};
+
+    auto const v = static_cast<viua::types::Vector*>(frame->arguments->at(0));
+    for (auto const& each : v->value()) {
+        args.push_back(each->str());
+    }
+    for (auto const& each : args) {
+        argv.push_back(const_cast<char*>(each.c_str()));
+    }
+    argv.push_back(nullptr);
+
+    std::array<int, 2> piped_stdout;
+    pipe(piped_stdout.data());  // FIXME check errors
+
+    auto const read_end = piped_stdout[0];
+    auto const write_end = piped_stdout[1];
+
+    auto ret = int{0};
+    auto buffer = std::string{};
+
+    auto const child_pid = fork();
+    if (child_pid == 0) {
+        close(read_end);
+        dup2(write_end, 1);
+        auto const n = execve(argv.at(0), argv.data(), nullptr);
+        if (n == -1) {
+            exit(1);
+        }
+    } else {
+        close(write_end);
+
+        auto buf = std::string{};
+        buf.resize(1024);
+
+        auto n = ssize_t{0};
+        while ((n = read(read_end, buf.data(), buf.size())) > 0) {
+            buf.resize(static_cast<size_t>(n));
+            buffer += buf;
+        }
+
+        waitpid(child_pid, &ret, 0);
+
+        close(read_end);
+    }
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(2));
+    frame->local_register_set->set(0,
+                                   viua::types::String::make(std::move(buffer)));
 }
 
 static void os_lsdir(Frame* frame,
@@ -111,6 +180,7 @@ static void os_fs_path_lexically_relative(Frame* frame,
 
 const Foreign_function_spec functions[] = {
     {"std::os::system/1", &os_system},
+    {"std::os::exec_pipe_stdout/1", os_exec_pipe_stdout},
     {"std::os::lsdir/1", &os_lsdir},
     {"std::os::fs::path::lexically_normal/1", &os_fs_path_lexically_normal},
     {"std::os::fs::path::lexically_relative/2", &os_fs_path_lexically_relative},
