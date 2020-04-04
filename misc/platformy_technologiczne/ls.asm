@@ -2,6 +2,7 @@
 
 .signature: std::os::lsdir/1
 .signature: std::os::system/1
+.signature: std::os::exec_pipe_stdout/1
 .signature: std::os::fs::path::lexically_normal/1
 .signature: std::os::fs::path::lexically_relative/2
 
@@ -480,6 +481,34 @@
 
     return
 .end
+.function: stat_of/1
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota args
+    .name: iota tmp
+    .name: iota path
+
+    vector %args local
+
+    string %tmp local "/usr/bin/stat"
+    vpush %args local %tmp local
+
+    string %tmp local "--printf"
+    vpush %args local %tmp local
+
+    string %tmp local "%a/%A %s bytes (%F)"
+    vpush %args local %tmp local
+
+    move %path local %0 parameters
+    vpush %args local %path local
+
+    frame %1
+    move %0 arguments %args local
+    call %r0 local std::os::exec_pipe_stdout/1
+
+    return
+.end
 .function: print_bottom_line/1
     allocate_registers %6 local
 
@@ -496,14 +525,29 @@
     structremove %file local %state local %key local
     atom %key local 'data'
     structremove %tmp local %state local %key local
+
+    if %tmp local normal_status empty_status
+
+    .mark: empty_status
+    text %status_line local "[status: (none)]\r"
+    jump emit_status_line
+
+    .mark: normal_status
     vat %file local %tmp local %file local
-    text %file local *file local
+    atom %key local 'path'
+    structremove %file local *file local %key local
+
+    frame %1
+    move %0 arguments %file local
+    call %file local stat_of/1
+    text %file local %file local
 
     text %status_line local "[status: "
     textconcat %status_line local %status_line local %file local
     text %tmp local "]\r"
     textconcat %status_line local %status_line local %tmp local
 
+    .mark: emit_status_line
     echo %status_line local
     string %status_line local "\033[1A"
     print %status_line
