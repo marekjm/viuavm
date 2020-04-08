@@ -46,6 +46,3 @@ insert into orders (customer, employee, order_date) values
     , ('BLONP', 2, '1996-07-25 12:00:00')
     , ('WARTH', 3, '1996-07-26 12:00:00')
 ;
-
-select * from employees;
-select * from orders;
