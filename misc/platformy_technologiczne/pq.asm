@@ -119,6 +119,71 @@
     move %3 arguments %limit local
     tailcall for_each/4
 .end
+.function: for_each_nx/5
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota vec
+    .name: iota fn
+    .name: iota data
+    .name: iota n
+    .name: iota limit
+
+    move %vec local %0 parameters
+    move %fn local %1 parameters
+    move %data local %2 parameters
+    move %n local %3 parameters
+    move %limit local %4 parameters
+
+    frame %3
+    copy %0 arguments %n local
+    ptr %r0 local %vec local
+    move %1 arguments %r0 local
+    copy %2 arguments %data local
+    call void %fn local
+
+    iinc %n local
+    lt %r0 local %n local %limit local
+    if %r0 local next_iteration the_end
+
+    .mark: next_iteration
+    frame %5
+    move %0 arguments %vec local
+    move %1 arguments %fn local
+    move %2 arguments %data local
+    move %3 arguments %n local
+    move %4 arguments %limit local
+    tailcall for_each_nx/5
+
+    .mark: the_end
+    move %r0 local %vec local
+    return
+.end
+.function: for_each_nx/3
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota vec
+    .name: iota fn
+    .name: iota data
+    .name: iota n
+    .name: iota limit
+
+    move %vec local %0 parameters
+    move %fn local %1 parameters
+    move %data local %2 parameters
+
+    izero %n local
+    vlen %limit local %vec local
+
+    frame %5
+    move %0 arguments %vec local
+    move %1 arguments %fn local
+    move %2 arguments %data local
+    move %3 arguments %n local
+    move %4 arguments %limit local
+    tailcall for_each_nx/5
+.end
 
 
 ; Funkcje pomocnicze do zarządzania stanem konsoli.
@@ -284,20 +349,48 @@
 
     return
 .end
-.function: view_actor_list_orders_print_entry/1
-    allocate_registers %3 local
+.function: view_actor_list_orders_print_entry/3
+    allocate_registers %7 local
 
+    .name: 0 r0
     .name: iota each
-    .name: iota tmp
+    .name: iota data
+    .name: iota state
+    .name: iota pointer
+    .name: iota key
+    .name: iota control_sequence
 
-    move %each local %0 parameters
-    text %each local *each local
+    move %r0 local %0 parameters
+    move %data local %1 parameters
+    move %state local %2 parameters
 
-    text %tmp local "\r⇝ "
-    textconcat %each local %tmp local %each local
-    text %tmp local "\r"
-    textconcat %each local %each local %tmp local
-    print %each local
+    atom %key local 'pointer'
+    structat %pointer local *state local %key local
+    eq %pointer local %r0 local *pointer local
+
+    if %pointer local enable_highlighting print_entry
+
+    .mark: enable_highlighting
+    string %control_sequence "\033[1m"
+    echo %control_sequence local
+    string %control_sequence "\033[4m"
+    echo %control_sequence local
+
+    .mark: print_entry
+    vat %each local *data local %r0 local
+    print *each local
+
+    string %control_sequence "\033[0m\r"
+    echo %control_sequence local
+
+    ;move %each local %0 parameters
+    ;text %each local *each local
+
+    ;text %tmp local "\r⇝ "
+    ;textconcat %each local %tmp local %each local
+    ;text %tmp local "\r"
+    ;textconcat %each local %each local %tmp local
+    ;print %each local
 
     return
 .end
@@ -315,11 +408,12 @@
     atom %key local 'data'
     structat %data local *state local %key local
 
-    frame %2
+    frame %3
     copy %0 arguments *data local
-    function %fn local view_actor_list_orders_print_entry/1
+    function %fn local view_actor_list_orders_print_entry/3
     move %1 arguments %fn local
-    call void for_each/2
+    move %2 arguments %state local
+    call void for_each_nx/3
 
     return
 .end
