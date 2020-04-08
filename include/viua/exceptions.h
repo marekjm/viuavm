@@ -151,18 +151,21 @@ class Zero_division : public viua::types::Exception {
 };
 
 class Invalid_field_access : public viua::types::Exception {
+    std::string const what_field;
   public:
     std::string type() const override { return "Invalid_field_access"; }
 
-    std::string str() const override { return "invalid field access"; }
+    std::string str() const override { return "invalid field access: '" + what_field + "'"; }
 
     std::unique_ptr<Value> copy() const override
     {
         return viua::util::exceptions::make_unique_exception<
-            Invalid_field_access>();
+            Invalid_field_access>(what_field);
     }
 
     std::string what() const override { return str(); }
+
+    Invalid_field_access(std::string f): what_field{std::move(f)} {}
 };
 }}}  // namespace viua::runtime::exceptions
 

@@ -63,7 +63,7 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto value = std::move(attributes.at(key));
@@ -76,7 +76,7 @@ auto viua::types::Struct::at(std::string const& key) -> viua::types::Value*
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto& value = attributes.at(key);
@@ -89,7 +89,7 @@ auto viua::types::Struct::at(std::string const& key) const
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto& value = attributes.at(key);
