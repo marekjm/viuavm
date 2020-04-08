@@ -312,38 +312,38 @@
 
 ; Implementacja aktora prezentującego interfejs.
 .function: print_top_line/1
-    allocate_registers %3 local
+    allocate_registers %2 local
 
     .name: 0 r0
     .name: iota state
-    .name: iota tmp
+    ;.name: iota tmp
 
-    move %state local %0 parameters
+    ;move %state local %0 parameters
 
-    text %tmp local "["
-    text %state local *state local
-    textconcat %state local %tmp local %state local
-    text %tmp local "]\r"
-    textconcat %state local %state local %tmp local
+    text %state local "[...]\r"
+    ;text %state local *state local
+    ;textconcat %state local %tmp local %state local
+    ;text %tmp local "]\r"
+    ;textconcat %state local %state local %tmp local
 
     print %state local
 
     return
 .end
 .function: print_bottom_line/1
-    allocate_registers %3 local
+    allocate_registers %2 local
 
     .name: 0 r0
     .name: iota state
-    .name: iota tmp
+    ;.name: iota tmp
 
-    move %state local %0 parameters
+    ;move %state local %0 parameters
 
-    text %tmp local "["
-    text %state local *state local
-    textconcat %state local %tmp local %state local
-    text %tmp local "]\r"
-    textconcat %state local %state local %tmp local
+    text %state local "[...]\r"
+    ;text %state local *state local
+    ;textconcat %state local %tmp local %state local
+    ;text %tmp local "]\r"
+    ;textconcat %state local %state local %tmp local
 
     print %state local
 
