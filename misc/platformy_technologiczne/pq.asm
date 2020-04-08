@@ -301,23 +301,22 @@
 
     return
 .end
-.function: view_actor_list_orders/2
+.function: view_actor_list_orders/1
     allocate_registers %5 local
 
     .name: 0 r0
-    ;.name: iota state
-    .name: iota message
+    .name: iota state
     .name: iota key
     .name: iota data
     .name: iota fn
 
-    move %message local %1 parameters
+    move %state local %0 parameters
 
     atom %key local 'data'
-    structremove %data local %message local %key local
+    structat %data local *state local %key local
 
     frame %2
-    move %0 arguments %data local
+    copy %0 arguments *data local
     function %fn local view_actor_list_orders_print_entry/1
     move %1 arguments %fn local
     call void for_each/2
@@ -372,6 +371,10 @@
     return
 
     .mark: stage_order_list
+    atom %key local 'data'
+    structremove %message local %message local %key local
+    structinsert %state local %key local %message local
+
     .mark: printing_sequence
     string %control_sequence "\033[2J"
     echo %control_sequence local
@@ -383,11 +386,10 @@
     move %0 arguments %tmp local
     call void print_top_line/1
 
-    frame %2
+    frame %1
     ptr %tmp local %state local
     move %0 arguments %tmp local
-    move %1 arguments %message local
-    call void view_actor_list_orders/2
+    call void view_actor_list_orders/1
 
     frame %1 local
     ptr %tmp local %state local
