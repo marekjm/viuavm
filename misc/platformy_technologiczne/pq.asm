@@ -64,6 +64,61 @@
     move %3 arguments %limit local
     tailcall map/4
 .end
+.function: for_each/4
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota vec
+    .name: iota fn
+    .name: iota n
+    .name: iota limit
+    .name: iota item
+
+    move %vec local %0 parameters
+    move %fn local %1 parameters
+    move %n local %2 parameters
+    move %limit local %3 parameters
+
+    vat %item local %vec local %n local
+    frame %1
+    move %0 arguments %item local
+    call void %fn local
+
+    iinc %n local
+    lt %r0 local %n local %limit local
+    if %r0 local next_iteration the_end
+
+    .mark: next_iteration
+    frame %4
+    move %0 arguments %vec local
+    move %1 arguments %fn local
+    move %2 arguments %n local
+    move %3 arguments %limit local
+    tailcall for_each/4
+
+    .mark: the_end
+    move %r0 local %vec local
+    return
+.end
+.function: for_each/2
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota vec
+    .name: iota n
+    .name: iota limit
+
+    move %vec local %0 parameters
+    izero %n local
+    vlen %limit local %vec local
+
+    frame %4
+    move %0 arguments %vec local
+    move %1 arguments %1 parameters
+    move %2 arguments %n local
+    move %3 arguments %limit local
+    tailcall for_each/4
+.end
 
 
 ; Funkcje pomocnicze do zarządzania stanem konsoli.
@@ -229,6 +284,46 @@
 
     return
 .end
+.function: view_actor_list_orders_print_entry/1
+    allocate_registers %3 local
+
+    .name: iota each
+    .name: iota tmp
+
+    move %each local %0 parameters
+    text %each local *each local
+
+    text %tmp local "\r⇝ "
+    textconcat %each local %tmp local %each local
+    text %tmp local "\r"
+    textconcat %each local %each local %tmp local
+    print %each local
+
+    return
+.end
+.function: view_actor_list_orders/2
+    allocate_registers %5 local
+
+    .name: 0 r0
+    ;.name: iota state
+    .name: iota message
+    .name: iota key
+    .name: iota data
+    .name: iota fn
+
+    move %message local %1 parameters
+
+    atom %key local 'data'
+    structremove %data local %message local %key local
+
+    frame %2
+    move %0 arguments %data local
+    function %fn local view_actor_list_orders_print_entry/1
+    move %1 arguments %fn local
+    call void for_each/2
+
+    return
+.end
 .function: view_actor_impl/1
     allocate_registers %11 local
 
@@ -240,7 +335,7 @@
     .name: iota key
     .name: iota got_tag
     .name: iota tag_shutdown
-    .name: iota tag_data
+    .name: iota tag_order_list
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
 
@@ -249,21 +344,26 @@
     receive %message local infinity
 
     atom %tag_shutdown local 'shutdown'
-    atom %tag_data local 'data'
+    atom %tag_order_list local 'order_list'
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
     atomeq %tag_shutdown local *got_tag local %tag_shutdown local
-    atomeq %tag_data local *got_tag local %tag_data local
+    atomeq %tag_order_list local *got_tag local %tag_order_list local
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
 
     if %tag_shutdown local stage_shutdown +1
-    if %tag_data local stage_data +1
+    if %tag_order_list local stage_order_list +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
+
+    text %tmp local "got weird message: "
+    text %message local %message local
+    textconcat %tmp local %tmp local %message local
+    print %tmp local
     jump the_end
 
     .mark: stage_shutdown
@@ -271,10 +371,7 @@
     print %tmp local
     return
 
-    .mark: stage_data
-    .mark: stage_ptr_down
-    .mark: stage_ptr_up
-
+    .mark: stage_order_list
     .mark: printing_sequence
     string %control_sequence "\033[2J"
     echo %control_sequence local
@@ -286,11 +383,19 @@
     move %0 arguments %tmp local
     call void print_top_line/1
 
+    frame %2
+    ptr %tmp local %state local
+    move %0 arguments %tmp local
+    move %1 arguments %message local
+    call void view_actor_list_orders/2
+
     frame %1 local
     ptr %tmp local %state local
     move %0 arguments %tmp local
     call void print_bottom_line/1
 
+    .mark: stage_ptr_down
+    .mark: stage_ptr_up
     .mark: the_end
     frame %1
     move %0 arguments %state local
@@ -304,13 +409,7 @@
     .name: iota key
     .name: iota value
 
-    text %0 local "view actor starting up... (awaiting PID of input actor)"
-    print %0 local
-
     receive %input_actor local 60s
-
-    text %0 local "view actor starting up..."
-    print %0 local
 
     struct %state local
 
@@ -320,6 +419,10 @@
 
     atom %key local 'data'
     vector %value local
+    structinsert %state local %key local %value local
+
+    atom %key local 'connection'
+    move %value local %0 parameters
     structinsert %state local %key local %value local
 
     atom %key local 'input_actor'
@@ -349,7 +452,7 @@
     move %0 local %message local
     return
 .end
-.function: make_data_message/1
+.function: make_order_list_message/1
     allocate_registers %5 local
 
     .name: iota message
@@ -357,12 +460,12 @@
     .name: iota data
     .name: iota key
 
-    atom %tag local 'data'
+    atom %tag local 'order_list'
     frame %1
     move %0 arguments %tag local
     call %message local make_tagged_message_impl/1
 
-    ; insert the data field: { tag: 'data', data: ... }
+    ; insert the data field: { tag: 'order_list', data: ... }
     atom %key local 'data'
     move %data local %0 parameters
     structinsert %message local %key local %data local
@@ -525,22 +628,34 @@
     frame %0
     call void make_tty_raw/0
 
-    text %0 local "input actor starting up..."
-    print %0 local
-
     frame %1
     move %0 arguments %0 parameters
     tailcall input_actor_impl/1
 .end
 
 
+.function: finish_pq_connection/1
+    allocate_registers %2 local
+
+    .name: iota tmp
+
+    text %tmp local "\n\rfinishing PostgreSQL connection"
+    print %tmp local
+
+    frame %1
+    move %0 arguments %0 parameters
+    call void viuapq::finish/1
+
+    return
+.end
 .function: main/0
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: 0 r0
     .name: iota connection
     .name: iota view_actor
     .name: iota input_actor
+    .name: iota query
 
     frame %0
     defer return_tty_to_sanity/0
@@ -563,11 +678,21 @@
     copy %r0 local %input_actor local
     send %view_actor local %r0 local
 
-    ;frame %1
-    ;ptr %r0 local %connection local
-    ;move %0 arguments %r0 local
-    ;call %query local employees_all/1
-    ;print %query local
+    frame %1
+    ptr %r0 local %connection local
+    move %0 arguments %r0 local
+    call %query local orders_all/1
+
+    frame %1
+    move %0 arguments %query local
+    call %query local make_order_list_message/1
+    send %view_actor local %query local
+
+    ; Połączenie z bazą danych nie jest nam już dłużej potrzebne w tym miejscu
+    ; więc zlećmy jego automatyczne zamknięcie.
+    frame %1
+    move %0 arguments %connection local
+    defer finish_pq_connection/1
 
     ;frame %1
     ;ptr %r0 local %connection local
@@ -577,10 +702,6 @@
 
     join void %input_actor local
     join void %view_actor local
-
-    frame %1
-    move %0 arguments %connection local
-    call void viuapq::finish/1
 
     izero %0 local
     return
