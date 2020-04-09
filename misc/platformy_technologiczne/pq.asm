@@ -521,8 +521,52 @@
 
     return
 .end
+.function: view_actor_single_order/1
+    allocate_registers %7 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota message
+    .name: iota key
+    .name: iota got_tag
+    .name: iota tag_shutdown
+    .name: iota tmp
+
+    string %tmp "\033[2J"
+    echo %tmp local
+    string %tmp "\033[1;1H"
+    echo %tmp local
+
+    move %state local %0 parameters
+    print %state local
+
+    receive %message local
+
+    atom %tag_shutdown local 'shutdown'
+    atom %key local 'tag'
+    structat %got_tag local %message local %key local
+
+    atomeq %tag_shutdown local *got_tag local %tag_shutdown local
+
+    if %tag_shutdown local stage_shutdown swallow_any_message
+
+    .mark: swallow_any_message
+    ; "Zjedz" dowolną wiadomość, która nie jest użyteczna i wywołaj jeszcze raz
+    ; siebie podmieniając ramkę na stosie. W ten sposób przejmujemy pętlę
+    ; zdarzeń w aktorze implementującym konkretny widok interfejsu i nie wracamy
+    ; do aktora implementującego główny widok.
+    ;
+    ; Jest to sztuczka, ale działa.
+    frame %1
+    move %0 arguments %state local
+    tailcall view_actor_single_order/1
+
+    .mark: stage_shutdown
+    ; Wróć do funkcji wywołującej oddając jej kontrolę nad interfejsem.
+    return
+.end
 .function: view_actor_impl/1
-    allocate_registers %12 local
+    allocate_registers %13 local
 
     .name: 0 r0
     .name: iota state
@@ -536,6 +580,7 @@
     .name: iota tag_order_list
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
+    .name: iota tag_enter
 
     move %state local %0 parameters
 
@@ -545,6 +590,7 @@
     atom %tag_order_list local 'order_list'
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
+    atom %tag_enter local 'enter'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -552,11 +598,13 @@
     atomeq %tag_order_list local *got_tag local %tag_order_list local
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
+    atomeq %tag_enter local *got_tag local %tag_enter local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_order_list local stage_order_list +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
+    if %tag_enter local stage_enter +1
 
     text %tmp local "got weird message: "
     text %message local %message local
@@ -574,6 +622,13 @@
     structremove %message local %message local %key local
     structinsert %state local %key local %message local
     jump pointer_bounds_check
+
+    .mark: stage_enter
+    frame %1
+    ptr %r0 local %state local
+    move %0 arguments %r0 local
+    call void view_actor_single_order/1
+    jump printing_sequence
 
     .mark: stage_ptr_down
     atom %key local 'pointer'
@@ -684,6 +739,17 @@
     move %0 local %message local
     return
 .end
+.function: make_none_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local '_'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
 .function: make_order_list_message/1
     allocate_registers %5 local
 
@@ -732,6 +798,17 @@
 
     .name: iota tag
     atom %tag local 'pointer_down'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
+.function: make_enter_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'enter'
 
     frame %1
     move %0 arguments %tag local
@@ -787,25 +864,52 @@
         leave
     .end
     enter .block: wait_for_some_input
-        io_wait %buf local %req local 1s
+        io_wait %buf local %req local 100ms
         leave
     .end
 
     move %r0 local %buf local
     return
 .end
+.function: is_it_time_to_shut_down_input/0
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota message
+
+    try
+    catch "Exception" .block: is_it_time_to_shut_down_input__nope
+        draw void
+        izero %message local
+        leave
+    .end
+    enter .block: is_it_time_to_shut_down_input__maybe
+        receive %message local 0ms
+        leave
+    .end
+
+    move %r0 local %message local
+    return
+.end
 .function: input_actor_impl/1
-    allocate_registers %13 local
+    allocate_registers %14 local
 
     .name: iota tree_view_actor
     .name: iota tmp
     .name: iota buf
 
     .name: iota c_quit
+    .name: iota c_enter
     .name: iota c_pointer_down
     .name: iota c_pointer_up
 
+    .name: iota time_to_shut_down
+
     move %tree_view_actor local %0 parameters
+
+    frame %0
+    call %time_to_shut_down local is_it_time_to_shut_down_input/0
+    if %time_to_shut_down local the_end await_input_stage
 
     .mark: await_input_stage
     frame %0
@@ -813,12 +917,15 @@
 
     string %c_quit local "q"
     streq %c_quit local %buf local %c_quit local
+    string %c_enter local "\r"
+    streq %c_enter local %buf local %c_enter local
     string %c_pointer_down local "j"
     streq %c_pointer_down local %buf local %c_pointer_down local
     string %c_pointer_up local "k"
     streq %c_pointer_up local %buf local %c_pointer_up local
 
-    if %c_quit local the_end +1
+    if %c_quit local quit_view +1
+    if %c_enter local enter_item +1
     if %c_pointer_down local move_pointer_down +1
     if %c_pointer_up local move_pointer_up +1
 
@@ -840,11 +947,22 @@
 
     jump happy_loopin
 
-    .mark: the_end
+    .mark: enter_item
+
+    frame %0
+    call %tmp make_enter_message/0
+    send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: quit_view
     frame %0
     call %tmp local make_shutdown_message/0
     send %tree_view_actor local %tmp local
 
+    jump happy_loopin
+
+    .mark: the_end
     text %tmp "input actor shutting down\r"
     print %tmp local
     return
@@ -932,8 +1050,13 @@
     ;call %query local orders_all/1
     ;print %query local
 
-    join void %input_actor local
     join void %view_actor local
+
+    integer %0 local 1
+    send %input_actor local %0 local
+
+    join void %input_actor local
+
 
     izero %0 local
     return

@@ -23,4 +23,4 @@ fi
 
 cat $PT_PATH/pt.sql | psql pt_lab2
 ./build/bin/vm/asm -o ./pq.bin $PT_PATH/pq.asm
-./build/bin/vm/kernel ./pq.bin
+./build/bin/vm/kernel ./pq.bin 2>./pq.log
