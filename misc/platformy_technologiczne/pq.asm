@@ -403,6 +403,52 @@
 
     return
 .end
+.function: format_order_list_entry/1
+    allocate_registers %5 local
+
+    .name: 0 r0
+    .name: iota item
+    .name: iota tmp
+    .name: iota key
+    .name: iota value
+
+    move %item local %0 parameters
+
+    text %r0 local "⇢ "
+
+    atom %key local 'id'
+    structat %value local *item local %key local
+
+    integer %tmp local 10
+    lt %tmp local *value local %tmp local
+    if %tmp local needs_leading_space no_leading_space
+
+    .mark: needs_leading_space
+    text %tmp local " "
+    textconcat %r0 local %r0 local %tmp local
+
+    .mark: no_leading_space
+    text %value local *value local
+    text %tmp local " | "
+    textconcat %r0 local %r0 local %value local
+    textconcat %r0 local %r0 local %tmp local
+
+    atom %key local 'customer'
+    structat %value local *item local %key local
+    text %value local *value local
+    text %tmp local " | "
+    textconcat %r0 local %r0 local %value local
+    textconcat %r0 local %r0 local %tmp local
+
+    atom %key local 'order_date'
+    structat %value local *item local %key local
+    text %value local *value local
+    text %tmp local " |"
+    textconcat %r0 local %r0 local %value local
+    textconcat %r0 local %r0 local %tmp local
+
+    return
+.end
 .function: view_actor_list_orders_print_entry/3
     allocate_registers %7 local
 
@@ -432,7 +478,11 @@
 
     .mark: print_entry
     vat %each local *data local %r0 local
-    print *each local
+
+    frame %1
+    move %0 arguments %each local
+    call %each local format_order_list_entry/1
+    print %each local
 
     string %control_sequence "\033[0m\r"
     echo %control_sequence local
