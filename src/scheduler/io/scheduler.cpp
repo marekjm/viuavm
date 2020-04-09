@@ -155,7 +155,15 @@ void viua::scheduler::io::io_scheduler(
                                   + " interaction on fd "
                                   + std::to_string(*work.fd()) + "\n");
                 }
-                kernel.schedule_io(std::move(interaction));
+                if (work.cancelled()) {
+                    kernel.complete_io(
+                        work.id(),
+                        viua::kernel::Kernel::IO_result::make_error(
+                            std::make_unique<viua::types::Exception>(
+                                      "IO_cancel", "I/O cancelled")));
+                } else {
+                    kernel.schedule_io(std::move(interaction));
+                }
                 continue;
             }
 
