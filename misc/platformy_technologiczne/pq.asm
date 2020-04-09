@@ -8,6 +8,60 @@
 
 
 ; Funkcje pomocznicze ogólnego przeznaczenia.
+.function: max/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota lhs
+    .name: iota rhs
+
+    move %lhs local %0 parameters
+    move %rhs local %1 parameters
+
+    lt %r0 local %lhs local %rhs local
+    if %r0 local +1 +3
+    move %r0 local %rhs local
+    jump the_end
+    move %r0 local %lhs local
+
+    .mark: the_end
+    return
+.end
+.function: min/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota lhs
+    .name: iota rhs
+
+    move %lhs local %0 parameters
+    move %rhs local %1 parameters
+
+    gt %r0 local %lhs local %rhs local
+    if %r0 local +1 +3
+    move %r0 local %rhs local
+    jump the_end
+    move %r0 local %lhs local
+
+    .mark: the_end
+    return
+.end
+.function: lower_bound_to_zero/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota n
+
+    move %n local %0 parameters
+    izero %r0 local
+
+    frame %2
+    move %0 arguments %r0 local
+    move %1 arguments %n local
+    call %r0 local max/2
+
+    return
+.end
 .function: map/4
     allocate_registers %6 local
 
@@ -418,11 +472,12 @@
     return
 .end
 .function: view_actor_impl/1
-    allocate_registers %11 local
+    allocate_registers %12 local
 
     .name: 0 r0
     .name: iota state
     .name: iota message
+    .name: iota data
     .name: iota control_sequence
     .name: iota tmp
     .name: iota key
@@ -468,6 +523,39 @@
     atom %key local 'data'
     structremove %message local %message local %key local
     structinsert %state local %key local %message local
+    jump pointer_bounds_check
+
+    .mark: stage_ptr_down
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
+    iinc *tmp local
+    jump pointer_bounds_check
+
+    .mark: stage_ptr_up
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
+    idec *tmp local
+    ; Ten skok jest niepotrzebny, ale trzymajmy go dla czytelności.
+    ; jump pointer_bounds_check
+
+    .mark: pointer_bounds_check
+    atom %key local 'data'
+    structat %data local %state local %key local
+
+    atom %key local 'pointer'
+    structat %tmp local %state local %key local
+    frame %1
+    copy %0 arguments *tmp local
+    call %tmp local lower_bound_to_zero/1
+
+    frame %2 local
+    move %0 arguments %tmp local
+    vlen %tmp local *data local
+    idec %tmp local
+    move %1 arguments %tmp local
+    call %tmp local min/2
+
+    structinsert %state local %key local %tmp local
 
     .mark: printing_sequence
     string %control_sequence "\033[2J"
@@ -490,8 +578,6 @@
     move %0 arguments %tmp local
     call void print_bottom_line/1
 
-    .mark: stage_ptr_down
-    .mark: stage_ptr_up
     .mark: the_end
     frame %1
     move %0 arguments %state local
