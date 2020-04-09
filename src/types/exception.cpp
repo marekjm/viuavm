@@ -54,9 +54,23 @@ std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const
     return std::make_unique<Exception>(cause);
 }
 
+auto viua::types::Exception::add_throw_point(Throw_point const tp) const
+    -> std::unique_ptr<Exception>
+{
+    auto tps = throw_points;
+    tps.push_back(tp);
+    return std::make_unique<Exception>(tps, detailed_type, cause);
+}
+
 viua::types::Exception::Exception(std::string s)
         : cause(s), detailed_type("Exception")
 {}
 viua::types::Exception::Exception(std::string ts, std::string cs)
         : cause(cs), detailed_type(ts)
+{}
+viua::types::Exception::Exception(std::vector<Throw_point> tp, std::string s)
+        : cause(s), detailed_type("Exception"), throw_points{std::move(tp)}
+{}
+viua::types::Exception::Exception(std::vector<Throw_point> tp, std::string ts, std::string cs)
+        : cause(cs), detailed_type(ts), throw_points{std::move(tp)}
 {}

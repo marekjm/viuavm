@@ -267,6 +267,19 @@ void viua::kernel::Kernel::load_native_module(
 
     cxx_dynamic_lib_handles.push_back(handle);
 }
+auto viua::kernel::Kernel::module_at(uint8_t const* const location) const
+    -> std::optional<std::string>
+{
+    if (bytecode.get() == location) {
+        return commandline_arguments.at(0);
+    }
+    for (auto const& [ name, mod ] : linked_modules) {
+        if (mod.second.get() == location) {
+            return name;
+        }
+    }
+    return {};
+}
 
 bool viua::kernel::Kernel::is_local_function(std::string const& name) const
 {

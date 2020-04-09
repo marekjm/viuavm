@@ -58,11 +58,24 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
               << (ex ? ex->what() : thrown_object->str()) << "\n";
     std::cerr << "\n";
 
-    auto const ex_addr =
-        ((process.current_stack().instruction_pointer - 1) - process.current_stack().jump_base);
-    std::cerr << "exception address: 0x"
-        << std::hex << std::setw(4) << std::setfill('0') << ex_addr << std::dec
-        << " (byte " << ex_addr << ")\n";
+    std::cerr << "throw points: ";
+    if (ex and not ex->throw_points.empty()) {
+        std::cerr << "\n";
+        for (auto const& each : ex->throw_points) {
+            auto at_module =
+                process.get_kernel().module_at(reinterpret_cast<uint8_t*>(each.jump_base));
+            std::cerr << "    address: 0x"
+                << std::hex << std::setw(4) << std::setfill('0') << each.offset << std::dec
+                << " (byte " << each.offset << ") inside 0x"
+                << std::hex << std::setw(12) << std::setfill('0') << each.jump_base
+                << " [" << at_module.value_or("(unknown)") << "]\n";
+        }
+    } else if (ex) {
+        std::cerr << "none\n";
+    } else {
+        std::cerr << "unavailable\n";
+    }
+    std::cerr << "\n";
     std::cerr << "frame details:\n";
 
     if (trace.size()) {

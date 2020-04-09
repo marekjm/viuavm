@@ -443,7 +443,12 @@ auto viua::process::Process::tick() -> Op_address_type
          * If user code cannot deal with them (i.e. did not register a catcher
          * block) they will terminate execution later.
          */
-        stack->thrown = std::move(e);
+        auto const tp = viua::types::Exception::Throw_point{
+              reinterpret_cast<uint64_t>(current_stack().jump_base)
+            , static_cast<uint64_t>(current_stack().instruction_pointer
+                    - current_stack().jump_base)
+        };
+        stack->thrown = e->add_throw_point(tp);
     } catch (std::unique_ptr<viua::types::Value>& e) {
         /*
          * All values can be thrown as exceptions, so Values must also be
@@ -485,8 +490,15 @@ auto viua::process::Process::tick() -> Op_address_type
         and (not allowed_unchanged_ops.count(
             OPCODE(*stack->instruction_pointer)))
         and (not stack->thrown)) {
+
+        auto tp = std::vector<viua::types::Exception::Throw_point>{};
+        tp.push_back(viua::types::Exception::Throw_point{
+              reinterpret_cast<uint64_t>(current_stack().jump_base)
+            , static_cast<uint64_t>(current_stack().instruction_pointer
+                    - current_stack().jump_base)
+        });
         stack->thrown =
-            std::make_unique<viua::types::Exception>("InstructionUnchanged");
+            std::make_unique<viua::types::Exception>(tp, "InstructionUnchanged");
     }
 
     if (stack->thrown and stack->frame_new) {
@@ -695,6 +707,11 @@ auto viua::process::Process::cancel_io(
 void viua::process::Process::migrate_to(viua::scheduler::Process_scheduler* sch)
 {
     attached_scheduler = sch;
+}
+
+auto viua::process::Process::get_kernel() const -> viua::kernel::Kernel&
+{
+    return attached_scheduler->kernel();
 }
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,

@@ -95,8 +95,20 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     if (attached_scheduler->is_stopped(proc->pid())) {
         return_addr = addr;
         if (attached_scheduler->is_terminated(proc->pid())) {
-            stack->thrown =
-                attached_scheduler->transfer_exception_of(proc->pid());
+            auto joined_throw = std::move(attached_scheduler->transfer_exception_of(proc->pid()));
+
+            /*
+             * We need to detect if the joined throw value is an exception and, if
+             * that is the case, rethrow it using exception type. This will allow
+             * the process to add throw points to better track the exception path.
+             */
+            if (auto joined_ex = dynamic_cast<viua::types::Exception*>(joined_throw.get()); joined_ex) {
+                auto ex = std::unique_ptr<viua::types::Exception>();
+                ex.reset(static_cast<viua::types::Exception*>(joined_throw.release()));
+                throw ex;
+            } else {
+                throw joined_throw;
+            }
         } else {
             auto result = attached_scheduler->transfer_result_of(proc->pid());
             if (target) {
@@ -107,9 +119,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
                and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active      = false;
         wait_until_infinity = false;
-        stack->thrown =
-            std::make_unique<viua::types::Exception>("process did not join");
         return_addr = addr;
+        throw std::make_unique<viua::types::Exception>("process did not join");
     }
 
     return return_addr;
@@ -167,9 +178,8 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         if (timeout_passed or immediate_timeout) {
             timeout_active      = false;
             wait_until_infinity = false;
-            stack->thrown =
-                std::make_unique<viua::types::Exception>("no message received");
             return_addr = addr;
+            throw std::make_unique<viua::types::Exception>("no message received");
         }
     }
 

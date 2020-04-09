@@ -99,7 +99,7 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type
         oss << "throw from null register";
         throw std::make_unique<viua::types::Exception>(oss.str());
     }
-    stack->thrown = source->give();
+    throw source->give();
 
     return addr;
 }

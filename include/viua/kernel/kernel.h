@@ -320,6 +320,7 @@ class Kernel {
     auto get_entry_point_of(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
+    auto module_at(uint8_t const* const) const -> std::optional<std::string>;
 
     void request_foreign_function_call(Frame*, viua::process::Process*);
     void request_foreign_function_call(std::unique_ptr<Frame>,

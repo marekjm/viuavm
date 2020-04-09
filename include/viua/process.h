@@ -619,6 +619,8 @@ class Process {
         -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
+    auto get_kernel() const -> viua::kernel::Kernel&;
+
     Process(std::unique_ptr<Frame>,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,

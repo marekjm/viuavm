@@ -20,7 +20,9 @@
 #ifndef VIUA_TYPES_EXCEPTION_H
 #define VIUA_TYPES_EXCEPTION_H
 
+#include <cstdint>
 #include <string>
+#include <vector>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/support/string.h>
 #include <viua/types/value.h>
@@ -40,6 +42,16 @@ class Exception : public Value {
   public:
     static std::string const type_name;
 
+    struct Throw_point {
+        uint64_t const jump_base {0};
+        uint64_t const offset {0};
+
+        inline Throw_point(uint64_t const j, uint64_t const o)
+            : jump_base{j}, offset{o}
+        {}
+    };
+    std::vector<Throw_point> throw_points;
+
     std::string type() const override;
     std::string str() const override;
     std::string repr() const override;
@@ -50,8 +62,13 @@ class Exception : public Value {
     virtual std::string what() const;
     virtual std::string etype() const;
 
+    virtual auto add_throw_point(Throw_point const) const
+        -> std::unique_ptr<Exception>;
+
     Exception(std::string s = "");
     Exception(std::string ts, std::string cs);
+    Exception(std::vector<Throw_point>, std::string s = "");
+    Exception(std::vector<Throw_point>, std::string ts, std::string cs);
 };
 }}  // namespace viua::types
 
