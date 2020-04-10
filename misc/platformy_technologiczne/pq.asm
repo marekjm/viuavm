@@ -4,6 +4,7 @@
 .signature: viuapq::connect/1
 .signature: viuapq::finish/1
 .signature: viuapq::get/2
+.signature: viuapq::get_one/2
 .signature: std::os::system/1
 
 
@@ -414,6 +415,24 @@
 
     return
 .end
+.function: orders_all_count/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota query
+
+    text %query local "select count(*) as x from orders"
+    frame %2
+    move %0 arguments %0 parameters
+    move %1 arguments %query local
+    call %query local viuapq::get_one/2
+
+    atom %r0 local 'x'
+    structat %r0 local %query local %r0 local
+    stoi %r0 local *r0 local
+
+    return
+.end
 .function: orders_products_of_order_id/2
     allocate_registers %4 local
 
@@ -442,21 +461,30 @@
 
 ; Implementacja aktora prezentującego interfejs.
 .function: print_top_line/1
-    allocate_registers %2 local
+    allocate_registers %5 local
 
     .name: 0 r0
     .name: iota state
-    ;.name: iota tmp
+    .name: iota connection
+    .name: iota orders_no
+    .name: iota fmt
 
-    ;move %state local %0 parameters
+    move %state local %0 parameters
 
-    text %state local "[...]\r"
-    ;text %state local *state local
-    ;textconcat %state local %tmp local %state local
-    ;text %tmp local "]\r"
-    ;textconcat %state local %state local %tmp local
+    atom %connection local 'connection'
+    structat %connection local *state local %connection local
 
-    print %state local
+    frame %1
+    move %0 arguments %connection local
+    call %orders_no local orders_all_count/1
+
+    text %fmt local "\r[ total orders: "
+    text %orders_no local %orders_no local
+    textconcat %fmt local %fmt local %orders_no local
+    text %r0 local " ]"
+    textconcat %fmt local %fmt local %r0 local
+
+    print %fmt local
 
     return
 .end
@@ -490,7 +518,7 @@
 
     move %item local %0 parameters
 
-    text %r0 local "⇢ "
+    text %r0 local "\r⇢ "
 
     atom %key local 'id'
     structat %value local *item local %key local
@@ -679,7 +707,6 @@
     ; Prezentacja widoku pojedynczego zamówienia.
     atom %selected_order local 'selected_order'
     structat %selected_order local *state local %selected_order local
-    print *selected_order local
 
     atom %key local 'customer'
     structat %customer local *selected_order local %key local
@@ -693,7 +720,7 @@
     structat %order_id local *selected_order local %key local
     text %order_id local *order_id local
 
-    text %tmp local "\r┌──── General information"
+    text %tmp local "\r┌──── General information ──────────────────────────────┐"
     print %tmp local
 
     text %tmp local "\r│ Order ID:   "
@@ -708,7 +735,7 @@
     textconcat %tmp local %tmp local %customer local
     print %tmp local
 
-    text %tmp local "\r├──── Order positions"
+    text %tmp local "\r├──── Order positions ──────────────────────────────────┤"
     print %tmp local
 
     atom %key local 'connection'
@@ -728,7 +755,7 @@
     move %1 arguments %tmp local
     call void for_each/2
 
-    text %tmp local "\r└────"
+    text %tmp local "\r└───────────────────────────────────────────────────────┘"
     echo %tmp local
     string %tmp local "\033[1A\r"
     print %tmp local
