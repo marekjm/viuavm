@@ -342,6 +342,44 @@
     move %r0 local %order local
     return
 .end
+.function: orders_by_id/2
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota query
+    .name: iota connection
+    .name: iota id
+
+    move %connection local %0 parameters
+    move %id local %1 parameters
+
+    ; Wiem, że sklejanie zapytań ręcznie, bez jakiejkolwiek weryfikacji to
+    ; kiepski pomysł, ale 1/ tutaj robię demo 2/ nie mam porządnej biblioteki do
+    ; interakcji z PostreSQL.
+    text %query local "select * from orders where id = "
+    text %id local %id local
+    textconcat %query local %query local %id local
+
+    print %query local
+    print %connection local
+
+    frame %2
+    move %0 arguments %connection local
+    move %1 arguments %query local
+    call %query local viuapq::get/2
+
+    izero %r0 local
+    vpop %query local %query local %r0 local
+    print %query local
+
+    frame %1
+    move %0 arguments %query local
+    call %r0 local order_of_pq/1
+
+    print %r0 local
+
+    return
+.end
 .function: orders_all/1
     allocate_registers %2 local
 
@@ -521,8 +559,8 @@
 
     return
 .end
-.function: view_actor_single_order/1
-    allocate_registers %7 local
+.function: view_actor_single_order_impl/1
+    allocate_registers %11 local
 
     .name: 0 r0
     .name: iota state
@@ -531,6 +569,10 @@
     .name: iota got_tag
     .name: iota tag_shutdown
     .name: iota tmp
+    .name: iota selected_order
+    .name: iota customer
+    .name: iota order_date
+    .name: iota order_id
 
     string %tmp "\033[2J"
     echo %tmp local
@@ -538,9 +580,50 @@
     echo %tmp local
 
     move %state local %0 parameters
-    print %state local
 
-    receive %message local
+    ; Prezentacja widoku pojedynczego zamówienia.
+    atom %selected_order local 'selected_order'
+    structat %selected_order local *state local %selected_order local
+    print *selected_order local
+
+    atom %key local 'customer'
+    structat %customer local *selected_order local %key local
+    text %customer local *customer local
+
+    atom %key local 'order_date'
+    structat %order_date local *selected_order local %key local
+    text %order_date local *order_date local
+
+    atom %key local 'id'
+    structat %order_id local *selected_order local %key local
+    text %order_id local *order_id local
+
+    text %tmp local "\r┌────"
+    print %tmp local
+
+    text %tmp local "\r│ Order ID: "
+    textconcat %r0 local %tmp local %order_id local
+    text %tmp local " \t\t| "
+    textconcat %r0 local %r0 local %tmp local
+    text %tmp local "Order date: "
+    textconcat %r0 local %r0 local %tmp local
+    textconcat %r0 local %r0 local %order_date local
+    print %r0 local
+
+    text %tmp local "\r│ Customer: "
+    textconcat %tmp local %tmp local %customer local
+    print %tmp local
+
+    text %tmp local "\r├────"
+    print %tmp local
+
+    text %tmp local "\r└────"
+    echo %tmp local
+    string %tmp local "\033[1A\r"
+    print %tmp local
+
+    ; Po prezentacji widoku, oczekuj na akcje użytkownika.
+    receive %message local infinity
 
     atom %tag_shutdown local 'shutdown'
     atom %key local 'tag'
@@ -564,6 +647,51 @@
     .mark: stage_shutdown
     ; Wróć do funkcji wywołującej oddając jej kontrolę nad interfejsem.
     return
+.end
+.function: view_actor_single_order/1
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota key
+    .name: iota order
+    .name: iota data
+    .name: iota connection
+
+    move %state local %0 parameters
+
+    ; Potrzebujemy wiedzieć na jakim miejscu listy znajdował się wskaźnik żeby
+    ; pobrać dane właściwego zamówienia.
+    atom %key local 'pointer'
+    structat %order local *state local %key local
+
+    ; Następnie potrzebujemy wyciągnąć dane...
+    atom %key local 'data'
+    structat %data local *state local %key local
+
+    ; ...pobrać odpowiednią pozycję na liście...
+    vat %order local *data local *order local
+
+    ; ...i wyłuskać z niej ID.
+    atom %key local 'id'
+    structat %order local *order local %key local
+    copy %order local *order local
+
+    ; Kiedy mamy już ID potrzebujemy pobrać odpowiadające mu zamówienie.
+    atom %key local 'connection'
+    structat %connection local *state local %key local
+
+    frame %2
+    move %0 arguments %connection local
+    move %1 arguments %order local
+    call %order local orders_by_id/2
+
+    atom %key local 'selected_order'
+    structinsert *state local %key local %order local
+
+    frame %1
+    move %0 arguments %state local
+    tailcall view_actor_single_order_impl/1
 .end
 .function: view_actor_impl/1
     allocate_registers %13 local
@@ -998,6 +1126,19 @@
 
     return
 .end
+.function: send_shutdown_to_input_actor/1
+    allocate_registers %2 local
+
+    .name: iota input_actor
+
+    move %input_actor local %0 parameters
+
+    integer %0 local 1
+    send %input_actor local %0 local
+    join void %input_actor local
+
+    return
+.end
 .function: main/0
     allocate_registers %5 local
 
@@ -1019,6 +1160,14 @@
     frame %1
     ptr %r0 local %connection local
     move %0 arguments %r0 local
+    call %query local orders_all/1
+
+    frame %1
+    move %0 arguments %query local
+    call %query local make_order_list_message/1
+
+    frame %1
+    move %0 arguments %connection local
     process %view_actor local view_actor/1
 
     frame %1
@@ -1029,20 +1178,16 @@
     send %view_actor local %r0 local
 
     frame %1
-    ptr %r0 local %connection local
-    move %0 arguments %r0 local
-    call %query local orders_all/1
+    move %0 arguments %input_actor local
+    defer send_shutdown_to_input_actor/1
 
-    frame %1
-    move %0 arguments %query local
-    call %query local make_order_list_message/1
     send %view_actor local %query local
 
     ; Połączenie z bazą danych nie jest nam już dłużej potrzebne w tym miejscu
     ; więc zlećmy jego automatyczne zamknięcie.
-    frame %1
-    move %0 arguments %connection local
-    defer finish_pq_connection/1
+    ;frame %1
+    ;move %0 arguments %connection local
+    ;defer finish_pq_connection/1
 
     ;frame %1
     ;ptr %r0 local %connection local
@@ -1051,12 +1196,6 @@
     ;print %query local
 
     join void %view_actor local
-
-    integer %0 local 1
-    send %input_actor local %0 local
-
-    join void %input_actor local
-
 
     izero %0 local
     return
