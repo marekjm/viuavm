@@ -166,12 +166,19 @@
     izero %n local
     vlen %limit local %vec local
 
+    eq %r0 local %n local %limit local
+    if %r0 local empty_vector vector_ok
+
+    .mark: vector_ok
     frame %4
     move %0 arguments %vec local
     move %1 arguments %1 parameters
     move %2 arguments %n local
     move %3 arguments %limit local
     tailcall for_each/4
+
+    .mark: empty_vector
+    return
 .end
 .function: for_each_nx/5
     allocate_registers %6 local
@@ -230,6 +237,10 @@
     izero %n local
     vlen %limit local %vec local
 
+    eq %r0 local %n local %limit local
+    if %r0 local empty_vector vector_ok
+
+    .mark: vector_ok
     frame %5
     move %0 arguments %vec local
     move %1 arguments %fn local
@@ -237,6 +248,9 @@
     move %3 arguments %n local
     move %4 arguments %limit local
     tailcall for_each_nx/5
+
+    .mark: empty_vector
+    return
 .end
 
 
