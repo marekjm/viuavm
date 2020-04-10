@@ -177,6 +177,35 @@ static void viuapq_get(Frame* frame,
     frame->local_register_set->set(0, std::move(ret));
 }
 
+static void viuapq_get_one(Frame* frame,
+                      viua::kernel::Register_set*,
+                      viua::kernel::Register_set*,
+                      viua::process::Process* proc,
+                      viua::kernel::Kernel*)
+{
+    auto const connection = static_cast<PQ_connection*>(
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(proc));
+    auto const query = frame->arguments->get(1)->str();
+
+    auto const res = PQexec(connection->get(), query.c_str());
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        auto const error = PQerrorMessage(connection->get());
+        throw std::make_unique<viua::types::Exception>(error);
+    }
+
+    auto ret = results_of(res);
+    auto item = std::make_unique<viua::types::Struct>();
+    for (auto const& [ k, v ] : ret.front()) {
+        item->insert(k, viua::types::String::make(v));
+    }
+
+    PQclear(res);
+
+    frame->set_local_register_set(
+        std::make_unique<viua::kernel::Register_set>(1));
+    frame->local_register_set->set(0, std::move(item));
+}
+
 static void viuapq_finish(Frame* frame,
                       viua::kernel::Register_set*,
                       viua::kernel::Register_set*,
@@ -192,6 +221,7 @@ static void viuapq_finish(Frame* frame,
 const Foreign_function_spec functions[] = {
     {"viuapq::connect/1", viuapq_connect},
     {"viuapq::get/2", viuapq_get},
+    {"viuapq::get_one/2", viuapq_get_one},
     {"viuapq::finish/1", viuapq_finish},
     {nullptr, nullptr},
 };
