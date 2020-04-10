@@ -10,6 +10,9 @@ export VIUA_LIBRARY_PATH=./build/stdlib:$PT_PATH
 set -x
 
 touch $PT_PATH/libviuapq.cpp.hash
+if [[ ! -f $PT_PATH/viuapq.so ]]; then
+    echo '0' > $PT_PATH/libviuapq.cpp.hash
+fi
 if [[ $(cat $PT_PATH/libviuapq.cpp.hash) != $(sha384sum $PT_PATH/libviuapq.cpp) ]]; then
     gxx \
         -fPIC \
@@ -23,4 +26,4 @@ fi
 
 cat $PT_PATH/pt.sql | psql pt_lab2
 ./build/bin/vm/asm -o ./pq.bin $PT_PATH/pq.asm
-./build/bin/vm/kernel ./pq.bin 2>./pq.log
+./build/bin/vm/kernel ./pq.bin
