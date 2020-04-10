@@ -400,6 +400,30 @@
 
     return
 .end
+.function: orders_products_of_order_id/2
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota connection
+    .name: iota id
+    .name: iota query
+    .name: iota tmp
+
+    move %connection local %0 parameters
+    move %id local %1 parameters
+
+    text %query local "select entries.id, products.name, unit_price, discount, quantity from entries, products where entries.product_id = products.id and order_id = "
+    text %id local %id local
+    textconcat %query local %query local %id local
+
+    frame %2
+    move %0 arguments %connection local
+    move %1 arguments %query local
+    call %query local viuapq::get/2
+
+    move %r0 local %query local
+    return
+.end
 
 
 ; Implementacja aktora prezentującego interfejs.
@@ -559,8 +583,63 @@
 
     return
 .end
+.function: print_order_entry/1
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota entry
+    .name: iota key
+    .name: iota value
+    .name: iota fmt
+    .name: iota tmp
+
+    move %entry local %0 parameters
+
+    text %fmt local "\r│ ["
+
+    atom %key local 'id'
+    structat %value local *entry local %key local
+    text %value local *value local
+    textconcat %fmt local %fmt local %value local
+
+    text %tmp local "] \t"
+    textconcat %fmt local %fmt local %tmp local
+
+    atom %key local 'name'
+    structat %value local *entry local %key local
+    text %value local *value local
+    textconcat %fmt local %fmt local %value local
+
+    text %tmp local ": "
+    textconcat %fmt local %fmt local %tmp local
+
+    atom %key local 'unit_price'
+    structat %value local *entry local %key local
+    text %value local *value local
+    textconcat %fmt local %fmt local %value local
+
+    text %tmp local " (discount: "
+    textconcat %fmt local %fmt local %tmp local
+
+    atom %key local 'discount'
+    structat %value local *entry local %key local
+    text %value local *value local
+    textconcat %fmt local %fmt local %value local
+
+    text %tmp local ") x "
+    textconcat %fmt local %fmt local %tmp local
+
+    atom %key local 'quantity'
+    structat %value local *entry local %key local
+    text %value local *value local
+    textconcat %fmt local %fmt local %value local
+
+    print %fmt local
+
+    return
+.end
 .function: view_actor_single_order_impl/1
-    allocate_registers %11 local
+    allocate_registers %13 local
 
     .name: 0 r0
     .name: iota state
@@ -573,6 +652,8 @@
     .name: iota customer
     .name: iota order_date
     .name: iota order_id
+    .name: iota connection
+    .name: iota order_entries
 
     string %tmp "\033[2J"
     echo %tmp local
@@ -598,24 +679,40 @@
     structat %order_id local *selected_order local %key local
     text %order_id local *order_id local
 
-    text %tmp local "\r┌────"
+    text %tmp local "\r┌──── General information"
     print %tmp local
 
-    text %tmp local "\r│ Order ID: "
+    text %tmp local "\r│ Order ID:   "
     textconcat %r0 local %tmp local %order_id local
-    text %tmp local " \t\t| "
-    textconcat %r0 local %r0 local %tmp local
-    text %tmp local "Order date: "
-    textconcat %r0 local %r0 local %tmp local
-    textconcat %r0 local %r0 local %order_date local
     print %r0 local
 
-    text %tmp local "\r│ Customer: "
+    text %tmp local "\r│ Order date: "
+    textconcat %r0 local %tmp local %order_date local
+    print %r0 local
+
+    text %tmp local "\r│ Customer:   "
     textconcat %tmp local %tmp local %customer local
     print %tmp local
 
-    text %tmp local "\r├────"
+    text %tmp local "\r├──── Order positions"
     print %tmp local
+
+    atom %key local 'connection'
+    structat %connection local *state local %key local
+
+    atom %key local 'id'
+    structat %order_id local *selected_order local %key local
+
+    frame %2
+    move %0 arguments %connection local
+    copy %1 arguments *order_id local
+    call %order_entries local orders_products_of_order_id/2
+
+    frame %2
+    move %0 arguments %order_entries local
+    function %tmp local print_order_entry/1
+    move %1 arguments %tmp local
+    call void for_each/2
 
     text %tmp local "\r└────"
     echo %tmp local

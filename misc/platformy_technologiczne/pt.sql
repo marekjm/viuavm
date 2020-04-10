@@ -75,4 +75,6 @@ insert into products (name, price) values
 insert into entries (order_id, product_id, unit_price, discount, quantity) values
       (1, 1, 2.50, 0.0, 2.0)
     , (1, 2, 16.00, 0.0, 0.16)
+    , (2, 3, 0.99, 0.0, 30.0)
+    , (3, 5, 42.00, 0.0, 1.0)
 ;
