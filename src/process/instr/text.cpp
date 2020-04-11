@@ -19,7 +19,7 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/process.h>
-#include <viua/support/string.h>
+#include <viua/util/string/ops.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
@@ -30,10 +30,11 @@ auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
 {
     auto target = decoder.fetch_register(addr, *this);
 
+    using viua::util::string::ops::strdecode;
     auto ot      = viua::bytecode::codec::main::get_operand_type(addr);
     auto const s = (ot == OT_REGISTER_INDEX or ot == OT_POINTER)
                        ? decoder.fetch_value(addr, *this)->str()
-                       : str::strdecode(decoder.fetch_string(++addr));
+                       : strdecode(decoder.fetch_string(++addr));
 
     *target = std::make_unique<viua::types::Text>(s);
 
