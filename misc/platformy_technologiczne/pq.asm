@@ -271,6 +271,9 @@
     move %0 arguments %tmp local
     call void std::os::system/1
 
+    string %tmp local "\033[?25l"
+    print %tmp local
+
     return
 .end
 .function: return_tty_to_sanity/0
@@ -287,6 +290,9 @@
     frame %1
     move %0 arguments %command local
     call void std::os::system/1
+
+    string %command local "\033[?25h"
+    print %command local
 
     return
 .end
