@@ -484,47 +484,42 @@
     move %0 arguments %connection local
     call %orders_no local orders_all_count/1
 
-    text %fmt local "\r[ total orders: "
+    string %r0 local "\r┌──── General information ──────────────────────────────┐"
+    print %r0 local
+
+    text %fmt local "\r│ Total orders: "
     text %orders_no local %orders_no local
     textconcat %fmt local %fmt local %orders_no local
-    text %r0 local " ]"
-    textconcat %fmt local %fmt local %r0 local
-
     print %fmt local
+
+    string %r0 local "\r├───────────────────────────────────────────────────────┤"
+    print %r0 local
 
     return
 .end
 .function: print_bottom_line/1
-    allocate_registers %2 local
+    allocate_registers %1 local
 
     .name: 0 r0
-    .name: iota state
-    ;.name: iota tmp
-
-    ;move %state local %0 parameters
-
-    text %state local "[...]\r"
-    ;text %state local *state local
-    ;textconcat %state local %tmp local %state local
-    ;text %tmp local "]\r"
-    ;textconcat %state local %state local %tmp local
-
-    print %state local
+    string %r0 local "\r└───────────────────────────────────────────────────────┘\r"
+    print %r0 local
 
     return
 .end
-.function: format_order_list_entry/1
-    allocate_registers %5 local
+.function: format_order_list_entry/2
+    allocate_registers %6 local
 
     .name: 0 r0
     .name: iota item
+    .name: iota highlighted
     .name: iota tmp
     .name: iota key
     .name: iota value
 
     move %item local %0 parameters
+    move %highlighted local %1 parameters
 
-    text %r0 local "\r⇢ "
+    text %r0 local "\r│ ["
 
     atom %key local 'id'
     structat %value local *item local %key local
@@ -539,23 +534,30 @@
 
     .mark: no_leading_space
     text %value local *value local
-    text %tmp local " | "
+    text %tmp local "] "
     textconcat %r0 local %r0 local %value local
     textconcat %r0 local %r0 local %tmp local
 
+    if %highlighted local enable_highlighting no_highlighting
+
+    .mark: enable_highlighting
+    text %tmp "\033[1m"
+    textconcat %r0 local %r0 local %tmp local
+    text %tmp "\033[4m"
+    textconcat %r0 local %r0 local %tmp local
+
+    .mark: no_highlighting
     atom %key local 'customer'
     structat %value local *item local %key local
     text %value local *value local
-    text %tmp local " | "
+    text %tmp local " / "
     textconcat %r0 local %r0 local %value local
     textconcat %r0 local %r0 local %tmp local
 
     atom %key local 'order_date'
     structat %value local *item local %key local
     text %value local *value local
-    text %tmp local " |"
     textconcat %r0 local %r0 local %value local
-    textconcat %r0 local %r0 local %tmp local
 
     return
 .end
@@ -578,20 +580,12 @@
     structat %pointer local *state local %key local
     eq %pointer local %r0 local *pointer local
 
-    if %pointer local enable_highlighting print_entry
-
-    .mark: enable_highlighting
-    string %control_sequence "\033[1m"
-    echo %control_sequence local
-    string %control_sequence "\033[4m"
-    echo %control_sequence local
-
-    .mark: print_entry
     vat %each local *data local %r0 local
 
-    frame %1
+    frame %2
     move %0 arguments %each local
-    call %each local format_order_list_entry/1
+    move %1 arguments %pointer local
+    call %each local format_order_list_entry/2
     print %each local
 
     string %control_sequence "\033[0m\r"
