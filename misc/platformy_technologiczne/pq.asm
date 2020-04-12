@@ -297,7 +297,8 @@
     return
 .end
 
-
+;
+; MODEL DANYCH
 ; Funkcje some_of_pq/1 konwertują wartości zwrócone z tabeli "some" na użyteczne
 ; struktury danych.
 ; Funkcje some_all/1 pobierają wszystkie rekordy z tabeli "some".
@@ -537,7 +538,11 @@
 .end
 
 
+;
+; WIDOK
 ; Implementacja aktora prezentującego interfejs.
+;
+; LISTA ZAMÓWIEŃ
 .function: print_top_line/1
     allocate_registers %5 local
 
@@ -688,6 +693,8 @@
 
     return
 .end
+
+; POJEDYNCZE ZAMÓWIENIE
 .function: print_order_entry/1
     allocate_registers %6 local
 
@@ -901,6 +908,8 @@
     move %0 arguments %state local
     tailcall view_actor_single_order_impl/1
 .end
+
+; POJEDYNCZY KLIENT
 .function: format_customer_list_entry/2
     allocate_registers %6 local
 
@@ -1127,6 +1136,8 @@
     move %1 arguments %data local
     tailcall view_actor_customers_impl/2
 .end
+
+; GŁÓWNY WIDOK
 .function: view_actor_impl/1
     allocate_registers %14 local
 
@@ -1619,11 +1630,13 @@
     frame %0
     defer return_tty_to_sanity/0
 
+    ; begin POSTGRESQL CONNECTION
     text %connection local "dbname = pt_lab2"
 
     frame %1
     move %0 arguments %connection local
     call %connection local viuapq::connect/1
+    ; end POSTGRESQL CONNECTION
 
     frame %1
     ptr %r0 local %connection local
