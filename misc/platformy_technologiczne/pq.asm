@@ -360,6 +360,11 @@
     stoi %value local %value local
     structinsert %order local %key local %value local
 
+    atom %key local 'customer'
+    structremove %value local %order local %key local
+    text %value local %value local
+    structinsert %order local %key local %value local
+
     atom %key local 'name'
     structremove %value local %order local %key local
     text %value local %value local
@@ -382,7 +387,7 @@
     ; Wiem, że sklejanie zapytań ręcznie, bez jakiejkolwiek weryfikacji to
     ; kiepski pomysł, ale 1/ tutaj robię demo 2/ nie mam porządnej biblioteki do
     ; interakcji z PostreSQL.
-    text %query local "select * from orders, customers where orders.id = "
+    text %query local "select orders.id, customer, employee, order_date, customers.name from orders, customers where orders.id = "
     text %id local %id local
     textconcat %query local %query local %id local
 
@@ -412,7 +417,7 @@
     .name: 0 r0
     .name: iota query
 
-    text %query local "select orders.id, customer, employee, order_date, customers.name from orders where orders.customer = customers.id"
+    text %query local "select orders.id, customer, employee, order_date, customers.name from orders, customers where orders.customer = customers.id"
     frame %2
     move %0 arguments %0 parameters
     move %1 arguments %query local
@@ -686,7 +691,7 @@
     return
 .end
 .function: view_actor_single_order_impl/1
-    allocate_registers %13 local
+    allocate_registers %14 local
 
     .name: 0 r0
     .name: iota state
@@ -696,7 +701,8 @@
     .name: iota tag_shutdown
     .name: iota tmp
     .name: iota selected_order
-    .name: iota customer
+    .name: iota customer_id
+    .name: iota customer_name
     .name: iota order_date
     .name: iota order_id
     .name: iota connection
@@ -714,8 +720,9 @@
     structat %selected_order local *state local %selected_order local
 
     atom %key local 'customer'
-    structat %customer local *selected_order local %key local
-    text %customer local *customer local
+    structat %customer_id local *selected_order local %key local
+    atom %key local 'name'
+    structat %customer_name local *selected_order local %key local
 
     atom %key local 'order_date'
     structat %order_date local *selected_order local %key local
@@ -737,8 +744,13 @@
     print %r0 local
 
     text %tmp local "\r│ Customer:   "
-    textconcat %tmp local %tmp local %customer local
-    print %tmp local
+    textconcat %r0 local %tmp local *customer_name local
+    text %tmp local " ("
+    textconcat %r0 local %r0 local %tmp local
+    textconcat %r0 local %r0 local *customer_id local
+    text %tmp local ")"
+    textconcat %r0 local %r0 local %tmp local
+    print %r0 local
 
     text %tmp local "\r├──── Order positions ──────────────────────────────────┤"
     print %tmp local
