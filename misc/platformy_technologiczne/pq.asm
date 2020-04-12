@@ -971,17 +971,27 @@
     return
 .end
 .function: view_actor_list_customers/2
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: 0 r0
     .name: iota state
     .name: iota customers
     .name: iota tmp
+    .name: iota fmt
 
     move %state local %0 parameters
     move %customers local %1 parameters
 
-    text %tmp local "\r┌──── Customers ────────────────────────────────────────┐"
+    text %tmp local "\r┌──── General information ──────────────────────────────┐"
+    print %tmp local
+
+    text %fmt local "\r│ Total customers: "
+    vlen %tmp local *customers local
+    text %tmp local %tmp local
+    textconcat %fmt local %fmt local %tmp local
+    print %fmt local
+
+    text %tmp local "\r├──── Customers ────────────────────────────────────────┤"
     print %tmp local
 
     frame %3
