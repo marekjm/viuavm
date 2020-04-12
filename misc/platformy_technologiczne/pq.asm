@@ -663,15 +663,6 @@
     string %control_sequence "\033[0m\r"
     echo %control_sequence local
 
-    ;move %each local %0 parameters
-    ;text %each local *each local
-
-    ;text %tmp local "\r⇝ "
-    ;textconcat %each local %tmp local %each local
-    ;text %tmp local "\r"
-    ;textconcat %each local %each local %tmp local
-    ;print %each local
-
     return
 .end
 .function: view_actor_list_orders/1
@@ -910,18 +901,100 @@
     move %0 arguments %state local
     tailcall view_actor_single_order_impl/1
 .end
+.function: format_customer_list_entry/2
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota item
+    .name: iota highlighted
+    .name: iota tmp
+    .name: iota key
+    .name: iota value
+
+    move %item local %0 parameters
+    move %highlighted local %1 parameters
+
+    text %r0 local "\r│ ["
+
+    atom %key local 'id'
+    structat %value local *item local %key local
+
+    text %tmp local "] "
+    textconcat %r0 local %r0 local *value local
+    textconcat %r0 local %r0 local %tmp local
+
+    if %highlighted local enable_highlighting no_highlighting
+
+    .mark: enable_highlighting
+    text %tmp "\033[1m"
+    textconcat %r0 local %r0 local %tmp local
+    text %tmp "\033[4m"
+    textconcat %r0 local %r0 local %tmp local
+
+    .mark: no_highlighting
+    atom %key local 'name'
+    structat %value local *item local %key local
+    textconcat %r0 local %r0 local *value local
+
+    return
+.end
+.function: view_actor_list_customers_print_entry/3
+    allocate_registers %7 local
+
+    .name: 0 r0
+    .name: iota each
+    .name: iota data
+    .name: iota state
+    .name: iota pointer
+    .name: iota key
+    .name: iota control_sequence
+
+    move %r0 local %0 parameters
+    move %data local %1 parameters
+    move %state local %2 parameters
+
+    atom %key local 'customer_pointer'
+    structat %pointer local *state local %key local
+    eq %pointer local %r0 local *pointer local
+
+    vat %each local *data local %r0 local
+
+    frame %2
+    move %0 arguments %each local
+    move %1 arguments %pointer local
+    call %each local format_customer_list_entry/2
+    print %each local
+
+    string %control_sequence "\033[0m\r"
+    echo %control_sequence local
+
+    return
+.end
 .function: view_actor_list_customers/2
-    allocate_registers %3 local
+    allocate_registers %4 local
 
     .name: 0 r0
     .name: iota state
     .name: iota customers
+    .name: iota tmp
 
     move %state local %0 parameters
     move %customers local %1 parameters
 
-    print %state local
-    print *customers local
+    text %tmp local "\r┌──── Customers ────────────────────────────────────────┐"
+    print %tmp local
+
+    frame %3
+    copy %0 arguments *customers local
+    function %tmp local view_actor_list_customers_print_entry/3
+    move %1 arguments %tmp local
+    move %2 arguments %state local
+    call void for_each_nx/3
+
+    text %tmp local "\r└───────────────────────────────────────────────────────┘"
+    echo %tmp local
+    string %tmp local "\033[1A\r"
+    print %tmp local
 
     return
 .end
