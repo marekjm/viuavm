@@ -30,6 +30,23 @@ There are several categories of change:
 # From 0.10.0 to 0.10.1
 
 - bic: integers are stored in big-endian order in bytecode
+- enhancement: stack traces now include exception throw points to make debugging
+  easier
+
+Exceptions now track the points at which they were thrown and rethrown. Rethrows
+happen at process join points (i.e. join instructions). Stack trace reports use
+this information to show *where* the exception that killed a process was thrown.
+It looks like this:
+
+    throw points:
+        address: 0x19d2 (byte 6610) inside 0x89dead42beef [a.out::foo/2]
+        address: 0x295d (byte 10589) inside 0x89dead42beef [a.out::main/0]
+
+If the failure was really bad the report may look like this:
+
+    throw points:
+        address: 0xdead (byte 57005) inside 0xc00ffe [a.out:<outside of executable range>]
+        address: 0xbeef (byte 48879) inside 0xf84210 [<unknown>::<unknown>]
 
 ----
 
