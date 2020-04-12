@@ -4,6 +4,8 @@ set -e
 
 PT_PATH=misc/platformy_technologiczne
 
+# export VIUA_PROC_SCHEDULERS=1
+# export VIUA_FFI_SCHEDULERS=1
 export VIUA_IO_SCHEDULERS=1
 export VIUA_LIBRARY_PATH=./build/stdlib:$PT_PATH
 

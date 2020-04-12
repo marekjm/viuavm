@@ -1,3 +1,9 @@
+drop table if exists customers;
+create table customers (
+      id char(5) primary key
+    , name varchar
+);
+
 drop table if exists employees;
 create table employees (
       id serial primary key
@@ -7,7 +13,7 @@ create table employees (
 drop table if exists orders;
 create table orders (
       id serial primary key
-    , customer varchar
+    , customer char(5)
     , employee int
     , order_date timestamp
 );
@@ -28,6 +34,18 @@ create table entries (
     , discount decimal(8,4)
     , quantity decimal(8,4)
 );
+
+insert into customers (id, name) values
+      ('VINET', 'Vintage Electric Tomatoes')
+    , ('TOMSP', 'Toms Spezialitäten')
+    , ('HANAR', 'Hyper-Natural Raspberries')
+    , ('VICTE', 'Victoria-Teufel Erdbeere')
+    , ('SUPRD', 'Super Duper')
+    , ('CHOPS', 'Chinese-Oriental Phood Supply')
+    , ('RICSU', 'Rare Ingredients Company Süd')
+    , ('WELLI', 'Wellington Catering')
+    , ('HILAA', 'Hilarious Apple')
+;
 
 insert into employees (name) values
       ('John Doe')

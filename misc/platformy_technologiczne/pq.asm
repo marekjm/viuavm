@@ -360,6 +360,11 @@
     stoi %value local %value local
     structinsert %order local %key local %value local
 
+    atom %key local 'name'
+    structremove %value local %order local %key local
+    text %value local %value local
+    structinsert %order local %key local %value local
+
     move %r0 local %order local
     return
 .end
@@ -377,7 +382,7 @@
     ; Wiem, że sklejanie zapytań ręcznie, bez jakiejkolwiek weryfikacji to
     ; kiepski pomysł, ale 1/ tutaj robię demo 2/ nie mam porządnej biblioteki do
     ; interakcji z PostreSQL.
-    text %query local "select * from orders where id = "
+    text %query local "select * from orders, customers where orders.id = "
     text %id local %id local
     textconcat %query local %query local %id local
 
@@ -407,7 +412,7 @@
     .name: 0 r0
     .name: iota query
 
-    text %query local "select * from orders"
+    text %query local "select orders.id, customer, employee, order_date, customers.name from orders where orders.customer = customers.id"
     frame %2
     move %0 arguments %0 parameters
     move %1 arguments %query local
