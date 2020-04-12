@@ -1,3 +1,23 @@
+;
+;  Copyright (C) 2020 Marek Marecki
+;
+;  This file is part of Viua VM.
+;
+;  Viua VM is free software: you can redistribute it and/or modify
+;  it under the terms of the GNU General Public License as published by
+;  the Free Software Foundation, either version 3 of the License, or
+;  (at your option) any later version.
+;
+;  Viua VM is distributed in the hope that it will be useful,
+;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;  GNU General Public License for more details.
+;
+;  You should have received a copy of the GNU General Public License
+;  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+;
+
+
 .import: [[dynamic]] viuapq
 .import: [[dynamic]] std::os
 
@@ -388,7 +408,7 @@
     ; Wiem, że sklejanie zapytań ręcznie, bez jakiejkolwiek weryfikacji to
     ; kiepski pomysł, ale 1/ tutaj robię demo 2/ nie mam porządnej biblioteki do
     ; interakcji z PostreSQL.
-    text %query local "select orders.id, customer, employee, order_date, customers.name from orders, customers where orders.id = "
+    text %query local "select orders.id, customer, employee, order_date, customers.name from orders, customers where orders.customer = customers.id and orders.id = "
     text %id local %id local
     textconcat %query local %query local %id local
 
