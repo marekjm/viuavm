@@ -190,7 +190,8 @@ void viua::kernel::Kernel::load_module(std::string module)
     auto const module_path = viua::runtime::imports::find_module(module);
     if (not module_path.has_value()) {
         throw std::make_unique<viua::types::Exception>(
-            "LinkException", ("failed to locate module: " + module));
+            viua::types::Exception::Tag{"LinkException"}
+            , ("failed to locate module: " + module));
     }
 
     switch (module_path->first) {
@@ -243,7 +244,7 @@ void viua::kernel::Kernel::load_native_module(
 
     if (handle == nullptr) {
         throw std::make_unique<viua::types::Exception>(
-            "LinkException",
+            viua::types::Exception::Tag{"LinkException"},
             ("failed to open handle: " + std::string{module_name} + ": "
              + dlerror()));
     }

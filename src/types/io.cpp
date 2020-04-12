@@ -75,7 +75,8 @@ auto IO_read_interaction::interact() -> Interaction_result
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
                                   std::make_unique<viua::types::Exception>(
-                                      "IO_cancel", "I/O cancelled")};
+                                      viua::types::Exception::Tag{"IO_cancel"}
+                                      , "I/O cancelled")};
     }
 
     auto const n = ::read(file_descriptor, buffer.data(), buffer.size());
@@ -110,7 +111,8 @@ auto IO_write_interaction::interact() -> Interaction_result
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
                                   std::make_unique<viua::types::Exception>(
-                                      "IO_cancel", "I/O cancelled")};
+                                      viua::types::Exception::Tag{"IO_cancel"}
+                                      , "I/O cancelled")};
     }
 
     auto const n = ::write(file_descriptor, buffer.data(), buffer.size());
@@ -137,7 +139,8 @@ auto IO_close_interaction::interact() -> Interaction_result
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
                                   std::make_unique<viua::types::Exception>(
-                                      "IO_cancel", "I/O cancelled")};
+                                      viua::types::Exception::Tag{"IO_cancel"}
+                                      , "I/O cancelled")};
     }
 
     auto const n = ::close(file_descriptor);
@@ -160,7 +163,8 @@ auto IO_empty_interaction::interact() -> Interaction_result
         return Interaction_result{IO_interaction::State::Complete,
                                   IO_interaction::Status::Cancelled,
                                   std::make_unique<viua::types::Exception>(
-                                      "IO_cancel", "I/O cancelled")};
+                                      viua::types::Exception::Tag{"IO_cancel"}
+                                      , "I/O cancelled")};
     }
 
     return Interaction_result{IO_interaction::State::Complete,
@@ -198,7 +202,7 @@ bool IO_fd::boolean() const { return true; }
 
 std::unique_ptr<Value> IO_fd::copy() const
 {
-    throw std::make_unique<viua::types::Exception>("Not_copyable");
+    throw std::make_unique<viua::types::Exception>(viua::types::Exception::Tag{"Not_copyable"});
 }
 
 auto IO_fd::fd() const -> int { return file_descriptor; }
@@ -272,8 +276,9 @@ bool IO_request::boolean() const { return true; }
 
 std::unique_ptr<Value> IO_request::copy() const
 {
-    throw std::make_unique<viua::types::Exception>("IO_request",
-                                                   "not copyable");
+    throw std::make_unique<viua::types::Exception>(
+        viua::types::Exception::Tag{"IO_request"}
+        , "not copyable");
 }
 
 IO_request::IO_request(viua::kernel::Kernel* k, interaction_id_type const x)

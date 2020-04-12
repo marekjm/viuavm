@@ -588,6 +588,7 @@ class Process {
     auto terminated() const -> bool;
     auto get_active_exception() -> viua::types::Value*;
     auto transfer_active_exception() -> std::unique_ptr<viua::types::Value>;
+    auto raise(std::unique_ptr<viua::types::Exception>) -> void;
     auto raise(std::unique_ptr<viua::types::Value>) -> void;
     auto handle_active_exception() -> void;
 

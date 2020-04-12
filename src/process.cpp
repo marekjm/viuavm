@@ -59,7 +59,8 @@ auto viua::process::Decoder_adapter::fetch_register(
         and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
         // This should never happen - assembler should catch such situations.
         throw std::make_unique<viua::types::Exception>(
-            "Invalid_access", "pointer dereference not allowed");
+            viua::types::Exception::Tag{"Invalid_access"}
+            , "pointer dereference not allowed");
     }
 
     auto index = std::get<1>(reg);
@@ -71,7 +72,8 @@ auto viua::process::Decoder_adapter::fetch_register(
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                "Invalid_register_index", "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"}
+                , "registers cannot be negative");
         }
         return proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
@@ -109,7 +111,8 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
         and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
         // This should never happen - assembler should catch such situations.
         throw std::make_unique<viua::types::Exception>(
-            "Invalid_access", "pointer dereference not allowed");
+            viua::types::Exception::Tag{"Invalid_access"}
+            , "pointer dereference not allowed");
     }
 
     auto index = std::get<1>(reg);
@@ -121,7 +124,8 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                "Invalid_register_index", "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"}
+                , "registers cannot be negative");
         }
         return {
             static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)),
@@ -169,7 +173,8 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                "Invalid_register_index", "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"}
+                , "registers cannot be negative");
         }
         slot = proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
@@ -189,7 +194,7 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
         auto const pointer = dynamic_cast<viua::types::Pointer*>(value);
         if (pointer == nullptr) {
             throw std::make_unique<viua::types::Exception>(
-                "Not_a_pointer",
+                viua::types::Exception::Tag{"Not_a_pointer"},
                 "dereferenced value is not a pointer: " + value->type());
         }
         value = pointer->to(&proc);
@@ -443,12 +448,7 @@ auto viua::process::Process::tick() -> Op_address_type
          * If user code cannot deal with them (i.e. did not register a catcher
          * block) they will terminate execution later.
          */
-        auto const tp = viua::types::Exception::Throw_point{
-              reinterpret_cast<uint64_t>(current_stack().jump_base)
-            , static_cast<uint64_t>(current_stack().instruction_pointer
-                    - current_stack().jump_base)
-        };
-        stack->thrown = e->add_throw_point(tp);
+        raise(std::move(e));
     } catch (std::unique_ptr<viua::types::Value>& e) {
         /*
          * All values can be thrown as exceptions, so Values must also be
@@ -498,7 +498,9 @@ auto viua::process::Process::tick() -> Op_address_type
                     - current_stack().jump_base)
         });
         stack->thrown =
-            std::make_unique<viua::types::Exception>(tp, "InstructionUnchanged");
+            std::make_unique<viua::types::Exception>(
+                  tp
+                , viua::types::Exception::Tag{"InstructionUnchanged"});
     }
 
     if (stack->thrown and stack->frame_new) {
@@ -614,6 +616,17 @@ std::unique_ptr<viua::types::Value> viua::process::Process::
     return std::move(stack->thrown);
 }
 
+void viua::process::Process::raise(
+    std::unique_ptr<viua::types::Exception> exception)
+{
+    using Throw_point = viua::types::Exception::Throw_point;
+    exception->add_throw_point(Throw_point{
+          reinterpret_cast<uint64_t>(current_stack().jump_base)
+        , static_cast<uint64_t>(current_stack().instruction_pointer
+                - current_stack().jump_base)
+    });
+    stack->thrown = std::move(exception);
+}
 void viua::process::Process::raise(
     std::unique_ptr<viua::types::Value> exception)
 {

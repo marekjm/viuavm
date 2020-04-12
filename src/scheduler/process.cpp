@@ -62,6 +62,10 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
     if (ex and not ex->throw_points.empty()) {
         std::cerr << "\n";
         for (auto const& each : ex->throw_points) {
+            if (not each.name.empty()) {
+                std::cerr << "    name:    " + each.name + "\n";
+                continue;
+            }
             auto const in_module =
                 process.get_kernel().module_at(reinterpret_cast<uint8_t*>(each.jump_base));
             auto const in_function =

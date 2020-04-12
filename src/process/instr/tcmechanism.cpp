@@ -95,13 +95,15 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type
     auto source = decoder.fetch_register(addr, *this);
 
     if (source->empty()) {
-        std::ostringstream oss;
-        oss << "throw from null register";
-        throw std::make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>("throw from null register");
     }
-    throw source->give();
 
-    return addr;
+    auto value = source->give();
+    if (dynamic_cast<viua::types::Exception*>(value.get())) {
+        throw value;
+    }
+
+    throw std::make_unique<viua::types::Exception>(std::move(value));
 }
 
 auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type

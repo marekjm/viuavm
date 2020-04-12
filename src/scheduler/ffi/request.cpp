@@ -46,9 +46,9 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
-                caller_process.raise(std::make_unique<viua::types::Exception>(
+                throw std::make_unique<viua::types::Exception>(
                     "return value requested by frame but external function did "
-                    "not set return register"));
+                    "not set return register");
             }
             returned = frame->local_register_set->pop(0);
         }
@@ -57,10 +57,11 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         if (returned and caller_process.trace().size() > 0) {
             *return_register = std::move(returned);
         }
-    } catch (std::unique_ptr<viua::types::Value>& exception) {
+    } catch (std::unique_ptr<viua::types::Exception>& exception) {
+        exception->add_throw_point(viua::types::Exception::Throw_point{function_name()});
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
-    } catch (std::unique_ptr<viua::types::Exception>& exception) {
+    } catch (std::unique_ptr<viua::types::Value>& exception) {
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
     }

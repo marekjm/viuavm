@@ -46,10 +46,13 @@ static auto inet_ston(std::string const& s) -> uint32_t
         inet_pton(AF_INET, s.c_str(), static_cast<void*>(&address));
 
     if (ret == 0) {
-        throw std::make_unique<viua::types::Exception>("Misformatted_address");
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Misformatted_address"});
     }
     if (ret == -1) {
-        throw std::make_unique<viua::types::Exception>("EAFNOSUPPORT");
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Errno"}
+            , "EAFNOSUPPORT");
     }
 
     return address;
@@ -890,8 +893,9 @@ static auto read(Frame* frame,
     auto const n_bytes = ::read(sock.fd(), buffer.data(), buffer.size());
 
     if (n_bytes == 0) {
-        throw std::make_unique<viua::types::Exception>("Eof",
-                                                       "end of file reached");
+        throw std::make_unique<viua::types::Exception>(
+                  viua::types::Exception::Tag{"Eof"}
+                , "end of file reached");
     }
 
     if (n_bytes == -1) {
@@ -1028,18 +1032,21 @@ static auto recv(Frame* frame,
     auto const n_bytes = ::recv(sock.fd(), buffer.data(), buffer.size(), 0);
 
     if (n_bytes == 0) {
-        throw std::make_unique<viua::types::Exception>("Eof",
-                                                       "end of file reached");
+        throw std::make_unique<viua::types::Exception>(
+             viua::types::Exception::Tag{"Eof"}
+           , "end of file reached");
     }
     if (n_bytes == -1) {
         auto const error_number = errno;
         if (error_number == EAGAIN) {
-            throw std::make_unique<viua::types::Exception>("Eagain",
-                                                           "try again");
+            throw std::make_unique<viua::types::Exception>(
+                  viua::types::Exception::Tag{"Eagain"}
+                , "try again");
         }
         if (error_number == EWOULDBLOCK) {
-            throw std::make_unique<viua::types::Exception>("Ewouldblock",
-                                                           "would block");
+            throw std::make_unique<viua::types::Exception>(
+                  viua::types::Exception::Tag{"Ewouldblock"}
+                , "would block");
         }
 
         auto const known_errors = std::map<decltype(error_number), std::string>{
@@ -1146,7 +1153,8 @@ static auto recv(Frame* frame,
         };
         if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>(
-                "recv(3): Unknown_errno: " + std::to_string(error_number));
+                viua::types::Exception::Tag{"Unknown_errno"}
+                , "recv(3): Unknown_errno: " + std::to_string(error_number));
         }
         throw std::make_unique<viua::types::Exception>(
             known_errors.at(error_number));

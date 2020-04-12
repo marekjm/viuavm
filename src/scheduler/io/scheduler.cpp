@@ -95,7 +95,7 @@ void viua::scheduler::io::io_scheduler(
                 interaction->id(),
                 viua::kernel::Kernel::IO_result::make_error(
                     std::make_unique<viua::types::Exception>(
-                        "IO_without_fd",
+                        viua::types::Exception::Tag{"IO_without_fd"},
                         "I/O port did not expose file descriptor")));
             continue;
         }
@@ -160,7 +160,8 @@ void viua::scheduler::io::io_scheduler(
                         work.id(),
                         viua::kernel::Kernel::IO_result::make_error(
                             std::make_unique<viua::types::Exception>(
-                                      "IO_cancel", "I/O cancelled")));
+                                      viua::types::Exception::Tag{"IO_cancel"}
+                                      , "I/O cancelled")));
                 } else {
                     kernel.schedule_io(std::move(interaction));
                 }
