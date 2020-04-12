@@ -27,5 +27,14 @@ if [[ $(cat $PT_PATH/libviuapq.cpp.hash) != $(sha384sum $PT_PATH/libviuapq.cpp) 
 fi
 
 cat $PT_PATH/pt.sql | psql pt_lab2
-./build/bin/vm/asm -o ./pq.bin $PT_PATH/pq.asm
+
+touch $PT_PATH/pq.asm.hash
+if [[ ! -f ./pq.bin ]]; then
+    echo '0' > $PT_PATH/pq.asm.hash
+fi
+if [[ $(cat $PT_PATH/pq.asm.hash) != $(sha384sum $PT_PATH/pq.asm) ]]; then
+    ./build/bin/vm/asm -o ./pq.bin $PT_PATH/pq.asm
+    sha384sum $PT_PATH/pq.asm > $PT_PATH/pq.asm.hash
+fi
+
 ./build/bin/vm/kernel ./pq.bin
