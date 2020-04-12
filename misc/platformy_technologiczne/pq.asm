@@ -474,6 +474,68 @@
     return
 .end
 
+.function: customer_of_pq/1
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota customer
+    .name: iota key
+    .name: iota value
+
+    move %customer local %0 parameters
+
+    atom %key local 'id'
+    structremove %value local %customer local %key local
+    text %value local %value local
+    structinsert %customer local %key local %value local
+
+    atom %key local 'name'
+    structremove %value local %customer local %key local
+    text %value local %value local
+    structinsert %customer local %key local %value local
+
+    move %r0 local %customer local
+    return
+.end
+.function: customers_all/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota query
+
+    text %query local "select * from customers"
+    frame %2
+    move %0 arguments %0 parameters
+    move %1 arguments %query local
+    call %query local viuapq::get/2
+
+    frame %2
+    move %0 arguments %query local
+    function %r0 local customer_of_pq/1
+    move %1 arguments %r0 local
+    call %r0 local map/2
+
+    return
+.end
+.function: customers_all_count/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota query
+
+    text %query local "select count(*) as x from customers"
+    frame %2
+    move %0 arguments %0 parameters
+    move %1 arguments %query local
+    call %query local viuapq::get_one/2
+
+    atom %r0 local 'x'
+    structat %r0 local %query local %r0 local
+    stoi %r0 local *r0 local
+
+    return
+.end
+
 
 ; Implementacja aktora prezentującego interfejs.
 .function: print_top_line/1
@@ -848,8 +910,142 @@
     move %0 arguments %state local
     tailcall view_actor_single_order_impl/1
 .end
+.function: view_actor_list_customers/2
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota customers
+
+    move %state local %0 parameters
+    move %customers local %1 parameters
+
+    print %state local
+    print *customers local
+
+    return
+.end
+.function: view_actor_customers_impl/2
+    allocate_registers %11 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota message
+    .name: iota data
+    .name: iota control_sequence
+    .name: iota tmp
+    .name: iota key
+    .name: iota got_tag
+    .name: iota tag_shutdown
+    .name: iota tag_ptr_down
+    .name: iota tag_ptr_up
+
+    move %state local %0 parameters
+    move %data local %1 parameters
+
+    .mark: printing_sequence
+    string %control_sequence "\033[2J"
+    echo %control_sequence local
+    string %control_sequence "\033[1;1H"
+    echo %control_sequence local
+
+    frame %2
+    copy %0 arguments %state local
+    ptr %tmp local %data local
+    move %1 arguments %tmp local
+    call void view_actor_list_customers/2
+
+    .mark: input_handling
+    receive %message local infinity
+
+    atom %tag_shutdown local 'shutdown'
+    atom %tag_ptr_down local 'pointer_down'
+    atom %tag_ptr_up local 'pointer_up'
+    atom %key local 'tag'
+    structat %got_tag local %message local %key local
+
+    atomeq %tag_shutdown local *got_tag local %tag_shutdown local
+    atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
+    atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
+
+    if %tag_shutdown local stage_shutdown +1
+    if %tag_ptr_down local stage_ptr_down +1
+    if %tag_ptr_up local stage_ptr_up +1
+
+    text %tmp local "got weird message: "
+    text %message local %message local
+    textconcat %tmp local %tmp local %message local
+    print %tmp local
+    jump the_end
+
+    .mark: stage_shutdown
+    return
+
+    .mark: stage_ptr_down
+    atom %key local 'customer_pointer'
+    structat %tmp local *state local %key local
+    iinc *tmp local
+    jump pointer_bounds_check
+
+    .mark: stage_ptr_up
+    atom %key local 'customer_pointer'
+    structat %tmp local *state local %key local
+    idec *tmp local
+    ; Ten skok jest niepotrzebny, ale trzymajmy go dla czytelności.
+    ; jump pointer_bounds_check
+
+    .mark: pointer_bounds_check
+    atom %key local 'customer_pointer'
+    structat %tmp local *state local %key local
+    frame %1
+    copy %0 arguments *tmp local
+    call %tmp local lower_bound_to_zero/1
+
+    frame %2 local
+    move %0 arguments %tmp local
+    vlen %tmp local %data local
+    idec %tmp local
+    move %1 arguments %tmp local
+    call %tmp local min/2
+
+    structinsert *state local %key local %tmp local
+
+    .mark: the_end
+    frame %2
+    move %0 arguments %state local
+    move %1 arguments %data local
+    tailcall view_actor_customers_impl/2
+.end
+.function: view_actor_customers/1
+    allocate_registers %5 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota key
+    .name: iota connection
+    .name: iota data
+
+    move %state local %0 parameters
+
+    ; Zerujemy wartość wskaźnika żeby był na początku listy klientów.
+    atom %key local 'customer_pointer'
+    izero %r0 local
+    structinsert *state local %key local %r0 local
+
+    atom %key local 'connection'
+    structat %connection local *state local %key local
+
+    frame %1
+    move %0 arguments %connection local
+    call %data local customers_all/1
+
+    frame %2
+    move %0 arguments %state local
+    move %1 arguments %data local
+    tailcall view_actor_customers_impl/2
+.end
 .function: view_actor_impl/1
-    allocate_registers %13 local
+    allocate_registers %14 local
 
     .name: 0 r0
     .name: iota state
@@ -864,6 +1060,7 @@
     .name: iota tag_ptr_down
     .name: iota tag_ptr_up
     .name: iota tag_enter
+    .name: iota tag_c
 
     move %state local %0 parameters
 
@@ -874,6 +1071,7 @@
     atom %tag_ptr_down local 'pointer_down'
     atom %tag_ptr_up local 'pointer_up'
     atom %tag_enter local 'enter'
+    atom %tag_c local 'c'
     atom %key local 'tag'
     structat %got_tag local %message local %key local
 
@@ -882,12 +1080,14 @@
     atomeq %tag_ptr_down local *got_tag local %tag_ptr_down local
     atomeq %tag_ptr_up local *got_tag local %tag_ptr_up local
     atomeq %tag_enter local *got_tag local %tag_enter local
+    atomeq %tag_c local *got_tag local %tag_c local
 
     if %tag_shutdown local stage_shutdown +1
     if %tag_order_list local stage_order_list +1
     if %tag_ptr_down local stage_ptr_down +1
     if %tag_ptr_up local stage_ptr_up +1
     if %tag_enter local stage_enter +1
+    if %tag_c local stage_customers_list +1
 
     text %tmp local "got weird message: "
     text %message local %message local
@@ -911,6 +1111,13 @@
     ptr %r0 local %state local
     move %0 arguments %r0 local
     call void view_actor_single_order/1
+    jump printing_sequence
+
+    .mark: stage_customers_list
+    frame %1
+    ptr %r0 local %state local
+    move %0 arguments %r0 local
+    call void view_actor_customers/1
     jump printing_sequence
 
     .mark: stage_ptr_down
@@ -1098,6 +1305,17 @@
     call %0 local make_tagged_message_impl/1
     return
 .end
+.function: make_c_message/0
+    allocate_registers %2 local
+
+    .name: iota tag
+    atom %tag local 'c'
+
+    frame %1
+    move %0 arguments %tag local
+    call %0 local make_tagged_message_impl/1
+    return
+.end
 
 
 ; Implementacja aktora pobierającego dane od użutkownika.
@@ -1175,7 +1393,7 @@
     return
 .end
 .function: input_actor_impl/1
-    allocate_registers %14 local
+    allocate_registers %15 local
 
     .name: iota tree_view_actor
     .name: iota tmp
@@ -1185,6 +1403,7 @@
     .name: iota c_enter
     .name: iota c_pointer_down
     .name: iota c_pointer_up
+    .name: iota c_c
 
     .name: iota time_to_shut_down
 
@@ -1206,11 +1425,14 @@
     streq %c_pointer_down local %buf local %c_pointer_down local
     string %c_pointer_up local "k"
     streq %c_pointer_up local %buf local %c_pointer_up local
+    string %c_c local "c"
+    streq %c_c local %buf local %c_c local
 
     if %c_quit local quit_view +1
     if %c_enter local enter_item +1
     if %c_pointer_down local move_pointer_down +1
     if %c_pointer_up local move_pointer_up +1
+    if %c_c local input_c +1
 
     jump happy_loopin
 
@@ -1234,6 +1456,14 @@
 
     frame %0
     call %tmp make_enter_message/0
+    send %tree_view_actor local %tmp local
+
+    jump happy_loopin
+
+    .mark: input_c
+
+    frame %0
+    call %tmp make_c_message/0
     send %tree_view_actor local %tmp local
 
     jump happy_loopin
