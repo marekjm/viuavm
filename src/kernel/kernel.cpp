@@ -280,6 +280,47 @@ auto viua::kernel::Kernel::module_at(uint8_t const* const location) const
     }
     return {};
 }
+auto viua::kernel::Kernel::in_which_function(std::string const mod, uint64_t const offset) const -> std::optional<std::string>
+{
+    auto const main_module = (mod == commandline_arguments.at(0));
+
+    auto const jump_base = main_module
+        ? bytecode.get()
+        : linked_modules.at(mod).second.get();
+
+    auto fns = std::map<std::string, uint64_t>{};
+    if (main_module) {
+        fns = function_addresses;
+    } else {
+        for (auto const& [ fn, spec ] : linked_functions) {
+            if (spec.first != mod) {
+                continue;
+            }
+            fns[fn] = static_cast<uint64_t>(spec.second - jump_base);
+        }
+    }
+
+    auto const mod_size = main_module
+        ? (bytecode_size - executable_offset)
+        : linked_modules.at(mod).first;
+    if (offset >= mod_size) {
+        return "<outside of executable range>";
+    }
+
+    auto candidate_name = std::string{};
+    auto candidate_addr = uint64_t{};
+    for (auto const& [ fn, relative_addr ] : fns) {
+        if (offset == relative_addr) {
+            return fn;
+        }
+        if (offset > relative_addr and relative_addr > candidate_addr) {
+            candidate_name = fn;
+            candidate_addr = relative_addr;
+        }
+    }
+
+    return candidate_name;
+}
 
 bool viua::kernel::Kernel::is_local_function(std::string const& name) const
 {

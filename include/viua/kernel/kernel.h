@@ -154,7 +154,7 @@ class Kernel {
                        std::unique_ptr<uint8_t[]>>>
         linked_modules;
 
-    int return_code;
+    int return_code {-1};
 
     /*
      * The number of running processes. This is needed to calculate the load on
@@ -321,6 +321,7 @@ class Kernel {
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
     auto module_at(uint8_t const* const) const -> std::optional<std::string>;
+    auto in_which_function(std::string const, uint64_t const) const -> std::optional<std::string>;
 
     void request_foreign_function_call(Frame*, viua::process::Process*);
     void request_foreign_function_call(std::unique_ptr<Frame>,

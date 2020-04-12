@@ -62,13 +62,19 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
     if (ex and not ex->throw_points.empty()) {
         std::cerr << "\n";
         for (auto const& each : ex->throw_points) {
-            auto at_module =
+            auto const in_module =
                 process.get_kernel().module_at(reinterpret_cast<uint8_t*>(each.jump_base));
+            auto const in_function =
+                (in_module)
+                ? process.get_kernel().in_which_function(*in_module, each.offset)
+                : std::nullopt;
             std::cerr << "    address: 0x"
                 << std::hex << std::setw(4) << std::setfill('0') << each.offset << std::dec
                 << " (byte " << each.offset << ") inside 0x"
                 << std::hex << std::setw(12) << std::setfill('0') << each.jump_base
-                << " [" << at_module.value_or("(unknown)") << "]\n";
+                << " [" << in_module.value_or("<unknown>")
+                << "::" << in_function.value_or("<unknown>")
+                << "]\n";
         }
     } else if (ex) {
         std::cerr << "none\n";
