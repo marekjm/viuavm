@@ -32,6 +32,7 @@ There are several categories of change:
 - bic: integers are stored in big-endian order in bytecode
 - enhancement: stack traces now include exception throw points to make debugging
   easier
+- bic: thrown values are wrapped in an exception value and need to be extracted
 
 Exceptions now track the points at which they were thrown and rethrown. Rethrows
 happen at process join points (i.e. join instructions). Stack trace reports use
