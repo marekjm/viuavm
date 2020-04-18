@@ -431,6 +431,7 @@ auto check_register_usage_for_instruction_block_impl(
             case THROW:
                 check_op_throw(
                     register_usage_profile, ps, created_closures, *instruction);
+                stop = true;
                 break;
             case CATCH:
                 // FIXME TODO SA for entered blocks
@@ -496,7 +497,11 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_io_cancel(register_usage_profile, *instruction);
                 break;
             case RETURN:
-                // do nothing
+                /*
+                 * Stop analysis after a return because at this point the
+                 * frame does no longer exist.
+                 */
+                stop = true;
                 break;
             case HALT:
                 // do nothing
