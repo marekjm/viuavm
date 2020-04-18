@@ -64,12 +64,16 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::Value_types::UNDEFINED>(
         register_usage_profile, *source);
 
-    if (target) {
+    // we need to check if the register set is local because we only track state
+    // of local registers
+    if (target and (target->rss == viua::bytecode::codec::Register_set::Local)) {
         auto val       = Register(*target);
         val.value_type = register_usage_profile.at(*source).second.value_type;
         register_usage_profile.define(val, target->tokens.at(0));
     }
 
-    erase_if_direct_access(register_usage_profile, source, instruction);
+    if (source->rss == viua::bytecode::codec::Register_set::Local) {
+        erase_if_direct_access(register_usage_profile, source, instruction);
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
