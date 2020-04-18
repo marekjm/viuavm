@@ -242,12 +242,12 @@ auto check_use_of_register(Register_usage_profile& rup,
         auto error = Traced_syntax_error{}.append(
             Invalid_syntax(r.tokens.at(0), msg.str()));
 
+        maybe_mistyped_register_set(rup, r, error);
+
         if (rup.erased(Register(r))) {
             error.append(Invalid_syntax(rup.erased_where(Register(r)), "")
                              .note("erased here:"));
         }
-
-        maybe_mistyped_register_set(rup, r, error);
 
         throw error;
     }
