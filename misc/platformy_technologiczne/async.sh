@@ -4,8 +4,8 @@ set -e
 
 PT_PATH=misc/platformy_technologiczne
 
-# export VIUA_PROC_SCHEDULERS=1
-# export VIUA_FFI_SCHEDULERS=1
+export VIUA_PROC_SCHEDULERS=2
+export VIUA_FFI_SCHEDULERS=2
 export VIUA_IO_SCHEDULERS=1
 export VIUA_LIBRARY_PATH=./build/stdlib:$PT_PATH
 
@@ -37,4 +37,6 @@ if [[ $(cat $PT_PATH/async.asm.hash) != $(sha384sum $PT_PATH/async.asm) ]]; then
     sha384sum $PT_PATH/async.asm > $PT_PATH/async.asm.hash
 fi
 
+# gdb --args ./build/bin/vm/kernel ./async.bin
+# valgrind ./build/bin/vm/kernel ./async.bin
 ./build/bin/vm/kernel ./async.bin

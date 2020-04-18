@@ -190,7 +190,7 @@ static void viuapq_get_one(Frame* frame,
     auto const res = PQexec(connection->get(), query.c_str());
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         auto const error = PQerrorMessage(connection->get());
-        throw std::make_unique<viua::types::Exception>(error);
+        throw std::make_unique<viua::types::Exception>(std::string{error});
     }
 
     auto ret = results_of(res);

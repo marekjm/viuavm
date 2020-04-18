@@ -113,9 +113,12 @@
 
     move %pq_conn local %0 parameters
     move %message local %1 parameters
+    print %pq_conn local
+    print %message local
 
     atom %q local 'q'
     structremove %q local %message local %q local
+    print %q local
 
     frame %2
     move %0 arguments %pq_conn local
@@ -124,7 +127,9 @@
 
     atom %field local 'field'
     structremove %field local %message local %field local
-    structremove %field local %q local %field local
+    ;structremove %field local %q local %field local
+    print %q local
+    print %field local
 
     frame %1
     move %0 arguments %field local
@@ -184,9 +189,9 @@
     call void postgres_io_get_field_impl/2
 
     .mark: stage_shutdown
-    frame %1
-    move %0 arguments %connection local
-    call void viuapq::finish/1
+    ;frame %1
+    ;move %0 arguments %connection local
+    ;call void viuapq::finish/1
 
     string %r0 local "Postgres I/O actor shutting down"
     print %r0 local
