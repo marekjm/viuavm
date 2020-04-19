@@ -481,12 +481,6 @@ auto Process_scheduler::operator()() -> void
 
         auto a_process = pop();
 
-        if (a_process->stopped() and a_process->joinable()) {
-            // return false in execute_quant()
-            push(std::move(a_process));
-            continue;
-        }
-
 #if 0
         auto const push_the_process_back = deferred([&a_process, this]{
             process_queue.push_back(std::move(a_process));
