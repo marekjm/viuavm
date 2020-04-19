@@ -630,7 +630,8 @@ void viua::process::Process::raise(
 void viua::process::Process::raise(
     std::unique_ptr<viua::types::Value> exception)
 {
-    stack->thrown = std::move(exception);
+    // FIXME remove the Value overload of Process::raise()
+    raise(std::make_unique<viua::types::Exception>(std::move(exception)));
 }
 
 
