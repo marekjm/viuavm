@@ -61,7 +61,10 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         exception->add_throw_point(viua::types::Exception::Throw_point{function_name()});
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
-    } catch (std::unique_ptr<viua::types::Value>& exception) {
+    } catch (std::unique_ptr<viua::types::Value>& value) {
+        using viua::types::Exception;
+        auto exception = std::make_unique<Exception>(std::move(value));
+        exception->add_throw_point(Exception::Throw_point{function_name()});
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
     }

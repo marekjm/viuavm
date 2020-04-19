@@ -260,12 +260,11 @@ auto viua::process::Stack::find_catch_frame()
 
 auto viua::process::Stack::unwind() -> void
 {
-    Try_frame* tframe           = nullptr;
-    auto handler_found_for_type = std::string{};
-
-    // Find catch frame for current thrown exception.
-    // May return nullptr, because the catcher may not always be found.
-    tie(tframe, handler_found_for_type) = find_catch_frame();
+    /*
+     * Find catch frame for current thrown exception.
+     * May return nullptr, because the catcher may not always be found.
+     */
+    auto [tframe, handler_found_for_type] = find_catch_frame();
 
     if (tframe != nullptr) {
         if (state_of() == STATE::RUNNING) {
@@ -285,9 +284,12 @@ auto viua::process::Stack::unwind() -> void
         // let the VM run stacks of deferred calls.
         unwind_to(tframe, handler_found_for_type);
     } else {
-        // No catcher has been found so we can just unwind the stack and
-        // be done with the exception.
+        /*
+         * No catcher has been found so we can just unwind the stack and
+         * be done with the exception.
+         */
         parent_process->stacks_order.push(this);
+        // FIXME shouldn't deferred calls run in reverse order?
         for (size_type i = 0; i < size(); ++i) {
             register_deferred_calls_from(at(i).get());
         }
