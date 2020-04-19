@@ -21,6 +21,7 @@
 #define VIUA_SCHEDULER_FFI_H
 
 #include <condition_variable>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <viua/include/module.h>

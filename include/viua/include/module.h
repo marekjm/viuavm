@@ -25,7 +25,6 @@
 #include <vector>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/types/object.h>
 
 
 const auto VIUAPATH = std::vector<std::string>{

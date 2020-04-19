@@ -516,7 +516,6 @@ VIUA_TYPES_FILES_O=build/types/atom.o \
 				   build/types/integer.o \
 				   build/types/io.o \
 				   build/types/number.o \
-				   build/types/object.o \
 				   build/types/pointer.o \
 				   build/types/process.o \
 				   build/types/reference.o \

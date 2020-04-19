@@ -28,7 +28,7 @@
 #include <viua/exceptions.h>
 #include <viua/support/string.h>
 #include <viua/types/boolean.h>
-#include <viua/types/object.h>
+#include <viua/types/struct.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
@@ -212,7 +212,7 @@ void String::format(Frame* frame,
                                   ->str();
             } else {
                 replacement =
-                    static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
+                    static_cast<Struct*>(frame->arguments->at(2))->at(m)->str();
             }
             std::string pat("#\\{" + m + "\\}");
             std::regex subst(pat);

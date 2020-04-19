@@ -44,7 +44,6 @@
 #include <viua/types/function.h>
 #include <viua/types/integer.h>
 #include <viua/types/io.h>
-#include <viua/types/object.h>
 #include <viua/types/reference.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
