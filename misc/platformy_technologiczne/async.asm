@@ -113,12 +113,9 @@
 
     move %pq_conn local %0 parameters
     move %message local %1 parameters
-    print %pq_conn local
-    print %message local
 
     atom %q local 'q'
     structremove %q local %message local %q local
-    print %q local
 
     frame %2
     move %0 arguments %pq_conn local
@@ -129,8 +126,6 @@
     atom %field local 'field'
     structremove %field local %message local %field local
     structremove %field local %q local %field local
-    print %q local
-    print %field local
 
     frame %1
     move %0 arguments %field local
@@ -217,10 +212,10 @@
     move %state local %0 parameters
 
     atom %postgres local 'postgres'
-    structat %postgres local %state local %postgres local
+    structat %postgres local *state local %postgres local
 
     atom %table local 'table'
-    structat %table local %state local %table local
+    structat %table local *state local %table local
 
     frame %3
 
@@ -257,6 +252,7 @@
     copy %table local *table local
 
     receive %message local infinity
+    print %message local
 
     ; check if we need to shut down
     atom %key local 'tag'
@@ -266,12 +262,11 @@
     if %value local shutdown normal_processing
 
     .mark: normal_processing
-    print %message local
 
     frame %1
     ptr %r0 local %state local
     move %0 arguments %r0 local
-    call %r0 local get_current_count_of_table/1
+    call void get_current_count_of_table/1
     jump the_end
 
     .mark: shutdown
@@ -312,7 +307,7 @@
     frame %1
     ptr %r0 local %state local
     move %0 arguments %r0 local
-    call %r0 local get_current_count_of_table/1
+    call void get_current_count_of_table/1
 
     frame %1
     move %0 arguments %state local
@@ -338,10 +333,12 @@
     return
 .end
 .function: main/0
-    allocate_registers %2 local
+    allocate_registers %4 local
 
     .name: 0 r0
     .name: iota postgres_connection
+    .name: iota monitor_of_table_a
+    .name: iota shutdown
 
     ; begin POSTGRESQL CONNECTION
     text %postgres_connection local "dbname = pt_lab3"
@@ -359,32 +356,29 @@
     defer send_shutdown_to_postgres/1
     ; end POSTGRESQL CONNECTION
 
-    frame %3
-    self %r0 local
-    move %0 arguments %r0 local
-    string %r0 local "select count(*) from a"
-    move %1 arguments %r0 local
-    atom %r0 local 'count'
-    move %2 arguments %r0 local
-    call %r0 local make_get_field_message/3
-    send %postgres_connection local %r0 local
-
-    try
-    catch "Exception" .block: nope
-        draw %r0 local
-        leave
-    .end
-    enter .block: try_receiving
-        receive %r0 local 1s
-        leave
-    .end
-    print %r0 local
+    frame %2
+    copy %0 arguments %postgres_connection local
+    text %r0 local "a"
+    copy %1 arguments %r0 local
+    process %monitor_of_table_a local monitor_table/2
 
     frame %0
-    call %r0 local make_shutdown_message/0
-    send %postgres_connection local %r0 local
+    call %shutdown local make_shutdown_message/0
 
-    join void %postgres_connection local infinity
+    try
+    catch "Exception" .block: some_time
+        draw void
+        leave
+    .end
+    enter .block: foom
+        receive void 16ms
+        leave
+    .end
+
+    copy %r0 local %shutdown local
+    send %monitor_of_table_a local %r0 local
+
+    join void %monitor_of_table_a local infinity
 
     izero %0 local
     return
