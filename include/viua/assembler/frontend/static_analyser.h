@@ -300,6 +300,9 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
                                            Register(register_index)),
                                        "")
                             .note("register defined here"));
+        // FIXME if a type is first references as a value, and then incorrectly
+        // as a pointer the error message does not include the "type inferred
+        // here" line
         if (auto r = register_usage_profile.at(Register(register_index)).second;
             r.inferred.first) {
             error.append(Invalid_syntax(r.inferred.second, "")
