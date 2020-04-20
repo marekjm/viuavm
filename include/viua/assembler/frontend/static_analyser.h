@@ -234,8 +234,9 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         return expected_type;
     }
 
-    auto actual_type =
+    auto const original_type =
         register_usage_profile.at(Register(register_index)).second.value_type;
+    auto actual_type = original_type;
 
     auto access_via_pointer_dereference =
         (register_index.as
@@ -263,10 +264,6 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
             throw error;
         }
 
-        /*
-         * Modify types only if they are defined.
-         * Tinkering with UNDEFINEDs will prevent inferencer from kicking in.
-         */
         if (actual_type != Value_types::UNDEFINED) {
             actual_type = (actual_type ^ Value_types::POINTER);
         }
@@ -288,17 +285,24 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         return depointerise_type_if_needed(actual_type,
                                            access_via_pointer_dereference);
     }
-    if (not(actual_type & expected_type)) {
+
+    auto const type_matches = static_cast<bool>(actual_type & expected_type);
+    auto const is_pointer_type = static_cast<bool>(original_type & Value_types::POINTER);
+    auto const pointerness_matches = (
+           (access_via_pointer_dereference and is_pointer_type)
+        or ((not access_via_pointer_dereference) and (not is_pointer_type))
+    );
+    if ((not type_matches) or (not pointerness_matches)) {
         auto error =
             Traced_syntax_error{}
-                .append(Invalid_syntax(
+                .append(Invalid_syntax{
                             register_index.tokens.at(0),
-                            "invalid type of value contained in register")
+                            "invalid type of value contained in register"}
                             .note("expected " + to_string(expected_type)
                                   + ", got " + to_string(actual_type)))
-                .append(Invalid_syntax(register_usage_profile.defined_where(
+                .append(Invalid_syntax{register_usage_profile.defined_where(
                                            Register(register_index)),
-                                       "")
+                                       ""}
                             .note("register defined here"));
         // FIXME if a type is first references as a value, and then incorrectly
         // as a pointer the error message does not include the "type inferred
