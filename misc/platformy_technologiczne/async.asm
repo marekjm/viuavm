@@ -211,7 +211,7 @@
     .name: iota postgres_connection
 
     ; begin POSTGRESQL CONNECTION
-    text %postgres_connection local "dbname = pt_lab2"
+    text %postgres_connection local "dbname = pt_lab3"
 
     frame %1
     move %0 arguments %postgres_connection local
