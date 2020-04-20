@@ -454,7 +454,7 @@ auto viua::process::Process::tick() -> Op_address_type
          * All values can be thrown as exceptions, so Values must also be
          * caught.
          */
-        stack->thrown = std::move(e);
+        raise(std::move(e));
     }
 
     if (stack->state_of() == Stack::STATE::HALTED or stack->size() == 0) {
