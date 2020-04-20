@@ -320,6 +320,23 @@
 .end
 
 
+.function: send_shutdown_to_postgres/1
+    allocate_registers %3 local
+
+    .name: 0 r0
+    .name: iota postgres
+    .name: iota shutdown
+
+    move %postgres local %0 parameters
+
+    frame %0
+    call %shutdown local make_shutdown_message/0
+    send %postgres local %shutdown local
+
+    join void %postgres local infinity
+
+    return
+.end
 .function: main/0
     allocate_registers %2 local
 
@@ -336,6 +353,10 @@
     frame %1
     move %0 arguments %postgres_connection local
     process %postgres_connection local postgres_io_actor/1
+
+    frame %1
+    copy %0 arguments %postgres_connection local
+    defer send_shutdown_to_postgres/1
     ; end POSTGRESQL CONNECTION
 
     frame %3
