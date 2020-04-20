@@ -123,11 +123,12 @@
     frame %2
     move %0 arguments %pq_conn local
     move %1 arguments %q local
+
     call %q local viuapq::get_one/2
 
     atom %field local 'field'
     structremove %field local %message local %field local
-    ;structremove %field local %q local %field local
+    structremove %field local %q local %field local
     print %q local
     print %field local
 
@@ -187,11 +188,12 @@
     move %0 arguments %r0 local
     move %1 arguments %message local
     call void postgres_io_get_field_impl/2
+    jump the_end
 
     .mark: stage_shutdown
-    ;frame %1
-    ;move %0 arguments %connection local
-    ;call void viuapq::finish/1
+    frame %1
+    move %0 arguments %connection local
+    call void viuapq::finish/1
 
     string %r0 local "Postgres I/O actor shutting down"
     print %r0 local
@@ -201,6 +203,120 @@
     frame %1
     move %0 arguments %connection local
     tailcall postgres_io_actor/1
+.end
+
+
+.function: get_current_count_of_table/1
+    allocate_registers %4 local
+
+    .name: 0 r0
+    .name: iota state
+    .name: iota postgres
+    .name: iota table
+
+    move %state local %0 parameters
+
+    atom %postgres local 'postgres'
+    structat %postgres local %state local %postgres local
+
+    atom %table local 'table'
+    structat %table local %state local %table local
+
+    frame %3
+
+    self %r0 local
+    move %0 arguments %r0 local
+
+    text %r0 local "select count(*) from "
+    textconcat %r0 local %r0 local *table local
+    move %1 arguments %r0 local
+
+    atom %r0 local 'count'
+    move %2 arguments %r0 local
+
+    call %r0 local make_get_field_message/3
+    send *postgres local %r0 local
+
+    return
+.end
+.function: monitor_table_impl/1
+    allocate_registers %7 local
+
+    .name: 0 r0
+    .name: iota postgres
+    .name: iota table
+    .name: iota state
+    .name: iota key
+    .name: iota value
+    .name: iota message
+
+    move %state local %0 parameters
+
+    atom %table local 'table'
+    structat %table local %state local %table local
+    copy %table local *table local
+
+    receive %message local infinity
+
+    ; check if we need to shut down
+    atom %key local 'tag'
+    structat %value local %message local %key local
+    atom %key local 'shutdown'
+    atomeq %value local %key local *value local
+    if %value local shutdown normal_processing
+
+    .mark: normal_processing
+    print %message local
+
+    frame %1
+    ptr %r0 local %state local
+    move %0 arguments %r0 local
+    call %r0 local get_current_count_of_table/1
+    jump the_end
+
+    .mark: shutdown
+    text %r0 local "shutting down monitoring of table "
+    textconcat %r0 local %r0 local %table local
+    print %r0 local
+    return
+
+    .mark: the_end
+    frame %1
+    move %0 arguments %state local
+    tailcall monitor_table_impl/1
+.end
+.function: monitor_table/2
+    allocate_registers %6 local
+
+    .name: 0 r0
+    .name: iota postgres
+    .name: iota table
+    .name: iota state
+    .name: iota key
+    .name: iota value
+
+    struct %state local
+
+    atom %key local 'last_highest_index'
+    integer %value local 0
+    structinsert %state local %key local %value local
+
+    atom %key local 'postgres'
+    move %postgres local %0 parameters
+    structinsert %state local %key local %postgres local
+
+    atom %key local 'table'
+    move %table local %1 parameters
+    structinsert %state local %key local %table local
+
+    frame %1
+    ptr %r0 local %state local
+    move %0 arguments %r0 local
+    call %r0 local get_current_count_of_table/1
+
+    frame %1
+    move %0 arguments %state local
+    tailcall monitor_table_impl/1
 .end
 
 
@@ -232,7 +348,15 @@
     call %r0 local make_get_field_message/3
     send %postgres_connection local %r0 local
 
-    receive %r0 local infinity
+    try
+    catch "Exception" .block: nope
+        draw %r0 local
+        leave
+    .end
+    enter .block: try_receiving
+        receive %r0 local 1s
+        leave
+    .end
     print %r0 local
 
     frame %0
