@@ -332,12 +332,33 @@
 
     return
 .end
+.function: safe_join_wait_forever/1
+    allocate_registers %2 local
+
+    .name: 0 r0
+    .name: iota pid
+
+    move %pid local %0 parameters
+    try
+    catch "Exception" .block: failure
+        draw %r0 local
+        print %r0 local
+        leave
+    .end
+    enter .block: try_it
+        join void %pid local infinity
+        leave
+    .end
+
+    return
+.end
 .function: main/0
-    allocate_registers %4 local
+    allocate_registers %5 local
 
     .name: 0 r0
     .name: iota postgres_connection
     .name: iota monitor_of_table_a
+    .name: iota monitor_of_table_b
     .name: iota shutdown
 
     ; begin POSTGRESQL CONNECTION
@@ -362,6 +383,12 @@
     copy %1 arguments %r0 local
     process %monitor_of_table_a local monitor_table/2
 
+    frame %2
+    copy %0 arguments %postgres_connection local
+    text %r0 local "b"
+    copy %1 arguments %r0 local
+    process %monitor_of_table_b local monitor_table/2
+
     frame %0
     call %shutdown local make_shutdown_message/0
 
@@ -377,8 +404,15 @@
 
     copy %r0 local %shutdown local
     send %monitor_of_table_a local %r0 local
+    frame %1
+    move %0 arguments %monitor_of_table_a local
+    call void safe_join_wait_forever/1
 
-    join void %monitor_of_table_a local infinity
+    copy %r0 local %shutdown local
+    send %monitor_of_table_b local %r0 local
+    frame %1
+    move %0 arguments %monitor_of_table_b local
+    call void safe_join_wait_forever/1
 
     izero %0 local
     return
