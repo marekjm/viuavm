@@ -162,6 +162,7 @@ auto strdecode(std::string const s) -> std::string
             { 'r', '\r' },
             { 't', '\t' },
             { 'v', '\v' },
+            { '\\', '\\' },
         };
         if (simple.count(next)) {
             decoded << simple.at(next);

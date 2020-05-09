@@ -34,6 +34,6 @@
 #define VIUA_VERSION_H
 
 constexpr auto VERSION = "0.10.0";
-constexpr auto MICRO   = "64";
+constexpr auto MICRO   = "66";
 
 #endif
