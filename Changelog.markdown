@@ -8,7 +8,7 @@ Changes documented here are not the fullest representation of all changes.
 For that you have to reference Git commit log.
 
 
-----
+--------------------------------------------------------------------------------
 
 ### Change categories
 
@@ -25,7 +25,7 @@ There are several categories of change:
 - **misc**: various other changes not really fitting into any other category,
 
 
-----
+--------------------------------------------------------------------------------
 
 # From 0.10.0 to 0.10.1
 
@@ -33,6 +33,7 @@ There are several categories of change:
 - enhancement: stack traces now include exception throw points to make debugging
   easier
 - bic: thrown values are wrapped in an exception value and need to be extracted
+- enhancement: user code can throw exceptions with custom tags and values
 
 Exceptions now track the points at which they were thrown and rethrown. Rethrows
 happen at process join points (i.e. join instructions). Stack trace reports use
@@ -50,6 +51,54 @@ If the failure was really bad the report may look like this:
         address: 0xbeef (byte 48879) inside 0xf84210 [<unknown>::<unknown>]
 
 ----
+
+Previously user code could only throw ordinary values, e.g. integers, strings.
+It is now possible for user code to construct exceptions with arbitrarily chosen
+tags (atoms) and values. This means that programs running on the VM can
+construct any exception they need and have the same power as the VM itself.
+
+An exception is a simple value that carries a tag (which is used to determine
+which catch block to use) and an optional value (which may be a description of
+the error, an error code, etc.). A new instruction is introduced to allow user
+code to construct exceptions; its mnemonic is `exception`.
+
+    .name: iota ex
+    .name: iota tag
+    .name: iota value
+
+    atom %tag local 'Some_error'
+    text %value local "some error occurred"
+    exception %ex local %tag local %value local
+
+The example above constructs an exception tagged with `Some_error` and carrying
+a description. In the next example a value-less exception is constructed:
+
+    .name: iota ex
+    .name: iota tag
+
+    atom %tag local 'Some_error'
+    exception %ex local %tag local void
+
+Such an exception does not carry any value and its meaning is conveyed only by
+its tag.
+
+To extract a tag of an exception the `exception_tag` instruction is used; to
+extract a value the `exception_value` instruction is used. The `exception_value`
+instruction is a destructive one - it moves the value out of an exception. If
+the exception needs to be rethrown it must be constructed anew.
+
+    .name: iota tag
+    .name: iota value
+    .name: iota ex
+
+    draw %ex local
+    exception_tag %tag local %ex local
+    exception_value %value local %ex local
+
+The example above presents `exception_tag` and `exception_value` instructions in
+action.
+
+--------------------------------------------------------------------------------
 
 # From 0.9.0 to 0.10.0
 
@@ -153,7 +202,7 @@ major revamp in the way I/O is performed by programs running on Viua VM.
 A dedicated I/O subsystem will free the generic FFI subsystem to do more work
 not related to I/O that has to be done outside of the "normal" VM constraints.
 
-----
+--------------------------------------------------------------------------------
 
 # From 0.8.4 to 0.9.0
 
@@ -294,7 +343,7 @@ As a feature for contributors, a `.clang-format` has been added to the repositor
 ensuring a uniform coding style accross Viua VM source base.
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.8.3 to 0.8.4
@@ -308,7 +357,7 @@ ensuring a uniform coding style accross Viua VM source base.
 - feature: `--json` option in CPU frontend same as `--info` but in JSON format
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.8.2 to 0.8.3
@@ -328,7 +377,7 @@ ensuring a uniform coding style accross Viua VM source base.
   spawned by default is 2
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.8.1 to 0.8.2
@@ -354,7 +403,7 @@ concurrent processes running.
 - bic: machine exits with non-zero exit code only if the `main/` function fails,
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.8.0 to 0.8.1
@@ -402,7 +451,7 @@ compilation unit), and some arity errors during function calls.
 - enhancement: assembler catches double passes to parameter slotss,
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.7.0 to 0.8.0
@@ -453,7 +502,7 @@ FFI worker thread for non-blocking calls to foreign functions.
   this way native Viua code is never blocked by an FFI call,
 
 
-----
+--------------------------------------------------------------------------------
 
 
 # From 0.6.1 to 0.7.0
@@ -467,7 +516,7 @@ FFI worker thread for non-blocking calls to foreign functions.
 - fix: stack traces displayed after uncaught exceptions are generated for the thread that
   the exception originated from
 - bic: machine reports the function that started a thread as orphaning thread's children,
-  this means that old "main/1 orphaning threads" changes to "__entry/0 orphaning trhreads"
+  this means that old "main/1 orphaning threads" changes to "`__entry/0` orphaning trhreads"
 - misc: if stack is not available "<unavailable> (stack empty)" will be used when
   machine reports that threads were orphaned,
 - enhancement: returning objects from functions has "move semantics" - there is no copy
