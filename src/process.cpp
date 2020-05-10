@@ -440,19 +440,16 @@ auto viua::process::Process::tick() -> Op_address_type
         }
     } catch (std::unique_ptr<viua::types::Exception>& e) {
         /*
-         * All machine-thrown exceptions are passed back to user code.
-         * This is much easier than checking for erroneous conditions and
-         * terminating functions conditionally, instead - machine just throws
+         * All machine-thrown exceptions are passed back to user code. This is
+         * much easier than checking for erroneous conditions and terminating
+         * functions conditionally, instead - machine just throws
          * viua::types::Exception objects which are then caught here.
          *
          * If user code cannot deal with them (i.e. did not register a catcher
          * block) they will terminate execution later.
-         */
-        raise(std::move(e));
-    } catch (std::unique_ptr<viua::types::Value>& e) {
-        /*
-         * All values can be thrown as exceptions, so Values must also be
-         * caught.
+         *
+         * It is impossible for bytecode to throw something that is not a proper
+         * exception; the 'throw' instruction always wraps values in exceptions.
          */
         raise(std::move(e));
     }

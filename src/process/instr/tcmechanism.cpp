@@ -100,7 +100,9 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type
 
     auto value = source->give();
     if (dynamic_cast<viua::types::Exception*>(value.get())) {
-        throw value;
+        auto ex = std::unique_ptr<viua::types::Exception>{};
+        ex.reset(static_cast<viua::types::Exception*>(value.release()));
+        throw ex;
     }
 
     throw std::make_unique<viua::types::Exception>(std::move(value));
