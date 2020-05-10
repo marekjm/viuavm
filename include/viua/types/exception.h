@@ -30,6 +30,8 @@
 
 namespace viua { namespace types {
 struct Exception : public Value {
+    static std::string const type_name;
+
     /*
      * Tag is the value that is used to catch the exception in catch blocks. For
      * example, if the exception has tag 'Foo' it can be caught by the following
@@ -84,6 +86,7 @@ struct Exception : public Value {
     Exception(std::string s = "");
     Exception(std::unique_ptr<Value>);
     Exception(Tag, std::string);
+    Exception(Tag, std::unique_ptr<Value>);
     Exception(std::vector<Throw_point>, Tag);
 };
 }}  // namespace viua::types

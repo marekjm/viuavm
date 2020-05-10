@@ -468,6 +468,15 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
     case NOP:
         ++addr;
         break;
+    case EXCEPTION:
+        addr = op_exception(addr + 1);
+        break;
+    case EXCEPTION_TAG:
+        addr = op_exception_tag(addr + 1);
+        break;
+    case EXCEPTION_VALUE:
+        addr = op_exception_value(addr + 1);
+        break;
     case IO_READ:
         addr = op_io_read(addr + 1);
         break;

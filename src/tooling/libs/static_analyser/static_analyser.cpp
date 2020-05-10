@@ -3784,6 +3784,13 @@ static auto analyse_single_arm(
 
                 break;
             }
+            case EXCEPTION:
+            case EXCEPTION_TAG:
+            case EXCEPTION_VALUE:
+            {
+                // FIXME add static analysis for exception instructions
+                break;
+            }
             case IO_READ:
             case IO_WRITE:
             case IO_CLOSE:

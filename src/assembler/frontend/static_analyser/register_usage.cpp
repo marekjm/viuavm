@@ -481,6 +481,15 @@ auto check_register_usage_for_instruction_block_impl(
             case STRUCTKEYS:
                 check_op_structkeys(register_usage_profile, *instruction);
                 break;
+            case EXCEPTION:
+                check_op_exception(register_usage_profile, *instruction);
+                break;
+            case EXCEPTION_TAG:
+                check_op_exception_tag(register_usage_profile, *instruction);
+                break;
+            case EXCEPTION_VALUE:
+                check_op_exception_value(register_usage_profile, *instruction);
+                break;
             case IO_READ:
                 check_op_io_read(register_usage_profile, *instruction);
                 break;

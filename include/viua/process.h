@@ -543,6 +543,8 @@ class Process {
     auto opthrow(Op_address_type) -> Op_address_type;
     auto opleave(Op_address_type) -> Op_address_type;
 
+    auto opimport(Op_address_type) -> Op_address_type;
+
     auto opatom(Op_address_type) -> Op_address_type;
     auto opatomeq(Op_address_type) -> Op_address_type;
 
@@ -552,7 +554,9 @@ class Process {
     auto opstructat(Op_address_type) -> Op_address_type;
     auto opstructkeys(Op_address_type) -> Op_address_type;
 
-    auto opimport(Op_address_type) -> Op_address_type;
+    auto op_exception(Op_address_type) -> Op_address_type;
+    auto op_exception_tag(Op_address_type) -> Op_address_type;
+    auto op_exception_value(Op_address_type) -> Op_address_type;
 
     auto op_io_read(Op_address_type) -> Op_address_type;
     auto op_io_write(Op_address_type) -> Op_address_type;

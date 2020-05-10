@@ -1345,6 +1345,35 @@ auto Program::opstructkeys(int_op const target, int_op const source) -> Program&
     return (*this);
 }
 
+auto Program::op_exception(int_op const target, int_op const tag, int_op const value) -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(tag));
+    if (value.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(value));
+    }
+    return (*this);
+}
+
+auto Program::op_exception_tag(int_op const target, int_op const ex) -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION_TAG);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ex));
+    return (*this);
+}
+
+auto Program::op_exception_value(int_op const target, int_op const ex) -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION_VALUE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ex));
+    return (*this);
+}
+
 auto Program::op_io_read(int_op const req,
                          int_op const port,
                          int_op const limit) -> Program&

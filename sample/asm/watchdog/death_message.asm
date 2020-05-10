@@ -21,18 +21,18 @@
     allocate_registers %5 local
 
     .name: %iota death_message
-    .name: %iota exception
+    .name: %iota ex
     .name: %iota aborted_function
 
     move %death_message local %0 parameters
-    structremove %exception local %death_message local (atom %exception local 'exception') local
+    structremove %ex local %death_message local (atom %ex local 'exception') local
     structremove %aborted_function local %death_message local (atom %aborted_function local 'function') local
 
     .name: %iota message
     echo (string %message local "[WARNING] process '") local
     echo %aborted_function local
     echo (string %message local "' killed by >>>") local
-    echo %exception local
+    echo %ex local
     print (string %message local "<<<") local
 
     return

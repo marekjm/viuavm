@@ -119,6 +119,8 @@ enum class Value_types : ValueTypesType {
     IO_REQUEST   = 1 << 16,
     IO_PORT      = 1 << 17,
     IO_PORT_LIKE = (IO_PORT | INTEGER),
+
+    EXCEPTION = 1 << 18,
 };
 }}  // namespace viua::internals
 

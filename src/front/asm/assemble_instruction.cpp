@@ -561,6 +561,42 @@ auto assemble_instruction(
         assemble_op_structat(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
+    } else if (tokens.at(i) == "exception") {
+        auto target = Token_index{i + 1};
+        auto tag = Token_index{target + 2};
+        auto value = Token_index{tag + 2};
+
+        if (tokens.at(value) == "void") {
+            program.op_exception(
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(target)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(target + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(tag)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(tag + 1))),
+                ::assembler::operands::getint(
+                    ::assembler::operands::resolve_register(tokens.at(value))));
+        } else {
+            program.op_exception(
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(target)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(target + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(tag)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(tag + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(value)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(value + 1))));
+        }
+    } else if (tokens.at(i) == "exception_tag") {
+        assemble_double_register_op<&Program::op_exception_tag>(program, tokens, i);
+    } else if (tokens.at(i) == "exception_value") {
+        assemble_double_register_op<&Program::op_exception_value>(program, tokens, i);
     } else if (tokens.at(i) == "io_read") {
         assemble_three_register_op<&Program::op_io_read>(program, tokens, i);
     } else if (tokens.at(i) == "io_write") {

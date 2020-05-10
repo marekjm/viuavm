@@ -21,6 +21,8 @@
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
+#include <viua/types/atom.h>
+#include <viua/types/exception.h>
 #include <viua/types/integer.h>
 
 
@@ -120,5 +122,53 @@ auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type
     if (stack->size() > 0) {
         adjust_jump_base_for(stack->back()->function_name);
     }
+    return addr;
+}
+
+auto viua::process::Process::op_exception(Op_address_type addr) -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto const tag = decoder.fetch_value_of<viua::types::Atom>(addr, *this);
+    auto const value = decoder.fetch_register_or_void(addr, *this);
+
+    using viua::types::Exception;
+    auto ex = (value.has_value()
+        ? std::make_unique<Exception>(Exception::Tag{std::string{*tag}}, (*value)->give())
+        : std::make_unique<Exception>(Exception::Tag{std::string{*tag}}));
+
+    *target = std::move(ex);
+
+    return addr;
+}
+
+auto viua::process::Process::op_exception_tag(Op_address_type addr) -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto const ex = decoder.fetch_value_of<viua::types::Exception>(addr, *this);
+
+    *target = std::make_unique<viua::types::Atom>(ex->tag);
+
+    return addr;
+}
+
+auto viua::process::Process::op_exception_value(Op_address_type addr) -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto ex = decoder.fetch_value_of<viua::types::Exception>(addr, *this);
+
+    if (not ex->value) {
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Empty_exception"}, "exception has no value");
+    }
+
+    /*
+     * The value is moved out of the exception so we avoid a copy operation, but
+     * effectively destroy the exception. Is there any downside to this except
+     * the fact that the exception must be re-constructed if it needs to be
+     * rethrown?
+     */
+    *target = std::move(ex->value);
+
     return addr;
 }

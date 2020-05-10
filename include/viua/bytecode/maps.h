@@ -195,6 +195,10 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {STRUCTAT, "structat"},
     {STRUCTKEYS, "structkeys"},
 
+    {EXCEPTION, "exception"},
+    {EXCEPTION_TAG, "exception_tag"},
+    {EXCEPTION_VALUE, "exception_value"},
+
     {IO_READ, "io_read"},
     {IO_WRITE, "io_write"},
     {IO_CLOSE, "io_close"},

@@ -429,6 +429,19 @@ enum OPCODE : uint8_t {
      */
     STRUCTKEYS,
 
+    /*
+     * Create an exception.
+     */
+    EXCEPTION,
+    /*
+     * Obtain the tag of an exception.
+     */
+    EXCEPTION_TAG,
+    /*
+     * Obtain the value of an exception.
+     */
+    EXCEPTION_VALUE,
+
     IO_READ,
     IO_WRITE,
     IO_CLOSE,

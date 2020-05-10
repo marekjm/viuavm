@@ -260,6 +260,10 @@ class Program {
     auto opstructat(int_op const, int_op const, int_op const) -> Program&;
     auto opstructkeys(int_op const, int_op const) -> Program&;
 
+    auto op_exception(int_op const, int_op const, int_op const) -> Program&;
+    auto op_exception_tag(int_op const, int_op const) -> Program&;
+    auto op_exception_value(int_op const, int_op const) -> Program&;
+
     auto op_io_read(int_op const, int_op const, int_op const) -> Program&;
     auto op_io_write(int_op const, int_op const, int_op const) -> Program&;
     auto op_io_close(int_op const, int_op const) -> Program&;

@@ -444,6 +444,8 @@ auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     case ROR:
     case BITS_OF_INTEGER:
     case INTEGER_OF_BITS:
+    case EXCEPTION_TAG:
+    case EXCEPTION_VALUE:
     case IO_CLOSE:
         ptr = disassemble_ri_operand_with_rs_type(oss, decoder, ptr);
         ptr = disassemble_ri_operand_with_rs_type(oss, decoder, ptr);
@@ -516,6 +518,7 @@ auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     case STRUCTREMOVE:
     case STRUCTAT:
     case STREQ:
+    case EXCEPTION:
     case IO_READ:
     case IO_WRITE:
         ptr = disassemble_ri_operand_with_rs_type(oss, decoder, ptr);

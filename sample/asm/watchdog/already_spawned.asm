@@ -22,8 +22,8 @@
 
     move (.name: %iota death_message) local %0 parameters
 
-    .name: %iota exception
-    structremove %exception %1 (atom %exception 'exception')
+    .name: %iota ex
+    structremove %ex %1 (atom %ex 'exception')
 
     .name: %iota aborted_function
     structremove %aborted_function %1 (atom %aborted_function 'function')
@@ -31,7 +31,7 @@
     echo (string (.name: %iota message) local "process spawned with <") local
     echo %aborted_function local
     echo (string %message local "> killed by >>>") local
-    echo %exception local
+    echo %ex local
     print (string %message local "<<<") local
 
     return

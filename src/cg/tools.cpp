@@ -979,6 +979,13 @@ static auto size_of_insert =
 static auto size_of_remove =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 
+static auto size_of_exception =
+    size_of_instruction_with_three_ri_operands_with_rs_types;
+static auto size_of_exception_tag =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
+static auto size_of_exception_value =
+    size_of_instruction_with_two_ri_operands_with_rs_types;
+
 static auto size_of_io_read =
     size_of_instruction_with_three_ri_operands_with_rs_types;
 static auto size_of_io_write =
@@ -1450,12 +1457,21 @@ auto calculate_bytecode_size_of_first_n_instructions(
         } else if (tokens.at(i) == "structkeys") {
             ++i;
             std::tie(increase, i) = size_of_structkeys(tokens, i);
-        } else if (tokens.at(i) == "insert") {
+        } else if (tokens.at(i) == "insert") {  // FIXME remove this - there is no "insert" instruction
             ++i;
             std::tie(increase, i) = size_of_insert(tokens, i);
-        } else if (tokens.at(i) == "remove") {
+        } else if (tokens.at(i) == "remove") {  // FIXME remove this - there is no "remove" instruction
             ++i;
             std::tie(increase, i) = size_of_remove(tokens, i);
+        } else if (tokens.at(i) == "exception") {
+            ++i;
+            std::tie(increase, i) = size_of_exception(tokens, i);
+        } else if (tokens.at(i) == "exception_tag") {
+            ++i;
+            std::tie(increase, i) = size_of_exception_tag(tokens, i);
+        } else if (tokens.at(i) == "exception_value") {
+            ++i;
+            std::tie(increase, i) = size_of_exception_value(tokens, i);
         } else if (tokens.at(i) == "io_read") {
             ++i;
             std::tie(increase, i) = size_of_io_read(tokens, i);

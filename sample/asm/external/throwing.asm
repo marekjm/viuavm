@@ -34,9 +34,9 @@
 
     move (.name: %iota death_message) local %0 parameters
 
-    .name: %iota exception
-    structremove %exception local %death_message local (atom %exception local 'exception') local
-    print %exception local
+    .name: %iota ex
+    structremove %ex local %death_message local (atom %ex local 'exception') local
+    print %ex local
 
     return
 .end

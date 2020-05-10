@@ -20,6 +20,8 @@
 #include <string>
 #include <viua/types/exception.h>
 
+std::string const viua::types::Exception::type_name = "viua::types::Exception";
+
 auto viua::types::Exception::what() const -> std::string
 {
     if (value) {
@@ -66,6 +68,10 @@ viua::types::Exception::Exception(std::unique_ptr<Value> v)
 viua::types::Exception::Exception(Tag t, std::string c)
     : tag{std::move(t.tag)}
     , description{std::move(c)}
+{}
+viua::types::Exception::Exception(Tag t, std::unique_ptr<Value> v)
+    : tag{std::move(t.tag)}
+    , value{std::move(v)}
 {}
 viua::types::Exception::Exception(std::vector<Throw_point> tp, Tag t)
     : tag{std::move(t.tag)}

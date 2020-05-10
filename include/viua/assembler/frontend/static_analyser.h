@@ -508,6 +508,12 @@ auto check_op_structat(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void;
 auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
+auto check_op_exception(Register_usage_profile& register_usage_profile,
+                      Instruction const& instruction) -> void;
+auto check_op_exception_tag(Register_usage_profile& register_usage_profile,
+                      Instruction const& instruction) -> void;
+auto check_op_exception_value(Register_usage_profile& register_usage_profile,
+                      Instruction const& instruction) -> void;
 auto check_op_io_read(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_io_write(Register_usage_profile& register_usage_profile,

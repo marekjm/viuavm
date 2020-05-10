@@ -1432,6 +1432,15 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
             case IMPORT:
                 i += parse_op_import(fragments, vector_view{tokens, i});
                 break;
+            case EXCEPTION:
+                i += parse_any_3_register_instruction(fragments,
+                                                      vector_view{tokens, i});
+                break;
+            case EXCEPTION_TAG:
+            case EXCEPTION_VALUE:
+                i += parse_any_2_register_instruction(fragments,
+                                                      vector_view{tokens, i});
+                break;
             case IO_READ:
             case IO_WRITE:
                 i += parse_any_3_register_instruction(fragments,
