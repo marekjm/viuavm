@@ -126,7 +126,8 @@ static bool usage(std::string const program,
         std::cout << VERSION << '.' << MICRO;
     }
     if (show_help or (show_version and verbose)) {
-        std::cout << " (" << VIUA_VM_COMMIT << ")";
+        std::cout << " (" << VIUA_VM_COMMIT << ")\n";
+        std::cout << "code hash: " << VIUA_VM_CODE_HASH;
     }
     if (show_help or show_version) {
         std::cout << "\n";

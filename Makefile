@@ -238,9 +238,17 @@ endif
 
 # Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
 # CXX_EXTRA_FLAGS are meant to be supplied on the command line.
+#
+# Build information includes commit from which the VM was built and a hash of
+# the code (this is for development builds as commit and version stays the same
+# for them). These two pieces of information stay constant and depend only on
+# the code.
+# If we were to include build date in build information embedded in Viua VM
+# executables it should be presented this way: date --rfc-3339 ns
 CXXFLAGS=\
 		 -std=$(CXX_STANDARD) \
 		 -DVIUA_VM_COMMIT="\"$(shell ./scripts/get_head_commit.sh)\"" \
+		 -DVIUA_VM_CODE_HASH="\"$(shell cat \$(find ./include ./src -type f) | sha384sum | cut -d' ' -f1)\"" \
 		 $(COMPILER_FLAGS) \
 		 $(SANITISER_FLAGS) \
 		 $(CXX_EXTRA_FLAGS)
