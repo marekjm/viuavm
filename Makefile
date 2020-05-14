@@ -248,7 +248,7 @@ endif
 CXXFLAGS=\
 		 -std=$(CXX_STANDARD) \
 		 -DVIUA_VM_COMMIT="\"$(shell ./scripts/get_head_commit.sh)\"" \
-		 -DVIUA_VM_CODE_HASH="\"$(shell cat \$(find ./include ./src -type f) | sha384sum | cut -d' ' -f1)\"" \
+		 -DVIUA_VM_CODE_HASH="\"$(shell ./scripts/get_code_fingerprint.sh)\"" \
 		 $(COMPILER_FLAGS) \
 		 $(SANITISER_FLAGS) \
 		 $(CXX_EXTRA_FLAGS)
