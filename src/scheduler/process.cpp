@@ -54,8 +54,14 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
 
     // cerr << "failed instruction: " <<
     // get<0>(disassembler::instruction(process->execution_at())) << endl;
-    std::cerr << "uncaught object: " << ex_type << " = "
-              << (ex ? ex->what() : thrown_object->str()) << "\n";
+    std::cerr << "uncaught object: " << ex_type;
+    {
+        auto const s = (ex ? ex->what() : thrown_object->str());
+        if (not s.empty()) {
+            std::cerr << " = " << s;
+        }
+        std::cerr << "\n";
+    }
     std::cerr << "\n";
 
     std::cerr << "throw points: ";
