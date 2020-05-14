@@ -43,14 +43,16 @@ auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
 {
+    auto const address_of_this_jump = (addr - 1);
+
     auto const target = stack->jump_base + decoder.fetch_address(addr);
 
-    if (target == addr) {
+    if (target == address_of_this_jump) {
         auto const bad_byte = static_cast<uint64_t>(target - stack->jump_base);
 
         auto o = std::ostringstream{};
         o << "aborting: JUMP instruction pointing to itself at byte ";
-        o << bad_byte << " (" << std::hex << "0x" << std::setw(4)
+        o << bad_byte << " (" << std::hex << "0x" << std::setw(8)
             << std::setfill('0') << bad_byte << ")";
         throw std::make_unique<viua::types::Exception>(o.str());
     }
