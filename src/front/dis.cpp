@@ -72,7 +72,7 @@ static bool usage(const char* program,
     }
     if (show_help or (show_version and verbose)) {
         std::cout << " (" << VIUA_VM_COMMIT << ")\n";
-        std::cout << "code hash: " << VIUA_VM_CODE_HASH;
+        std::cout << "fingerprint: " << VIUA_VM_CODE_FINGERPRINT;
     }
     if (show_help or show_version) {
         std::cout << "\n";
