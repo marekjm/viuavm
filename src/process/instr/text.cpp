@@ -77,6 +77,14 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
     auto working_index =
         convert_signed_integer_to_text_size_type(text, index->as_integer());
 
+    if (working_index >= text->size()) {
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_range"},
+            ("index " + std::to_string(working_index)
+             + " is out of range for string of " + std::to_string(text->size()) + " characters"));
+    }
+
     *target = std::make_unique<viua::types::Text>(text->at(working_index));
 
     return addr;
