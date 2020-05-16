@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <string>
 #include <viua/assembler/frontend/static_analyser.h>
 
