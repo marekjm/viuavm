@@ -220,6 +220,8 @@ auto strdecode(std::string const s) -> std::string
             i += 2;
             continue;
         }
+
+        decoded << next;
     }
 
     return decoded.str();
