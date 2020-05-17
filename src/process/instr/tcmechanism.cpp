@@ -24,6 +24,7 @@
 #include <viua/types/atom.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
+#include <viua/types/text.h>
 
 
 auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type
@@ -156,19 +157,23 @@ auto viua::process::Process::op_exception_value(Op_address_type addr) -> Op_addr
     auto target = decoder.fetch_register(addr, *this);
     auto ex = decoder.fetch_value_of<viua::types::Exception>(addr, *this);
 
-    if (not ex->value) {
+    if ((not ex->value) and ex->what().empty()) {
         using viua::types::Exception;
         throw std::make_unique<Exception>(
             Exception::Tag{"Empty_exception"}, "exception has no value");
     }
 
-    /*
-     * The value is moved out of the exception so we avoid a copy operation, but
-     * effectively destroy the exception. Is there any downside to this except
-     * the fact that the exception must be re-constructed if it needs to be
-     * rethrown?
-     */
-    *target = std::move(ex->value);
+    if (ex->value) {
+        /*
+         * The value is moved out of the exception so we avoid a copy operation, but
+         * effectively destroy the exception. Is there any downside to this except
+         * the fact that the exception must be re-constructed if it needs to be
+         * rethrown?
+         */
+        *target = std::move(ex->value);
+    } else {
+        *target = std::make_unique<viua::types::Text>(ex->what());
+    }
 
     return addr;
 }
