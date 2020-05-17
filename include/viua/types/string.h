@@ -62,7 +62,7 @@ class String : public Value {
 
     auto operator==(String const&) const -> bool;
 
-    std::string& value();
+    auto value() const -> std::string const&;
 
     Integer* size();
     String* sub(int64_t b = 0, int64_t e = -1);

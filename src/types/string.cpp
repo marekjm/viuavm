@@ -53,7 +53,10 @@ auto viua::types::String::operator==(viua::types::String const& other) const -> 
     return (svalue == other.svalue);
 }
 
-std::string& String::value() { return svalue; }
+auto String::value() const -> std::string const&
+{
+    return svalue;
+}
 
 Integer* String::size()
 {

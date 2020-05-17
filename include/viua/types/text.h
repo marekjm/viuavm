@@ -49,6 +49,7 @@ class Text : public Value {
 
   private:
     std::vector<Character> text;
+    std::string text_str;
 
     auto parse(std::string) -> decltype(text);
 
@@ -73,6 +74,8 @@ class Text : public Value {
     auto sub(size_type) const -> decltype(text);
     auto common_prefix(Text const&) const -> size_type;
     auto common_suffix(Text const&) const -> size_type;
+
+    auto data() const -> std::string const&;
 
     Text(std::vector<Character>);
     Text(std::string);
