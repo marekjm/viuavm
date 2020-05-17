@@ -33,7 +33,14 @@ There are several categories of change:
 - enhancement: stack traces now include exception throw points to make debugging
   easier
 - bic: thrown values are wrapped in an exception value and need to be extracted
-- enhancement: user code can throw exceptions with custom tags and values
+- feature: user code can throw exceptions with custom tags and values
+- feature: user code can extract exception tags using `exception_tag`
+  instruction
+- feature: user code can extract exception values using `exception_value`
+  instruction
+- fix: escape sequences in strings are handled correctly (or at least better)
+- fix: do not crash when `textat` instruction is used on empty string; throw an
+  exception instead
 
 Exceptions now track the points at which they were thrown and rethrown. Rethrows
 happen at process join points (i.e. join instructions). Stack trace reports use
