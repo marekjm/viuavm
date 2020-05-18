@@ -540,6 +540,21 @@ auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
                                                      InstructionIndex,
                                                      InstructionIndex) -> void;
 
+struct Safe_result {
+    std::optional<viua::cg::lex::Unused_register> unused_register;
+    std::optional<viua::cg::lex::Unused_value> unused_value;
+    std::optional<viua::cg::lex::Invalid_syntax> invalid_syntax;
+    std::optional<viua::cg::lex::Traced_syntax_error> traced_syntax;
+
+    auto ok() const -> bool;
+    auto raise_if_any() -> void;
+};
+auto check_register_usage_for_instruction_block_impl_safe(Register_usage_profile&,
+                                                     Parsed_source const&,
+                                                     Instructions_block const&,
+                                                     InstructionIndex,
+                                                     InstructionIndex) -> Safe_result;
+
 auto map_names_to_register_indexes(Register_usage_profile&,
                                    Instructions_block const&) -> void;
 auto erase_if_direct_access(

@@ -708,7 +708,7 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \
 	build/assembler/util/pretty_printer.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ -lpthread
 
 build/bin/vm/lex: build/front/lexer.o \
 	build/cg/lex.o \
