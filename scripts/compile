@@ -40,6 +40,8 @@ elif [[ $MODE == 'fast' ]]; then
     CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O1
 elif [[ $MODE == 'normal' ]]; then
     CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O2
+elif [[ $MODE == 'hard' ]]; then
+    CXXOPTIMIZATIONFLAGS=CXXOPTIMIZATIONFLAGS=-O3
 fi
 
 echo "$0: using $JOBS jobs"
