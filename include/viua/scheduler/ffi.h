@@ -44,10 +44,10 @@ class Foreign_function_call_request {
     viua::kernel::Kernel& kernel;
 
   public:
-    std::string function_name() const;
-    void call(ForeignFunction*);
-    void raise(std::unique_ptr<viua::types::Value>);
-    void wakeup();
+    auto function_name() const -> std::string;
+    auto call(ForeignFunction*) -> void;
+    auto raise(std::unique_ptr<viua::types::Value>) -> void;
+    auto wakeup() -> void;
 
     Foreign_function_call_request(Frame* fr,
                                   viua::process::Process* cp,

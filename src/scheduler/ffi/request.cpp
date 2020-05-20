@@ -25,13 +25,13 @@
 #include <viua/types/integer.h>
 
 
-std::string viua::scheduler::ffi::Foreign_function_call_request::function_name()
+auto viua::scheduler::ffi::Foreign_function_call_request::function_name() -> std::string
     const
 {
     return frame->function_name;
 }
-void viua::scheduler::ffi::Foreign_function_call_request::call(
-    ForeignFunction* callback)
+auto viua::scheduler::ffi::Foreign_function_call_request::call(
+    ForeignFunction* callback) -> void
 {
     /* FIXME: second parameter should be a pointer to static registers or
      *        nullptr if function does not have static registers registered
@@ -69,12 +69,12 @@ void viua::scheduler::ffi::Foreign_function_call_request::call(
         caller_process.handle_active_exception();
     }
 }
-void viua::scheduler::ffi::Foreign_function_call_request::raise(
-    std::unique_ptr<viua::types::Value> object)
+auto viua::scheduler::ffi::Foreign_function_call_request::raise(
+    std::unique_ptr<viua::types::Value> object) -> void
 {
     caller_process.raise(std::move(object));
 }
-void viua::scheduler::ffi::Foreign_function_call_request::wakeup()
+auto viua::scheduler::ffi::Foreign_function_call_request::wakeup() -> void
 {
     caller_process.wakeup();
 }
