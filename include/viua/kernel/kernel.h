@@ -199,7 +199,7 @@ class Kernel {
      *
      */
     // Foreign function call requests are placed here to be executed later.
-    std::vector<
+    std::queue<
         std::unique_ptr<viua::scheduler::ffi::Foreign_function_call_request>>
         foreign_call_queue;
     std::mutex foreign_call_queue_mutex;

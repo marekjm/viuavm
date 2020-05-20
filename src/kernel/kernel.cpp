@@ -400,7 +400,7 @@ void viua::kernel::Kernel::request_foreign_function_call(
     viua::process::Process& requesting_process)
 {
     std::unique_lock<std::mutex> lock(foreign_call_queue_mutex);
-    foreign_call_queue.emplace_back(
+    foreign_call_queue.emplace(
         std::make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
             std::move(frame), requesting_process, *this));
 
@@ -861,7 +861,7 @@ viua::kernel::Kernel::~Kernel()
              * Send the actual poison pill. One per worker thread since we can
              * be sure that a thread consumes at most one pill.
              */
-            foreign_call_queue.push_back(nullptr);
+            foreign_call_queue.push(nullptr);
 
             lck.unlock();
             foreign_call_queue_condition.notify_all();

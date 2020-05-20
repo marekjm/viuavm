@@ -20,14 +20,14 @@
 #include <condition_variable>
 #include <memory>
 #include <thread>
-#include <vector>
+#include <queue>
 #include <viua/kernel/frame.h>
 #include <viua/scheduler/ffi.h>
 #include <viua/types/exception.h>
 
 
 void viua::scheduler::ffi::ff_call_processor(
-    std::vector<std::unique_ptr<
+    std::queue<std::unique_ptr<
         viua::scheduler::ffi::Foreign_function_call_request>>* requests,
     std::map<std::string, ForeignFunction*>* foreign_functions,
     std::mutex* ff_map_mtx,
@@ -45,7 +45,7 @@ void viua::scheduler::ffi::ff_call_processor(
             ;
 
         auto request = std::move(requests->front());
-        requests->erase(requests->begin());
+        requests->pop();
 
         // unlock as soon as the request is obtained
         lock.unlock();

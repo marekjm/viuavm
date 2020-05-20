@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <viua/include/module.h>
 
 
@@ -70,7 +71,7 @@ class Foreign_function_call_request {
 };
 
 void ff_call_processor(
-    std::vector<std::unique_ptr<Foreign_function_call_request>>* requests,
+    std::queue<std::unique_ptr<Foreign_function_call_request>>* requests,
     std::map<std::string, ForeignFunction*>* foreign_functions,
     std::mutex* ff_map_mtx,
     std::mutex* mtx,
