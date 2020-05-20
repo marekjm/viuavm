@@ -323,7 +323,6 @@ class Kernel {
     auto module_at(uint8_t const* const) const -> std::optional<std::string>;
     auto in_which_function(std::string const, uint64_t const) const -> std::optional<std::string>;
 
-    void request_foreign_function_call(Frame*, viua::process::Process*);
     void request_foreign_function_call(std::unique_ptr<Frame>,
                                        viua::process::Process&);
 
