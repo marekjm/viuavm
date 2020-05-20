@@ -25,8 +25,7 @@
 #include <viua/types/integer.h>
 
 
-auto viua::scheduler::ffi::Foreign_function_call_request::function_name() -> std::string
-    const
+auto viua::scheduler::ffi::Foreign_function_call_request::function_name() const -> std::string
 {
     return frame->function_name;
 }
@@ -42,7 +41,7 @@ auto viua::scheduler::ffi::Foreign_function_call_request::call(
         (*callback)(frame.get(), nullptr, nullptr, &caller_process, &kernel);
 
         std::unique_ptr<viua::types::Value> returned;
-        viua::kernel::Register* return_register = frame->return_register;
+        auto return_register = frame->return_register;
         if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
