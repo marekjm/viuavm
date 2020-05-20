@@ -59,7 +59,14 @@ class Foreign_function_call_request {
                                   viua::kernel::Kernel& c)
             : frame{std::move(fr)}, caller_process{cp}, kernel{c}
     {}
-    ~Foreign_function_call_request() {}
+
+    Foreign_function_call_request(Foreign_function_call_request const&) = delete;
+    auto operator=(Foreign_function_call_request const&) -> Foreign_function_call_request& = delete;
+
+    Foreign_function_call_request(Foreign_function_call_request&&) = delete;
+    auto operator=(Foreign_function_call_request&&) -> Foreign_function_call_request& = delete;
+
+    ~Foreign_function_call_request() = default;
 };
 
 void ff_call_processor(
