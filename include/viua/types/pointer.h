@@ -32,8 +32,7 @@ class Kernel;
 
 namespace types {
 class Pointer : public Value {
-    Value* points_to;
-    bool valid;
+    Value* points_to = nullptr;
     /*
      *  Pointer of origin is a parallelism-safety token.
      *  Viua asserts that pointers can be dereferenced only
@@ -54,7 +53,7 @@ class Pointer : public Value {
     static std::string const type_name;
 
     void invalidate(Value* t);
-    bool expired();
+    bool expired() const;
     auto authenticate(viua::process::Process const*) -> void;
     void reset(Value* t);
     Value* to(viua::process::Process const*);

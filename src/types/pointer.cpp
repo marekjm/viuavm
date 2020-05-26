@@ -33,24 +33,26 @@ std::string const viua::types::Pointer::type_name = "Pointer";
 void viua::types::Pointer::attach()
 {
     points_to->pointers.push_back(this);
-    valid = true;
 }
 void viua::types::Pointer::detach()
 {
-    if (valid) {
+    if (not expired()) {
         points_to->pointers.erase(std::find(
             points_to->pointers.begin(), points_to->pointers.end(), this));
     }
-    valid = false;
+    points_to = nullptr;
 }
 
 void viua::types::Pointer::invalidate(viua::types::Value* t)
 {
     if (t == points_to) {
-        valid = false;
+        points_to = nullptr;
     }
 }
-bool viua::types::Pointer::expired() { return !valid; }
+bool viua::types::Pointer::expired() const
+{
+    return (points_to == nullptr);
+}
 auto viua::types::Pointer::authenticate(const viua::process::Process* process)
     -> void
 {
@@ -60,7 +62,9 @@ auto viua::types::Pointer::authenticate(const viua::process::Process* process)
      *  code passes the pointer object to user-process to ensure that Pointer's
      * state is properly accounted for.
      */
-    valid = (valid and (process_of_origin == process));
+    points_to = (process_of_origin == process)
+        ? points_to
+        : nullptr;
 }
 void viua::types::Pointer::reset(viua::types::Value* t)
 {
@@ -75,7 +79,7 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p)
         throw std::make_unique<viua::types::Exception>(
             "InvalidDereference: outside of original process");
     }
-    if (not valid) {
+    if (expired()) {
         throw std::make_unique<viua::types::Exception>(
             "expired pointer exception");
     }
@@ -84,16 +88,17 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p)
 
 std::string viua::types::Pointer::type() const
 {
-    return ((valid ? points_to->type() : "Expired") + "Pointer");
+    return (((not expired()) ? points_to->type() : "Expired") + "Pointer");
 }
 
-bool viua::types::Pointer::boolean() const { return valid; }
+auto viua::types::Pointer::boolean() const -> bool
+{ return (not expired()); }
 
 std::string viua::types::Pointer::str() const { return type(); }
 
 std::unique_ptr<viua::types::Value> viua::types::Pointer::copy() const
 {
-    if (not valid) {
+    if (expired()) {
         return std::make_unique<Pointer>(process_of_origin);
     }
     return std::make_unique<Pointer>(points_to, process_of_origin);
@@ -101,11 +106,13 @@ std::unique_ptr<viua::types::Value> viua::types::Pointer::copy() const
 
 
 viua::types::Pointer::Pointer(const viua::process::Process* poi)
-        : points_to(nullptr), valid(false), process_of_origin(poi)
+    : points_to{nullptr}
+    , process_of_origin{poi}
 {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
                               const viua::process::Process* poi)
-        : points_to(t), valid(true), process_of_origin(poi)
+    : points_to{t}
+    , process_of_origin{poi}
 {
     attach();
 }
