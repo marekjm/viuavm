@@ -79,8 +79,9 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     auto const timeout = decoder.fetch_timeout(addr);
 
     if (not attached_scheduler->is_joinable(proc->pid())) {
-        throw std::make_unique<viua::types::Exception>(
-            "process cannot be joined");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Process_cannot_be_joined"}, proc->pid().str());
     }
 
     if (timeout and not timeout_active) {

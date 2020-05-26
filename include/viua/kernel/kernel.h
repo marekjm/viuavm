@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -255,6 +255,12 @@ class Kernel {
     std::map<std::tuple<uint64_t, uint64_t>, IO_result> io_results;
 
     /*
+     * PID MANAGEMENT
+     */
+    viua::process::Pid_emitter pid_sequence;
+    mutable std::mutex pid_mutex;
+
+    /*
      * MESSAGE PASSING
      *
      * Why are mailboxes are kept inside the kernel? To remove the need to look
@@ -265,7 +271,7 @@ class Kernel {
      * indirection but in this case I think it is justified.
      */
     std::map<viua::process::PID, Mailbox> mailboxes;
-    std::mutex mailbox_mutex;
+    mutable std::mutex mailbox_mutex;
 
     /*
      * Only processes that were not disowned have an entry here.
@@ -332,6 +338,8 @@ class Kernel {
         -> void;
     auto notify_about_process_death() -> void;
     auto process_count() const -> size_t;
+
+    auto make_pid() -> viua::process::PID;
 
     auto create_mailbox(const viua::process::PID)
         -> size_t;

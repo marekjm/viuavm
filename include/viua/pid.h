@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,19 +26,59 @@
 namespace viua { namespace process {
 class Process;
 
-class PID {
-    const viua::process::Process* associated_process;
+struct PID {
+    using pid_type = std::tuple<
+          uint64_t  // base:  chosen randomly at VM start
+        , uint64_t  // big:   increasing sequentially; begins with a randomly chosen
+                    //        highest and lowest 16 bits
+        , uint32_t  // small: increasing sequentially; begins with a randomly chosen
+                    //        highest 12 and lowest 8 bits
+        , uint16_t  // n:     increasing sequentially every big N (randomly chosen at VM
+                    //        start from [0; 2^8)); begins with random [0; 2^16)
+        , uint16_t  // m:     increasing sequentially every small M (randomly chosen at VM
+                    //        start); begins with random [0; 2^8)
+    >;
+
+  private:
+    pid_type const value;
 
   public:
-    bool operator==(viua::process::PID const&) const;
-    bool operator==(const viua::process::Process*) const;
-    bool operator<(viua::process::PID const&) const;
-    bool operator>(viua::process::PID const&) const;
+    auto operator<(PID const&) const -> bool;
+    auto operator==(PID const&) const -> bool;
+    auto operator!=(PID const&) const -> bool;
 
-    auto get() const -> decltype(associated_process);
-    auto str() const -> std::string;
+    auto get() const -> pid_type;
+    auto str(bool const readable = true) const -> std::string;
 
-    PID(const viua::process::Process*);
+    PID(pid_type const);
+};
+
+class Pid_emitter {
+    // 1st field
+    uint64_t base = 0;
+
+    // 2nd field
+    uint64_t big_offset = 0;
+    uint64_t big = 0;
+
+    // 3rd field
+    uint32_t small_offset = 0;
+    uint32_t small = 0;
+
+    // 4th field
+    uint8_t n_modulo = 1;
+    uint16_t n_offset = 0;
+    uint16_t n = 0;
+
+    // 5th field
+    uint8_t m_modulo = 1;
+    uint16_t m_offset = 0;
+    uint16_t m = 0;
+
+  public:
+    Pid_emitter();
+
+    auto emit() -> PID::pid_type;
 };
 }}  // namespace viua::process
 

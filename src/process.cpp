@@ -733,22 +733,23 @@ auto viua::process::Process::get_kernel() const -> viua::kernel::Kernel&
 }
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
+                                viua::process::PID p,
                                 viua::scheduler::Process_scheduler* sch,
                                 viua::process::Process* pt,
                                 bool const enable_tracing,
                                 viua::process::Decoder_adapter const& da)
-        : tracing_enabled(enable_tracing)
-        , attached_scheduler(sch)
+        : tracing_enabled{enable_tracing}
+        , attached_scheduler{sch}
         , decoder{da}
-        , parent_process(pt)
-        , global_register_set(nullptr)
-        , stack(nullptr)
-        , finished(false)
-        , is_joinable(true)
-        , is_suspended(false)
-        , process_priority(512)
-        , process_id(this)
-        , is_hidden(false)
+        , parent_process{pt}
+        , global_register_set{nullptr}
+        , stack{nullptr}
+        , finished{false}
+        , is_joinable{true}
+        , is_suspended{false}
+        , process_priority{512}
+        , process_id{p}
+        , is_hidden{false}
 {
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);

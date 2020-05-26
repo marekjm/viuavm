@@ -273,8 +273,14 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
                               process_type* parent,
                               bool disown) -> viua::process::Process*
 {
+    auto const pid_of_new_process = attached_kernel.make_pid();
+
     auto process = std::make_unique<process_type>(
-        std::move(frame), this, parent, false /* tracing_enabled */
+          std::move(frame)
+        , pid_of_new_process
+        , this
+        , parent
+        , false /* tracing_enabled */
     );
 
     process->start();
@@ -282,7 +288,6 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
         process->detach();
     }
 
-    auto pid_of_new_process = process->pid();
     attached_kernel.create_mailbox(pid_of_new_process);
     if (not disown) {
         attached_kernel.create_result_slot_for(pid_of_new_process);
@@ -579,7 +584,7 @@ auto Process_scheduler::operator()() -> void
                      */
                     std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
                               << std::setfill('0') << id() << std::dec
-                              << "][pid=" << a_process->pid().get()
+                              << "][pid=" << a_process->pid().str()
                               << "] watchdog failed, the process is broken "
                                  "beyond repair\n";
 
@@ -595,7 +600,7 @@ auto Process_scheduler::operator()() -> void
 
                 std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
                           << std::setfill('0') << id() << std::dec
-                          << "][pid=" << a_process->pid().get()
+                          << "][pid=" << a_process->pid().str()
                           << "] the process has crashed, calling watchdog: "
                           << a_process->watchdog() << "\n";
 

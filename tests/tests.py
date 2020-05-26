@@ -416,10 +416,24 @@ def extractExceptionsThrown(output):
 def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
+def extractFirstExceptionTagOnly(output):
+    return (extractExceptionsThrown(output)[0][0], None,)
+
 def runTestThrowsException(self, name, expected_output, assembly_opts=None, expected_exit_code = 1, test_disasm = True):
-    runTest(self, name, expected_error=expected_output, expected_exit_code=expected_exit_code,
-            error_processing_function=extractFirstException, valgrind_enable=False,
-            assembly_opts=assembly_opts, test_disasm = test_disasm)
+    runTest(
+        self,
+        name,
+        expected_error = expected_output,
+        expected_exit_code=expected_exit_code,
+        error_processing_function = (
+            extractFirstExceptionTagOnly
+            if (expected_output[1] is None) else
+            extractFirstException
+        ),
+        valgrind_enable=False,
+        assembly_opts=assembly_opts,
+        test_disasm = test_disasm,
+    )
 
 def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
     was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
@@ -2763,10 +2777,12 @@ class ConcurrencyTests(unittest.TestCase):
         runTestSplitlines(self, 'joining_a_process.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 
     def testJoiningJoinedProcess(self):
-        runTestThrowsException(self, 'joining_joined_process.asm', ('Exception', 'process cannot be joined',))
+        runTestThrowsException(self, 'joining_joined_process.asm',
+                ('Process_cannot_be_joined', None,))
 
     def testJoiningDetachedProcess(self):
-        runTestThrowsException(self, 'joining_detached_process.asm', ('Exception', 'process cannot be joined',))
+        runTestThrowsException(self, 'joining_detached_process.asm',
+                ('Process_cannot_be_joined', None,))
 
     def testDetachingProcess(self):
         runTestReturnsUnorderedLines(
@@ -2787,7 +2803,10 @@ class ConcurrencyTests(unittest.TestCase):
 
     def testTransferringExceptionsOnJoin(self):
         def match_output(self, excode, output):
-            pat = re.compile(r'^exception transferred from process Process: 0x[a-f0-9]+: Hello exception transferring World!$')
+            pat = re.compile(
+                r'^exception transferred from process '
+                r'Process: [a-f0-9]+(?::[a-f0-9]+)+'
+                r': Hello exception transferring World!$')
             wat = re.match(pat, output)
             self.assertTrue(wat is not None)
             self.assertEqual(0, excode)

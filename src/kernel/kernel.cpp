@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -462,6 +462,12 @@ auto viua::kernel::Kernel::process_count() const
     -> size_t
 {
     return running_processes;
+}
+
+auto viua::kernel::Kernel::make_pid() -> viua::process::PID
+{
+    std::unique_lock<std::mutex> lck{pid_mutex};
+    return viua::process::PID{ pid_sequence.emit() };
 }
 
 auto viua::kernel::Kernel::create_mailbox(const viua::process::PID pid)

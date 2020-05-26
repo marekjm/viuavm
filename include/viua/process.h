@@ -627,6 +627,7 @@ class Process {
     auto get_kernel() const -> viua::kernel::Kernel&;
 
     Process(std::unique_ptr<Frame>,
+            viua::process::PID,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,
             bool const             = false,
