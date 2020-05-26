@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -58,128 +58,7 @@ auto String::value() const -> std::string const&
     return svalue;
 }
 
-Integer* String::size()
-{
-    /** Return size of the string.
-     */
-    return new Integer(static_cast<Integer::underlying_type>(svalue.size()));
-}
-
-String* String::sub(int64_t b, int64_t e)
-{
-    /** Return substring extracted from this object.
-     */
-    std::string::size_type cut_from, cut_to;
-    // these casts are ugly as hell, but without them Clang warns about implicit
-    // sign-changing
-    if (b < 0) {
-        cut_from = (svalue.size() - static_cast<unsigned>(-b));
-    } else {
-        cut_from = static_cast<decltype(cut_from)>(b);
-    }
-    if (e < 0) {
-        cut_to = (svalue.size() - static_cast<unsigned>(-e) + 1);
-    } else {
-        cut_to = static_cast<decltype(cut_to)>(e);
-    }
-    return new String(svalue.substr(cut_from, cut_to));
-}
-
-String* String::add(String* s)
-{
-    /** Append string to this string.
-     */
-    svalue += s->value();
-    return this;
-}
-
-String* String::join(Vector* v)
-{
-    auto s         = std::string{""};
-    int vector_len = v->len();
-    for (int i = 0; i < vector_len; ++i) {
-        s += v->at(i)->str();
-        if (i < (vector_len - 1)) {
-            s += svalue;
-        }
-    }
-    return new String(s);
-}
-
 // foreign methods
-void String::stringify(Frame* frame,
-                       viua::kernel::Register_set*,
-                       viua::kernel::Register_set*,
-                       viua::process::Process* process,
-                       viua::kernel::Kernel*)
-{
-    if (frame->arguments->size() < 2) {
-        throw std::make_unique<viua::types::Exception>("expected 2 parameters");
-    }
-    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->str();
-}
-
-void String::represent(Frame* frame,
-                       viua::kernel::Register_set*,
-                       viua::kernel::Register_set*,
-                       viua::process::Process* process,
-                       viua::kernel::Kernel*)
-{
-    if (frame->arguments->size() < 2) {
-        throw std::make_unique<viua::types::Exception>("expected 2 parameters");
-    }
-    svalue =
-        static_cast<Pointer*>(frame->arguments->at(1))->to(process)->repr();
-}
-
-void String::startswith(Frame* frame,
-                        viua::kernel::Register_set*,
-                        viua::kernel::Register_set*,
-                        viua::process::Process*,
-                        viua::kernel::Kernel*)
-{
-    std::string s    = static_cast<String*>(frame->arguments->at(1))->value();
-    bool starts_with = false;
-
-    if (s.size() <= svalue.size()) {
-        long unsigned i = 0;
-        while (i < s.size()) {
-            if (!(starts_with = (s[i] == svalue[i]))) {
-                break;
-            }
-            ++i;
-        }
-    }
-
-    frame->local_register_set->set(
-        0, std::make_unique<viua::types::Boolean>(starts_with));
-}
-
-void String::endswith(Frame* frame,
-                      viua::kernel::Register_set*,
-                      viua::kernel::Register_set*,
-                      viua::process::Process*,
-                      viua::kernel::Kernel*)
-{
-    std::string s  = static_cast<String*>(frame->arguments->at(1))->value();
-    bool ends_with = false;
-
-    if (s.size() <= svalue.size()) {
-        auto i = s.size();
-        auto j = svalue.size();
-        while (i > 0) {
-            if (!(ends_with = (s[i] == svalue[j]))) {
-                break;
-            }
-            --i;
-            --j;
-        }
-    }
-
-    frame->local_register_set->set(
-        0, std::make_unique<viua::types::Boolean>(ends_with));
-}
-
 void String::format(Frame* frame,
                     viua::kernel::Register_set*,
                     viua::kernel::Register_set*,
@@ -224,65 +103,6 @@ void String::format(Frame* frame,
     }
 
     frame->local_register_set->set(0, std::make_unique<String>(result));
-}
-
-void String::substr(Frame* frame,
-                    viua::kernel::Register_set*,
-                    viua::kernel::Register_set*,
-                    viua::process::Process*,
-                    viua::kernel::Kernel*)
-{
-    Integer::underlying_type begin = 0;
-    Integer::underlying_type end   = -1;
-
-    assert_arity(frame, 1u, 2u, 3u);
-
-    if (frame->arguments->size() > 1) {
-        assert_typeof(frame->arguments->at(1), "Integer");
-        if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(1))) {
-            begin = i->as_integer();
-        }
-    }
-    if (frame->arguments->size() > 2) {
-        assert_typeof(frame->arguments->at(2), "Integer");
-        if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(2))) {
-            end = i->as_integer();
-        }
-    }
-    frame->local_register_set->set(
-        0, std::unique_ptr<viua::types::Value>{sub(begin, end)});
-}
-
-void String::concatenate(Frame* frame,
-                         viua::kernel::Register_set*,
-                         viua::kernel::Register_set*,
-                         viua::process::Process*,
-                         viua::kernel::Kernel*)
-{
-    frame->local_register_set->set(
-        0,
-        std::make_unique<String>(
-            static_cast<String*>(frame->arguments->at(0))->value()
-            + static_cast<String*>(frame->arguments->at(1))->value()));
-}
-
-void String::join(Frame*,
-                  viua::kernel::Register_set*,
-                  viua::kernel::Register_set*,
-                  viua::process::Process*,
-                  viua::kernel::Kernel*)
-{
-    // TODO: implement
-}
-
-void String::size(Frame* frame,
-                  viua::kernel::Register_set*,
-                  viua::kernel::Register_set*,
-                  viua::process::Process*,
-                  viua::kernel::Kernel*)
-{
-    frame->local_register_set->set(
-        0, std::make_unique<Integer>(static_cast<int>(svalue.size())));
 }
 
 String::String(std::string s) : svalue(s) {}
