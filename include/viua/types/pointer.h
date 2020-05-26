@@ -46,24 +46,24 @@ class Pointer : public Value {
      */
     viua::process::Process const* process_of_origin;
 
-    void attach();
-    void detach();
+    auto attach(Value* t) -> void;
+    auto detach() -> void;
 
   public:
     static std::string const type_name;
 
-    void invalidate(Value* t);
-    bool expired() const;
+    auto invalidate(Value* t) -> void;
+    auto expired() const -> bool;
     auto authenticate(viua::process::Process const*) -> void;
-    void reset(Value* t);
-    Value* to(viua::process::Process const*);
+    auto reset(Value* t) -> void;
+    auto to(viua::process::Process const*) -> Value*;
 
-    std::string str() const override;
+    auto str() const -> std::string override;
 
-    std::string type() const override;
-    bool boolean() const override;
+    auto type() const -> std::string override;
+    auto boolean() const -> bool override;
 
-    std::unique_ptr<Value> copy() const override;
+    auto copy() const -> std::unique_ptr<Value> override;
 
     Pointer(viua::process::Process const*);
     Pointer(Value* t, viua::process::Process const*);

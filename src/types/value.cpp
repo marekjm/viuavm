@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <viua/types/exception.h>
@@ -28,14 +29,15 @@
 
 auto viua::types::Value::type() const -> std::string
 { return "Value"; }
-std::string viua::types::Value::str() const
+auto viua::types::Value::str() const -> std::string
 {
     std::ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-std::string viua::types::Value::repr() const { return str(); }
-bool viua::types::Value::boolean() const
+auto viua::types::Value::repr() const -> std::string
+{ return str(); }
+auto viua::types::Value::boolean() const -> bool
 {
     /*  Boolean defaults to false.
      *  This is because in if, loops etc. we will NOT execute code depending on
@@ -46,8 +48,8 @@ bool viua::types::Value::boolean() const
 }
 
 
-std::unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
-    const viua::process::Process* process_of_origin)
+auto viua::types::Value::pointer(
+    viua::process::Process const* process_of_origin) -> std::unique_ptr<viua::types::Pointer>
 {
     return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }
