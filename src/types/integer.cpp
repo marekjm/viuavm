@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,7 +28,7 @@ using namespace viua::types;
 
 std::string const viua::types::Integer::type_name = "Integer";
 
-std::string Integer::type() const { return "Integer"; }
+std::string Integer::type() const { return type_name; }
 std::string Integer::str() const { return std::to_string(number); }
 bool Integer::boolean() const { return (number != 0); }
 

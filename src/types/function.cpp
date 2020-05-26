@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -31,7 +31,7 @@ viua::types::Function::Function(std::string const& name) : function_name(name)
 viua::types::Function::~Function() {}
 
 
-std::string viua::types::Function::type() const { return "Function"; }
+std::string viua::types::Function::type() const { return type_name; }
 
 std::string viua::types::Function::str() const
 {

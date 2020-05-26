@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,7 +29,7 @@
 
 std::string const viua::types::Process::type_name = "Process";
 
-std::string viua::types::Process::type() const { return "Process"; }
+std::string viua::types::Process::type() const { return type_name; }
 
 std::string viua::types::Process::str() const
 {

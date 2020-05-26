@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2019 Marek Marecki
+ *  Copyright (C) 2017, 2019, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,7 +26,7 @@
 
 std::string const viua::types::Struct::type_name = "Struct";
 
-std::string viua::types::Struct::type() const { return "Struct"; }
+std::string viua::types::Struct::type() const { return type_name; }
 
 bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
 

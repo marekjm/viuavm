@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,7 +23,7 @@
 
 std::string const viua::types::numeric::Number::type_name = "Number";
 
-std::string viua::types::numeric::Number::type() const { return "Number"; }
+std::string viua::types::numeric::Number::type() const { return type_name; }
 
 bool viua::types::numeric::Number::negative() const
 {

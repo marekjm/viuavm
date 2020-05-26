@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,11 +20,11 @@
 #include <viua/support/string.h>
 #include <viua/types/atom.h>
 
-std::string const viua::types::Atom::type_name = "viua::types::Atom";
+std::string const viua::types::Atom::type_name = "Atom";
 
 auto viua::types::Atom::type() const -> std::string
 {
-    return "viua::types::Atom";
+    return type_name;
 }
 
 auto viua::types::Atom::boolean() const -> bool { return true; }

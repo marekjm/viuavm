@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -135,7 +135,7 @@ int viua::types::Vector::len()
     return static_cast<int>(internal_object.size());
 }
 
-std::string viua::types::Vector::type() const { return "Vector"; }
+std::string viua::types::Vector::type() const { return type_name; }
 
 std::string viua::types::Vector::str() const
 {

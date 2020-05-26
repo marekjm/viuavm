@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,7 +26,8 @@
 #include <viua/types/value.h>
 
 
-std::string viua::types::Value::type() const { return "Value"; }
+auto viua::types::Value::type() const -> std::string
+{ return "Value"; }
 std::string viua::types::Value::str() const
 {
     std::ostringstream s;

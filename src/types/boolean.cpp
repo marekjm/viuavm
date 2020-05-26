@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,7 +21,7 @@
 
 std::string const viua::types::Boolean::type_name = "Boolean";
 
-auto viua::types::Boolean::type() const -> std::string { return "Boolean"; }
+auto viua::types::Boolean::type() const -> std::string { return type_name; }
 
 auto viua::types::Boolean::str() const -> std::string
 {

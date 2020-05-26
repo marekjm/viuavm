@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,7 +27,7 @@ using namespace viua::types;
 std::string const viua::types::Float::type_name = "Float";
 
 
-std::string Float::type() const { return "Float"; }
+std::string Float::type() const { return type_name; }
 std::string Float::str() const { return std::to_string(number); }
 bool Float::boolean() const { return (number != 0); }
 

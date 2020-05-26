@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -34,7 +34,7 @@ viua::types::Closure::Closure(std::string const& name,
 viua::types::Closure::~Closure() {}
 
 
-auto viua::types::Closure::type() const -> std::string { return "Closure"; }
+auto viua::types::Closure::type() const -> std::string { return type_name; }
 
 auto viua::types::Closure::str() const -> std::string
 {

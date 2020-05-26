@@ -38,7 +38,7 @@ using namespace viua::types;
 
 std::string const viua::types::String::type_name = "String";
 
-std::string String::type() const { return "String"; }
+std::string String::type() const { return type_name; }
 std::string String::str() const { return svalue; }
 std::string String::repr() const { return "b" + str::enquote(svalue); }
 bool String::boolean() const { return svalue.size() != 0; }

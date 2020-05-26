@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,7 @@
 #include <string>
 #include <viua/types/exception.h>
 
-std::string const viua::types::Exception::type_name = "viua::types::Exception";
+std::string const viua::types::Exception::type_name = "Exception";
 
 auto viua::types::Exception::what() const -> std::string
 {

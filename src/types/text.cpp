@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -116,7 +116,7 @@ viua::types::Text::Text(Text&& s)
 
 auto viua::types::Text::type() const -> std::string
 {
-    return "Text";
+    return type_name;
 }
 
 auto viua::types::Text::str() const -> std::string
