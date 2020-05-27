@@ -53,6 +53,21 @@ auto viua::types::Value::pointer(
 {
     return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }
+auto viua::types::Value::attach_pointer(
+    viua::types::Pointer* const ptr) -> void
+{
+    pointers.push_back(ptr);
+}
+auto viua::types::Value::detach_pointer(
+    viua::types::Pointer* const ptr) -> void
+{
+    auto const pos = std::find(
+          pointers.begin()
+        , pointers.end()
+        , ptr
+    );
+    pointers.erase(pos);
+}
 
 viua::types::Value::~Value()
 {

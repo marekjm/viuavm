@@ -35,7 +35,6 @@ namespace types {
 class Pointer;
 
 class Value {
-    friend class Pointer;
     std::vector<Pointer*> pointers;
 
   public:
@@ -53,6 +52,8 @@ class Value {
     virtual auto boolean() const -> bool;
 
     virtual auto pointer(viua::process::Process const*) -> std::unique_ptr<Pointer>;
+    virtual auto attach_pointer(viua::types::Pointer* const) -> void;
+    virtual auto detach_pointer(viua::types::Pointer* const) -> void;
 
     virtual auto copy() const -> std::unique_ptr<Value> =  0;
 

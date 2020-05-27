@@ -33,16 +33,12 @@ std::string const viua::types::Pointer::type_name = "Pointer";
 auto viua::types::Pointer::attach(viua::types::Value* t) -> void
 {
     points_to = t;
-    points_to->pointers.push_back(this);
+    points_to->attach_pointer(this);
 }
 auto viua::types::Pointer::detach() -> void
 {
     if (not expired()) {
-        points_to->pointers.erase(std::find(
-              points_to->pointers.begin()
-            , points_to->pointers.begin()
-            , this
-        ));
+        points_to->detach_pointer(this);
     }
     points_to = nullptr;
 }
