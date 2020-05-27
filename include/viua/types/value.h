@@ -21,9 +21,8 @@
 #define VIUA_TYPES_VALUE_H
 
 #include <memory>
-#include <sstream>
+#include <set>
 #include <string>
-#include <vector>
 
 
 namespace viua {
@@ -35,7 +34,7 @@ namespace types {
 class Pointer;
 
 class Value {
-    std::vector<Pointer*> pointers;
+    std::set<Pointer*> pointers;
 
   public:
     /*

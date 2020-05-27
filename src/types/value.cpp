@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 #include <viua/types/exception.h>
@@ -56,17 +57,12 @@ auto viua::types::Value::pointer(
 auto viua::types::Value::attach_pointer(
     viua::types::Pointer* const ptr) -> void
 {
-    pointers.push_back(ptr);
+    pointers.insert(ptr);
 }
 auto viua::types::Value::detach_pointer(
     viua::types::Pointer* const ptr) -> void
 {
-    auto const pos = std::find(
-          pointers.begin()
-        , pointers.end()
-        , ptr
-    );
-    pointers.erase(pos);
+    pointers.erase(ptr);
 }
 
 viua::types::Value::~Value()
