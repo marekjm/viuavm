@@ -386,7 +386,6 @@ class Process {
      * Process identifier. Used to join processes and send them messages.
      */
     viua::process::PID const process_id;
-    bool is_hidden;
 
     /*
      * Timeouts for receiving messages, waiting for processes, and waiting for
@@ -613,8 +612,6 @@ class Process {
     auto trace() const -> std::vector<Frame*>;
 
     auto pid() const -> viua::process::PID;
-    auto hidden() const -> bool;
-    auto hidden(bool) -> void;
 
     auto empty() const -> bool;
 

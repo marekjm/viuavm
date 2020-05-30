@@ -749,7 +749,6 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
         , is_suspended{false}
         , process_priority{512}
         , process_id{p}
-        , is_hidden{false}
 {
     global_register_set =
         std::make_unique<viua::kernel::Register_set>(DEFAULT_REGISTER_SIZE);

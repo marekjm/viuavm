@@ -155,9 +155,7 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         timeout_active      = true;
     }
 
-    if (not is_hidden) {
-        attached_scheduler->receive(process_id, message_queue);
-    }
+    attached_scheduler->receive(process_id, message_queue);
 
     if (not message_queue.empty()) {
         if (target) {
@@ -168,10 +166,6 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         wait_until_infinity = false;
         return_addr         = addr;
     } else {
-        if (is_hidden) {
-            suspend();
-        }
-
         auto const timeout_passed = (
                 timeout_active
             and (not wait_until_infinity)
