@@ -75,12 +75,16 @@ auto viua::types::Pointer::to(viua::process::Process const* p) -> viua::types::V
 {
     if (process_of_origin != p) {
         // Dereferencing pointers outside of their original process is illegal.
-        throw std::make_unique<viua::types::Exception>(
-            "InvalidDereference: outside of original process");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+              Exception::Tag{"Invalid_dereference"}
+            , "outside of original process");
     }
     if (expired()) {
-        throw std::make_unique<viua::types::Exception>(
-            "expired pointer exception");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+              Exception::Tag{"Expired_pointer"}
+            , "pointer is no longer valid");
     }
     return points_to;
 }
