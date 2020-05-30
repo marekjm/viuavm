@@ -91,7 +91,9 @@ auto viua::types::Pointer::to(viua::process::Process const* p) -> viua::types::V
 
 auto viua::types::Pointer::type() const -> std::string
 {
-    return (((not expired()) ? points_to->type() : "Expired") + "Pointer");
+    return ((not expired())
+        ? ("Pointer_of_" + points_to->type())
+        : "Expired_pointer");
 }
 
 auto viua::types::Pointer::boolean() const -> bool

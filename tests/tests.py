@@ -2077,7 +2077,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestSplitlines(self, 'vinsert_does_not_erase_dereferenced_sources.asm', [
             '1',
             '[1]',
-            'IntegerPointer',
+            'Pointer_of_Integer',
         ])
 
     def testInferringTypesForArgs(self):
@@ -3101,7 +3101,7 @@ class TypePointerTests(unittest.TestCase):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736, 74399, 74375)
-        runTest(self, 'type_of_expired.asm', 'ExpiredPointer')
+        runTest(self, 'type_of_expired.asm', 'Expired_pointer')
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
 
