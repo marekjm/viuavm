@@ -186,8 +186,8 @@ auto viua::process::Stack::adjust_instruction_pointer(
 }
 auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void
 {
-    size_type distance = 0;
-    for (size_type j = (size() - 1); j > 0; --j) {
+    auto distance = size_type{0};
+    for (auto j = size_type{size() - 1}; j > 0; --j) {
         if (at(j).get() == frame) {
             break;
         }
@@ -197,7 +197,7 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void
     if (state_of() == STATE::RUNNING) {
         state_of(STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING);
         parent_process->stacks_order.push(this);
-        for (size_type i = (size() - distance); i < size(); ++i) {
+        for (auto i = size_type{size() - distance}; i < size(); ++i) {
             register_deferred_calls_from(at(i).get());
         }
 
@@ -243,7 +243,7 @@ auto viua::process::Stack::find_catch_frame()
     auto handler_found_for_type =
         (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
-    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
+    for (auto i = tryframes.size(); i > 0; --i) {
         auto tframe        = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 

@@ -158,7 +158,7 @@ bool viua::types::Vector::boolean() const
 std::unique_ptr<viua::types::Value> viua::types::Vector::copy() const
 {
     auto v = std::make_unique<Vector>();
-    for (unsigned i = 0; i < internal_object.size(); ++i) {
+    for (auto i = size_t{0}; i < internal_object.size(); ++i) {
         v->push(internal_object[i]->copy());
     }
     return v;
