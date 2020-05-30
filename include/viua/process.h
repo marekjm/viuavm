@@ -382,9 +382,10 @@ class Process {
     uint16_t process_priority;
     std::mutex process_mtx;
 
-    /*  viua::process::Process identifier.
+    /*
+     * Process identifier. Used to join processes and send them messages.
      */
-    viua::process::PID process_id;
+    viua::process::PID const process_id;
     bool is_hidden;
 
     /*
@@ -627,7 +628,7 @@ class Process {
     auto get_kernel() const -> viua::kernel::Kernel&;
 
     Process(std::unique_ptr<Frame>,
-            viua::process::PID,
+            viua::process::PID const,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,
             bool const             = false,

@@ -733,7 +733,7 @@ auto viua::process::Process::get_kernel() const -> viua::kernel::Kernel&
 }
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
-                                viua::process::PID p,
+                                viua::process::PID const p,
                                 viua::scheduler::Process_scheduler* sch,
                                 viua::process::Process* pt,
                                 bool const enable_tracing,
