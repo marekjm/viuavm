@@ -23,6 +23,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <viua/pid.h>
 
 
 namespace viua {
@@ -50,7 +51,7 @@ class Value {
     virtual auto repr() const -> std::string;
     virtual auto boolean() const -> bool;
 
-    virtual auto pointer(viua::process::Process const*) -> std::unique_ptr<Pointer>;
+    virtual auto pointer(viua::process::PID const) -> std::unique_ptr<Pointer>;
     virtual auto attach_pointer(viua::types::Pointer* const) -> void;
     virtual auto detach_pointer(viua::types::Pointer* const) -> void;
 

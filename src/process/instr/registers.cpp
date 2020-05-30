@@ -51,7 +51,7 @@ auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type
     auto target = decoder.fetch_register(addr, *this);
     auto source = decoder.fetch_value(addr, *this);
 
-    *target = source->pointer(this);
+    *target = source->pointer(pid());
 
     return addr;
 }

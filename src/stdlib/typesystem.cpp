@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <viua/include/module.h>
+#include <viua/process.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/exception.h>
@@ -44,7 +45,7 @@ static auto typeof(Frame* frame,
             std::make_unique<viua::kernel::Register_set>(1));
         frame->local_register_set->set(0,
                                        std::make_unique<viua::types::String>(
-                                           pointer->to(process)->type()));
+                                           pointer->to(process->pid())->type()));
     } else {
         throw std::make_unique<viua::types::Exception>(
             "expected a pointer as parameter 0");

@@ -49,11 +49,8 @@ void viua::types::Pointer::invalidate(viua::types::Value* t)
         points_to = nullptr;
     }
 }
-auto viua::types::Pointer::expired() const -> bool
-{
-    return (points_to == nullptr);
-}
-auto viua::types::Pointer::authenticate(viua::process::Process const* process)
+auto viua::types::Pointer::expired() const -> bool { return (points_to == nullptr); }
+auto viua::types::Pointer::authenticate(viua::process::PID const pid)
     -> void
 {
     /*
@@ -62,7 +59,7 @@ auto viua::types::Pointer::authenticate(viua::process::Process const* process)
      *  code passes the pointer object to user-process to ensure that Pointer's
      * state is properly accounted for.
      */
-    points_to = (process_of_origin == process)
+    points_to = (origin_pid == pid)
         ? points_to
         : nullptr;
 }
@@ -71,9 +68,9 @@ auto viua::types::Pointer::reset(viua::types::Value* t) -> void
     detach();
     attach(t);
 }
-auto viua::types::Pointer::to(viua::process::Process const* p) -> viua::types::Value*
+auto viua::types::Pointer::to(viua::process::PID const p) -> viua::types::Value*
 {
-    if (process_of_origin != p) {
+    if (origin_pid != p) {
         // Dereferencing pointers outside of their original process is illegal.
         using viua::types::Exception;
         throw std::make_unique<Exception>(
@@ -104,20 +101,20 @@ auto viua::types::Pointer::str() const -> std::string { return type(); }
 auto viua::types::Pointer::copy() const -> std::unique_ptr<viua::types::Value>
 {
     if (expired()) {
-        return std::make_unique<Pointer>(process_of_origin);
+        return std::make_unique<Pointer>(origin_pid);
     }
-    return std::make_unique<Pointer>(points_to, process_of_origin);
+    return std::make_unique<Pointer>(points_to, origin_pid);
 }
 
 
-viua::types::Pointer::Pointer(const viua::process::Process* poi)
+viua::types::Pointer::Pointer(viua::process::PID pid)
     : points_to{nullptr}
-    , process_of_origin{poi}
+    , origin_pid{pid}
 {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
-                              const viua::process::Process* poi)
+                              viua::process::PID const pid)
     : points_to{nullptr}
-    , process_of_origin{poi}
+    , origin_pid{pid}
 {
     attach(t);
 }

@@ -23,6 +23,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <viua/pid.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
@@ -50,7 +51,7 @@ auto viua::types::Value::boolean() const -> bool
 
 
 auto viua::types::Value::pointer(
-    viua::process::Process const* process_of_origin) -> std::unique_ptr<viua::types::Pointer>
+    viua::process::PID const process_of_origin) -> std::unique_ptr<viua::types::Pointer>
 {
     return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }

@@ -197,10 +197,10 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
                 viua::types::Exception::Tag{"Not_a_pointer"},
                 "dereferenced value is not a pointer: " + value->type());
         }
-        value = pointer->to(&proc);
+        value = pointer->to(proc.pid());
     }
     if (auto pointer = dynamic_cast<viua::types::Pointer*>(value)) {
-        pointer->authenticate(&proc);
+        pointer->authenticate(proc.pid());
     }
 
     return value;
