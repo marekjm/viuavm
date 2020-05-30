@@ -41,6 +41,10 @@ There are several categories of change:
 - fix: escape sequences in strings are handled correctly (or at least better)
 - fix: do not crash when `textat` instruction is used on empty string; throw an
   exception instead
+- bic: instead of throwing a generic Exception, pointers now throw
+  `Invalid_dereference` (when dereferenced outside of original process) and
+  `Expired_pointer`-tagged exceptions when they detect an error during
+  dereference
 
 Exceptions now track the points at which they were thrown and rethrown. Rethrows
 happen at process join points (i.e. join instructions). Stack trace reports use
