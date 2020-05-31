@@ -30,14 +30,17 @@
 
 void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o)
 {
-    if (dynamic_cast<viua::types::Reference*>(value.get())) {
-        static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
+    if (auto ref = dynamic_cast<viua::types::Reference*>(value.get()); ref) {
+        ref->rebind(o.release());
     } else {
         value = std::move(o);
     }
 }
 
-bool viua::kernel::Register::empty() const { return value == nullptr; }
+bool viua::kernel::Register::empty() const
+{
+    return value == nullptr;
+}
 
 auto viua::kernel::Register::get() -> viua::types::Value*
 {
