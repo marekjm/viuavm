@@ -132,7 +132,7 @@ auto viua::process::Stack::pop() -> std::unique_ptr<Frame>
          i < frame->arguments->size();
          ++i) {
         if (frame->arguments->at(i) != nullptr
-            and frame->arguments->isflagged(i, MOVED)) {
+            and frame->arguments->is_flagged(i, MOVED)) {
             throw std::make_unique<viua::types::Exception>(
                 "unused pass-by-move parameter");
         }

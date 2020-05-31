@@ -136,7 +136,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                     continue;
                 }
                 std::cerr << "    arguments[" << r << "]: ";
-                if (last->arguments->isflagged(r, MOVED)) {
+                if (last->arguments->is_flagged(r, MOVED)) {
                     std::cerr << "[moved] ";
                 }
                 if (auto ptr = dynamic_cast<viua::types::Pointer*>(

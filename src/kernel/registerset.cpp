@@ -128,7 +128,7 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register&
 
 
 void viua::kernel::Register_set::put(
-    viua::bytecode::codec::register_index_type index,
+    size_type const index,
     std::unique_ptr<viua::types::Value> object)
 {
     if (index >= registerset_size) {
@@ -139,7 +139,7 @@ void viua::kernel::Register_set::put(
 }
 
 std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
-    viua::bytecode::codec::register_index_type index)
+    size_type const index)
 {
     /** Pop an object from the register.
      */
@@ -152,7 +152,7 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
 }
 
 void viua::kernel::Register_set::set(
-    viua::bytecode::codec::register_index_type index,
+    size_type const index,
     std::unique_ptr<viua::types::Value> object)
 {
     /** Put object inside register specified by given index.
@@ -172,20 +172,15 @@ void viua::kernel::Register_set::set(
     }
 }
 
-viua::types::Value* viua::kernel::Register_set::get(
-    viua::bytecode::codec::register_index_type index)
+auto viua::kernel::Register_set::get(
+    size_type const index) -> viua::types::Value*
 {
-    /** Fetch object from register specified by given index.
-     *
-     *  Performs bounds checking.
-     *  Throws exception when accessing empty register.
-     */
     if (index >= registerset_size) {
         std::ostringstream emsg;
         emsg << "register access out of bounds: read from " << index;
         throw std::make_unique<viua::types::Exception>(emsg.str());
     }
-    viua::types::Value* optr = registers.at(index).get();
+    auto optr = registers.at(index).get();
     if (optr == nullptr) {
         std::ostringstream oss;
         oss << "(get) read from null register: " << index;
@@ -194,8 +189,8 @@ viua::types::Value* viua::kernel::Register_set::get(
     return optr;
 }
 
-viua::types::Value* viua::kernel::Register_set::at(
-    viua::bytecode::codec::register_index_type index)
+auto viua::kernel::Register_set::at(
+    size_type const index) -> viua::types::Value*
 {
     /** Fetch object from register specified by given index.
      *
@@ -211,7 +206,7 @@ viua::types::Value* viua::kernel::Register_set::at(
 }
 
 viua::kernel::Register* viua::kernel::Register_set::register_at(
-    viua::bytecode::codec::register_index_type index)
+    size_type const index)
 {
     if (index >= registerset_size) {
         std::ostringstream emsg;
@@ -353,9 +348,9 @@ void viua::kernel::Register_set::clear(
     registers.at(index).set_mask(0);
 }
 
-bool viua::kernel::Register_set::isflagged(
+auto viua::kernel::Register_set::is_flagged(
     viua::bytecode::codec::register_index_type index,
-    mask_type filter)
+    mask_type filter) const -> bool
 {
     if (index >= registerset_size) {
         // FIXME Use tagged exception.
@@ -365,9 +360,9 @@ bool viua::kernel::Register_set::isflagged(
     return registers.at(index).is_flagged(filter);
 }
 
-void viua::kernel::Register_set::setmask(
-    viua::bytecode::codec::register_index_type index,
-    mask_type mask)
+auto viua::kernel::Register_set::set_mask(
+    size_type const index,
+    mask_type mask) -> void
 {
     /** Set mask for a register.
      *
@@ -386,8 +381,8 @@ void viua::kernel::Register_set::setmask(
     registers.at(index).set_mask(mask);
 }
 
-mask_type viua::kernel::Register_set::getmask(
-    viua::bytecode::codec::register_index_type index)
+auto viua::kernel::Register_set::get_mask(
+    size_type const index) const -> mask_type
 {
     /** Get mask of a register.
      *
@@ -421,7 +416,7 @@ void viua::kernel::Register_set::drop()
 }
 
 
-std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy()
+auto viua::kernel::Register_set::copy() const -> std::unique_ptr<viua::kernel::Register_set>
 {
     auto rscopy = std::make_unique<viua::kernel::Register_set>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
@@ -429,20 +424,19 @@ std::unique_ptr<viua::kernel::Register_set> viua::kernel::Register_set::copy()
             continue;
         }
         rscopy->set(i, at(i)->copy());
-        rscopy->setmask(i, getmask(i));
+        rscopy->set_mask(i, get_mask(i));
     }
     return rscopy;
 }
 
 viua::kernel::Register_set::Register_set(
-    viua::bytecode::codec::register_index_type sz)
-        : registerset_size(sz)
+    size_type const sz)
+        : registerset_size{sz}
 {
     /** Create register set with specified size.
      */
     registers.reserve(sz);
-
-    for (decltype(sz) i = 0; i < sz; ++i) {
+    for (auto i = size_type{0}; i < sz; ++i) {
         registers.emplace_back(nullptr);
     }
 }
