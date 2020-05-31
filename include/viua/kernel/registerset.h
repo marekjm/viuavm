@@ -58,10 +58,13 @@ class Register {
 
     Register();
     Register(std::unique_ptr<viua::types::Value>);
+    Register(Register const&) = delete;
     Register(Register&&);
+    ~Register() = default;
 
     operator bool() const;
-    auto operator=(Register &&) -> Register&;
+    auto operator=(Register const&) -> Register& = delete;
+    auto operator=(Register&&) -> Register&;
     auto operator=(decltype(value)&&) -> Register&;
 };
 
@@ -111,6 +114,10 @@ class Register_set {
     auto copy() const -> std::unique_ptr<Register_set>;
 
     Register_set(size_type const);
+    Register_set(Register_set const&) = delete;
+    Register_set(Register_set&&) = delete;
+    auto operator=(Register_set const&) -> Register_set& = delete;
+    auto operator=(Register_set&&) -> Register_set& = delete;
     ~Register_set();
 };
 }}  // namespace viua::kernel
