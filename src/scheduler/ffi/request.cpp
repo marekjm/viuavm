@@ -53,7 +53,7 @@ auto viua::scheduler::ffi::Foreign_function_call_request::call(
         }
 
         // place return value
-        if (returned and caller_process.trace().size() > 0) {
+        if (returned and caller_process.depth() > 0) {
             *return_register = std::move(returned);
         }
     } catch (std::unique_ptr<viua::types::Exception>& exception) {

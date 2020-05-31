@@ -698,7 +698,7 @@ auto viua::process::Process::execution_at() const
 }
 
 
-auto viua::process::Process::trace() const -> std::vector<Frame const*>
+auto viua::process::Process::trace() const -> Trace_type
 {
     auto tr = std::vector<Frame const*>{};
     tr.reserve(stack->size());
@@ -706,6 +706,10 @@ auto viua::process::Process::trace() const -> std::vector<Frame const*>
         tr.push_back(each.get());
     }
     return tr;
+}
+auto viua::process::Process::depth() const -> Trace_type::size_type
+{
+    return stack->size();
 }
 
 auto viua::process::Process::pid() const -> viua::process::PID

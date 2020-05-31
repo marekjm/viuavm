@@ -609,7 +609,9 @@ class Process {
     auto start() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);
 
-    auto trace() const -> std::vector<Frame const*>;
+    using Trace_type = std::vector<Frame const*>;
+    auto trace() const -> Trace_type;
+    auto depth() const -> Trace_type::size_type;
 
     auto pid() const -> viua::process::PID;
 
