@@ -318,30 +318,29 @@ clean-test-compiles:
 
 ############################################################
 # INSTALLATION AND UNINSTALLATION
-bininstall: build/bin/vm/asm \
-	build/bin/vm/kernel \
-	build/bin/vm/dis
-	mkdir -p $(BIN_PATH)
-	cp ./build/bin/vm/asm $(BIN_PATH)/viua-asm
-	chmod 755 $(BIN_PATH)/viua-asm
-	cp ./build/bin/vm/kernel $(BIN_PATH)/viua-vm
-	chmod 755 $(BIN_PATH)/viua-vm
-	cp ./build/bin/vm/dis $(BIN_PATH)/viua-dis
-	chmod 755 $(BIN_PATH)/viua-dis
+install-execs: \
+	build/bin/vm/asm \
+	build/bin/vm/dis \
+	build/bin/vm/kernel
+	@mkdir -p $(BIN_PATH)
+	@cp ./build/bin/vm/asm $(BIN_PATH)/viua-asm
+	@chmod 755 $(BIN_PATH)/viua-asm
+	@cp ./build/bin/vm/kernel $(BIN_PATH)/viua-vm
+	@chmod 755 $(BIN_PATH)/viua-vm
+	@cp ./build/bin/vm/dis $(BIN_PATH)/viua-dis
+	@chmod 755 $(BIN_PATH)/viua-dis
 
-libinstall: stdlib
-	mkdir -p $(LIB_PATH)/std
-	mkdir -p $(LIB_PATH)/std/posix
-	cp ./build/stdlib/std/*.so $(LIB_PATH)/std
-	cp ./build/stdlib/std/posix/*.so $(LIB_PATH)/std/posix
+install-libs: stdlib
+	@mkdir -p $(LIB_PATH)/std
+	@mkdir -p $(LIB_PATH)/std/posix
+	@cp ./build/stdlib/std/*.so $(LIB_PATH)/std
+	@cp ./build/stdlib/std/posix/*.so $(LIB_PATH)/std/posix
 
-installdevel: platform
-	mkdir -p $(LIB_PATH)/platform
-	cp ./build/platform/*.o $(LIB_PATH)/platform
+install-headers:
+	# mkdir -p $(H_PATH)
+	# cp -R ./include/viua/. $(H_PATH)/
 
-install: bininstall libinstall
-	mkdir -p $(H_PATH)
-	cp -R ./include/viua/. $(H_PATH)/
+install: install-execs install-libs
 
 uninstall:
 	rm -rf $(H_PATH)
