@@ -44,7 +44,11 @@ static auto open(Frame* frame,
 {
     auto const fd = ::open(frame->arguments->get(0)->str().c_str(), 0);
     if (fd == -1) {
-        throw std::make_unique<viua::types::Exception>("Unknown_errno");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"IO_error"}
+            , ("unknown errno: " + std::to_string(errno))
+        );
     }
 
     frame->set_local_register_set(
