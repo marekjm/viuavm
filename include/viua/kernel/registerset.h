@@ -80,7 +80,9 @@ class Register_set {
     auto set(size_type const,
              std::unique_ptr<viua::types::Value>) -> void;
     auto get(size_type const) -> viua::types::Value*;
+    auto get(size_type const) const -> viua::types::Value const*;
     auto at(size_type const) -> viua::types::Value*;
+    auto at(size_type const) const -> viua::types::Value const*;
 
     auto register_at(size_type const) -> Register*;
 

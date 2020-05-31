@@ -188,9 +188,40 @@ auto viua::kernel::Register_set::get(
     }
     return optr;
 }
+auto viua::kernel::Register_set::get(
+    size_type const index) const -> viua::types::Value const*
+{
+    if (index >= registerset_size) {
+        std::ostringstream emsg;
+        emsg << "register access out of bounds: read from " << index;
+        throw std::make_unique<viua::types::Exception>(emsg.str());
+    }
+    auto optr = registers.at(index).get();
+    if (optr == nullptr) {
+        std::ostringstream oss;
+        oss << "(get) read from null register: " << index;
+        throw std::make_unique<viua::types::Exception>(oss.str());
+    }
+    return optr;
+}
 
 auto viua::kernel::Register_set::at(
     size_type const index) -> viua::types::Value*
+{
+    /** Fetch object from register specified by given index.
+     *
+     *  Performs bounds checking.
+     *  Returns 0 when accessing empty register.
+     */
+    if (index >= registerset_size) {
+        std::ostringstream emsg;
+        emsg << "register access out of bounds: read from " << index;
+        throw std::make_unique<viua::types::Exception>(emsg.str());
+    }
+    return registers.at(index).get();
+}
+auto viua::kernel::Register_set::at(
+    size_type const index) const -> viua::types::Value const*
 {
     /** Fetch object from register specified by given index.
      *
