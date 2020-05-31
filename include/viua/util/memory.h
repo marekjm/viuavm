@@ -29,8 +29,8 @@ template<typename T>
 using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr
 
 template<class T> class maybe_unique_ptr {
-    bool owns_pointer;
-    T* pointer;
+    bool owns_pointer = true;
+    T* pointer = nullptr;
 
     auto delete_if_owned() -> void
     {
@@ -68,10 +68,12 @@ template<class T> class maybe_unique_ptr {
     }
 
     auto get() -> T* { return pointer; }
+    auto get() const -> T const* { return pointer; }
 
     auto owns() const -> bool { return owns_pointer; }
 
     auto operator-> () -> T* { return pointer; }
+    auto operator-> () const -> T const* { return pointer; }
 
     maybe_unique_ptr(T* ptr = nullptr, bool own = true)
             : owns_pointer(own), pointer(ptr)
