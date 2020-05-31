@@ -125,7 +125,7 @@ auto viua::process::Stack::register_deferred_calls(bool const push_this_stack)
 
 auto viua::process::Stack::pop() -> std::unique_ptr<Frame>
 {
-    std::unique_ptr<Frame> frame{std::move(frames.back())};
+    auto frame = std::unique_ptr<Frame>{std::move(frames.back())};
     frames.pop_back();
 
     for (viua::bytecode::codec::register_index_type i = 0;
