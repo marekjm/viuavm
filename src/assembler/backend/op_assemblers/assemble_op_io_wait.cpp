@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+
 #include <viua/assembler/backend/op_assemblers.h>
 
 namespace viua { namespace assembler { namespace backend {

@@ -21,6 +21,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
 
@@ -28,7 +29,8 @@ namespace viua {
     namespace tooling {
         namespace libs {
             namespace static_analyser {
-static auto to_string(viua::bytecode::codec::Register_set const rs) -> std::string
+static auto to_string(viua::bytecode::codec::Register_set const rs)
+    -> std::string
 {
     using viua::bytecode::codec::Register_set;
     switch (rs) {
@@ -345,9 +347,9 @@ static auto analyse_single_arm(
         if (line->type() == Fragment_type::Name_directive) {
             using viua::tooling::libs::parser::Name_directive;
             auto const& directive = *static_cast<Name_directive const*>(line);
-            auto const index      = (directive.iota
-                                    ? function_state.iota(directive.token(1))
-                                    : directive.register_index);
+            auto const index =
+                (directive.iota ? function_state.iota(directive.token(1))
+                                : directive.register_index);
 
             function_state.rename_register(index, directive.name, directive);
         }

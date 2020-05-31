@@ -21,8 +21,9 @@
 #define VIUA_CG_TOOLS_H
 
 #include <cstdint>
-#include <viua/bytecode/maps.h>
+
 #include <viua/bytecode/codec.h>
+#include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 
 

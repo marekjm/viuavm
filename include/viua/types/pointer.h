@@ -21,6 +21,7 @@
 #define VIUA_TYPES_POINTER_H
 
 #include <vector>
+
 #include <viua/kernel/frame.h>
 #include <viua/types/value.h>
 

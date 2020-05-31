@@ -22,6 +22,7 @@
 #include <functional>
 #include <iostream>
 #include <utility>
+
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>

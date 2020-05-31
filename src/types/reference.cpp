@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+
 #include <viua/types/reference.h>
 
 
@@ -45,11 +46,23 @@ void viua::types::Reference::rebind(std::unique_ptr<viua::types::Value> ptr)
 }
 
 
-std::string viua::types::Reference::type() const { return (*pointer)->type(); }
+std::string viua::types::Reference::type() const
+{
+    return (*pointer)->type();
+}
 
-std::string viua::types::Reference::str() const { return (*pointer)->str(); }
-std::string viua::types::Reference::repr() const { return (*pointer)->repr(); }
-bool viua::types::Reference::boolean() const { return (*pointer)->boolean(); }
+std::string viua::types::Reference::str() const
+{
+    return (*pointer)->str();
+}
+std::string viua::types::Reference::repr() const
+{
+    return (*pointer)->repr();
+}
+bool viua::types::Reference::boolean() const
+{
+    return (*pointer)->boolean();
+}
 
 std::unique_ptr<viua::types::Value> viua::types::Reference::copy() const
 {

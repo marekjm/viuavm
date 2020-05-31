@@ -32,5 +32,8 @@ auto Error_wrapper::errors() const -> std::vector<Error> const&
     return fallout;
 }
 
-auto Error_wrapper::errors() -> std::vector<Error>& { return fallout; }
+auto Error_wrapper::errors() -> std::vector<Error>&
+{
+    return fallout;
+}
 }}}}  // namespace viua::tooling::errors::compile_time

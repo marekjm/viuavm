@@ -22,6 +22,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
 
@@ -124,15 +125,14 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         register_usage_profile;
     register_usage_profile_if_false.defresh();
 
-    auto branch_if_false = std::async(
-          std::launch::async
-        , check_register_usage_for_instruction_block_impl_safe
-        , std::ref(register_usage_profile_if_false)
-        , std::ref(ps)
-        , std::ref(ib)
-        , jump_target_if_false
-        , mnemonic_counter
-    );
+    auto branch_if_false =
+        std::async(std::launch::async,
+                   check_register_usage_for_instruction_block_impl_safe,
+                   std::ref(register_usage_profile_if_false),
+                   std::ref(ps),
+                   std::ref(ib),
+                   jump_target_if_false,
+                   mnemonic_counter);
 
     try {
         check_register_usage_for_instruction_block_impl(

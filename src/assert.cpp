@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+
 #include <viua/assert.h>
 #include <viua/util/exceptions.h>
 

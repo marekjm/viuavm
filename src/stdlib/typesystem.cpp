@@ -20,10 +20,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <viua/include/module.h>
-#include <viua/process.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
+#include <viua/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
@@ -43,9 +44,10 @@ static auto typeof(Frame* frame,
         pointer) {
         frame->set_local_register_set(
             std::make_unique<viua::kernel::Register_set>(1));
-        frame->local_register_set->set(0,
-                                       std::make_unique<viua::types::String>(
-                                           pointer->to(process->pid())->type()));
+        frame->local_register_set->set(
+            0,
+            std::make_unique<viua::types::String>(
+                pointer->to(process->pid())->type()));
     } else {
         throw std::make_unique<viua::types::Exception>(
             "expected a pointer as parameter 0");
@@ -58,4 +60,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

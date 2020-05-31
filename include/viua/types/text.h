@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/support/string.h>
@@ -80,7 +81,8 @@ class Text : public Value {
     Text(std::vector<Character>);
     Text(std::string);
     Text(Text&&);
-    ~Text() {}
+    ~Text()
+    {}
 };
 }}  // namespace viua::types
 

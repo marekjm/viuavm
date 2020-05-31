@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+
 #include <viua/exceptions.h>
 #include <viua/support/string.h>
 #include <viua/types/struct.h>
@@ -26,9 +27,15 @@
 
 std::string const viua::types::Struct::type_name = "Struct";
 
-std::string viua::types::Struct::type() const { return type_name; }
+std::string viua::types::Struct::type() const
+{
+    return type_name;
+}
 
-bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
+bool viua::types::Struct::boolean() const
+{
+    return (not attributes.empty());
+}
 
 std::string viua::types::Struct::str() const
 {
@@ -49,7 +56,10 @@ std::string viua::types::Struct::str() const
     return oss.str();
 }
 
-std::string viua::types::Struct::repr() const { return str(); }
+std::string viua::types::Struct::repr() const
+{
+    return str();
+}
 
 void viua::types::Struct::insert(std::string const& key,
                                  std::unique_ptr<viua::types::Value> value)

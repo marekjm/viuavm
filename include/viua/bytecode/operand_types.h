@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 enum OperandType : uint8_t {
-    OT_INVALID = 0,
+    OT_INVALID            = 0,
     OT_REGISTER_INDEX     = 1,  // register index
     OT_REGISTER_REFERENCE = 2,  // register reference (indirect register index)
     OT_REGISTER_INDEX_ANNOTATED = 3,  // register index with an annotation from

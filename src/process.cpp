@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
@@ -59,21 +60,22 @@ auto viua::process::Decoder_adapter::fetch_register(
         and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
         // This should never happen - assembler should catch such situations.
         throw std::make_unique<viua::types::Exception>(
-            viua::types::Exception::Tag{"Invalid_access"}
-            , "pointer dereference not allowed");
+            viua::types::Exception::Tag{"Invalid_access"},
+            "pointer dereference not allowed");
     }
 
     auto index = std::get<1>(reg);
     auto slot  = proc.register_at(
-        index, static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
+        index,
+        static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
 
     if (std::get<2>(reg) == Access_specifier::Register_indirect) {
         auto const i =
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                viua::types::Exception::Tag{"Invalid_register_index"}
-                , "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"},
+                "registers cannot be negative");
         }
         return proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
@@ -111,27 +113,29 @@ auto viua::process::Decoder_adapter::fetch_tagged_register(
         and (std::get<2>(reg) == Access_specifier::Pointer_dereference)) {
         // This should never happen - assembler should catch such situations.
         throw std::make_unique<viua::types::Exception>(
-            viua::types::Exception::Tag{"Invalid_access"}
-            , "pointer dereference not allowed");
+            viua::types::Exception::Tag{"Invalid_access"},
+            "pointer dereference not allowed");
     }
 
     auto index = std::get<1>(reg);
     auto slot  = proc.register_at(
-        index, static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
+        index,
+        static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)));
 
     if (std::get<2>(reg) == Access_specifier::Register_indirect) {
         auto const i =
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                viua::types::Exception::Tag{"Invalid_register_index"}
-                , "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"},
+                "registers cannot be negative");
         }
         return {
             static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)),
             proc.register_at(
                 static_cast<viua::bytecode::codec::register_index_type>(i),
-                static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)))};
+                static_cast<viua::bytecode::codec::Register_set>(
+                    std::get<0>(reg)))};
     }
 
     return {static_cast<viua::bytecode::codec::Register_set>(std::get<0>(reg)),
@@ -162,9 +166,7 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
 
     addr = next_addr;
 
-    auto slot = proc.register_at(
-        std::get<1>(reg),
-        std::get<0>(reg));
+    auto slot = proc.register_at(std::get<1>(reg), std::get<0>(reg));
 
     using viua::bytecode::codec::Access_specifier;
 
@@ -173,8 +175,8 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
             static_cast<viua::types::Integer*>(slot->get())->as_integer();
         if (i < 0) {
             throw std::make_unique<viua::types::Exception>(
-                viua::types::Exception::Tag{"Invalid_register_index"}
-                , "registers cannot be negative");
+                viua::types::Exception::Tag{"Invalid_register_index"},
+                "registers cannot be negative");
         }
         slot = proc.register_at(
             static_cast<viua::bytecode::codec::register_index_type>(i),
@@ -298,7 +300,8 @@ auto viua::process::Process::register_at(
     }
 }
 
-auto viua::process::Process::ensure_static_registers(std::string function_name) -> void
+auto viua::process::Process::ensure_static_registers(std::string function_name)
+    -> void
 {
     /** Makes sure that static register set for requested function is
      * initialized.
@@ -497,17 +500,13 @@ auto viua::process::Process::tick() -> Op_address_type
         and (not allowed_unchanged_ops.count(
             OPCODE(*stack->instruction_pointer)))
         and (not stack->thrown)) {
-
         auto tp = std::vector<viua::types::Exception::Throw_point>{};
         tp.push_back(viua::types::Exception::Throw_point{
-              reinterpret_cast<uint64_t>(current_stack().jump_base)
-            , static_cast<uint64_t>(current_stack().instruction_pointer
-                    - current_stack().jump_base)
-        });
-        stack->thrown =
-            std::make_unique<viua::types::Exception>(
-                  tp
-                , viua::types::Exception::Tag{"InstructionUnchanged"});
+            reinterpret_cast<uint64_t>(current_stack().jump_base),
+            static_cast<uint64_t>(current_stack().instruction_pointer
+                                  - current_stack().jump_base)});
+        stack->thrown = std::make_unique<viua::types::Exception>(
+            tp, viua::types::Exception::Tag{"InstructionUnchanged"});
     }
 
     if (stack->thrown and stack->frame_new) {
@@ -605,7 +604,8 @@ auto viua::process::Process::terminated() const -> bool
     return static_cast<bool>(stack->thrown);
 }
 
-auto viua::process::Process::pass(std::unique_ptr<viua::types::Value> message) -> void
+auto viua::process::Process::pass(std::unique_ptr<viua::types::Value> message)
+    -> void
 {
     message_queue.push(std::move(message));
     wakeup();
@@ -617,7 +617,8 @@ auto viua::process::Process::get_active_exception() -> viua::types::Value*
     return stack->thrown.get();
 }
 
-auto viua::process::Process::transfer_active_exception() -> std::unique_ptr<viua::types::Value>
+auto viua::process::Process::transfer_active_exception()
+    -> std::unique_ptr<viua::types::Value>
 {
     return std::move(stack->thrown);
 }
@@ -626,11 +627,10 @@ auto viua::process::Process::raise(
     std::unique_ptr<viua::types::Exception> exception) -> void
 {
     using Throw_point = viua::types::Exception::Throw_point;
-    exception->add_throw_point(Throw_point{
-          reinterpret_cast<uint64_t>(current_stack().jump_base)
-        , static_cast<uint64_t>(current_stack().instruction_pointer
-                - current_stack().jump_base)
-    });
+    exception->add_throw_point(
+        Throw_point{reinterpret_cast<uint64_t>(current_stack().jump_base),
+                    static_cast<uint64_t>(current_stack().instruction_pointer
+                                          - current_stack().jump_base)});
     stack->thrown = std::move(exception);
 }
 auto viua::process::Process::raise(
@@ -641,7 +641,8 @@ auto viua::process::Process::raise(
 }
 
 
-auto viua::process::Process::get_return_value() -> std::unique_ptr<viua::types::Value>
+auto viua::process::Process::get_return_value()
+    -> std::unique_ptr<viua::types::Value>
 {
     return std::move(stack->return_value);
 }
@@ -733,7 +734,8 @@ auto viua::process::Process::cancel_io(
     attached_scheduler->cancel_io(interaction_id);
 }
 
-auto viua::process::Process::migrate_to(viua::scheduler::Process_scheduler* sch) -> void
+auto viua::process::Process::migrate_to(viua::scheduler::Process_scheduler* sch)
+    -> void
 {
     attached_scheduler = sch;
 }
@@ -773,4 +775,5 @@ viua::process::Process::Process(std::unique_ptr<Frame> frm,
     stacks[s.get()] = std::move(s);
 }
 
-viua::process::Process::~Process() {}
+viua::process::Process::~Process()
+{}

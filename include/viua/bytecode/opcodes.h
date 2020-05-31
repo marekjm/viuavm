@@ -333,9 +333,9 @@ enum OPCODE : uint8_t {
     FUNCTION,
 
     // Opcodes related to functions.
-    FRAME,  // create new frame (required before param and pamv) for future
-            // function call
-    CALL,   // call given function with parameters set in parameter register,
+    FRAME,     // create new frame (required before param and pamv) for future
+               // function call
+    CALL,      // call given function with parameters set in parameter register,
     TAILCALL,  // perform a tail call to a function
     DEFER,  // call a function just after the frame it was called in is popped
             // off the stack

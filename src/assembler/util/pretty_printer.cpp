@@ -17,9 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
+
 #include <iomanip>
 #include <iostream>
-#include <unistd.h>
+
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/front/asm.h>
 #include <viua/support/string.h>

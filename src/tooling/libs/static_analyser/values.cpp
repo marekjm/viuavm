@@ -20,6 +20,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <string>
+
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
 
@@ -28,9 +29,13 @@ namespace viua {
         namespace libs {
             namespace static_analyser {
 namespace values {
-Value::Value(Value_type const t) : type_of_value{t} {}
+Value::Value(Value_type const t) : type_of_value{t}
+{}
 
-auto Value::type() const -> Value_type { return type_of_value; }
+auto Value::type() const -> Value_type
+{
+    return type_of_value;
+}
 
 auto Value::clone(Value const& value, Value_wrapper::map_type& values)
     -> std::unique_ptr<Value>
@@ -133,55 +138,100 @@ auto Value::clone(Value const& value, Value_wrapper::map_type& values)
     return cloned;
 }
 
-Integer::Integer() : Value{Value_type::Integer} {}
+Integer::Integer() : Value{Value_type::Integer}
+{}
 
-Integer::Integer(int const x) : Value{Value_type::Integer}, n{x} {}
+Integer::Integer(int const x) : Value{Value_type::Integer}, n{x}
+{}
 
-auto Integer::known() const -> bool { return n.has_value(); }
+auto Integer::known() const -> bool
+{
+    return n.has_value();
+}
 
-auto Integer::of() const -> int { return n.value(); }
-auto Integer::of(int const x) -> void { n = x; }
+auto Integer::of() const -> int
+{
+    return n.value();
+}
+auto Integer::of(int const x) -> void
+{
+    n = x;
+}
 
-Float::Float() : Value{Value_type::Float} {}
+Float::Float() : Value{Value_type::Float}
+{}
 
 Vector::Vector(Value_wrapper v) : Value{Value_type::Vector}, contained_type{v}
 {}
 
-auto Vector::of() const -> Value_wrapper const& { return contained_type; }
-auto Vector::of(Value_wrapper v) -> void { contained_type = v; }
+auto Vector::of() const -> Value_wrapper const&
+{
+    return contained_type;
+}
+auto Vector::of(Value_wrapper v) -> void
+{
+    contained_type = v;
+}
 
 Pointer::Pointer(Value_wrapper v)
         : Value{Value_type::Pointer}, contained_type{v}
 {}
 
-auto Pointer::of() const -> Value_wrapper const& { return contained_type; }
-auto Pointer::of(Value_wrapper v) -> void { contained_type = v; }
+auto Pointer::of() const -> Value_wrapper const&
+{
+    return contained_type;
+}
+auto Pointer::of(Value_wrapper v) -> void
+{
+    contained_type = v;
+}
 
-String::String() : Value{Value_type::String} {}
+String::String() : Value{Value_type::String}
+{}
 
-Text::Text() : Value{Value_type::Text} {}
+Text::Text() : Value{Value_type::Text}
+{}
 
-Boolean::Boolean() : Value{Value_type::Boolean} {}
+Boolean::Boolean() : Value{Value_type::Boolean}
+{}
 
-Bits::Bits() : Value{Value_type::Bits} {}
+Bits::Bits() : Value{Value_type::Bits}
+{}
 
-Closure::Closure(std::string n) : Value{Value_type::Closure}, name{n} {}
+Closure::Closure(std::string n) : Value{Value_type::Closure}, name{n}
+{}
 
-auto Closure::of() const -> std::string { return name; }
+auto Closure::of() const -> std::string
+{
+    return name;
+}
 
-Function::Function(std::string n) : Value{Value_type::Function}, name{n} {}
+Function::Function(std::string n) : Value{Value_type::Function}, name{n}
+{}
 
-auto Function::of() const -> std::string { return name; }
+auto Function::of() const -> std::string
+{
+    return name;
+}
 
-Atom::Atom() : Value{Value_type::Atom} {}
+Atom::Atom() : Value{Value_type::Atom}
+{}
 
-Atom::Atom(std::string s) : Value{Value_type::Atom}, value{s} {}
+Atom::Atom(std::string s) : Value{Value_type::Atom}, value{s}
+{}
 
-auto Atom::known() const -> bool { return value.has_value(); }
+auto Atom::known() const -> bool
+{
+    return value.has_value();
+}
 
-auto Atom::of() const -> std::string { return value.value(); }
+auto Atom::of() const -> std::string
+{
+    return value.value();
+}
 
-Struct::Struct() : Value{Value_type::Struct} {}
+Struct::Struct() : Value{Value_type::Struct}
+{}
 
 auto Struct::fields() const -> decltype(known_fields) const&
 {
@@ -201,7 +251,8 @@ auto Struct::field(std::string key, Value_wrapper value) -> void
     known_fields.insert_or_assign(std::move(key), value);
 }
 
-Pid::Pid() : Value{Value_type::Pid} {}
+Pid::Pid() : Value{Value_type::Pid}
+{}
 
 Value_wrapper::Value_wrapper(index_type const v, map_type& m) : i{v}, values{&m}
 {}
@@ -223,7 +274,8 @@ auto Value_wrapper::operator=(Value_wrapper&& that) -> Value_wrapper&
     return *this;
 }
 
-Value_wrapper::~Value_wrapper() {}
+Value_wrapper::~Value_wrapper()
+{}
 
 auto Value_wrapper::Value_wrapper::value() const -> Value&
 {
@@ -259,7 +311,10 @@ auto Value_wrapper::to_simple() const -> std::vector<Value_type>
     return simple;
 }
 
-auto Value_wrapper::index() const -> index_type { return i; }
+auto Value_wrapper::index() const -> index_type
+{
+    return i;
+}
 
 auto Value_wrapper::rebind(map_type& to) const -> Value_wrapper
 {

@@ -17,8 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <unistd.h>
+
+#include <iostream>
+
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
@@ -45,4 +47,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

@@ -101,7 +101,10 @@ struct IO_interaction {
     virtual auto interact() -> Interaction_result = 0;
 
     auto id() const -> id_type;
-    virtual auto fd() const -> std::optional<fd_type> { return std::nullopt; }
+    virtual auto fd() const -> std::optional<fd_type>
+    {
+        return std::nullopt;
+    }
     virtual auto kind() const -> IO_kind = 0;
 
     auto cancel() -> void;
@@ -119,8 +122,14 @@ struct IO_interaction {
 struct IO_empty_interaction : public IO_interaction {
     auto interact() -> Interaction_result override;
 
-    std::optional<fd_type> fd() const override { return std::nullopt; }
-    IO_kind kind() const override { return IO_kind::Output; }
+    std::optional<fd_type> fd() const override
+    {
+        return std::nullopt;
+    }
+    IO_kind kind() const override
+    {
+        return IO_kind::Output;
+    }
 
     using IO_interaction::IO_interaction;
 };
@@ -130,8 +139,14 @@ struct IO_read_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    std::optional<fd_type> fd() const override { return file_descriptor; }
-    IO_kind kind() const override { return IO_kind::Input; }
+    std::optional<fd_type> fd() const override
+    {
+        return file_descriptor;
+    }
+    IO_kind kind() const override
+    {
+        return IO_kind::Input;
+    }
 
     IO_read_interaction(id_type const, int const, size_t const);
 };
@@ -141,8 +156,14 @@ struct IO_write_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    std::optional<fd_type> fd() const override { return file_descriptor; }
-    IO_kind kind() const override { return IO_kind::Output; }
+    std::optional<fd_type> fd() const override
+    {
+        return file_descriptor;
+    }
+    IO_kind kind() const override
+    {
+        return IO_kind::Output;
+    }
 
     IO_write_interaction(id_type const, int const, std::string);
 };
@@ -151,8 +172,14 @@ struct IO_close_interaction : public IO_interaction {
 
     auto interact() -> Interaction_result override;
 
-    std::optional<fd_type> fd() const override { return file_descriptor; }
-    IO_kind kind() const override { return IO_kind::Close; }
+    std::optional<fd_type> fd() const override
+    {
+        return file_descriptor;
+    }
+    IO_kind kind() const override
+    {
+        return IO_kind::Close;
+    }
 
     IO_close_interaction(id_type const, int const);
 };

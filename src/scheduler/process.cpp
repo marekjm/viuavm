@@ -18,9 +18,11 @@
  */
 
 #include <pthread.h>
+
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+
 #include <viua/kernel/kernel.h>
 #include <viua/machine.h>
 #include <viua/printutils.h>
@@ -72,19 +74,18 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 std::cerr << "    name:    " + each.name + "\n";
                 continue;
             }
-            auto const in_module =
-                process.get_kernel().module_at(reinterpret_cast<uint8_t*>(each.jump_base));
+            auto const in_module = process.get_kernel().module_at(
+                reinterpret_cast<uint8_t*>(each.jump_base));
             auto const in_function =
-                (in_module)
-                ? process.get_kernel().in_which_function(*in_module, each.offset)
-                : std::nullopt;
-            std::cerr << "    address: 0x"
-                << std::hex << std::setw(4) << std::setfill('0') << each.offset << std::dec
-                << " (byte " << each.offset << ") inside 0x"
-                << std::hex << std::setw(12) << std::setfill('0') << each.jump_base
-                << " [" << in_module.value_or("<unknown>")
-                << "::" << in_function.value_or("<unknown>")
-                << "]\n";
+                (in_module) ? process.get_kernel().in_which_function(
+                    *in_module, each.offset)
+                            : std::nullopt;
+            std::cerr << "    address: 0x" << std::hex << std::setw(4)
+                      << std::setfill('0') << each.offset << std::dec
+                      << " (byte " << each.offset << ") inside 0x" << std::hex
+                      << std::setw(12) << std::setfill('0') << each.jump_base
+                      << " [" << in_module.value_or("<unknown>")
+                      << "::" << in_function.value_or("<unknown>") << "]\n";
         }
     } else if (ex) {
         std::cerr << "none\n";
@@ -95,7 +96,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
     std::cerr << "frame details:\n";
 
     if (trace.size()) {
-        auto const last = trace.back();
+        auto const last       = trace.back();
         auto const& registers = last->local_register_set;
 
         using Size = viua::kernel::Register_set::size_type;
@@ -108,17 +109,16 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 }
             }
 
-            std::cerr << "  non-empty registers: " << std::dec << non_empty << '/'
-                      << registers->size();
+            std::cerr << "  non-empty registers: " << std::dec << non_empty
+                      << '/' << registers->size();
             std::cerr << (non_empty ? ":\n" : "\n");
             for (auto r = Size{0}; r < registers->size(); ++r) {
                 if (registers->at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    registers[" << r << "]: ";
-                std::cerr << '<' << registers->get(r)->type()
-                          << "> " << registers->get(r)->str()
-                          << "\n";
+                std::cerr << '<' << registers->get(r)->type() << "> "
+                          << registers->get(r)->str() << "\n";
             }
         } else if (not registers.owns()) {
             std::cerr << "  this frame did not own its registers\n";
@@ -127,8 +127,8 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
         }
 
         if (registers->size()) {
-            std::cerr << "  non-empty arguments (out of "
-                      << registers->size() << "):\n";
+            std::cerr << "  non-empty arguments (out of " << registers->size()
+                      << "):\n";
             for (auto r = Size{0}; r < registers->size(); ++r) {
                 if (registers->at(r) == nullptr) {
                     continue;
@@ -137,7 +137,8 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 if (registers->is_flagged(r, MOVED)) {
                     std::cerr << "[moved] ";
                 }
-                if (auto const ptr = dynamic_cast<viua::types::Pointer const*>(registers->get(r))) {
+                if (auto const ptr = dynamic_cast<viua::types::Pointer const*>(
+                        registers->get(r))) {
                     std::cerr << "<" << ptr->type() << ">\n";
                 } else {
                     std::cerr << '<' << registers->get(r)->type() << "> "
@@ -239,9 +240,13 @@ Process_scheduler::Process_scheduler(viua::kernel::Kernel& k, id_type const x)
         : assigned_id{x}, attached_kernel{k}
 {}
 
-Process_scheduler::~Process_scheduler() {}
+Process_scheduler::~Process_scheduler()
+{}
 
-auto Process_scheduler::id() const -> id_type { return assigned_id; }
+auto Process_scheduler::id() const -> id_type
+{
+    return assigned_id;
+}
 
 auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void
 {
@@ -267,12 +272,12 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
 {
     auto const pid_of_new_process = attached_kernel.make_pid();
 
-    auto process = std::make_unique<process_type>(
-          std::move(frame)
-        , pid_of_new_process
-        , this
-        , parent
-        , false /* tracing_enabled */
+    auto process = std::make_unique<process_type>(std::move(frame),
+                                                  pid_of_new_process,
+                                                  this,
+                                                  parent,
+                                                  false /* tracing_enabled
+                                                         */
     );
 
     process->start();
@@ -415,20 +420,23 @@ auto Process_scheduler::get_entry_point_of_function(std::string const& name)
 template<typename T> struct deferred {
     T const& fn_to_call;
 
-    deferred(T const& fn) : fn_to_call{fn} {}
+    deferred(T const& fn) : fn_to_call{fn}
+    {}
     deferred(deferred<T> const&) = delete;
     auto operator=(deferred<T> const&) = delete;
     deferred(deferred<T>&&)            = delete;
     auto operator=(deferred<T>&&) = delete;
-    inline ~deferred() { fn_to_call(); }
+    inline ~deferred()
+    {
+        fn_to_call();
+    }
 };
 
 auto Process_scheduler::launch() -> void
 {
     scheduler_thread = std::thread([this] { (*this)(); });
-    pthread_setname_np(
-        scheduler_thread.native_handle()
-        , ("proc." + std::to_string(assigned_id)).c_str());
+    pthread_setname_np(scheduler_thread.native_handle(),
+                       ("proc." + std::to_string(assigned_id)).c_str());
 }
 auto Process_scheduler::operator()() -> void
 {
@@ -652,9 +660,16 @@ auto Process_scheduler::operator()() -> void
     }
 }
 
-auto Process_scheduler::shutdown() -> void {}
-auto Process_scheduler::join() -> void { scheduler_thread.join(); }
-auto Process_scheduler::exit() const -> int { return exit_code.value_or(0); }
+auto Process_scheduler::shutdown() -> void
+{}
+auto Process_scheduler::join() -> void
+{
+    scheduler_thread.join();
+}
+auto Process_scheduler::exit() const -> int
+{
+    return exit_code.value_or(0);
+}
 
 auto Process_scheduler::schedule_io(
     std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void

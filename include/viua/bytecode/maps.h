@@ -25,6 +25,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
 

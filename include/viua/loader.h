@@ -27,11 +27,13 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include <viua/bytecode/codec.h>
 #include <viua/machine.h>
 
-using IdToAddressMapping = std::tuple<std::vector<std::string>,
-                   std::map<std::string, viua::bytecode::codec::bytecode_size_type>>;
+using IdToAddressMapping = std::tuple<
+    std::vector<std::string>,
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>>;
 
 template<class T> void readinto(std::ifstream& in, T* object)
 {
@@ -55,14 +57,16 @@ class Loader {
 
     std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         function_addresses;
-    std::map<std::string, viua::bytecode::codec::bytecode_size_type> function_sizes;
+    std::map<std::string, viua::bytecode::codec::bytecode_size_type>
+        function_sizes;
     std::vector<std::string> functions;
     std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         block_addresses;
     std::vector<std::string> blocks;
 
-    IdToAddressMapping loadmap(char*,
-                               viua::bytecode::codec::bytecode_size_type const&);
+    IdToAddressMapping loadmap(
+        char*,
+        viua::bytecode::codec::bytecode_size_type const&);
     void calculate_function_sizes();
 
     void load_magic_number(std::ifstream&);
@@ -104,8 +108,10 @@ class Loader {
 
     auto dynamic_imports() const -> std::vector<std::string>;
 
-    Loader(std::string pth) : path(pth), size(0), bytecode(nullptr) {}
-    ~Loader() {}
+    Loader(std::string pth) : path(pth), size(0), bytecode(nullptr)
+    {}
+    ~Loader()
+    {}
 };
 
 

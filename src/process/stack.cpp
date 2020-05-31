@@ -18,7 +18,9 @@
  */
 
 #include <experimental/memory>
+
 #include <memory>
+
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
 #include <viua/scheduler/process.h>
@@ -57,7 +59,10 @@ auto viua::process::Stack::set_return_value() -> void
     }
 }
 
-auto viua::process::Stack::state_of() const -> STATE { return current_state; }
+auto viua::process::Stack::state_of() const -> STATE
+{
+    return current_state;
+}
 
 auto viua::process::Stack::state_of(const STATE s) -> STATE
 {
@@ -150,7 +155,10 @@ auto viua::process::Stack::size() const -> decltype(frames)::size_type
     return frames.size();
 }
 
-auto viua::process::Stack::clear() -> void { frames.clear(); }
+auto viua::process::Stack::clear() -> void
+{
+    frames.clear();
+}
 
 auto viua::process::Stack::emplace_back(std::unique_ptr<Frame> frame)
     -> decltype(frames.emplace_back(frame))

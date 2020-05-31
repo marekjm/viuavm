@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <sstream>
+
 #include <viua/support/string.h>
 #include <viua/types/text.h>
 
@@ -101,17 +102,13 @@ auto viua::types::Text::parse(std::string s) -> decltype(text)
     return parsed_text;
 }
 
-viua::types::Text::Text(std::string s)
-    : text{parse(s)}
-    , text_str{std::move(s)}
+viua::types::Text::Text(std::string s) : text{parse(s)}, text_str{std::move(s)}
 {}
 viua::types::Text::Text(std::vector<Character> s)
-    : text(std::move(s))
-    , text_str{str()}
+        : text(std::move(s)), text_str{str()}
 {}
 viua::types::Text::Text(Text&& s)
-    : text{std::move(s.text)}
-    , text_str{std::move(s.text_str)}
+        : text{std::move(s.text)}, text_str{std::move(s.text_str)}
 {}
 
 auto viua::types::Text::type() const -> std::string

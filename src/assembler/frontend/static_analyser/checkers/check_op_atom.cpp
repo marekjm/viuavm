@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -42,13 +43,12 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
     auto source = get_operand<Atom_literal>(instruction, 1);
     if (not source) {
         auto error = invalid_syntax(instruction.operands.at(1)->tokens,
-                             "invalid operand")
-            .note("expected atom literal");
+                                    "invalid operand")
+                         .note("expected atom literal");
         if (auto s = get_operand<Text_literal>(instruction, 1); s) {
-            error.aside(
-                instruction.operands.at(1)->tokens.at(0)
-                , ("atom literals use single quotes: '"
-                   + s->content.substr(1, s->content.size() - 2) + "'"));
+            error.aside(instruction.operands.at(1)->tokens.at(0),
+                        ("atom literals use single quotes: '"
+                         + s->content.substr(1, s->content.size() - 2) + "'"));
         }
         throw error;
     }

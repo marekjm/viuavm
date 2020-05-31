@@ -21,6 +21,7 @@
 #define VIUA_TYPE_FUNCTION_H
 
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/value.h>

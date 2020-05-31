@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
@@ -29,7 +30,10 @@
 
 std::string const viua::types::Process::type_name = "Process";
 
-std::string viua::types::Process::type() const { return type_name; }
+std::string viua::types::Process::type() const
+{
+    return type_name;
+}
 
 std::string viua::types::Process::str() const
 {
@@ -38,7 +42,10 @@ std::string viua::types::Process::str() const
     return oss.str();
 }
 
-std::string viua::types::Process::repr() const { return str(); }
+std::string viua::types::Process::repr() const
+{
+    return str();
+}
 
 bool viua::types::Process::boolean() const
 {
@@ -52,7 +59,10 @@ std::unique_ptr<viua::types::Value> viua::types::Process::copy() const
     return std::make_unique<Process>(thrd);
 }
 
-viua::process::PID viua::types::Process::pid() const { return saved_pid; }
+viua::process::PID viua::types::Process::pid() const
+{
+    return saved_pid;
+}
 
 viua::types::Process::Process(viua::process::Process* t)
         : thrd(t), saved_pid(thrd->pid())

@@ -27,17 +27,26 @@ namespace viua { namespace process {
 class Process;
 
 struct PID {
-    using pid_type = std::tuple<
-          uint64_t  // base:  chosen randomly at VM start
-        , uint64_t  // big:   increasing sequentially; begins with a randomly chosen
-                    //        highest and lowest 16 bits
-        , uint32_t  // small: increasing sequentially; begins with a randomly chosen
-                    //        highest 12 and lowest 8 bits
-        , uint16_t  // n:     increasing sequentially every big N (randomly chosen at VM
-                    //        start from [0; 2^8)); begins with random [0; 2^16)
-        , uint16_t  // m:     increasing sequentially every small M (randomly chosen at VM
-                    //        start); begins with random [0; 2^8)
-    >;
+    using pid_type =
+        std::tuple<uint64_t  // base:  chosen randomly at VM start
+                   ,
+                   uint64_t  // big:   increasing sequentially; begins with a
+                             // randomly chosen
+                             //        highest and lowest 16 bits
+                   ,
+                   uint32_t  // small: increasing sequentially; begins with a
+                             // randomly chosen
+                             //        highest 12 and lowest 8 bits
+                   ,
+                   uint16_t  // n:     increasing sequentially every big N
+                             // (randomly chosen at VM
+                             //        start from [0; 2^8)); begins with random
+                             //        [0; 2^16)
+                   ,
+                   uint16_t  // m:     increasing sequentially every small M
+                             // (randomly chosen at VM
+                             //        start); begins with random [0; 2^8)
+                   >;
 
   private:
     pid_type const value;
@@ -59,21 +68,21 @@ class Pid_emitter {
 
     // 2nd field
     uint64_t big_offset = 0;
-    uint64_t big = 0;
+    uint64_t big        = 0;
 
     // 3rd field
     uint32_t small_offset = 0;
-    uint32_t small = 0;
+    uint32_t small        = 0;
 
     // 4th field
-    uint8_t n_modulo = 1;
+    uint8_t n_modulo  = 1;
     uint16_t n_offset = 0;
-    uint16_t n = 0;
+    uint16_t n        = 0;
 
     // 5th field
-    uint8_t m_modulo = 1;
+    uint8_t m_modulo  = 1;
     uint16_t m_offset = 0;
-    uint16_t m = 0;
+    uint16_t m        = 0;
 
   public:
     Pid_emitter();

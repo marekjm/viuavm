@@ -21,10 +21,11 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+
+#include <viua/bytecode/codec.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
-#include <viua/bytecode/codec.h>
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/support/env.h>
 #include <viua/support/pointer.h>
@@ -45,55 +46,56 @@ static auto intop_with_rs_type(Decoder_type const& decoder, uint8_t const* ptr)
         oss << "void";
         ++ptr;
     } else if (type == OT_INT) {
-        auto const [ next_ptr, value ] = decoder.decode_i32(ptr);
+        auto const [next_ptr, value] = decoder.decode_i32(ptr);
         oss << value;
         ptr = next_ptr;
     } else if (type == OT_FLOAT) {
-        auto const [ next_ptr, value ] = decoder.decode_f64(ptr);
+        auto const [next_ptr, value] = decoder.decode_f64(ptr);
         oss << value;
         ptr = next_ptr;
-    } else if (std::set{ OT_REGISTER_INDEX, OT_REGISTER_REFERENCE, OT_POINTER }.count(type)) {
-        auto const [ next_ptr, value ] = decoder.decode_register(ptr);
+    } else if (std::set{OT_REGISTER_INDEX, OT_REGISTER_REFERENCE, OT_POINTER}
+                   .count(type)) {
+        auto const [next_ptr, value] = decoder.decode_register(ptr);
 
         using viua::bytecode::codec::Access_specifier;
         switch (std::get<2>(value)) {
-            case Access_specifier::Direct:
-                oss << "%";
-                break;
-            case Access_specifier::Register_indirect:
-                oss << "@";
-                break;
-            case Access_specifier::Pointer_dereference:
-                oss << "*";
-                break;
-            default:
-                throw "invalid access specifier encoded";
+        case Access_specifier::Direct:
+            oss << "%";
+            break;
+        case Access_specifier::Register_indirect:
+            oss << "@";
+            break;
+        case Access_specifier::Pointer_dereference:
+            oss << "*";
+            break;
+        default:
+            throw "invalid access specifier encoded";
         }
 
         oss << std::get<1>(value) << " ";
 
         using viua::bytecode::codec::Register_set;
         switch (std::get<0>(value)) {
-            case Register_set::Global:
-                oss << "global";
-                break;
-            case Register_set::Local:
-                oss << "local";
-                break;
-            case Register_set::Static:
-                oss << "static";
-                break;
-            case Register_set::Arguments:
-                oss << "arguments";
-                break;
-            case Register_set::Parameters:
-                oss << "parameters";
-                break;
-            case Register_set::Closure_local:
-                oss << "";
-                break;
-            default:
-                throw "invalid register set encoded";
+        case Register_set::Global:
+            oss << "global";
+            break;
+        case Register_set::Local:
+            oss << "local";
+            break;
+        case Register_set::Static:
+            oss << "static";
+            break;
+        case Register_set::Arguments:
+            oss << "arguments";
+            break;
+        case Register_set::Parameters:
+            oss << "parameters";
+            break;
+        case Register_set::Closure_local:
+            oss << "";
+            break;
+        default:
+            throw "invalid register set encoded";
         }
 
         ptr = next_ptr;
@@ -107,33 +109,34 @@ static auto intop_with_rs_type(Decoder_type const& decoder, uint8_t const* ptr)
         throw "invalid operand type encoded";
     }
 
-    return { oss.str(), ptr };
+    return {oss.str(), ptr};
 }
 
-static auto disassemble_string(
-        std::ostream& oss,
-        Decoder_type const& decoder,
-        uint8_t const* ptr,
-        std::optional<char const> quote = std::nullopt) -> uint8_t const*
+static auto disassemble_string(std::ostream& oss,
+                               Decoder_type const& decoder,
+                               uint8_t const* ptr,
+                               std::optional<char const> quote = std::nullopt)
+    -> uint8_t const*
 {
     ++ptr;  // for operand type
-    auto const [ next_ptr, s ] = decoder.decode_string(ptr);
+    auto const [next_ptr, s] = decoder.decode_string(ptr);
     oss << " " << (quote.has_value() ? str::enquote(s, *quote) : s);
     return next_ptr;
 }
 
 static auto disassemble_raw_string(
-        std::ostream& oss,
-        Decoder_type const& decoder,
-        uint8_t const* ptr,
-        std::optional<char const> quote = std::nullopt) -> uint8_t const*
+    std::ostream& oss,
+    Decoder_type const& decoder,
+    uint8_t const* ptr,
+    std::optional<char const> quote = std::nullopt) -> uint8_t const*
 {
-    auto const [ next_ptr, s ] = decoder.decode_string(ptr);
+    auto const [next_ptr, s] = decoder.decode_string(ptr);
     oss << " " << (quote.has_value() ? str::enquote(s, *quote) : s);
     return next_ptr;
 }
 
-static auto stringify_bit_string_to_hex(std::vector<uint8_t> bytes) -> std::string
+static auto stringify_bit_string_to_hex(std::vector<uint8_t> bytes)
+    -> std::string
 {
     if (bytes.empty()) {
         return "0x0";
@@ -222,7 +225,8 @@ static auto stringify_bit_string_to_hex(std::vector<uint8_t> bytes) -> std::stri
 
     return oss.str();
 }
-static auto stringify_bit_string_to_binary(std::vector<uint8_t> bytes) -> std::string
+static auto stringify_bit_string_to_binary(std::vector<uint8_t> bytes)
+    -> std::string
 {
     if (bytes.empty()) {
         return "0b0";
@@ -252,18 +256,18 @@ static auto stringify_bit_string(std::vector<uint8_t> bytes) -> std::string
 }
 static auto disassemble_bit_string(std::ostream& oss,
                                    Decoder_type const& decoder,
-                                   uint8_t const* ptr)
-    -> uint8_t const*
+                                   uint8_t const* ptr) -> uint8_t const*
 {
-    auto const [ next_ptr, bits ] = decoder.decode_bits_string(ptr);
+    auto const [next_ptr, bits] = decoder.decode_bits_string(ptr);
     oss << " " << stringify_bit_string(bits);
     return next_ptr;
 }
 
-static auto disassemble_timeout(std::ostream& oss, Decoder_type const& decoder, uint8_t const* ptr)
-    -> uint8_t const*
+static auto disassemble_timeout(std::ostream& oss,
+                                Decoder_type const& decoder,
+                                uint8_t const* ptr) -> uint8_t const*
 {
-    auto const [ next_ptr, value ] = decoder.decode_timeout(ptr);
+    auto const [next_ptr, value] = decoder.decode_timeout(ptr);
 
     oss << " ";
     if (value == 0) {
@@ -275,10 +279,11 @@ static auto disassemble_timeout(std::ostream& oss, Decoder_type const& decoder, 
     return next_ptr;
 }
 
-static auto disassemble_address(std::ostream& oss, Decoder_type const& decoder, uint8_t const* ptr)
-    -> uint8_t const*
+static auto disassemble_address(std::ostream& oss,
+                                Decoder_type const& decoder,
+                                uint8_t const* ptr) -> uint8_t const*
 {
-    auto const [ next_ptr, value ] = decoder.decode_address(ptr);
+    auto const [next_ptr, value] = decoder.decode_address(ptr);
 
     oss << " 0x";
     oss << std::hex;
@@ -288,12 +293,12 @@ static auto disassemble_address(std::ostream& oss, Decoder_type const& decoder, 
     return next_ptr;
 }
 
-static auto disassemble_ri_operand_with_rs_type(
-    std::ostream& oss,
-    Decoder_type const& decoder,
-    uint8_t const* ptr) -> uint8_t const*
+static auto disassemble_ri_operand_with_rs_type(std::ostream& oss,
+                                                Decoder_type const& decoder,
+                                                uint8_t const* ptr)
+    -> uint8_t const*
 {
-    auto const [ s, next_ptr ] = disassembler::intop_with_rs_type(decoder, ptr);
+    auto const [s, next_ptr] = disassembler::intop_with_rs_type(decoder, ptr);
     oss << ' ' << s;
     return next_ptr;
 }
@@ -542,7 +547,7 @@ auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     case FLOAT:
     {
         ptr = disassemble_ri_operand_with_rs_type(oss, decoder, ptr);
-        auto const [ next_ptr, value ] = decoder.decode_f64(ptr);
+        auto const [next_ptr, value] = decoder.decode_f64(ptr);
         oss << " " << value;
         ptr = next_ptr;
         break;
@@ -574,4 +579,4 @@ auto instruction(Decoder_type const& decoder, uint8_t const* ptr)
     return std::tuple<std::string, viua::bytecode::codec::bytecode_size_type>(
         oss.str(), increase);
 }
-}
+}  // namespace disassembler

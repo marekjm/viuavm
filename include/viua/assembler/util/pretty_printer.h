@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/cg/lex.h>
 
 namespace viua {

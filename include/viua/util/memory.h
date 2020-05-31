@@ -30,7 +30,7 @@ using dumb_ptr = T*;  // FIXME; use std::experimental::observer_ptr
 
 template<class T> class maybe_unique_ptr {
     bool owns_pointer = true;
-    T* pointer = nullptr;
+    T* pointer        = nullptr;
 
     auto delete_if_owned() -> void
     {
@@ -67,22 +67,40 @@ template<class T> class maybe_unique_ptr {
         return *this;
     }
 
-    auto get() -> T* { return pointer; }
-    auto get() const -> T const* { return pointer; }
+    auto get() -> T*
+    {
+        return pointer;
+    }
+    auto get() const -> T const*
+    {
+        return pointer;
+    }
 
-    auto owns() const -> bool { return owns_pointer; }
+    auto owns() const -> bool
+    {
+        return owns_pointer;
+    }
 
-    auto operator-> () -> T* { return pointer; }
-    auto operator-> () const -> T const* { return pointer; }
+    auto operator->() -> T*
+    {
+        return pointer;
+    }
+    auto operator->() const -> T const*
+    {
+        return pointer;
+    }
 
     maybe_unique_ptr(T* ptr = nullptr, bool own = true)
             : owns_pointer(own), pointer(ptr)
     {}
     maybe_unique_ptr(maybe_unique_ptr<T> const&) = delete;
-    maybe_unique_ptr(maybe_unique_ptr<T>&&) = delete;
+    maybe_unique_ptr(maybe_unique_ptr<T>&&)      = delete;
     auto operator=(maybe_unique_ptr<T> const&) -> maybe_unique_ptr<T>& = delete;
-    auto operator=(maybe_unique_ptr<T>&&) -> maybe_unique_ptr<T>& = delete;
-    ~maybe_unique_ptr() { delete_if_owned(); }
+    auto operator=(maybe_unique_ptr<T> &&) -> maybe_unique_ptr<T>& = delete;
+    ~maybe_unique_ptr()
+    {
+        delete_if_owned();
+    }
 };
 
 template<class To, class From> auto load_aligned(const From* source) -> To
@@ -96,7 +114,8 @@ template<class To> class aligned_write_impl {
     To* target;
 
   public:
-    aligned_write_impl(To* t) : target(t) {}
+    aligned_write_impl(To* t) : target(t)
+    {}
 
     template<class From>
     auto operator=(const From source) -> aligned_write_impl&
@@ -124,7 +143,8 @@ template<class To> class aligned_read_impl {
     To& target;
 
   public:
-    aligned_read_impl(To& t) : target(t) {}
+    aligned_read_impl(To& t) : target(t)
+    {}
 
     template<class From>
     auto operator=(const From* source) -> aligned_read_impl&

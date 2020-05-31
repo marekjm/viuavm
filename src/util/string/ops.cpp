@@ -23,6 +23,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+
 #include <viua/util/string/ops.h>
 
 namespace viua { namespace util { namespace string { namespace ops {
@@ -155,67 +156,55 @@ auto strdecode(std::string const s) -> std::string
         auto const next = s.at(++i);
 
         auto const simple = std::map<char, char>{
-            { 'a', '\a' },
-            { 'b', '\b' },
-            { 'f', '\f' },
-            { 'n', '\n' },
-            { 'r', '\r' },
-            { 't', '\t' },
-            { 'v', '\v' },
-            { '\\', '\\' },
+            {'a', '\a'},
+            {'b', '\b'},
+            {'f', '\f'},
+            {'n', '\n'},
+            {'r', '\r'},
+            {'t', '\t'},
+            {'v', '\v'},
+            {'\\', '\\'},
         };
         if (simple.count(next)) {
             decoded << simple.at(next);
             continue;
         }
 
-        auto const octals = std::set<char>{
-              '0'
-            , '1'
-            , '2'
-            , '3'
-            , '4'
-            , '5'
-            , '6'
-            , '7'
-        };
-        auto const o = [octals, s, i](size_t const n) -> bool
-        {
+        auto const octals =
+            std::set<char>{'0', '1', '2', '3', '4', '5', '6', '7'};
+        auto const o = [octals, s, i](size_t const n) -> bool {
             return octals.count(s.at(i + n));
         };
         if ((i + 2) < s.size() and o(0) and o(1) and o(2)) {
             auto const digits = s.substr(i, 3);
-            auto const n = std::stoi(digits, nullptr, 8);
+            auto const n      = std::stoi(digits, nullptr, 8);
             decoded << static_cast<char>(n);
             i += 2;
             continue;
         }
 
-        auto const hexadecimals = std::set<char>{
-              '0'
-            , '1'
-            , '2'
-            , '3'
-            , '4'
-            , '5'
-            , '6'
-            , '7'
-            , '8'
-            , '9'
-            , 'a'
-            , 'b'
-            , 'c'
-            , 'd'
-            , 'e'
-            , 'f'
-        };
-        auto const h = [hexadecimals, s, i](size_t const n) -> bool
-        {
+        auto const hexadecimals = std::set<char>{'0',
+                                                 '1',
+                                                 '2',
+                                                 '3',
+                                                 '4',
+                                                 '5',
+                                                 '6',
+                                                 '7',
+                                                 '8',
+                                                 '9',
+                                                 'a',
+                                                 'b',
+                                                 'c',
+                                                 'd',
+                                                 'e',
+                                                 'f'};
+        auto const h            = [hexadecimals, s, i](size_t const n) -> bool {
             return hexadecimals.count(s.at(i + n));
         };
         if ((i + 2) < s.size() and next == 'x' and h(1) and h(2)) {
             auto const digits = '0' + s.substr(i, 4);
-            auto const n = std::stoi(digits, nullptr, 16);
+            auto const n      = std::stoi(digits, nullptr, 16);
             decoded << static_cast<char>(n);
             i += 2;
             continue;

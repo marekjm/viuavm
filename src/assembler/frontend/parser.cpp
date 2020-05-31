@@ -19,17 +19,18 @@
 
 #include <iostream>
 #include <stdexcept>
+
 #include <viua/assembler/frontend/parser.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
 
 
+using viua::bytecode::codec::Register_set;
 using viua::cg::lex::Invalid_syntax;
 using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 using viua::internals::Access_specifier;
-using viua::bytecode::codec::Register_set;
 
 
 // This value is completely arbitrary.
@@ -138,14 +139,14 @@ auto viua::assembler::frontend::parser::parse_operand(
         ri->add(tokens.at(i));  // add index token
 
         if (str::isnum(tok.substr(1), false)) {
-            constexpr auto max_allowed =
-                std::numeric_limits<viua::bytecode::codec::register_index_type>::max();
+            constexpr auto max_allowed = std::numeric_limits<
+                viua::bytecode::codec::register_index_type>::max();
             try {
                 /*
                  * We check the string value here since it is not susceptible to
                  * wraparound. If we checked the index value we would access a
-                 * value that was potentially tainted by wraparound - which could
-                 * lead to a false sense of security here, and weird error
+                 * value that was potentially tainted by wraparound - which
+                 * could lead to a false sense of security here, and weird error
                  * messages like "cannot access register 0 with 0 allocated"
                  * while the underlined source clearly states 65536.
                  *
@@ -155,23 +156,22 @@ auto viua::assembler::frontend::parser::parse_operand(
                  */
                 auto const actual_tried = std::stoull(tok.substr(1));
                 if (actual_tried > max_allowed) {
-                    throw std::out_of_range{"tried to allocate too many registers"};
+                    throw std::out_of_range{
+                        "tried to allocate too many registers"};
                 }
-                ri->index =
-                    static_cast<decltype(ri->index)>(actual_tried);
+                ri->index = static_cast<decltype(ri->index)>(actual_tried);
             } catch (std::out_of_range&) {
                 throw Invalid_syntax{
                     tokens.at(0),
                     "register index outside of defined range (max allowed "
                     "register index is "
-                        + std::to_string(max_allowed)
-                        + ')'};
+                        + std::to_string(max_allowed) + ')'};
             }
             ri->resolved = true;
         } else if (str::isnum(tok.substr(1), true)) {
-            throw Invalid_syntax(tokens.at(0),
-                                 "register indexes cannot be negative: "
-                                     + tok.substr(1));
+            throw Invalid_syntax(
+                tokens.at(0),
+                "register indexes cannot be negative: " + tok.substr(1));
         } else {
             // FIXME Throw this error during register usage analysis, when we
             // have a full map of names built so "did you mean...?" note can be
@@ -399,7 +399,7 @@ auto viua::assembler::frontend::parser::parse_directive(
 {
     auto i = decltype(tokens)::size_type{0};
 
-    if (not::assembler::utils::lines::is_directive(tokens.at(0))) {
+    if (not ::assembler::utils::lines::is_directive(tokens.at(0))) {
         auto error = Invalid_syntax(tokens.at(0), "unknown directive");
         if (auto suggestion =
                 str::levenshtein_best(tokens.at(i),
@@ -517,7 +517,7 @@ auto viua::assembler::frontend::parser::parse_function(
 
     ib.name = tokens.at(i);
 
-    if (not::assembler::utils::is_valid_function_name(ib.name)) {
+    if (not ::assembler::utils::is_valid_function_name(ib.name)) {
         throw Invalid_syntax(ib.name,
                              ("invalid function name: " + ib.name.str()));
     }
@@ -555,7 +555,7 @@ auto viua::assembler::frontend::parser::parse_closure(
     ib.closure = true;
     ib.name    = tokens.at(i);
 
-    if (not::assembler::utils::is_valid_function_name(ib.name)) {
+    if (not ::assembler::utils::is_valid_function_name(ib.name)) {
         throw Invalid_syntax(ib.name,
                              ("invalid function name: " + ib.name.str()));
     }
@@ -646,7 +646,7 @@ auto viua::assembler::frontend::parser::parse(std::vector<Token> const& tokens)
             if (tokens.at(i) == "\n") {
                 throw Invalid_syntax(tokens.at(i - 1), "missing function name");
             }
-            if (not::assembler::utils::is_valid_function_name(tokens.at(i))) {
+            if (not ::assembler::utils::is_valid_function_name(tokens.at(i))) {
                 throw Invalid_syntax(tokens.at(i), "not a valid function name");
             }
             parsed.function_signatures.push_back(tokens.at(i++));

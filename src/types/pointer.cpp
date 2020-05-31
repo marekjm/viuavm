@@ -22,6 +22,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
@@ -49,9 +50,11 @@ void viua::types::Pointer::invalidate(viua::types::Value* t)
         points_to = nullptr;
     }
 }
-auto viua::types::Pointer::expired() const -> bool { return (points_to == nullptr); }
-auto viua::types::Pointer::authenticate(viua::process::PID const pid)
-    -> void
+auto viua::types::Pointer::expired() const -> bool
+{
+    return (points_to == nullptr);
+}
+auto viua::types::Pointer::authenticate(viua::process::PID const pid) -> void
 {
     /*
      *  Pointers should automatically expire upon crossing process boundaries.
@@ -59,9 +62,7 @@ auto viua::types::Pointer::authenticate(viua::process::PID const pid)
      *  code passes the pointer object to user-process to ensure that Pointer's
      * state is properly accounted for.
      */
-    points_to = (origin_pid == pid)
-        ? points_to
-        : nullptr;
+    points_to = (origin_pid == pid) ? points_to : nullptr;
 }
 auto viua::types::Pointer::reset(viua::types::Value* t) -> void
 {
@@ -73,30 +74,32 @@ auto viua::types::Pointer::to(viua::process::PID const p) -> viua::types::Value*
     if (origin_pid != p) {
         // Dereferencing pointers outside of their original process is illegal.
         using viua::types::Exception;
-        throw std::make_unique<Exception>(
-              Exception::Tag{"Invalid_dereference"}
-            , "outside of original process");
+        throw std::make_unique<Exception>(Exception::Tag{"Invalid_dereference"},
+                                          "outside of original process");
     }
     if (expired()) {
         using viua::types::Exception;
-        throw std::make_unique<Exception>(
-              Exception::Tag{"Expired_pointer"}
-            , "pointer is no longer valid");
+        throw std::make_unique<Exception>(Exception::Tag{"Expired_pointer"},
+                                          "pointer is no longer valid");
     }
     return points_to;
 }
 
 auto viua::types::Pointer::type() const -> std::string
 {
-    return ((not expired())
-        ? ("Pointer_of_" + points_to->type())
-        : "Expired_pointer");
+    return ((not expired()) ? ("Pointer_of_" + points_to->type())
+                            : "Expired_pointer");
 }
 
 auto viua::types::Pointer::boolean() const -> bool
-{ return (not expired()); }
+{
+    return (not expired());
+}
 
-auto viua::types::Pointer::str() const -> std::string { return type(); }
+auto viua::types::Pointer::str() const -> std::string
+{
+    return type();
+}
 
 auto viua::types::Pointer::copy() const -> std::unique_ptr<viua::types::Value>
 {
@@ -108,14 +111,15 @@ auto viua::types::Pointer::copy() const -> std::unique_ptr<viua::types::Value>
 
 
 viua::types::Pointer::Pointer(viua::process::PID pid)
-    : points_to{nullptr}
-    , origin_pid{pid}
+        : points_to{nullptr}, origin_pid{pid}
 {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
                               viua::process::PID const pid)
-    : points_to{nullptr}
-    , origin_pid{pid}
+        : points_to{nullptr}, origin_pid{pid}
 {
     attach(t);
 }
-viua::types::Pointer::~Pointer() { detach(); }
+viua::types::Pointer::~Pointer()
+{
+    detach();
+}

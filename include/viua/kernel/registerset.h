@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <vector>
+
 #include <viua/bytecode/codec.h>
 #include <viua/types/value.h>
 
@@ -64,7 +65,7 @@ class Register {
 
     operator bool() const;
     auto operator=(Register const&) -> Register& = delete;
-    auto operator=(Register&&) -> Register&;
+    auto operator                                =(Register &&) -> Register&;
     auto operator=(decltype(value)&&) -> Register&;
 };
 
@@ -76,12 +77,9 @@ class Register_set {
     std::vector<Register> registers;
 
   public:
-    auto put(size_type const,
-             std::unique_ptr<viua::types::Value>) -> void;
-    auto pop(
-        size_type const) -> std::unique_ptr<viua::types::Value>;
-    auto set(size_type const,
-             std::unique_ptr<viua::types::Value>) -> void;
+    auto put(size_type const, std::unique_ptr<viua::types::Value>) -> void;
+    auto pop(size_type const) -> std::unique_ptr<viua::types::Value>;
+    auto set(size_type const, std::unique_ptr<viua::types::Value>) -> void;
     auto get(size_type const) -> viua::types::Value*;
     auto get(size_type const) const -> viua::types::Value const*;
     auto at(size_type const) -> viua::types::Value*;
@@ -90,10 +88,8 @@ class Register_set {
     auto register_at(size_type const) -> Register*;
 
     // register modifications
-    auto move(size_type const,
-              size_type const) -> void;
-    auto swap(size_type const,
-              size_type const) -> void;
+    auto move(size_type const, size_type const) -> void;
+    auto swap(size_type const, size_type const) -> void;
     auto empty(size_type const) -> void;
     auto free(size_type const) -> void;
 
@@ -115,9 +111,9 @@ class Register_set {
 
     Register_set(size_type const);
     Register_set(Register_set const&) = delete;
-    Register_set(Register_set&&) = delete;
+    Register_set(Register_set&&)      = delete;
     auto operator=(Register_set const&) -> Register_set& = delete;
-    auto operator=(Register_set&&) -> Register_set& = delete;
+    auto operator=(Register_set &&) -> Register_set& = delete;
     ~Register_set();
 };
 }}  // namespace viua::kernel

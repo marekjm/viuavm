@@ -18,6 +18,7 @@
  */
 
 #include <functional>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>

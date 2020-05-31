@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 namespace viua { namespace assembler { namespace frontend {
@@ -31,7 +32,10 @@ auto Register_usage_profile::fresh(Register const r) const -> bool
     return fresh_registers.count(r);
 }
 
-auto Register_usage_profile::defresh() -> void { fresh_registers.clear(); }
+auto Register_usage_profile::defresh() -> void
+{
+    fresh_registers.clear();
+}
 auto Register_usage_profile::erase_arguments(Token const t) -> void
 {
     auto args_regs = std::vector<Register>{};
@@ -56,7 +60,8 @@ auto Register_usage_profile::define(Register const r,
     if ((not in_bounds(r))
         and !(r.register_set == viua::bytecode::codec::Register_set::Global
               or r.register_set == viua::bytecode::codec::Register_set::Static
-              or r.register_set == viua::bytecode::codec::Register_set::Parameters)) {
+              or r.register_set
+                     == viua::bytecode::codec::Register_set::Parameters)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
@@ -92,7 +97,8 @@ auto Register_usage_profile::define(Register const r,
     if ((not in_bounds(r))
         and !(r.register_set == viua::bytecode::codec::Register_set::Global
               or r.register_set == viua::bytecode::codec::Register_set::Static
-              or r.register_set == viua::bytecode::codec::Register_set::Parameters)) {
+              or r.register_set
+                     == viua::bytecode::codec::Register_set::Parameters)) {
         /*
          * Do not thrown on global or static register set access.
          * There is currently no simple (or complicated) way to check if such

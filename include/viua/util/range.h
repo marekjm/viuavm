@@ -35,8 +35,14 @@ template<typename T> class Range {
         std::iota(v.begin(), v.end(), T{0});
     }
 
-    auto begin() const -> decltype(v.begin()) { return v.begin(); }
-    auto end() const -> decltype(v.end()) { return v.end(); }
+    auto begin() const -> decltype(v.begin())
+    {
+        return v.begin();
+    }
+    auto end() const -> decltype(v.end())
+    {
+        return v.end();
+    }
 };
 }}  // namespace viua::util
 

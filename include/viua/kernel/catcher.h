@@ -21,6 +21,7 @@
 #define VIUA_CPU_CATCHER_H
 
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 
 class Catcher {

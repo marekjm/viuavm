@@ -24,6 +24,7 @@
 #include <optional>
 #include <set>
 #include <string>
+
 #include <viua/assembler/frontend/parser.h>
 
 
@@ -124,8 +125,10 @@ class Register_usage_profile {
     auto fresh(Register const) const -> bool;
 
   public:
-    std::map<std::string, viua::bytecode::codec::register_index_type> name_to_index;
-    std::map<viua::bytecode::codec::register_index_type, std::string> index_to_name;
+    std::map<std::string, viua::bytecode::codec::register_index_type>
+        name_to_index;
+    std::map<viua::bytecode::codec::register_index_type, std::string>
+        index_to_name;
 
     auto define(Register const r,
                 viua::cg::lex::Token const t,
@@ -287,17 +290,17 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
     }
 
     auto const type_matches = static_cast<bool>(actual_type & expected_type);
-    auto const is_pointer_type = static_cast<bool>(original_type & Value_types::POINTER);
-    auto const pointerness_matches = (
-           (access_via_pointer_dereference and is_pointer_type)
-        or ((not access_via_pointer_dereference) and (not is_pointer_type))
-    );
+    auto const is_pointer_type =
+        static_cast<bool>(original_type & Value_types::POINTER);
+    auto const pointerness_matches =
+        ((access_via_pointer_dereference and is_pointer_type)
+         or ((not access_via_pointer_dereference) and (not is_pointer_type)));
     if ((not type_matches) or (not pointerness_matches)) {
         auto error =
             Traced_syntax_error{}
                 .append(Invalid_syntax{
-                            register_index.tokens.at(0),
-                            "invalid type of value contained in register"}
+                    register_index.tokens.at(0),
+                    "invalid type of value contained in register"}
                             .note("expected " + to_string(expected_type)
                                   + ", got " + to_string(actual_type)))
                 .append(Invalid_syntax{register_usage_profile.defined_where(
@@ -509,11 +512,11 @@ auto check_op_structat(Register_usage_profile& register_usage_profile,
 auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
 auto check_op_exception(Register_usage_profile& register_usage_profile,
-                      Instruction const& instruction) -> void;
+                        Instruction const& instruction) -> void;
 auto check_op_exception_tag(Register_usage_profile& register_usage_profile,
-                      Instruction const& instruction) -> void;
+                            Instruction const& instruction) -> void;
 auto check_op_exception_value(Register_usage_profile& register_usage_profile,
-                      Instruction const& instruction) -> void;
+                              Instruction const& instruction) -> void;
 auto check_op_io_read(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_io_write(Register_usage_profile& register_usage_profile,
@@ -549,11 +552,12 @@ struct Safe_result {
     auto ok() const -> bool;
     auto raise_if_any() -> void;
 };
-auto check_register_usage_for_instruction_block_impl_safe(Register_usage_profile&,
-                                                     Parsed_source const&,
-                                                     Instructions_block const&,
-                                                     InstructionIndex,
-                                                     InstructionIndex) -> Safe_result;
+auto check_register_usage_for_instruction_block_impl_safe(
+    Register_usage_profile&,
+    Parsed_source const&,
+    Instructions_block const&,
+    InstructionIndex,
+    InstructionIndex) -> Safe_result;
 
 auto map_names_to_register_indexes(Register_usage_profile&,
                                    Instructions_block const&) -> void;

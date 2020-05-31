@@ -18,6 +18,7 @@
  */
 
 #include <utility>
+
 #include <viua/assert.h>
 #include <viua/process.h>
 #include <viua/types/atom.h>

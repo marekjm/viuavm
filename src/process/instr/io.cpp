@@ -17,9 +17,11 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
+
 #include <iostream>
 #include <memory>
-#include <unistd.h>
+
 #include <viua/process.h>
 #include <viua/scheduler/process.h>
 #include <viua/types/integer.h>
@@ -120,7 +122,7 @@ auto viua::process::Process::op_io_wait(Op_address_type addr) -> Op_address_type
             and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active      = false;
             wait_until_infinity = false;
-            return_addr = addr;
+            return_addr         = addr;
             throw std::make_unique<viua::types::Exception>("I/O not completed");
         }
     }

@@ -27,6 +27,8 @@ auto Closure::define(Register const r, viua::cg::lex::Token const t) -> void
         r, std::pair<viua::cg::lex::Token, Register>(t, r));
 }
 
-Closure::Closure() : name("") {}
-Closure::Closure(std::string n) : name(n) {}
+Closure::Closure() : name("")
+{}
+Closure::Closure(std::string n) : name(n)
+{}
 }}}}  // namespace viua::assembler::frontend::static_analyser

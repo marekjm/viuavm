@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/exception.h>
@@ -63,8 +64,8 @@ auto viua::process::Process::opstoi(Op_address_type addr) -> Op_address_type
         throw std::make_unique<viua::types::Exception>("out of range for stoi: "
                                                        + supplied_string);
     } catch (std::invalid_argument const& e) {
-        throw std::make_unique<viua::types::Exception>("invalid argument for stoi: "
-                                                       + supplied_string);
+        throw std::make_unique<viua::types::Exception>(
+            "invalid argument for stoi: " + supplied_string);
     }
 
     *target = std::make_unique<viua::types::Integer>(result_integer);
@@ -80,13 +81,14 @@ auto viua::process::Process::opstof(Op_address_type addr) -> Op_address_type
 
     auto const supplied_string = source->value();
     try {
-        *target = std::make_unique<viua::types::Float>(std::stod(supplied_string));
+        *target =
+            std::make_unique<viua::types::Float>(std::stod(supplied_string));
     } catch (std::out_of_range const& e) {
         throw std::make_unique<viua::types::Exception>("out of range for stof: "
                                                        + supplied_string);
     } catch (std::invalid_argument const& e) {
-        throw std::make_unique<viua::types::Exception>("invalid argument for stof: "
-                                                       + supplied_string);
+        throw std::make_unique<viua::types::Exception>(
+            "invalid argument for stof: " + supplied_string);
     }
 
     return addr;

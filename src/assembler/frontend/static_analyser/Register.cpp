@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 namespace viua { namespace assembler { namespace frontend {

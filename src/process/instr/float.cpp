@@ -18,6 +18,7 @@
  */
 
 #include <functional>
+
 #include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/kernel.h>

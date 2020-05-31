@@ -19,6 +19,7 @@
 
 #include <regex>
 #include <string>
+
 #include <viua/tooling/libs/lexer/classifier.h>
 #include <viua/util/string/ops.h>
 
@@ -86,8 +87,14 @@ auto is_float(std::string const& s) -> bool
     auto const decimal_integer = std::regex{"^-?(0|[1-9][0-9]*)\\.[0-9]+$"};
     return regex_match(s, decimal_integer);
 }
-auto is_default(std::string const& s) -> bool { return (s == "default"); }
-auto is_void(std::string const& s) -> bool { return (s == "void"); }
+auto is_default(std::string const& s) -> bool
+{
+    return (s == "default");
+}
+auto is_void(std::string const& s) -> bool
+{
+    return (s == "void");
+}
 
 auto is_boolean_literal(std::string const& s) -> bool
 {

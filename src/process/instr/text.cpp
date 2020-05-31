@@ -19,11 +19,11 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/process.h>
-#include <viua/util/string/ops.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/text.h>
+#include <viua/util/string/ops.h>
 
 
 auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
@@ -82,7 +82,8 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
         throw std::make_unique<Exception>(
             Exception::Tag{"Out_of_range"},
             ("index " + std::to_string(working_index)
-             + " is out of range for string of " + std::to_string(text->size()) + " characters"));
+             + " is out of range for string of " + std::to_string(text->size())
+             + " characters"));
     }
 
     *target = std::make_unique<viua::types::Text>(text->at(working_index));

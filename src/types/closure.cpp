@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <string>
+
 #include <viua/types/closure.h>
 #include <viua/types/value.h>
 
@@ -31,10 +32,14 @@ viua::types::Closure::Closure(std::string const& name,
         , local_register_set{std::move(rs)}
 {}
 
-viua::types::Closure::~Closure() {}
+viua::types::Closure::~Closure()
+{}
 
 
-auto viua::types::Closure::type() const -> std::string { return type_name; }
+auto viua::types::Closure::type() const -> std::string
+{
+    return type_name;
+}
 
 auto viua::types::Closure::str() const -> std::string
 {
@@ -43,9 +48,15 @@ auto viua::types::Closure::str() const -> std::string
     return oss.str();
 }
 
-auto viua::types::Closure::repr() const -> std::string { return str(); }
+auto viua::types::Closure::repr() const -> std::string
+{
+    return str();
+}
 
-auto viua::types::Closure::boolean() const -> bool { return true; }
+auto viua::types::Closure::boolean() const -> bool
+{
+    return true;
+}
 
 auto viua::types::Closure::copy() const -> std::unique_ptr<viua::types::Value>
 {
@@ -53,7 +64,10 @@ auto viua::types::Closure::copy() const -> std::unique_ptr<viua::types::Value>
 }
 
 
-auto viua::types::Closure::name() const -> std::string { return function_name; }
+auto viua::types::Closure::name() const -> std::string
+{
+    return function_name;
+}
 
 auto viua::types::Closure::rs() const -> viua::kernel::Register_set*
 {

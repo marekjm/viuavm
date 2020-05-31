@@ -18,18 +18,24 @@
  */
 
 #include <string>
+
 #include <viua/types/number.h>
 
 
 std::string const viua::types::numeric::Number::type_name = "Number";
 
-std::string viua::types::numeric::Number::type() const { return type_name; }
+std::string viua::types::numeric::Number::type() const
+{
+    return type_name;
+}
 
 bool viua::types::numeric::Number::negative() const
 {
     return (as_integer() < 0);
 }
 
-viua::types::numeric::Number::Number() {}
+viua::types::numeric::Number::Number()
+{}
 
-viua::types::numeric::Number::~Number() {}
+viua::types::numeric::Number::~Number()
+{}

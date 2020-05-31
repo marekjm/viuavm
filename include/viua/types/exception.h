@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/support/string.h>
 #include <viua/types/value.h>
@@ -42,30 +43,28 @@ struct Exception : public Value {
     struct Tag {
         std::string tag;
 
-        Tag(std::string t)
-            : tag{std::move(t)}
+        Tag(std::string t) : tag{std::move(t)}
         {}
     };
-    std::string const tag {"Exception"};
+    std::string const tag{"Exception"};
 
     /*
      * Either of these may be specified, but not both at the same time.
      * The `description` string is just a placeholder for Text-typed values to
      * make it easier to throw exceptions from C++.
      */
-    std::string const description {""};
-    std::unique_ptr<Value> value { nullptr };
+    std::string const description{""};
+    std::unique_ptr<Value> value{nullptr};
 
     struct Throw_point {
-        uint64_t const jump_base {0};
-        uint64_t const offset {0};
-        std::string const name {};
+        uint64_t const jump_base{0};
+        uint64_t const offset{0};
+        std::string const name{};
 
         inline Throw_point(uint64_t const j, uint64_t const o)
-            : jump_base{j}, offset{o}
+                : jump_base{j}, offset{o}
         {}
-        inline Throw_point(std::string n)
-            : name{std::move(n)}
+        inline Throw_point(std::string n) : name{std::move(n)}
         {}
     };
     std::vector<Throw_point> throw_points;
@@ -79,8 +78,7 @@ struct Exception : public Value {
 
     virtual auto what() const -> std::string;
 
-    virtual auto add_throw_point(Throw_point const)
-        -> void;
+    virtual auto add_throw_point(Throw_point const) -> void;
 
     Exception(Tag);
     Exception(std::string s = "");

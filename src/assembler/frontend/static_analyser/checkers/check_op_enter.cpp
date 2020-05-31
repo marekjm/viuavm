@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -46,9 +47,9 @@ auto check_op_enter(Register_usage_profile& register_usage_profile,
         check_register_usage_for_instruction_block_impl(
             register_usage_profile, ps, ps.block(block_name), 0, 0);
     } catch (std::out_of_range const& e) {
-        throw Invalid_syntax{label->tokens.at(0),
-                             "reference to undefined block: "
-                                 + label->tokens.at(0).str()};
+        throw Invalid_syntax{
+            label->tokens.at(0),
+            "reference to undefined block: " + label->tokens.at(0).str()};
     } catch (Invalid_syntax& e) {
         throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
             label->tokens.at(0), "after entering block " + block_name});

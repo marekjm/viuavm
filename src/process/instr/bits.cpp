@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <memory>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>

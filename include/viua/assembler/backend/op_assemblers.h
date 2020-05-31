@@ -21,6 +21,7 @@
 #define VIUA_ASSEMBLER_BACKEND_OP_ASSEMBLERS_H
 
 #include <vector>
+
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
 #include <viua/program.h>
@@ -53,13 +54,13 @@ auto assemble_double_register_op(Program& program,
     Token_index target = i + 1;
     Token_index source = target + 2;
 
-    (program
-     .*op)(::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(target)),
-               ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(source)),
-               ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+    (program.*op)(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(source)),
+            ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
 }
 
 using Three_register_op = Program& (Program::*)(int_op, int_op, int_op);
@@ -72,16 +73,16 @@ auto assemble_three_register_op(Program& program,
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;
 
-    (program
-     .*op)(::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(target)),
-               ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(lhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(rhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
+    (program.*op)(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(lhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(rhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
 }
 
 using Four_register_op = Program& (Program::*)(int_op, int_op, int_op, int_op);
@@ -141,11 +142,11 @@ auto assemble_fn_ctor_op(Program& program,
     Token_index target = i + 1;
     Token_index source = target + 2;
 
-    (program
-     .*op)(::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(target)),
-               ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-           tokens.at(source));
+    (program.*op)(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        tokens.at(source));
 }
 
 using No_result_name_call_op  = Program& (Program::*)(int_op);
@@ -175,13 +176,13 @@ auto assemble_parameter_op(Program& program,
     Token_index target = i + 1;
     Token_index source = target + 1;
 
-    (program
-     .*op)(::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(target)),
-               viua::bytecode::codec::Register_set::Arguments),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(source)),
-               ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
+    (program.*op)(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            viua::bytecode::codec::Register_set::Arguments),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(source)),
+            ::assembler::operands::resolve_rs_type(tokens.at(source + 1))));
 }
 
 using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
@@ -206,14 +207,14 @@ auto assemble_bit_shift_instruction(Program& program,
             ::assembler::operands::resolve_rs_type(tokens.at(target + 1)));
     }
 
-    (program
-     .*op)(ret,
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(lhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(rhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
+    (program.*op)(
+        ret,
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(lhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(rhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
 }
 
 using IncrementOp = Program& (Program::*)(int_op);
@@ -239,16 +240,16 @@ auto assemble_arithmetic_instruction(Program& program,
     Token_index lhs    = target + 2;
     Token_index rhs    = lhs + 2;
 
-    (program
-     .*op)(::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(target)),
-               ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(lhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
-           ::assembler::operands::getint_with_rs_type(
-               ::assembler::operands::resolve_register(tokens.at(rhs)),
-               ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
+    (program.*op)(
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(target)),
+            ::assembler::operands::resolve_rs_type(tokens.at(target + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(lhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(lhs + 1))),
+        ::assembler::operands::getint_with_rs_type(
+            ::assembler::operands::resolve_register(tokens.at(rhs)),
+            ::assembler::operands::resolve_rs_type(tokens.at(rhs + 1))));
 }
 
 auto assemble_op_integer(Program&, std::vector<Token> const&, Token_index const)

@@ -21,6 +21,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/maps.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/lexer/classifier.h>

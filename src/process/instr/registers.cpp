@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>

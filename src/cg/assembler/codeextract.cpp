@@ -22,6 +22,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>

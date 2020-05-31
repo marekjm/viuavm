@@ -19,6 +19,7 @@
 
 #include <regex>
 #include <string>
+
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
 

@@ -24,13 +24,14 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include <viua/assert.h>
 #include <viua/exceptions.h>
 #include <viua/support/string.h>
 #include <viua/types/boolean.h>
-#include <viua/types/struct.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
+#include <viua/types/struct.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
 using namespace viua::assertions;
@@ -38,17 +39,30 @@ using namespace viua::types;
 
 std::string const viua::types::String::type_name = "String";
 
-std::string String::type() const { return type_name; }
-std::string String::str() const { return svalue; }
-std::string String::repr() const { return "b" + str::enquote(svalue); }
-bool String::boolean() const { return svalue.size() != 0; }
+std::string String::type() const
+{
+    return type_name;
+}
+std::string String::str() const
+{
+    return svalue;
+}
+std::string String::repr() const
+{
+    return "b" + str::enquote(svalue);
+}
+bool String::boolean() const
+{
+    return svalue.size() != 0;
+}
 
 std::unique_ptr<Value> String::copy() const
 {
     return std::make_unique<String>(svalue);
 }
 
-auto viua::types::String::operator==(viua::types::String const& other) const -> bool
+auto viua::types::String::operator==(viua::types::String const& other) const
+    -> bool
 {
     return (svalue == other.svalue);
 }
@@ -105,7 +119,8 @@ void String::format(Frame* frame,
     frame->local_register_set->set(0, std::make_unique<String>(result));
 }
 
-String::String(std::string s) : svalue(s) {}
+String::String(std::string s) : svalue(s)
+{}
 
 auto String::make(std::string s) -> std::unique_ptr<String>
 {

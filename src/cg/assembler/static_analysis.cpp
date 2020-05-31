@@ -26,6 +26,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
@@ -47,7 +48,10 @@ class Registers {
     {
         return (defined_registers.count(r) == 1);
     }
-    Token defined_where(std::string r) { return defined_registers.at(r); }
+    Token defined_where(std::string r)
+    {
+        return defined_registers.at(r);
+    }
     void insert(std::string r, Token where)
     {
         if (r != "void") {
@@ -63,11 +67,23 @@ class Registers {
     {
         return (erased_registers.count(r) == 1);
     }
-    Token erased_by(std::string const& r) { return erased_registers.at(r); }
-    void use(std::string r, Token where) { used_registers.emplace(r, where); }
-    bool used(std::string r) { return used_registers.count(r); }
+    Token erased_by(std::string const& r)
+    {
+        return erased_registers.at(r);
+    }
+    void use(std::string r, Token where)
+    {
+        used_registers.emplace(r, where);
+    }
+    bool used(std::string r)
+    {
+        return used_registers.count(r);
+    }
 
-    void unused(std::string r) { maybe_unused_registers.insert(r); }
+    void unused(std::string r)
+    {
+        maybe_unused_registers.insert(r);
+    }
     auto maybe_unused(std::string r) -> bool
     {
         return (maybe_unused_registers.count(r) != 0);
@@ -409,9 +425,9 @@ static auto get_token_index_of_operand(TokenVector const& tokens,
                   or token.str().at(0) == '*')
                  and (str::isnum(token.str().substr(1))
                       or str::isid(token.str().substr(1)))));
-        bool is_valid_operand_area_token = (token == "," or token == "static"
-                                            or token == "local"
-                                            or token == "global");
+        bool is_valid_operand_area_token =
+            (token == "," or token == "static" or token == "local"
+             or token == "global");
         if (is_valid_operand_area_token) {
             ++i;
         } else if (is_valid_operand) {

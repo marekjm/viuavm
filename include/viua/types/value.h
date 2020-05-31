@@ -23,6 +23,7 @@
 #include <memory>
 #include <set>
 #include <string>
+
 #include <viua/pid.h>
 
 
@@ -55,7 +56,7 @@ class Value {
     virtual auto attach_pointer(viua::types::Pointer* const) -> void;
     virtual auto detach_pointer(viua::types::Pointer* const) -> void;
 
-    virtual auto copy() const -> std::unique_ptr<Value> =  0;
+    virtual auto copy() const -> std::unique_ptr<Value> = 0;
 
     Value() = default;
     virtual ~Value();

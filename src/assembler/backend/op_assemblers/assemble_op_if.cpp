@@ -18,15 +18,17 @@
  */
 
 #include <tuple>
+
 #include <viua/assembler/backend/op_assemblers.h>
 
 namespace viua { namespace assembler { namespace backend {
 namespace op_assemblers {
-auto assemble_op_if(Program& program,
-                    std::vector<Token> const& tokens,
-                    Token_index const i,
-                    viua::bytecode::codec::bytecode_size_type const& instruction,
-                    std::map<std::string, Token_index> const& marks) -> void
+auto assemble_op_if(
+    Program& program,
+    std::vector<Token> const& tokens,
+    Token_index const i,
+    viua::bytecode::codec::bytecode_size_type const& instruction,
+    std::map<std::string, Token_index> const& marks) -> void
 {
     /*  If branch is given three operands, it means its full, three-operands
      * form is being used. Otherwise, it is short, two-operands form

@@ -22,6 +22,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -53,7 +54,7 @@ auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
         auto o = std::ostringstream{};
         o << "aborting: JUMP instruction pointing to itself at byte ";
         o << bad_byte << " (" << std::hex << "0x" << std::setw(8)
-            << std::setfill('0') << bad_byte << ")";
+          << std::setfill('0') << bad_byte << ")";
         throw std::make_unique<viua::types::Exception>(o.str());
     }
 

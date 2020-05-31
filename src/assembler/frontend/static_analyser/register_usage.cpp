@@ -20,6 +20,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/assembler/assembler.h>
@@ -545,12 +546,8 @@ auto check_register_usage_for_instruction_block_impl(
 
 auto Safe_result::ok() const -> bool
 {
-    return (
-            (not unused_register)
-        and (not unused_value)
-        and (not invalid_syntax)
-        and (not traced_syntax)
-    );
+    return ((not unused_register) and (not unused_value)
+            and (not invalid_syntax) and (not traced_syntax));
 }
 auto Safe_result::raise_if_any() -> void
 {
@@ -579,12 +576,7 @@ auto check_register_usage_for_instruction_block_impl_safe(
 
     try {
         check_register_usage_for_instruction_block_impl(
-              register_usage_profile
-            , ps
-            , ib
-            , i
-            , mnemonic_counter
-        );
+            register_usage_profile, ps, ib, i, mnemonic_counter);
     } catch (viua::cg::lex::Unused_register const& e) {
         result.unused_register = e;
     } catch (viua::cg::lex::Unused_value const& e) {
@@ -631,9 +623,9 @@ static auto check_register_usage_for_instruction_block(
     // FIXME: This is ad-hoc code - move it to a utility function.
     auto const function_arity =
         std::stoul(ib.name.str().substr(ib.name.str().rfind('/') + 1));
-    for (auto const each :
-         viua::util::Range(static_cast<viua::bytecode::codec::register_index_type>(
-             function_arity))) {
+    for (auto const each : viua::util::Range(
+             static_cast<viua::bytecode::codec::register_index_type>(
+                 function_arity))) {
         auto val         = Register{};
         val.index        = each;
         val.register_set = viua::bytecode::codec::Register_set::Parameters;

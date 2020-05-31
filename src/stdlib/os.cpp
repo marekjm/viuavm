@@ -21,22 +21,23 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <cstdlib>
 #include <array>
+#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
+#include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
-#include <viua/types/vector.h>
 #include <viua/types/struct.h>
-#include <viua/types/boolean.h>
 #include <viua/types/value.h>
+#include <viua/types/vector.h>
 
 
 static void os_system(Frame* frame,
@@ -58,17 +59,18 @@ static void os_system(Frame* frame,
 }
 
 static void os_exec_pipe_stdout(Frame* frame,
-                      viua::kernel::Register_set*,
-                      viua::kernel::Register_set*,
-                      viua::process::Process*,
-                      viua::kernel::Kernel*)
+                                viua::kernel::Register_set*,
+                                viua::kernel::Register_set*,
+                                viua::process::Process*,
+                                viua::kernel::Kernel*)
 {
     if (frame->arguments->at(0) == nullptr) {
         throw std::make_unique<viua::types::Exception>(
             "expected command to launch (vector of string) as parameter 0");
     }
 
-    // "/usr/bin/stat", "--printf", "%a/%A %s byte(s), %F, %b blocks of %B", "capture.cpp"
+    // "/usr/bin/stat", "--printf", "%a/%A %s byte(s), %F, %b blocks of %B",
+    // "capture.cpp"
     auto args = std::vector<std::string>{};
     auto argv = std::vector<char*>{};
 
@@ -84,10 +86,10 @@ static void os_exec_pipe_stdout(Frame* frame,
     std::array<int, 2> piped_stdout;
     pipe(piped_stdout.data());  // FIXME check errors
 
-    auto const read_end = piped_stdout[0];
+    auto const read_end  = piped_stdout[0];
     auto const write_end = piped_stdout[1];
 
-    auto ret = int{0};
+    auto ret    = int{0};
     auto buffer = std::string{};
 
     auto const child_pid = fork();
@@ -117,8 +119,8 @@ static void os_exec_pipe_stdout(Frame* frame,
 
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(2));
-    frame->local_register_set->set(0,
-                                   viua::types::String::make(std::move(buffer)));
+    frame->local_register_set->set(
+        0, viua::types::String::make(std::move(buffer)));
 }
 
 static void os_lsdir(Frame* frame,
@@ -133,11 +135,14 @@ static void os_lsdir(Frame* frame,
 
     for (auto const& each : std::filesystem::directory_iterator{path}) {
         auto entry = std::make_unique<viua::types::Struct>();
-        entry->insert("path", std::make_unique<viua::types::String>(each.path()));
+        entry->insert("path",
+                      std::make_unique<viua::types::String>(each.path()));
         entry->insert("is_directory",
-            viua::types::Boolean::make(std::filesystem::is_directory(each.status())));
+                      viua::types::Boolean::make(
+                          std::filesystem::is_directory(each.status())));
         entry->insert("is_regular_file",
-            viua::types::Boolean::make(std::filesystem::is_regular_file(each.status())));
+                      viua::types::Boolean::make(
+                          std::filesystem::is_regular_file(each.status())));
         entries->push(std::move(entry));
     }
 
@@ -147,25 +152,25 @@ static void os_lsdir(Frame* frame,
 }
 
 static void os_fs_path_lexically_normal(Frame* frame,
-                     viua::kernel::Register_set*,
-                     viua::kernel::Register_set*,
-                     viua::process::Process*,
-                     viua::kernel::Kernel*)
+                                        viua::kernel::Register_set*,
+                                        viua::kernel::Register_set*,
+                                        viua::process::Process*,
+                                        viua::kernel::Kernel*)
 {
     auto const path = frame->arguments->at(0)->str();
 
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     using viua::types::String;
-    frame->local_register_set->set(0,
-        String::make(std::filesystem::path{path}.lexically_normal()));
+    frame->local_register_set->set(
+        0, String::make(std::filesystem::path{path}.lexically_normal()));
 }
 
 static void os_fs_path_lexically_relative(Frame* frame,
-                     viua::kernel::Register_set*,
-                     viua::kernel::Register_set*,
-                     viua::process::Process*,
-                     viua::kernel::Kernel*)
+                                          viua::kernel::Register_set*,
+                                          viua::kernel::Register_set*,
+                                          viua::process::Process*,
+                                          viua::kernel::Kernel*)
 {
     auto const path = frame->arguments->at(0)->str();
     auto const base = frame->arguments->at(1)->str();
@@ -173,8 +178,8 @@ static void os_fs_path_lexically_relative(Frame* frame,
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     using viua::types::String;
-    frame->local_register_set->set(0,
-        String::make(std::filesystem::path{path}.lexically_relative(base)));
+    frame->local_register_set->set(
+        0, String::make(std::filesystem::path{path}.lexically_relative(base)));
 }
 
 
@@ -187,4 +192,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

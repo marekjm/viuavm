@@ -18,11 +18,13 @@
  */
 
 #include <endian.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <sstream>
+
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/cg/tools.h>
@@ -34,16 +36,14 @@ using viua::util::memory::aligned_write;
 using viua::util::memory::load_aligned;
 
 
-auto Program::bytecode() const
-    -> std::unique_ptr<uint8_t[]>
+auto Program::bytecode() const -> std::unique_ptr<uint8_t[]>
 {
     auto tmp = std::make_unique<uint8_t[]>(bytes);
     std::copy_n(program.get(), size(), tmp.get());
     return tmp;
 }
 
-auto Program::fill(std::unique_ptr<uint8_t[]> code)
-    -> Program&
+auto Program::fill(std::unique_ptr<uint8_t[]> code) -> Program&
 {
     program  = std::move(code);
     addr_ptr = program.get();
@@ -51,7 +51,10 @@ auto Program::fill(std::unique_ptr<uint8_t[]> code)
 }
 
 
-auto Program::size() const -> uint64_t { return bytes; }
+auto Program::size() const -> uint64_t
+{
+    return bytes;
+}
 
 using Token = viua::cg::lex::Token;
 auto Program::calculate_jumps(
@@ -66,7 +69,7 @@ auto Program::calculate_jumps(
          * are doing. We *know* that this location points to uint64_t even if it
          * is stored inside the uint8_t array.
          */
-        auto const ptr = (program.get() + position);
+        auto const ptr            = (program.get() + position);
         auto const n_instructions = be64toh(load_aligned<uint64_t>(ptr));
         auto const adjustment =
             viua::cg::tools::calculate_bytecode_size_of_first_n_instructions(
@@ -86,7 +89,8 @@ auto Program::jumps() const -> std::vector<uint64_t>
     return jmps;
 }
 
-Program::Program(viua::bytecode::codec::bytecode_size_type const bts) : bytes{bts}
+Program::Program(viua::bytecode::codec::bytecode_size_type const bts)
+        : bytes{bts}
 {
     program = std::make_unique<uint8_t[]>(bytes);
 

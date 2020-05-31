@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/support/string.h>
@@ -206,10 +207,10 @@ auto viua::assembler::frontend::static_analyser::verify_frame_balance(
                 }
 
                 if (balance < 0) {
-                    throw Invalid_syntax(instruction->tokens.at(0),
-                                         ("call with '"
-                                          + instruction->tokens.at(0).str()
-                                          + "' without a frame"));
+                    throw Invalid_syntax(
+                        instruction->tokens.at(0),
+                        ("call with '" + instruction->tokens.at(0).str()
+                         + "' without a frame"));
                 }
 
                 if (balance > 1) {
@@ -251,13 +252,8 @@ auto viua::assembler::frontend::static_analyser::verify_function_call_arities(
                 }
 
                 auto opcode = instruction->opcode;
-                auto const relevant_ops = std::set<OPCODE>{
-                      CALL
-                    , TAILCALL
-                    , PROCESS
-                    , DEFER
-                    , FRAME
-                };
+                auto const relevant_ops =
+                    std::set<OPCODE>{CALL, TAILCALL, PROCESS, DEFER, FRAME};
                 if (not relevant_ops.count(opcode)) {
                     continue;
                 }
@@ -359,8 +355,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                 auto opcode = instruction->opcode;
                 if (not(opcode == CALL or opcode == PROCESS or opcode == DEFER
-                        or opcode == FRAME
-                        or opcode == MOVE or opcode == COPY)) {
+                        or opcode == FRAME or opcode == MOVE
+                        or opcode == COPY)) {
                     continue;
                 }
 
@@ -386,7 +382,8 @@ auto viua::assembler::frontend::static_analyser::verify_frames_have_no_gaps(
 
                 auto const& first_operand = *instruction->operands.at(0);
                 if ((opcode == MOVE or opcode == COPY)
-                    and (first_operand.tokens.size() >= 3 and first_operand.tokens.at(2) == "arguments")) {
+                    and (first_operand.tokens.size() >= 3
+                         and first_operand.tokens.at(2) == "arguments")) {
                     unsigned long slot_index = 0;
                     bool detected_slot_index = false;
 

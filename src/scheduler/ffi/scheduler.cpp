@@ -19,8 +19,9 @@
 
 #include <condition_variable>
 #include <memory>
-#include <thread>
 #include <queue>
+#include <thread>
+
 #include <viua/kernel/frame.h>
 #include <viua/scheduler/ffi.h>
 #include <viua/types/exception.h>

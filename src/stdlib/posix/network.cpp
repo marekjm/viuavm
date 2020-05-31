@@ -26,10 +26,12 @@
                          //   , shutdown(3)
                          //   , recv(3)
                          //   , setsockopt(3)
+#include <unistd.h>      // for close(3), write(3), read(3)
+
 #include <iostream>
 #include <memory>
 #include <string_view>
-#include <unistd.h>  // for close(3), write(3), read(3)
+
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
@@ -51,8 +53,7 @@ static auto inet_ston(std::string const& s) -> uint32_t
     }
     if (ret == -1) {
         throw std::make_unique<viua::types::Exception>(
-            viua::types::Exception::Tag{"Errno"}
-            , "EAFNOSUPPORT");
+            viua::types::Exception::Tag{"Errno"}, "EAFNOSUPPORT");
     }
 
     return address;
@@ -894,8 +895,7 @@ static auto read(Frame* frame,
 
     if (n_bytes == 0) {
         throw std::make_unique<viua::types::Exception>(
-                  viua::types::Exception::Tag{"Eof"}
-                , "end of file reached");
+            viua::types::Exception::Tag{"Eof"}, "end of file reached");
     }
 
     if (n_bytes == -1) {
@@ -1033,20 +1033,17 @@ static auto recv(Frame* frame,
 
     if (n_bytes == 0) {
         throw std::make_unique<viua::types::Exception>(
-             viua::types::Exception::Tag{"Eof"}
-           , "end of file reached");
+            viua::types::Exception::Tag{"Eof"}, "end of file reached");
     }
     if (n_bytes == -1) {
         auto const error_number = errno;
         if (error_number == EAGAIN) {
             throw std::make_unique<viua::types::Exception>(
-                  viua::types::Exception::Tag{"Eagain"}
-                , "try again");
+                viua::types::Exception::Tag{"Eagain"}, "try again");
         }
         if (error_number == EWOULDBLOCK) {
             throw std::make_unique<viua::types::Exception>(
-                  viua::types::Exception::Tag{"Ewouldblock"}
-                , "would block");
+                viua::types::Exception::Tag{"Ewouldblock"}, "would block");
         }
 
         auto const known_errors = std::map<decltype(error_number), std::string>{
@@ -1153,8 +1150,8 @@ static auto recv(Frame* frame,
         };
         if (not known_errors.count(error_number)) {
             throw std::make_unique<viua::types::Exception>(
-                viua::types::Exception::Tag{"Unknown_errno"}
-                , "recv(3): Unknown_errno: " + std::to_string(error_number));
+                viua::types::Exception::Tag{"Unknown_errno"},
+                "recv(3): Unknown_errno: " + std::to_string(error_number));
         }
         throw std::make_unique<viua::types::Exception>(
             known_errors.at(error_number));
@@ -1255,4 +1252,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

@@ -18,10 +18,12 @@
  */
 
 #include <endian.h>
+
 #include <cassert>
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/codec/main.h>
 #include <viua/bytecode/opcodes.h>
@@ -61,7 +63,7 @@ auto Encoder::encode_register(uint8_t* addr, Register_access const ra) const
 
     {
         using set_type = std::underlying_type_t<Register_set>;
-        *addr = static_cast<set_type>(set);
+        *addr          = static_cast<set_type>(set);
         ++addr;
     }
 
@@ -92,7 +94,8 @@ auto Encoder::encode_i32(uint8_t* addr, int32_t const n) const -> uint8_t*
     *addr = OT_INT;
     addr += sizeof(OT_INT);
 
-    aligned_write(addr) = static_cast<int32_t>(htobe32(static_cast<uint32_t>(n)));
+    aligned_write(addr) =
+        static_cast<int32_t>(htobe32(static_cast<uint32_t>(n)));
     addr += sizeof(int32_t);
 
     return addr;
@@ -143,7 +146,8 @@ auto Encoder::encode_bits_string(uint8_t* addr,
     return addr;
 }
 
-auto Encoder::encode_timeout(uint8_t* addr, timeout_type const value) const -> uint8_t*
+auto Encoder::encode_timeout(uint8_t* addr, timeout_type const value) const
+    -> uint8_t*
 {
     *addr = OT_INT;
     ++addr;
@@ -154,9 +158,10 @@ auto Encoder::encode_timeout(uint8_t* addr, timeout_type const value) const -> u
     return addr;
 }
 
-auto Encoder::encode_address(uint8_t* addr, uint64_t const dest) const -> uint8_t*
+auto Encoder::encode_address(uint8_t* addr, uint64_t const dest) const
+    -> uint8_t*
 {
-    auto const bedest = htobe64(dest);
+    auto const bedest   = htobe64(dest);
     aligned_write(addr) = bedest;
     addr += sizeof(uint64_t);
     return addr;

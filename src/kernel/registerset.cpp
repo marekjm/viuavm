@@ -21,6 +21,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
 #include <viua/kernel/registerset.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
@@ -93,14 +94,18 @@ mask_type viua::kernel::Register::unflag(mask_type new_mask)
     return tmp;
 }
 
-mask_type viua::kernel::Register::get_mask() const { return mask; }
+mask_type viua::kernel::Register::get_mask() const
+{
+    return mask;
+}
 
 bool viua::kernel::Register::is_flagged(mask_type filter) const
 {
     return (mask & filter);
 }
 
-viua::kernel::Register::Register() : value(nullptr), mask(0) {}
+viua::kernel::Register::Register() : value(nullptr), mask(0)
+{}
 
 viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o)
         : value(std::move(o)), mask(0)
@@ -112,7 +117,10 @@ viua::kernel::Register::Register(Register&& that)
     that.mask = 0;
 }
 
-viua::kernel::Register::operator bool() const { return not empty(); }
+viua::kernel::Register::operator bool() const
+{
+    return not empty();
+}
 
 auto viua::kernel::Register::operator=(Register&& that) -> Register&
 {
@@ -130,9 +138,8 @@ auto viua::kernel::Register::operator=(decltype(value)&& o) -> Register&
 }
 
 
-void viua::kernel::Register_set::put(
-    size_type const index,
-    std::unique_ptr<viua::types::Value> object)
+void viua::kernel::Register_set::put(size_type const index,
+                                     std::unique_ptr<viua::types::Value> object)
 {
     if (index >= registerset_size) {
         throw std::make_unique<viua::types::Exception>(
@@ -154,9 +161,8 @@ std::unique_ptr<viua::types::Value> viua::kernel::Register_set::pop(
     return object;
 }
 
-void viua::kernel::Register_set::set(
-    size_type const index,
-    std::unique_ptr<viua::types::Value> object)
+void viua::kernel::Register_set::set(size_type const index,
+                                     std::unique_ptr<viua::types::Value> object)
 {
     /** Put object inside register specified by given index.
      *
@@ -175,8 +181,8 @@ void viua::kernel::Register_set::set(
     }
 }
 
-auto viua::kernel::Register_set::get(
-    size_type const index) -> viua::types::Value*
+auto viua::kernel::Register_set::get(size_type const index)
+    -> viua::types::Value*
 {
     if (index >= registerset_size) {
         std::ostringstream emsg;
@@ -191,8 +197,8 @@ auto viua::kernel::Register_set::get(
     }
     return optr;
 }
-auto viua::kernel::Register_set::get(
-    size_type const index) const -> viua::types::Value const*
+auto viua::kernel::Register_set::get(size_type const index) const
+    -> viua::types::Value const*
 {
     if (index >= registerset_size) {
         std::ostringstream emsg;
@@ -208,8 +214,8 @@ auto viua::kernel::Register_set::get(
     return optr;
 }
 
-auto viua::kernel::Register_set::at(
-    size_type const index) -> viua::types::Value*
+auto viua::kernel::Register_set::at(size_type const index)
+    -> viua::types::Value*
 {
     /** Fetch object from register specified by given index.
      *
@@ -223,8 +229,8 @@ auto viua::kernel::Register_set::at(
     }
     return registers.at(index).get();
 }
-auto viua::kernel::Register_set::at(
-    size_type const index) const -> viua::types::Value const*
+auto viua::kernel::Register_set::at(size_type const index) const
+    -> viua::types::Value const*
 {
     /** Fetch object from register specified by given index.
      *
@@ -394,9 +400,8 @@ auto viua::kernel::Register_set::is_flagged(
     return registers.at(index).is_flagged(filter);
 }
 
-auto viua::kernel::Register_set::set_mask(
-    size_type const index,
-    mask_type mask) -> void
+auto viua::kernel::Register_set::set_mask(size_type const index, mask_type mask)
+    -> void
 {
     /** Set mask for a register.
      *
@@ -415,8 +420,8 @@ auto viua::kernel::Register_set::set_mask(
     registers.at(index).set_mask(mask);
 }
 
-auto viua::kernel::Register_set::get_mask(
-    size_type const index) const -> mask_type
+auto viua::kernel::Register_set::get_mask(size_type const index) const
+    -> mask_type
 {
     /** Get mask of a register.
      *
@@ -450,7 +455,8 @@ void viua::kernel::Register_set::drop()
 }
 
 
-auto viua::kernel::Register_set::copy() const -> std::unique_ptr<viua::kernel::Register_set>
+auto viua::kernel::Register_set::copy() const
+    -> std::unique_ptr<viua::kernel::Register_set>
 {
     auto rscopy = std::make_unique<viua::kernel::Register_set>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
@@ -463,8 +469,7 @@ auto viua::kernel::Register_set::copy() const -> std::unique_ptr<viua::kernel::R
     return rscopy;
 }
 
-viua::kernel::Register_set::Register_set(
-    size_type const sz)
+viua::kernel::Register_set::Register_set(size_type const sz)
         : registerset_size{sz}
 {
     /** Create register set with specified size.
@@ -474,4 +479,5 @@ viua::kernel::Register_set::Register_set(
         registers.emplace_back(nullptr);
     }
 }
-viua::kernel::Register_set::~Register_set() {}
+viua::kernel::Register_set::~Register_set()
+{}

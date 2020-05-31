@@ -17,11 +17,13 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/select.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <memory>
 #include <string>
-#include <sys/select.h>
-#include <unistd.h>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/integer.h>
@@ -29,7 +31,10 @@
 #include <viua/types/string.h>
 
 namespace viua::scheduler::io {
-auto IO_interaction::id() const -> id_type { return assigned_id; }
+auto IO_interaction::id() const -> id_type
+{
+    return assigned_id;
+}
 auto IO_interaction::cancel() -> void
 {
     is_cancelled.store(true, std::memory_order_release);
@@ -55,8 +60,10 @@ auto IO_interaction::completed() const -> bool
     return is_complete.load(std::memory_order_acquire);
 }
 
-IO_interaction::IO_interaction(id_type const x) : assigned_id{x} {}
-IO_interaction::~IO_interaction() {}
+IO_interaction::IO_interaction(id_type const x) : assigned_id{x}
+{}
+IO_interaction::~IO_interaction()
+{}
 
 IO_interaction::Interaction_result::Interaction_result(State const st,
                                                        Status const su,
@@ -72,11 +79,11 @@ IO_read_interaction::IO_read_interaction(id_type const x,
 auto IO_read_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
-        return Interaction_result{IO_interaction::State::Complete,
-                                  IO_interaction::Status::Cancelled,
-                                  std::make_unique<viua::types::Exception>(
-                                      viua::types::Exception::Tag{"IO_cancel"}
-                                      , "I/O cancelled")};
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Cancelled,
+            std::make_unique<viua::types::Exception>(
+                viua::types::Exception::Tag{"IO_cancel"}, "I/O cancelled")};
     }
 
     auto const n = ::read(file_descriptor, buffer.data(), buffer.size());
@@ -108,11 +115,11 @@ IO_write_interaction::IO_write_interaction(id_type const x,
 auto IO_write_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
-        return Interaction_result{IO_interaction::State::Complete,
-                                  IO_interaction::Status::Cancelled,
-                                  std::make_unique<viua::types::Exception>(
-                                      viua::types::Exception::Tag{"IO_cancel"}
-                                      , "I/O cancelled")};
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Cancelled,
+            std::make_unique<viua::types::Exception>(
+                viua::types::Exception::Tag{"IO_cancel"}, "I/O cancelled")};
     }
 
     auto const n = ::write(file_descriptor, buffer.data(), buffer.size());
@@ -136,11 +143,11 @@ IO_close_interaction::IO_close_interaction(id_type const x, int const fd)
 auto IO_close_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
-        return Interaction_result{IO_interaction::State::Complete,
-                                  IO_interaction::Status::Cancelled,
-                                  std::make_unique<viua::types::Exception>(
-                                      viua::types::Exception::Tag{"IO_cancel"}
-                                      , "I/O cancelled")};
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Cancelled,
+            std::make_unique<viua::types::Exception>(
+                viua::types::Exception::Tag{"IO_cancel"}, "I/O cancelled")};
     }
 
     auto const n = ::close(file_descriptor);
@@ -160,11 +167,11 @@ auto IO_close_interaction::interact() -> Interaction_result
 auto IO_empty_interaction::interact() -> Interaction_result
 {
     if (cancelled()) {
-        return Interaction_result{IO_interaction::State::Complete,
-                                  IO_interaction::Status::Cancelled,
-                                  std::make_unique<viua::types::Exception>(
-                                      viua::types::Exception::Tag{"IO_cancel"}
-                                      , "I/O cancelled")};
+        return Interaction_result{
+            IO_interaction::State::Complete,
+            IO_interaction::Status::Cancelled,
+            std::make_unique<viua::types::Exception>(
+                viua::types::Exception::Tag{"IO_cancel"}, "I/O cancelled")};
     }
 
     return Interaction_result{IO_interaction::State::Complete,
@@ -176,36 +183,63 @@ auto IO_empty_interaction::interact() -> Interaction_result
 namespace viua::types {
 std::string const viua::types::IO_port::type_name = "IO_port";
 
-std::string IO_port::type() const { return type_name; }
-std::string IO_port::str() const { return ""; }
-std::string IO_port::repr() const { return ""; }
-bool IO_port::boolean() const { return false; }
+std::string IO_port::type() const
+{
+    return type_name;
+}
+std::string IO_port::str() const
+{
+    return "";
+}
+std::string IO_port::repr() const
+{
+    return "";
+}
+bool IO_port::boolean() const
+{
+    return false;
+}
 
 std::unique_ptr<Value> IO_port::copy() const
 {
     return std::unique_ptr<IO_port>();
 }
 
-IO_port::IO_port() {}
-IO_port::~IO_port() {}
+IO_port::IO_port()
+{}
+IO_port::~IO_port()
+{}
 
 
 std::string const viua::types::IO_fd::type_name = "IO_fd";
 
-std::string IO_fd::type() const { return type_name; }
+std::string IO_fd::type() const
+{
+    return type_name;
+}
 std::string IO_fd::str() const
 {
     return "IO_fd: " + std::to_string(file_descriptor);
 }
-std::string IO_fd::repr() const { return std::to_string(file_descriptor); }
-bool IO_fd::boolean() const { return true; }
+std::string IO_fd::repr() const
+{
+    return std::to_string(file_descriptor);
+}
+bool IO_fd::boolean() const
+{
+    return true;
+}
 
 std::unique_ptr<Value> IO_fd::copy() const
 {
-    throw std::make_unique<viua::types::Exception>(viua::types::Exception::Tag{"Not_copyable"});
+    throw std::make_unique<viua::types::Exception>(
+        viua::types::Exception::Tag{"Not_copyable"});
 }
 
-auto IO_fd::fd() const -> int { return file_descriptor; }
+auto IO_fd::fd() const -> int
+{
+    return file_descriptor;
+}
 auto IO_fd::read(viua::kernel::Kernel& k, std::unique_ptr<Value> x)
     -> std::unique_ptr<IO_request>
 {
@@ -260,29 +294,43 @@ auto IO_fd::close() -> void
 
 IO_fd::IO_fd(int const x, Ownership const o) : file_descriptor{x}, ownership{o}
 {}
-IO_fd::~IO_fd() { close(); }
+IO_fd::~IO_fd()
+{
+    close();
+}
 
 
 std::string const viua::types::IO_request::type_name = "IO_request";
 
-std::string IO_request::type() const { return type_name; }
+std::string IO_request::type() const
+{
+    return type_name;
+}
 std::string IO_request::str() const
 {
     auto const [a, b] = interaction_id;
     return "<I/O request: " + std::to_string(a) + "." + std::to_string(b) + ">";
 }
-std::string IO_request::repr() const { return "<I/O request>"; }
-bool IO_request::boolean() const { return true; }
+std::string IO_request::repr() const
+{
+    return "<I/O request>";
+}
+bool IO_request::boolean() const
+{
+    return true;
+}
 
 std::unique_ptr<Value> IO_request::copy() const
 {
     throw std::make_unique<viua::types::Exception>(
-        viua::types::Exception::Tag{"IO_request"}
-        , "not copyable");
+        viua::types::Exception::Tag{"IO_request"}, "not copyable");
 }
 
 IO_request::IO_request(viua::kernel::Kernel* k, interaction_id_type const x)
         : interaction_id{x}, kernel{k}
 {}
-IO_request::~IO_request() { kernel->cancel_io(id()); }
+IO_request::~IO_request()
+{
+    kernel->cancel_io(id());
+}
 }  // namespace viua::types

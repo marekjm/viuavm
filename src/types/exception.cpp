@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/types/exception.h>
 
 std::string const viua::types::Exception::type_name = "Exception";
@@ -42,38 +43,34 @@ std::string viua::types::Exception::repr() const
 {
     return (type() + ": " + str::enquote(description));
 }
-bool viua::types::Exception::boolean() const { return true; }
+bool viua::types::Exception::boolean() const
+{
+    return true;
+}
 
 std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const
 {
     throw std::make_unique<Exception>("not copyable");
 }
 
-auto viua::types::Exception::add_throw_point(Throw_point const tp)
-    -> void
+auto viua::types::Exception::add_throw_point(Throw_point const tp) -> void
 {
     throw_points.push_back(tp);
 }
 
-viua::types::Exception::Exception(Tag t)
-    : tag{std::move(t.tag)}
+viua::types::Exception::Exception(Tag t) : tag{std::move(t.tag)}
 {}
-viua::types::Exception::Exception(std::string c)
-    : description{std::move(c)}
+viua::types::Exception::Exception(std::string c) : description{std::move(c)}
 {}
 viua::types::Exception::Exception(std::unique_ptr<Value> v)
-    : tag{v->type()}
-    , value{std::move(v)}
+        : tag{v->type()}, value{std::move(v)}
 {}
 viua::types::Exception::Exception(Tag t, std::string c)
-    : tag{std::move(t.tag)}
-    , description{std::move(c)}
+        : tag{std::move(t.tag)}, description{std::move(c)}
 {}
 viua::types::Exception::Exception(Tag t, std::unique_ptr<Value> v)
-    : tag{std::move(t.tag)}
-    , value{std::move(v)}
+        : tag{std::move(t.tag)}, value{std::move(v)}
 {}
 viua::types::Exception::Exception(std::vector<Throw_point> tp, Tag t)
-    : tag{std::move(t.tag)}
-    , throw_points{std::move(tp)}
+        : tag{std::move(t.tag)}, throw_points{std::move(tp)}
 {}

@@ -23,6 +23,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+
 #include <viua/pid.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
@@ -30,7 +31,9 @@
 
 
 auto viua::types::Value::type() const -> std::string
-{ return "Value"; }
+{
+    return "Value";
+}
 auto viua::types::Value::str() const -> std::string
 {
     std::ostringstream s;
@@ -38,7 +41,9 @@ auto viua::types::Value::str() const -> std::string
     return s.str();
 }
 auto viua::types::Value::repr() const -> std::string
-{ return str(); }
+{
+    return str();
+}
 auto viua::types::Value::boolean() const -> bool
 {
     /*  Boolean defaults to false.
@@ -50,18 +55,16 @@ auto viua::types::Value::boolean() const -> bool
 }
 
 
-auto viua::types::Value::pointer(
-    viua::process::PID const process_of_origin) -> std::unique_ptr<viua::types::Pointer>
+auto viua::types::Value::pointer(viua::process::PID const process_of_origin)
+    -> std::unique_ptr<viua::types::Pointer>
 {
     return std::make_unique<viua::types::Pointer>(this, process_of_origin);
 }
-auto viua::types::Value::attach_pointer(
-    viua::types::Pointer* const ptr) -> void
+auto viua::types::Value::attach_pointer(viua::types::Pointer* const ptr) -> void
 {
     pointers.insert(ptr);
 }
-auto viua::types::Value::detach_pointer(
-    viua::types::Pointer* const ptr) -> void
+auto viua::types::Value::detach_pointer(viua::types::Pointer* const ptr) -> void
 {
     pointers.erase(ptr);
 }

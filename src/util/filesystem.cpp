@@ -17,8 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <sys/stat.h>
+
+#include <string>
+
 #include <viua/util/filesystem.h>
 
 namespace viua { namespace util { namespace filesystem {

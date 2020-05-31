@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
 
@@ -39,29 +40,31 @@ using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 
 using viua::bytecode::codec::Register_set;
-auto register_set_names = std::map<viua::bytecode::codec::Register_set, std::string>{
-    {
-        viua::bytecode::codec::Register_set::Global,
-        "global",
-    },
-    {
-        viua::bytecode::codec::Register_set::Static,
-        "static",
-    },
-    {
-        viua::bytecode::codec::Register_set::Local,
-        "local",
-    },
-    {
-        viua::bytecode::codec::Register_set::Arguments,
-        "arguments",
-    },
-    {
-        viua::bytecode::codec::Register_set::Parameters,
-        "parameters",
-    },
-};
-auto to_string(viua::bytecode::codec::Register_set const register_set_id) -> std::string
+auto register_set_names =
+    std::map<viua::bytecode::codec::Register_set, std::string>{
+        {
+            viua::bytecode::codec::Register_set::Global,
+            "global",
+        },
+        {
+            viua::bytecode::codec::Register_set::Static,
+            "static",
+        },
+        {
+            viua::bytecode::codec::Register_set::Local,
+            "local",
+        },
+        {
+            viua::bytecode::codec::Register_set::Arguments,
+            "arguments",
+        },
+        {
+            viua::bytecode::codec::Register_set::Parameters,
+            "parameters",
+        },
+    };
+auto to_string(viua::bytecode::codec::Register_set const register_set_id)
+    -> std::string
 {
     return register_set_names.at(register_set_id);
 }
@@ -196,7 +199,8 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
-    if ((r.rss == viua::bytecode::codec::Register_set::Arguments) and not allow_arguments) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Arguments)
+        and not allow_arguments) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of arguments register set"}
@@ -205,7 +209,8 @@ auto check_use_of_register(Register_usage_profile& rup,
                       "register of `copy` and `move` instructions when a frame "
                       "is allocated"));
     }
-    if ((r.rss == viua::bytecode::codec::Register_set::Parameters) and not allow_parameters) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Parameters)
+        and not allow_parameters) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of parameters register set"}
@@ -215,7 +220,8 @@ auto check_use_of_register(Register_usage_profile& rup,
     }
 
     // FIXME check in bound-ness of register sets other than local
-    if ((not rup.in_bounds(r)) and r.rss == viua::bytecode::codec::Register_set::Local) {
+    if ((not rup.in_bounds(r))
+        and r.rss == viua::bytecode::codec::Register_set::Local) {
         throw Traced_syntax_error{}
             .append(Invalid_syntax{
                 r.tokens.at(0),

@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/function.h>

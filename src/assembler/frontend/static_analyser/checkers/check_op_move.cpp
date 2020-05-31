@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -66,7 +67,8 @@ auto check_op_move(Register_usage_profile& register_usage_profile,
 
     // we need to check if the register set is local because we only track state
     // of local registers
-    if (target and (target->rss == viua::bytecode::codec::Register_set::Local)) {
+    if (target
+        and (target->rss == viua::bytecode::codec::Register_set::Local)) {
         auto val       = Register(*target);
         val.value_type = register_usage_profile.at(*source).second.value_type;
         register_usage_profile.define(val, target->tokens.at(0));

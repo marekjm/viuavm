@@ -18,11 +18,12 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <random>
 #include <sstream>
 #include <string>
+
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
@@ -33,8 +34,7 @@
 #include <viua/types/reference.h>
 
 
-viua::process::PID::PID(pid_type const p)
-    : value{p}
+viua::process::PID::PID(pid_type const p) : value{p}
 {}
 auto viua::process::PID::operator<(PID const& other) const -> bool
 {
@@ -67,13 +67,21 @@ auto viua::process::PID::str(bool const readable) const -> std::string
     {
         auto const [base, big, small, n, m] = value;
         s << std::hex << std::setw(16) << std::setfill('0') << base;
-        if (readable) { s << SEPARATOR; }
+        if (readable) {
+            s << SEPARATOR;
+        }
         s << std::hex << std::setw(16) << std::setfill('0') << big;
-        if (readable) { s << SEPARATOR; }
+        if (readable) {
+            s << SEPARATOR;
+        }
         s << std::hex << std::setw(8) << std::setfill('0') << small;
-        if (readable) { s << SEPARATOR; }
+        if (readable) {
+            s << SEPARATOR;
+        }
         s << std::hex << std::setw(4) << std::setfill('0') << n;
-        if (readable) { s << SEPARATOR; }
+        if (readable) {
+            s << SEPARATOR;
+        }
         s << std::hex << std::setw(4) << std::setfill('0') << m;
     }
     return s.str();
@@ -84,26 +92,22 @@ viua::process::Pid_emitter::Pid_emitter()
     std::random_device rd;
 
     base = std::uniform_int_distribution<uint64_t>{
-        0, static_cast<uint64_t>(-1)
-    }(rd);
+        0, static_cast<uint64_t>(-1)}(rd);
 
     auto const b_high = (std::uniform_int_distribution<uint64_t>{
-        0, static_cast<uint16_t>(-1)
-    }(rd) << 48);
-    auto const b_low = std::uniform_int_distribution<uint64_t>{
-        0, static_cast<uint16_t>(-1)
-    }(rd);
+                             0, static_cast<uint16_t>(-1)}(rd)
+                         << 48);
+    auto const b_low  = std::uniform_int_distribution<uint64_t>{
+        0, static_cast<uint16_t>(-1)}(rd);
     auto const b_full = (b_high + b_low);
-    big_offset = b_full;
+    big_offset        = b_full;
 
-    auto const s_high = (std::uniform_int_distribution<uint32_t>{
-        0, 0x0fff
-    }(rd) << 20);
+    auto const s_high =
+        (std::uniform_int_distribution<uint32_t>{0, 0x0fff}(rd) << 20);
     auto const s_low = std::uniform_int_distribution<uint32_t>{
-        0, static_cast<uint8_t>(-1)
-    }(rd);
+        0, static_cast<uint8_t>(-1)}(rd);
     auto const s_full = (s_high + s_low);
-    small_offset = s_full;
+    small_offset      = s_full;
 
     /*
      * The "small" component has modulo 2 and there is no reason we should have
@@ -115,18 +119,14 @@ viua::process::Pid_emitter::Pid_emitter()
     constexpr auto M_MIN_MODULO = uint8_t{4};
 
     n_offset = std::uniform_int_distribution<uint16_t>{
-        0, static_cast<uint16_t>(-1)
-    }(rd);
+        0, static_cast<uint16_t>(-1)}(rd);
     n_modulo = std::uniform_int_distribution<uint8_t>{
-        N_MIN_MODULO, static_cast<uint8_t>(-1)
-    }(rd);
+        N_MIN_MODULO, static_cast<uint8_t>(-1)}(rd);
 
     m_offset = std::uniform_int_distribution<uint16_t>{
-        0, static_cast<uint8_t>(-1)
-    }(rd);
+        0, static_cast<uint8_t>(-1)}(rd);
     m_modulo = std::uniform_int_distribution<uint8_t>{
-        M_MIN_MODULO, static_cast<uint8_t>(-1)
-    }(rd);
+        M_MIN_MODULO, static_cast<uint8_t>(-1)}(rd);
 }
 
 auto viua::process::Pid_emitter::emit() -> PID::pid_type
@@ -144,11 +144,9 @@ auto viua::process::Pid_emitter::emit() -> PID::pid_type
         ++m;
     }
 
-    return PID::pid_type{
-          base
-        , (big_offset + big)
-        , (small_offset + small)
-        , (n_offset + n)
-        , (m_offset + m)
-    };
+    return PID::pid_type{base,
+                         (big_offset + big),
+                         (small_offset + small),
+                         (n_offset + n),
+                         (m_offset + m)};
 }

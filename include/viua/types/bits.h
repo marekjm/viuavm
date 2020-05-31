@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/types/value.h>
 
 
@@ -80,7 +81,7 @@ class Bits : public viua::types::Value {
     auto operator>(Bits const&) const -> bool;
     auto operator>=(Bits const&) const -> bool;
 
-    auto operator&(Bits const&)const -> std::unique_ptr<Bits>;
+    auto operator&(Bits const&) const -> std::unique_ptr<Bits>;
     auto operator|(Bits const&) const -> std::unique_ptr<Bits>;
     auto operator^(Bits const&) const -> std::unique_ptr<Bits>;
 

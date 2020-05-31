@@ -21,6 +21,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/exceptions.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
@@ -135,7 +136,10 @@ int viua::types::Vector::len()
     return static_cast<int>(internal_object.size());
 }
 
-std::string viua::types::Vector::type() const { return type_name; }
+std::string viua::types::Vector::type() const
+{
+    return type_name;
+}
 
 std::string viua::types::Vector::str() const
 {
@@ -175,11 +179,13 @@ std::vector<std::unique_ptr<viua::types::Value>> const& viua::types::Vector::
     return internal_object;
 }
 
-viua::types::Vector::Vector() {}
+viua::types::Vector::Vector()
+{}
 viua::types::Vector::Vector(const std::vector<viua::types::Value*>& v)
 {
     for (unsigned i = 0; i < v.size(); ++i) {
         internal_object.push_back(v[i]->copy());
     }
 }
-viua::types::Vector::~Vector() {}
+viua::types::Vector::~Vector()
+{}

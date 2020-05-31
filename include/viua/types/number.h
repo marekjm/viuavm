@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+
 #include <viua/types/boolean.h>
 #include <viua/types/value.h>
 
@@ -53,7 +54,7 @@ class Number : public Value {
 
     virtual auto operator+(Number const&) const -> std::unique_ptr<Number> = 0;
     virtual auto operator-(Number const&) const -> std::unique_ptr<Number> = 0;
-    virtual auto operator*(Number const&)const -> std::unique_ptr<Number>  = 0;
+    virtual auto operator*(Number const&) const -> std::unique_ptr<Number> = 0;
     virtual auto operator/(Number const&) const -> std::unique_ptr<Number> = 0;
 
     virtual auto operator<(Number const&) const -> std::unique_ptr<Boolean> = 0;

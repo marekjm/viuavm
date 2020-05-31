@@ -18,6 +18,7 @@
  */
 
 #include <pthread.h>
+
 #include <chrono>
 #include <condition_variable>
 #include <iostream>
@@ -25,6 +26,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/io.h>
 #include <viua/scheduler/io/interactions.h>
@@ -44,7 +46,8 @@ void viua::scheduler::io::io_scheduler(
     std::mutex& io_request_mutex,
     std::condition_variable& io_request_cv)
 {
-    pthread_setname_np(pthread_self(), ("io." + std::to_string(scheduler_id)).c_str());
+    pthread_setname_np(pthread_self(),
+                       ("io." + std::to_string(scheduler_id)).c_str());
 
     auto local_interactions = std::deque<std::unique_ptr<IO_interaction>>{};
 
@@ -160,8 +163,8 @@ void viua::scheduler::io::io_scheduler(
                         work.id(),
                         viua::kernel::Kernel::IO_result::make_error(
                             std::make_unique<viua::types::Exception>(
-                                      viua::types::Exception::Tag{"IO_cancel"}
-                                      , "I/O cancelled")));
+                                viua::types::Exception::Tag{"IO_cancel"},
+                                "I/O cancelled")));
                 } else {
                     kernel.schedule_io(std::move(interaction));
                 }

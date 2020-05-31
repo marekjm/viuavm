@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/include/module.h>
 #include <viua/process.h>
 #include <viua/scheduler/ffi.h>
@@ -25,7 +26,8 @@
 #include <viua/types/integer.h>
 
 
-auto viua::scheduler::ffi::Foreign_function_call_request::function_name() const -> std::string
+auto viua::scheduler::ffi::Foreign_function_call_request::function_name() const
+    -> std::string
 {
     return frame->function_name;
 }
@@ -57,7 +59,8 @@ auto viua::scheduler::ffi::Foreign_function_call_request::call(
             *return_register = std::move(returned);
         }
     } catch (std::unique_ptr<viua::types::Exception>& exception) {
-        exception->add_throw_point(viua::types::Exception::Throw_point{function_name()});
+        exception->add_throw_point(
+            viua::types::Exception::Throw_point{function_name()});
         caller_process.raise(std::move(exception));
         caller_process.handle_active_exception();
     } catch (std::unique_ptr<viua::types::Value>& value) {

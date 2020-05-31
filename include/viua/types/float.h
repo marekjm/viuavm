@@ -23,6 +23,7 @@
 #include <ios>
 #include <sstream>
 #include <string>
+
 #include <viua/types/number.h>
 
 
@@ -53,7 +54,7 @@ class Float : public viua::types::numeric::Number {
 
     auto operator+(Number const&) const -> std::unique_ptr<Number> override;
     auto operator-(Number const&) const -> std::unique_ptr<Number> override;
-    auto operator*(Number const&)const -> std::unique_ptr<Number> override;
+    auto operator*(Number const&) const -> std::unique_ptr<Number> override;
     auto operator/(Number const&) const -> std::unique_ptr<Number> override;
 
     auto operator<(Number const&) const -> std::unique_ptr<Boolean> override;

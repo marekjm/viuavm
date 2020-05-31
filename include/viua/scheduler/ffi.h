@@ -25,6 +25,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+
 #include <viua/include/module.h>
 
 
@@ -61,11 +62,14 @@ class Foreign_function_call_request {
             : frame{std::move(fr)}, caller_process{cp}, kernel{c}
     {}
 
-    Foreign_function_call_request(Foreign_function_call_request const&) = delete;
-    auto operator=(Foreign_function_call_request const&) -> Foreign_function_call_request& = delete;
+    Foreign_function_call_request(Foreign_function_call_request const&) =
+        delete;
+    auto operator=(Foreign_function_call_request const&)
+        -> Foreign_function_call_request& = delete;
 
     Foreign_function_call_request(Foreign_function_call_request&&) = delete;
-    auto operator=(Foreign_function_call_request&&) -> Foreign_function_call_request& = delete;
+    auto operator                         =(Foreign_function_call_request &&)
+        -> Foreign_function_call_request& = delete;
 
     ~Foreign_function_call_request() = default;
 };

@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -25,7 +26,7 @@ using viua::assembler::frontend::parser::Instruction;
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
 auto check_op_exception_value(Register_usage_profile& register_usage_profile,
-                           Instruction const& instruction) -> void
+                              Instruction const& instruction) -> void
 {
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {

@@ -29,6 +29,7 @@
 #include <queue>
 #include <stack>
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/codec/main.h>
 #include <viua/include/module.h>
@@ -43,7 +44,8 @@
 
 class Halt_exception : public std::runtime_error {
   public:
-    Halt_exception() : std::runtime_error("execution halted") {}
+    Halt_exception() : std::runtime_error("execution halted")
+    {}
 };
 
 
@@ -169,7 +171,8 @@ class Stack {
     auto register_deferred_calls_from(Frame*) -> void;
     auto register_deferred_calls(bool const = true) -> void;
 
-    auto prepare_frame(viua::bytecode::codec::register_index_type const) -> Frame*;
+    auto prepare_frame(viua::bytecode::codec::register_index_type const)
+        -> Frame*;
     auto push_prepared_frame() -> void;
 
     auto adjust_jump_base_for_block(std::string const&)
@@ -246,7 +249,8 @@ struct Decoder_adapter {
     auto fetch_tagged_register(Op_address_type&,
                                Process&,
                                bool const = false) const
-        -> std::pair<viua::bytecode::codec::Register_set, viua::kernel::Register*>;
+        -> std::pair<viua::bytecode::codec::Register_set,
+                     viua::kernel::Register*>;
     auto fetch_register_index(Op_address_type&) const
         -> viua::bytecode::codec::register_index_type;
     auto fetch_tagged_register_index(Op_address_type&) const
@@ -275,8 +279,7 @@ class Process {
      * regarding executed code.
      */
     bool const tracing_enabled;
-    auto get_trace_line(uint8_t const*) const
-        -> std::string;
+    auto get_trace_line(uint8_t const*) const -> std::string;
     auto emit_trace_line(uint8_t const*) const -> void;
 
     /*
@@ -569,7 +572,8 @@ class Process {
     auto tick() -> Op_address_type;
 
     auto register_at(viua::bytecode::codec::register_index_type,
-                     viua::bytecode::codec::Register_set) -> viua::kernel::Register*;
+                     viua::bytecode::codec::Register_set)
+        -> viua::kernel::Register*;
 
     bool joinable() const;
     void join();
@@ -617,8 +621,14 @@ class Process {
 
     auto empty() const -> bool;
 
-    auto pin(bool const x = true) -> void { is_pinned_to_scheduler = x; }
-    auto pinned() const -> bool { return is_pinned_to_scheduler; }
+    auto pin(bool const x = true) -> void
+    {
+        is_pinned_to_scheduler = x;
+    }
+    auto pinned() const -> bool
+    {
+        return is_pinned_to_scheduler;
+    }
 
     auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
         -> void;
@@ -634,8 +644,8 @@ class Process {
             Decoder_adapter const& = Decoder_adapter{});
     ~Process();
 
-    static viua::bytecode::codec::register_index_type const DEFAULT_REGISTER_SIZE =
-        255;
+    static viua::bytecode::codec::register_index_type const
+        DEFAULT_REGISTER_SIZE = 255;
 
     inline auto current_stack() -> Stack&
     {

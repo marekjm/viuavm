@@ -17,11 +17,13 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+#include <unistd.h>
+
 #include <fstream>
 #include <iostream>
 #include <locale>
-#include <stdlib.h>
-#include <unistd.h>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/cg/assembler/assembler.h>

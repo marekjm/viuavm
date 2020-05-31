@@ -21,6 +21,7 @@
 #define VIUA_TOOLING_LIBS_LEXER_NORMALISER_H
 
 #include <vector>
+
 #include <viua/tooling/libs/lexer/tokenise.h>
 
 namespace viua { namespace tooling { namespace libs { namespace lexer {

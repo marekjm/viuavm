@@ -20,6 +20,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+
 #include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/exceptions.h>

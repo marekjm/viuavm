@@ -21,6 +21,7 @@
 #define VIUA_TYPES_IO_H
 
 #include <string>
+
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/process.h>
@@ -45,7 +46,10 @@ class IO_request : public Value {
     std::string repr() const override;
     bool boolean() const override;
 
-    auto id() const -> interaction_id_type { return interaction_id; }
+    auto id() const -> interaction_id_type
+    {
+        return interaction_id;
+    }
 
     std::unique_ptr<Value> copy() const override;
 
