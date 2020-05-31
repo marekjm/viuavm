@@ -39,7 +39,14 @@ void viua::kernel::Register::reset(std::unique_ptr<viua::types::Value> o)
 
 bool viua::kernel::Register::empty() const { return value == nullptr; }
 
-viua::types::Value* viua::kernel::Register::get() { return value.get(); }
+auto viua::kernel::Register::get() -> viua::types::Value*
+{
+    return value.get();
+}
+auto viua::kernel::Register::get() const -> viua::types::Value const*
+{
+    return value.get();
+}
 
 viua::types::Value* viua::kernel::Register::release()
 {

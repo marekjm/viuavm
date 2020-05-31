@@ -44,6 +44,7 @@ class Register {
     auto empty() const -> bool;
 
     auto get() -> viua::types::Value*;
+    auto get() const -> viua::types::Value const*;
     auto release() -> viua::types::Value*;
     auto give() -> std::unique_ptr<viua::types::Value>;
 
