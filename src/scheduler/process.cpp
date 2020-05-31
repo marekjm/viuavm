@@ -96,60 +96,52 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
 
     if (trace.size()) {
         auto const last = trace.back();
-        if (last->local_register_set.owns()
-            and last->local_register_set->size()) {
-            auto non_empty = unsigned{0};
-            for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size();
-                 ++r) {
-                if (last->local_register_set->at(r) != nullptr) {
+        auto const& registers = last->local_register_set;
+
+        using Size = viua::kernel::Register_set::size_type;
+
+        if (registers.owns() and registers->size()) {
+            auto non_empty = Size{0};
+            for (auto r = Size{0}; r < registers->size(); ++r) {
+                if (registers->at(r) != nullptr) {
                     ++non_empty;
                 }
             }
-            std::cerr << "  non-empty registers: " << non_empty << '/'
-                      << last->local_register_set->size();
+
+            std::cerr << "  non-empty registers: " << std::dec << non_empty << '/'
+                      << registers->size();
             std::cerr << (non_empty ? ":\n" : "\n");
-            for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size();
-                 ++r) {
-                if (last->local_register_set->at(r) == nullptr) {
+            for (auto r = Size{0}; r < registers->size(); ++r) {
+                if (registers->at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    registers[" << r << "]: ";
-                std::cerr << '<' << last->local_register_set->get(r)->type()
-                          << "> " << last->local_register_set->get(r)->str()
+                std::cerr << '<' << registers->get(r)->type()
+                          << "> " << registers->get(r)->str()
                           << "\n";
             }
-        } else if (not last->local_register_set.owns()) {
+        } else if (not registers.owns()) {
             std::cerr << "  this frame did not own its registers\n";
         } else {
             std::cerr << "  no registers were allocated for this frame\n";
         }
 
-        if (last->arguments->size()) {
+        if (registers->size()) {
             std::cerr << "  non-empty arguments (out of "
-                      << last->arguments->size() << "):\n";
-            for (decltype(last->arguments->size()) r = 0;
-                 r < last->arguments->size();
-                 ++r) {
-                if (last->arguments->at(r) == nullptr) {
+                      << registers->size() << "):\n";
+            for (auto r = Size{0}; r < registers->size(); ++r) {
+                if (registers->at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    arguments[" << r << "]: ";
-                if (last->arguments->is_flagged(r, MOVED)) {
+                if (registers->is_flagged(r, MOVED)) {
                     std::cerr << "[moved] ";
                 }
-                if (auto ptr = dynamic_cast<viua::types::Pointer*>(
-                        last->arguments->get(r))) {
-                    if (ptr->expired()) {
-                        std::cerr << "<ExpiredPointer>"
-                                  << "\n";
-                    } else {
-                        std::cerr << '<' << ptr->type() << ">\n";
-                    }
+                if (auto const ptr = dynamic_cast<viua::types::Pointer const*>(registers->get(r))) {
+                    std::cerr << "<" << ptr->type() << ">\n";
                 } else {
-                    std::cerr << '<' << last->arguments->get(r)->type() << "> "
-                              << last->arguments->get(r)->str() << "\n";
+                    std::cerr << '<' << registers->get(r)->type() << "> "
+                              << registers->get(r)->str() << "\n";
                 }
             }
         } else {
