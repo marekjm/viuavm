@@ -37,9 +37,7 @@ std::string viua::types::Process::type() const
 
 std::string viua::types::Process::str() const
 {
-    std::ostringstream oss;
-    oss << "Process: " << std::hex << pid().str() << std::dec;
-    return oss.str();
+    return pid().str();
 }
 
 std::string viua::types::Process::repr() const

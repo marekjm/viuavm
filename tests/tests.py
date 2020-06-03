@@ -2805,7 +2805,7 @@ class ConcurrencyTests(unittest.TestCase):
         def match_output(self, excode, output):
             pat = re.compile(
                 r'^exception transferred from process '
-                r'Process: [a-f0-9]+(?::[a-f0-9]+)+'
+                r'[a-f0-9]+(?::[a-f0-9]+)+'
                 r': Hello exception transferring World!$')
             wat = re.match(pat, output)
             self.assertTrue(wat is not None)
