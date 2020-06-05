@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 Marek Marecki
+ *  Copyright (C) 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <string>
 #include <viua/assembler/frontend/static_analyser.h>
 
