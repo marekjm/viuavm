@@ -177,6 +177,13 @@ std::vector<std::unique_ptr<viua::types::Value>> const& viua::types::Vector::
     return internal_object;
 }
 
+auto viua::types::Vector::expire() -> void
+{
+    for (auto& each : internal_object) {
+        each->expire();
+    }
+}
+
 viua::types::Vector::Vector()
 {}
 viua::types::Vector::Vector(const std::vector<viua::types::Value*>& v)

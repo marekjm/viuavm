@@ -49,6 +49,8 @@ class Vector : public Value {
     Value* at(long int);
     int len();
 
+    auto expire() -> void override;
+
     Vector();
     Vector(const std::vector<Value*>& v);
     ~Vector();

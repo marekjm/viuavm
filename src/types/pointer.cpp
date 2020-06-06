@@ -38,15 +38,14 @@ auto viua::types::Pointer::detach() -> void
 {
     if (not expired()) {
         points_to->detach_pointer(this);
+        points_to = nullptr;
     }
     points_to = nullptr;
 }
 
-void viua::types::Pointer::invalidate(viua::types::Value* t)
+auto viua::types::Pointer::expire() -> void
 {
-    if (t == points_to) {
-        points_to = nullptr;
-    }
+    detach();
 }
 auto viua::types::Pointer::expired() const -> bool
 {

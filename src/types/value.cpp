@@ -69,9 +69,23 @@ auto viua::types::Value::detach_pointer(viua::types::Pointer* const ptr) -> void
     pointers.erase(ptr);
 }
 
+auto viua::types::Value::expire() -> void
+{
+    /*
+     * By default do nothing, as values of most types may be safely exchanged
+     * between processes.
+     */
+}
+
 viua::types::Value::~Value()
 {
-    for (auto p : pointers) {
-        p->invalidate(this);
+    /*
+     * A copy is needed because calling expire() on a Pointer will detach it
+     * from the value - so we would be mutating 'pointers' while iterating over
+     * it.
+     */
+    auto ptrs = pointers;
+    for (auto p : ptrs) {
+        p->expire();
     }
 }

@@ -248,14 +248,12 @@ auto viua::process::Stack::find_catch_frame()
 {
     auto found_exception_frame = std::experimental::observer_ptr<Try_frame>();
     auto caught_with_type      = std::string{""};
-    viua::types::Value* ex     = nullptr;
+
+    viua::types::Value* ex = nullptr;
     if (state_of() == STATE::RUNNING) {
         ex = thrown.get();
     } else {
         ex = caught.get();
-    }
-    if (ex == nullptr) {
-        abort();
     }
     auto handler_found_for_type = ex->type();
 

@@ -95,6 +95,9 @@ auto viua::kernel::Process_result::resolve(
 {
     std::unique_lock<std::mutex> lck{result_mutex};
     value_returned = std::move(result);
+    if (value_returned) {
+        value_returned->expire();
+    }
     done.store(true, std::memory_order_release);
 }
 auto viua::kernel::Process_result::raise(
@@ -102,6 +105,9 @@ auto viua::kernel::Process_result::raise(
 {
     std::unique_lock<std::mutex> lck{result_mutex};
     exception_thrown = std::move(failure);
+    if (exception_thrown) {
+        exception_thrown->expire();
+    }
     done.store(true, std::memory_order_release);
 }
 auto viua::kernel::Process_result::stopped() const -> bool

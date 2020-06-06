@@ -53,7 +53,6 @@ class Pointer : public Value {
   public:
     constexpr static auto type_name = "Pointer";
 
-    auto invalidate(Value* t) -> void;
     auto expired() const -> bool;
     auto authenticate(viua::process::PID const) -> void;
     auto reset(Value* t) -> void;
@@ -65,6 +64,7 @@ class Pointer : public Value {
     auto boolean() const -> bool override;
 
     auto copy() const -> std::unique_ptr<Value> override;
+    auto expire() -> void override;
 
     Pointer(viua::process::PID const);
     Pointer(Value* t, viua::process::PID const);

@@ -56,6 +56,17 @@ class Value {
     virtual auto attach_pointer(viua::types::Pointer* const) -> void;
     virtual auto detach_pointer(viua::types::Pointer* const) -> void;
 
+    /*
+     * Called before a value is sent to another process. For types that should
+     * not be usable outside of their original process it should set the value
+     * to some sane, invalid state; if such a state is impossible to construct
+     * the function should throw an exception.
+     *
+     * This is currently only useful for pointers (as they are the only value
+     * that SHOULD NOT be exchanged by processes).
+     */
+    virtual auto expire() -> void;
+
     virtual auto copy() const -> std::unique_ptr<Value> = 0;
 
     Value() = default;

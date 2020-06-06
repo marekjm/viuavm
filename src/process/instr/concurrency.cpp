@@ -137,7 +137,9 @@ auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type
     auto const proc = decoder.fetch_value_of<viua::types::Process>(addr, *this);
     auto source     = decoder.fetch_register(addr, *this);
 
-    attached_scheduler->send(proc->pid(), source->give());
+    auto value = source->give();
+    value->expire();
+    attached_scheduler->send(proc->pid(), std::move(value));
 
     return addr;
 }

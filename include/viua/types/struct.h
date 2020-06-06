@@ -53,8 +53,9 @@ class Struct : public Value {
     virtual auto keys() const -> std::vector<std::string>;
 
     auto copy() const -> std::unique_ptr<Value> override;
+    auto expire() -> void override;
 
-    ~Struct() override = default;
+    ~Struct() override;
 };
 }}  // namespace viua::types
 

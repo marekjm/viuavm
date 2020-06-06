@@ -121,3 +121,13 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const
     }
     return copied;
 }
+
+auto viua::types::Struct::expire() -> void
+{
+    for (auto& each : attributes) {
+        each.second->expire();
+    }
+}
+
+viua::types::Struct::~Struct()
+{}
