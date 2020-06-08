@@ -21,7 +21,11 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <mutex>
+#include <optional>
+#include <string>
+#include <string_view>
 
 #include <viua/kernel/kernel.h>
 #include <viua/machine.h>
@@ -104,30 +108,38 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
 
         using Size = viua::kernel::Register_set::size_type;
 
-        if (last->local_register_set.owns()
-            and static_cast<bool>(last->local_register_set.get())
-            and last->local_register_set->size()) {
-            auto const& registers = *last->local_register_set.get();
+        auto const limit_length = [](std::string const& s) -> void {
+            constexpr auto MAX_LENGTH = 80;
+            if (s.size() <= MAX_LENGTH) {
+                std::cerr << s << "\n";
+            } else {
+                auto view = std::string_view{s};
+                view.remove_suffix(s.size() - MAX_LENGTH);
+                std::cerr << view << "... <cut>";
+            }
+        };
 
-            auto non_empty = unsigned{0};
-            for (auto r = Size{0}; r < registers.size(); ++r) {
-                if (registers.at(r) != nullptr) {
+        auto const& locals = last->local_register_set;
+        if (locals.owns() and locals.get() and locals->size()) {
+            auto non_empty = size_t{0};
+            for (auto r = Size{0}; r < locals->size(); ++r) {
+                if (locals->at(r) != nullptr) {
                     ++non_empty;
                 }
             }
-
-            std::cerr << "  non-empty registers: " << std::dec << non_empty
-                      << '/' << registers.size();
+            std::cerr << "  non-empty registers: " << non_empty << '/'
+                      << locals->size();
             std::cerr << (non_empty ? ":\n" : "\n");
-            for (auto r = Size{0}; r < registers.size(); ++r) {
-                if (registers.at(r) == nullptr) {
+            for (auto r = uint16_t{0}; r < locals->size(); ++r) {
+                if (locals->at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    registers[" << r << "]: ";
-                std::cerr << '<' << registers.get(r)->type() << "> "
-                          << registers.get(r)->str() << "\n";
+                std::cerr << '<' << locals->get(r)->type() << "> ";
+                limit_length(locals->get(r)->str());
+                std::cerr << "\n";
             }
-        } else if (not last->local_register_set.owns()) {
+        } else if (not locals.owns()) {
             std::cerr << "  this frame did not own its registers\n";
         } else {
             std::cerr << "  no registers were allocated for this frame\n";
@@ -135,7 +147,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
 
         auto const& arguments = *last->arguments.get();
 
-        if (arguments.size()) {
+        if (not arguments.empty()) {
             std::cerr << "  non-empty arguments (out of " << arguments.size()
                       << "):\n";
             for (auto r = Size{0}; r < arguments.size(); ++r) {
@@ -150,8 +162,9 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                         arguments.get(r))) {
                     std::cerr << "<" << ptr->type() << ">\n";
                 } else {
-                    std::cerr << '<' << arguments.get(r)->type() << "> "
-                              << arguments.get(r)->str() << "\n";
+                    std::cerr << '<' << arguments.get(r)->type() << "> ";
+                    limit_length(arguments.get(r)->str());
+                    std::cerr << "\n";
                 }
             }
         } else {

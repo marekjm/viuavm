@@ -106,6 +106,10 @@ class Register_set {
     {
         return registerset_size;
     }
+    inline auto empty() const -> bool
+    {
+        return (size() == 0);
+    }
 
     auto copy() const -> std::unique_ptr<Register_set>;
 
