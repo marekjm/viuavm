@@ -317,7 +317,7 @@ auto viua::kernel::Kernel::in_which_function(std::string const mod,
         return "<outside of executable range>";
     }
 
-    auto candidate_name = std::string{};
+    auto candidate_name = std::optional<std::string>{};
     auto candidate_addr = uint64_t{};
     for (auto const& [fn, relative_addr] : fns) {
         if (offset == relative_addr) {

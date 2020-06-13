@@ -17,8 +17,8 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/1
-    allocate_registers %6 local
+.function: watchdog_process/2
+    allocate_registers %8 local
 
     .name: %iota death_message
     .name: %iota ex
@@ -38,8 +38,12 @@
     echo %ex local
     print (string %message local "<<<") local
 
-    .name: %iota i
-    frame ^[(move %0 arguments (integer %iota local 42) local) (move %1 arguments (integer %iota local 1) local)]
+    .name: iota i
+    move %i local %1 parameters
+
+    frame %2
+    move %0 arguments %i local
+    move %1 arguments (integer %iota local 1) local
     process void a_division_executing_process/2
 
     return
@@ -47,9 +51,6 @@
 
 .function: a_detached_concurrent_process/0
     allocate_registers %2 local
-
-    frame %1
-    watchdog watchdog_process/1
 
     frame ^[(move %0 arguments (integer %1 local 32) local)]
     call std::misc::cycle/1
@@ -90,20 +91,21 @@
 .function: a_division_executing_process/2
     allocate_registers %5 local
 
-    frame %1
-    watchdog watchdog_process/1
-
-    frame ^[(move %0 arguments (integer %1 local 128) local)]
-    call std::misc::cycle/1
-
-    .name: 1 divide_what
+    .name: iota divide_what
     move %divide_what local %0 parameters
 
-    .name: 2 divide_by
+    .name: iota divide_by
     move %divide_by local %1 parameters
 
-    .name: 3 zero
+    .name: iota zero
     izero %zero local
+
+    frame %2
+    copy %1 arguments %divide_what local
+    watchdog watchdog_process/2
+
+    frame ^[(move %0 arguments (integer %4 local 128) local)]
+    call std::misc::cycle/1
 
     if (eq %4 local %divide_by local %zero local) local +1 __after_throw
     throw (string %4 local "cannot divide by zero") local
