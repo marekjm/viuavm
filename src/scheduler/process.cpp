@@ -78,14 +78,18 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 reinterpret_cast<uint8_t*>(each.jump_base));
             auto const in_function =
                 (in_module) ? process.get_kernel().in_which_function(
-                    *in_module, each.offset)
+                    in_module->first, each.offset)
                             : std::nullopt;
-            std::cerr << "    address: 0x" << std::hex << std::setw(4)
-                      << std::setfill('0') << each.offset << std::dec
-                      << " (byte " << each.offset << ") inside 0x" << std::hex
-                      << std::setw(12) << std::setfill('0') << each.jump_base
-                      << " [" << in_module.value_or("<unknown>")
-                      << "::" << in_function.value_or("<unknown>") << "]\n";
+            std::cerr
+                << "    address: 0x" << std::hex << std::setw(4)
+                << std::setfill('0') << each.offset << std::dec << " (byte "
+                << each.offset << ") inside 0x" << std::hex << std::setw(12)
+                << std::setfill('0') << each.jump_base << " ["
+                << in_function.value_or("<unknown>") << " => "
+                << (in_module.has_value()
+                        ? (in_module->second + " {" + in_module->first + "}")
+                        : "<unknown>")
+                << "]\n";
         }
     } else if (ex) {
         std::cerr << "none\n";

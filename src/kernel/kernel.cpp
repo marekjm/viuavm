@@ -52,6 +52,9 @@
 #include <viua/types/vector.h>
 
 
+constexpr auto MAIN_MODULE = "<main>";
+
+
 viua::kernel::Mailbox::Mailbox(Mailbox&& that)
         : messages(std::move(that.messages))
 {}
@@ -204,6 +207,15 @@ void viua::kernel::Kernel::load_module(std::string module)
     default:
         assert(false);
     }
+
+    switch (module_path->first) {
+    case viua::runtime::imports::Module_type::Native:
+    case viua::runtime::imports::Module_type::Bytecode:
+        loaded_module_paths.insert({module, module_path->second});
+        break;
+    default:
+        assert(false);
+    }
 }
 void viua::kernel::Kernel::load_bytecode_module(
     std::string_view const module_name,
@@ -266,14 +278,14 @@ void viua::kernel::Kernel::load_native_module(
     cxx_dynamic_lib_handles.push_back(handle);
 }
 auto viua::kernel::Kernel::module_at(uint8_t const* const location) const
-    -> std::optional<std::string>
+    -> std::optional<std::pair<std::string, std::string>>
 {
     if (bytecode.get() == location) {
-        return commandline_arguments.at(0);
+        return {{MAIN_MODULE, commandline_arguments.at(0)}};
     }
     for (auto const& [name, mod] : linked_modules) {
         if (mod.second.get() == location) {
-            return name;
+            return {{name, loaded_module_paths.at(name)}};
         }
     }
     return {};
@@ -282,7 +294,7 @@ auto viua::kernel::Kernel::in_which_function(std::string const mod,
                                              uint64_t const offset) const
     -> std::optional<std::string>
 {
-    auto const main_module = (mod == commandline_arguments.at(0));
+    auto const main_module = (mod == MAIN_MODULE);
 
     auto const jump_base = main_module ? bytecode.get()
                                        : linked_modules.at(mod).second.get();

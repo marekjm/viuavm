@@ -44,6 +44,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/include/module.h>
 #include <viua/process.h>
+#include <viua/runtime/imports.h>
 
 
 namespace viua {
@@ -153,6 +154,8 @@ class Kernel {
              std::pair<viua::bytecode::codec::bytecode_size_type,
                        std::unique_ptr<uint8_t[]>>>
         linked_modules;
+
+    std::map<std::string, std::string> loaded_module_paths;
 
     int return_code{-1};
 
@@ -327,7 +330,8 @@ class Kernel {
     auto get_entry_point_of(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
-    auto module_at(uint8_t const* const) const -> std::optional<std::string>;
+    auto module_at(uint8_t const* const) const
+        -> std::optional<std::pair<std::string, std::string>>;
     auto in_which_function(std::string const, uint64_t const) const
         -> std::optional<std::string>;
 
