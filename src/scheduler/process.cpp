@@ -639,9 +639,16 @@ auto Process_scheduler::operator()() -> void
             attached_kernel.notify_about_process_death();
             if (a_process.get() == main_process and not exit_code.has_value()) {
                 auto const ret = a_process->get_return_value();
-                auto const ret_int =
-                    static_cast<viua::types::Integer*>(ret.get());
-                exit_code = (ret ? static_cast<int>(ret_int->as_integer()) : 0);
+                exit_code      = 0;
+                if (ret) {
+                    auto ret_int =
+                        dynamic_cast<viua::types::Integer*>(ret.get());
+                    if (ret_int) {
+                        exit_code = static_cast<int>(ret_int->as_integer());
+                    } else {
+                        exit_code = static_cast<int>(not ret->boolean());
+                    }
+                }
             }
         } else {
             push(std::move(a_process));
