@@ -19,11 +19,9 @@
 
 #include <viua/types/boolean.h>
 
-std::string const viua::types::Boolean::type_name = "Boolean";
-
 auto viua::types::Boolean::type() const -> std::string
 {
-    return type_name;
+    return "Boolean";
 }
 
 auto viua::types::Boolean::str() const -> std::string

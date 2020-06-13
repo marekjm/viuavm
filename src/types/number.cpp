@@ -22,8 +22,6 @@
 #include <viua/types/number.h>
 
 
-std::string const viua::types::numeric::Number::type_name = "Number";
-
 std::string viua::types::numeric::Number::type() const
 {
     return type_name;

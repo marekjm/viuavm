@@ -23,8 +23,6 @@
 #include <viua/types/closure.h>
 #include <viua/types/value.h>
 
-std::string const viua::types::Closure::type_name = "Closure";
-
 
 viua::types::Closure::Closure(std::string const& name,
                               std::unique_ptr<viua::kernel::Register_set> rs)

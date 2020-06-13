@@ -38,7 +38,7 @@ class Integer : public viua::types::numeric::Number {
     underlying_type number;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Integer";
 
     std::string type() const override;
     std::string str() const override;

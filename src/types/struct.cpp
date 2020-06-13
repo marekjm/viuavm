@@ -25,8 +25,6 @@
 #include <viua/util/exceptions.h>
 
 
-std::string const viua::types::Struct::type_name = "Struct";
-
 std::string viua::types::Struct::type() const
 {
     return type_name;

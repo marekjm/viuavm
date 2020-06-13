@@ -181,7 +181,6 @@ auto IO_empty_interaction::interact() -> Interaction_result
 }  // namespace viua::scheduler::io
 
 namespace viua::types {
-std::string const viua::types::IO_port::type_name = "IO_port";
 
 std::string IO_port::type() const
 {
@@ -210,8 +209,6 @@ IO_port::IO_port()
 IO_port::~IO_port()
 {}
 
-
-std::string const viua::types::IO_fd::type_name = "IO_fd";
 
 std::string IO_fd::type() const
 {
@@ -299,8 +296,6 @@ IO_fd::~IO_fd()
     close();
 }
 
-
-std::string const viua::types::IO_request::type_name = "IO_request";
 
 std::string IO_request::type() const
 {

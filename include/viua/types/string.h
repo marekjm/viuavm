@@ -52,7 +52,7 @@ class String : public Value {
     std::string svalue;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "String";
 
     std::string type() const override;
     std::string str() const override;

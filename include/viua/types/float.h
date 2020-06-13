@@ -39,7 +39,7 @@ class Float : public viua::types::numeric::Number {
     underlying_type number;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Float";
 
     std::string type() const override;
     std::string str() const override;

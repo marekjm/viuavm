@@ -37,7 +37,7 @@ class Struct : public Value {
     std::map<std::string, std::unique_ptr<Value>> attributes;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Struct";
 
     auto type() const -> std::string override;
     auto boolean() const -> bool override;

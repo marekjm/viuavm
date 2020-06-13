@@ -33,9 +33,6 @@
 #include <viua/types/process.h>
 #include <viua/types/reference.h>
 
-// Provide storage for static member.
-viua::bytecode::codec::register_index_type const
-    viua::process::Process::DEFAULT_REGISTER_SIZE;
 
 auto viua::process::Decoder_adapter::fetch_slot(Op_address_type& addr) const
     -> viua::bytecode::codec::Register_access

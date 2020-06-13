@@ -186,7 +186,7 @@ class Stack {
           viua::kernel::Register_set*,
           viua::scheduler::Process_scheduler*);
 
-    static uint16_t const MAX_STACK_SIZE = 8192;
+    constexpr static auto MAX_STACK_SIZE = uint16_t{8192};
 };
 
 struct Decoder_adapter {
@@ -201,7 +201,9 @@ struct Decoder_adapter {
         if (converted == nullptr) {
             // FIXME don't use the old generic-exception type
             throw std::make_unique<viua::types::Exception>(
-                ("fetched invalid type: expected '" + T::type_name
+                // FIXME C++20 will make this std::string{...} ctor call
+                // obsolete
+                ("fetched invalid type: expected '" + std::string{T::type_name}
                  + "' but got '" + value->type() + "'")
                 /* "Invalid_type" */
                 /* , "expected " + T::type_name + ", got " + value->type() */
@@ -225,7 +227,9 @@ struct Decoder_adapter {
         if (converted == nullptr) {
             // FIXME don't use the old generic-exception type
             throw std::make_unique<viua::types::Exception>(
-                ("fetched invalid type: expected '" + T::type_name
+                // FIXME C++20 will make this std::string{...} ctor call
+                // obsolete
+                ("fetched invalid type: expected '" + std::string{T::type_name}
                  + "' but got '" + value->type() + "'")
                 /* "Invalid_type" */
                 /* , "expected " + T::type_name + ", got " + value->type() */
@@ -644,8 +648,8 @@ class Process {
             Decoder_adapter const& = Decoder_adapter{});
     ~Process();
 
-    static viua::bytecode::codec::register_index_type const
-        DEFAULT_REGISTER_SIZE = 255;
+    constexpr static auto DEFAULT_REGISTER_SIZE =
+        viua::bytecode::codec::register_index_type{255};
 
     inline auto current_stack() -> Stack&
     {

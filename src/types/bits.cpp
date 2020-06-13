@@ -1360,8 +1360,6 @@ static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
 }}  // namespace viua::arithmetic
 
 
-std::string const viua::types::Bits::type_name = "Bits";
-
 auto viua::types::Bits::type() const -> std::string
 {
     return type_name;

@@ -85,7 +85,7 @@ class Bits : public viua::types::Value {
     auto operator|(Bits const&) const -> std::unique_ptr<Bits>;
     auto operator^(Bits const&) const -> std::unique_ptr<Bits>;
 
-    static std::string const type_name;
+    constexpr static auto type_name = "Bits";
 
     std::string type() const override;
     std::string str() const override;

@@ -30,8 +30,6 @@
 
 using viua::util::exceptions::make_unique_exception;
 
-std::string const viua::types::Vector::type_name = "Vector";
-
 void viua::types::Vector::insert(long int index,
                                  std::unique_ptr<viua::types::Value> object)
 {

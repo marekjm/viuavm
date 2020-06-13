@@ -51,7 +51,7 @@ class Pointer : public Value {
     auto detach() -> void;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Pointer";
 
     auto invalidate(Value* t) -> void;
     auto expired() const -> bool;

@@ -30,7 +30,7 @@
 namespace viua { namespace types {
 class Function : public Value {
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Function";
 
     std::string function_name;
 

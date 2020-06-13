@@ -20,8 +20,6 @@
 #include <viua/support/string.h>
 #include <viua/types/atom.h>
 
-std::string const viua::types::Atom::type_name = "Atom";
-
 auto viua::types::Atom::type() const -> std::string
 {
     return type_name;

@@ -24,8 +24,6 @@
 #include <viua/types/text.h>
 
 
-std::string const viua::types::Text::type_name = "Text";
-
 namespace {
 const uint8_t UTF8_1ST_ROW = 0b00000000;
 const uint8_t UTF8_2ND_ROW = 0b11000000;

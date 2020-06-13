@@ -28,7 +28,7 @@ class Atom : public Value {
     std::string const value;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Atom";
 
     virtual std::string type() const override;
     virtual bool boolean() const override;

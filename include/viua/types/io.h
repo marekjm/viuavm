@@ -39,7 +39,7 @@ class IO_request : public Value {
     viua::kernel::Kernel* const kernel;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "IO_request";
 
     std::string type() const override;
     std::string str() const override;
@@ -65,7 +65,7 @@ class IO_port : public Value {
     counter_type counter = 0;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "IO_port";
 
     std::string type() const override;
     std::string str() const override;
@@ -103,7 +103,7 @@ class IO_fd : public IO_port {
     Ownership const ownership;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "IO_fd";
 
     std::string type() const override;
     std::string str() const override;
