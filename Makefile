@@ -376,34 +376,8 @@ build/platform/support/string.o: src/support/string.cpp
 
 ############################################################
 # TESTING
-build/test/printer.so: build/test/printer.o \
-	build/platform/kernel/registerset.o \
-	build/platform/types/value.o \
-	build/platform/types/exception.o
-
-build/test/sleeper.so: build/test/sleeper.o \
-	build/platform/kernel/registerset.o \
-	build/platform/types/value.o \
-	build/platform/types/exception.o
-
-build/test/math.so: build/test/math.o \
-	build/platform/kernel/registerset.o \
-	build/platform/types/exception.o \
-	build/platform/types/value.o \
-	build/platform/types/pointer.o \
-	build/platform/types/integer.o \
-	build/platform/types/float.o \
-	build/platform/types/number.o
-
-build/test/throwing.so: build/test/throwing.o \
-	build/platform/kernel/registerset.o \
-	build/platform/types/exception.o \
-	build/platform/types/value.o \
-	build/platform/types/pointer.o \
-	build/platform/types/integer.o \
-	build/platform/types/number.o
-
-compile-test: build/test/math.so \
+compile-test: \
+	build/test/math.so \
 	build/test/World.so \
 	build/test/throwing.so \
 	build/test/printer.so \
