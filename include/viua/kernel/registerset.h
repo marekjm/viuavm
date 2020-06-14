@@ -102,6 +102,7 @@ class Register_set {
     auto get_mask(size_type const) const -> mask_type;
 
     auto drop() -> void;
+
     inline auto size() const -> size_type
     {
         return registerset_size;

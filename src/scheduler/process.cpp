@@ -145,7 +145,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
             std::cerr << "  no registers were allocated for this frame\n";
         }
 
-        auto const& arguments = *last->arguments.get();
+        auto& arguments = *last->arguments.get();
 
         if (not arguments.empty()) {
             std::cerr << "  non-empty arguments (out of " << arguments.size()
@@ -158,9 +158,14 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 if (arguments.is_flagged(r, MOVED)) {
                     std::cerr << "[moved] ";
                 }
-                if (auto const ptr = dynamic_cast<viua::types::Pointer const*>(
-                        arguments.get(r))) {
-                    std::cerr << "<" << ptr->type() << ">\n";
+                if (auto ptr =
+                        dynamic_cast<viua::types::Pointer*>(arguments.get(r))) {
+                    if (ptr->expired()) {
+                        std::cerr << "<ExpiredPointer>"
+                                  << "\n";
+                    } else {
+                        std::cerr << '<' << ptr->type() << ">\n";
+                    }
                 } else {
                     std::cerr << '<' << arguments.get(r)->type() << "> ";
                     limit_length(arguments.get(r)->str());
