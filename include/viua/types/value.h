@@ -36,7 +36,7 @@ namespace types {
 class Pointer;
 
 class Value {
-    std::set<Pointer*> pointers;
+    class viua::process::Process* pointered = nullptr;
 
   public:
     /*
@@ -52,10 +52,6 @@ class Value {
     virtual auto repr() const -> std::string;
     virtual auto boolean() const -> bool;
 
-    virtual auto pointer(viua::process::PID const) -> std::unique_ptr<Pointer>;
-    virtual auto attach_pointer(viua::types::Pointer* const) -> void;
-    virtual auto detach_pointer(viua::types::Pointer* const) -> void;
-
     /*
      * Called before a value is sent to another process. For types that should
      * not be usable outside of their original process it should set the value
@@ -66,6 +62,8 @@ class Value {
      * that SHOULD NOT be exchanged by processes).
      */
     virtual auto expire() -> void;
+    virtual auto pointer(viua::process::Process* const)
+        -> std::unique_ptr<Pointer>;
 
     virtual auto copy() const -> std::unique_ptr<Value> = 0;
 

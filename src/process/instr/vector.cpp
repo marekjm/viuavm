@@ -147,7 +147,7 @@ auto viua::process::Process::opvat(Op_address_type addr) -> Op_address_type
     auto vec    = decoder.fetch_value_of<viua::types::Vector>(addr, *this);
     auto index  = decoder.fetch_value_of<viua::types::Integer>(addr, *this);
 
-    *target = vec->at(index->as_integer())->pointer(pid());
+    *target = vec->at(index->as_integer())->pointer(this);
 
     return addr;
 }

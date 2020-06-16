@@ -196,7 +196,7 @@ auto viua::process::Decoder_adapter::fetch_value(Op_address_type& addr,
                 viua::types::Exception::Tag{"Not_a_pointer"},
                 "dereferenced value is not a pointer: " + value->type());
         }
-        value = pointer->to(proc.pid());
+        value = pointer->to(proc);
     }
     if (auto pointer = dynamic_cast<viua::types::Pointer*>(value)) {
         pointer->authenticate(proc.pid());
@@ -741,6 +741,64 @@ auto viua::process::Process::get_kernel() const -> viua::kernel::Kernel&
 {
     return attached_scheduler->kernel();
 }
+
+namespace viua::process {
+auto Process::attach_pointer(viua::types::Value* const val,
+                             viua::types::Pointer* const) -> void
+{
+    /*
+     * At one point the 'live_pointers' contained a set of pointers attached to
+     * the value, providing full and accurate tracking of which pointers were
+     * attached to which values.
+     *
+     * This proved to be too brittle for real-world code, though, so the the
+     * scope was reduced to just record live values that had a pointer taken.
+     *
+     * See comment to Process::detach_pointer() for more information and
+     * background.
+     */
+    live_pointers.insert(val);
+}
+auto Process::detach_pointer(viua::types::Value* const,
+                             viua::types::Pointer* const) -> void
+{
+    /*
+     * At one point the VM was accurately tracking the relationships between
+     * values and their pointers. This function was used to detach a pointer
+     * from a value; a detached pointer would be destroyed soon after, and the
+     * value would not mark it as expired when it would be later deleted itself.
+     *
+     * However, this nice machinery proved to be brittle and was the cause of
+     * heap corruption in more complex programs (first example being the
+     * self-hosting version of Viuact compiler). And so, this function was made
+     * to be a no-op, and left as a placeholder for a future (better)
+     * implementation of pointer tracking.
+     */
+}
+auto Process::invalidate_pointers_of(viua::types::Value* const val) -> void
+{
+    live_pointers.erase(val);
+}
+auto Process::verify_liveness(viua::types::Pointer& ptr) const -> bool
+{
+    auto const val = ptr.of();
+
+    if (not live_pointers.count(val)) {
+        ptr.expire();
+        return false;
+    }
+    return true;
+}
+auto Process::verify_liveness(viua::types::Pointer const& ptr) const -> bool
+{
+    auto const val = ptr.of();
+
+    if (not live_pointers.count(val)) {
+        return false;
+    }
+    return true;
+}
+}  // namespace viua::process
 
 viua::process::Process::Process(std::unique_ptr<Frame> frm,
                                 viua::process::PID const p,

@@ -52,7 +52,7 @@ auto viua::process::Process::opptr(Op_address_type addr) -> Op_address_type
     auto target = decoder.fetch_register(addr, *this);
     auto source = decoder.fetch_value(addr, *this);
 
-    *target = source->pointer(pid());
+    *target = source->pointer(this);
 
     return addr;
 }
@@ -61,7 +61,8 @@ auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type
     auto target = decoder.fetch_register(addr, *this);
     auto source = decoder.fetch_value_of<viua::types::Pointer>(addr, *this);
 
-    *target = std::make_unique<viua::types::Boolean>(not source->expired());
+    *target =
+        std::make_unique<viua::types::Boolean>(not source->expired(*this));
 
     return addr;
 }

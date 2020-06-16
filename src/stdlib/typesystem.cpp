@@ -44,10 +44,9 @@ static auto typeof(Frame* frame,
         pointer) {
         frame->set_local_register_set(
             std::make_unique<viua::kernel::Register_set>(1));
-        frame->local_register_set->set(
-            0,
-            std::make_unique<viua::types::String>(
-                pointer->to(process->pid())->type()));
+        frame->local_register_set->set(0,
+                                       std::make_unique<viua::types::String>(
+                                           pointer->to(*process)->type()));
     } else {
         throw std::make_unique<viua::types::Exception>(
             "expected a pointer as parameter 0");

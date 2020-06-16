@@ -45,18 +45,34 @@ class Pointer : public Value {
      *  pointer should be illegal by definition (even if the access
      *  could be made safe).
      */
-    viua::process::PID const origin_pid;
+    viua::process::PID const origin;
 
-    auto attach(Value* t) -> void;
-    auto detach() -> void;
 
   public:
     constexpr static auto type_name = "Pointer";
 
-    auto expired() const -> bool;
-    auto authenticate(viua::process::PID const) -> void;
-    auto reset(Value* t) -> void;
-    auto to(viua::process::PID const) -> Value*;
+    /*
+     * Check if the pointer is expired, and set its state appropriately. Return
+     * the new state.
+     */
+    auto expired(viua::process::Process const&) -> bool;
+
+    /*
+     * Authenticate the pointer for use in a process. This causes the pointer to
+     * become invalid if it is used outside of its process of origin.
+     */
+    auto authenticate(viua::process::PID const pid) -> void;
+
+    /*
+     * Guarded (via to() function) and unguarded (via of() function) access to
+     * the pointee.
+     *
+     * The to() function requires a process that the value would be used in, and
+     * may set the pointer's state to expired if it's not the pointer's process
+     * of origin.
+     */
+    auto to(viua::process::Process const&) -> Value*;
+    auto of() const -> Value*;
 
     auto str() const -> std::string override;
 
@@ -68,7 +84,7 @@ class Pointer : public Value {
 
     Pointer(viua::process::PID const);
     Pointer(Value* t, viua::process::PID const);
-    virtual ~Pointer();
+    ~Pointer() override;
 };
 }  // namespace types
 }  // namespace viua

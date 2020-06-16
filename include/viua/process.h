@@ -27,6 +27,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <set>
 #include <stack>
 #include <string>
 
@@ -329,6 +330,28 @@ class Process {
 
 
     /*
+     * This is a set of values that have had a pointer taken and are alive (were
+     * not destroyed).
+     *
+     * Any value allocated for use in Viua VM knows if a pointer has been taken
+     * to it; as it is the value itself that creates the pointer (and then
+     * notifies the process inside which this happened). This means that a
+     * process is aware of the possibility that a pointer to that value exists.
+     *
+     * When the value is destroyed its pointer is removed from this set. From
+     * that moment, pointer liveness checks will fail for any pointer that is
+     * pointing to that value.
+     *
+     * This set MUST only be accessed by one thread at a time to avoid race
+     * conditions, but we do not have to guard it with a mutex because a process
+     * is only ever manipulated by a single thread (proc scheduler code is
+     * responsible for guaranteeing this assumption holds).
+     */
+    using Pointer_map_type = std::set<viua::types::Value const*>;
+    Pointer_map_type live_pointers;
+
+
+    /*
      * Call stack information.
      *
      * A process may have many suspended stacks (the simplest example: during
@@ -350,6 +373,7 @@ class Process {
     std::map<Stack*, std::unique_ptr<Stack>> stacks;
     Stack* stack;
     std::stack<Stack*> stacks_order;
+
 
     /*
      * Messages which the process already has locally. To avoid synchronisation
@@ -639,6 +663,14 @@ class Process {
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
     auto get_kernel() const -> viua::kernel::Kernel&;
+
+    auto attach_pointer(viua::types::Value* const, viua::types::Pointer* const)
+        -> void;
+    auto detach_pointer(viua::types::Value* const, viua::types::Pointer* const)
+        -> void;
+    auto invalidate_pointers_of(viua::types::Value* const) -> void;
+    auto verify_liveness(viua::types::Pointer&) const -> bool;
+    auto verify_liveness(viua::types::Pointer const&) const -> bool;
 
     Process(std::unique_ptr<Frame>,
             viua::process::PID const,

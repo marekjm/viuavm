@@ -25,6 +25,7 @@
 #include <string>
 
 #include <viua/pid.h>
+#include <viua/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
@@ -55,18 +56,13 @@ auto viua::types::Value::boolean() const -> bool
 }
 
 
-auto viua::types::Value::pointer(viua::process::PID const process_of_origin)
+auto viua::types::Value::pointer(viua::process::Process* const proc)
     -> std::unique_ptr<viua::types::Pointer>
 {
-    return std::make_unique<viua::types::Pointer>(this, process_of_origin);
-}
-auto viua::types::Value::attach_pointer(viua::types::Pointer* const ptr) -> void
-{
-    pointers.insert(ptr);
-}
-auto viua::types::Value::detach_pointer(viua::types::Pointer* const ptr) -> void
-{
-    pointers.erase(ptr);
+    pointered = proc;
+    auto ptr  = std::make_unique<viua::types::Pointer>(this, proc->pid());
+    pointered->attach_pointer(this, ptr.get());
+    return ptr;
 }
 
 auto viua::types::Value::expire() -> void
@@ -75,17 +71,12 @@ auto viua::types::Value::expire() -> void
      * By default do nothing, as values of most types may be safely exchanged
      * between processes.
      */
+    if (pointered) {
+        pointered->invalidate_pointers_of(this);
+    }
 }
 
 viua::types::Value::~Value()
 {
-    /*
-     * A copy is needed because calling expire() on a Pointer will detach it
-     * from the value - so we would be mutating 'pointers' while iterating over
-     * it.
-     */
-    auto ptrs = pointers;
-    for (auto p : ptrs) {
-        p->expire();
-    }
+    expire();
 }

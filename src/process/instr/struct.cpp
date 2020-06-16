@@ -76,7 +76,7 @@ auto viua::process::Process::opstructat(Op_address_type addr) -> Op_address_type
     auto const key = decoder.fetch_value_of<viua::types::Atom>(addr, *this);
 
     if (target.has_value()) {
-        **target = struct_operand->at(*key)->pointer(pid());
+        **target = struct_operand->at(*key)->pointer(this);
     }
 
     return addr;

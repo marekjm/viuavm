@@ -23,33 +23,20 @@
 #include <sstream>
 #include <string>
 
+#include <viua/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
 
 
-auto viua::types::Pointer::attach(viua::types::Value* t) -> void
-{
-    points_to = t;
-    points_to->attach_pointer(this);
-}
-auto viua::types::Pointer::detach() -> void
-{
-    if (not expired()) {
-        points_to->detach_pointer(this);
-        points_to = nullptr;
-    }
-    points_to = nullptr;
-}
-
 auto viua::types::Pointer::expire() -> void
 {
-    detach();
+    points_to = nullptr;
 }
-auto viua::types::Pointer::expired() const -> bool
+auto viua::types::Pointer::expired(viua::process::Process const& proc) -> bool
 {
-    return (points_to == nullptr);
+    return (not proc.verify_liveness(*this));
 }
 auto viua::types::Pointer::authenticate(viua::process::PID const pid) -> void
 {
@@ -59,38 +46,47 @@ auto viua::types::Pointer::authenticate(viua::process::PID const pid) -> void
      *  code passes the pointer object to user-process to ensure that Pointer's
      * state is properly accounted for.
      */
-    points_to = (origin_pid == pid) ? points_to : nullptr;
+    if (pid != origin) {
+        expire();
+    }
 }
-auto viua::types::Pointer::reset(viua::types::Value* t) -> void
+auto viua::types::Pointer::to(viua::process::Process const& p) -> Value*
 {
-    detach();
-    attach(t);
-}
-auto viua::types::Pointer::to(viua::process::PID const p) -> viua::types::Value*
-{
-    if (origin_pid != p) {
+    if (origin != p.pid()) {
         // Dereferencing pointers outside of their original process is illegal.
-        using viua::types::Exception;
-        throw std::make_unique<Exception>(Exception::Tag{"Invalid_dereference"},
-                                          "outside of original process");
+        expire();
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Invalid_dereference"},
+            "outside of original process");
     }
-    if (expired()) {
-        using viua::types::Exception;
-        throw std::make_unique<Exception>(Exception::Tag{"Expired_pointer"},
-                                          "pointer is no longer valid");
+    if (not p.verify_liveness(*this)) {
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Expired_pointer"});
     }
+    if (points_to == nullptr) {
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Expired_pointer"});
+    }
+    return points_to;
+}
+auto viua::types::Pointer::of() const -> Value*
+{
     return points_to;
 }
 
 auto viua::types::Pointer::type() const -> std::string
 {
-    return ((not expired()) ? ("Pointer_of_" + points_to->type())
-                            : "Expired_pointer");
+    return "Pointer";
+    // FIXME The below code would require to() to work on const pointers.
+    /* auto const& val = to(); */
+    /* return (val.has_value() */
+    /*     ? ("Pointer_of_" + val->type()) */
+    /*     : "Expired_pointer"); */
 }
 
 auto viua::types::Pointer::boolean() const -> bool
 {
-    return (not expired());
+    return (points_to != nullptr);
 }
 
 auto viua::types::Pointer::str() const -> std::string
@@ -98,25 +94,22 @@ auto viua::types::Pointer::str() const -> std::string
     return type();
 }
 
-auto viua::types::Pointer::copy() const -> std::unique_ptr<viua::types::Value>
+auto viua::types::Pointer::copy() const -> std::unique_ptr<Value>
 {
-    if (expired()) {
-        return std::make_unique<Pointer>(origin_pid);
+    if (points_to == nullptr /* and (origin == proc) */) {
+        // FIXME Make copying a expired pointer an exception?
+        return std::make_unique<Pointer>(origin);
     }
-    return std::make_unique<Pointer>(points_to, origin_pid);
+    return std::make_unique<Pointer>(points_to, origin);
 }
 
 
-viua::types::Pointer::Pointer(viua::process::PID pid)
-        : points_to{nullptr}, origin_pid{pid}
+viua::types::Pointer::Pointer(viua::process::PID const pid)
+        : points_to{nullptr}, origin{pid}
 {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
                               viua::process::PID const pid)
-        : points_to{nullptr}, origin_pid{pid}
-{
-    attach(t);
-}
+        : points_to{t}, origin{pid}
+{}
 viua::types::Pointer::~Pointer()
-{
-    detach();
-}
+{}

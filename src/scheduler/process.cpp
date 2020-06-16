@@ -160,7 +160,7 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
                 }
                 if (auto ptr =
                         dynamic_cast<viua::types::Pointer*>(arguments.get(r))) {
-                    if (ptr->expired()) {
+                    if (ptr->expired(process)) {
                         std::cerr << "<ExpiredPointer>"
                                   << "\n";
                     } else {

@@ -26,6 +26,7 @@
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
+#include <viua/types/pointer.h>
 #include <viua/util/memory.h>
 
 
@@ -37,7 +38,11 @@ auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type
 {
-    std::cout << decoder.fetch_value(addr, *this)->str() + "\n";
+    auto value = decoder.fetch_value(addr, *this);
+    if (auto ptr = dynamic_cast<viua::types::Pointer*>(value); ptr) {
+        verify_liveness(*ptr);
+    }
+    std::cout << value->str() + '\n';
     return addr;
 }
 

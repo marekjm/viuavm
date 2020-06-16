@@ -323,7 +323,7 @@ static auto bind(Frame* frame,
 
     auto const& sock = static_cast<Socket_type&>(
         *static_cast<viua::types::Pointer*>(frame->arguments->get(0))
-             ->to(proc->pid()));
+             ->to(*proc));
     if (::bind(sock.fd(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr))
         == -1) {
         auto const error_number = errno;
@@ -449,7 +449,7 @@ static auto listen(Frame* frame,
 {
     auto const& sock = static_cast<Socket_type&>(
         *static_cast<viua::types::Pointer*>(frame->arguments->get(0))
-             ->to(proc->pid()));
+             ->to(*proc));
     auto const backlog =
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
             ->as_integer();
@@ -577,7 +577,7 @@ static auto accept(Frame* frame,
 {
     auto const& sock = static_cast<Socket_type&>(
         *static_cast<viua::types::Pointer*>(frame->arguments->get(0))
-             ->to(proc->pid()));
+             ->to(*proc));
     auto const incoming = ::accept(sock.fd(), nullptr, nullptr);
     if (incoming == -1) {
         auto const error_number = errno;
