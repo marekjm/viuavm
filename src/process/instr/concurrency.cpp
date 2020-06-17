@@ -97,8 +97,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     if (attached_scheduler->is_stopped(proc->pid())) {
         return_addr = addr;
         if (attached_scheduler->is_terminated(proc->pid())) {
-            auto joined_throw = std::move(
-                attached_scheduler->transfer_exception_of(proc->pid()));
+            auto joined_throw =
+                attached_scheduler->transfer_exception_of(proc->pid());
 
             /*
              * We need to detect if the joined throw value is an exception and,
