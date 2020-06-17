@@ -604,12 +604,6 @@ auto Process_scheduler::operator()() -> void
             } else {
                 auto const tr = a_process->trace();
                 if (tr.empty()) {
-                    std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
-                              << std::setfill('0') << id() << std::dec
-                              << "][pid=" << a_process->pid().str()
-                              << "] no trace when setting up a watchdog call, "
-                                 "the process is broken beyond repair\n";
-
                     print_stack_trace(*a_process.get());
                     attached_kernel.delete_mailbox(a_process->pid());
                     attached_kernel.notify_about_process_death();
@@ -626,12 +620,6 @@ auto Process_scheduler::operator()() -> void
                      * watchdog has crashed. We have no choice but to reap the
                      * process as it failed to save itself.
                      */
-                    std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
-                              << std::setfill('0') << id() << std::dec
-                              << "][pid=" << a_process->pid().str()
-                              << "] watchdog failed, the process is broken "
-                                 "beyond repair\n";
-
                     print_stack_trace(*a_process.get());
                     attached_kernel.delete_mailbox(a_process->pid());
                     attached_kernel.notify_about_process_death();
@@ -641,12 +629,6 @@ auto Process_scheduler::operator()() -> void
                     }
                     continue;
                 }
-
-                std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
-                          << std::setfill('0') << id() << std::dec
-                          << "][pid=" << a_process->pid().str()
-                          << "] the process has crashed, calling watchdog: "
-                          << a_process->watchdog() << "\n";
 
                 auto parameters = std::make_unique<viua::types::Vector>();
                 auto top_args   = tr.at(0)->arguments.get();
