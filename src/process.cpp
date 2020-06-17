@@ -469,6 +469,10 @@ auto viua::process::Process::tick() -> Op_address_type
         return nullptr;
     }
 
+    if (suspended()) {
+        return stack->instruction_pointer;
+    }
+
     /*
      * Machine should halt execution if previous instruction pointer is the same
      * as current one as it means that the execution flow is corrupted and
