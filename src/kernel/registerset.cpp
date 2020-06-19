@@ -201,15 +201,18 @@ auto viua::kernel::Register_set::get(size_type const index) const
     -> viua::types::Value const*
 {
     if (index >= registerset_size) {
-        std::ostringstream emsg;
-        emsg << "register access out of bounds: read from " << index;
-        throw std::make_unique<viua::types::Exception>(emsg.str());
+        auto o = std::ostringstream{};
+        o << "read from " << index << " of " << registerset_size;
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Register_access_out_of_bounds"},
+            o.str());
     }
     auto optr = registers.at(index).get();
     if (optr == nullptr) {
-        std::ostringstream oss;
-        oss << "(get) read from null register: " << index;
-        throw std::make_unique<viua::types::Exception>(oss.str());
+        auto o = std::ostringstream{};
+        o << "read from " << index << " of " << registerset_size;
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Null_register_access"}, o.str());
     }
     return optr;
 }
