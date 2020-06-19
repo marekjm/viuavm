@@ -627,11 +627,12 @@ auto viua::process::Process::transfer_active_exception()
 auto viua::process::Process::raise(
     std::unique_ptr<viua::types::Exception> exception) -> void
 {
+    auto const base = reinterpret_cast<uint64_t>(current_stack().jump_base);
+    auto const off  = static_cast<uint64_t>(current_stack().instruction_pointer
+                                           - current_stack().jump_base);
+
     using Throw_point = viua::types::Exception::Throw_point;
-    exception->add_throw_point(
-        Throw_point{reinterpret_cast<uint64_t>(current_stack().jump_base),
-                    static_cast<uint64_t>(current_stack().instruction_pointer
-                                          - current_stack().jump_base)});
+    exception->add_throw_point(Throw_point{base, off});
     stack->thrown = std::move(exception);
 }
 auto viua::process::Process::raise(
