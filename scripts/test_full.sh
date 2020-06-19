@@ -12,7 +12,7 @@ VIUA_TEST_SUITE_VALGRIND_CHECKS=0 make test
 # Then, test without sanitisers but with Valgrind.
 echo "Running Valgrind build"
 make clean
-make GENERIC_SANITISER_FLAGS= CLANG_SANITISER_FLAGS= GCC_SANITISER_FLAGS= "$@"
+make CLANG_SANITISER_FLAGS= GCC_SANITISER_FLAGS= "$@"
 make test
 
 if [[ $OPTIMISED == '' ]]; then

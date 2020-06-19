@@ -1,25 +1,20 @@
-# Clang 4.0 does not recognise -std=c++17 option, and
-# needs -std=c++1z.
-# Clang 5.0 and later recognises -std=c++17
-# See http://clang.llvm.org/cxx_status.html for details.
+# See http://clang.llvm.org/cxx_status.html for clang++ details.
 CXX_STANDARD=c++17
 
 
 # By default, try to catch everything.
 # This may be painful at first but it pays off in the long run.
-GENERIC_SANITISER_FLAGS=-fstack-protector-strong \
-						-fsanitize=undefined \
-						-fsanitize=leak \
-						-fsanitize=address
-CLANG_SANITISER_FLAGS=  -fstack-protector-strong \
-						-fsanitize=undefined \
-						-fsanitize=leak \
-						-fsanitize=address
+COMMON_SANITISER_FLAGS=\
+					   -fstack-protector-strong \
+					   -fsanitize=undefined
+CLANG_SANITISER_FLAGS=\
+					  $(COMMON_SANITISER_FLAGS) \
+					  -fsanitize=leak \
+					  -fsanitize=address
 # No -fsanitize=address for GCC because of too many false positives.
-# No -fsanitize=leak for GCC because it broke on my Arch Linux after
-# last update.
-GCC_SANITISER_FLAGS=    -fstack-protector-strong \
-						-fsanitize=undefined
+GCC_SANITISER_FLAGS=\
+					$(COMMON_SANITISER_FLAGS) \
+					-fsanitize=leak
 
 
 # These are generic flags that should be used for compiling Viua VM.
@@ -32,41 +27,16 @@ GCC_SANITISER_FLAGS=    -fstack-protector-strong \
 #	-Winline			-- fails if GCC tries to inline calls that are unlikely and
 #							the code size would grow
 # 	-Wdisabled-optimization	-- some source files are too big
-GENERIC_CXXFLAGS=-Wall \
-				 -Wextra \
-				 -Wctor-dtor-privacy \
-				 -Wnon-virtual-dtor \
-				 -Wreorder \
-				 -Woverloaded-virtual \
-				 -Wundef \
-				 -Wstrict-overflow=2 \
-				 -Winit-self \
-				 -Wzero-as-null-pointer-constant \
-				 -Wuseless-cast \
-				 -Wconversion \
-				 -Wshadow \
-				 -Wswitch-default \
-				 -Wswitch-enum \
-				 -Wredundant-decls \
-				 -Wlogical-op \
-				 -Wmissing-include-dirs \
-				 -Wmissing-declarations \
-				 -Wcast-align \
-				 -Wcast-qual \
-				 -Wold-style-cast \
-				 -Walloc-zero \
-				 -Wdouble-promotion \
-				 -Wunused-const-variable=2 \
-				 -Wduplicated-branches \
-				 -Wduplicated-cond \
-				 -Wsign-conversion \
-				 -Wrestrict \
-				 -Wstack-protector \
-				 -Werror \
-				 -Wfatal-errors \
-				 -Wpedantic \
-				 -g \
-				 -I./include
+INCLUDE_FLAGS=\
+			  -I./include
+COMMON_CXXFLAGS=\
+				-Wall \
+				-Wextra \
+				-Werror \
+				-Wfatal-errors \
+				-pedantic \
+				-g \
+				$(INCLUDE_FLAGS)
 # -Weverything						-- in theory enables *everything*
 # -Wdeprecated-implementations		-- makes sense for C++?
 # -Wpadded							-- breaks existing code
@@ -77,8 +47,8 @@ GENERIC_CXXFLAGS=-Wall \
 # -Wunused-template					-- breaks existing code
 # -Wfloat-equal 					-- breaks existing code
 # -Wlifetime						-- would be useful
-CLANG_CXXFLAGS=-Wall \
-			   -Wextra \
+CLANG_CXXFLAGS=\
+			   $(COMMON_CXXFLAGS) \
 			   -Wabsolute-value \
 			   -Wabstract-vbase-init \
 			   -Warray-bounds-pointer-arithmetic \
@@ -176,69 +146,54 @@ CLANG_CXXFLAGS=-Wall \
 			   -Wzero-as-null-pointer-constant \
 			   -Wzero-length-array \
 			   -Wc++2a-compat \
-			   -Werror \
 			   -Wno-weak-vtables \
-			   -Wfatal-errors \
-			   -pedantic \
-			   -g \
-			   -I./include
-GCC_CXXFLAGS=$(GENERIC_CXXFLAGS)
+			   $(CLANG_SANITISER_FLAGS)
+GCC_CXXFLAGS=\
+			 $(COMMON_CXXFLAGS) \
+			 -Wctor-dtor-privacy \
+			 -Wnon-virtual-dtor \
+			 -Wreorder \
+			 -Woverloaded-virtual \
+			 -Wundef \
+			 -Wstrict-overflow=2 \
+			 -Winit-self \
+			 -Wzero-as-null-pointer-constant \
+			 -Wuseless-cast \
+			 -Wconversion \
+			 -Wshadow \
+			 -Wswitch-default \
+			 -Wswitch-enum \
+			 -Wredundant-decls \
+			 -Wlogical-op \
+			 -Wmissing-include-dirs \
+			 -Wmissing-declarations \
+			 -Wcast-align \
+			 -Wcast-qual \
+			 -Wold-style-cast \
+			 -Walloc-zero \
+			 -Wdouble-promotion \
+			 -Wunused-const-variable=2 \
+			 -Wduplicated-branches \
+			 -Wduplicated-cond \
+			 -Wsign-conversion \
+			 -Wrestrict \
+			 -Wstack-protector \
+			 $(GCC_SANITISER_FLAGS)
 
-
-# For different compilers (and for TravisCI) compiler flags should be overridden, because
-# of throwing too many false positives or being unsupported.
-# If any compiler that should be treated specially is detected, CXXFLAGS is adjusted for its (the
-# compiler's) needs; otherwise, generic CXXFLAGS are used.
-#
-# The process of setting CXXFLAGS in a multi-phase one.
-# There are several things that need to be decided on:
-# - the C++ standard to be used
-# - the set of warning flags
-# - the set of sanitiser flags
-# - optimisation level
-#
-# After all this parts are set, Make will compose the final CXXFLAGS.
-
-# By default, use generic flags.
-SANITISER_FLAGS=$(GENERIC_SANITISER_FLAGS)
-COMPILER_FLAGS=$(GENERIC_CXXFLAGS)
 
 ifeq ($(CXX), g++)
-COMPILER_FLAGS=$(GENERIC_CXXFLAGS) \
+COMPILER_FLAGS=$(GCC_CXXFLAGS) \
 			   --param max-gcse-memory=134217728
-			   #--param max-gcse-memory=67108864
-SANITISER_FLAGS=$(GCC_SANITISER_FLAGS)
-else ifeq ($(CXX), g++-7)
-COMPILER_FLAGS=-Wall \
-			   -Wextra \
-			   -Wzero-as-null-pointer-constant \
-			   -Wuseless-cast \
-			   -Wconversion \
-			   -Wshadow \
-			   -Wswitch-default \
-			   -Wredundant-decls \
-			   -Wlogical-op \
-			   -Wmissing-include-dirs \
-			   -Wcast-align \
-			   -Wold-style-cast \
-			   -Werror \
-			   -Wfatal-errors \
-			   -pedantic \
-			   -g \
-			   -I./include
-SANITISER_FLAGS=-fsanitize=undefined
 else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-else ifeq ($(CXX), clang++-5.0)
-COMPILER_FLAGS=$(CLANG_CXXFLAGS)
-SANITISER_FLAGS=-fsanitize=undefined \
-				-fstack-protector-strong \
-				-fsanitize=address
 endif
 
-# Combine compiler and sanitiser flags, and used C++ standard into final CXXFLAGS.
-# CXX_EXTRA_FLAGS are meant to be supplied on the command line.
-#
+# By default, the VM is compiled using no optimisations.
+# This makes for shorter compile times, but prevents speed-testing the VM.
+# You should run the VM with -O3 every once in a while to see how it's doing.
+OPTIMISATION_LEVEL=0
+OPTIMISATION_FLAG=-O$(OPTIMISATION_LEVEL)
+
 # Build information includes commit from which the VM was built and a hash of
 # the code (this is for development builds as commit and version stays the same
 # for them). These two pieces of information stay constant and depend only on
@@ -250,21 +205,13 @@ CXXFLAGS=\
 		 -DVIUA_VM_COMMIT="\"$(shell ./scripts/get_head_commit.sh)\"" \
 		 -DVIUA_VM_CODE_FINGERPRINT="\"$(shell ./scripts/get_code_fingerprint.sh)\"" \
 		 $(COMPILER_FLAGS) \
-		 $(SANITISER_FLAGS) \
-		 $(CXX_EXTRA_FLAGS)
-
-# By default, the VM is compiled using no optimisations.
-# This makes for shorter compile times, but prevents speed-testing the VM.
-# You should run the VM with -O3 every once in a while to see how it's doing.
-CXXOPTIMIZATIONFLAGS=-O0
-COPTIMIZATIONFLAGS=
+		 $(OPTIMISATION_FLAG)
 
 # Expose symbols in the VM kernel binary to the shared libraries that are linked at runtime.
 # It is done this way to avoid making every library carry its own copy of functions used to access
 # registers, types, the kernel, etc.
 # I don't yet know how this will affect library compatibility. Runtime crashes because a symbol has
-# been moved? Shouldn't happen because the symbol will be located dynamically.
-# I guess we'll see.
+# been moved? Shouldn't happen because the symbol will be located dynamically. I guess we'll see.
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo -rdynamic
 
 
@@ -276,18 +223,25 @@ LDLIBS=-ldl -lpthread
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version platform
+.PHONY: \
+	all \
+	clean \
+	clean-support \
+	clean-test-compiles \
+	compile-test \
+	install \
+	remake \
+	test \
+	version
 
 
-############################################################
-# BASICS
-all: build/bin/vm/asm \
+all: \
+	build/bin/vm/asm \
 	build/bin/vm/kernel \
 	build/bin/vm/dis \
 	build/bin/vm/lex \
 	build/bin/vm/parser \
 	build/bin/opcodes.bin \
-	platform \
 	stdlib \
 	standardlibrary \
 	compile-test \
@@ -340,38 +294,14 @@ install-headers:
 	# mkdir -p $(H_PATH)
 	# cp -R ./include/viua/. $(H_PATH)/
 
-install: install-execs install-libs
+install: \
+	install-execs \
+	install-libs
 
 uninstall:
 	rm -rf $(H_PATH)
 	rm -rf $(LIB_PATH)
 	rm -rf $(BIN_PATH)/viua-*
-
-
-############################################################
-# PLATFORM OBJECT FILES
-platform: build/platform/types/exception.o \
-	build/platform/types/value.o \
-	build/platform/types/pointer.o \
-	build/platform/types/number.o \
-	build/platform/types/integer.o \
-	build/platform/types/io.o \
-	build/platform/types/bits.o \
-	build/platform/types/float.o \
-	build/platform/types/string.o \
-	build/platform/types/atom.o \
-	build/platform/types/struct.o \
-	build/platform/types/text.o \
-	build/platform/types/vector.o \
-	build/platform/types/reference.o \
-	build/platform/kernel/registerset.o \
-	build/platform/support/string.o
-
-build/platform/kernel/registerset.o: src/kernel/registerset.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/support/string.o: src/support/string.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 
 ############################################################
@@ -411,57 +341,29 @@ tools: build/bin/tools/log-shortener
 
 ############################################################
 # RULES
-build/platform/types/%.o: src/types/%.cpp include/viua/types/%.h
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-build/platform/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
 build/test/%.o: sample/asm/external/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $<
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -c -o $@ $<
 
 build/test/%.so: build/test/%.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
-
-build/front/asm/%.o: src/front/asm/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/front/%.o: src/front/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/scheduler/%.o: src/scheduler/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
-build/kernel/%.o: src/kernel/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/stdlib/std/%.module: src/stdlib/viua/%.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/std/%.o: src/stdlib/%.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
+# FIXME what about -Wl,--no-undefined ?
 build/stdlib/std/%.so: build/stdlib/std/%.o
-	$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
-	# $(CXX) $(CXXFLAGS) -Wl,--no-undefined -fPIC -shared -o $@ $^
-
-build/types/%.o: src/types/%.cpp include/viua/types/%.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/process/instr/%.o: src/process/instr/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/support/%.o: src/support/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/assembler/%.o: src/assembler/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
-
-build/cg/%.o: src/cg/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) -fPIC -shared -o $@ $^
 
 
 ############################################################
@@ -487,7 +389,8 @@ VIUA_INSTR_FILES_O=\
 				   build/process/instr/text.o \
 				   build/process/instr/vector.o
 
-VIUA_TYPES_FILES_O=build/types/atom.o \
+VIUA_TYPES_FILES_O=\
+				   build/types/atom.o \
 				   build/types/bits.o \
 				   build/types/boolean.o \
 				   build/types/closure.o \
@@ -537,7 +440,8 @@ build/bin/vm/kernel: \
 	build/cg/lex.o \
 	build/cg/lex/reduce_fns.o \
 	build/cg/lex/cook.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(DYNAMIC_SYMS) -o $@ $^ $(LDLIBS)
 
 OP_ASSEMBLERS= \
 	build/assembler/backend/op_assemblers/assemble_op_bits.o \
@@ -681,7 +585,8 @@ build/bin/vm/asm: build/front/asm.o \
 	build/assembler/frontend/static_analyser/Closure.o \
 	build/assembler/frontend/static_analyser/Register_usage_profile.o \
 	build/assembler/util/pretty_printer.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ -lpthread
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^ -lpthread
 
 build/bin/vm/lex: build/front/lexer.o \
 	build/cg/lex.o \
@@ -691,7 +596,8 @@ build/bin/vm/lex: build/front/lexer.o \
 	build/support/string.o \
 	build/support/env.o \
 	build/cg/assembler/binary_literals.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/parser: build/front/parser.o \
 	build/cg/lex.o \
@@ -705,7 +611,8 @@ build/bin/vm/parser: build/front/parser.o \
 	build/assembler/frontend/parser.o \
 	build/assembler/frontend/static_analyser/verifier.o \
 	build/assembler/util/pretty_printer.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/dis: build/front/dis.o \
 	build/loader.o \
@@ -717,7 +624,8 @@ build/bin/vm/dis: build/front/dis.o \
 	build/cg/assembler/utils.o \
 	build/assembler/util/pretty_printer.o \
 	build/cg/lex.o
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+	@echo "$(CXX) -> $@"
+	@$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 
 ############################################################
@@ -773,62 +681,39 @@ stdlib: build/bin/vm/asm \
 	build/stdlib/Std/Random.so \
 	build/stdlib/std/kitchensink.so
 
-####
-#### Fix for Travis CI.
-#### Once GNU Make is upgraded to 4.2 or later, these targets will not
-#### be needed.
-####
-build/stdlib/std/typesystem.o: src/stdlib/typesystem.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
-build/stdlib/std/os.o: src/stdlib/os.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
-build/stdlib/std/io.o: src/stdlib/io.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
-build/stdlib/std/random.o: src/stdlib/random.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-
-build/stdlib/std/kitchensink.o: src/stdlib/kitchensink.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -I./include -o $@ $<
-####
-#### End of fix for Travis CI.
-####
-
-build/stdlib/std/typesystem.so: build/stdlib/std/typesystem.o
-
-build/stdlib/std/os.so: build/stdlib/std/os.o
-
 build/stdlib/std/io.so: build/stdlib/std/io.o
-
-build/stdlib/std/posix/network.so: build/stdlib/std/posix/network.o
-build/stdlib/std/posix/io.so: build/stdlib/std/posix/io.o
-
-build/stdlib/std/random.so: build/stdlib/std/random.o
-
 build/stdlib/std/kitchensink.so: build/stdlib/std/kitchensink.o
+build/stdlib/std/os.so: build/stdlib/std/os.o
+build/stdlib/std/posix/io.so: build/stdlib/std/posix/io.o
+build/stdlib/std/posix/network.so: build/stdlib/std/posix/network.o
+build/stdlib/std/random.so: build/stdlib/std/random.o
+build/stdlib/std/typesystem.so: build/stdlib/std/typesystem.o
 
 
 ############################################################
 # OPCODE LISTER PROGRAM
-build/bin/opcodes.bin: src/bytecode/opcd.cpp \
+build/bin/opcodes.bin: \
+	src/bytecode/opcd.cpp \
 	include/viua/bytecode/opcodes.h \
 	include/viua/bytecode/maps.h
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 
 ############################################################
 # DEPENDENCY LIBRARIES
-build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
+build/lib/linenoise.o: \
+	lib/linenoise/linenoise.c \
+	lib/linenoise/linenoise.h
 	$(CC) $(CFLAGS) $(COPTIMIZATIONFLAGS) -c -o $@ $<
 
 
 #######################################################################
 # TOOLING
-tooling: build/tooling/exec/assembler.bin
+tooling: \
+	build/tooling/exec/assembler.bin
 
-build/tooling/libs/lexer/tokenise.o: build/tooling/libs/lexer/normaliser.o
+build/tooling/libs/lexer/tokenise.o: \
+	build/tooling/libs/lexer/normaliser.o
 build/tooling/exec/assembler.bin: \
 	build/tooling/exec/assembler/main.o \
 	build/tooling/errors/compile_time.o \
