@@ -45,6 +45,8 @@ There are several categories of change:
   `Invalid_dereference` (when dereferenced outside of original process) and
   `Expired_pointer`-tagged exceptions when they detect an error during
   dereference
+- bic: pointer-tracking works a little bit differently, the change may not be
+  entirely backwards compatible
 
 Exceptions now track the points at which they were thrown and rethrown. Rethrows
 happen at process join points (i.e. join instructions). Stack trace reports use
