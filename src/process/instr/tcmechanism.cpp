@@ -60,8 +60,7 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type
     if (auto target = decoder.fetch_register_or_void(addr, *this);
         target.has_value()) {
         if (not stack->caught) {
-            throw std::make_unique<viua::types::Exception>(
-                "no caught object to draw");
+            abort();
         }
         **target = std::move(stack->caught);
     } else {
