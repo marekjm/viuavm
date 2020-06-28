@@ -150,6 +150,7 @@ CLANG_CXXFLAGS=\
 			   $(CLANG_SANITISER_FLAGS)
 GCC_CXXFLAGS=\
 			 $(COMMON_CXXFLAGS) \
+			 -fdiagnostics-color=always \
 			 -Wctor-dtor-privacy \
 			 -Wnon-virtual-dtor \
 			 -Wreorder \
@@ -188,9 +189,12 @@ else ifeq ($(CXX), clang++)
 COMPILER_FLAGS=$(CLANG_CXXFLAGS)
 endif
 
-# By default, the VM is compiled using no optimisations.
-# This makes for shorter compile times, but prevents speed-testing the VM.
+# By default, the VM is compiled using no optimisations. This makes for shorter
+# compile times and better debugging experience, but prevents speed-testing the
+# VM. For even better debugging - use 'g' (as if -Og) value.
+#
 # You should run the VM with -O3 every once in a while to see how it's doing.
+#
 OPTIMISATION_LEVEL=0
 OPTIMISATION_FLAG=-O$(OPTIMISATION_LEVEL)
 
