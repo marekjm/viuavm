@@ -26,5 +26,5 @@ export CXX_EXTRA_FLAGS
 
 while true; do
     (find ./include -name '*.h' ; find ./src/ -name '*.cpp' ; find ./sample -name '*.cpp') \
-        | entr -p ./scripts/compile_and_notify.sh $1
+        | entr -cp ./scripts/compile_and_notify.sh $1
 done
