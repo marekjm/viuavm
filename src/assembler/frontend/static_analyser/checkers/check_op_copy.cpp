@@ -57,7 +57,9 @@ auto check_op_copy(Register_usage_profile& register_usage_profile,
             register_usage_profile, *source);
 
     auto val       = Register(*target);
-    val.value_type = type_of_source;
+    val.value_type = depointerise_type_if_needed(
+        type_of_source
+        , (source->as == viua::internals::Access_specifier::POINTER_DEREFERENCE));
     register_usage_profile.define(val, target->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
