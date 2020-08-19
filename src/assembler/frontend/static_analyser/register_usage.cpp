@@ -632,6 +632,7 @@ static auto check_register_usage_for_instruction_block(
         register_usage_profile.define(val, ib.name);
     }
 
+    /* std::cerr << "[checking register usage of: " << ib.name.str() << "]\n"; */
     viua::assembler::frontend::static_analyser::checkers::
         check_register_usage_for_instruction_block_impl(
             register_usage_profile,

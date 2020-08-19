@@ -25,17 +25,11 @@ namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
 auto Register::operator<(Register const& that) const -> bool
 {
-    if (register_set < that.register_set) {
-        return true;
-    }
-    if (register_set == that.register_set and index < that.index) {
-        return true;
-    }
-    return false;
+    return (index < that.index);
 }
 auto Register::operator==(Register const& that) const -> bool
 {
-    return (register_set == that.register_set) and (index == that.index);
+    return (index == that.index);
 }
 
 Register::Register(viua::assembler::frontend::parser::Register_index const& ri)

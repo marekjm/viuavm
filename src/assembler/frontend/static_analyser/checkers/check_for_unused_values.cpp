@@ -34,32 +34,35 @@ auto check_for_unused_values(
         return;
     }
 
-    for (auto const& each : register_usage_profile) {
-        if (not each.first.index) {
-            /*
-             * Registers with index 0 do not take part in the "unused" analysis,
-             * because they are used to store return values of functions. This
-             * means that they *MUST* be defined, but *MAY* stay unused.
-             */
-            continue;
-        }
-
-        // FIXME Implement the .unused: directive, and [[maybe_unused]]
-        // attribute (later).
-        if (not register_usage_profile.used(each.first)) {
-            auto msg = std::ostringstream{};
-            msg << "unused " + to_string(each.second.second.value_type)
-                       + " in register "
-                << str::enquote(std::to_string(each.first.index));
-            if (register_usage_profile.index_to_name.count(each.first.index)) {
-                msg << " (named "
-                    << str::enquote(register_usage_profile.index_to_name.at(
-                           each.first.index))
-                    << ')';
+    register_usage_profile.for_all_defined([&register_usage_profile](
+            std::pair<Register, std::pair<viua::cg::lex::Token, Register>> each
+        ) -> void
+        {
+            if (not each.first.index) {
+                /*
+                 * Registers with index 0 do not take part in the "unused" analysis,
+                 * because they are used to store return values of functions. This
+                 * means that they *MUST* be defined, but *MAY* stay unused.
+                 */
+                return;
             }
 
-            throw viua::cg::lex::Unused_value{each.second.first, msg.str()};
-        }
-    }
+            // FIXME Implement the .unused: directive, and [[maybe_unused]]
+            // attribute (later).
+            if (not register_usage_profile.used(each.first)) {
+                auto msg = std::ostringstream{};
+                msg << "unused " + to_string(each.second.second.value_type)
+                           + " in register "
+                    << str::enquote(std::to_string(each.first.index));
+                if (register_usage_profile.index_to_name.count(each.first.index)) {
+                    msg << " (named "
+                        << str::enquote(register_usage_profile.index_to_name.at(
+                               each.first.index))
+                        << ')';
+                }
+
+                throw viua::cg::lex::Unused_value{each.second.first, msg.str()};
+            }
+        });
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

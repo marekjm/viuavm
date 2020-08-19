@@ -81,11 +81,11 @@ auto invalid_syntax(std::vector<Token> const& tokens, std::string const message)
     return invalid_syntax_error;
 }
 
-auto get_line_index_of_instruction(InstructionIndex const n,
+auto get_line_index_of_instruction(InstructionIndex const mnemonic_counter,
                                    Instructions_block const& ib)
     -> InstructionIndex
 {
-    auto left = n;
+    auto left = mnemonic_counter;
     auto i    = InstructionIndex{0};
     for (; left and i < ib.body.size(); ++i) {
         auto instruction =

@@ -21,6 +21,7 @@
 #define VIUA_ASSEMBLER_FRONTEND_STATIC_ANALYSER_H
 
 
+#include <functional>
 #include <optional>
 #include <set>
 #include <string>
@@ -76,7 +77,13 @@ class Register_usage_profile {
      *                                      ; the defining token is '%1'
      */
     std::map<Register, std::pair<viua::cg::lex::Token, Register>>
-        defined_registers;
+        defined_registers_local;
+    std::map<Register, std::pair<viua::cg::lex::Token, Register>>
+        defined_registers_static;
+    std::map<Register, std::pair<viua::cg::lex::Token, Register>>
+        defined_registers_arguments;
+    std::map<Register, std::pair<viua::cg::lex::Token, Register>>
+        defined_registers_parameters;
 
     /*
      * Registers are "fresh" until they either 1/ cross the boundary of an "if"
@@ -86,7 +93,10 @@ class Register_usage_profile {
      * register is an error because it means that the previously defined value
      * is never used.
      */
-    std::set<Register> fresh_registers;
+    std::set<Register> fresh_registers_local;
+    std::set<Register> fresh_registers_static;
+    std::set<Register> fresh_registers_arguments;
+    std::set<Register> fresh_registers_parameters;
 
     /*
      * Maps a register to the token marking the last place a register
@@ -96,7 +106,8 @@ class Register_usage_profile {
      *      text %1 local "Hello World!"    ; register 1 is defined, but unused
      *      print %1 local                  ; register 1 becomes used
      */
-    std::map<Register, viua::cg::lex::Token> used_registers;
+    std::map<Register, viua::cg::lex::Token> used_registers_local;
+    std::map<Register, viua::cg::lex::Token> used_registers_arguments;
 
     /*
      * Maps a register to the location where it was erased.
@@ -108,7 +119,8 @@ class Register_usage_profile {
      *      delete %1 local                 ; register 1 is erased
      *      integer %1 local 42             ; register 1 is defined again
      */
-    std::map<Register, viua::cg::lex::Token> erased_registers;
+    std::map<Register, viua::cg::lex::Token> erased_registers_local;
+    std::map<Register, viua::cg::lex::Token> erased_registers_arguments;
 
     /*
      * The set of registers marked as "maybe unused".
@@ -116,7 +128,7 @@ class Register_usage_profile {
      * this set an error should not be thrown for this register (but a warning,
      * or a different type of diagnostic message can be emitted).
      */
-    std::set<Register> maybe_unused_registers;
+    std::set<Register> maybe_unused_registers_local;
 
     std::optional<viua::bytecode::codec::register_index_type>
         no_of_allocated_registers;
@@ -145,12 +157,13 @@ class Register_usage_profile {
                viua::cg::lex::Token const& t) -> void;
 
     auto at(Register const r) const -> const
-        decltype(defined_registers)::mapped_type;
+        decltype(defined_registers_local)::mapped_type;
 
     auto used(Register const r) const -> bool;
     auto use(Register const r, viua::cg::lex::Token const t) -> void;
 
     auto defresh() -> void;
+    auto defresh(Register const) -> void;
     auto erase_arguments(viua::cg::lex::Token const) -> void;
 
     auto erase(Register const r, viua::cg::lex::Token const& token) -> void;
@@ -166,8 +179,12 @@ class Register_usage_profile {
 
     auto in_bounds(Register const) const -> bool;
 
-    auto begin() const -> decltype(defined_registers.begin());
-    auto end() const -> decltype(defined_registers.end());
+    auto begin_local() const -> decltype(defined_registers_local.begin());
+    auto end_local() const -> decltype(defined_registers_local.end());
+
+    using defined_register_type =
+        std::pair<Register, std::pair<viua::cg::lex::Token, Register>>;
+    auto for_all_defined(std::function<void(defined_register_type)>) const -> void;
 };
 
 enum class Reportable_error {

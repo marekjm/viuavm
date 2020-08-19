@@ -17,9 +17,19 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #include <algorithm>
+#include <iostream>
 
 #include <viua/assembler/frontend/static_analyser.h>
+
+
+static auto fail[[noreturn]](std::string message) -> void
+{
+    std::cerr << (message + "\n");
+    assert(false);
+}
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser {
@@ -29,27 +39,32 @@ using viua::cg::lex::Traced_syntax_error;
 
 auto Register_usage_profile::fresh(Register const r) const -> bool
 {
-    return fresh_registers.count(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return fresh_registers_local.count(r);
+    }
+    return false;
 }
 
 auto Register_usage_profile::defresh() -> void
 {
-    fresh_registers.clear();
+    fresh_registers_local.clear();
+    fresh_registers_arguments.clear();
 }
-auto Register_usage_profile::erase_arguments(Token const t) -> void
+auto Register_usage_profile::defresh(Register const r) -> void
 {
-    auto args_regs = std::vector<Register>{};
-    std::copy_if(fresh_registers.begin(),
-                 fresh_registers.end(),
-                 std::back_inserter(args_regs),
-                 [](Register const& r) -> bool {
-                     return r.register_set
-                            == viua::bytecode::codec::Register_set::Arguments;
-                 });
-    for (auto const& each : args_regs) {
-        erase(each, t);
-        fresh_registers.erase(fresh_registers.find(each));
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        fresh_registers_local.erase(r);
     }
+    if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        fresh_registers_arguments.erase(r);
+    }
+}
+auto Register_usage_profile::erase_arguments(Token const tok) -> void
+{
+    for (auto const& each : fresh_registers_arguments) {
+        erase(each, tok);
+    }
+    fresh_registers_arguments.clear();
 }
 
 auto Register_usage_profile::define(Register const r,
@@ -63,7 +78,7 @@ auto Register_usage_profile::define(Register const r,
               or r.register_set
                      == viua::bytecode::codec::Register_set::Parameters)) {
         /*
-         * Do not thrown on global or static register set access.
+         * Do not throw on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
          * accesses are correct or not.
          * FIXME Maybe check global and static register set accesses?
@@ -73,7 +88,8 @@ auto Register_usage_profile::define(Register const r,
                 t,
                 ("access to register " + std::to_string(r.index) + " with only "
                  + std::to_string(allocated_registers().value())
-                 + " register(s) allocated")})
+                 + " register(s) allocated")}
+                    .add(t))
             .append(Invalid_syntax{allocated_where().value(), ""}.note(
                 "increase this value to " + std::to_string(r.index + 1)
                 + " to fix this issue"));
@@ -85,8 +101,24 @@ auto Register_usage_profile::define(Register const r,
             .append(
                 Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }
-    defined_registers.insert_or_assign(r, std::pair<Token, Register>(t, r));
-    fresh_registers.insert(r);
+
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        defined_registers_local.insert_or_assign(r, std::pair<Token, Register>{t, r});
+        fresh_registers_local.insert(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Static) {
+        defined_registers_static.insert_or_assign(r, std::pair<Token, Register>{t, r});
+        fresh_registers_static.insert(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Global) {
+        // FIXME At least try to track global registers
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        defined_registers_arguments.insert_or_assign(r, std::pair<Token, Register>{t, r});
+        fresh_registers_arguments.insert(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Parameters) {
+        defined_registers_parameters.insert_or_assign(r, std::pair<Token, Register>{t, r});
+        fresh_registers_parameters.insert(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::define()"));
+    }
 }
 auto Register_usage_profile::define(Register const r,
                                     Token const index,
@@ -100,7 +132,7 @@ auto Register_usage_profile::define(Register const r,
               or r.register_set
                      == viua::bytecode::codec::Register_set::Parameters)) {
         /*
-         * Do not thrown on global or static register set access.
+         * Do not throw on global or static register set access.
          * There is currently no simple (or complicated) way to check if such
          * accesses are correct or not.
          * FIXME Maybe check global and static register set accesses?
@@ -111,7 +143,7 @@ auto Register_usage_profile::define(Register const r,
                 ("access to register " + std::to_string(r.index) + " with only "
                  + std::to_string(allocated_registers().value())
                  + " register(s) allocated")}
-                        .add(register_set))
+                    .add(register_set))
             .append(Invalid_syntax{allocated_where().value(), ""}.note(
                 "increase this value to " + std::to_string(r.index + 1)
                 + " to fix this issue"));
@@ -123,16 +155,49 @@ auto Register_usage_profile::define(Register const r,
             .append(
                 Invalid_syntax{at(r).first}.note("unused value defined here:"));
     }
-    defined_registers.insert_or_assign(r, std::pair<Token, Register>(index, r));
-    fresh_registers.insert(r);
+
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        defined_registers_local.insert_or_assign(r, std::pair<Token, Register>{index, r});
+        fresh_registers_local.insert(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        defined_registers_arguments.insert_or_assign(r, std::pair<Token, Register>{index, r});
+        fresh_registers_arguments.insert(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Parameters) {
+        defined_registers_parameters.insert_or_assign(r, std::pair<Token, Register>{index, r});
+        fresh_registers_parameters.insert(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::define() with register set"));
+    }
 }
 auto Register_usage_profile::defined(Register const r) const -> bool
 {
-    return defined_registers.count(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return defined_registers_local.count(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Static) {
+        return defined_registers_static.count(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Global) {
+        /*
+         * We cannot reliably detect if global registers are defined or not so
+         * just close our eyes and hope for the best.
+         */
+        return true;
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return defined_registers_arguments.count(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Parameters) {
+        return defined_registers_parameters.count(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::defined()"));
+    }
 }
 auto Register_usage_profile::defined_where(Register const r) const -> Token
 {
-    return defined_registers.at(r).first;
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return defined_registers_local.at(r).first;
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return defined_registers_arguments.at(r).first;
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::defined_where()"));
+    }
 }
 
 auto Register_usage_profile::infer(
@@ -147,38 +212,75 @@ auto Register_usage_profile::infer(
     auto was_fresh = fresh(r);
     define(reg.second, reg.first);
     if (not was_fresh) {
-        fresh_registers.erase(r);
+        defresh(r);
     }
 }
 
 auto Register_usage_profile::at(Register const r) const -> const
-    decltype(defined_registers)::mapped_type
+    decltype(defined_registers_local)::mapped_type
 {
-    return defined_registers.at(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return defined_registers_local.at(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return defined_registers_arguments.at(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Parameters) {
+        return defined_registers_parameters.at(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::at()"));
+    }
 }
 
 auto Register_usage_profile::used(Register const r) const -> bool
 {
-    return used_registers.count(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return used_registers_local.count(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return used_registers_arguments.count(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::used()"));
+    }
 }
 auto Register_usage_profile::use(Register const r, Token const t) -> void
 {
-    used_registers[r] = t;
-    fresh_registers.erase(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        used_registers_local[r] = t;
+    }
+    if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        used_registers_arguments[r] = t;
+    }
+    defresh(r);
 }
 
 auto Register_usage_profile::erase(Register const r, Token const& token) -> void
 {
-    erased_registers.emplace(r, token);
-    defined_registers.erase(defined_registers.find(r));
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        erased_registers_local.emplace(r, token);
+        defined_registers_local.erase(defined_registers_local.find(r));
+    }
+    if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        erased_registers_arguments.emplace(r, token);
+        defined_registers_arguments.erase(defined_registers_arguments.find(r));
+    }
 }
 auto Register_usage_profile::erased(Register const r) const -> bool
 {
-    return (erased_registers.count(r) == 1);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return erased_registers_local.count(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return erased_registers_arguments.count(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::erased()"));
+    }
 }
 auto Register_usage_profile::erased_where(Register const r) const -> Token
 {
-    return erased_registers.at(r);
+    if (r.register_set == viua::bytecode::codec::Register_set::Local) {
+        return erased_registers_local.at(r);
+    } else if (r.register_set == viua::bytecode::codec::Register_set::Arguments) {
+        return erased_registers_arguments.at(r);
+    } else {
+        fail(("did not expect " + to_string(r) + " register in ::erased_where()"));
+    }
 }
 
 auto Register_usage_profile::allocated_registers(
@@ -209,13 +311,23 @@ auto Register_usage_profile::in_bounds(Register const r) const -> bool
                and r.index >= allocated_registers().value());
 }
 
-auto Register_usage_profile::begin() const
-    -> decltype(defined_registers.begin())
+auto Register_usage_profile::begin_local() const
+    -> decltype(defined_registers_local.begin())
 {
-    return defined_registers.begin();
+    return defined_registers_local.begin();
 }
-auto Register_usage_profile::end() const -> decltype(defined_registers.end())
+auto Register_usage_profile::end_local() const -> decltype(defined_registers_local.end())
 {
-    return defined_registers.end();
+    return defined_registers_local.end();
+}
+
+auto Register_usage_profile::for_all_defined(std::function<void(defined_register_type)> fn) const -> void
+{
+    for (auto const& each : defined_registers_local) {
+        fn(each);
+    }
+    for (auto const& each : defined_registers_arguments) {
+        fn(each);
+    }
 }
 }}}}  // namespace viua::assembler::frontend::static_analyser

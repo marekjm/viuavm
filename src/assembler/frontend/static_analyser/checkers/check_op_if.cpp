@@ -17,8 +17,6 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <chrono>
-#include <future>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -30,11 +28,25 @@ using viua::assembler::frontend::parser::Instruction;
 
 namespace viua { namespace assembler { namespace frontend {
 namespace static_analyser { namespace checkers {
+static auto mnemonic_index_of_line(Instructions_block const& block, size_t const n) -> size_t
+{
+    auto index = size_t{0};
+
+    for (auto i = size_t{0}; i < std::min(n, block.body.size()); ++i) {
+        auto const& line = block.body.at(i);
+        if (dynamic_cast<Instruction*>(line.get())) {
+            ++index;
+        }
+    }
+
+    return index;
+}
+
 auto check_op_if(Register_usage_profile& register_usage_profile,
                  Parsed_source const& ps,
                  Instruction const& instruction,
                  Instructions_block const& ib,
-                 InstructionIndex i,
+                 InstructionIndex i,  // line_counter
                  InstructionIndex const mnemonic_counter) -> void
 {
     using viua::assembler::frontend::parser::Label;
@@ -54,21 +66,26 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
 
     auto jump_target_if_true = InstructionIndex{0};
     if (auto offset = get_operand<Offset>(instruction, 1); offset) {
-        auto const jump_target = std::stol(offset->tokens.at(0));
+        auto const jump_target = std::stol(offset->tokens.at(0).str());
         if (jump_target > 0) {
             jump_target_if_true = get_line_index_of_instruction(
                 mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
         } else {
             // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
+                                 "backward offset jump as true arm");
             return;
         }
     } else if (auto label = get_operand<Label>(instruction, 1); label) {
         auto jump_target = get_line_index_of_instruction(
             ib.marker_map.at(label->tokens.at(0)), ib);
+
         if (jump_target > i) {
             jump_target_if_true = jump_target;
         } else {
             // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
+                                 "backward label jump as true arm");
             return;
         }
     } else if (str::ishex(instruction.operands.at(1)->tokens.at(0))) {
@@ -77,20 +94,26 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // the future.
         // FIXME Return now and abort further checking of this block or risk
         // throwing *many* false positives.
+        throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
+                             "hex jump as true arm");
         return;
     } else {
         throw Invalid_syntax(instruction.operands.at(1)->tokens.at(0),
-                             "invalid operand for if instruction");
+                             "invalid operand for if instruction in true arm");
     }
+    auto const mnemonic_counter_if_true =
+        mnemonic_index_of_line(ib, jump_target_if_true);
 
     auto jump_target_if_false = InstructionIndex{0};
     if (auto offset = get_operand<Offset>(instruction, 2); offset) {
-        auto const jump_target = std::stol(offset->tokens.at(0));
+        auto const jump_target = std::stol(offset->tokens.at(0).str());
         if (jump_target > 0) {
             jump_target_if_false = get_line_index_of_instruction(
                 mnemonic_counter + static_cast<decltype(i)>(jump_target), ib);
         } else {
             // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
+                                 "backward offset jump as false arm");
             return;
         }
     } else if (auto label = get_operand<Label>(instruction, 2); label) {
@@ -100,6 +123,8 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
             jump_target_if_false = jump_target;
         } else {
             // XXX FIXME Checking backward jumps is tricky, beware of loops.
+            throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
+                                 "backward label jump as false arm");
             return;
         }
     } else if (str::ishex(instruction.operands.at(2)->tokens.at(0))) {
@@ -108,14 +133,29 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // the future.
         // FIXME Return now and abort further checking of this block or risk
         // throwing *many* false positives.
+        throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
+                             "hex jump as false arm");
         return;
     } else {
         throw Invalid_syntax(instruction.operands.at(2)->tokens.at(0),
-                             "invalid operand for if instruction");
+                             "invalid operand for if instruction in false arm");
     }
+    auto const mnemonic_counter_if_false =
+        mnemonic_index_of_line(ib, jump_target_if_false);
 
     auto register_with_unused_value = std::string{};
     auto unused_register            = std::string{};
+
+    /* std::cerr */
+    /*     << "if targets" */
+    /*     << ":   here = " << i */
+    /*     << ", true = " << jump_target_if_true */
+    /*     << ", false = " << jump_target_if_false << "\n"; */
+    /* std::cerr */
+    /*     << "if mnemonics" */
+    /*     << ": here = " << mnemonic_counter */
+    /*     << ", true = " << mnemonic_counter_if_true */
+    /*     << ", false = " << mnemonic_counter_if_false << "\n"; */
 
     Register_usage_profile register_usage_profile_if_true =
         register_usage_profile;
@@ -125,23 +165,14 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         register_usage_profile;
     register_usage_profile_if_false.defresh();
 
-    auto branch_if_false =
-        std::async(std::launch::async,
-                   check_register_usage_for_instruction_block_impl_safe,
-                   std::ref(register_usage_profile_if_false),
-                   std::ref(ps),
-                   std::ref(ib),
-                   jump_target_if_false,
-                   mnemonic_counter);
-
     try {
         check_register_usage_for_instruction_block_impl(
             register_usage_profile_if_true,
             ps,
             ib,
             jump_target_if_true,
-            mnemonic_counter);
-    } catch (viua::cg::lex::Unused_register const& e) {
+            mnemonic_counter_if_true);
+    } catch (viua::cg::lex::Unused_register& e) {
         // Do not fail yet, because the register may be used by false branch.
         // Save the error for later rethrowing.
         unused_register = e.what();
@@ -150,30 +181,24 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // Save the error for later rethrowing.
         register_with_unused_value = e.what();
     } catch (Invalid_syntax const& e) {
-        try {
-            branch_if_false.wait();
-        } catch (...) {
-            /* Do nothingg. */
-        }
         throw Traced_syntax_error{}.append(e).append(
             Invalid_syntax{instruction.tokens.at(0),
                            "after taking true branch here:"}
                 .add(instruction.operands.at(1)->tokens.at(0)));
     } catch (Traced_syntax_error& e) {
-        try {
-            branch_if_false.wait();
-        } catch (...) {
-            /* Do nothingg. */
-        }
         throw e.append(Invalid_syntax{instruction.tokens.at(0),
                                       "after taking true branch here:"}
                            .add(instruction.operands.at(1)->tokens.at(0)));
     }
 
     try {
-        auto result = branch_if_false.get();
-        result.raise_if_any();
-    } catch (viua::cg::lex::Unused_register const& e) {
+        check_register_usage_for_instruction_block_impl(
+            register_usage_profile_if_false,
+            ps,
+            ib,
+            jump_target_if_false,
+            mnemonic_counter_if_false);
+    } catch (viua::cg::lex::Unused_register& e) {
         if (unused_register == e.what()) {
             throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
                 instruction.tokens.at(0), "after taking either branch:"});
