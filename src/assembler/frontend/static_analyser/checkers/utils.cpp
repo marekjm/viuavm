@@ -376,10 +376,16 @@ auto to_string(Value_types const value_type_id) -> std::string
         has_pointer ? (value_type_id ^ Value_types::POINTER) : value_type_id);
     return (has_pointer ? "pointer to " : "") + type_name;
 }
-auto depointerise_type_if_needed(Value_types const t,
-                                 bool const access_via_pointer_dereference)
-    -> Value_types
+auto depointerise_type_if_needed(
+      Value_types const t
+    , bool const access_via_pointer_dereference
+) -> Value_types
 {
-    return (access_via_pointer_dereference ? (t ^ Value_types::POINTER) : t);
+    auto const is_pointered = static_cast<bool>(t & Value_types::POINTER);
+    if (access_via_pointer_dereference && is_pointered) {
+        return (t ^ Value_types::POINTER);
+    } else {
+        return t;
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
