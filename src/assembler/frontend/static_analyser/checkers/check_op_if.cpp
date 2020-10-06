@@ -125,14 +125,6 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         register_usage_profile;
     register_usage_profile_if_false.defresh();
 
-    auto branch_if_false =
-        std::async(std::launch::async,
-                   check_register_usage_for_instruction_block_impl_safe,
-                   std::ref(register_usage_profile_if_false),
-                   std::ref(ps),
-                   std::ref(ib),
-                   jump_target_if_false,
-                   mnemonic_counter);
 
     try {
         check_register_usage_for_instruction_block_impl(
@@ -150,29 +142,23 @@ auto check_op_if(Register_usage_profile& register_usage_profile,
         // Save the error for later rethrowing.
         register_with_unused_value = e.what();
     } catch (Invalid_syntax const& e) {
-        try {
-            branch_if_false.wait();
-        } catch (...) {
-            /* Do nothingg. */
-        }
         throw Traced_syntax_error{}.append(e).append(
             Invalid_syntax{instruction.tokens.at(0),
                            "after taking true branch here:"}
                 .add(instruction.operands.at(1)->tokens.at(0)));
     } catch (Traced_syntax_error& e) {
-        try {
-            branch_if_false.wait();
-        } catch (...) {
-            /* Do nothingg. */
-        }
         throw e.append(Invalid_syntax{instruction.tokens.at(0),
                                       "after taking true branch here:"}
                            .add(instruction.operands.at(1)->tokens.at(0)));
     }
 
     try {
-        auto result = branch_if_false.get();
-        result.raise_if_any();
+        check_register_usage_for_instruction_block_impl(
+            register_usage_profile_if_false,
+            ps,
+            ib,
+            jump_target_if_false,
+            mnemonic_counter);
     } catch (viua::cg::lex::Unused_register const& e) {
         if (unused_register == e.what()) {
             throw Traced_syntax_error{}.append(e).append(Invalid_syntax{
