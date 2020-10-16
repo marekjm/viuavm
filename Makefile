@@ -281,11 +281,11 @@ install-execs: \
 	build/bin/vm/dis \
 	build/bin/vm/kernel
 	@mkdir -p $(BIN_PATH)
-	@cp ./build/bin/vm/asm $(BIN_PATH)/viua-asm
+	@cp -v ./build/bin/vm/asm $(BIN_PATH)/viua-asm
 	@chmod 755 $(BIN_PATH)/viua-asm
-	@cp ./build/bin/vm/kernel $(BIN_PATH)/viua-vm
+	@cp -v ./build/bin/vm/kernel $(BIN_PATH)/viua-vm
 	@chmod 755 $(BIN_PATH)/viua-vm
-	@cp ./build/bin/vm/dis $(BIN_PATH)/viua-dis
+	@cp -v ./build/bin/vm/dis $(BIN_PATH)/viua-dis
 	@chmod 755 $(BIN_PATH)/viua-dis
 
 install-libs: stdlib
