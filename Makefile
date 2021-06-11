@@ -206,8 +206,8 @@ OPTIMISATION_FLAG=-O$(OPTIMISATION_LEVEL)
 # executables it should be presented this way: date --rfc-3339 ns
 CXXFLAGS=\
 		 -std=$(CXX_STANDARD) \
-		 -DVIUA_VM_COMMIT="\"$(shell ./scripts/get_head_commit.sh)\"" \
-		 -DVIUA_VM_CODE_FINGERPRINT="\"$(shell ./scripts/get_code_fingerprint.sh)\"" \
+		 -DVIUA_VM_COMMIT="\"$(shell bash ./scripts/get_head_commit.sh)\"" \
+		 -DVIUA_VM_CODE_FINGERPRINT="\"$(shell bash ./scripts/get_code_fingerprint.sh)\"" \
 		 $(COMPILER_FLAGS) \
 		 $(OPTIMISATION_FLAG)
 
