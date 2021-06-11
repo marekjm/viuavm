@@ -21,6 +21,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <optional>
 
 #include <viua/bytecode/codec.h>
 #include <viua/bytecode/maps.h>

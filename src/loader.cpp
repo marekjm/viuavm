@@ -82,8 +82,8 @@ void Loader::calculate_function_sizes()
 
 void Loader::load_magic_number(std::ifstream& in)
 {
-    std::array<char, 5> magic_number;
-    in.read(magic_number.data(), sizeof(char) * magic_number.size());
+    std::array<char, 5> magic_number {};
+    in.read(magic_number.data(), magic_number.size());
     if (magic_number.back() != '\0') {
         throw "invalid magic number";
     }

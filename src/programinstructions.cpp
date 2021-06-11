@@ -18,6 +18,7 @@
  */
 
 #include <cassert>
+#include <optional>
 
 #include <viua/bytecode/opcodes.h>
 #include <viua/program.h>

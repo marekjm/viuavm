@@ -21,6 +21,7 @@
 #define VIUA_TOOLING_LIBS_STATIC_ANALYSER_H
 
 #include <set>
+#include <optional>
 
 #include <viua/tooling/libs/parser/parser.h>
 

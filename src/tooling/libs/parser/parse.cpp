@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <viua/bytecode/maps.h>
 #include <viua/tooling/errors/compile_time/errors.h>

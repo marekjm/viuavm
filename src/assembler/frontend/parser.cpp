@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <limits>
 
 #include <viua/assembler/frontend/parser.h>
 #include <viua/bytecode/maps.h>
