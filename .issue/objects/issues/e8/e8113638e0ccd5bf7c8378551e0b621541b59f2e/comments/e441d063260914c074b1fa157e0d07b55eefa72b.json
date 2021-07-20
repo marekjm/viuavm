@@ -1,1 +1,0 @@
-{"author.name": "Marek Marecki", "author.email": "marejm@ozro.pw", "message": "Dedicated instructions for fixed-width subtraction should be added to ISA.\nFive new instructions will be needed:\n\n- wrapsub\n- checkedssub\n- checkedusub\n- saturatingssub\n- saturatingusub", "timestamp": 1512416845.105123}
