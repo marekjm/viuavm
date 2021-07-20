@@ -17,15 +17,18 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
+
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <unistd.h>
 #include <vector>
+
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
@@ -70,7 +73,8 @@ static bool usage(const char* program,
         std::cout << VERSION << '.' << MICRO;
     }
     if (show_help or (show_version and verbose)) {
-        std::cout << " (" << VIUA_VM_COMMIT << ")";
+        std::cout << " (" << VIUA_VM_COMMIT << ")\n";
+        std::cout << "fingerprint: " << VIUA_VM_CODE_FINGERPRINT;
     }
     if (show_help or show_version) {
         std::cout << "\n";
@@ -195,9 +199,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    uint64_t bytes = loader.get_bytecode_size();
-    std::unique_ptr<uint8_t[]> bytecode =
-        loader.get_bytecode();
+    uint64_t bytes                      = loader.get_bytecode_size();
+    std::unique_ptr<uint8_t[]> bytecode = loader.get_bytecode();
 
     std::map<std::string, uint64_t> function_address_mapping =
         loader.get_function_addresses();
@@ -342,17 +345,26 @@ int main(int argc, char* argv[])
             auto instruction = std::string{};
             try {
                 auto size = viua::bytecode::codec::bytecode_size_type{};
-                tie(instruction, size) = disassembler::instruction(
-                    decoder
-                    , (bytecode.get() + element_address_mapping[name] + j));
+                auto const at_ptr =
+                    (bytecode.get() + element_address_mapping[name] + j);
+                auto const at_byte_index =
+                    static_cast<uint64_t>(at_ptr - bytecode.get());
+                std::tie(instruction, size) =
+                    disassembler::instruction(decoder, at_ptr);
                 if (DEBUG) {
                     if (j != 0) {
                         (DEBUG ? std::cout : oss) << '\n';
                     }
                     (DEBUG ? std::cout : oss)
                         << "    ; size: " << size << " bytes\n";
-                    (DEBUG ? std::cout : oss) << "    ; address: 0x" << std::hex
-                                              << j << std::dec << '\n';
+                    (DEBUG ? std::cout : oss)
+                        << "    ; relative address: 0x" << std::hex
+                        << std::setw(4) << std::setfill('0') << j << std::dec
+                        << '\n';
+                    (DEBUG ? std::cout : oss)
+                        << "    ; absolute address: 0x" << std::hex
+                        << std::setw(4) << std::setfill('0') << at_byte_index
+                        << std::dec << '\n';
                 }
                 (DEBUG ? std::cout : oss) << "    " << instruction << '\n';
                 j += size;

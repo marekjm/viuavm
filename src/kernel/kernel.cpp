@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,14 +18,16 @@
  */
 
 #include <assert.h>
+#include <dlfcn.h>
+
 #include <chrono>
 #include <cstdlib>
-#include <dlfcn.h>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <regex>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
@@ -44,11 +46,13 @@
 #include <viua/types/function.h>
 #include <viua/types/integer.h>
 #include <viua/types/io.h>
-#include <viua/types/object.h>
 #include <viua/types/reference.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
+
+
+constexpr auto MAIN_MODULE = "<main>";
 
 
 viua::kernel::Mailbox::Mailbox(Mailbox&& that)
@@ -91,6 +95,9 @@ auto viua::kernel::Process_result::resolve(
 {
     std::unique_lock<std::mutex> lck{result_mutex};
     value_returned = std::move(result);
+    if (value_returned) {
+        value_returned->expire();
+    }
     done.store(true, std::memory_order_release);
 }
 auto viua::kernel::Process_result::raise(
@@ -98,6 +105,9 @@ auto viua::kernel::Process_result::raise(
 {
     std::unique_lock<std::mutex> lck{result_mutex};
     exception_thrown = std::move(failure);
+    if (exception_thrown) {
+        exception_thrown->expire();
+    }
     done.store(true, std::memory_order_release);
 }
 auto viua::kernel::Process_result::stopped() const -> bool
@@ -126,8 +136,7 @@ auto viua::kernel::Process_result::transfer_result()
 }
 
 
-viua::kernel::Kernel& viua::kernel::Kernel::load(
-    std::unique_ptr<uint8_t[]> bc)
+viua::kernel::Kernel& viua::kernel::Kernel::load(std::unique_ptr<uint8_t[]> bc)
 {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will
@@ -190,7 +199,8 @@ void viua::kernel::Kernel::load_module(std::string module)
     auto const module_path = viua::runtime::imports::find_module(module);
     if (not module_path.has_value()) {
         throw std::make_unique<viua::types::Exception>(
-            "LinkException", ("failed to locate module: " + module));
+            viua::types::Exception::Tag{"LinkException"},
+            ("failed to locate module: " + module));
     }
 
     switch (module_path->first) {
@@ -203,6 +213,15 @@ void viua::kernel::Kernel::load_module(std::string module)
     default:
         assert(false);
     }
+
+    switch (module_path->first) {
+    case viua::runtime::imports::Module_type::Native:
+    case viua::runtime::imports::Module_type::Bytecode:
+        loaded_module_paths.insert({module, module_path->second});
+        break;
+    default:
+        assert(false);
+    }
 }
 void viua::kernel::Kernel::load_bytecode_module(
     std::string_view const module_name,
@@ -211,29 +230,26 @@ void viua::kernel::Kernel::load_bytecode_module(
     Loader loader(module_path);
     loader.load();
 
-    std::unique_ptr<uint8_t[]> lnk_btcd{
-        loader.get_bytecode()};
+    std::unique_ptr<uint8_t[]> lnk_btcd{loader.get_bytecode()};
 
     auto const fn_names = loader.get_functions();
     auto const fn_addrs = loader.get_function_addresses();
     for (auto const& fn_linkname : fn_names) {
-        linked_functions[fn_linkname] =
-            std::pair<std::string, uint8_t*>(
-                module_name, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
+        linked_functions[fn_linkname] = std::pair<std::string, uint8_t*>(
+            module_name, (lnk_btcd.get() + fn_addrs.at(fn_linkname)));
     }
 
     auto const bl_names = loader.get_blocks();
     auto const bl_addrs = loader.get_block_addresses();
     for (auto const& bl_linkname : bl_names) {
-        linked_blocks[bl_linkname] =
-            std::pair<std::string, uint8_t*>(
-                module_name, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
+        linked_blocks[bl_linkname] = std::pair<std::string, uint8_t*>(
+            module_name, (lnk_btcd.get() + bl_addrs.at(bl_linkname)));
     }
 
     linked_modules[std::string{module_name}] =
         std::pair<viua::bytecode::codec::bytecode_size_type,
-                  std::unique_ptr<uint8_t[]>>(
-            loader.get_bytecode_size(), std::move(lnk_btcd));
+                  std::unique_ptr<uint8_t[]>>(loader.get_bytecode_size(),
+                                              std::move(lnk_btcd));
 }
 void viua::kernel::Kernel::load_native_module(
     std::string_view const module_name,
@@ -243,7 +259,7 @@ void viua::kernel::Kernel::load_native_module(
 
     if (handle == nullptr) {
         throw std::make_unique<viua::types::Exception>(
-            "LinkException",
+            viua::types::Exception::Tag{"LinkException"},
             ("failed to open handle: " + std::string{module_name} + ": "
              + dlerror()));
     }
@@ -266,6 +282,60 @@ void viua::kernel::Kernel::load_native_module(
     }
 
     cxx_dynamic_lib_handles.push_back(handle);
+}
+auto viua::kernel::Kernel::module_at(uint8_t const* const location) const
+    -> std::optional<std::pair<std::string, std::string>>
+{
+    if (bytecode.get() == location) {
+        return {{MAIN_MODULE, commandline_arguments.at(0)}};
+    }
+    for (auto const& [name, mod] : linked_modules) {
+        if (mod.second.get() == location) {
+            return {{name, loaded_module_paths.at(name)}};
+        }
+    }
+    return {};
+}
+auto viua::kernel::Kernel::in_which_function(std::string const mod,
+                                             uint64_t const offset) const
+    -> std::optional<std::string>
+{
+    auto const main_module = (mod == MAIN_MODULE);
+
+    auto const jump_base = main_module ? bytecode.get()
+                                       : linked_modules.at(mod).second.get();
+
+    auto fns = std::map<std::string, uint64_t>{};
+    if (main_module) {
+        fns = function_addresses;
+    } else {
+        for (auto const& [fn, spec] : linked_functions) {
+            if (spec.first != mod) {
+                continue;
+            }
+            fns[fn] = static_cast<uint64_t>(spec.second - jump_base);
+        }
+    }
+
+    auto const mod_size = main_module ? (bytecode_size - executable_offset)
+                                      : linked_modules.at(mod).first;
+    if (offset >= mod_size) {
+        return "<outside of executable range>";
+    }
+
+    auto candidate_name = std::optional<std::string>{};
+    auto candidate_addr = uint64_t{};
+    for (auto const& [fn, relative_addr] : fns) {
+        if (offset == relative_addr) {
+            return fn;
+        }
+        if (offset > relative_addr and relative_addr > candidate_addr) {
+            candidate_name = fn;
+            candidate_addr = relative_addr;
+        }
+    }
+
+    return candidate_name;
 }
 
 bool viua::kernel::Kernel::is_local_function(std::string const& name) const
@@ -342,26 +412,11 @@ auto viua::kernel::Kernel::get_entry_point_of(std::string const& name) const
 }
 
 void viua::kernel::Kernel::request_foreign_function_call(
-    Frame* frame,
-    viua::process::Process* requesting_process)
-{
-    std::unique_lock<std::mutex> lock(foreign_call_queue_mutex);
-    foreign_call_queue.emplace_back(
-        std::make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
-            frame, requesting_process, this));
-
-    // unlock before calling notify_one() to avoid waking the worker thread when
-    // it cannot obtain the lock and fetch the call request
-    lock.unlock();
-    foreign_call_queue_condition.notify_one();
-}
-
-void viua::kernel::Kernel::request_foreign_function_call(
     std::unique_ptr<Frame> frame,
     viua::process::Process& requesting_process)
 {
     std::unique_lock<std::mutex> lock(foreign_call_queue_mutex);
-    foreign_call_queue.emplace_back(
+    foreign_call_queue.emplace(
         std::make_unique<viua::scheduler::ffi::Foreign_function_call_request>(
             std::move(frame), requesting_process, *this));
 
@@ -419,10 +474,15 @@ auto viua::kernel::Kernel::notify_about_process_death() -> void
 {
     --running_processes;
 }
-auto viua::kernel::Kernel::process_count() const
-    -> size_t
+auto viua::kernel::Kernel::process_count() const -> size_t
 {
     return running_processes;
+}
+
+auto viua::kernel::Kernel::make_pid() -> viua::process::PID
+{
+    std::unique_lock<std::mutex> lck{pid_mutex};
+    return viua::process::PID{pid_sequence.emit()};
 }
 
 auto viua::kernel::Kernel::create_mailbox(const viua::process::PID pid)
@@ -441,7 +501,7 @@ auto viua::kernel::Kernel::delete_mailbox(const viua::process::PID pid)
     std::unique_lock<std::mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     std::cerr << "[kernel:mailbox:delete] pid = " << pid.get()
-         << ", queued messages = " << mailboxes[pid].size() << std::endl;
+              << ", queued messages = " << mailboxes[pid].size() << std::endl;
 #endif
     mailboxes.erase(pid);
     return --running_processes;
@@ -551,7 +611,10 @@ void viua::kernel::Kernel::receive(
 #endif
 }
 
-uint64_t viua::kernel::Kernel::pids() const { return running_processes; }
+uint64_t viua::kernel::Kernel::pids() const
+{
+    return running_processes;
+}
 
 auto viua::kernel::Kernel::schedule_io(
     std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void
@@ -638,12 +701,13 @@ auto viua::kernel::Kernel::IO_result::make_error(
     return IO_result{false, std::move(x)};
 }
 
-int viua::kernel::Kernel::exit() const { return return_code; }
+int viua::kernel::Kernel::exit() const
+{
+    return return_code;
+}
 
-static auto no_of_schedulers(
-    std::string const env_name,
-    size_t const default_limit)
-    -> size_t
+static auto no_of_schedulers(std::string const env_name,
+                             size_t const default_limit) -> size_t
 {
     if (auto const env_limit = getenv(env_name.c_str()); env_limit != nullptr) {
         auto const raw_limit = std::stoi(env_limit);
@@ -653,22 +717,19 @@ static auto no_of_schedulers(
     }
     return default_limit;
 }
-auto viua::kernel::Kernel::no_of_process_schedulers()
-    -> size_t
+auto viua::kernel::Kernel::no_of_process_schedulers() -> size_t
 {
     auto const default_value = std::thread::hardware_concurrency();
     return no_of_schedulers("VIUA_PROC_SCHEDULERS",
                             static_cast<size_t>(default_value));
 }
-auto viua::kernel::Kernel::no_of_ffi_schedulers()
-    -> size_t
+auto viua::kernel::Kernel::no_of_ffi_schedulers() -> size_t
 {
     auto const default_value = (std::thread::hardware_concurrency() / 2);
     return no_of_schedulers("VIUA_FFI_SCHEDULERS",
                             static_cast<size_t>(default_value));
 }
-auto viua::kernel::Kernel::no_of_io_schedulers()
-    -> size_t
+auto viua::kernel::Kernel::no_of_io_schedulers() -> size_t
 {
     auto const default_value = (std::thread::hardware_concurrency() / 2);
     return no_of_schedulers("VIUA_IO_SCHEDULERS",
@@ -790,8 +851,8 @@ viua::kernel::Kernel::Kernel()
             &foreign_call_queue_mutex,
             &foreign_call_queue_condition));
         pthread_setname_np(
-              foreign_call_workers.back()->native_handle()
-            , ("ffi." + std::to_string(ffi_schedulers_limit - i)).c_str());
+            foreign_call_workers.back()->native_handle(),
+            ("ffi." + std::to_string(ffi_schedulers_limit - i)).c_str());
     }
 
     auto const io_schedulers_limit = no_of_io_schedulers();
@@ -822,7 +883,7 @@ viua::kernel::Kernel::~Kernel()
              * Send the actual poison pill. One per worker thread since we can
              * be sure that a thread consumes at most one pill.
              */
-            foreign_call_queue.push_back(nullptr);
+            foreign_call_queue.push(nullptr);
 
             lck.unlock();
             foreign_call_queue_condition.notify_all();

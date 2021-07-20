@@ -20,6 +20,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <string>
+
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/static_analyser/static_analyser.h>
 
@@ -150,9 +151,10 @@ auto Function_state::defined_at(
     return defined_where.at(std::make_pair(index, register_set));
 }
 
-auto Function_state::type_of(viua::bytecode::codec::register_index_type const index,
-                             viua::bytecode::codec::Register_set const register_set)
-    const -> values::Value_wrapper
+auto Function_state::type_of(
+    viua::bytecode::codec::register_index_type const index,
+    viua::bytecode::codec::Register_set const register_set) const
+    -> values::Value_wrapper
 {
     return defined_registers.at(std::make_pair(index, register_set));
 }
@@ -362,7 +364,8 @@ auto Function_state::assume_type(
     return true;
 }
 
-static auto to_string(viua::bytecode::codec::Register_set const rs) -> std::string
+static auto to_string(viua::bytecode::codec::Register_set const rs)
+    -> std::string
 {
     using viua::bytecode::codec::Register_set;
     switch (rs) {

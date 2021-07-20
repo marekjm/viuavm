@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/support/string.h>
@@ -49,11 +50,12 @@ class Text : public Value {
 
   private:
     std::vector<Character> text;
+    std::string text_str;
 
     auto parse(std::string) -> decltype(text);
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Text";
 
     std::string type() const override;
     std::string str() const override;
@@ -74,10 +76,13 @@ class Text : public Value {
     auto common_prefix(Text const&) const -> size_type;
     auto common_suffix(Text const&) const -> size_type;
 
+    auto data() const -> std::string const&;
+
     Text(std::vector<Character>);
     Text(std::string);
     Text(Text&&);
-    ~Text() {}
+    ~Text()
+    {}
 };
 }}  // namespace viua::types
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,22 +19,33 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
+#include <set>
 #include <sstream>
 #include <string>
+
+#include <viua/pid.h>
+#include <viua/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
 
 
-std::string viua::types::Value::type() const { return "Value"; }
-std::string viua::types::Value::str() const
+auto viua::types::Value::type() const -> std::string
+{
+    return "Value";
+}
+auto viua::types::Value::str() const -> std::string
 {
     std::ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-std::string viua::types::Value::repr() const { return str(); }
-bool viua::types::Value::boolean() const
+auto viua::types::Value::repr() const -> std::string
+{
+    return str();
+}
+auto viua::types::Value::boolean() const -> bool
 {
     /*  Boolean defaults to false.
      *  This is because in if, loops etc. we will NOT execute code depending on
@@ -45,15 +56,27 @@ bool viua::types::Value::boolean() const
 }
 
 
-std::unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
-    const viua::process::Process* process_of_origin)
+auto viua::types::Value::pointer(viua::process::Process* const proc)
+    -> std::unique_ptr<viua::types::Pointer>
 {
-    return std::make_unique<viua::types::Pointer>(this, process_of_origin);
+    pointered = proc;
+    auto ptr  = std::make_unique<viua::types::Pointer>(this, proc->pid());
+    pointered->attach_pointer(this, ptr.get());
+    return ptr;
+}
+
+auto viua::types::Value::expire() -> void
+{
+    /*
+     * By default do nothing, as values of most types may be safely exchanged
+     * between processes.
+     */
+    if (pointered) {
+        pointered->invalidate_pointers_of(this);
+    }
 }
 
 viua::types::Value::~Value()
 {
-    for (auto p : pointers) {
-        p->invalidate(this);
-    }
+    expire();
 }

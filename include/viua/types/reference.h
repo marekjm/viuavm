@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <viua/types/value.h>
 
 namespace viua { namespace types {
@@ -33,7 +34,7 @@ class Reference : public Value {
     uint64_t* counter;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Reference";
 
     std::string type() const override;
     std::string str() const override;

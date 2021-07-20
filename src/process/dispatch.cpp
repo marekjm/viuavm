@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <sstream>
+
 #include <viua/bytecode/codec/main.h>
 #include <viua/bytecode/maps.h>
 #include <viua/kernel/kernel.h>
@@ -26,8 +27,8 @@
 #include <viua/types/exception.h>
 
 
-auto viua::process::Process::get_trace_line(
-    uint8_t const* for_address) const -> std::string
+auto viua::process::Process::get_trace_line(uint8_t const* for_address) const
+    -> std::string
 {
     auto trace_line = std::ostringstream{};
 
@@ -69,11 +70,10 @@ auto viua::process::Process::get_trace_line(
         if (viua::bytecode::codec::main::is_void(working_address)) {
             ++working_address;
         } else {
+            working_address += sizeof(uint8_t);  // for opcode type
             working_address +=
-                sizeof(uint8_t);  // for opcode type
-            working_address += sizeof(viua::bytecode::codec::register_index_type);
-            working_address +=
-                sizeof(viua::bytecode::codec::Register_set);
+                sizeof(viua::bytecode::codec::register_index_type);
+            working_address += sizeof(viua::bytecode::codec::Register_set);
         }
         trace_line
             << ' '
@@ -100,8 +100,8 @@ auto viua::process::Process::get_trace_line(
 
     return trace_line.str();
 }
-auto viua::process::Process::emit_trace_line(
-    uint8_t const* for_address) const -> void
+auto viua::process::Process::emit_trace_line(uint8_t const* for_address) const
+    -> void
 {
     // FIXME conditionally enable duplicate trace lines
     static auto previous_trace_line = std::string{};
@@ -114,8 +114,7 @@ auto viua::process::Process::emit_trace_line(
 }
 
 
-auto viua::process::Process::dispatch(uint8_t const* addr)
-    -> uint8_t const*
+auto viua::process::Process::dispatch(uint8_t const* addr) -> uint8_t const*
 {
     /** Dispatches instruction at a pointer to its handler.
      */
@@ -179,6 +178,9 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
         break;
     case STRING:
         addr = opstring(addr + 1);
+        break;
+    case STREQ:
+        addr = opstreq(addr + 1);
         break;
     case TEXT:
         addr = optext(addr + 1);
@@ -465,6 +467,15 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
     case NOP:
         ++addr;
         break;
+    case EXCEPTION:
+        addr = op_exception(addr + 1);
+        break;
+    case EXCEPTION_TAG:
+        addr = op_exception_tag(addr + 1);
+        break;
+    case EXCEPTION_VALUE:
+        addr = op_exception_value(addr + 1);
+        break;
     case IO_READ:
         addr = op_io_read(addr + 1);
         break;
@@ -480,7 +491,6 @@ auto viua::process::Process::dispatch(uint8_t const* addr)
     case IO_CANCEL:
         addr = op_io_cancel(addr + 1);
         break;
-    case STREQ:
     case BOOL:
     case BITSWIDTH:
     case BITSEQ:

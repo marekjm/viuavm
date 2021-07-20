@@ -18,10 +18,14 @@
  */
 
 #include <memory>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
+#include <viua/types/atom.h>
+#include <viua/types/exception.h>
 #include <viua/types/integer.h>
+#include <viua/types/text.h>
 
 
 auto viua::process::Process::optry(Op_address_type addr) -> Op_address_type
@@ -56,8 +60,7 @@ auto viua::process::Process::opdraw(Op_address_type addr) -> Op_address_type
     if (auto target = decoder.fetch_register_or_void(addr, *this);
         target.has_value()) {
         if (not stack->caught) {
-            throw std::make_unique<viua::types::Exception>(
-                "no caught object to draw");
+            abort();
         }
         **target = std::move(stack->caught);
     } else {
@@ -95,13 +98,18 @@ auto viua::process::Process::opthrow(Op_address_type addr) -> Op_address_type
     auto source = decoder.fetch_register(addr, *this);
 
     if (source->empty()) {
-        std::ostringstream oss;
-        oss << "throw from null register";
-        throw std::make_unique<viua::types::Exception>(oss.str());
+        throw std::make_unique<viua::types::Exception>(
+            "throw from null register");
     }
-    stack->thrown = source->give();
 
-    return addr;
+    auto value = source->give();
+    if (dynamic_cast<viua::types::Exception*>(value.get())) {
+        auto ex = std::unique_ptr<viua::types::Exception>{};
+        ex.reset(static_cast<viua::types::Exception*>(value.release()));
+        throw ex;
+    }
+
+    throw std::make_unique<viua::types::Exception>(std::move(value));
 }
 
 auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type
@@ -116,5 +124,62 @@ auto viua::process::Process::opleave(Op_address_type addr) -> Op_address_type
     if (stack->size() > 0) {
         adjust_jump_base_for(stack->back()->function_name);
     }
+    return addr;
+}
+
+auto viua::process::Process::op_exception(Op_address_type addr)
+    -> Op_address_type
+{
+    auto target      = decoder.fetch_register(addr, *this);
+    auto const tag   = decoder.fetch_value_of<viua::types::Atom>(addr, *this);
+    auto const value = decoder.fetch_register_or_void(addr, *this);
+
+    using viua::types::Exception;
+    auto ex =
+        (value.has_value()
+             ? std::make_unique<Exception>(Exception::Tag{std::string{*tag}},
+                                           (*value)->give())
+             : std::make_unique<Exception>(Exception::Tag{std::string{*tag}}));
+
+    *target = std::move(ex);
+
+    return addr;
+}
+
+auto viua::process::Process::op_exception_tag(Op_address_type addr)
+    -> Op_address_type
+{
+    auto target   = decoder.fetch_register(addr, *this);
+    auto const ex = decoder.fetch_value_of<viua::types::Exception>(addr, *this);
+
+    *target = std::make_unique<viua::types::Atom>(ex->tag);
+
+    return addr;
+}
+
+auto viua::process::Process::op_exception_value(Op_address_type addr)
+    -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto ex     = decoder.fetch_value_of<viua::types::Exception>(addr, *this);
+
+    if ((not ex->value) and ex->what().empty()) {
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(Exception::Tag{"Empty_exception"},
+                                          "exception has no value");
+    }
+
+    if (ex->value) {
+        /*
+         * The value is moved out of the exception so we avoid a copy operation,
+         * but effectively destroy the exception. Is there any downside to this
+         * except the fact that the exception must be re-constructed if it needs
+         * to be rethrown?
+         */
+        *target = std::move(ex->value);
+    } else {
+        *target = std::make_unique<viua::types::Text>(ex->what());
+    }
+
     return addr;
 }

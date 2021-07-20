@@ -23,6 +23,7 @@
 #include <map>
 #include <memory>
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/catcher.h>
 #include <viua/kernel/frame.h>
@@ -41,7 +42,8 @@ class Try_frame {
         return return_address;
     }
 
-    Try_frame() : return_address(nullptr), associated_frame(nullptr) {}
+    Try_frame() : return_address(nullptr), associated_frame(nullptr)
+    {}
 };
 
 

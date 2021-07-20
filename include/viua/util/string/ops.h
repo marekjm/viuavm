@@ -26,6 +26,7 @@
 namespace viua { namespace util { namespace string { namespace ops {
 auto extract(std::string const&) -> std::string;
 auto strencode(std::string const&) -> std::string;
+auto strdecode(std::string const) -> std::string;
 auto quoted(std::string const&) -> std::string;
 
 using LevenshteinDistance = std::string::size_type;

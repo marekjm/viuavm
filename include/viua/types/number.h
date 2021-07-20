@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+
 #include <viua/types/boolean.h>
 #include <viua/types/value.h>
 
@@ -40,7 +41,7 @@ class Number : public Value {
      *  Otherwise, they will not be usable by arithmetic instructions.
      */
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Number";
 
     std::string type() const override;
     std::string str() const override = 0;
@@ -53,7 +54,7 @@ class Number : public Value {
 
     virtual auto operator+(Number const&) const -> std::unique_ptr<Number> = 0;
     virtual auto operator-(Number const&) const -> std::unique_ptr<Number> = 0;
-    virtual auto operator*(Number const&)const -> std::unique_ptr<Number>  = 0;
+    virtual auto operator*(Number const&) const -> std::unique_ptr<Number> = 0;
     virtual auto operator/(Number const&) const -> std::unique_ptr<Number> = 0;
 
     virtual auto operator<(Number const&) const -> std::unique_ptr<Boolean> = 0;

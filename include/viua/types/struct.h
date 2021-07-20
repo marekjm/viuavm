@@ -23,6 +23,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 #include <viua/types/value.h>
 
 
@@ -36,7 +37,7 @@ class Struct : public Value {
     std::map<std::string, std::unique_ptr<Value>> attributes;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Struct";
 
     auto type() const -> std::string override;
     auto boolean() const -> bool override;
@@ -52,8 +53,9 @@ class Struct : public Value {
     virtual auto keys() const -> std::vector<std::string>;
 
     auto copy() const -> std::unique_ptr<Value> override;
+    auto expire() -> void override;
 
-    ~Struct() override = default;
+    ~Struct() override;
 };
 }}  // namespace viua::types
 

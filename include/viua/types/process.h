@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/process.h>
@@ -43,7 +44,7 @@ class Process : public Value {
     viua::process::PID saved_pid;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Process";
 
     /*
      * For use by the VM and user code.

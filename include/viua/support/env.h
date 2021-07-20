@@ -20,8 +20,9 @@
 #ifndef VIUA_SUPPORT_ENV_H
 #define VIUA_SUPPORT_ENV_H
 
-#include <string>
 #include <sys/stat.h>
+
+#include <string>
 #include <vector>
 
 namespace viua { namespace support { namespace env {

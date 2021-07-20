@@ -20,6 +20,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;

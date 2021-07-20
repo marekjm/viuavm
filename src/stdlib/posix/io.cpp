@@ -18,11 +18,13 @@
  */
 
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>  // for close(3), write(3), read(3)
+
 #include <iostream>
 #include <memory>
 #include <string_view>
-#include <sys/stat.h>
-#include <unistd.h>  // for close(3), write(3), read(3)
+
 #include <viua/include/module.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
@@ -44,7 +46,10 @@ static auto open(Frame* frame,
 {
     auto const fd = ::open(frame->arguments->get(0)->str().c_str(), 0);
     if (fd == -1) {
-        throw std::make_unique<viua::types::Exception>("Unknown_errno");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"IO_error"},
+            ("unknown errno: " + std::to_string(errno)));
     }
 
     frame->set_local_register_set(
@@ -58,4 +63,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

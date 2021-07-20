@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+
 #include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/kernel.h>
@@ -58,7 +59,9 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type
 
     using viua::bytecode::codec::register_index_type;
     for (auto i = register_index_type{0}; i < pack_size; ++i) {
-        if (register_at(static_cast<register_index_type>(pack_start_ri + i), pack_start_rs)->empty()) {
+        if (register_at(static_cast<register_index_type>(pack_start_ri + i),
+                        pack_start_rs)
+                ->empty()) {
             throw std::make_unique<viua::types::Exception>(
                 "vector: cannot pack null register");
         }
@@ -76,7 +79,9 @@ auto viua::process::Process::opvector(Op_address_type addr) -> Op_address_type
 
     auto v = std::make_unique<viua::types::Vector>();
     for (auto i = register_index_type{0}; i < pack_size; ++i) {
-        v->push(register_at(static_cast<register_index_type>(pack_start_ri + i), pack_start_rs)->give());
+        v->push(register_at(static_cast<register_index_type>(pack_start_ri + i),
+                            pack_start_rs)
+                    ->give());
     }
 
     *register_at(target_ri, target_rs) = std::move(v);

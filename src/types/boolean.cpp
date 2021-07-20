@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,22 +19,43 @@
 
 #include <viua/types/boolean.h>
 
-std::string const viua::types::Boolean::type_name = "Boolean";
-
-auto viua::types::Boolean::type() const -> std::string { return "Boolean"; }
+auto viua::types::Boolean::type() const -> std::string
+{
+    return "Boolean";
+}
 
 auto viua::types::Boolean::str() const -> std::string
 {
     return (b ? "true" : "false");
 }
 
-auto viua::types::Boolean::boolean() const -> bool { return b; }
+auto viua::types::Boolean::boolean() const -> bool
+{
+    return b;
+}
 
-auto viua::types::Boolean::value() -> bool& { return b; }
+auto viua::types::Boolean::value() -> bool&
+{
+    return b;
+}
 
 auto viua::types::Boolean::copy() const -> std::unique_ptr<viua::types::Value>
 {
     return std::make_unique<Boolean>(b);
 }
 
-viua::types::Boolean::Boolean(bool const v) : b(v) {}
+viua::types::Boolean::Boolean(bool const v) : b(v)
+{}
+
+auto viua::types::Boolean::make(bool const v) -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(v);
+}
+auto viua::types::Boolean::make_true() -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(true);
+}
+auto viua::types::Boolean::make_false() -> std::unique_ptr<Boolean>
+{
+    return std::make_unique<Boolean>(false);
+}

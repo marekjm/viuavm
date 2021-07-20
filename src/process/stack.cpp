@@ -18,7 +18,9 @@
  */
 
 #include <experimental/memory>
+
 #include <memory>
+
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
 #include <viua/scheduler/process.h>
@@ -57,7 +59,10 @@ auto viua::process::Stack::set_return_value() -> void
     }
 }
 
-auto viua::process::Stack::state_of() const -> STATE { return current_state; }
+auto viua::process::Stack::state_of() const -> STATE
+{
+    return current_state;
+}
 
 auto viua::process::Stack::state_of(const STATE s) -> STATE
 {
@@ -125,14 +130,14 @@ auto viua::process::Stack::register_deferred_calls(bool const push_this_stack)
 
 auto viua::process::Stack::pop() -> std::unique_ptr<Frame>
 {
-    std::unique_ptr<Frame> frame{std::move(frames.back())};
+    auto frame = std::unique_ptr<Frame>{std::move(frames.back())};
     frames.pop_back();
 
     for (viua::bytecode::codec::register_index_type i = 0;
          i < frame->arguments->size();
          ++i) {
         if (frame->arguments->at(i) != nullptr
-            and frame->arguments->isflagged(i, MOVED)) {
+            and frame->arguments->is_flagged(i, MOVED)) {
             throw std::make_unique<viua::types::Exception>(
                 "unused pass-by-move parameter");
         }
@@ -150,7 +155,10 @@ auto viua::process::Stack::size() const -> decltype(frames)::size_type
     return frames.size();
 }
 
-auto viua::process::Stack::clear() -> void { frames.clear(); }
+auto viua::process::Stack::clear() -> void
+{
+    frames.clear();
+}
 
 auto viua::process::Stack::emplace_back(std::unique_ptr<Frame> frame)
     -> decltype(frames.emplace_back(frame))
@@ -186,8 +194,8 @@ auto viua::process::Stack::adjust_instruction_pointer(
 }
 auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void
 {
-    size_type distance = 0;
-    for (size_type j = (size() - 1); j > 0; --j) {
+    auto distance = size_type{0};
+    for (auto j = size_type{size() - 1}; j > 0; --j) {
         if (at(j).get() == frame) {
             break;
         }
@@ -197,7 +205,7 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void
     if (state_of() == STATE::RUNNING) {
         state_of(STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING);
         parent_process->stacks_order.push(this);
-        for (size_type i = (size() - distance); i < size(); ++i) {
+        for (auto i = size_type{size() - distance}; i < size(); ++i) {
             register_deferred_calls_from(at(i).get());
         }
 
@@ -240,10 +248,16 @@ auto viua::process::Stack::find_catch_frame()
 {
     auto found_exception_frame = std::experimental::observer_ptr<Try_frame>();
     auto caught_with_type      = std::string{""};
-    auto handler_found_for_type =
-        (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
-    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
+    viua::types::Value* ex = nullptr;
+    if (state_of() == STATE::RUNNING) {
+        ex = thrown.get();
+    } else {
+        ex = caught.get();
+    }
+    auto handler_found_for_type = ex->type();
+
+    for (auto i = tryframes.size(); i > 0; --i) {
         auto tframe        = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
@@ -260,12 +274,11 @@ auto viua::process::Stack::find_catch_frame()
 
 auto viua::process::Stack::unwind() -> void
 {
-    Try_frame* tframe           = nullptr;
-    auto handler_found_for_type = std::string{};
-
-    // Find catch frame for current thrown exception.
-    // May return nullptr, because the catcher may not always be found.
-    tie(tframe, handler_found_for_type) = find_catch_frame();
+    /*
+     * Find catch frame for current thrown exception.
+     * May return nullptr, because the catcher may not always be found.
+     */
+    auto [tframe, handler_found_for_type] = find_catch_frame();
 
     if (tframe != nullptr) {
         if (state_of() == STATE::RUNNING) {
@@ -285,9 +298,12 @@ auto viua::process::Stack::unwind() -> void
         // let the VM run stacks of deferred calls.
         unwind_to(tframe, handler_found_for_type);
     } else {
-        // No catcher has been found so we can just unwind the stack and
-        // be done with the exception.
+        /*
+         * No catcher has been found so we can just unwind the stack and
+         * be done with the exception.
+         */
         parent_process->stacks_order.push(this);
+        // FIXME shouldn't deferred calls run in reverse order?
         for (size_type i = 0; i < size(); ++i) {
             register_deferred_calls_from(at(i).get());
         }

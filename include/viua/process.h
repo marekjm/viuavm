@@ -27,8 +27,10 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <set>
 #include <stack>
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/codec/main.h>
 #include <viua/include/module.h>
@@ -43,7 +45,8 @@
 
 class Halt_exception : public std::runtime_error {
   public:
-    Halt_exception() : std::runtime_error("execution halted") {}
+    Halt_exception() : std::runtime_error("execution halted")
+    {}
 };
 
 
@@ -169,7 +172,8 @@ class Stack {
     auto register_deferred_calls_from(Frame*) -> void;
     auto register_deferred_calls(bool const = true) -> void;
 
-    auto prepare_frame(viua::bytecode::codec::register_index_type const) -> Frame*;
+    auto prepare_frame(viua::bytecode::codec::register_index_type const)
+        -> Frame*;
     auto push_prepared_frame() -> void;
 
     auto adjust_jump_base_for_block(std::string const&)
@@ -183,7 +187,7 @@ class Stack {
           viua::kernel::Register_set*,
           viua::scheduler::Process_scheduler*);
 
-    static uint16_t const MAX_STACK_SIZE = 8192;
+    constexpr static auto MAX_STACK_SIZE = uint16_t{8192};
 };
 
 struct Decoder_adapter {
@@ -198,7 +202,9 @@ struct Decoder_adapter {
         if (converted == nullptr) {
             // FIXME don't use the old generic-exception type
             throw std::make_unique<viua::types::Exception>(
-                ("fetched invalid type: expected '" + T::type_name
+                // FIXME C++20 will make this std::string{...} ctor call
+                // obsolete
+                ("fetched invalid type: expected '" + std::string{T::type_name}
                  + "' but got '" + value->type() + "'")
                 /* "Invalid_type" */
                 /* , "expected " + T::type_name + ", got " + value->type() */
@@ -222,7 +228,9 @@ struct Decoder_adapter {
         if (converted == nullptr) {
             // FIXME don't use the old generic-exception type
             throw std::make_unique<viua::types::Exception>(
-                ("fetched invalid type: expected '" + T::type_name
+                // FIXME C++20 will make this std::string{...} ctor call
+                // obsolete
+                ("fetched invalid type: expected '" + std::string{T::type_name}
                  + "' but got '" + value->type() + "'")
                 /* "Invalid_type" */
                 /* , "expected " + T::type_name + ", got " + value->type() */
@@ -246,7 +254,8 @@ struct Decoder_adapter {
     auto fetch_tagged_register(Op_address_type&,
                                Process&,
                                bool const = false) const
-        -> std::pair<viua::bytecode::codec::Register_set, viua::kernel::Register*>;
+        -> std::pair<viua::bytecode::codec::Register_set,
+                     viua::kernel::Register*>;
     auto fetch_register_index(Op_address_type&) const
         -> viua::bytecode::codec::register_index_type;
     auto fetch_tagged_register_index(Op_address_type&) const
@@ -275,8 +284,7 @@ class Process {
      * regarding executed code.
      */
     bool const tracing_enabled;
-    auto get_trace_line(uint8_t const*) const
-        -> std::string;
+    auto get_trace_line(uint8_t const*) const -> std::string;
     auto emit_trace_line(uint8_t const*) const -> void;
 
     /*
@@ -322,6 +330,28 @@ class Process {
 
 
     /*
+     * This is a set of values that have had a pointer taken and are alive (were
+     * not destroyed).
+     *
+     * Any value allocated for use in Viua VM knows if a pointer has been taken
+     * to it; as it is the value itself that creates the pointer (and then
+     * notifies the process inside which this happened). This means that a
+     * process is aware of the possibility that a pointer to that value exists.
+     *
+     * When the value is destroyed its pointer is removed from this set. From
+     * that moment, pointer liveness checks will fail for any pointer that is
+     * pointing to that value.
+     *
+     * This set MUST only be accessed by one thread at a time to avoid race
+     * conditions, but we do not have to guard it with a mutex because a process
+     * is only ever manipulated by a single thread (proc scheduler code is
+     * responsible for guaranteeing this assumption holds).
+     */
+    using Pointer_map_type = std::set<viua::types::Value const*>;
+    Pointer_map_type live_pointers;
+
+
+    /*
      * Call stack information.
      *
      * A process may have many suspended stacks (the simplest example: during
@@ -343,6 +373,7 @@ class Process {
     std::map<Stack*, std::unique_ptr<Stack>> stacks;
     Stack* stack;
     std::stack<Stack*> stacks_order;
+
 
     /*
      * Messages which the process already has locally. To avoid synchronisation
@@ -382,10 +413,10 @@ class Process {
     uint16_t process_priority;
     std::mutex process_mtx;
 
-    /*  viua::process::Process identifier.
+    /*
+     * Process identifier. Used to join processes and send them messages.
      */
-    viua::process::PID process_id;
-    bool is_hidden;
+    viua::process::PID const process_id;
 
     /*
      * Timeouts for receiving messages, waiting for processes, and waiting for
@@ -422,6 +453,7 @@ class Process {
     auto opeq(Op_address_type) -> Op_address_type;
 
     auto opstring(Op_address_type) -> Op_address_type;
+    auto opstreq(Op_address_type) -> Op_address_type;
 
     auto optext(Op_address_type) -> Op_address_type;
     auto optexteq(Op_address_type) -> Op_address_type;
@@ -542,6 +574,8 @@ class Process {
     auto opthrow(Op_address_type) -> Op_address_type;
     auto opleave(Op_address_type) -> Op_address_type;
 
+    auto opimport(Op_address_type) -> Op_address_type;
+
     auto opatom(Op_address_type) -> Op_address_type;
     auto opatomeq(Op_address_type) -> Op_address_type;
 
@@ -551,7 +585,9 @@ class Process {
     auto opstructat(Op_address_type) -> Op_address_type;
     auto opstructkeys(Op_address_type) -> Op_address_type;
 
-    auto opimport(Op_address_type) -> Op_address_type;
+    auto op_exception(Op_address_type) -> Op_address_type;
+    auto op_exception_tag(Op_address_type) -> Op_address_type;
+    auto op_exception_value(Op_address_type) -> Op_address_type;
 
     auto op_io_read(Op_address_type) -> Op_address_type;
     auto op_io_write(Op_address_type) -> Op_address_type;
@@ -564,7 +600,8 @@ class Process {
     auto tick() -> Op_address_type;
 
     auto register_at(viua::bytecode::codec::register_index_type,
-                     viua::bytecode::codec::Register_set) -> viua::kernel::Register*;
+                     viua::bytecode::codec::Register_set)
+        -> viua::kernel::Register*;
 
     bool joinable() const;
     void join();
@@ -587,6 +624,7 @@ class Process {
     auto terminated() const -> bool;
     auto get_active_exception() -> viua::types::Value*;
     auto transfer_active_exception() -> std::unique_ptr<viua::types::Value>;
+    auto raise(std::unique_ptr<viua::types::Exception>) -> void;
     auto raise(std::unique_ptr<viua::types::Value>) -> void;
     auto handle_active_exception() -> void;
 
@@ -603,30 +641,52 @@ class Process {
     auto start() -> Op_address_type;
     auto execution_at() const -> decltype(Stack::instruction_pointer);
 
-    auto trace() const -> std::vector<Frame*>;
+    using Trace_type = std::vector<Frame const*>;
+    auto trace() const -> Trace_type;
+    auto depth() const -> Trace_type::size_type;
 
     auto pid() const -> viua::process::PID;
-    auto hidden() const -> bool;
-    auto hidden(bool) -> void;
 
     auto empty() const -> bool;
 
-    auto pin(bool const x = true) -> void { is_pinned_to_scheduler = x; }
-    auto pinned() const -> bool { return is_pinned_to_scheduler; }
+    auto pin(bool const x = true) -> void
+    {
+        is_pinned_to_scheduler = x;
+    }
+    auto pinned() const -> bool
+    {
+        return is_pinned_to_scheduler;
+    }
 
     auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
         -> void;
     auto cancel_io(std::tuple<uint64_t, uint64_t> const) -> void;
 
+    auto get_kernel() const -> viua::kernel::Kernel&;
+
+    auto attach_pointer(viua::types::Value* const, viua::types::Pointer* const)
+        -> void;
+    auto detach_pointer(viua::types::Value* const, viua::types::Pointer* const)
+        -> void;
+    auto invalidate_pointers_of(viua::types::Value* const) -> void;
+    auto verify_liveness(viua::types::Pointer&) const -> bool;
+    auto verify_liveness(viua::types::Pointer const&) const -> bool;
+
     Process(std::unique_ptr<Frame>,
+            viua::process::PID const,
             viua::scheduler::Process_scheduler*,
             viua::process::Process*,
             bool const             = false,
             Decoder_adapter const& = Decoder_adapter{});
     ~Process();
 
-    static viua::bytecode::codec::register_index_type const DEFAULT_REGISTER_SIZE =
-        255;
+    constexpr static auto DEFAULT_REGISTER_SIZE =
+        viua::bytecode::codec::register_index_type{255};
+
+    inline auto current_stack() -> Stack&
+    {
+        return *stack;
+    }
 };
 }}  // namespace viua::process
 

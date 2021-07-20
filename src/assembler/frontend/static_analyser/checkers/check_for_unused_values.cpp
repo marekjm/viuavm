@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <sstream>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
 

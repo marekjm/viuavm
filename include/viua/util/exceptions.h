@@ -2,6 +2,7 @@
 #define VIUA_UTIL_EXCEPTIONS_H
 
 #include <memory>
+
 #include <viua/types/exception.h>
 
 namespace viua { namespace util { namespace exceptions {

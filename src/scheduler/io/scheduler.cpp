@@ -18,6 +18,7 @@
  */
 
 #include <pthread.h>
+
 #include <chrono>
 #include <condition_variable>
 #include <iostream>
@@ -25,6 +26,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/io.h>
 #include <viua/scheduler/io/interactions.h>
@@ -95,7 +97,7 @@ void viua::scheduler::io::io_scheduler(
                 interaction->id(),
                 viua::kernel::Kernel::IO_result::make_error(
                     std::make_unique<viua::types::Exception>(
-                        "IO_without_fd",
+                        viua::types::Exception::Tag{"IO_without_fd"},
                         "I/O port did not expose file descriptor")));
             continue;
         }
@@ -155,7 +157,16 @@ void viua::scheduler::io::io_scheduler(
                                   + " interaction on fd "
                                   + std::to_string(*work.fd()) + "\n");
                 }
-                kernel.schedule_io(std::move(interaction));
+                if (work.cancelled()) {
+                    kernel.complete_io(
+                        work.id(),
+                        viua::kernel::Kernel::IO_result::make_error(
+                            std::make_unique<viua::types::Exception>(
+                                viua::types::Exception::Tag{"IO_cancel"},
+                                "I/O cancelled")));
+                } else {
+                    kernel.schedule_io(std::move(interaction));
+                }
                 continue;
             }
 

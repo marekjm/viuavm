@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017, 2018 Marek Marecki
+ *  Copyright (C) 2015-2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,7 +22,9 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
 #include <viua/include/module.h>
+#include <viua/process.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
@@ -68,10 +70,22 @@ class Fstream : public viua::types::Value {
     mutable std::fstream the_stream;
 
   public:
-    auto type() const -> std::string override { return "Fstream"; }
-    auto str() const -> std::string override { return type(); }
-    auto repr() const -> std::string override { return str(); }
-    auto boolean() const -> bool override { return the_stream.is_open(); }
+    auto type() const -> std::string override
+    {
+        return "Fstream";
+    }
+    auto str() const -> std::string override
+    {
+        return type();
+    }
+    auto repr() const -> std::string override
+    {
+        return str();
+    }
+    auto boolean() const -> bool override
+    {
+        return the_stream.is_open();
+    }
     auto copy() const -> std::unique_ptr<viua::types::Value> override
     {
         throw std::make_unique<viua::types::Exception>(
@@ -84,7 +98,8 @@ class Fstream : public viua::types::Value {
     auto read() -> std::string;
     auto write(std::string const) -> void;
 
-    Fstream(std::string const& path) : file_name(path), the_stream{file_name} {}
+    Fstream(std::string const& path) : file_name(path), the_stream{file_name}
+    {}
     virtual ~Fstream()
     {
         if (the_stream.is_open()) {
@@ -153,7 +168,7 @@ static auto fstream_peek(Frame* frame,
                          viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
@@ -167,7 +182,7 @@ static auto fstream_getline_default(Frame* frame,
                                     viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
@@ -181,7 +196,7 @@ static auto fstream_getline_delim(Frame* frame,
                                   viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     auto const delim = frame->arguments->get(1)->str().at(0);
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
@@ -196,7 +211,7 @@ static auto fstream_read(Frame* frame,
                          viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     auto const size =
         static_cast<viua::types::Integer*>(frame->arguments->get(1))
             ->as_unsigned();
@@ -213,7 +228,7 @@ static auto fstream_read_whole(Frame* frame,
                                viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     frame->set_local_register_set(
         std::make_unique<viua::kernel::Register_set>(1));
     frame->local_register_set->set(
@@ -227,7 +242,7 @@ static auto fstream_write(Frame* frame,
                           viua::kernel::Kernel*) -> void
 {
     auto const fstream = dynamic_cast<Fstream*>(
-        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
+        static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(*p));
     auto const data = frame->arguments->get(1)->str();
     fstream->write(data);
 }
@@ -249,4 +264,7 @@ const Foreign_function_spec functions[] = {
     {nullptr, nullptr},
 };
 
-extern "C" const Foreign_function_spec* exports() { return functions; }
+extern "C" const Foreign_function_spec* exports()
+{
+    return functions;
+}

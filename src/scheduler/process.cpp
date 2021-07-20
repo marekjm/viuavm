@@ -18,8 +18,15 @@
  */
 
 #include <pthread.h>
+
 #include <iomanip>
+#include <iostream>
+#include <memory>
 #include <mutex>
+#include <optional>
+#include <string>
+#include <string_view>
+
 #include <viua/kernel/kernel.h>
 #include <viua/machine.h>
 #include <viua/printutils.h>
@@ -53,68 +60,116 @@ static auto print_stack_trace_default(viua::process::Process& process) -> void
 
     // cerr << "failed instruction: " <<
     // get<0>(disassembler::instruction(process->execution_at())) << endl;
-    std::cerr << "uncaught object: " << ex_type << " = "
-              << (ex ? ex->what() : thrown_object->str()) << "\n";
+    std::cerr << "uncaught object: " << ex_type;
+    {
+        auto const s = (ex ? ex->what() : thrown_object->str());
+        if (not s.empty()) {
+            std::cerr << " = " << s;
+        }
+        std::cerr << "\n";
+    }
     std::cerr << "\n";
 
+    std::cerr << "throw points: ";
+    if (ex and not ex->throw_points.empty()) {
+        std::cerr << "\n";
+        for (auto const& each : ex->throw_points) {
+            if (not each.name.empty()) {
+                std::cerr << "    name:    " + each.name + "\n";
+                continue;
+            }
+            auto const in_module = process.get_kernel().module_at(
+                reinterpret_cast<uint8_t*>(each.jump_base));
+            auto const in_function =
+                (in_module) ? process.get_kernel().in_which_function(
+                    in_module->first, each.offset)
+                            : std::nullopt;
+            std::cerr
+                << "    address: 0x" << std::hex << std::setw(4)
+                << std::setfill('0') << each.offset << std::dec << " (byte "
+                << each.offset << ") inside 0x" << std::hex << std::setw(12)
+                << std::setfill('0') << each.jump_base << " ["
+                << in_function.value_or("<unknown>") << " => "
+                << (in_module.has_value()
+                        ? (in_module->second + " {" + in_module->first + "}")
+                        : "<unknown>")
+                << "]\n";
+        }
+    } else if (ex) {
+        std::cerr << "none\n";
+    } else {
+        std::cerr << "unavailable\n";
+    }
+    std::cerr << "\n";
     std::cerr << "frame details:\n";
 
-    if (trace.size()) {
+    if (not trace.empty()) {
         auto const last = trace.back();
-        if (last->local_register_set.owns()
-            and last->local_register_set->size()) {
-            auto non_empty = unsigned{0};
-            for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size();
-                 ++r) {
-                if (last->local_register_set->at(r) != nullptr) {
+
+        using Size = viua::kernel::Register_set::size_type;
+
+        auto const limit_length = [](std::string const& s) -> void {
+            constexpr auto MAX_LENGTH = 80;
+            if (s.size() <= MAX_LENGTH) {
+                std::cerr << s << "\n";
+            } else {
+                auto view = std::string_view{s};
+                view.remove_suffix(s.size() - MAX_LENGTH);
+                std::cerr << view << "... <cut>";
+            }
+        };
+
+        auto const& locals = last->local_register_set;
+        if (locals.owns() and locals.get() and locals->size()) {
+            auto non_empty = size_t{0};
+            for (auto r = Size{0}; r < locals->size(); ++r) {
+                if (locals->at(r) != nullptr) {
                     ++non_empty;
                 }
             }
             std::cerr << "  non-empty registers: " << non_empty << '/'
-                      << last->local_register_set->size();
+                      << locals->size();
             std::cerr << (non_empty ? ":\n" : "\n");
-            for (decltype(last->local_register_set->size()) r = 0;
-                 r < last->local_register_set->size();
-                 ++r) {
-                if (last->local_register_set->at(r) == nullptr) {
+            for (auto r = uint16_t{0}; r < locals->size(); ++r) {
+                if (locals->at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    registers[" << r << "]: ";
-                std::cerr << '<' << last->local_register_set->get(r)->type()
-                          << "> " << last->local_register_set->get(r)->str()
-                          << "\n";
+                std::cerr << '<' << locals->get(r)->type() << "> ";
+                limit_length(locals->get(r)->str());
+                std::cerr << "\n";
             }
-        } else if (not last->local_register_set.owns()) {
+        } else if (not locals.owns()) {
             std::cerr << "  this frame did not own its registers\n";
         } else {
             std::cerr << "  no registers were allocated for this frame\n";
         }
 
-        if (last->arguments->size()) {
-            std::cerr << "  non-empty arguments (out of "
-                      << last->arguments->size() << "):\n";
-            for (decltype(last->arguments->size()) r = 0;
-                 r < last->arguments->size();
-                 ++r) {
-                if (last->arguments->at(r) == nullptr) {
+        auto& arguments = *last->arguments.get();
+
+        if (not arguments.empty()) {
+            std::cerr << "  non-empty arguments (out of " << arguments.size()
+                      << "):\n";
+            for (auto r = Size{0}; r < arguments.size(); ++r) {
+                if (arguments.at(r) == nullptr) {
                     continue;
                 }
                 std::cerr << "    arguments[" << r << "]: ";
-                if (last->arguments->isflagged(r, MOVED)) {
+                if (arguments.is_flagged(r, MOVED)) {
                     std::cerr << "[moved] ";
                 }
-                if (auto ptr = dynamic_cast<viua::types::Pointer*>(
-                        last->arguments->get(r))) {
-                    if (ptr->expired()) {
+                if (auto ptr =
+                        dynamic_cast<viua::types::Pointer*>(arguments.get(r))) {
+                    if (ptr->expired(process)) {
                         std::cerr << "<ExpiredPointer>"
                                   << "\n";
                     } else {
                         std::cerr << '<' << ptr->type() << ">\n";
                     }
                 } else {
-                    std::cerr << '<' << last->arguments->get(r)->type() << "> "
-                              << last->arguments->get(r)->str() << "\n";
+                    std::cerr << '<' << arguments.get(r)->type() << "> ";
+                    limit_length(arguments.get(r)->str());
+                    std::cerr << "\n";
                 }
             }
         } else {
@@ -212,9 +267,13 @@ Process_scheduler::Process_scheduler(viua::kernel::Kernel& k, id_type const x)
         : assigned_id{x}, attached_kernel{k}
 {}
 
-Process_scheduler::~Process_scheduler() {}
+Process_scheduler::~Process_scheduler()
+{}
 
-auto Process_scheduler::id() const -> id_type { return assigned_id; }
+auto Process_scheduler::id() const -> id_type
+{
+    return assigned_id;
+}
 
 auto Process_scheduler::bootstrap(std::vector<std::string> args) -> void
 {
@@ -238,8 +297,14 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
                               process_type* parent,
                               bool disown) -> viua::process::Process*
 {
-    auto process = std::make_unique<process_type>(
-        std::move(frame), this, parent, false /* tracing_enabled */
+    auto const pid_of_new_process = attached_kernel.make_pid();
+
+    auto process = std::make_unique<process_type>(std::move(frame),
+                                                  pid_of_new_process,
+                                                  this,
+                                                  parent,
+                                                  false /* tracing_enabled
+                                                         */
     );
 
     process->start();
@@ -247,7 +312,6 @@ auto Process_scheduler::spawn(std::unique_ptr<Frame> frame,
         process->detach();
     }
 
-    auto pid_of_new_process = process->pid();
     attached_kernel.create_mailbox(pid_of_new_process);
     if (not disown) {
         attached_kernel.create_result_slot_for(pid_of_new_process);
@@ -383,20 +447,23 @@ auto Process_scheduler::get_entry_point_of_function(std::string const& name)
 template<typename T> struct deferred {
     T const& fn_to_call;
 
-    deferred(T const& fn) : fn_to_call{fn} {}
+    deferred(T const& fn) : fn_to_call{fn}
+    {}
     deferred(deferred<T> const&) = delete;
     auto operator=(deferred<T> const&) = delete;
     deferred(deferred<T>&&)            = delete;
     auto operator=(deferred<T>&&) = delete;
-    inline ~deferred() { fn_to_call(); }
+    inline ~deferred()
+    {
+        fn_to_call();
+    }
 };
 
 auto Process_scheduler::launch() -> void
 {
     scheduler_thread = std::thread([this] { (*this)(); });
-    pthread_setname_np(
-        scheduler_thread.native_handle()
-        , ("proc." + std::to_string(assigned_id)).c_str());
+    pthread_setname_np(scheduler_thread.native_handle(),
+                       ("proc." + std::to_string(assigned_id)).c_str());
 }
 auto Process_scheduler::operator()() -> void
 {
@@ -451,12 +518,6 @@ auto Process_scheduler::operator()() -> void
         }
 
         auto a_process = pop();
-
-        if (a_process->stopped() and a_process->joinable()) {
-            // return false in execute_quant()
-            push(std::move(a_process));
-            continue;
-        }
 
 #if 0
         auto const push_the_process_back = deferred([&a_process, this]{
@@ -541,19 +602,8 @@ auto Process_scheduler::operator()() -> void
                 attached_kernel.notify_about_process_death();
                 continue;
             } else {
-                if (a_process->trace().at(0)->function_name
-                    == a_process->watchdog()) {
-                    /*
-                     * If the topmost function is the watchdog it means that the
-                     * watchdog has crashed. We have no choice but to reap the
-                     * process as it failed to save itself.
-                     */
-                    std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
-                              << std::setfill('0') << id() << std::dec
-                              << "][pid=" << a_process->pid().get()
-                              << "] watchdog failed, the process is broken "
-                                 "beyond repair\n";
-
+                auto const tr = a_process->trace();
+                if (tr.empty()) {
                     print_stack_trace(*a_process.get());
                     attached_kernel.delete_mailbox(a_process->pid());
                     attached_kernel.notify_about_process_death();
@@ -564,14 +614,24 @@ auto Process_scheduler::operator()() -> void
                     continue;
                 }
 
-                std::cerr << "[scheduler][id=" << std::hex << std::setw(4)
-                          << std::setfill('0') << id() << std::dec
-                          << "][pid=" << a_process->pid().get()
-                          << "] the process has crashed, calling watchdog: "
-                          << a_process->watchdog() << "\n";
+                if (tr.at(0)->function_name == a_process->watchdog()) {
+                    /*
+                     * If the topmost function is the watchdog it means that the
+                     * watchdog has crashed. We have no choice but to reap the
+                     * process as it failed to save itself.
+                     */
+                    print_stack_trace(*a_process.get());
+                    attached_kernel.delete_mailbox(a_process->pid());
+                    attached_kernel.notify_about_process_death();
+                    if (a_process.get() == main_process
+                        and not exit_code.has_value()) {
+                        exit_code = 1;
+                    }
+                    continue;
+                }
 
                 auto parameters = std::make_unique<viua::types::Vector>();
-                auto top_args   = a_process->trace().at(0)->arguments.get();
+                auto top_args   = tr.at(0)->arguments.get();
                 for (auto j = decltype(top_args->size()){0};
                      j < top_args->size();
                      ++j) {
@@ -581,10 +641,9 @@ auto Process_scheduler::operator()() -> void
                 }
 
                 auto death_message = std::make_unique<viua::types::Struct>();
-                death_message->insert(
-                    "function",
-                    std::make_unique<viua::types::Function>(
-                        a_process->trace().at(0)->function_name));
+                death_message->insert("function",
+                                      std::make_unique<viua::types::Function>(
+                                          tr.at(0)->function_name));
                 auto exc = a_process->transfer_active_exception();
                 death_message->insert("exception", std::move(exc));
                 death_message->insert("parameters", std::move(parameters));
@@ -605,9 +664,16 @@ auto Process_scheduler::operator()() -> void
             attached_kernel.notify_about_process_death();
             if (a_process.get() == main_process and not exit_code.has_value()) {
                 auto const ret = a_process->get_return_value();
-                auto const ret_int =
-                    static_cast<viua::types::Integer*>(ret.get());
-                exit_code = (ret ? static_cast<int>(ret_int->as_integer()) : 0);
+                exit_code      = 0;
+                if (ret) {
+                    auto ret_int =
+                        dynamic_cast<viua::types::Integer*>(ret.get());
+                    if (ret_int) {
+                        exit_code = static_cast<int>(ret_int->as_integer());
+                    } else {
+                        exit_code = static_cast<int>(not ret->boolean());
+                    }
+                }
             }
         } else {
             push(std::move(a_process));
@@ -626,9 +692,16 @@ auto Process_scheduler::operator()() -> void
     }
 }
 
-auto Process_scheduler::shutdown() -> void {}
-auto Process_scheduler::join() -> void { scheduler_thread.join(); }
-auto Process_scheduler::exit() const -> int { return exit_code.value_or(0); }
+auto Process_scheduler::shutdown() -> void
+{}
+auto Process_scheduler::join() -> void
+{
+    scheduler_thread.join();
+}
+auto Process_scheduler::exit() const -> int
+{
+    return exit_code.value_or(0);
+}
 
 auto Process_scheduler::schedule_io(
     std::unique_ptr<viua::scheduler::io::IO_interaction> i) -> void

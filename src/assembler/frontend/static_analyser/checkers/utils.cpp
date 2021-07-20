@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
 
@@ -39,29 +40,31 @@ using viua::cg::lex::Token;
 using viua::cg::lex::Traced_syntax_error;
 
 using viua::bytecode::codec::Register_set;
-auto register_set_names = std::map<viua::bytecode::codec::Register_set, std::string>{
-    {
-        viua::bytecode::codec::Register_set::Global,
-        "global",
-    },
-    {
-        viua::bytecode::codec::Register_set::Static,
-        "static",
-    },
-    {
-        viua::bytecode::codec::Register_set::Local,
-        "local",
-    },
-    {
-        viua::bytecode::codec::Register_set::Arguments,
-        "arguments",
-    },
-    {
-        viua::bytecode::codec::Register_set::Parameters,
-        "parameters",
-    },
-};
-auto to_string(viua::bytecode::codec::Register_set const register_set_id) -> std::string
+auto register_set_names =
+    std::map<viua::bytecode::codec::Register_set, std::string>{
+        {
+            viua::bytecode::codec::Register_set::Global,
+            "global",
+        },
+        {
+            viua::bytecode::codec::Register_set::Static,
+            "static",
+        },
+        {
+            viua::bytecode::codec::Register_set::Local,
+            "local",
+        },
+        {
+            viua::bytecode::codec::Register_set::Arguments,
+            "arguments",
+        },
+        {
+            viua::bytecode::codec::Register_set::Parameters,
+            "parameters",
+        },
+    };
+auto to_string(viua::bytecode::codec::Register_set const register_set_id)
+    -> std::string
 {
     return register_set_names.at(register_set_id);
 }
@@ -196,7 +199,8 @@ auto check_use_of_register(Register_usage_profile& rup,
          */
         return;
     }
-    if ((r.rss == viua::bytecode::codec::Register_set::Arguments) and not allow_arguments) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Arguments)
+        and not allow_arguments) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of arguments register set"}
@@ -205,7 +209,8 @@ auto check_use_of_register(Register_usage_profile& rup,
                       "register of `copy` and `move` instructions when a frame "
                       "is allocated"));
     }
-    if ((r.rss == viua::bytecode::codec::Register_set::Parameters) and not allow_parameters) {
+    if ((r.rss == viua::bytecode::codec::Register_set::Parameters)
+        and not allow_parameters) {
         throw Traced_syntax_error{}.append(
             Invalid_syntax{r.tokens.at(0),
                            "invalid use of parameters register set"}
@@ -215,7 +220,8 @@ auto check_use_of_register(Register_usage_profile& rup,
     }
 
     // FIXME check in bound-ness of register sets other than local
-    if ((not rup.in_bounds(r)) and r.rss == viua::bytecode::codec::Register_set::Local) {
+    if ((not rup.in_bounds(r))
+        and r.rss == viua::bytecode::codec::Register_set::Local) {
         throw Traced_syntax_error{}
             .append(Invalid_syntax{
                 r.tokens.at(0),
@@ -242,12 +248,12 @@ auto check_use_of_register(Register_usage_profile& rup,
         auto error = Traced_syntax_error{}.append(
             Invalid_syntax(r.tokens.at(0), msg.str()));
 
+        maybe_mistyped_register_set(rup, r, error);
+
         if (rup.erased(Register(r))) {
             error.append(Invalid_syntax(rup.erased_where(Register(r)), "")
                              .note("erased here:"));
         }
-
-        maybe_mistyped_register_set(rup, r, error);
 
         throw error;
     }
@@ -370,10 +376,16 @@ auto to_string(Value_types const value_type_id) -> std::string
         has_pointer ? (value_type_id ^ Value_types::POINTER) : value_type_id);
     return (has_pointer ? "pointer to " : "") + type_name;
 }
-auto depointerise_type_if_needed(Value_types const t,
-                                 bool const access_via_pointer_dereference)
-    -> Value_types
+auto depointerise_type_if_needed(
+      Value_types const t
+    , bool const access_via_pointer_dereference
+) -> Value_types
 {
-    return (access_via_pointer_dereference ? (t ^ Value_types::POINTER) : t);
+    auto const is_pointered = static_cast<bool>(t & Value_types::POINTER);
+    if (access_via_pointer_dereference && is_pointered) {
+        return (t ^ Value_types::POINTER);
+    } else {
+        return t;
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

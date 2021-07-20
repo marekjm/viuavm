@@ -27,8 +27,7 @@ auto assemble_op_frame(Program& program,
 {
     Token_index target = i + 1;
 
-    program.opframe(
-        ::assembler::operands::getint(
-            ::assembler::operands::resolve_register(tokens.at(target))));
+    program.opframe(::assembler::operands::getint(
+        ::assembler::operands::resolve_register(tokens.at(target))));
 }
 }}}}  // namespace viua::assembler::backend::op_assemblers

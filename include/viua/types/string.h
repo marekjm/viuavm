@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,7 +20,9 @@
 #ifndef VIUA_TYPES_STRING_H
 #define VIUA_TYPES_STRING_H
 
+#include <memory>
 #include <string>
+
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/support/string.h>
@@ -50,7 +52,7 @@ class String : public Value {
     std::string svalue;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "String";
 
     std::string type() const override;
     std::string str() const override;
@@ -59,63 +61,18 @@ class String : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    std::string& value();
+    auto operator==(String const&) const -> bool;
 
-    Integer* size();
-    String* sub(int64_t b = 0, int64_t e = -1);
-    String* add(String*);
-    String* join(Vector*);
-
-    virtual void stringify(Frame*,
-                           viua::kernel::Register_set*,
-                           viua::kernel::Register_set*,
-                           viua::process::Process*,
-                           viua::kernel::Kernel*);
-    virtual void represent(Frame*,
-                           viua::kernel::Register_set*,
-                           viua::kernel::Register_set*,
-                           viua::process::Process*,
-                           viua::kernel::Kernel*);
-
-    virtual void startswith(Frame*,
-                            viua::kernel::Register_set*,
-                            viua::kernel::Register_set*,
-                            viua::process::Process*,
-                            viua::kernel::Kernel*);
-    virtual void endswith(Frame*,
-                          viua::kernel::Register_set*,
-                          viua::kernel::Register_set*,
-                          viua::process::Process*,
-                          viua::kernel::Kernel*);
+    auto value() const -> std::string const&;
 
     virtual void format(Frame*,
                         viua::kernel::Register_set*,
                         viua::kernel::Register_set*,
                         viua::process::Process*,
                         viua::kernel::Kernel*);
-    virtual void substr(Frame*,
-                        viua::kernel::Register_set*,
-                        viua::kernel::Register_set*,
-                        viua::process::Process*,
-                        viua::kernel::Kernel*);
-    virtual void concatenate(Frame*,
-                             viua::kernel::Register_set*,
-                             viua::kernel::Register_set*,
-                             viua::process::Process*,
-                             viua::kernel::Kernel*);
-    virtual void join(Frame*,
-                      viua::kernel::Register_set*,
-                      viua::kernel::Register_set*,
-                      viua::process::Process*,
-                      viua::kernel::Kernel*);
-
-    virtual void size(Frame*,
-                      viua::kernel::Register_set*,
-                      viua::kernel::Register_set*,
-                      viua::process::Process*,
-                      viua::kernel::Kernel*);
 
     String(std::string s = "");
+    static auto make(std::string = "") -> std::unique_ptr<String>;
 };
 }}  // namespace viua::types
 

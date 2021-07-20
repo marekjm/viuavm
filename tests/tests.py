@@ -416,10 +416,24 @@ def extractExceptionsThrown(output):
 def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
+def extractFirstExceptionTagOnly(output):
+    return (extractExceptionsThrown(output)[0][0], None,)
+
 def runTestThrowsException(self, name, expected_output, assembly_opts=None, expected_exit_code = 1, test_disasm = True):
-    runTest(self, name, expected_error=expected_output, expected_exit_code=expected_exit_code,
-            error_processing_function=extractFirstException, valgrind_enable=False,
-            assembly_opts=assembly_opts, test_disasm = test_disasm)
+    runTest(
+        self,
+        name,
+        expected_error = expected_output,
+        expected_exit_code=expected_exit_code,
+        error_processing_function = (
+            extractFirstExceptionTagOnly
+            if (expected_output[1] is None) else
+            extractFirstException
+        ),
+        valgrind_enable=False,
+        assembly_opts=assembly_opts,
+        test_disasm = test_disasm,
+    )
 
 def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
     was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
@@ -1332,7 +1346,8 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
     def testInsertingOutOfRangeWithPositiveIndex(self):
-        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('Out_of_range_exception', 'positive vector index out of range: index = 5, size = 4',))
+        runTestThrowsException(self, 'out_of_range_index_positive.asm',
+                ('Out_of_bounds', 'positive index 5 with size 4',))
 
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
@@ -2063,7 +2078,7 @@ class StaticAnalysis(unittest.TestCase):
         runTestSplitlines(self, 'vinsert_does_not_erase_dereferenced_sources.asm', [
             '1',
             '[1]',
-            'IntegerPointer',
+            'Pointer',
         ])
 
     def testInferringTypesForArgs(self):
@@ -2631,10 +2646,12 @@ class MiscExceptionTests(unittest.TestCase):
         ('--no-sa',),)
 
     def testVectorOutOfRangeRead(self):
-        runTestThrowsException(self, 'vector_out_of_range_read.asm', ('Out_of_range_exception', 'positive vector index out of range',))
+        runTestThrowsException(self, 'vector_out_of_range_read.asm',
+                ('Out_of_bounds', 'positive index 4 with size 1',))
 
     def testVectorOutOfRangeReadFromEmpty(self):
-        runTestThrowsException(self, 'vector_out_of_range_read_from_empty.asm', ('Out_of_range_exception', 'empty vector index out of range',))
+        runTestThrowsException(self, 'vector_out_of_range_read_from_empty.asm',
+                ('Out_of_bounds', 'positive index 0 with empty vector',))
 
     def testDeleteOfEmptyRegister(self):
         runTestThrowsException(self, 'delete_of_empty_register.asm', ('Exception', 'delete of null register',), assembly_opts=('--no-sa',))
@@ -2763,10 +2780,12 @@ class ConcurrencyTests(unittest.TestCase):
         runTestSplitlines(self, 'joining_a_process.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 
     def testJoiningJoinedProcess(self):
-        runTestThrowsException(self, 'joining_joined_process.asm', ('Exception', 'process cannot be joined',))
+        runTestThrowsException(self, 'joining_joined_process.asm',
+                ('Process_cannot_be_joined', None,))
 
     def testJoiningDetachedProcess(self):
-        runTestThrowsException(self, 'joining_detached_process.asm', ('Exception', 'process cannot be joined',))
+        runTestThrowsException(self, 'joining_detached_process.asm',
+                ('Process_cannot_be_joined', None,))
 
     def testDetachingProcess(self):
         runTestReturnsUnorderedLines(
@@ -2787,7 +2806,10 @@ class ConcurrencyTests(unittest.TestCase):
 
     def testTransferringExceptionsOnJoin(self):
         def match_output(self, excode, output):
-            pat = re.compile(r'^exception transferred from process Process: 0x[a-f0-9]+: Hello exception transferring World!$')
+            pat = re.compile(
+                r'^exception transferred from process '
+                r'[a-f0-9]+(?::[a-f0-9]+)+'
+                r': Hello exception transferring World!$')
             wat = re.match(pat, output)
             self.assertTrue(wat is not None)
             self.assertEqual(0, excode)
@@ -3082,7 +3104,7 @@ class TypePointerTests(unittest.TestCase):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736, 74399, 74375)
-        runTest(self, 'type_of_expired.asm', 'ExpiredPointer')
+        runTest(self, 'type_of_expired.asm', 'Pointer')
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
 

@@ -20,25 +20,38 @@
 #include <map>
 #include <set>
 #include <sstream>
+
 #include <viua/bytecode/maps.h>
 #include <viua/cg/lex.h>
 #include <viua/support/string.h>
 
 namespace viua { namespace cg { namespace lex {
-auto Token::line() const -> decltype(line_number) { return line_number; }
+auto Token::line() const -> decltype(line_number)
+{
+    return line_number;
+}
 auto Token::character() const -> decltype(character_in_line)
 {
     return character_in_line;
 }
 
-auto Token::str() const -> decltype(content) { return content; }
-auto Token::str(std::string s) -> void { content = s; }
+auto Token::str() const -> decltype(content)
+{
+    return content;
+}
+auto Token::str(std::string s) -> void
+{
+    content = s;
+}
 
 auto Token::original() const -> decltype(original_content)
 {
     return original_content;
 }
-auto Token::original(std::string s) -> void { original_content = s; }
+auto Token::original(std::string s) -> void
+{
+    original_content = s;
+}
 
 auto Token::ends(bool const as_original) const -> decltype(character_in_line)
 {
@@ -55,7 +68,10 @@ auto Token::operator!=(std::string const& s) const -> bool
     return (content != s);
 }
 
-Token::operator std::string() const { return str(); }
+Token::operator std::string() const
+{
+    return str();
+}
 
 Token::Token(decltype(line_number) line_,
              decltype(character_in_line) character_,
@@ -65,10 +81,17 @@ Token::Token(decltype(line_number) line_,
         , line_number(line_)
         , character_in_line(character_)
 {}
-Token::Token() : Token(0, 0, "") {}
+Token::Token() : Token(0, 0, "")
+{}
 
-auto Invalid_syntax::what() const -> const char* { return message.c_str(); }
-auto Invalid_syntax::str() const -> std::string { return message; }
+auto Invalid_syntax::what() const -> const char*
+{
+    return message.c_str();
+}
+auto Invalid_syntax::str() const -> std::string
+{
+    return message;
+}
 
 auto Invalid_syntax::line() const -> decltype(line_number)
 {
@@ -124,7 +147,10 @@ auto Invalid_syntax::aside(Token t, std::string a) -> Invalid_syntax&
     aside_token = t;
     return *this;
 }
-auto Invalid_syntax::aside() const -> std::string { return aside_note; }
+auto Invalid_syntax::aside() const -> std::string
+{
+    return aside_note;
+}
 
 auto Invalid_syntax::match_aside(Token token) const -> bool
 {

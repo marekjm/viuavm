@@ -25,6 +25,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/codec/main.h>
 #include <viua/cg/lex.h>
@@ -58,7 +59,7 @@ struct timeout_op {
     timeout_op(Integer_operand_type, viua::bytecode::codec::timeout_type = 0);
     timeout_op(viua::bytecode::codec::timeout_type);
 };
-using byte_op = std::tuple<bool, uint8_t>;
+using byte_op  = std::tuple<bool, uint8_t>;
 using float_op = std::tuple<bool, float>;
 
 enum JUMPTYPE {
@@ -119,6 +120,7 @@ class Program {
     auto opeq(int_op const, int_op const, int_op const) -> Program&;
 
     auto opstring(int_op const, std::string const) -> Program&;
+    auto opstreq(int_op const, int_op const, int_op const) -> Program&;
 
     auto optext(int_op const, std::string const) -> Program&;
     auto optext(int_op const, int_op const) -> Program&;
@@ -259,6 +261,10 @@ class Program {
     auto opstructat(int_op const, int_op const, int_op const) -> Program&;
     auto opstructkeys(int_op const, int_op const) -> Program&;
 
+    auto op_exception(int_op const, int_op const, int_op const) -> Program&;
+    auto op_exception_tag(int_op const, int_op const) -> Program&;
+    auto op_exception_value(int_op const, int_op const) -> Program&;
+
     auto op_io_read(int_op const, int_op const, int_op const) -> Program&;
     auto op_io_write(int_op const, int_op const, int_op const) -> Program&;
     auto op_io_close(int_op const, int_op const) -> Program&;
@@ -274,10 +280,12 @@ class Program {
      * must know size of the program.
      */
     auto calculate_jumps(
-        std::vector<std::tuple<viua::bytecode::codec::bytecode_size_type,
-                               viua::bytecode::codec::bytecode_size_type>> const,
+        std::vector<
+            std::tuple<viua::bytecode::codec::bytecode_size_type,
+                       viua::bytecode::codec::bytecode_size_type>> const,
         std::vector<viua::cg::lex::Token> const&) -> Program&;
-    auto jumps() const -> std::vector<viua::bytecode::codec::bytecode_size_type>;
+    auto jumps() const
+        -> std::vector<viua::bytecode::codec::bytecode_size_type>;
 
     auto bytecode() const -> std::unique_ptr<uint8_t[]>;
     auto fill(std::unique_ptr<uint8_t[]>) -> Program&;

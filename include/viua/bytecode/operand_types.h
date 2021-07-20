@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 enum OperandType : uint8_t {
-    OT_INVALID = 0,
+    OT_INVALID            = 0,
     OT_REGISTER_INDEX     = 1,  // register index
     OT_REGISTER_REFERENCE = 2,  // register reference (indirect register index)
     OT_REGISTER_INDEX_ANNOTATED = 3,  // register index with an annotation from
@@ -119,6 +119,8 @@ enum class Value_types : ValueTypesType {
     IO_REQUEST   = 1 << 16,
     IO_PORT      = 1 << 17,
     IO_PORT_LIKE = (IO_PORT | INTEGER),
+
+    EXCEPTION = 1 << 18,
 };
 }}  // namespace viua::internals
 

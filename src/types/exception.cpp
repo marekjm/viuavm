@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,45 +18,57 @@
  */
 
 #include <string>
+
 #include <viua/types/exception.h>
 
-std::string const viua::types::Exception::type_name = "Exception";
-
-
-std::string viua::types::Exception::what() const
+auto viua::types::Exception::what() const -> std::string
 {
-    /** Stay compatible with standatd exceptions and
-     *  provide what() method.
-     */
-    return cause;
+    if (value) {
+        return value->str();
+    }
+    return description;
 }
 
-std::string viua::types::Exception::etype() const
+std::string viua::types::Exception::type() const
 {
-    /** Returns exception type.
-     *
-     *  Basic type is 'viua::types::Exception' and is returned by the type()
-     * method. This method returns detailed type of the exception.
-     */
-    return detailed_type;
+    return tag;
 }
-
-std::string viua::types::Exception::type() const { return detailed_type; }
-std::string viua::types::Exception::str() const { return cause; }
+std::string viua::types::Exception::str() const
+{
+    return what();
+}
 std::string viua::types::Exception::repr() const
 {
-    return (etype() + ": " + str::enquote(cause));
+    return (type() + ": " + str::enquote(description));
 }
-bool viua::types::Exception::boolean() const { return true; }
+bool viua::types::Exception::boolean() const
+{
+    return true;
+}
 
 std::unique_ptr<viua::types::Value> viua::types::Exception::copy() const
 {
-    return std::make_unique<Exception>(cause);
+    throw std::make_unique<Exception>("not copyable");
 }
 
-viua::types::Exception::Exception(std::string s)
-        : cause(s), detailed_type("Exception")
+auto viua::types::Exception::add_throw_point(Throw_point const tp) -> void
+{
+    throw_points.push_back(tp);
+}
+
+viua::types::Exception::Exception(Tag t) : tag{std::move(t.tag)}
 {}
-viua::types::Exception::Exception(std::string ts, std::string cs)
-        : cause(cs), detailed_type(ts)
+viua::types::Exception::Exception(std::string c) : description{std::move(c)}
+{}
+viua::types::Exception::Exception(std::unique_ptr<Value> v)
+        : tag{v->type()}, value{std::move(v)}
+{}
+viua::types::Exception::Exception(Tag t, std::string c)
+        : tag{std::move(t.tag)}, description{std::move(c)}
+{}
+viua::types::Exception::Exception(Tag t, std::unique_ptr<Value> v)
+        : tag{std::move(t.tag)}, value{std::move(v)}
+{}
+viua::types::Exception::Exception(std::vector<Throw_point> tp, Tag t)
+        : tag{std::move(t.tag)}, throw_points{std::move(tp)}
 {}

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,19 +19,30 @@
 
 #include <sstream>
 #include <string>
+
 #include <viua/exceptions.h>
 #include <viua/types/boolean.h>
 #include <viua/types/float.h>
 using namespace viua::types;
 
-std::string const viua::types::Float::type_name = "Float";
 
+std::string Float::type() const
+{
+    return type_name;
+}
+std::string Float::str() const
+{
+    return std::to_string(number);
+}
+bool Float::boolean() const
+{
+    return (number != 0);
+}
 
-std::string Float::type() const { return "Float"; }
-std::string Float::str() const { return std::to_string(number); }
-bool Float::boolean() const { return (number != 0); }
-
-auto Float::value() -> decltype(number)& { return number; }
+auto Float::value() -> decltype(number)&
+{
+    return number;
+}
 
 std::unique_ptr<viua::types::Value> Float::copy() const
 {
@@ -43,7 +54,10 @@ auto Float::as_integer() const -> int64_t
     return static_cast<int64_t>(number);
 }
 
-auto Float::as_float() const -> viua::float64 { return number; }
+auto Float::as_float() const -> viua::float64
+{
+    return number;
+}
 
 auto Float::operator+(numeric::Number const& that) const
     -> std::unique_ptr<numeric::Number>
@@ -96,4 +110,5 @@ auto Float::operator==(numeric::Number const& that) const
     return std::make_unique<Boolean>(number == that.as_float());
 }
 
-Float::Float(decltype(number) n) : number(n) {}
+Float::Float(decltype(number) n) : number(n)
+{}

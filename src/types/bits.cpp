@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/types/bits.h>
 #include <viua/types/exception.h>
 using namespace viua::types;
@@ -1359,9 +1360,10 @@ static auto signed_div(std::vector<bool> dividend, std::vector<bool> divisor)
 }}  // namespace viua::arithmetic
 
 
-std::string const viua::types::Bits::type_name = "Bits";
-
-auto viua::types::Bits::type() const -> std::string { return type_name; }
+auto viua::types::Bits::type() const -> std::string
+{
+    return type_name;
+}
 
 auto viua::types::Bits::str() const -> std::string
 {
@@ -1625,7 +1627,10 @@ viua::types::Bits::Bits(std::vector<bool>&& bs)
     underlying_array = std::move(bs);
 }
 
-viua::types::Bits::Bits(std::vector<bool> const& bs) { underlying_array = bs; }
+viua::types::Bits::Bits(std::vector<bool> const& bs)
+{
+    underlying_array = bs;
+}
 
 viua::types::Bits::Bits(size_type i)
 {

@@ -22,6 +22,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <optional>
+
 #include <viua/bytecode/maps.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/lexer/classifier.h>
@@ -34,7 +36,10 @@ namespace viua { namespace tooling { namespace libs { namespace parser {
 using viua::util::vector_view;
 using index_type = std::vector<viua::tooling::libs::lexer::Token>::size_type;
 
-auto Fragment::type() const -> Fragment_type { return fragment_type; }
+auto Fragment::type() const -> Fragment_type
+{
+    return fragment_type;
+}
 
 auto Fragment::add(viua::tooling::libs::lexer::Token tok) -> void
 {
@@ -52,7 +57,8 @@ auto Fragment::token(Tokens_size_type const n) const
     return fragment_tokens.at(n);
 }
 
-Fragment::Fragment(Fragment_type t) : fragment_type{t} {}
+Fragment::Fragment(Fragment_type t) : fragment_type{t}
+{}
 
 Extern_function::Extern_function(std::string fn, uint64_t const a)
         : Fragment{Fragment_type::Extern_function}
@@ -64,7 +70,8 @@ Extern_block::Extern_block(std::string bn)
         : Fragment{Fragment_type::Extern_block}, block_name{std::move(bn)}
 {}
 
-End_directive::End_directive() : Fragment{Fragment_type::End_directive} {}
+End_directive::End_directive() : Fragment{Fragment_type::End_directive}
+{}
 
 Function_head::Function_head(std::string fn,
                              uint64_t const a,
@@ -106,16 +113,20 @@ Mark_directive::Mark_directive(std::string m)
         : Fragment{Fragment_type::Mark_directive}, mark{std::move(m)}
 {}
 
-Name_directive::Name_directive(viua::bytecode::codec::register_index_type const ri,
-                               bool const i,
-                               std::string n)
+Name_directive::Name_directive(
+    viua::bytecode::codec::register_index_type const ri,
+    bool const i,
+    std::string n)
         : Fragment{Fragment_type::Name_directive}
         , register_index{ri}
         , iota{i}
         , name{std::move(n)}
 {}
 
-auto Operand::type() const -> Operand_type { return operand_type; }
+auto Operand::type() const -> Operand_type
+{
+    return operand_type;
+}
 
 auto Operand::add(viua::tooling::libs::lexer::Token t) -> void
 {
@@ -127,7 +138,8 @@ auto Operand::tokens() const -> decltype(operand_tokens) const&
     return operand_tokens;
 }
 
-Operand::Operand(Operand_type const o) : operand_type{o} {}
+Operand::Operand(Operand_type const o) : operand_type{o}
+{}
 
 Register_address::Register_address(
     viua::bytecode::codec::register_index_type const ri,
@@ -167,7 +179,8 @@ Boolean_literal::Boolean_literal(bool const v)
         : Operand{Operand_type::Boolean_literal}, value{v}
 {}
 
-Void::Void() : Operand{Operand_type::Void} {}
+Void::Void() : Operand{Operand_type::Void}
+{}
 
 Function_name::Function_name(std::string fn, uint64_t const a)
         : Operand{Operand_type::Function_name}
@@ -321,7 +334,7 @@ static auto parse_name_directive(
     auto i = index_type{0};
 
     auto const is_iota = (tokens.at(1) == "iota");
-    auto const index   = static_cast<viua::bytecode::codec::register_index_type>(
+    auto const index = static_cast<viua::bytecode::codec::register_index_type>(
         is_iota ? 0 : std::stoul(tokens.at(1).str()));
 
     auto frag =
@@ -421,32 +434,33 @@ static auto string_to_register_set(std::string const& s)
     -> viua::bytecode::codec::Register_set
 {
     using viua::bytecode::codec::Register_set;
-    static auto const mapping = std::map<std::string, viua::bytecode::codec::Register_set>{
-        {
-            "local",
-            viua::bytecode::codec::Register_set::Local,
-        },
-        {
-            "static",
-            viua::bytecode::codec::Register_set::Static,
-        },
-        {
-            "global",
-            viua::bytecode::codec::Register_set::Global,
-        },
-        {
-            "arguments",
-            viua::bytecode::codec::Register_set::Arguments,
-        },
-        {
-            "parameters",
-            viua::bytecode::codec::Register_set::Parameters,
-        },
-        {
-            "closure_local",
-            viua::bytecode::codec::Register_set::Closure_local,
-        },
-    };
+    static auto const mapping =
+        std::map<std::string, viua::bytecode::codec::Register_set>{
+            {
+                "local",
+                viua::bytecode::codec::Register_set::Local,
+            },
+            {
+                "static",
+                viua::bytecode::codec::Register_set::Static,
+            },
+            {
+                "global",
+                viua::bytecode::codec::Register_set::Global,
+            },
+            {
+                "arguments",
+                viua::bytecode::codec::Register_set::Arguments,
+            },
+            {
+                "parameters",
+                viua::bytecode::codec::Register_set::Parameters,
+            },
+            {
+                "closure_local",
+                viua::bytecode::codec::Register_set::Closure_local,
+            },
+        };
     return mapping.at(s);
 }
 
@@ -494,7 +508,7 @@ static auto parse_register_address(
 
     auto const is_iota = (tokens.at(1) == "iota");
     auto const is_name = is_id(tokens.at(1).str());
-    auto const index   = static_cast<viua::bytecode::codec::register_index_type>(
+    auto const index = static_cast<viua::bytecode::codec::register_index_type>(
         (is_iota or is_name) ? 0 : std::stoul(tokens.at(1).str()));
     auto const register_set = string_to_register_set(tokens.at(2).str());
     auto access             = string_to_access_type(tokens.at(0).str());
@@ -1431,6 +1445,15 @@ auto parse(std::vector<viua::tooling::libs::lexer::Token> const& tokens)
                 break;
             case IMPORT:
                 i += parse_op_import(fragments, vector_view{tokens, i});
+                break;
+            case EXCEPTION:
+                i += parse_any_3_register_instruction(fragments,
+                                                      vector_view{tokens, i});
+                break;
+            case EXCEPTION_TAG:
+            case EXCEPTION_VALUE:
+                i += parse_any_2_register_instruction(fragments,
+                                                      vector_view{tokens, i});
                 break;
             case IO_READ:
             case IO_WRITE:

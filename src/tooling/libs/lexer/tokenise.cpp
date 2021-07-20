@@ -21,23 +21,39 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/tooling/libs/lexer/classifier.h>
 #include <viua/tooling/libs/lexer/normaliser.h>
 #include <viua/tooling/libs/lexer/tokenise.h>
 #include <viua/util/string/ops.h>
 
 namespace viua { namespace tooling { namespace libs { namespace lexer {
-auto Token::line() const -> Position_type { return line_number; }
-auto Token::character() const -> Position_type { return character_in_line; }
+auto Token::line() const -> Position_type
+{
+    return line_number;
+}
+auto Token::character() const -> Position_type
+{
+    return character_in_line;
+}
 
-auto Token::str() const -> decltype(content) { return content; }
-auto Token::str(std::string s) -> void { content = s; }
+auto Token::str() const -> decltype(content)
+{
+    return content;
+}
+auto Token::str(std::string s) -> void
+{
+    content = s;
+}
 
 auto Token::original() const -> decltype(original_content)
 {
     return original_content;
 }
-auto Token::original(std::string s) -> void { original_content = s; }
+auto Token::original(std::string s) -> void
+{
+    original_content = s;
+}
 
 auto Token::ends(bool const as_original) const -> Position_type
 {
@@ -54,7 +70,10 @@ auto Token::operator!=(std::string const& s) const -> bool
     return (content != s);
 }
 
-Token::operator std::string() const { return str(); }
+Token::operator std::string() const
+{
+    return str();
+}
 
 Token::Token(Position_type const line,
              Position_type const character,
@@ -65,7 +84,8 @@ Token::Token(Position_type const line,
         , line_number{line}
         , character_in_line{character}
 {}
-Token::Token() : Token(0, 0, "", "") {}
+Token::Token() : Token(0, 0, "", "")
+{}
 
 auto Token::operator=(Token const& token) -> Token&
 {
@@ -291,11 +311,11 @@ static auto reduce_scoped_names(std::vector<Token> source) -> std::vector<Token>
             }
 
             if (not scoped_name_tokens.empty()) {
-                tokens.emplace_back(token.line(),
-                                    token.character(),
-                                    join_tokens(scoped_name_tokens,
-                                                0,
-                                                scoped_name_tokens.size()));
+                tokens.emplace_back(
+                    token.line(),
+                    token.character(),
+                    join_tokens(
+                        scoped_name_tokens, 0, scoped_name_tokens.size()));
                 i = j;
                 continue;
             }

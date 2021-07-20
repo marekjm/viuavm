@@ -27,6 +27,7 @@
 #include <queue>
 #include <thread>
 #include <vector>
+
 #include <viua/kernel/frame.h>
 #include <viua/pid.h>
 #include <viua/scheduler/io/interactions.h>
@@ -198,7 +199,10 @@ class Process_scheduler {
     auto join() -> void;
     auto exit() const -> int;
 
-    auto kernel() const -> viua::kernel::Kernel& { return attached_kernel; }
+    auto kernel() const -> viua::kernel::Kernel&
+    {
+        return attached_kernel;
+    }
 
     auto schedule_io(std::unique_ptr<viua::scheduler::io::IO_interaction>)
         -> void;

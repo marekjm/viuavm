@@ -18,6 +18,7 @@
  */
 
 #include <endian.h>
+
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -27,6 +28,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
@@ -80,8 +82,8 @@ void Loader::calculate_function_sizes()
 
 void Loader::load_magic_number(std::ifstream& in)
 {
-    std::array<char, 5> magic_number;
-    in.read(magic_number.data(), sizeof(char) * magic_number.size());
+    std::array<char, 5> magic_number {};
+    in.read(magic_number.data(), magic_number.size());
     if (magic_number.back() != '\0') {
         throw "invalid magic number";
     }
@@ -283,7 +285,10 @@ Loader& Loader::executable()
     return (*this);
 }
 
-uint64_t Loader::get_bytecode_size() { return size; }
+uint64_t Loader::get_bytecode_size()
+{
+    return size;
+}
 auto Loader::get_bytecode() -> std::unique_ptr<uint8_t[]>
 {
     auto copy = std::make_unique<uint8_t[]>(size);
@@ -293,7 +298,10 @@ auto Loader::get_bytecode() -> std::unique_ptr<uint8_t[]>
     return copy;
 }
 
-auto Loader::get_jumps() -> std::vector<uint64_t> { return jumps; }
+auto Loader::get_jumps() -> std::vector<uint64_t>
+{
+    return jumps;
+}
 
 auto Loader::get_meta_information() -> std::map<std::string, std::string>
 {
@@ -318,13 +326,19 @@ auto Loader::get_function_sizes() -> std::map<std::string, uint64_t>
 {
     return function_sizes;
 }
-auto Loader::get_functions() -> std::vector<std::string> { return functions; }
+auto Loader::get_functions() -> std::vector<std::string>
+{
+    return functions;
+}
 
 auto Loader::get_block_addresses() -> std::map<std::string, uint64_t>
 {
     return block_addresses;
 }
-auto Loader::get_blocks() -> std::vector<std::string> { return blocks; }
+auto Loader::get_blocks() -> std::vector<std::string>
+{
+    return blocks;
+}
 
 auto Loader::dynamic_imports() const -> std::vector<std::string>
 {

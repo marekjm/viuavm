@@ -18,11 +18,13 @@
  */
 
 #include <endian.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/codec/main.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/util/memory.h>

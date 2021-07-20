@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/codec.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>

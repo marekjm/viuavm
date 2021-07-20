@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/types/value.h>
 
 
@@ -32,7 +33,7 @@ class Vector : public Value {
     std::vector<std::unique_ptr<Value>> internal_object;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Vector";
 
     std::string type() const override;
     std::string str() const override;
@@ -47,6 +48,8 @@ class Vector : public Value {
     std::unique_ptr<Value> pop(long int);
     Value* at(long int);
     int len();
+
+    auto expire() -> void override;
 
     Vector();
     Vector(const std::vector<Value*>& v);

@@ -23,8 +23,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <viua/bytecode/codec.h>
+
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/codec.h>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/tooling/libs/lexer/tokenise.h>

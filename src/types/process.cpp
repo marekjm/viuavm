@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/process.h>
@@ -27,18 +28,20 @@
 #include <viua/types/process.h>
 
 
-std::string const viua::types::Process::type_name = "Process";
-
-std::string viua::types::Process::type() const { return "Process"; }
+std::string viua::types::Process::type() const
+{
+    return type_name;
+}
 
 std::string viua::types::Process::str() const
 {
-    std::ostringstream oss;
-    oss << "Process: " << std::hex << pid().str() << std::dec;
-    return oss.str();
+    return pid().str();
 }
 
-std::string viua::types::Process::repr() const { return str(); }
+std::string viua::types::Process::repr() const
+{
+    return str();
+}
 
 bool viua::types::Process::boolean() const
 {
@@ -52,7 +55,10 @@ std::unique_ptr<viua::types::Value> viua::types::Process::copy() const
     return std::make_unique<Process>(thrd);
 }
 
-viua::process::PID viua::types::Process::pid() const { return saved_pid; }
+viua::process::PID viua::types::Process::pid() const
+{
+    return saved_pid;
+}
 
 viua::types::Process::Process(viua::process::Process* t)
         : thrd(t), saved_pid(thrd->pid())

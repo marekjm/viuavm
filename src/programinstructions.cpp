@@ -18,6 +18,8 @@
  */
 
 #include <cassert>
+#include <optional>
+
 #include <viua/bytecode/opcodes.h>
 #include <viua/program.h>
 #include <viua/support/pointer.h>
@@ -42,7 +44,8 @@ int_op::int_op(viua::bytecode::codec::plain_int_type n)
         , value(n)
 {}
 
-timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0) {}
+timeout_op::timeout_op() : type(Integer_operand_type::PLAIN), value(0)
+{}
 timeout_op::timeout_op(Integer_operand_type t,
                        viua::bytecode::codec::timeout_type n)
         : type(t), value(n)
@@ -58,13 +61,15 @@ auto Program::opnop() -> Program&
     return (*this);
 }
 
-static auto ra_of_intop(int_op const x, std::optional<Integer_operand_type> const alt_type = std::nullopt)
+static auto ra_of_intop(
+    int_op const x,
+    std::optional<Integer_operand_type> const alt_type = std::nullopt)
     -> viua::bytecode::codec::Register_access
 {
     using namespace viua::bytecode::codec;
 
     Access_specifier access = Access_specifier::Direct;
-    auto const xt = (alt_type.has_value() ? *alt_type : x.type);
+    auto const xt           = (alt_type.has_value() ? *alt_type : x.type);
     switch (xt) {
     case Integer_operand_type::INDEX:
         access = Access_specifier::Direct;
@@ -116,7 +121,8 @@ auto Program::opidec(int_op const regno) -> Program&
 }
 
 auto Program::opfloat(int_op const regno,
-                      viua::bytecode::codec::plain_float_type const f) -> Program&
+                      viua::bytecode::codec::plain_float_type const f)
+    -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FLOAT);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(regno));
@@ -254,6 +260,16 @@ auto Program::opstring(int_op const reg, std::string const s) -> Program&
     return (*this);
 }
 
+auto Program::opstreq(int_op const target, int_op const lhs, int_op const rhs)
+    -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STREQ);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(lhs));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(rhs));
+    return (*this);
+}
+
 auto Program::optext(int_op const reg, std::string const s) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::TEXT);
@@ -346,8 +362,10 @@ auto Program::opvector(int_op const target,
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::VECTOR);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(pack_start_index, Integer_operand_type::INDEX));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(pack_length, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(
+        addr_ptr, ra_of_intop(pack_start_index, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(
+        addr_ptr, ra_of_intop(pack_length, Integer_operand_type::INDEX));
     return (*this);
 }
 
@@ -975,7 +993,8 @@ auto Program::opcapture(int_op const target_closure,
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTURE);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(
+        addr_ptr, ra_of_intop(target_register, Integer_operand_type::INDEX));
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
@@ -986,7 +1005,9 @@ auto Program::opcapturecopy(int_op const target_closure,
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTURECOPY);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
+    addr_ptr = encoder.encode_register(
+        addr_ptr,
+        ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
@@ -997,7 +1018,9 @@ auto Program::opcapturemove(int_op const target_closure,
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CAPTUREMOVE);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_closure));
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
+    addr_ptr = encoder.encode_register(
+        addr_ptr,
+        ra_of_intop(target_register, Integer_operand_type::REGISTER_REFERENCE));
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
     return (*this);
 }
@@ -1021,7 +1044,8 @@ auto Program::opfunction(int_op const reg, std::string const& fn) -> Program&
 auto Program::opframe(int_op const args) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::FRAME);
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(args, Integer_operand_type::INDEX));
+    addr_ptr = encoder.encode_register(
+        addr_ptr, ra_of_intop(args, Integer_operand_type::INDEX));
     return (*this);
 }
 
@@ -1084,8 +1108,7 @@ auto Program::opdefer(int_op const fn) -> Program&
     return (*this);
 }
 
-auto Program::opprocess(int_op const ret, std::string const& fn)
-    -> Program&
+auto Program::opprocess(int_op const ret, std::string const& fn) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::PROCESS);
     if (ret.type == Integer_operand_type::VOID) {
@@ -1149,7 +1172,8 @@ auto Program::opsend(int_op const target, int_op const source) -> Program&
     return (*this);
 }
 
-auto Program::opreceive(int_op const target, timeout_op const timeout) -> Program&
+auto Program::opreceive(int_op const target, timeout_op const timeout)
+    -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::RECEIVE);
     if (target.type == Integer_operand_type::VOID) {
@@ -1188,18 +1212,18 @@ auto Program::opif(int_op const condition,
 {
     auto jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode +=
-        sizeof(uint8_t);  // for opcode
-    jump_position_in_bytecode +=
-        sizeof(uint8_t);  // for operand-type marker
+    jump_position_in_bytecode += sizeof(uint8_t);  // for opcode
+    jump_position_in_bytecode += sizeof(uint8_t);  // for operand-type marker
     jump_position_in_bytecode +=
         sizeof(viua::bytecode::codec::Register_set);  // for rs-type marker
-    jump_position_in_bytecode += sizeof(viua::bytecode::codec::register_index_type);
+    jump_position_in_bytecode +=
+        sizeof(viua::bytecode::codec::register_index_type);
 
     if (absolute_truth != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);
     }
-    jump_position_in_bytecode += sizeof(viua::bytecode::codec::bytecode_size_type);
+    jump_position_in_bytecode +=
+        sizeof(viua::bytecode::codec::bytecode_size_type);
 
     if (absolute_false != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);
@@ -1222,7 +1246,8 @@ auto Program::opcatch(std::string const tag, std::string const block_name)
     -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::CATCH);
-    addr_ptr = encoder.encode_raw_string(addr_ptr, tag.substr(1, (tag.size() - 2)));
+    addr_ptr =
+        encoder.encode_raw_string(addr_ptr, tag.substr(1, (tag.size() - 2)));
     addr_ptr = encoder.encode_raw_string(addr_ptr, block_name);
     return (*this);
 }
@@ -1230,7 +1255,11 @@ auto Program::opcatch(std::string const tag, std::string const block_name)
 auto Program::opdraw(int_op const target) -> Program&
 {
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::DRAW);
-    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    if (target.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    }
     return (*this);
 }
 
@@ -1328,6 +1357,38 @@ auto Program::opstructkeys(int_op const target, int_op const source) -> Program&
     addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::STRUCTKEYS);
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
     addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(source));
+    return (*this);
+}
+
+auto Program::op_exception(int_op const target,
+                           int_op const tag,
+                           int_op const value) -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(tag));
+    if (value.type == Integer_operand_type::VOID) {
+        addr_ptr = encoder.encode_void(addr_ptr);
+    } else {
+        addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(value));
+    }
+    return (*this);
+}
+
+auto Program::op_exception_tag(int_op const target, int_op const ex) -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION_TAG);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ex));
+    return (*this);
+}
+
+auto Program::op_exception_value(int_op const target, int_op const ex)
+    -> Program&
+{
+    addr_ptr = encoder.encode_opcode(addr_ptr, OPCODE::EXCEPTION_VALUE);
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(target));
+    addr_ptr = encoder.encode_register(addr_ptr, ra_of_intop(ex));
     return (*this);
 }
 

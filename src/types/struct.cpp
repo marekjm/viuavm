@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2019 Marek Marecki
+ *  Copyright (C) 2017, 2019, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,17 +18,22 @@
  */
 
 #include <sstream>
+
 #include <viua/exceptions.h>
 #include <viua/support/string.h>
 #include <viua/types/struct.h>
 #include <viua/util/exceptions.h>
 
 
-std::string const viua::types::Struct::type_name = "Struct";
+std::string viua::types::Struct::type() const
+{
+    return type_name;
+}
 
-std::string viua::types::Struct::type() const { return "Struct"; }
-
-bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
+bool viua::types::Struct::boolean() const
+{
+    return (not attributes.empty());
+}
 
 std::string viua::types::Struct::str() const
 {
@@ -49,7 +54,10 @@ std::string viua::types::Struct::str() const
     return oss.str();
 }
 
-std::string viua::types::Struct::repr() const { return str(); }
+std::string viua::types::Struct::repr() const
+{
+    return str();
+}
 
 void viua::types::Struct::insert(std::string const& key,
                                  std::unique_ptr<viua::types::Value> value)
@@ -63,7 +71,7 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::remove(
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto value = std::move(attributes.at(key));
@@ -76,7 +84,7 @@ auto viua::types::Struct::at(std::string const& key) -> viua::types::Value*
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto& value = attributes.at(key);
@@ -89,7 +97,7 @@ auto viua::types::Struct::at(std::string const& key) const
     if (attributes.count(key) == 0) {
         using viua::util::exceptions::make_unique_exception;
         throw make_unique_exception<
-            viua::runtime::exceptions::Invalid_field_access>();
+            viua::runtime::exceptions::Invalid_field_access>(key);
     }
 
     auto& value = attributes.at(key);
@@ -113,3 +121,13 @@ std::unique_ptr<viua::types::Value> viua::types::Struct::copy() const
     }
     return copied;
 }
+
+auto viua::types::Struct::expire() -> void
+{
+    for (auto& each : attributes) {
+        each.second->expire();
+    }
+}
+
+viua::types::Struct::~Struct()
+{}

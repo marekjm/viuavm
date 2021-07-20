@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+
 #include <viua/support/env.h>
 
 namespace viua { namespace support { namespace env {

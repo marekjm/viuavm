@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -22,37 +22,23 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include <viua/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/types/value.h>
 
 
-std::string const viua::types::Pointer::type_name = "Pointer";
-
-void viua::types::Pointer::attach()
+auto viua::types::Pointer::expire() -> void
 {
-    points_to->pointers.push_back(this);
-    valid = true;
+    points_to = nullptr;
 }
-void viua::types::Pointer::detach()
+auto viua::types::Pointer::expired(viua::process::Process const& proc) -> bool
 {
-    if (valid) {
-        points_to->pointers.erase(std::find(
-            points_to->pointers.begin(), points_to->pointers.end(), this));
-    }
-    valid = false;
+    return (not proc.verify_liveness(*this));
 }
-
-void viua::types::Pointer::invalidate(viua::types::Value* t)
-{
-    if (t == points_to) {
-        valid = false;
-    }
-}
-bool viua::types::Pointer::expired() { return !valid; }
-auto viua::types::Pointer::authenticate(const viua::process::Process* process)
-    -> void
+auto viua::types::Pointer::authenticate(viua::process::PID const pid) -> void
 {
     /*
      *  Pointers should automatically expire upon crossing process boundaries.
@@ -60,53 +46,70 @@ auto viua::types::Pointer::authenticate(const viua::process::Process* process)
      *  code passes the pointer object to user-process to ensure that Pointer's
      * state is properly accounted for.
      */
-    valid = (valid and (process_of_origin == process));
-}
-void viua::types::Pointer::reset(viua::types::Value* t)
-{
-    detach();
-    points_to = t;
-    attach();
-}
-viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p)
-{
-    if (process_of_origin != p) {
-        // Dereferencing pointers outside of their original process is illegal.
-        throw std::make_unique<viua::types::Exception>(
-            "InvalidDereference: outside of original process");
+    if (pid != origin) {
+        expire();
     }
-    if (not valid) {
+}
+auto viua::types::Pointer::to(viua::process::Process const& p) -> Value*
+{
+    if (origin != p.pid()) {
+        // Dereferencing pointers outside of their original process is illegal.
+        expire();
         throw std::make_unique<viua::types::Exception>(
-            "expired pointer exception");
+            viua::types::Exception::Tag{"Invalid_dereference"},
+            "outside of original process");
+    }
+    if (not p.verify_liveness(*this)) {
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Expired_pointer"});
+    }
+    if (points_to == nullptr) {
+        throw std::make_unique<viua::types::Exception>(
+            viua::types::Exception::Tag{"Expired_pointer"});
     }
     return points_to;
 }
-
-std::string viua::types::Pointer::type() const
+auto viua::types::Pointer::of() const -> Value*
 {
-    return ((valid ? points_to->type() : "Expired") + "Pointer");
+    return points_to;
 }
 
-bool viua::types::Pointer::boolean() const { return valid; }
-
-std::string viua::types::Pointer::str() const { return type(); }
-
-std::unique_ptr<viua::types::Value> viua::types::Pointer::copy() const
+auto viua::types::Pointer::type() const -> std::string
 {
-    if (not valid) {
-        return std::make_unique<Pointer>(process_of_origin);
+    return "Pointer";
+    // FIXME The below code would require to() to work on const pointers.
+    /* auto const& val = to(); */
+    /* return (val.has_value() */
+    /*     ? ("Pointer_of_" + val->type()) */
+    /*     : "Expired_pointer"); */
+}
+
+auto viua::types::Pointer::boolean() const -> bool
+{
+    return (points_to != nullptr);
+}
+
+auto viua::types::Pointer::str() const -> std::string
+{
+    return type();
+}
+
+auto viua::types::Pointer::copy() const -> std::unique_ptr<Value>
+{
+    if (points_to == nullptr /* and (origin == proc) */) {
+        // FIXME Make copying a expired pointer an exception?
+        return std::make_unique<Pointer>(origin);
     }
-    return std::make_unique<Pointer>(points_to, process_of_origin);
+    return std::make_unique<Pointer>(points_to, origin);
 }
 
 
-viua::types::Pointer::Pointer(const viua::process::Process* poi)
-        : points_to(nullptr), valid(false), process_of_origin(poi)
+viua::types::Pointer::Pointer(viua::process::PID const pid)
+        : points_to{nullptr}, origin{pid}
 {}
 viua::types::Pointer::Pointer(viua::types::Value* t,
-                              const viua::process::Process* poi)
-        : points_to(t), valid(true), process_of_origin(poi)
-{
-    attach();
-}
-viua::types::Pointer::~Pointer() { detach(); }
+                              viua::process::PID const pid)
+        : points_to{t}, origin{pid}
+{}
+viua::types::Pointer::~Pointer()
+{}

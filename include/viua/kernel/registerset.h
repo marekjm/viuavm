@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <vector>
+
 #include <viua/bytecode/codec.h>
 #include <viua/types/value.h>
 
@@ -44,6 +45,7 @@ class Register {
     auto empty() const -> bool;
 
     auto get() -> viua::types::Value*;
+    auto get() const -> viua::types::Value const*;
     auto release() -> viua::types::Value*;
     auto give() -> std::unique_ptr<viua::types::Value>;
 
@@ -57,55 +59,66 @@ class Register {
 
     Register();
     Register(std::unique_ptr<viua::types::Value>);
+    Register(Register const&) = delete;
     Register(Register&&);
+    ~Register() = default;
 
     operator bool() const;
-    auto operator=(Register &&) -> Register&;
+    auto operator=(Register const&) -> Register& = delete;
+    auto operator                                =(Register &&) -> Register&;
     auto operator=(decltype(value)&&) -> Register&;
 };
 
 class Register_set {
-    viua::bytecode::codec::register_index_type registerset_size;
+  public:
+    using size_type = viua::bytecode::codec::register_index_type;
+
+    size_type registerset_size = 0;
     std::vector<Register> registers;
 
   public:
-    // basic access to registers
-    void put(viua::bytecode::codec::register_index_type,
-             std::unique_ptr<viua::types::Value>);
-    std::unique_ptr<viua::types::Value> pop(
-        viua::bytecode::codec::register_index_type);
-    void set(viua::bytecode::codec::register_index_type,
-             std::unique_ptr<viua::types::Value>);
-    viua::types::Value* get(viua::bytecode::codec::register_index_type);
-    viua::types::Value* at(viua::bytecode::codec::register_index_type);
+    auto put(size_type const, std::unique_ptr<viua::types::Value>) -> void;
+    auto pop(size_type const) -> std::unique_ptr<viua::types::Value>;
+    auto set(size_type const, std::unique_ptr<viua::types::Value>) -> void;
+    auto get(size_type const) -> viua::types::Value*;
+    auto get(size_type const) const -> viua::types::Value const*;
+    auto at(size_type const) -> viua::types::Value*;
+    auto at(size_type const) const -> viua::types::Value const*;
 
-    Register* register_at(viua::bytecode::codec::register_index_type);
+    auto register_at(size_type const) -> Register*;
 
     // register modifications
-    void move(viua::bytecode::codec::register_index_type,
-              viua::bytecode::codec::register_index_type);
-    void swap(viua::bytecode::codec::register_index_type,
-              viua::bytecode::codec::register_index_type);
-    void empty(viua::bytecode::codec::register_index_type);
-    void free(viua::bytecode::codec::register_index_type);
+    auto move(size_type const, size_type const) -> void;
+    auto swap(size_type const, size_type const) -> void;
+    auto empty(size_type const) -> void;
+    auto free(size_type const) -> void;
 
     // mask inspection and manipulation
-    void flag(viua::bytecode::codec::register_index_type, mask_type);
-    void unflag(viua::bytecode::codec::register_index_type, mask_type);
-    void clear(viua::bytecode::codec::register_index_type);
-    bool isflagged(viua::bytecode::codec::register_index_type, mask_type);
-    void setmask(viua::bytecode::codec::register_index_type, mask_type);
-    mask_type getmask(viua::bytecode::codec::register_index_type);
+    auto flag(size_type const, mask_type) -> void;
+    auto unflag(size_type const, mask_type) -> void;
+    auto clear(size_type const) -> void;
+    auto is_flagged(size_type const, mask_type) const -> bool;
+    auto set_mask(size_type const, mask_type) -> void;
+    auto get_mask(size_type const) const -> mask_type;
 
-    void drop();
-    inline viua::bytecode::codec::register_index_type size()
+    auto drop() -> void;
+
+    inline auto size() const -> size_type
     {
         return registerset_size;
     }
+    inline auto empty() const -> bool
+    {
+        return (size() == 0);
+    }
 
-    std::unique_ptr<Register_set> copy();
+    auto copy() const -> std::unique_ptr<Register_set>;
 
-    Register_set(viua::bytecode::codec::register_index_type sz);
+    Register_set(size_type const);
+    Register_set(Register_set const&) = delete;
+    Register_set(Register_set&&)      = delete;
+    auto operator=(Register_set const&) -> Register_set& = delete;
+    auto operator=(Register_set &&) -> Register_set& = delete;
     ~Register_set();
 };
 }}  // namespace viua::kernel

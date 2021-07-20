@@ -95,7 +95,10 @@ auto Error::aside(viua::tooling::libs::lexer::Token t, std::string a) -> Error&
     aside_token = t;
     return *this;
 }
-auto Error::aside() const -> std::string { return aside_note; }
+auto Error::aside() const -> std::string
+{
+    return aside_note;
+}
 auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool
 {
     if (token.line() == aside_token.line()
@@ -112,7 +115,10 @@ auto Error::match_aside(viua::tooling::libs::lexer::Token token) const -> bool
     return false;
 }
 
-auto Error::str() const -> std::string { return message; }
+auto Error::str() const -> std::string
+{
+    return message;
+}
 auto Error::what() const -> std::string
 {
     if (auto s = viua::tooling::errors::compile_time::display_error(cause);

@@ -17,8 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <unistd.h>
+
+#include <string>
+
 #include <viua/util/string/escape_sequences.h>
 
 namespace viua {

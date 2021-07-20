@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Marek Marecki
+ *  Copyright (C) 2015-2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,12 +20,13 @@
 #ifndef VIUA_CPU_H
 #define VIUA_CPU_H
 
+#include <dlfcn.h>
+
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <deque>
-#include <dlfcn.h>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -39,9 +40,11 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/include/module.h>
 #include <viua/process.h>
+#include <viua/runtime/imports.h>
 
 
 namespace viua {
@@ -145,16 +148,16 @@ class Kernel {
     std::map<std::string, viua::bytecode::codec::bytecode_size_type>
         block_addresses;
 
-    std::map<std::string, std::pair<std::string, uint8_t*>>
-        linked_functions;
-    std::map<std::string, std::pair<std::string, uint8_t*>>
-        linked_blocks;
+    std::map<std::string, std::pair<std::string, uint8_t*>> linked_functions;
+    std::map<std::string, std::pair<std::string, uint8_t*>> linked_blocks;
     std::map<std::string,
              std::pair<viua::bytecode::codec::bytecode_size_type,
                        std::unique_ptr<uint8_t[]>>>
         linked_modules;
 
-    int return_code;
+    std::map<std::string, std::string> loaded_module_paths;
+
+    int return_code{-1};
 
     /*
      * The number of running processes. This is needed to calculate the load on
@@ -199,7 +202,7 @@ class Kernel {
      *
      */
     // Foreign function call requests are placed here to be executed later.
-    std::vector<
+    std::queue<
         std::unique_ptr<viua::scheduler::ffi::Foreign_function_call_request>>
         foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
@@ -255,6 +258,12 @@ class Kernel {
     std::map<std::tuple<uint64_t, uint64_t>, IO_result> io_results;
 
     /*
+     * PID MANAGEMENT
+     */
+    viua::process::Pid_emitter pid_sequence;
+    mutable std::mutex pid_mutex;
+
+    /*
      * MESSAGE PASSING
      *
      * Why are mailboxes are kept inside the kernel? To remove the need to look
@@ -265,7 +274,7 @@ class Kernel {
      * indirection but in this case I think it is justified.
      */
     std::map<viua::process::PID, Mailbox> mailboxes;
-    std::mutex mailbox_mutex;
+    mutable std::mutex mailbox_mutex;
 
     /*
      * Only processes that were not disowned have an entry here.
@@ -300,7 +309,8 @@ class Kernel {
 
     Kernel& mapfunction(std::string const&,
                         viua::bytecode::codec::bytecode_size_type);
-    Kernel& mapblock(std::string const&, viua::bytecode::codec::bytecode_size_type);
+    Kernel& mapblock(std::string const&,
+                     viua::bytecode::codec::bytecode_size_type);
 
     Kernel& register_external_function(std::string const&, ForeignFunction*);
     Kernel& remove_external_function(std::string);
@@ -320,8 +330,11 @@ class Kernel {
     auto get_entry_point_of(std::string const&) const
         -> std::pair<viua::internals::types::Op_address_type,
                      viua::internals::types::Op_address_type>;
+    auto module_at(uint8_t const* const) const
+        -> std::optional<std::pair<std::string, std::string>>;
+    auto in_which_function(std::string const, uint64_t const) const
+        -> std::optional<std::string>;
 
-    void request_foreign_function_call(Frame*, viua::process::Process*);
     void request_foreign_function_call(std::unique_ptr<Frame>,
                                        viua::process::Process&);
 
@@ -332,10 +345,10 @@ class Kernel {
     auto notify_about_process_death() -> void;
     auto process_count() const -> size_t;
 
-    auto create_mailbox(const viua::process::PID)
-        -> size_t;
-    auto delete_mailbox(const viua::process::PID)
-        -> size_t;
+    auto make_pid() -> viua::process::PID;
+
+    auto create_mailbox(const viua::process::PID) -> size_t;
+    auto delete_mailbox(const viua::process::PID) -> size_t;
 
     auto create_result_slot_for(viua::process::PID) -> void;
     auto detach_process(const viua::process::PID) -> void;
@@ -361,12 +374,9 @@ class Kernel {
     auto io_result(std::tuple<uint64_t, uint64_t> const)
         -> std::unique_ptr<viua::types::Value>;
 
-    auto static no_of_process_schedulers()
-        -> size_t;
-    auto static no_of_ffi_schedulers()
-        -> size_t;
-    auto static no_of_io_schedulers()
-        -> size_t;
+    auto static no_of_process_schedulers() -> size_t;
+    auto static no_of_ffi_schedulers() -> size_t;
+    auto static no_of_io_schedulers() -> size_t;
     auto static is_tracing_enabled() -> bool;
 
     int run();

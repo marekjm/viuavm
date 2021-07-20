@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/support/string.h>
 
@@ -60,8 +61,12 @@ auto check_op_arithmetic(Register_usage_profile& register_usage_profile,
     assert_type_of_register<viua::internals::Value_types::NUMBER>(
         register_usage_profile, *rhs);
 
-    auto val       = Register(*result);
-    val.value_type = register_usage_profile.at(*lhs).second.value_type;
+    auto val            = Register(*result);
+    auto const val_type = register_usage_profile.at(*lhs).second.value_type;
+    val.value_type =
+        (static_cast<bool>(val_type & viua::internals::Value_types::POINTER)
+             ? (val_type ^ viua::internals::Value_types::POINTER)
+             : val_type);
     register_usage_profile.define(val, result->tokens.at(0));
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

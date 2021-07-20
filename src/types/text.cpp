@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017 Marek Marecki
+ *  Copyright (C) 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,11 +19,10 @@
 
 #include <algorithm>
 #include <sstream>
+
 #include <viua/support/string.h>
 #include <viua/types/text.h>
 
-
-std::string const viua::types::Text::type_name = "Text";
 
 namespace {
 const uint8_t UTF8_1ST_ROW = 0b00000000;
@@ -101,26 +100,40 @@ auto viua::types::Text::parse(std::string s) -> decltype(text)
     return parsed_text;
 }
 
-viua::types::Text::Text(std::string s) : text(parse(s)) {}
-viua::types::Text::Text(std::vector<Character> s) : text(std::move(s)) {}
-viua::types::Text::Text(Text&& s) : text(std::move(s.text)) {}
+viua::types::Text::Text(std::string s) : text{parse(s)}, text_str{std::move(s)}
+{}
+viua::types::Text::Text(std::vector<Character> s)
+        : text(std::move(s)), text_str{str()}
+{}
+viua::types::Text::Text(Text&& s)
+        : text{std::move(s.text)}, text_str{std::move(s.text_str)}
+{}
 
-std::string viua::types::Text::type() const { return "Text"; }
-
-std::string viua::types::Text::str() const
+auto viua::types::Text::type() const -> std::string
 {
-    std::ostringstream oss;
+    return type_name;
+}
+
+auto viua::types::Text::str() const -> std::string
+{
+    auto oss = std::ostringstream{};
     for (auto const& each : text) {
         oss << each;
     }
     return oss.str();
 }
 
-std::string viua::types::Text::repr() const { return str::enquote(str()); }
+auto viua::types::Text::repr() const -> std::string
+{
+    return str::enquote(data());
+}
 
-bool viua::types::Text::boolean() const { return false; }
+auto viua::types::Text::boolean() const -> bool
+{
+    return false;
+}
 
-std::unique_ptr<viua::types::Value> viua::types::Text::copy() const
+auto viua::types::Text::copy() const -> std::unique_ptr<viua::types::Value>
 {
     return std::make_unique<Text>(text);
 }
@@ -132,7 +145,7 @@ auto viua::types::Text::operator==(viua::types::Text const& other) const -> bool
 
 auto viua::types::Text::operator+(viua::types::Text const& other) const -> Text
 {
-    decltype(text) copied;
+    auto copied = decltype(text){};
     for (size_type i = 0; i < size(); ++i) {
         copied.push_back(text.at(i));
     }
@@ -147,18 +160,20 @@ auto viua::types::Text::at(const size_type i) const -> Character
     return text.at(i);
 }
 
-
 auto viua::types::Text::signed_size() const -> int64_t
 {
     return static_cast<int64_t>(text.size());
 }
-auto viua::types::Text::size() const -> size_type { return text.size(); }
+auto viua::types::Text::size() const -> size_type
+{
+    return text.size();
+}
 
 
 auto viua::types::Text::sub(size_type first_index, size_type last_index) const
     -> decltype(text)
 {
-    decltype(text) copied;
+    auto copied = decltype(text){};
     for (size_type i = first_index; i < size() and i < last_index; ++i) {
         copied.push_back(text.at(i));
     }
@@ -172,8 +187,8 @@ auto viua::types::Text::sub(size_type first_index) const -> decltype(text)
 
 auto viua::types::Text::common_prefix(Text const& other) const -> size_type
 {
-    size_type length_of_common_prefix = 0;
-    auto limit                        = std::max(size(), other.size());
+    auto length_of_common_prefix = size_type{0};
+    auto limit                   = std::max(size(), other.size());
 
     while (length_of_common_prefix < limit
            and text.at(length_of_common_prefix)
@@ -185,10 +200,10 @@ auto viua::types::Text::common_prefix(Text const& other) const -> size_type
 }
 auto viua::types::Text::common_suffix(Text const& other) const -> size_type
 {
-    size_type length_of_common_suffix = 0;
+    auto length_of_common_suffix = size_type{0};
 
-    size_type this_index  = size() - 1;
-    size_type other_index = other.size() - 1;
+    auto this_index  = size_type{size() - 1};
+    auto other_index = size_type{other.size() - 1};
 
     while ((this_index and other_index)
            and text.at(this_index) == other.at(other_index)) {
@@ -198,4 +213,9 @@ auto viua::types::Text::common_suffix(Text const& other) const -> size_type
     }
 
     return length_of_common_suffix;
+}
+
+auto viua::types::Text::data() const -> std::string const&
+{
+    return text_str;
 }

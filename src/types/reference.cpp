@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,10 +18,9 @@
  */
 
 #include <sstream>
+
 #include <viua/types/reference.h>
 
-
-std::string const viua::types::Reference::type_name = "Reference";
 
 viua::types::Value* viua::types::Reference::points_to() const
 {
@@ -45,11 +44,23 @@ void viua::types::Reference::rebind(std::unique_ptr<viua::types::Value> ptr)
 }
 
 
-std::string viua::types::Reference::type() const { return (*pointer)->type(); }
+std::string viua::types::Reference::type() const
+{
+    return (*pointer)->type();
+}
 
-std::string viua::types::Reference::str() const { return (*pointer)->str(); }
-std::string viua::types::Reference::repr() const { return (*pointer)->repr(); }
-bool viua::types::Reference::boolean() const { return (*pointer)->boolean(); }
+std::string viua::types::Reference::str() const
+{
+    return (*pointer)->str();
+}
+std::string viua::types::Reference::repr() const
+{
+    return (*pointer)->repr();
+}
+bool viua::types::Reference::boolean() const
+{
+    return (*pointer)->boolean();
+}
 
 std::unique_ptr<viua::types::Value> viua::types::Reference::copy() const
 {

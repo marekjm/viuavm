@@ -21,6 +21,7 @@
 #define VIUA_TYPES_POINTER_H
 
 #include <vector>
+
 #include <viua/kernel/frame.h>
 #include <viua/types/value.h>
 
@@ -32,8 +33,7 @@ class Kernel;
 
 namespace types {
 class Pointer : public Value {
-    Value* points_to;
-    bool valid;
+    Value* points_to = nullptr;
     /*
      *  Pointer of origin is a parallelism-safety token.
      *  Viua asserts that pointers can be dereferenced only
@@ -45,30 +45,46 @@ class Pointer : public Value {
      *  pointer should be illegal by definition (even if the access
      *  could be made safe).
      */
-    viua::process::Process const* process_of_origin;
+    viua::process::PID const origin;
 
-    void attach();
-    void detach();
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Pointer";
 
-    void invalidate(Value* t);
-    bool expired();
-    auto authenticate(viua::process::Process const*) -> void;
-    void reset(Value* t);
-    Value* to(viua::process::Process const*);
+    /*
+     * Check if the pointer is expired, and set its state appropriately. Return
+     * the new state.
+     */
+    auto expired(viua::process::Process const&) -> bool;
 
-    std::string str() const override;
+    /*
+     * Authenticate the pointer for use in a process. This causes the pointer to
+     * become invalid if it is used outside of its process of origin.
+     */
+    auto authenticate(viua::process::PID const pid) -> void;
 
-    std::string type() const override;
-    bool boolean() const override;
+    /*
+     * Guarded (via to() function) and unguarded (via of() function) access to
+     * the pointee.
+     *
+     * The to() function requires a process that the value would be used in, and
+     * may set the pointer's state to expired if it's not the pointer's process
+     * of origin.
+     */
+    auto to(viua::process::Process const&) -> Value*;
+    auto of() const -> Value*;
 
-    std::unique_ptr<Value> copy() const override;
+    auto str() const -> std::string override;
 
-    Pointer(viua::process::Process const*);
-    Pointer(Value* t, viua::process::Process const*);
-    virtual ~Pointer();
+    auto type() const -> std::string override;
+    auto boolean() const -> bool override;
+
+    auto copy() const -> std::unique_ptr<Value> override;
+    auto expire() -> void override;
+
+    Pointer(viua::process::PID const);
+    Pointer(Value* t, viua::process::PID const);
+    ~Pointer() override;
 };
 }  // namespace types
 }  // namespace viua

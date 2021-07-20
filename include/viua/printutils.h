@@ -21,6 +21,7 @@
 #define VIUA_PRINTUTILS
 
 #include <string>
+
 #include <viua/kernel/frame.h>
 
 std::string stringify_function_invocation(const Frame*);

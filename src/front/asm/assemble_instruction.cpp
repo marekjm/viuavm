@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
 #include <viua/assembler/backend/op_assemblers.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/bytecode/maps.h>
@@ -54,9 +55,9 @@ auto ::assembler::operands::resolve_jump(
         /*  This function is used to resolve jumps in `jump` and `branch`
          * instructions.
          */
-        std::string jmp                            = token.str();
+        std::string jmp                                = token.str();
         viua::bytecode::codec::bytecode_size_type addr = 0;
-        enum JUMPTYPE jump_type                    = JMP_RELATIVE;
+        enum JUMPTYPE jump_type                        = JMP_RELATIVE;
         if (str::isnum(jmp, false)){addr = stoul(jmp);}
 else if (jmp.substr(0, 2) == "0x")
 {
@@ -77,19 +78,22 @@ else if (jmp[0] == '-')
         oss << "instruction_index = " << instruction_index;
         throw viua::cg::lex::Invalid_syntax(token, oss.str());
     }
-    addr =
-        (instruction_index
-         - static_cast<viua::bytecode::codec::bytecode_size_type>(-1 * jump_value));
+    addr = (instruction_index
+            - static_cast<viua::bytecode::codec::bytecode_size_type>(
+                -1 * jump_value));
 }
-else if (jmp[0] == '+') { addr = (instruction_index + stoul(jmp.substr(1))); }
+else if (jmp[0] == '+')
+{
+    addr = (instruction_index + stoul(jmp.substr(1)));
+}
 else
 {
     try {
         // FIXME: markers map should use
         // viua::bytecode::codec::bytecode_size_type to avoid the need for
         // casting
-        addr =
-            static_cast<viua::bytecode::codec::bytecode_size_type>(marks.at(jmp));
+        addr = static_cast<viua::bytecode::codec::bytecode_size_type>(
+            marks.at(jmp));
     } catch (std::out_of_range const& e) {
         throw viua::cg::lex::Invalid_syntax(
             token,
@@ -284,6 +288,8 @@ auto assemble_instruction(
     } else if (tokens.at(i) == "string") {
         viua::assembler::backend::op_assemblers::assemble_op_string(
             program, tokens, i);
+    } else if (tokens.at(i) == "streq") {
+        assemble_three_register_op<&Program::opstreq>(program, tokens, i);
     } else if (tokens.at(i) == "text") {
         viua::assembler::backend::op_assemblers::assemble_op_text(
             program, tokens, i);
@@ -559,6 +565,42 @@ auto assemble_instruction(
         assemble_op_structat(program, tokens, i);
     } else if (tokens.at(i) == "structkeys") {
         assemble_double_register_op<&Program::opstructkeys>(program, tokens, i);
+    } else if (tokens.at(i) == "exception") {
+        auto target = Token_index{i + 1};
+        auto tag    = Token_index{target + 2};
+        auto value  = Token_index{tag + 2};
+
+        if (tokens.at(value) == "void") {
+            program.op_exception(
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(target)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(target + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(tag)),
+                    ::assembler::operands::resolve_rs_type(tokens.at(tag + 1))),
+                ::assembler::operands::getint(
+                    ::assembler::operands::resolve_register(tokens.at(value))));
+        } else {
+            program.op_exception(
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(target)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(target + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(tag)),
+                    ::assembler::operands::resolve_rs_type(tokens.at(tag + 1))),
+                ::assembler::operands::getint_with_rs_type(
+                    ::assembler::operands::resolve_register(tokens.at(value)),
+                    ::assembler::operands::resolve_rs_type(
+                        tokens.at(value + 1))));
+        }
+    } else if (tokens.at(i) == "exception_tag") {
+        assemble_double_register_op<&Program::op_exception_tag>(
+            program, tokens, i);
+    } else if (tokens.at(i) == "exception_value") {
+        assemble_double_register_op<&Program::op_exception_value>(
+            program, tokens, i);
     } else if (tokens.at(i) == "io_read") {
         assemble_three_register_op<&Program::op_io_read>(program, tokens, i);
     } else if (tokens.at(i) == "io_write") {

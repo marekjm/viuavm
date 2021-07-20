@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016, 2017 Marek Marecki
+ *  Copyright (C) 2016, 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,22 +20,40 @@
 #include <memory>
 #include <sstream>
 #include <string>
+
 #include <viua/exceptions.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 using namespace viua::types;
 
-std::string const viua::types::Integer::type_name = "Integer";
 
-std::string Integer::type() const { return "Integer"; }
-std::string Integer::str() const { return std::to_string(number); }
-bool Integer::boolean() const { return (number != 0); }
+std::string Integer::type() const
+{
+    return type_name;
+}
+std::string Integer::str() const
+{
+    return std::to_string(number);
+}
+bool Integer::boolean() const
+{
+    return (number != 0);
+}
 
-auto Integer::value() -> decltype(number) { return number; }
+auto Integer::value() -> decltype(number)
+{
+    return number;
+}
 
-int64_t Integer::increment() { return (++number); }
-int64_t Integer::decrement() { return (--number); }
+int64_t Integer::increment()
+{
+    return (++number);
+}
+int64_t Integer::decrement()
+{
+    return (--number);
+}
 
 std::unique_ptr<Value> Integer::copy() const
 {
@@ -50,7 +68,10 @@ auto Integer::as_unsigned() const -> uint64_t
     return static_cast<uint64_t>(number);
 }
 
-auto Integer::as_integer() const -> int64_t { return number; }
+auto Integer::as_integer() const -> int64_t
+{
+    return number;
+}
 
 auto Integer::as_float() const -> viua::float64
 {

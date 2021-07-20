@@ -25,6 +25,7 @@
 #include <set>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
 
@@ -194,6 +195,10 @@ std::map<enum OPCODE, std::string> const OP_NAMES = {
     {STRUCTREMOVE, "structremove"},
     {STRUCTAT, "structat"},
     {STRUCTKEYS, "structkeys"},
+
+    {EXCEPTION, "exception"},
+    {EXCEPTION_TAG, "exception_tag"},
+    {EXCEPTION_VALUE, "exception_value"},
 
     {IO_READ, "io_read"},
     {IO_WRITE, "io_write"},

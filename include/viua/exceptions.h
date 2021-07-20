@@ -23,6 +23,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/codec.h>
 #include <viua/types/exception.h>
 #include <viua/util/exceptions.h>
@@ -30,8 +31,12 @@
 
 class Out_of_range_exception : public viua::types::Exception {
   public:
-    std::string type() const { return "Out_of_range_exception"; }
-    Out_of_range_exception(std::string const& s) : viua::types::Exception(s) {}
+    std::string type() const
+    {
+        return "Out_of_range_exception";
+    }
+    Out_of_range_exception(std::string const& s) : viua::types::Exception(s)
+    {}
 };
 
 class Arity_exception : public viua::types::Exception {
@@ -39,7 +44,10 @@ class Arity_exception : public viua::types::Exception {
     std::vector<decltype(got_arity)> valid_arities;
 
   public:
-    std::string type() const override { return "Arity_exception"; }
+    std::string type() const override
+    {
+        return "Arity_exception";
+    }
 
     std::string str() const override
     {
@@ -62,12 +70,16 @@ class Arity_exception : public viua::types::Exception {
             got_arity, valid_arities);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
 
     Arity_exception(decltype(got_arity) a, decltype(valid_arities) v)
             : got_arity(a), valid_arities(v)
     {}
-    ~Arity_exception() {}
+    ~Arity_exception()
+    {}
 };
 
 class Type_exception : public viua::types::Exception {
@@ -75,7 +87,10 @@ class Type_exception : public viua::types::Exception {
     std::string got;
 
   public:
-    std::string type() const override { return "Type_exception"; }
+    std::string type() const override
+    {
+        return "Type_exception";
+    }
 
     std::string str() const override
     {
@@ -90,18 +105,25 @@ class Type_exception : public viua::types::Exception {
             expected, got);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
 
     Type_exception(decltype(expected) e, decltype(got) g) : expected(e), got(g)
     {}
-    ~Type_exception() {}
+    ~Type_exception()
+    {}
 };
 
 class Unresolved_atom_exception : public viua::types::Exception {
     std::string atom;
 
   public:
-    std::string type() const override { return "Unresolved_atom_exception"; }
+    std::string type() const override
+    {
+        return "Unresolved_atom_exception";
+    }
 
     std::string str() const override
     {
@@ -114,17 +136,28 @@ class Unresolved_atom_exception : public viua::types::Exception {
             Unresolved_atom_exception>(atom);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
 
-    Unresolved_atom_exception(decltype(atom) a) : atom(a) {}
-    ~Unresolved_atom_exception() {}
+    Unresolved_atom_exception(decltype(atom) a) : atom(a)
+    {}
+    ~Unresolved_atom_exception()
+    {}
 };
 
 class Operand_type_exception : public viua::types::Exception {
   public:
-    std::string type() const override { return "Operand_type_exception"; }
+    std::string type() const override
+    {
+        return "Operand_type_exception";
+    }
 
-    std::string str() const override { return "invalid operand type"; }
+    std::string str() const override
+    {
+        return "invalid operand type";
+    }
 
     std::unique_ptr<Value> copy() const override
     {
@@ -132,37 +165,63 @@ class Operand_type_exception : public viua::types::Exception {
             Operand_type_exception>();
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
 };
 
 namespace viua { namespace runtime { namespace exceptions {
 class Zero_division : public viua::types::Exception {
   public:
-    std::string type() const override { return "Zero_division"; }
+    std::string type() const override
+    {
+        return "Zero_division";
+    }
 
-    std::string str() const override { return "zero division"; }
+    std::string str() const override
+    {
+        return "zero division";
+    }
 
     std::unique_ptr<Value> copy() const override
     {
         return viua::util::exceptions::make_unique_exception<Zero_division>();
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
 };
 
 class Invalid_field_access : public viua::types::Exception {
-  public:
-    std::string type() const override { return "Invalid_field_access"; }
+    std::string const what_field;
 
-    std::string str() const override { return "invalid field access"; }
+  public:
+    std::string type() const override
+    {
+        return "Invalid_field_access";
+    }
+
+    std::string str() const override
+    {
+        return "invalid field access: '" + what_field + "'";
+    }
 
     std::unique_ptr<Value> copy() const override
     {
         return viua::util::exceptions::make_unique_exception<
-            Invalid_field_access>();
+            Invalid_field_access>(what_field);
     }
 
-    std::string what() const override { return str(); }
+    std::string what() const override
+    {
+        return str();
+    }
+
+    Invalid_field_access(std::string f) : what_field{std::move(f)}
+    {}
 };
 }}}  // namespace viua::runtime::exceptions
 

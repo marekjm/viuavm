@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+
 #include <viua/assembler/frontend/parser.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>

@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -28,6 +29,7 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
                    Instruction const& instruction) -> void
 {
     using viua::assembler::frontend::parser::Atom_literal;
+    using viua::assembler::frontend::parser::Text_literal;
 
     auto operand = get_operand<Register_index>(instruction, 0);
     if (not operand) {
@@ -40,9 +42,15 @@ auto check_op_atom(Register_usage_profile& register_usage_profile,
 
     auto source = get_operand<Atom_literal>(instruction, 1);
     if (not source) {
-        throw invalid_syntax(instruction.operands.at(1)->tokens,
-                             "invalid operand")
-            .note("expected atom literal");
+        auto error = invalid_syntax(instruction.operands.at(1)->tokens,
+                                    "invalid operand")
+                         .note("expected atom literal");
+        if (auto s = get_operand<Text_literal>(instruction, 1); s) {
+            error.aside(instruction.operands.at(1)->tokens.at(0),
+                        ("atom literals use single quotes: '"
+                         + s->content.substr(1, s->content.size() - 2) + "'"));
+        }
+        throw error;
     }
 
     auto val         = Register{};

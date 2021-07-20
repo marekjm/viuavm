@@ -19,11 +19,11 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/kernel.h>
-#include <viua/support/string.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
 #include <viua/types/value.h>
+#include <viua/util/string/ops.h>
 
 
 auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type
@@ -33,7 +33,19 @@ auto viua::process::Process::opstring(Op_address_type addr) -> Op_address_type
     ++addr;  // for operand type
     auto const s = decoder.fetch_string(addr);
 
-    *target = std::make_unique<viua::types::String>(str::strdecode(s));
+    *target = std::make_unique<viua::types::String>(
+        viua::util::string::ops::strdecode(s));
+
+    return addr;
+}
+
+auto viua::process::Process::opstreq(Op_address_type addr) -> Op_address_type
+{
+    auto target = decoder.fetch_register(addr, *this);
+    auto lhs    = decoder.fetch_value_of<viua::types::String>(addr, *this);
+    auto rhs    = decoder.fetch_value_of<viua::types::String>(addr, *this);
+
+    *target = std::make_unique<viua::types::Boolean>(*lhs == *rhs);
 
     return addr;
 }

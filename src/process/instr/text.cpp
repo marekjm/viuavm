@@ -19,21 +19,22 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/process.h>
-#include <viua/support/string.h>
 #include <viua/types/boolean.h>
 #include <viua/types/exception.h>
 #include <viua/types/integer.h>
 #include <viua/types/text.h>
+#include <viua/util/string/ops.h>
 
 
 auto viua::process::Process::optext(Op_address_type addr) -> Op_address_type
 {
     auto target = decoder.fetch_register(addr, *this);
 
+    using viua::util::string::ops::strdecode;
     auto ot      = viua::bytecode::codec::main::get_operand_type(addr);
     auto const s = (ot == OT_REGISTER_INDEX or ot == OT_POINTER)
                        ? decoder.fetch_value(addr, *this)->str()
-                       : str::strdecode(decoder.fetch_string(++addr));
+                       : strdecode(decoder.fetch_string(++addr));
 
     *target = std::make_unique<viua::types::Text>(s);
 
@@ -75,6 +76,15 @@ auto viua::process::Process::optextat(Op_address_type addr) -> Op_address_type
 
     auto working_index =
         convert_signed_integer_to_text_size_type(text, index->as_integer());
+
+    if (working_index >= text->size()) {
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_range"},
+            ("index " + std::to_string(working_index)
+             + " is out of range for string of " + std::to_string(text->size())
+             + " characters"));
+    }
 
     *target = std::make_unique<viua::types::Text>(text->at(working_index));
 

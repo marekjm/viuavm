@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,25 +20,54 @@
 #ifndef VIUA_TYPES_EXCEPTION_H
 #define VIUA_TYPES_EXCEPTION_H
 
+#include <cstdint>
 #include <string>
+#include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/support/string.h>
 #include <viua/types/value.h>
 
 
 namespace viua { namespace types {
-class Exception : public Value {
-    /** Exception type.
+struct Exception : public Value {
+    /*
+     * Tag is the value that is used to catch the exception in catch blocks. For
+     * example, if the exception has tag 'Foo' it can be caught by the following
+     * block:
      *
-     *  Thrown when irrecoverable conditions are encountered
-     *  during program execution.
+     *      catch "Foo" handle_foo
      */
-  protected:
-    std::string cause;
-    std::string detailed_type;
+    struct Tag {
+        std::string tag;
 
-  public:
-    static std::string const type_name;
+        Tag(std::string t) : tag{std::move(t)}
+        {}
+    };
+    std::string const tag{"Exception"};
+
+    /*
+     * Either of these may be specified, but not both at the same time.
+     * The `description` string is just a placeholder for Text-typed values to
+     * make it easier to throw exceptions from C++.
+     */
+    std::string const description{""};
+    std::unique_ptr<Value> value{nullptr};
+
+    struct Throw_point {
+        uint64_t const jump_base{0};
+        uint64_t const offset{0};
+        std::string const name{};
+
+        inline Throw_point(uint64_t const j, uint64_t const o)
+                : jump_base{j}, offset{o}
+        {}
+        inline Throw_point(std::string n) : name{std::move(n)}
+        {}
+    };
+    std::vector<Throw_point> throw_points;
+
+    constexpr static auto type_name = "Exception";
 
     std::string type() const override;
     std::string str() const override;
@@ -47,11 +76,16 @@ class Exception : public Value {
 
     std::unique_ptr<Value> copy() const override;
 
-    virtual std::string what() const;
-    virtual std::string etype() const;
+    virtual auto what() const -> std::string;
 
+    virtual auto add_throw_point(Throw_point const) -> void;
+
+    Exception(Tag);
     Exception(std::string s = "");
-    Exception(std::string ts, std::string cs);
+    Exception(std::unique_ptr<Value>);
+    Exception(Tag, std::string);
+    Exception(Tag, std::unique_ptr<Value>);
+    Exception(std::vector<Throw_point>, Tag);
 };
 }}  // namespace viua::types
 

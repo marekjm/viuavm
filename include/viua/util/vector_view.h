@@ -45,8 +45,14 @@ template<typename T> class vector_view {
     }
 
   public:
-    auto at(size_type const i) const -> T const& { return vec.at(offset + i); }
-    auto size() const -> size_type { return (vec.size() - offset); }
+    auto at(size_type const i) const -> T const&
+    {
+        return vec.at(offset + i);
+    }
+    auto size() const -> size_type
+    {
+        return (vec.size() - offset);
+    }
 
     auto advance(size_type const n) const -> vector_view<T>
     {
@@ -57,7 +63,10 @@ template<typename T> class vector_view {
     {
         return vec.begin() + static_cast<difference_type>(offset);
     }
-    auto end() const -> decltype(vec.end()) { return vec.end(); }
+    auto end() const -> decltype(vec.end())
+    {
+        return vec.end();
+    }
 
     vector_view(container_type const& v, size_type const o) : vec{v}, offset{o}
     {

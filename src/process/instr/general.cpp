@@ -18,11 +18,15 @@
  */
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <memory>
+#include <string>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
+#include <viua/types/pointer.h>
 #include <viua/util/memory.h>
 
 
@@ -34,18 +38,29 @@ auto viua::process::Process::opecho(Op_address_type addr) -> Op_address_type
 
 auto viua::process::Process::opprint(Op_address_type addr) -> Op_address_type
 {
-    std::cout << decoder.fetch_value(addr, *this)->str() + "\n";
+    auto value = decoder.fetch_value(addr, *this);
+    if (auto ptr = dynamic_cast<viua::types::Pointer*>(value); ptr) {
+        verify_liveness(*ptr);
+    }
+    std::cout << value->str() + '\n';
     return addr;
 }
 
 
 auto viua::process::Process::opjump(Op_address_type addr) -> Op_address_type
 {
+    auto const address_of_this_jump = (addr - 1);
+
     auto const target = stack->jump_base + decoder.fetch_address(addr);
 
-    if (target == addr) {
-        throw std::make_unique<viua::types::Exception>(
-            "aborting: JUMP instruction pointing to itself");
+    if (target == address_of_this_jump) {
+        auto const bad_byte = static_cast<uint64_t>(target - stack->jump_base);
+
+        auto o = std::ostringstream{};
+        o << "aborting: JUMP instruction pointing to itself at byte ";
+        o << bad_byte << " (" << std::hex << "0x" << std::setw(8)
+          << std::setfill('0') << bad_byte << ")";
+        throw std::make_unique<viua::types::Exception>(o.str());
     }
 
     return target;

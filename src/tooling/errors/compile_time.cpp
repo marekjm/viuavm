@@ -17,11 +17,13 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <stdlib.h>
 #include <string>
+
 #include <viua/tooling/errors/compile_time.h>
 #include <viua/util/string/escape_sequences.h>
 

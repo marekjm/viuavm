@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/types/boolean.h>
@@ -60,7 +61,8 @@ auto viua::process::Process::opptrlive(Op_address_type addr) -> Op_address_type
     auto target = decoder.fetch_register(addr, *this);
     auto source = decoder.fetch_value_of<viua::types::Pointer>(addr, *this);
 
-    *target = std::make_unique<viua::types::Boolean>(not source->expired());
+    *target =
+        std::make_unique<viua::types::Boolean>(not source->expired(*this));
 
     return addr;
 }

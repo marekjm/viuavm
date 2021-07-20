@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017, 2018 Marek Marecki
+ *  Copyright (C) 2017, 2018, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -20,23 +20,30 @@
 #include <viua/support/string.h>
 #include <viua/types/atom.h>
 
-std::string const viua::types::Atom::type_name = "viua::types::Atom";
-
 auto viua::types::Atom::type() const -> std::string
 {
-    return "viua::types::Atom";
+    return type_name;
 }
 
-auto viua::types::Atom::boolean() const -> bool { return true; }
+auto viua::types::Atom::boolean() const -> bool
+{
+    return true;
+}
 
 auto viua::types::Atom::str() const -> std::string
 {
     return str::enquote(value, '\'');
 }
 
-auto viua::types::Atom::repr() const -> std::string { return str(); }
+auto viua::types::Atom::repr() const -> std::string
+{
+    return str();
+}
 
-viua::types::Atom::operator std::string() const { return value; }
+viua::types::Atom::operator std::string() const
+{
+    return value;
+}
 
 auto viua::types::Atom::copy() const -> std::unique_ptr<viua::types::Value>
 {
@@ -48,4 +55,5 @@ auto viua::types::Atom::operator==(Atom const& that) const -> bool
     return (value == that.value);
 }
 
-viua::types::Atom::Atom(std::string s) : value(s) {}
+viua::types::Atom::Atom(std::string s) : value(s)
+{}

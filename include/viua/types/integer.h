@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <string>
+
 #include <viua/types/number.h>
 
 
@@ -37,7 +38,7 @@ class Integer : public viua::types::numeric::Number {
     underlying_type number;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Integer";
 
     std::string type() const override;
     std::string str() const override;
@@ -56,7 +57,7 @@ class Integer : public viua::types::numeric::Number {
 
     auto operator+(Number const&) const -> std::unique_ptr<Number> override;
     auto operator-(Number const&) const -> std::unique_ptr<Number> override;
-    auto operator*(Number const&)const -> std::unique_ptr<Number> override;
+    auto operator*(Number const&) const -> std::unique_ptr<Number> override;
     auto operator/(Number const&) const -> std::unique_ptr<Number> override;
 
     auto operator<(Number const&) const -> std::unique_ptr<Boolean> override;
@@ -65,7 +66,8 @@ class Integer : public viua::types::numeric::Number {
     auto operator>=(Number const&) const -> std::unique_ptr<Boolean> override;
     auto operator==(Number const&) const -> std::unique_ptr<Boolean> override;
 
-    Integer(decltype(number) n = 0) : number(n) {}
+    Integer(decltype(number) n = 0) : number(n)
+    {}
 };
 }}  // namespace viua::types
 

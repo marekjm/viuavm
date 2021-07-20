@@ -20,8 +20,10 @@
 #ifndef VIUA_TYPES_BOOLEAN_H
 #define VIUA_TYPES_BOOLEAN_H
 
+#include <memory>
 #include <sstream>
 #include <string>
+
 #include <viua/types/value.h>
 
 
@@ -34,7 +36,7 @@ class Boolean : public viua::types::Value {
     bool b;
 
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Boolean";
 
     auto type() const -> std::string override;
     auto str() const -> std::string override;
@@ -45,6 +47,10 @@ class Boolean : public viua::types::Value {
     auto copy() const -> std::unique_ptr<Value> override;
 
     Boolean(bool const v = false);
+
+    static auto make(bool const) -> std::unique_ptr<Boolean>;
+    static auto make_true() -> std::unique_ptr<Boolean>;
+    static auto make_false() -> std::unique_ptr<Boolean>;
 };
 }}  // namespace viua::types
 

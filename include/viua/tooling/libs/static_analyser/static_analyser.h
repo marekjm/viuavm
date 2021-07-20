@@ -21,6 +21,8 @@
 #define VIUA_TOOLING_LIBS_STATIC_ANALYSER_H
 
 #include <set>
+#include <optional>
+
 #include <viua/tooling/libs/parser/parser.h>
 
 namespace viua {
@@ -201,7 +203,8 @@ class IO_request : public Value {
 }  // namespace values
 
 class Function_state {
-    viua::bytecode::codec::register_index_type const local_registers_allocated = 0;
+    viua::bytecode::codec::register_index_type const local_registers_allocated =
+        0;
     std::vector<viua::tooling::libs::lexer::Token>
         local_registers_allocated_where;
 

@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <memory>
+
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/process.h>
@@ -79,8 +80,9 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     auto const timeout = decoder.fetch_timeout(addr);
 
     if (not attached_scheduler->is_joinable(proc->pid())) {
-        throw std::make_unique<viua::types::Exception>(
-            "process cannot be joined");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Process_cannot_be_joined"}, proc->pid().str());
     }
 
     if (timeout and not timeout_active) {
@@ -95,8 +97,25 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
     if (attached_scheduler->is_stopped(proc->pid())) {
         return_addr = addr;
         if (attached_scheduler->is_terminated(proc->pid())) {
-            stack->thrown =
+            auto joined_throw =
                 attached_scheduler->transfer_exception_of(proc->pid());
+
+            /*
+             * We need to detect if the joined throw value is an exception and,
+             * if that is the case, rethrow it using exception type. This will
+             * allow the process to add throw points to better track the
+             * exception path.
+             */
+            if (auto joined_ex =
+                    dynamic_cast<viua::types::Exception*>(joined_throw.get());
+                joined_ex) {
+                auto ex = std::unique_ptr<viua::types::Exception>();
+                ex.reset(static_cast<viua::types::Exception*>(
+                    joined_throw.release()));
+                throw ex;
+            } else {
+                throw joined_throw;
+            }
         } else {
             auto result = attached_scheduler->transfer_result_of(proc->pid());
             if (target) {
@@ -107,9 +126,8 @@ auto viua::process::Process::opjoin(Op_address_type addr) -> Op_address_type
                and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active      = false;
         wait_until_infinity = false;
-        stack->thrown =
-            std::make_unique<viua::types::Exception>("process did not join");
-        return_addr = addr;
+        return_addr         = addr;
+        throw std::make_unique<viua::types::Exception>("process did not join");
     }
 
     return return_addr;
@@ -119,7 +137,9 @@ auto viua::process::Process::opsend(Op_address_type addr) -> Op_address_type
     auto const proc = decoder.fetch_value_of<viua::types::Process>(addr, *this);
     auto source     = decoder.fetch_register(addr, *this);
 
-    attached_scheduler->send(proc->pid(), source->give());
+    auto value = source->give();
+    value->expire();
+    attached_scheduler->send(proc->pid(), std::move(value));
 
     return addr;
 }
@@ -129,9 +149,12 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
 
     auto target = decoder.fetch_register_or_void(addr, *this);
 
-    auto const timeout = decoder.fetch_timeout(addr);
+    auto const timeout           = decoder.fetch_timeout(addr);
+    auto const immediate_timeout = (timeout == 1);
 
-    if (timeout and not timeout_active) {
+    if (immediate_timeout) {
+        // do nothing
+    } else if (timeout and not timeout_active) {
         waiting_until  = (std::chrono::steady_clock::now()
                          + std::chrono::milliseconds(timeout - 1));
         timeout_active = true;
@@ -140,9 +163,7 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         timeout_active      = true;
     }
 
-    if (not is_hidden) {
-        attached_scheduler->receive(process_id, message_queue);
-    }
+    attached_scheduler->receive(process_id, message_queue);
 
     if (not message_queue.empty()) {
         if (target) {
@@ -153,16 +174,15 @@ auto viua::process::Process::opreceive(Op_address_type addr) -> Op_address_type
         wait_until_infinity = false;
         return_addr         = addr;
     } else {
-        if (is_hidden) {
-            suspend();
-        }
-        if (timeout_active and (not wait_until_infinity)
-            and (waiting_until < std::chrono::steady_clock::now())) {
+        auto const timeout_passed =
+            (timeout_active and (not wait_until_infinity)
+             and (waiting_until < std::chrono::steady_clock::now()));
+        if (timeout_passed or immediate_timeout) {
             timeout_active      = false;
             wait_until_infinity = false;
-            stack->thrown =
-                std::make_unique<viua::types::Exception>("no message received");
-            return_addr = addr;
+            return_addr         = addr;
+            throw std::make_unique<viua::types::Exception>(
+                "no message received");
         }
     }
 

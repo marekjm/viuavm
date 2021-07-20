@@ -17,11 +17,13 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+#include <unistd.h>
+
 #include <fstream>
 #include <iostream>
 #include <locale>
-#include <stdlib.h>
-#include <unistd.h>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>
 #include <viua/cg/assembler/assembler.h>
@@ -70,7 +72,8 @@ static bool usage(const char* program,
         std::cout << VERSION << '.' << MICRO;
     }
     if (show_help or (show_version and verbose)) {
-        std::cout << " (" << VIUA_VM_COMMIT << ")";
+        std::cout << " (" << VIUA_VM_COMMIT << ")\n";
+        std::cout << "fingerprint: " << VIUA_VM_CODE_FINGERPRINT;
     }
     if (show_help or show_version) {
         std::cout << "\n";

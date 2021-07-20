@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/util/memory.h>

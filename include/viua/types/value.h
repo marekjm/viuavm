@@ -21,9 +21,10 @@
 #define VIUA_TYPES_VALUE_H
 
 #include <memory>
-#include <sstream>
+#include <set>
 #include <string>
-#include <vector>
+
+#include <viua/pid.h>
 
 
 namespace viua {
@@ -35,23 +36,36 @@ namespace types {
 class Pointer;
 
 class Value {
-    friend class Pointer;
-    std::vector<Pointer*> pointers;
+    class viua::process::Process* pointered = nullptr;
 
   public:
-    /** Basic interface of a Value.
+    /*
+     * Basic interface of a Value.
      *
-     *  Derived objects are expected to override this methods, but in case they
+     * Derived types are expected to override these methods. In case they do
+     * not, Value provides safe defaults.
+     * not
      * do not Value provides safe defaults.
      */
-    virtual std::string type() const;
-    virtual std::string str() const;
-    virtual std::string repr() const;
-    virtual bool boolean() const;
+    virtual auto type() const -> std::string;
+    virtual auto str() const -> std::string;
+    virtual auto repr() const -> std::string;
+    virtual auto boolean() const -> bool;
 
-    virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
+    /*
+     * Called before a value is sent to another process. For types that should
+     * not be usable outside of their original process it should set the value
+     * to some sane, invalid state; if such a state is impossible to construct
+     * the function should throw an exception.
+     *
+     * This is currently only useful for pointers (as they are the only value
+     * that SHOULD NOT be exchanged by processes).
+     */
+    virtual auto expire() -> void;
+    virtual auto pointer(viua::process::Process* const)
+        -> std::unique_ptr<Pointer>;
 
-    virtual std::unique_ptr<Value> copy() const = 0;
+    virtual auto copy() const -> std::unique_ptr<Value> = 0;
 
     Value() = default;
     virtual ~Value();

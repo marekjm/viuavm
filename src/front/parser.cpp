@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include <viua/assembler/frontend/parser.h>
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/assembler/util/pretty_printer.h>

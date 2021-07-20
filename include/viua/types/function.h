@@ -21,6 +21,7 @@
 #define VIUA_TYPE_FUNCTION_H
 
 #include <string>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/value.h>
@@ -29,7 +30,7 @@
 namespace viua { namespace types {
 class Function : public Value {
   public:
-    static std::string const type_name;
+    constexpr static auto type_name = "Function";
 
     std::string function_name;
 

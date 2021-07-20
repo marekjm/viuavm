@@ -20,6 +20,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/assembler/assembler.h>
@@ -431,6 +432,7 @@ auto check_register_usage_for_instruction_block_impl(
             case THROW:
                 check_op_throw(
                     register_usage_profile, ps, created_closures, *instruction);
+                stop = true;
                 break;
             case CATCH:
                 // FIXME TODO SA for entered blocks
@@ -480,6 +482,15 @@ auto check_register_usage_for_instruction_block_impl(
             case STRUCTKEYS:
                 check_op_structkeys(register_usage_profile, *instruction);
                 break;
+            case EXCEPTION:
+                check_op_exception(register_usage_profile, *instruction);
+                break;
+            case EXCEPTION_TAG:
+                check_op_exception_tag(register_usage_profile, *instruction);
+                break;
+            case EXCEPTION_VALUE:
+                check_op_exception_value(register_usage_profile, *instruction);
+                break;
             case IO_READ:
                 check_op_io_read(register_usage_profile, *instruction);
                 break;
@@ -496,7 +507,11 @@ auto check_register_usage_for_instruction_block_impl(
                 check_op_io_cancel(register_usage_profile, *instruction);
                 break;
             case RETURN:
-                // do nothing
+                /*
+                 * Stop analysis after a return because at this point the
+                 * frame does no longer exist.
+                 */
+                stop = true;
                 break;
             case HALT:
                 // do nothing
@@ -527,6 +542,52 @@ auto check_register_usage_for_instruction_block_impl(
     check_for_unused_registers(register_usage_profile);
     check_for_unused_values(register_usage_profile);
     check_closure_instantiations(register_usage_profile, ps, created_closures);
+}
+
+auto Safe_result::ok() const -> bool
+{
+    return ((not unused_register) and (not unused_value)
+            and (not invalid_syntax) and (not traced_syntax));
+}
+auto Safe_result::raise_if_any() -> void
+{
+    if (unused_register.has_value()) {
+        throw std::move(*unused_register);
+    }
+    if (unused_value.has_value()) {
+        throw std::move(*unused_value);
+    }
+    if (invalid_syntax.has_value()) {
+        throw std::move(*invalid_syntax);
+    }
+    if (traced_syntax.has_value()) {
+        throw std::move(*traced_syntax);
+    }
+}
+
+auto check_register_usage_for_instruction_block_impl_safe(
+    Register_usage_profile& register_usage_profile,
+    Parsed_source const& ps,
+    Instructions_block const& ib,
+    InstructionIndex i,
+    InstructionIndex mnemonic_counter) -> Safe_result
+{
+    auto result = Safe_result{};
+
+    try {
+        check_register_usage_for_instruction_block_impl(
+            register_usage_profile, ps, ib, i, mnemonic_counter);
+    } catch (viua::cg::lex::Unused_register const& e) {
+        result.unused_register = e;
+    } catch (viua::cg::lex::Unused_value const& e) {
+        result.unused_value = e;
+    } catch (Invalid_syntax const& e) {
+        result.invalid_syntax = e;
+    } catch (Traced_syntax_error& e) {
+        result.traced_syntax = e;
+    }
+
+    return result;
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers
 
@@ -562,9 +623,9 @@ static auto check_register_usage_for_instruction_block(
     // FIXME: This is ad-hoc code - move it to a utility function.
     auto const function_arity =
         std::stoul(ib.name.str().substr(ib.name.str().rfind('/') + 1));
-    for (auto const each :
-         viua::util::Range(static_cast<viua::bytecode::codec::register_index_type>(
-             function_arity))) {
+    for (auto const each : viua::util::Range(
+             static_cast<viua::bytecode::codec::register_index_type>(
+                 function_arity))) {
         auto val         = Register{};
         val.index        = each;
         val.register_set = viua::bytecode::codec::Register_set::Parameters;

@@ -21,8 +21,11 @@
 #define VIUA_SCHEDULER_FFI_H
 
 #include <condition_variable>
+#include <map>
 #include <memory>
 #include <mutex>
+#include <queue>
+
 #include <viua/include/module.h>
 
 
@@ -43,10 +46,10 @@ class Foreign_function_call_request {
     viua::kernel::Kernel& kernel;
 
   public:
-    std::string function_name() const;
-    void call(ForeignFunction*);
-    void raise(std::unique_ptr<viua::types::Value>);
-    void wakeup();
+    auto function_name() const -> std::string;
+    auto call(ForeignFunction*) -> void;
+    auto raise(std::unique_ptr<viua::types::Value>) -> void;
+    auto wakeup() -> void;
 
     Foreign_function_call_request(Frame* fr,
                                   viua::process::Process* cp,
@@ -58,11 +61,21 @@ class Foreign_function_call_request {
                                   viua::kernel::Kernel& c)
             : frame{std::move(fr)}, caller_process{cp}, kernel{c}
     {}
-    ~Foreign_function_call_request() {}
+
+    Foreign_function_call_request(Foreign_function_call_request const&) =
+        delete;
+    auto operator=(Foreign_function_call_request const&)
+        -> Foreign_function_call_request& = delete;
+
+    Foreign_function_call_request(Foreign_function_call_request&&) = delete;
+    auto operator                         =(Foreign_function_call_request &&)
+        -> Foreign_function_call_request& = delete;
+
+    ~Foreign_function_call_request() = default;
 };
 
 void ff_call_processor(
-    std::vector<std::unique_ptr<Foreign_function_call_request>>* requests,
+    std::queue<std::unique_ptr<Foreign_function_call_request>>* requests,
     std::map<std::string, ForeignFunction*>* foreign_functions,
     std::mutex* ff_map_mtx,
     std::mutex* mtx,

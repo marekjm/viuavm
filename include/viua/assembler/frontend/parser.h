@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
@@ -147,7 +148,10 @@ template<typename T> class vector_view {
     {
         return vec.at(offset + i);
     }
-    auto size() const -> size_type { return vec.size(); }
+    auto size() const -> size_type
+    {
+        return vec.size();
+    }
 
     vector_view(const decltype(vec) v, const decltype(offset) o)
             : vec(v), offset(o)

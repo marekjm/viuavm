@@ -22,10 +22,8 @@
 
 #include <stdint.h>
 
-namespace viua { namespace internals {
-namespace types {
+namespace viua { namespace internals { namespace types {
 using Op_address_type = uint8_t const*;
-}  // namespace types
-}}  // namespace viua::internals
+}}}  // namespace viua::internals::types
 
 #endif

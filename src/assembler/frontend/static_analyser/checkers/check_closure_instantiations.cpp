@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+
 #include <viua/assembler/frontend/static_analyser.h>
 #include <viua/util/range.h>
 

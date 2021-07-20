@@ -18,6 +18,7 @@
  */
 
 #include <string>
+
 #include <viua/assembler/frontend/static_analyser.h>
 
 using viua::assembler::frontend::parser::Instruction;
@@ -29,11 +30,16 @@ auto check_op_draw(Register_usage_profile& register_usage_profile,
 {
     auto target = get_operand<Register_index>(instruction, 0);
     if (not target) {
-        throw invalid_syntax(instruction.operands.at(0)->tokens,
-                             "invalid operand")
-            .note("expected register index");
+        using viua::assembler::frontend::parser::Void_literal;
+        if (not get_operand<Void_literal>(instruction, 0)) {
+            throw invalid_syntax(instruction.operands.at(0)->tokens,
+                                 "invalid operand")
+                .note("expected register index or void");
+        }
     }
 
-    register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    if (target) {
+        register_usage_profile.define(Register{*target}, target->tokens.at(0));
+    }
 }
 }}}}}  // namespace viua::assembler::frontend::static_analyser::checkers

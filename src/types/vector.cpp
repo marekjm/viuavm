@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016, 2017 Marek Marecki
+ *  Copyright (C) 2015-2017, 2020 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,15 +21,11 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <viua/exceptions.h>
+
+#include <viua/types/exception.h>
 #include <viua/types/value.h>
 #include <viua/types/vector.h>
-#include <viua/util/exceptions.h>
 
-
-using viua::util::exceptions::make_unique_exception;
-
-std::string const viua::types::Vector::type_name = "Vector";
 
 void viua::types::Vector::insert(long int index,
                                  std::unique_ptr<viua::types::Value> object)
@@ -40,15 +36,19 @@ void viua::types::Vector::insert(long int index,
     if (index > 0
         and static_cast<decltype(internal_object)::size_type>(index)
                 > internal_object.size()) {
-        std::ostringstream oss;
-        oss << "positive vector index out of range: index = " << index
-            << ", size = " << internal_object.size();
-        throw make_unique_exception<Out_of_range_exception>(oss.str());
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("positive index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     } else if (index < 0
                and static_cast<decltype(internal_object)::size_type>(-index)
                        > internal_object.size()) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "negative vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("negative index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     }
     if (index < 0) {
         offset = (static_cast<decltype(index)>(internal_object.size()) + index);
@@ -71,18 +71,26 @@ std::unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index)
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
     if (internal_object.size() == 0) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "empty vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("positive index " + std::to_string(index) + " with empty vector"));
     } else if (index > 0
                and static_cast<decltype(internal_object)::size_type>(index)
                        >= internal_object.size()) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "positive vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("positive index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     } else if (index < 0
                and static_cast<decltype(internal_object)::size_type>(-index)
                        > internal_object.size()) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "negative vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("negative index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     }
 
     if (index < 0) {
@@ -103,18 +111,26 @@ viua::types::Value* viua::types::Vector::at(long int index)
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
     if (internal_object.size() == 0) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "empty vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("positive index " + std::to_string(index) + " with empty vector"));
     } else if (index > 0
                and static_cast<decltype(internal_object)::size_type>(index)
                        >= internal_object.size()) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "positive vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("positive index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     } else if (index < 0
                and static_cast<decltype(internal_object)::size_type>(-index)
                        > internal_object.size()) {
-        throw make_unique_exception<Out_of_range_exception>(
-            "negative vector index out of range");
+        using viua::types::Exception;
+        throw std::make_unique<Exception>(
+            Exception::Tag{"Out_of_bounds"},
+            ("negative index " + std::to_string(index) + " with size "
+             + std::to_string(internal_object.size())));
     }
 
     if (index < 0) {
@@ -135,7 +151,10 @@ int viua::types::Vector::len()
     return static_cast<int>(internal_object.size());
 }
 
-std::string viua::types::Vector::type() const { return "Vector"; }
+std::string viua::types::Vector::type() const
+{
+    return type_name;
+}
 
 std::string viua::types::Vector::str() const
 {
@@ -158,7 +177,7 @@ bool viua::types::Vector::boolean() const
 std::unique_ptr<viua::types::Value> viua::types::Vector::copy() const
 {
     auto v = std::make_unique<Vector>();
-    for (unsigned i = 0; i < internal_object.size(); ++i) {
+    for (auto i = size_t{0}; i < internal_object.size(); ++i) {
         v->push(internal_object[i]->copy());
     }
     return v;
@@ -175,11 +194,20 @@ std::vector<std::unique_ptr<viua::types::Value>> const& viua::types::Vector::
     return internal_object;
 }
 
-viua::types::Vector::Vector() {}
+auto viua::types::Vector::expire() -> void
+{
+    for (auto& each : internal_object) {
+        each->expire();
+    }
+}
+
+viua::types::Vector::Vector()
+{}
 viua::types::Vector::Vector(const std::vector<viua::types::Value*>& v)
 {
     for (unsigned i = 0; i < v.size(); ++i) {
         internal_object.push_back(v[i]->copy());
     }
 }
-viua::types::Vector::~Vector() {}
+viua::types::Vector::~Vector()
+{}

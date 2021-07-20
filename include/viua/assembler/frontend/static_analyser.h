@@ -24,6 +24,7 @@
 #include <optional>
 #include <set>
 #include <string>
+
 #include <viua/assembler/frontend/parser.h>
 
 
@@ -124,8 +125,10 @@ class Register_usage_profile {
     auto fresh(Register const) const -> bool;
 
   public:
-    std::map<std::string, viua::bytecode::codec::register_index_type> name_to_index;
-    std::map<viua::bytecode::codec::register_index_type, std::string> index_to_name;
+    std::map<std::string, viua::bytecode::codec::register_index_type>
+        name_to_index;
+    std::map<viua::bytecode::codec::register_index_type, std::string>
+        index_to_name;
 
     auto define(Register const r,
                 viua::cg::lex::Token const t,
@@ -234,8 +237,9 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         return expected_type;
     }
 
-    auto actual_type =
+    auto const original_type =
         register_usage_profile.at(Register(register_index)).second.value_type;
+    auto actual_type = original_type;
 
     auto access_via_pointer_dereference =
         (register_index.as
@@ -263,10 +267,6 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
             throw error;
         }
 
-        /*
-         * Modify types only if they are defined.
-         * Tinkering with UNDEFINEDs will prevent inferencer from kicking in.
-         */
         if (actual_type != Value_types::UNDEFINED) {
             actual_type = (actual_type ^ Value_types::POINTER);
         }
@@ -288,18 +288,28 @@ auto assert_type_of_register(Register_usage_profile& register_usage_profile,
         return depointerise_type_if_needed(actual_type,
                                            access_via_pointer_dereference);
     }
-    if (not(actual_type & expected_type)) {
+
+    auto const type_matches = static_cast<bool>(actual_type & expected_type);
+    auto const is_pointer_type =
+        static_cast<bool>(original_type & Value_types::POINTER);
+    auto const pointerness_matches =
+        ((access_via_pointer_dereference and is_pointer_type)
+         or ((not access_via_pointer_dereference) and (not is_pointer_type)));
+    if ((not type_matches) or (not pointerness_matches)) {
         auto error =
             Traced_syntax_error{}
-                .append(Invalid_syntax(
-                            register_index.tokens.at(0),
-                            "invalid type of value contained in register")
+                .append(Invalid_syntax{
+                    register_index.tokens.at(0),
+                    "invalid type of value contained in register"}
                             .note("expected " + to_string(expected_type)
                                   + ", got " + to_string(actual_type)))
-                .append(Invalid_syntax(register_usage_profile.defined_where(
+                .append(Invalid_syntax{register_usage_profile.defined_where(
                                            Register(register_index)),
-                                       "")
+                                       ""}
                             .note("register defined here"));
+        // FIXME if a type is first references as a value, and then incorrectly
+        // as a pointer the error message does not include the "type inferred
+        // here" line
         if (auto r = register_usage_profile.at(Register(register_index)).second;
             r.inferred.first) {
             error.append(Invalid_syntax(r.inferred.second, "")
@@ -501,6 +511,12 @@ auto check_op_structat(Register_usage_profile& register_usage_profile,
                        Instruction const& instruction) -> void;
 auto check_op_structkeys(Register_usage_profile& register_usage_profile,
                          Instruction const& instruction) -> void;
+auto check_op_exception(Register_usage_profile& register_usage_profile,
+                        Instruction const& instruction) -> void;
+auto check_op_exception_tag(Register_usage_profile& register_usage_profile,
+                            Instruction const& instruction) -> void;
+auto check_op_exception_value(Register_usage_profile& register_usage_profile,
+                              Instruction const& instruction) -> void;
 auto check_op_io_read(Register_usage_profile& register_usage_profile,
                       Instruction const& instruction) -> void;
 auto check_op_io_write(Register_usage_profile& register_usage_profile,
@@ -526,6 +542,22 @@ auto check_register_usage_for_instruction_block_impl(Register_usage_profile&,
                                                      Instructions_block const&,
                                                      InstructionIndex,
                                                      InstructionIndex) -> void;
+
+struct Safe_result {
+    std::optional<viua::cg::lex::Unused_register> unused_register;
+    std::optional<viua::cg::lex::Unused_value> unused_value;
+    std::optional<viua::cg::lex::Invalid_syntax> invalid_syntax;
+    std::optional<viua::cg::lex::Traced_syntax_error> traced_syntax;
+
+    auto ok() const -> bool;
+    auto raise_if_any() -> void;
+};
+auto check_register_usage_for_instruction_block_impl_safe(
+    Register_usage_profile&,
+    Parsed_source const&,
+    Instructions_block const&,
+    InstructionIndex,
+    InstructionIndex) -> Safe_result;
 
 auto map_names_to_register_indexes(Register_usage_profile&,
                                    Instructions_block const&) -> void;

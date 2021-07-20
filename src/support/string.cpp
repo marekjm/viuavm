@@ -22,6 +22,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <viua/types/string.h>
 
 
@@ -102,7 +103,10 @@ auto is_boolean_literal(std::string const s) -> bool
     return (s == "true" or s == "false");
 }
 
-auto is_void(std::string const s) -> bool { return (s == "void"); }
+auto is_void(std::string const s) -> bool
+{
+    return (s == "void");
+}
 
 auto is_atom_literal(std::string const s) -> bool
 {

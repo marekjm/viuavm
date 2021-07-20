@@ -21,6 +21,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+
 #include <viua/bytecode/maps.h>
 #include <viua/tooling/errors/compile_time/errors.h>
 #include <viua/tooling/libs/lexer/classifier.h>
@@ -1538,6 +1539,15 @@ auto normalise(std::vector<Token> source) -> std::vector<Token>
                 break;
             case ATOM:
                 i += normalise_atom(tokens, vector_view{source, i});
+                break;
+            case EXCEPTION:
+                i += normalise_any_3_register_instruction(
+                    tokens, vector_view{source, i});
+                break;
+            case EXCEPTION_TAG:
+            case EXCEPTION_VALUE:
+                i += normalise_any_2_register_instruction(
+                    tokens, vector_view{source, i});
                 break;
             case IO_READ:
             case IO_WRITE:

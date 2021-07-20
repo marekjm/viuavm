@@ -333,9 +333,9 @@ enum OPCODE : uint8_t {
     FUNCTION,
 
     // Opcodes related to functions.
-    FRAME,  // create new frame (required before param and pamv) for future
-            // function call
-    CALL,   // call given function with parameters set in parameter register,
+    FRAME,     // create new frame (required before param and pamv) for future
+               // function call
+    CALL,      // call given function with parameters set in parameter register,
     TAILCALL,  // perform a tail call to a function
     DEFER,  // call a function just after the frame it was called in is popped
             // off the stack
@@ -428,6 +428,19 @@ enum OPCODE : uint8_t {
      *  structkeys {result} {source-struct-register}
      */
     STRUCTKEYS,
+
+    /*
+     * Create an exception.
+     */
+    EXCEPTION,
+    /*
+     * Obtain the tag of an exception.
+     */
+    EXCEPTION_TAG,
+    /*
+     * Obtain the value of an exception.
+     */
+    EXCEPTION_VALUE,
 
     IO_READ,
     IO_WRITE,
