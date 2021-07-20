@@ -1,0 +1,662 @@
+# Type hierarchy
+
+Types are separated into "fundamental" and "user-defined". User-defined types
+are built by combining fundamental types. A third category is "foreign types"
+which are written in the implementation language of the VM and are injected by
+foreign modules.
+
+--------------------------------------------------------------------------------
+
+# Fundamental types
+
+Operations manipulate values. Values may represent different types. The ISA
+defines a set of fundamental types, built-in into the VM itself.
+
+These fundamental types are further divided into simple, and compound types.
+
+The simple types are:
+
+- byte: an 8-bit unsigned integer representing raw data
+- bool: a boolean value representing either true (1) or false (0), all other
+  values may be implicitly converted to a boolean value
+- signed integer: A two's-complement signed integer, as wide as a register.
+- unsigned integer: An unsigned integer, as wide as a register.
+- float: A single-precision floating-point number (32 bit).
+- double: A double-precision floating-point number (64 bit).
+- bit vector: A sequence of bits, with user-defined width. Bit vectors allow
+  construction of such values as 8-bit or 16-bit integers or bit masks.
+- atom: A value representing itself.
+- pointer: An opaque value providing a reference to another value. Pointers are
+  checked for validity before use.
+
+The compound types are:
+
+- buffer: A variable-length array of values, mapping unsigned integer indexes
+  into values.
+- struct: A collection of fields of different types, mapping atom keys into
+  field values.
+
+Register width in current version of the VM is 64 bits.
+
+------------------------------------------------------------
+
+## Manipulation
+
+Values of fundamental types are manipulated using VM instructions. Some
+instructions are specific to a certain type (or set of types), but some are
+generic ie, moving, copying, and deleting values.
+
+### Moving
+
+Moving a value between registers is a simple operation and invisible to values.
+
+### Copying
+
+Copying a value between registers requires knowledge of the type's internals.
+Creating a copy is always deep ie, a copy is a full clone of an object and, in
+case of compound types, all its subobjects.
+
+### Deleting
+
+Deleting a value causes its memory to be freed. If a user-defined type requires
+additional actions to be performed before being deleted responsibility for
+invoking it lies with the user.
+
+--------------------------------------------------------------------------------
+
+# Foreign types
+
+Foreign types are written in the implementation language of the VM and
+manipulated using the FFI infrastructure.
+
+Foreign types MUST provide suitable overloads for copying and deletion.
+
+Foreign types SHOULD provide overloads for comparison, unless such operations do
+not make sense for them.
+
+If such a type intends to be used as a substitute for a fundamental type (eg, an
+integer with additional properties) it MUST implement all interfaces implemented
+by the fundamental type it substitutes.
+
+================================================================================
+
+# Registers
+
+There are at most N general purpose registers. Every function is responsible
+for allocating them itself using the "allocate_registers" instruction.
+
+General purpose register 0 is defined as the return-value register.
+
+There are also at most N function call registers used to pass arguments to a
+function. These are allocated using the "frame" instruction.
+
+In case of object-oriented code, argument register 0 is defined as the
+this-object register.
+
+The N is defined to be 2^8.
+
+## Register access
+
+ 0                   1
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| set |mod| res |     index     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Register sets (3 bits) as "set":
+
+- 000: void (ignored or defaulted value)
+- 001: local (general purpose)
+- 010: arguments (write-only from caller)
+- 011: parameters (read-only from callee)
+- 1__: reserved
+
+Access mode (2 bits) as "mod":
+
+- 00: direct
+- 01: pointer-dereference
+- 1_: reserved
+
+Reserved (3 bits) as "res".
+
+Index (8 bits) as "index".
+
+Written in code as:
+
+    ; direct access to general purpose register 42
+    delete %42
+
+    ; pointer-dereference of general purpose register 42 in the input field
+    bitnot %1, *42
+
+    ; pass-by-move from general purpose register 42 into frame register 0
+    move %frame(0), %42
+
+--------------------------------------------------------------------------------
+
+# Registers (alternative)
+
+There are several register sets available:
+
+- void: for ignored (of dest) or defaulted (of source) values
+- local: for local variables of a function
+- static: for static variables of a function
+- parameters: which stores the parameters the function expected to receive from
+  the caller
+- arguments: which stores the arguments made for the callee
+
+    000 void
+    001 local
+    010 static
+    100 parameters
+    101 arguments
+
+There are 5 register sets, so we need 3 bits to represent them all.
+
+> MAYBE "static" register set should be scrapped? It can be replaced by spawning
+> an actor which will accumulate and preserve values, and replacing direct calls
+> with message exchanges.
+>
+> This would reduce the number of different register sets to 4 and save 1 bit or
+> representation.
+
+There are two modes in which the register may be used:
+
+- direct: when the value is available directly from the register
+- pointer-dereference: when the value is available through a pointer stored in
+  the register
+
+There are 2 modes, so we need 1 bit to represent them.
+
+Apart from register set and mode, a register access spec also contains the
+register index. The register index is encoded on 8 bits.
+
+The total width of an encoded register access is 12 bits.
+
+================================================================================
+
+# Instruction encoding
+
+Instructions are encoded using 64-bit wide units.
+
+There are several kinds of instruction encodings, but they all follow a common
+theme: the lowest 16 bits are the opcode, and the rest (48 bits) are used to
+encode operands and flags.
+
+## 3-way register access kind (T format)
+
+eg, add, bitshl, eq
+
+- 16 bits opcode
+- 12 bits output register
+- 4 bits padding
+- 12 bits "left-hand" input register
+- 4 bits padding
+- 12 bits "right-hand" input register
+- 4 bits padding
+
+## 2-way register access kind (D format)
+
+eg, bitswidth, bitnot, conversion instructions, copy, exception, exception_tag
+
+- 16 bits opcode
+- 12 bits output register
+- 4 bits padding
+- 12 bits input register
+- 4 bits padding
+- 16 bits overhead
+
+## 1-way register access kind (S format)
+
+eg, delete, self, throw, struct, buffer
+
+- 16 bits opcode
+- 12 bits output register
+- 4 bits padding
+- 32 bits overhead
+
+## 1-way register access, 32-bit wide immediate (F format)
+
+ie, float
+
+- 16 bits opcode
+- 12 bits output register
+- 4 bits padding
+- 32 bits of immediate value
+
+## 1-way register access, 36-bit wide immediate (E format)
+
+eg, atom, function, closure, catch (for string table offset)
+eg, lui
+
+- 16 bits opcode
+- 12 bits output register
+- 36 bits of immediate value
+
+Offset calculation: (offset * 8)
+Strings in strings table are aligned on 8 bytes.
+
+## 2-way register access, 24-bit wide immediate (R format)
+
+eg, addi
+
+- 16 bits opcode
+- 12 bits output register
+- 4 high nibble of highest byte of immediate
+- 12 bits output register
+- 4 low nibble of highest byte of immediate
+- 16 bits lowest of immediate value
+
+HOW TO construct a 64-bit unsigned integer?
+
+    li %i, 0xdeadbeefdeadbeef
+
+...expands to:
+
+    g.lui   %i,     0xdeadbeefd  ; highest 36 bits: Greedy Load Upper Immediate
+    g.addiu %i, %i, ...          ; Greedy Add Immediate Unsigned
+    addiu   %i, %i, ...          ; Add Immediate Unsigned
+
+The g.addiu and addiu instructions add the rest of the integer. Whatever is left
+in lower 28 bits is divided by half, and loaded in two instructions.
+
+HOW TO construct a 64-bit signed integer?
+
+Load it as an unsigned and use signed instructions during arithmetic.
+
+## no operands
+
+eg, nop, return
+
+- 16 bits opcode
+- 48 bits overhead
+
+================================================================================
+
+# No operation, no operands
+
+These instructions do not do anything and may act as placeholders or
+padding.
+
+- nop
+- ebreak
+
+--------------------------------------------------------------------------------
+
+# Register-size integer arithmetic
+
+These instructions operate on register-bits wide integers. Their operands are
+raw integers, but each instruction may choose to interpret them as signed or
+unsigned.
+
+- integer %rx, <val>    Constructs an integer with value <val> in register rx.
+                        The value is sign-extended to match register width.
+                        Values too big to be stored cause a compilation error.
+
+- add %ro, %rl, %rr     Adds integer in %rl to integer in register %rr and
+                        stores the result in register %ro. If the result exceeds
+                        the range of possible values stored in a register the
+                        result is either wrapped-around (default), saturated, or
+                        traps, depending on the ARITHMETIC_OVERFLOW processor
+                        setting.
+- sub %ro, %rl, %rr     ditto, subtraction
+- mul %ro, %rl, %rr     ditto, multiplication
+- div %ro, %rl, %rr     ditto, division
+- mod %ro, %rl, %rr     ditto, division remainder
+
+- addi %ro, <val>       Adds an immediate <val> to integer in register $rs and
+                        stores the result in register %ro. <val> MUST be at most
+                        32 bits, and is sign-extended before being added to the
+                        value in %rs.
+- subi %ro, <val>       ditto, subtraction
+- muli %ro, <val>       ditto, multiplication
+- divi %ro, <val>       ditto, division
+- modi %ro, <val>       ditto, division remainder
+
+FIXME What about unsigned values?
+
+--------------------------------------------------------------------------------
+
+# Defined-width integer arithmetic
+
+These instructions operate on defined-width integers. Their input operands may
+be of different widths, but their outputs inherit the width of the right-hand
+side operand (default), or are extended to accommodate the results value
+depending on the BIT_ARITHMETIC_OVERFLOW processor setting.
+
+- bits  %ro, %rs        Create a defined-width bit vector in register %ro. The
+                        width is specified by an unsigned integer in register
+                        %rs.
+- bitsofi %ro, %rs      Convert an integer in register %rs to a bit vector and
+                        store the result in register %ro. Width of the resulting
+                        bit vector is equal to register width.
+- bitsi %ro, <val>      Create a defined-width bit vector in register %ro. The
+                        result is the shortest possible bit vector that can
+                        store the desired value. The width is rounded-up to a
+                        full nibble, and the result is sign-extended if the
+                        rounding occured.
+- bitswidth %rw, %rb    Check the size of bit vector in register %rb. Store the
+                        result in register %rw.
+
+- bitadd %ro, %rl, %rr  Adds bit vector value in register %rr to bit vector
+                        value in register %rl, and stores the result in register
+                        %ro. If the result exceeds the range of left-hand side
+                        operand the result is either wrapped-around (default),
+                        saturated, traps, or is extended depending on the
+                        BIT_ARITHMETIC_OVERFLOW processor setting.
+- bitsub %ro, %rl, %rr  ditto, subtraction
+- bitmul %ro, %rl, %rr  ditto, multiplication
+- bitdiv %ro, %rl, %rr  ditto, division
+- bitmod %ro, %rl, %rr  ditto, division remainder
+
+The following code:
+
+    bitsi %1, 0xdead
+    bitsi %2, 0xbeef
+    bitadd.wrap %1, %1, %2
+
+...implements fixed-widdth wrapping arithmetic. The other suffixes possible for
+bit arithmetic are:
+
+- ".trap" for signed, checked arithmetic
+- ".utrap" for unsigned, checked arithmetic
+- ".saturate" for signed, saturating arithmetic
+- ".usaturate" for unsigned, saturating arithmetic
+
+--------------------------------------------------------------------------------
+
+# Bit operations
+
+Bit operations operate on bit vectors, not integers. However, integer values in
+input registers are transparently converted into bit vectors by bit manipulation
+instructions. No such conversion takes place on output, so even if the input is
+an integer the output will be a bit vector.
+
+- bitshl %rr, %rv, %ro  Shift the bit vector in register %rv left by offset
+                        specified by unsigned integer in register %ro. Store the
+                        result in register %rr. Zeroes are shifted in on the
+                        right.
+- bitshr %rr, %rv, %ro  ditto, but shift right
+- bitashr %rr, %rv, %ro Performm an arithmetic right shift of the bit vector in
+                        register %rv by offset specified by unsigned integer in
+                        register %ro. Store the result in register %rr. The bit
+                        vector is sign-extended.
+- bitrol %rr, %rv, %ro  Rotate the bit vector in register %rv left by offset
+                        specified by unsigned integer in register %ro. Store
+                        result in register %rr.
+- bitror %rr, %rv, %ro  ditto, but rotate right
+
+- bitand %ro, %rl, %rr  Perform a bitwise-and of bit vectors in in registers %rr
+                        and %rl as if (rl & rr). Store the result in register
+                        %ro.
+                        If the widths of bit vectors in registers %rr and %rl
+                        are not the same, the result inherits the width of the
+                        left-hand bit vector. If the right-hand side bit vector
+                        is shorter it is zero-extended; otherwise it is clipped.
+- bitor %ro, %rl, %rr   ditto, but bitwise-or
+- bitxor %ro, %rl, %rr  ditto, but bitwise-exclusive-or
+- bitnot %ro, %ri       Produce a bitwise negation of the bit vector in register
+                        %ri and store the result in register %ro.
+
+- bitcut %rt, %rb, %re  Extract a slice of the bit vector %rt and store the
+                        result in the same register. The slice contains bits
+                        from index B and the next E positions, so from [B, B+E].
+                        B is an unsigned integer loaded from register %rb. E is
+                        an unsigned integer loaded from register %re.
+                        If %rb is void, B is 0.
+                        If %re is void, E is set to cut to the end of vector.
+
+The following code will extract bits [4,11] from a 16-bit vector:
+
+    bits %1, %0 parameters
+    integer %2, 4
+    integer %3, 8
+    bitcut %1, %2, %3
+
+--------------------------------------------------------------------------------
+
+# Logic operations
+
+- eq %ro, %rl, %rr      Compare values in registers %rl and %rr for equality. In
+                        case of buffer values compare element values. In case of
+                        struct values throw an exception. In case of values of
+                        foreign types call
+                        viuavm::traits::operators::Eq
+- lt %ro, %rl, %rr      ditto, but less-than relation. In case of values of
+                        foreign types call
+                        viuavm::traits::operators::Lt
+- gt %ro, %rl, %rr      ditto, but greater-than relation. In case of values of
+                        foreign types call
+                        viuavm::traits::operators::Gt
+- cmp %ro, %rl, %rr     ditto, but using generalised comparison. In case of
+                        values of foreign types call
+                        viuavm::traits::operators::Cmp
+
+--------------------------------------------------------------------------------
+
+# Floating-point arithmetic
+
+These instructions operate on floating point values.
+
+- float %rx, <val>      Constructs a floating point value <val> in register %rx.
+                        The value is a single-precision float (ie, C float).
+- double %rx, <val>     Constructs a floating point value <val> in register %rx.
+                        The value is a double-precision float (ie, C double).
+
+The `add`, `sub`, `mul`, and `div` opcodes are reused for floating point values
+and retain their meaning. Only the types they consume and produce change.
+
+add: viua::traits::operators::Plus
+sub: viua::traits::operators::Minus
+mul: viua::traits::operators::Star
+div: viua::traits::operators::Slash
+
+    /*
+     * Example implementation of the "add" opcode.
+     */
+    using Op = viua::traits::operators::Plus;
+
+    auto lhs = dynamic_cast<Op*>(lhr.get());
+    auto result = lhs(rhr.get());
+
+--------------------------------------------------------------------------------
+
+# Conversions between primitive types
+
+Floats, integers, booleans, timepoints, timevals.
+
+- integer_of_float %rr, %rs
+                        Convert floating-point value (single- or
+                        double-precision) in register %rs to an integer value,
+                        and put the result in register %rr.
+- float_of_integer %rr, %rs
+                        Convert integer value in register %rs to a
+                        single-precision floating-point value, and put the
+                        result in register %rr.
+- double_of_integer %rr, %rs
+                        Convert integer value in register %rs to a
+                        double-precision floating-point value, and put the
+                        result in register %rr.
+
+--------------------------------------------------------------------------------
+
+# Operations on atoms
+
+There are only two useful operations on atoms themselves: creating them and
+comparing them for equality (using the overloaded "eq" instruction).
+
+- atom %ra, <val>       Store atom <val> in register %ra.
+
+Since atoms may represent symbolic names for things, they are also used for
+struct field access operations.
+
+--------------------------------------------------------------------------------
+
+# Generic register operations
+
+Copies, moves, deletes.
+
+- copy %ro, %ri         Copy a value from register %ro, to register %ri.
+- move %ro, %ri         Move a value from register %ro, to register %ri.
+- swap %ro, %ri         Swap values between registers %ro and %ri.
+- delete %ri            Delete a value from register %ri.
+                        viua::traits::Delete
+
+--------------------------------------------------------------------------------
+
+# Pointers
+
+Pointers make it possible to pass values without copying, and add a degree of
+indirection to other places in the ISA. There are two main instructions for
+this:
+
+- ptr %rp, %rs          Create a pointer to a value located in register %rs and
+                        put the pointer in register %rp.
+- ptrlive %rl, %rp      Check if the pointer in register %rp is live, and return
+                        the result in register %rl.
+
+--------------------------------------------------------------------------------
+
+# Structure operations
+
+Allocation, field access.
+
+- struct %rx            Store an empty struct in register %rx.
+- struct_at %rr, %rs, %rf
+                        Get a pointer to the value of a field in the struct in
+                        register %rs. The name of the field is specified by the
+                        atom in register %rf. The pointer is stored in register
+                        %rr.
+- struct_insert %rs, %rf, %rv
+                        Set value of a field in the struct in register %rr. The
+                        name of the field is specified by the atom in register
+                        %rf. The value of the field is moved from register %rv.
+- struct_remove %rv, %rs, %rf
+                        Remove a field from the struct in register %rr. The
+                        name of the field is specified by the atom in register
+                        %rf. The value of the field is moved to register %rv, or
+                        dropped if the register is given as void.
+
+--------------------------------------------------------------------------------
+
+# Buffer operations
+
+Buffers are variable-length arrays used as the basic type for holding many
+values (usually of the same type).
+
+- buffer %rb            Create an buffer in register %rb.
+- buffer_push %rb, %rv  Push the value from register %rv to the end of the
+                        buffer in register %rb. The value is moved.
+- buffer_insert %rb, %rv, %ri
+                        Insert the value from register %rv into the buffer in
+                        register %rb at index specified by the integer in
+                        register %ri. The integer is unsigned. The value is
+                        moved. If %ri is void the value is inserted at the
+                        beginning of the buffer.
+- buffer_at %rp, %rb, %ri
+                        Get a pointer to the value of an index in the buffer in
+                        register %rb. The index is specified by the integer in
+                        register %ri. The pointer is stored in register %rp.
+- buffer_pop %rv, %rb, %ri
+                        Remove a value from the buffer in register %rb. The
+                        value is removed from the index specified by the integer
+                        in register %ri. If %ri is void, the value is removed
+                        from the end of the buffer. The value is stored in
+                        register %rv, or dropped if it is void.
+- buffer_size %rs, %rb  Obtain the size (ie, number of elements) of the buffer
+                        in register %rb and store the unsigned integer
+                        representing it in register %rs.
+
+--------------------------------------------------------------------------------
+
+# Function calls and closures
+
+Synchronous call, tail call, actor call.
+
+- function %rf, <fn>    Create a function value representing function <fn> from.
+                        Store the function in register %rf.
+- frame %ra             Create a call frame. The number of argument registers is
+                        specified directly in the operand if the direct access
+                        mode is used; or indirectly if the pointer-dereference
+                        access mode is used.
+- call %rr, %rf         Call the function from register %rf and store the result
+                        of the call in register %rr.
+- tailcall %rf          Call the function from register %rf replacing the
+                        current call frame.
+- defer %rf             Defer the call to function from register %rf until the
+                        current stack frame is removed from the stack.
+
+Closures.
+
+- closure %rc, <fn>     Create a closure value from closure <fn> and store it in
+                        register %rc.
+- closure_copy %rc, %ri, %ro
+                        Copy the value in register %ro into register %ri in the
+                        closure in register %rc.
+- closure_move %rc, %ri, %ro
+                        Move the value in register %ro into register %ri in the
+                        closure in register %rc.
+
+--------------------------------------------------------------------------------
+
+# Actor management and communication
+
+Message sends and receives. Actor rendez-vous.
+
+- actor %rp, %rf        Call the function from register %rf in a new actor, and
+                        store PID of the actor in register %rp. The process is
+                        "monitored" by default, it is unmonitored by default if
+                        the %rp operand is void.
+- actor_link %rold, %rp, %rnew
+                        Instruct the VM to deliver signals to calling actor when
+                        status of the actor described by PID in register %rp
+                        changes. If %rold is not void, store previous settings
+                        in this register. Current link settings are taken from
+                        register %rnew, unless %rnew is void.
+                        It is illegal for both %rold and %rnew to be void.
+- actor_join %rv, %rp, %rt
+                        Wait until the process with PID specified in register
+                        %rp exits, and store the result of its work in register
+                        %rv. If %rt is not void it specifies the register which
+                        contains the timeout to use.
+- self %rp              Store the PID of the current process in register %rp.
+- send %rp, %rv         Send a message to the actor with PID in register %rp.
+                        The message to be sent is a copy of the value in
+                        register %rv.
+- receive %rv, %rt      Receive a message from the mailbox and put it in
+                        register %rv. If no message is available wait until the
+                        timeout in register %rt passes; the time to wait is
+                        infinite if the %rt operands is void.
+
+--------------------------------------------------------------------------------
+
+# I/O requests
+
+Requesting, awaiting, checking status, cancelling, etc.
+
+- io_read %rd, %rp, %ro     Request a read-style operation described by object
+                            in register %ro to be performed by I/O port stored
+                            in register %rp. The resulting request descriptor is
+                            stored in register %rd.
+- io_write %rd, %rp, %ro    ditto, for write requests
+- io_do %rd, %rp, %ro       Request an arbitrary I/O operation described by
+                            object in register %ro to be performed by I/O port
+                            stored in register %rp. The resulting request
+                            descriptor is stored in register %rd. This is
+                            similar to the ioctl(2) mechanism of POSIX systems.
+- io_cancel %rd             Cancel an outstanding I/O operation described by
+                            object in register %rd. This is an inherently racy
+                            operation as the I/O request may have already been
+                            carried out and the outside world may have been
+                            affected.
+- io_await %rd, %rt         Wait until the I/O request described by request
+                            descriptor in register %rd changes status, but no
+                            longer than the time specified by limiting object in
+                            register %rt.
+- io_awaitv %rd, %rt        Same as io_await, but %rd is a vector of request
+                            descriptors.
+- io_status %rs, %rd        Fetch status of I/O request described by request
+                            descriptor in register %rd. FIXME Maybe merge this
+                            with the io_await opcode?
+- io_shutdown %rd, %rp
+- io_close %rd, %rp
