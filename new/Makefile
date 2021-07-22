@@ -3,7 +3,7 @@ BUILD=./build
 PREFIX=~/.local
 
 CXX = g++
-CXXSTD=c++17
+CXXSTD=c++20
 
 CXXFLAGS_OPTIMISATION=-g
 
