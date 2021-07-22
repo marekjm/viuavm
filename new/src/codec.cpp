@@ -486,10 +486,14 @@ namespace machine::ops {
 
     struct LUI : Op {
         codec::formats::E instruction;
+
+        LUI(codec::formats::E i): instruction{i} {}
     };
 
-    struct ADDI : Op {
+    struct ADDIU : Op {
         codec::formats::R instruction;
+
+        ADDIU(codec::formats::R i): instruction{i} {}
     };
 }
 
@@ -716,6 +720,15 @@ auto main() -> int
     std::cout << machine::arch::to_string(0x1003) << "\n";
     std::cout << machine::arch::to_string(0x1004) << "\n";
     std::cout << machine::arch::to_string(0x5001) << "\n";
+
+    {
+        auto registers = std::vector<Value>(256);
+
+        op_li(registers, 0xdeadbeefdeadbeef);
+
+        std::cout << std::hex << std::setw(16) << std::setfill('0')
+            << std::get<uint64_t>(registers.at(1).value) << "\n";
+    }
 
     return 0;
 }
