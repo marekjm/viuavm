@@ -4,11 +4,12 @@
 #include <iomanip>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 #include <utility>
 
 
-namespace machine {
+namespace machine::arch {
     using opcode_type = uint16_t;
 
     constexpr auto GREEDY = opcode_type{0x8000};
@@ -58,8 +59,9 @@ namespace machine {
         Parameters,
         Arguments,
     };
+    using Rs = Register_set;
 }
-namespace machine {
+namespace machine::arch {
     auto to_string(opcode_type const raw) -> std::string
     {
         static auto const OP_TO_NAME = std::map<Opcode, std::string>{
@@ -87,12 +89,12 @@ namespace machine {
 
 namespace codec::formats {
     struct Register_access {
-        machine::Register_set const set;
+        machine::arch::Register_set const set;
         bool const direct;
         uint8_t const index;
 
         Register_access();
-        Register_access(machine::Register_set const, bool const, uint8_t const);
+        Register_access(machine::arch::Register_set const, bool const, uint8_t const);
 
         static auto decode(uint16_t const) -> Register_access;
         auto encode() const -> uint16_t;
@@ -104,7 +106,7 @@ namespace codec::formats {
 
         inline auto is_legal() const -> bool
         {
-            if (set == machine::Register_set::Void and not direct and index != 0) {
+            if (set == machine::arch::Register_set::Void and not direct and index != 0) {
                 return false;
             }
             return true;
@@ -112,9 +114,11 @@ namespace codec::formats {
 
         inline auto is_void() const -> bool
         {
-            return (set == machine::Register_set::Void);
+            return (set == machine::arch::Register_set::Void);
         }
     };
+    using Ra = Register_access;
+    auto make_local_access(uint8_t const, bool const = true);
 
     /*
      * All instructions are encoded in a single encoding unit which is 64 bits
@@ -126,13 +130,13 @@ namespace codec::formats {
      * Three-way (triple) register access.
      */
     struct T {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
         Register_access const lhs;
         Register_access const rhs;
 
         T(
-              machine::opcode_type const
+              machine::arch::opcode_type const
             , Register_access const
             , Register_access const
             , Register_access const
@@ -146,12 +150,12 @@ namespace codec::formats {
      * Two-way (double) register access.
      */
     struct D {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
         Register_access const in;
 
         D(
-              machine::opcode_type const
+              machine::arch::opcode_type const
             , Register_access const
             , Register_access const
         );
@@ -164,11 +168,11 @@ namespace codec::formats {
      * One-way (single) register access.
      */
     struct S {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
 
         S(
-              machine::opcode_type const
+              machine::arch::opcode_type const
             , Register_access const
         );
 
@@ -181,19 +185,19 @@ namespace codec::formats {
      * "F" because it is used for eg, floats.
      */
     struct F {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
         uint32_t const immediate;
 
         F(
-              machine::opcode_type const op
+              machine::arch::opcode_type const op
             , Register_access const o
             , uint32_t const i
         );
 
         template<typename T>
         static auto make(
-              machine::opcode_type const op
+              machine::arch::opcode_type const op
             , Register_access const o
             , T const v
         ) -> F
@@ -213,12 +217,12 @@ namespace codec::formats {
      * "E" because it is "extended" immediate, 4 bits longer than the F format.
      */
     struct E {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
         uint64_t const immediate;
 
         E(
-              machine::opcode_type const op
+              machine::arch::opcode_type const op
             , Register_access const o
             , uint64_t const i
         );
@@ -232,13 +236,13 @@ namespace codec::formats {
      * "R" because it is "reduced" immediate, 8 bits shorter than the F format.
      */
     struct R {
-        machine::opcode_type opcode;
+        machine::arch::opcode_type opcode;
         Register_access const out;
         Register_access const in;
         uint32_t const immediate;
 
         R(
-              machine::opcode_type const
+              machine::arch::opcode_type const
             , Register_access const
             , Register_access const
             , uint32_t const
@@ -251,18 +255,18 @@ namespace codec::formats {
 
 namespace codec::formats {
     Register_access::Register_access()
-        : set{machine::Register_set::Void}
+        : set{machine::arch::Register_set::Void}
         , direct{true}
         , index{0}
     {}
-    Register_access::Register_access(machine::Register_set const s, bool const d, uint8_t const i)
+    Register_access::Register_access(machine::arch::Register_set const s, bool const d, uint8_t const i)
         : set{s}
         , direct{d}
         , index{i}
     {}
     auto Register_access::decode(uint16_t const raw) -> Register_access
     {
-        auto set = static_cast<machine::Register_set>((raw & 0x0e00) >> 9);
+        auto set = static_cast<machine::arch::Register_set>((raw & 0x0e00) >> 9);
         auto direct = static_cast<bool>(raw & 0x0100);
         auto index = static_cast<uint8_t>(raw & 0x00ff);
         return Register_access{set, direct, index};
@@ -274,10 +278,15 @@ namespace codec::formats {
         auto rset = static_cast<uint16_t>(set);
         return base | (mode << 8) | (rset << 9);
     }
+
+    auto make_local_access(uint8_t const index, bool const direct)
+    {
+        return Register_access{machine::arch::Rs::Local, direct, index};
+    }
 }
 namespace codec::formats {
     T::T(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
         , Register_access const l
         , Register_access const r
@@ -289,7 +298,7 @@ namespace codec::formats {
     {}
     auto T::decode(eu_type const raw) -> T
     {
-        auto opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         auto lhs = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
         auto rhs = Register_access::decode((raw & 0xffff000000000000) >> 48);
@@ -309,7 +318,7 @@ namespace codec::formats {
 }
 namespace codec::formats {
     D::D(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
         , Register_access const i
     )
@@ -319,7 +328,7 @@ namespace codec::formats {
     {}
     auto D::decode(eu_type const raw) -> D
     {
-        auto opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         auto in = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
         return D{opcode, out, in};
@@ -336,7 +345,7 @@ namespace codec::formats {
 }
 namespace codec::formats {
     S::S(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
     )
         : opcode{op}
@@ -344,7 +353,7 @@ namespace codec::formats {
     {}
     auto S::decode(eu_type const raw) -> S
     {
-        auto opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         return S{opcode, out};
     }
@@ -357,7 +366,7 @@ namespace codec::formats {
 }
 namespace codec::formats {
     F::F(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
         , uint32_t const i
     )
@@ -367,7 +376,7 @@ namespace codec::formats {
     {}
     auto F::decode(eu_type const raw) -> F
     {
-        auto opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         auto value = static_cast<uint32_t>(raw >> 32);
         return F{opcode, out, value};
@@ -382,7 +391,7 @@ namespace codec::formats {
 }
 namespace codec::formats {
     E::E(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
         , uint64_t const i
     )
@@ -392,7 +401,7 @@ namespace codec::formats {
     {}
     auto E::decode(eu_type const raw) -> E
     {
-        auto const opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto const opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto const out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         auto const high = (((raw >> 28) & 0xf) << 32);
         auto const low = ((raw >> 32) & 0x00000000ffffffff);
@@ -413,7 +422,7 @@ namespace codec::formats {
 }
 namespace codec::formats {
     R::R(
-          machine::opcode_type const op
+          machine::arch::opcode_type const op
         , Register_access const o
         , Register_access const i
         , uint32_t const im
@@ -425,7 +434,7 @@ namespace codec::formats {
     {}
     auto R::decode(eu_type const raw) -> R
     {
-        auto const opcode = static_cast<machine::opcode_type>(raw & 0x000000000000ffff);
+        auto const opcode = static_cast<machine::arch::opcode_type>(raw & 0x000000000000ffff);
         auto const out = Register_access::decode((raw & 0x00000000ffff0000) >> 16);
         auto const in = Register_access::decode((raw & 0x0000ffff00000000) >> 32);
 
@@ -513,14 +522,52 @@ auto to_loading_parts_unsigned(uint64_t const value) -> std::pair<uint64_t, std:
     return { high_part, addis };
 }
 
+struct Value {
+    bool boxed { false };
+    std::variant<uint64_t, void*> value;
+};
+
+namespace {
+    auto execute(std::vector<Value>& registers, machine::ops::LUI const op) -> void
+    {
+        auto& value = registers.at(op.instruction.out.index);
+        value.value = (op.instruction.immediate << 28);
+    }
+    auto execute(std::vector<Value>& registers, machine::ops::ADDIU const op) -> void
+    {
+        auto& value = registers.at(op.instruction.out.index);
+        value.value = (std::get<uint64_t>(value.value) + op.instruction.immediate);
+    }
+    auto op_li(std::vector<Value>& registers, uint64_t const value) -> void
+    {
+        auto const parts = to_loading_parts_unsigned(value);
+
+        execute(registers, machine::ops::LUI{codec::formats::E{
+            (machine::arch::GREEDY
+             | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::LUI))
+            , codec::formats::make_local_access(1)
+            , parts.first
+        }});
+        for (auto const each : parts.second) {
+            // FIXME make all but last instruction greedy
+            execute(registers, machine::ops::ADDIU{codec::formats::R{
+                  static_cast<machine::arch::opcode_type>(machine::arch::Opcode::LUI)
+                , codec::formats::make_local_access(1)
+                , codec::formats::make_local_access(1)
+                , each
+            }});
+        }
+    }
+}
+
 auto main() -> int
 {
     {
         auto const tm = codec::formats::T{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0xff}
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0x01}
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0x02}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0xff}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0x01}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0x02}
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
         auto const td = codec::formats::T::decode(tm.encode());
@@ -534,8 +581,8 @@ auto main() -> int
     {
         auto const tm = codec::formats::D{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0xff}
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0x01}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0xff}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0x01}
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
         auto const td = codec::formats::D::decode(tm.encode());
@@ -548,7 +595,7 @@ auto main() -> int
     {
         auto const tm = codec::formats::S{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0xff}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0xff}
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
         auto const td = codec::formats::S::decode(tm.encode());
@@ -565,7 +612,7 @@ auto main() -> int
 
         auto const tm = codec::formats::F{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0xff}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0xff}
             , imm_in
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
@@ -584,7 +631,7 @@ auto main() -> int
     {
         auto const tm = codec::formats::E{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0xff}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0xff}
             , 0xabcdef012
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
@@ -598,8 +645,8 @@ auto main() -> int
     {
         auto const tm = codec::formats::R{
               0xdead
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0x55}
-            , codec::formats::Register_access{machine::Register_set::Local, true, 0x22}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0x55}
+            , codec::formats::Register_access{machine::arch::Register_set::Local, true, 0x22}
             , 0xabcdef
         };
         std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
@@ -661,14 +708,14 @@ auto main() -> int
         }
     }
 
-    std::cout << machine::to_string(0x0000) << "\n";
-    std::cout << machine::to_string(0x0001) << "\n";
-    std::cout << machine::to_string(0x1001) << "\n";
-    std::cout << machine::to_string(0x9001) << "\n";
-    std::cout << machine::to_string(0x1002) << "\n";
-    std::cout << machine::to_string(0x1003) << "\n";
-    std::cout << machine::to_string(0x1004) << "\n";
-    std::cout << machine::to_string(0x5001) << "\n";
+    std::cout << machine::arch::to_string(0x0000) << "\n";
+    std::cout << machine::arch::to_string(0x0001) << "\n";
+    std::cout << machine::arch::to_string(0x1001) << "\n";
+    std::cout << machine::arch::to_string(0x9001) << "\n";
+    std::cout << machine::arch::to_string(0x1002) << "\n";
+    std::cout << machine::arch::to_string(0x1003) << "\n";
+    std::cout << machine::arch::to_string(0x1004) << "\n";
+    std::cout << machine::arch::to_string(0x5001) << "\n";
 
     return 0;
 }
