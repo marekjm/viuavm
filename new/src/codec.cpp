@@ -7,12 +7,13 @@
 #include <variant>
 #include <vector>
 #include <utility>
+#include <type_traits>
 
 
 namespace machine::arch {
     using opcode_type = uint16_t;
+    using instruction_type = uint64_t;
 
-    constexpr auto GREEDY = opcode_type{0x8000};
     constexpr auto FORMAT_N = opcode_type{0x0000};
     constexpr auto FORMAT_T = opcode_type{0x1000};
     constexpr auto FORMAT_D = opcode_type{0x2000};
@@ -21,7 +22,29 @@ namespace machine::arch {
     constexpr auto FORMAT_E = opcode_type{0x5000};
     constexpr auto FORMAT_R = opcode_type{0x6000};
 
+    /*
+     * Create an enum to make use of switch statement's exhaustiveness checks.
+     * Without an enum the compiler will not perform them. The intended usage
+     * is:
+     *
+     *  - FORMAT::X whenever a strong check is needed (ie, in switch statement)
+     *  - FORMAT_X whenever an integer is needed
+     *
+     * static_cast between them as appropriate.
+     */
+    enum class FORMAT : opcode_type {
+        N = FORMAT_N,
+        T = FORMAT_T,
+        D = FORMAT_D,
+        S = FORMAT_S,
+        F = FORMAT_F,
+        E = FORMAT_E,
+        R = FORMAT_R,
+    };
+
+    constexpr auto GREEDY = opcode_type{0x8000};
     constexpr auto OPCODE_MASK = opcode_type{0x7fff};
+    constexpr auto FORMAT_MASK = opcode_type{0x7000};
 
     enum class Opcode : opcode_type {
         NOOP   = (FORMAT_N | 0x0000),
@@ -35,8 +58,23 @@ namespace machine::arch {
         LUI    = (FORMAT_E | 0x0001),
 
         ADDI   = (FORMAT_R | 0x0001),
+        ADDIU  = (FORMAT_R | 0x0002),
     };
     auto to_string(opcode_type const) -> std::string;
+
+    enum class OPCODE_T : opcode_type {
+        ADD = static_cast<opcode_type>(Opcode::ADD),
+        SUB = static_cast<opcode_type>(Opcode::SUB),
+        MUL = static_cast<opcode_type>(Opcode::MUL),
+        DIV = static_cast<opcode_type>(Opcode::DIV),
+    };
+    enum class OPCODE_E : opcode_type {
+        LUI = static_cast<opcode_type>(Opcode::LUI),
+    };
+    enum class OPCODE_R : opcode_type {
+        ADDI = static_cast<opcode_type>(Opcode::ADDI),
+        ADDIU = static_cast<opcode_type>(Opcode::ADDIU),
+    };
 
     enum class Register_set {
         /*
@@ -74,6 +112,9 @@ namespace machine::arch {
             , { Opcode::DIV, "div" }
 
             , { Opcode::LUI, "lui" }
+
+            , { Opcode::ADDI, "addi" }
+            , { Opcode::ADDIU, "addiu" }
         };
 
         auto const greedy = static_cast<bool>(raw & GREEDY);
@@ -119,6 +160,7 @@ namespace codec::formats {
     };
     using Ra = Register_access;
     auto make_local_access(uint8_t const, bool const = true);
+    auto make_void_access();
 
     /*
      * All instructions are encoded in a single encoding unit which is 64 bits
@@ -283,6 +325,10 @@ namespace codec::formats {
     {
         return Register_access{machine::arch::Rs::Local, direct, index};
     }
+    auto make_void_access()
+    {
+        return Register_access{machine::arch::Rs::Void, true, 0};
+    }
 }
 namespace codec::formats {
     T::T(
@@ -442,9 +488,9 @@ namespace codec::formats {
         auto const low_nibble  = static_cast<uint32_t>((raw & 0x0000f00000000000) >> 44);
         auto const high_nibble = static_cast<uint32_t>((raw & 0x00000000f0000000) >> 28);
 
-        auto const value = low_short | (low_nibble << 16) | (high_nibble << 20);
+        auto const immediate = low_short | (low_nibble << 16) | (high_nibble << 20);
 
-        return R{opcode, out, in, value};
+        return R{opcode, out, in, immediate};
     }
     auto R::encode() const -> eu_type
     {
@@ -454,18 +500,18 @@ namespace codec::formats {
 
         auto const high_nibble = uint64_t{(immediate & 0x00f00000) >> 20};
         auto const low_nibble  = uint64_t{(immediate & 0x000f0000) >> 16};
-        auto const low_short   = uint64_t{immediate & 0x0000ffff};
+        auto const low_short   = uint64_t{(immediate & 0x0000ffff) >> 0};
 
         return base
             | (output_register << 16)
-            | (input_register << 32)
-            | (low_short << 48)
-            | (high_nibble << 28)
-            | (low_nibble << 44);
+            | (input_register  << 32)
+            | (low_short       << 48)
+            | (high_nibble     << 28)
+            | (low_nibble      << 44);
     }
 }
 
-namespace machine::ops {
+namespace machine::arch::ops {
     struct Op {};
 
     struct NOOP : Op {};
@@ -473,12 +519,16 @@ namespace machine::ops {
 
     struct ADD : Op {
         codec::formats::T instruction;
+
+        ADD(codec::formats::T i): instruction{i} {}
     };
     struct SUB : Op {
         codec::formats::T instruction;
     };
     struct MUL : Op {
         codec::formats::T instruction;
+
+        MUL(codec::formats::T i): instruction{i} {}
     };
     struct DIV : Op {
         codec::formats::T instruction;
@@ -497,33 +547,33 @@ namespace machine::ops {
     };
 }
 
-auto to_loading_parts_unsigned(uint64_t const value) -> std::pair<uint64_t, std::vector<uint32_t>>
+auto to_loading_parts_unsigned(uint64_t const value)
+    -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>
 {
-    constexpr auto LOW_24 = uint64_t{0x0000000000ffffff};
+    constexpr auto LOW_24  = uint64_t{0x0000000000ffffff};
     constexpr auto HIGH_36 = uint64_t{0xfffffffff0000000};
 
     auto const high_part = ((value & HIGH_36) >> 28);
     auto const low_part = static_cast<uint32_t>(value & ~HIGH_36);
 
     /*
-     * If the low part consists of only 24 bits we can use two instead of three
+     * If the low part consists of only 24 bits we can use just two
      * instructions:
      *
      *  1/ lui to load high 36 bits
      *  2/ addi to add low 24 bits
      *
-     * This saves one instructions pushing the overhead down.
+     * This reduces the overhead of loading 64-bit values.
      */
     if ((low_part & LOW_24) == low_part) {
-        return { high_part, { low_part } };
+        return { high_part, { { low_part, 0 }, 0 } };
     }
 
-    auto addis = std::vector<uint32_t>{};
-    auto const is_odd = static_cast<bool>(low_part % 2);
-    addis.push_back((low_part / 2) + is_odd);
-    addis.push_back(low_part / 2);
+    auto const multiplier = 16;
+    auto const remainder = (low_part % multiplier);
+    auto const base = (low_part - remainder) / multiplier;
 
-    return { high_part, addis };
+    return { high_part, { { base, multiplier }, remainder } };
 }
 
 struct Value {
@@ -531,35 +581,173 @@ struct Value {
     std::variant<uint64_t, void*> value;
 };
 
-namespace {
-    auto execute(std::vector<Value>& registers, machine::ops::LUI const op) -> void
+namespace machine::core::ops {
+    auto execute(std::vector<Value>& registers, machine::arch::ops::ADD const op) -> void
+    {
+        auto& out = registers.at(op.instruction.out.index);
+        auto& lhs = registers.at(op.instruction.lhs.index);
+        auto& rhs = registers.at(op.instruction.rhs.index);
+
+        out.value = (std::get<uint64_t>(lhs.value) + std::get<uint64_t>(rhs.value));
+
+        std::cerr << "  " + machine::arch::to_string(op.instruction.opcode)
+            + "\n";
+    }
+    auto execute(std::vector<Value>& registers, machine::arch::ops::MUL const op) -> void
+    {
+        auto& out = registers.at(op.instruction.out.index);
+        auto& lhs = registers.at(op.instruction.lhs.index);
+        auto& rhs = registers.at(op.instruction.rhs.index);
+
+        out.value = (std::get<uint64_t>(lhs.value) * std::get<uint64_t>(rhs.value));
+
+        std::cerr << "  " + machine::arch::to_string(op.instruction.opcode)
+            + "\n";
+    }
+
+    auto execute(std::vector<Value>& registers, machine::arch::ops::LUI const op) -> void
     {
         auto& value = registers.at(op.instruction.out.index);
         value.value = (op.instruction.immediate << 28);
+
+        std::cerr << "  " + machine::arch::to_string(op.instruction.opcode)
+            + " " + std::to_string(op.instruction.immediate)
+            + "\n";
     }
-    auto execute(std::vector<Value>& registers, machine::ops::ADDIU const op) -> void
+    auto execute(std::vector<Value>& registers, machine::arch::ops::ADDIU const op) -> void
     {
         auto& value = registers.at(op.instruction.out.index);
         value.value = (std::get<uint64_t>(value.value) + op.instruction.immediate);
+
+        std::cerr << "  " + machine::arch::to_string(op.instruction.opcode)
+            + " " + std::to_string(op.instruction.immediate)
+            + "\n";
     }
+
+    auto execute(std::vector<Value>& registers, machine::arch::instruction_type const raw) -> void
+    {
+        auto const opcode = static_cast<machine::arch::opcode_type>(raw & machine::arch::OPCODE_MASK);
+        auto const format = static_cast<machine::arch::FORMAT>(opcode & machine::arch::FORMAT_MASK);
+
+        std::cerr << "ex " + machine::arch::to_string(opcode) + "\n";
+
+        switch (format) {
+            case machine::arch::FORMAT::T:
+            {
+                auto instruction = codec::formats::T::decode(raw);
+                switch (static_cast<machine::arch::OPCODE_T>(opcode)) {
+                    case machine::arch::OPCODE_T::ADD:
+                        execute(registers, machine::arch::ops::ADD{instruction});
+                        break;
+                    case machine::arch::OPCODE_T::MUL:
+                        execute(registers, machine::arch::ops::MUL{instruction});
+                        break;
+                    default:
+                        std::cerr << "unimplemnted T instruction\n";
+                        exit(1);
+                }
+                break;
+            }
+            case machine::arch::FORMAT::E:
+            {
+                auto instruction = codec::formats::E::decode(raw);
+                switch (static_cast<machine::arch::OPCODE_E>(opcode)) {
+                    case machine::arch::OPCODE_E::LUI:
+                        execute(registers, machine::arch::ops::LUI{instruction});
+                        break;
+                }
+                break;
+            }
+            case machine::arch::FORMAT::R:
+            {
+                auto instruction = codec::formats::R::decode(raw);
+                switch (static_cast<machine::arch::OPCODE_R>(opcode)) {
+                    case machine::arch::OPCODE_R::ADDI:
+                        std::cerr << "unimplemnted R instruction: addiu\n";
+                        break;
+                    case machine::arch::OPCODE_R::ADDIU:
+                        execute(registers, machine::arch::ops::ADDIU{instruction});
+                        break;
+                }
+                break;
+            }
+            case machine::arch::FORMAT::N:
+            case machine::arch::FORMAT::D:
+            case machine::arch::FORMAT::S:
+            case machine::arch::FORMAT::F:
+                std::cerr << "unimplemented instruction\n";
+                exit(1);
+        }
+    }
+}
+
+namespace {
     auto op_li(std::vector<Value>& registers, uint64_t const value) -> void
     {
         auto const parts = to_loading_parts_unsigned(value);
 
-        execute(registers, machine::ops::LUI{codec::formats::E{
+        machine::core::ops::execute(registers, codec::formats::E{
             (machine::arch::GREEDY
              | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::LUI))
             , codec::formats::make_local_access(1)
             , parts.first
-        }});
-        for (auto const each : parts.second) {
-            // FIXME make all but last instruction greedy
-            execute(registers, machine::ops::ADDIU{codec::formats::R{
-                  static_cast<machine::arch::opcode_type>(machine::arch::Opcode::LUI)
+        }.encode());
+
+        auto const base = parts.second.first.first;
+        auto const multiplier = parts.second.first.second;
+
+        if (multiplier != 0) {
+            machine::core::ops::execute(registers, codec::formats::R{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_void_access()
+                , base
+            }.encode());
+            machine::core::ops::execute(registers, codec::formats::R{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
+                , codec::formats::make_local_access(3)
+                , codec::formats::make_void_access()
+                , multiplier
+            }.encode());
+            machine::core::ops::execute(registers, codec::formats::T{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::MUL))
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_local_access(3)
+            }.encode());
+
+            auto const remainder = parts.second.second;
+            machine::core::ops::execute(registers, codec::formats::R{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
+                , codec::formats::make_local_access(3)
+                , codec::formats::make_void_access()
+                , remainder
+            }.encode());
+            machine::core::ops::execute(registers, codec::formats::T{
+                 static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADD)
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_local_access(3)
+            }.encode());
+
+            machine::core::ops::execute(registers, codec::formats::T{
+                 static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADD)
                 , codec::formats::make_local_access(1)
                 , codec::formats::make_local_access(1)
-                , each
-            }});
+                , codec::formats::make_local_access(2)
+            }.encode());
+        } else {
+            machine::core::ops::execute(registers, codec::formats::R{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
+                , codec::formats::make_local_access(2)
+                , codec::formats::make_void_access()
+                , base
+            }.encode());
         }
     }
 }
@@ -693,18 +881,15 @@ auto main() -> int
 
             auto const parts = to_loading_parts_unsigned(wanted);
 
-            auto got = (parts.first << 28);
-            /* std::cout << std::hex; */
-            /* std::cout << "  lui   ..., 0x" << parts.first << "\n"; */
-            for (auto const each : parts.second) {
-                /* std::cout << "  addiu ..., 0x" << each << "\n"; */
-                got += each;
-            }
+            auto high = (parts.first << 28);
+            auto const low = (parts.second.first.second != 0)
+                ?  ((parts.second.first.first * parts.second.first.second)
+                 + parts.second.second)
+                : parts.second.first.first;
+            auto const got = (high | low);
 
             std::cout << std::hex << std::setw(16) << std::setfill('0') << wanted << "\n";
             std::cout << std::hex << std::setw(16) << std::setfill('0') << got << "\n";
-            std::cout << "  cost: " << std::dec
-                << (parts.second.size() + (parts.first ? 1 : 0)) << "\n";
             if (wanted != got) {
                 std::cerr << "BAD BAD BAD!\n";
                 break;
@@ -712,17 +897,21 @@ auto main() -> int
         }
     }
 
-    std::cout << machine::arch::to_string(0x0000) << "\n";
-    std::cout << machine::arch::to_string(0x0001) << "\n";
-    std::cout << machine::arch::to_string(0x1001) << "\n";
-    std::cout << machine::arch::to_string(0x9001) << "\n";
-    std::cout << machine::arch::to_string(0x1002) << "\n";
-    std::cout << machine::arch::to_string(0x1003) << "\n";
-    std::cout << machine::arch::to_string(0x1004) << "\n";
-    std::cout << machine::arch::to_string(0x5001) << "\n";
+    if constexpr (false) {
+        std::cout << machine::arch::to_string(0x0000) << "\n";
+        std::cout << machine::arch::to_string(0x0001) << "\n";
+        std::cout << machine::arch::to_string(0x1001) << "\n";
+        std::cout << machine::arch::to_string(0x9001) << "\n";
+        std::cout << machine::arch::to_string(0x1002) << "\n";
+        std::cout << machine::arch::to_string(0x1003) << "\n";
+        std::cout << machine::arch::to_string(0x1004) << "\n";
+        std::cout << machine::arch::to_string(0x5001) << "\n";
+    }
 
     {
         auto registers = std::vector<Value>(256);
+
+        std::cerr << "\n------ 8< ------\n\n";
 
         op_li(registers, 0xdeadbeefdeadbeef);
 
