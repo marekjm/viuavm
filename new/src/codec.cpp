@@ -48,7 +48,8 @@ namespace machine::arch {
 
     enum class Opcode : opcode_type {
         NOOP   = (FORMAT_N | 0x0000),
-        EBREAK = (FORMAT_N | 0x0001),
+        HALT   = (FORMAT_N | 0x0001),
+        EBREAK = (FORMAT_N | 0x0002),
 
         ADD    = (FORMAT_T | 0x0001),
         SUB    = (FORMAT_T | 0x0002),
@@ -102,29 +103,35 @@ namespace machine::arch {
 namespace machine::arch {
     auto to_string(opcode_type const raw) -> std::string
     {
-        static auto const OP_TO_NAME = std::map<Opcode, std::string>{
-              { Opcode::NOOP, "noop" }
-            , { Opcode::EBREAK, "ebreak" }
-
-            , { Opcode::ADD, "add" }
-            , { Opcode::SUB, "sub" }
-            , { Opcode::MUL, "mul" }
-            , { Opcode::DIV, "div" }
-
-            , { Opcode::LUI, "lui" }
-
-            , { Opcode::ADDI, "addi" }
-            , { Opcode::ADDIU, "addiu" }
+        auto const greedy[[maybe_unused]] = std::string{
+            static_cast<bool>(raw & GREEDY) ? "g." : ""
         };
-
-        auto const greedy = static_cast<bool>(raw & GREEDY);
         auto const opcode = static_cast<Opcode>(raw & OPCODE_MASK);
 
-        if (OP_TO_NAME.count(opcode)) {
-            return (greedy ? "g." : "") + OP_TO_NAME.at(opcode);
-        } else {
-            return "<unknown>";
+        switch (opcode) {
+            case Opcode::NOOP:
+                return greedy + "noop";
+            case Opcode::HALT:
+                return greedy + "halt";
+            case Opcode::EBREAK:
+                return greedy + "ebreak";
+            case Opcode::ADD:
+                return greedy + "add";
+            case Opcode::SUB:
+                return greedy + "sub";
+            case Opcode::MUL:
+                return greedy + "mul";
+            case Opcode::DIV:
+                return greedy + "div";
+            case Opcode::LUI:
+                return greedy + "lui";
+            case Opcode::ADDI:
+                return greedy + "addi";
+            case Opcode::ADDIU:
+                return greedy + "addiu";
         }
+
+        return "<unknown>";
     }
 }
 
