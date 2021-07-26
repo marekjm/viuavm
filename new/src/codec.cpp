@@ -2,11 +2,13 @@
 #include <string.h>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 #include <map>
 #include <string>
 #include <variant>
 #include <vector>
 #include <utility>
+#include <thread>
 #include <type_traits>
 
 
@@ -636,8 +638,6 @@ namespace machine::core::ops {
         auto const opcode = static_cast<machine::arch::opcode_type>(raw & machine::arch::OPCODE_MASK);
         auto const format = static_cast<machine::arch::FORMAT>(opcode & machine::arch::FORMAT_MASK);
 
-        std::cerr << "ex " + machine::arch::to_string(opcode) + "\n";
-
         switch (format) {
             case machine::arch::FORMAT::T:
             {
@@ -650,7 +650,7 @@ namespace machine::core::ops {
                         execute(registers, machine::arch::ops::MUL{instruction});
                         break;
                     default:
-                        std::cerr << "unimplemnted T instruction\n";
+                        std::cerr << "unimplemented T instruction\n";
                         exit(1);
                 }
                 break;
@@ -670,7 +670,7 @@ namespace machine::core::ops {
                 auto instruction = codec::formats::R::decode(raw);
                 switch (static_cast<machine::arch::OPCODE_R>(opcode)) {
                     case machine::arch::OPCODE_R::ADDI:
-                        std::cerr << "unimplemnted R instruction: addiu\n";
+                        std::cerr << "unimplemented R instruction: addiu\n";
                         break;
                     case machine::arch::OPCODE_R::ADDIU:
                         execute(registers, machine::arch::ops::ADDIU{instruction});
@@ -689,72 +689,154 @@ namespace machine::core::ops {
 }
 
 namespace {
-    auto op_li(std::vector<Value>& registers, uint64_t const value) -> void
+    auto op_li(uint64_t* instructions, uint64_t const value) -> uint64_t*
     {
         auto const parts = to_loading_parts_unsigned(value);
 
-        machine::core::ops::execute(registers, codec::formats::E{
+        *instructions++ = codec::formats::E{
             (machine::arch::GREEDY
              | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::LUI))
             , codec::formats::make_local_access(1)
             , parts.first
-        }.encode());
+        }.encode();
 
         auto const base = parts.second.first.first;
         auto const multiplier = parts.second.first.second;
 
         if (multiplier != 0) {
-            machine::core::ops::execute(registers, codec::formats::R{
+            *instructions++ = codec::formats::R{
                 (machine::arch::GREEDY
                  | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_void_access()
                 , base
-            }.encode());
-            machine::core::ops::execute(registers, codec::formats::R{
+            }.encode();
+            *instructions++ = codec::formats::R{
                 (machine::arch::GREEDY
                  | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
                 , codec::formats::make_local_access(3)
                 , codec::formats::make_void_access()
                 , multiplier
-            }.encode());
-            machine::core::ops::execute(registers, codec::formats::T{
+            }.encode();
+            *instructions++ = codec::formats::T{
                 (machine::arch::GREEDY
                  | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::MUL))
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_local_access(3)
-            }.encode());
+            }.encode();
 
             auto const remainder = parts.second.second;
-            machine::core::ops::execute(registers, codec::formats::R{
+            *instructions++ = codec::formats::R{
                 (machine::arch::GREEDY
                  | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
                 , codec::formats::make_local_access(3)
                 , codec::formats::make_void_access()
                 , remainder
-            }.encode());
-            machine::core::ops::execute(registers, codec::formats::T{
-                 static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADD)
+            }.encode();
+            *instructions++ = codec::formats::T{
+                (machine::arch::GREEDY
+                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADD))
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_local_access(3)
-            }.encode());
+            }.encode();
 
-            machine::core::ops::execute(registers, codec::formats::T{
+            *instructions++ = codec::formats::T{
                  static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADD)
                 , codec::formats::make_local_access(1)
                 , codec::formats::make_local_access(1)
                 , codec::formats::make_local_access(2)
-            }.encode());
+            }.encode();
         } else {
-            machine::core::ops::execute(registers, codec::formats::R{
-                (machine::arch::GREEDY
-                 | static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU))
+            *instructions++ = codec::formats::R{
+                  static_cast<machine::arch::opcode_type>(machine::arch::Opcode::ADDIU)
                 , codec::formats::make_local_access(2)
                 , codec::formats::make_void_access()
                 , base
-            }.encode());
+            }.encode();
+        }
+
+        return instructions;
+    }
+
+    auto run_instruction(std::vector<Value>& registers[[maybe_unused]], uint64_t const* ip) -> uint64_t const*
+    {
+        auto instruction = uint64_t{};
+        do {
+            instruction = *ip;
+            ++ip;
+
+            std::cerr << "    " << machine::arch::to_string(instruction) << "\n";
+            if (static_cast<machine::arch::Opcode>(instruction) == machine::arch::Opcode::HALT) {
+                return nullptr;
+            }
+        } while (instruction & machine::arch::GREEDY);
+
+        return ip;
+    }
+
+    auto run(std::vector<Value>& registers[[maybe_unused]], uint64_t const* ip, uint64_t const* const ip_end)
+        -> void
+    {
+        constexpr auto PREEMPTION_THRESHOLD = size_t{2};
+
+        while (ip != ip_end) {
+            auto const ip_before = ip;
+
+            std::cerr << "cycle at "
+                << std::hex << std::setw(8) << std::setfill('0')
+                << ip << std::dec << "\n";
+
+            for (auto i = size_t{0}; i < PREEMPTION_THRESHOLD and ip != ip_end; ++i) {
+                /*
+                 * This is needed to detect greedy bundles and adjust preemption
+                 * counter appropriately. If a greedy bundle contains more
+                 * instructions than the preemption threshold allows the process
+                 * will be suspended immediately.
+                 */
+                auto const greedy = (*ip & machine::arch::GREEDY);
+                auto const bundle_ip = ip;
+
+                std::cerr << "  "
+                    << (greedy ? "bundle" : "single")
+                    << " "
+                    << std::hex << std::setw(2) << std::setfill('0')
+                    << i << std::dec << "\n";
+
+                ip = run_instruction(registers, ip);
+
+                /*
+                 * Halting instruction returns nullptr because it does not know
+                 * where the end of bytecode lies. This is why we have to watch
+                 * out for null pointer here.
+                 */
+                ip = (ip == nullptr ? ip_end : ip);
+
+                /*
+                 * If the instruction was a greedy bundle instead of a single
+                 * one, the preemption counter has to be adjusted. It may be the
+                 * case that the bundle already hit the preemption threshold.
+                 */
+                if (greedy and ip != ip_end) {
+                    i += (ip - bundle_ip) - 1;
+                }
+            }
+
+            if (ip == ip_end) {
+                std::cerr << "halted\n";
+                break;
+            } else {
+                std::cerr << "preempted after " << (ip - ip_before) << " ops\n";
+            }
+
+            /*
+             * FIXME Limit the amount of instructions executed per second for
+             * debugging purposes. Once everything works as it should, remove
+             * this code.
+             */
+            using namespace std::literals;
+            std::this_thread::sleep_for(160ms);
         }
     }
 }
@@ -916,11 +998,16 @@ auto main() -> int
     }
 
     {
+        std::array<uint64_t, 24> executable {};
+        auto ip = op_li(executable.data(), 0xdeadbeefdeadbeef);
+        *ip++ = static_cast<uint64_t>(machine::arch::Opcode::EBREAK);
+        *ip++ = static_cast<uint64_t>(machine::arch::Opcode::HALT);
+
         auto registers = std::vector<Value>(256);
 
-        std::cerr << "\n------ 8< ------\n\n";
+        run(registers, executable.data(), executable.end());
 
-        op_li(registers, 0xdeadbeefdeadbeef);
+        std::cerr << "\n------ 8< ------\n\n";
 
         std::cout << std::hex << std::setw(16) << std::setfill('0')
             << std::get<uint64_t>(registers.at(1).value) << "\n";
