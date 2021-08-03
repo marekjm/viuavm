@@ -1367,6 +1367,8 @@ auto main(int argc, char* argv[]) -> int
             }
 
             close(a_out);
+
+            return 0;
         }
 
         /*
