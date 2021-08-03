@@ -1,8 +1,6 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 
-#include <stdint.h>
-#include <string.h>
 #include <iostream>
 #include <iomanip>
 #include <chrono>
@@ -13,6 +11,12 @@
 #include <utility>
 #include <thread>
 #include <type_traits>
+
+#include <elf.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
 
 
 namespace codec::formats {
@@ -1090,103 +1094,105 @@ namespace {
     }
 }
 
-auto main() -> int
+auto main(int argc, char* argv[]) -> int
 {
-    {
-        auto const tm = codec::formats::T{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x02}
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::T::decode(tm.encode());
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << (tm.lhs == td.lhs)
-            << (tm.rhs == td.rhs)
-            << "\n";
-    }
-    {
-        auto const tm = codec::formats::D{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::D::decode(tm.encode());
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << (tm.in == td.in)
-            << "\n";
-    }
-    {
-        auto const tm = codec::formats::S{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::S::decode(tm.encode());
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << "\n";
-    }
-    {
-        constexpr auto original_value = 3.14f;
+    if constexpr (false) {
+        {
+            auto const tm = codec::formats::T{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x02}
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::T::decode(tm.encode());
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << (tm.lhs == td.lhs)
+                << (tm.rhs == td.rhs)
+                << "\n";
+        }
+        {
+            auto const tm = codec::formats::D{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::D::decode(tm.encode());
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << (tm.in == td.in)
+                << "\n";
+        }
+        {
+            auto const tm = codec::formats::S{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::S::decode(tm.encode());
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << "\n";
+        }
+        {
+            constexpr auto original_value = 3.14f;
 
-        auto imm_in = uint32_t{};
-        memcpy(&imm_in, &original_value, sizeof(imm_in));
+            auto imm_in = uint32_t{};
+            memcpy(&imm_in, &original_value, sizeof(imm_in));
 
-        auto const tm = codec::formats::F{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-            , imm_in
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::F::decode(tm.encode());
+            auto const tm = codec::formats::F{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
+                , imm_in
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::F::decode(tm.encode());
 
-        auto imm_out = float{};
-        memcpy(&imm_out, &td.immediate, sizeof(imm_out));
+            auto imm_out = float{};
+            memcpy(&imm_out, &td.immediate, sizeof(imm_out));
 
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << (tm.immediate == td.immediate)
-            << (imm_out == original_value)
-            << "\n";
-    }
-    {
-        auto const tm = codec::formats::E{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-            , 0xabcdef012
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::E::decode(tm.encode());
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << (tm.immediate == td.immediate)
-            << "\n";
-    }
-    {
-        auto const tm = codec::formats::R{
-              0xdead
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x55}
-            , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x22}
-            , 0xabcdef
-        };
-        std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-        auto const td = codec::formats::R::decode(tm.encode());
-        std::cout
-            << (tm.opcode == td.opcode)
-            << (tm.out == td.out)
-            << (tm.in == td.in)
-            << (tm.immediate == td.immediate)
-            << "\n";
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << (tm.immediate == td.immediate)
+                << (imm_out == original_value)
+                << "\n";
+        }
+        {
+            auto const tm = codec::formats::E{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
+                , 0xabcdef012
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::E::decode(tm.encode());
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << (tm.immediate == td.immediate)
+                << "\n";
+        }
+        {
+            auto const tm = codec::formats::R{
+                  0xdead
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x55}
+                , codec::formats::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x22}
+                , 0xabcdef
+            };
+            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
+            auto const td = codec::formats::R::decode(tm.encode());
+            std::cout
+                << (tm.opcode == td.opcode)
+                << (tm.out == td.out)
+                << (tm.in == td.in)
+                << (tm.immediate == td.immediate)
+                << "\n";
+        }
     }
 
     if constexpr (false) {
@@ -1247,39 +1253,166 @@ auto main() -> int
     }
 
     {
-        std::array<uint64_t, 128> text {};
-        auto ip = text.data();
+        /*
+         * If invoked directly, emit a sample executable binary. This makes
+         * testing easy as we always can have a sample, working, known-good
+         * binary produced.
+         */
+        if (argc == 1) {
+            std::array<viua::arch::instruction_type, 32> text {};
+            auto ip = text.data();
 
-        ip = op_li(ip, 0xdeadbeefdeadbeef);
-        *ip++ = codec::formats::S{
-            (viua::arch::ops::GREEDY |
-              static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-            , codec::formats::make_local_access(2)
-        }.encode();
-        *ip++ = codec::formats::S{
-              static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-            , codec::formats::make_local_access(3)
-        }.encode();
-        *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+            ip = op_li(ip, 0xdeadbeefdeadbeef);
+            *ip++ = codec::formats::S{
+                (viua::arch::ops::GREEDY |
+                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
+                , codec::formats::make_local_access(2)
+            }.encode();
+            *ip++ = codec::formats::S{
+                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
+                , codec::formats::make_local_access(3)
+            }.encode();
+            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
 
-        ip = op_li(ip, 42l);
-        *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+            ip = op_li(ip, 42l);
+            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
 
-        ip = op_li(ip, -1l);
-        *ip++ = codec::formats::S{
-            (viua::arch::ops::GREEDY |
-              static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-            , codec::formats::make_local_access(2)
-        }.encode();
-        *ip++ = codec::formats::S{
-              static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-            , codec::formats::make_local_access(3)
-        }.encode();
-        *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-        *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
+            ip = op_li(ip, -1l);
+            *ip++ = codec::formats::S{
+                (viua::arch::ops::GREEDY |
+                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
+                , codec::formats::make_local_access(2)
+            }.encode();
+            *ip++ = codec::formats::S{
+                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
+                , codec::formats::make_local_access(3)
+            }.encode();
+            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
+
+            auto const a_out = open(
+                  "./a.out"
+                , O_CREAT|O_TRUNC|O_WRONLY
+                , S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH
+            );
+            if (a_out == -1) {
+                close(a_out);
+                exit(1);
+            }
+
+            constexpr auto VIUA_MAGIC[[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
+            auto const VIUAVM_INTERP = std::string{"viua-vm"};
+
+            {
+                auto const ops_count = (ip - text.begin());
+                auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
+
+                // see elf(5)
+                Elf64_Ehdr elf_header {};
+                elf_header.e_ident[EI_MAG0] = '\x7f';
+                elf_header.e_ident[EI_MAG1] = 'E';
+                elf_header.e_ident[EI_MAG2] = 'L';
+                elf_header.e_ident[EI_MAG3] = 'F';
+                elf_header.e_ident[EI_CLASS] = ELFCLASS64;
+                elf_header.e_ident[EI_DATA] = ELFDATA2LSB;
+                elf_header.e_ident[EI_VERSION] = EV_CURRENT;
+                elf_header.e_ident[EI_OSABI] = ELFOSABI_STANDALONE;
+                elf_header.e_ident[EI_ABIVERSION] = 0;
+                elf_header.e_type = ET_EXEC;
+                elf_header.e_machine = ET_NONE;
+                elf_header.e_version = elf_header.e_ident[EI_VERSION];
+                elf_header.e_entry = 0; // FIXME start of the main function
+                elf_header.e_phoff = sizeof(elf_header);
+                elf_header.e_phentsize = sizeof(Elf64_Phdr);
+                elf_header.e_phnum = 3;
+                elf_header.e_shoff = 0; // FIXME section header table
+                elf_header.e_flags = 0; // processor-specific flags, should be 0
+                elf_header.e_ehsize = sizeof(elf_header);
+                write(a_out, &elf_header, sizeof(elf_header));
+
+                Elf64_Phdr magic_for_binfmt_misc {};
+                magic_for_binfmt_misc.p_type = PT_NULL;
+                magic_for_binfmt_misc.p_offset = 0;
+                memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
+                write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
+
+                Elf64_Phdr interpreter {};
+                interpreter.p_type = PT_INTERP;
+                interpreter.p_offset = (sizeof(elf_header) + 3 * sizeof(Elf64_Phdr));
+                interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
+                interpreter.p_flags = PF_R;
+                write(a_out, &interpreter, sizeof(interpreter));
+
+                Elf64_Phdr text_segment {};
+                text_segment.p_type = PT_NULL;
+                text_segment.p_offset = (
+                      sizeof(elf_header)
+                    + (3 * sizeof(Elf64_Phdr))
+                    + (VIUAVM_INTERP.size() + 1));
+                text_segment.p_filesz = text_size;
+                text_segment.p_memsz = text_size;
+                text_segment.p_flags = PF_R|PF_X;
+                write(a_out, &text_segment, sizeof(text_segment));
+
+                write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
+
+                write(a_out, text.data(), text_size);
+            }
+
+            close(a_out);
+        }
+
+        std::array<viua::arch::instruction_type, 128> text {};
+        {
+            /*
+             * If invoked with some operands, use the first of them as the
+             * binary to load and execute. It most probably will be the sample
+             * executable generated by an earlier invokation of the codec
+             * testing program.
+             */
+            auto const executable_path = (argc > 1)
+                ? argv[1]
+                : "./a.out";
+
+            auto const a_out = open(executable_path, O_RDONLY);
+            if (a_out == -1) {
+                close(a_out);
+                exit(1);
+            }
+
+            Elf64_Ehdr elf_header {};
+            read(a_out, &elf_header, sizeof(elf_header));
+
+            /*
+             * We need to skip a few program headers which are just used to make
+             * the file a proper ELF as recognised by file(1) and readelf(1).
+             */
+            Elf64_Phdr program_header {};
+            read(a_out, &program_header, sizeof(program_header)); // skip magic PT_NULL
+            read(a_out, &program_header, sizeof(program_header)); // skip PT_INTERP
+
+            /*
+             * Then comes the actually useful program header describing PT_LOAD
+             * segment with .text section containing the instructions we need to
+             * run the program.
+             */
+            read(a_out, &program_header, sizeof(program_header));
+
+            lseek(a_out, program_header.p_offset, SEEK_SET);
+            read(a_out, text.data(), program_header.p_filesz);
+
+            std::cout
+                << "[vm] loaded " << program_header.p_filesz
+                << " byte(s) of .text section from PT_LOAD segment of "
+                << executable_path << "\n";
+            std::cout
+                << "[vm] loaded " << (program_header.p_filesz / sizeof(decltype(text)::value_type))
+                << " instructions\n";
+
+            close(a_out);
+        }
 
         auto registers = std::vector<Value>(256);
-
         run(registers, text.data(), text.end());
 
         std::cerr << "\n------ 8< ------\n\n";

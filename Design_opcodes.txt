@@ -29,9 +29,33 @@ The simple types are:
 - pointer: An opaque value providing a reference to another value. Pointers are
   checked for validity before use.
 
+Bytes (byte) are used as raw components of other data types, and of encoded
+messages. They have numeric value, but are NOT used in arithmetical operations.
+
+Booleans (bool) are used as true-false values.
+
+Signed (iX) and unsigned (uX) integers are used to store numerical values and
+are used in arithmetic expressions. Signed overflow traps by default, unsigned
+wraps.
+
+Unsigned integers are used to represent indices and offsets.
+
+Arithmetic operations are always perfomed on full register-width integers. If
+math on fixed-width integers is required bit vectors should be used.
+
+Bit vectors are used to represent bit masks, and for arbitrary-width arithmetic.
+Integers, both signed and unsigned, can be converted to bit vectors for bit
+manipulation. Bit vectors at most 64 bits wide can be converted to unsigned
+integers.
+
+Signedness of basic arithmetic operation depends on type of its inputs. Type of
+the result is the same as type of the left-hand operand's, and the right-hand
+operand is automatically converted to match type of the left-hand operand's.
+Basic arithmetic operations are: add, sub, mul, div, mod.
+
 The compound types are:
 
-- buffer: A variable-length array of values, mapping unsigned integer indexes
+- array: A variable-length array of values, mapping unsigned integer indexes
   into values.
 - struct: A collection of fields of different types, mapping atom keys into
   field values.
@@ -195,6 +219,34 @@ eg, add, bitshl, eq
 - 12 bits "right-hand" input register
 - 4 bits padding
 
+## 3-way register access with flags kind (A format)
+
+eg, aadd (Arithmetic Add)
+
+- 16 bits opcode
+- 12 bits output register
+- 4 bits lowest nibble of flags (integer width specifier (IWS))
+- 12 bits "left-hand" input register
+- 4 bits middle nibble of flags
+- 12 bits "right-hand" input register
+- 4 bits highest nibble of flags (behaviour specifier (BS))
+
+The "Arithmetic X" instructions implement controlled arithmetic on integers of a
+few predefined widths: 8 (0000), 16 (0001), 32 (0010), and 64 (0011) bits. The
+result produced by an operation is verified against the desired width, and is
+corrected if it does not conform to it.
+
+The behaviour specifier determines the action taken to "correct" the result, and
+is one of: wrap-around, trap, or saturate.
+
+For example, the instruction to perform a 16-bit saturating multiplication is:
+
+    amul16.s[atrurate] %o, %l, %r
+
+The instruction to perform 32-bit trapping addition is:
+
+    aadd32.t[rap] %o, %l, %r
+
 ## 2-way register access kind (D format)
 
 eg, bitswidth, bitnot, conversion instructions, copy, exception, exception_tag
@@ -217,7 +269,8 @@ eg, delete, self, throw, struct, buffer
 
 ## 1-way register access, 32-bit wide immediate (F format)
 
-ie, float
+eg, float
+eg, iuw (Insert Upper Word), ilw (Insert Lower Word)
 
 - 16 bits opcode
 - 12 bits output register
@@ -253,12 +306,14 @@ HOW TO construct a 64-bit unsigned integer?
 
 ...expands to:
 
-    g.lui   %i,     0xdeadbeefd  ; highest 36 bits: Greedy Load Upper Immediate
-    g.addiu %i, %i, ...          ; Greedy Add Immediate Unsigned
-    addiu   %i, %i, ...          ; Add Immediate Unsigned
-
-The g.addiu and addiu instructions add the rest of the integer. Whatever is left
-in lower 28 bits is divided by half, and loaded in two instructions.
+    ; let x = 0xdeadbeefdeadbeef
+    g.lui   %i, hi(x)  ; highest 36 bits: Greedy Load Upper Immediate
+    g.addiu %j, void, ((lo(x) - (lo(x) % 16)) / 16)
+    g.addiu %k, void, 16
+    g.mul   %j, %j, %k
+    g.addiu %k, void, (lo(x) % 16)
+    g.add   %j, %j, %k
+    add     %i, %i, %j
 
 HOW TO construct a 64-bit signed integer?
 
@@ -278,8 +333,10 @@ eg, nop, return
 These instructions do not do anything and may act as placeholders or
 padding.
 
-- nop
-- ebreak
+- nop                   No operation. May be used as padding or placeholder
+                        instruction if needed.
+- ebreak                Environment break. May be used by debuggers.
+- halt                  Halts the processor.
 
 --------------------------------------------------------------------------------
 
@@ -304,14 +361,18 @@ unsigned.
 - div %ro, %rl, %rr     ditto, division
 - mod %ro, %rl, %rr     ditto, division remainder
 
-- addi %ro, <val>       Adds an immediate <val> to integer in register $rs and
+- addi %ro, <val>       Adds an immediate <val> to integer in register %rs and
                         stores the result in register %ro. <val> MUST be at most
-                        32 bits, and is sign-extended before being added to the
+                        28 bits, and is sign-extended before being added to the
                         value in %rs.
 - subi %ro, <val>       ditto, subtraction
 - muli %ro, <val>       ditto, multiplication
 - divi %ro, <val>       ditto, division
 - modi %ro, <val>       ditto, division remainder
+
+- addiu %ro, %ri, <val> Adds an unsigned immediate <val> to unsigned integer in
+                        register %ri and stores the result in register %ro. The
+                        immediate is at most 28 bits wide.
 
 FIXME What about unsigned values?
 
@@ -660,3 +721,54 @@ Requesting, awaiting, checking status, cancelling, etc.
                             with the io_await opcode?
 - io_shutdown %rd, %rp
 - io_close %rd, %rp
+
+================================================================================
+
+HOW TO...
+
+Instruction sequences used to perform typical tasks.
+
+----------------------------------------
+
+HOW TO construct a 64-bit unsigned integer?
+
+    li %i, 0xdeadbeefdeadbeef
+
+...expands to:
+
+    ; let x = 0xdeadbeefdeadbeef
+    g.lui   %i, hi(x)  ; highest 36 bits: Greedy Load Upper Immediate
+    g.addiu %j, void, ((lo(x) - (lo(x) % 16)) / 16)
+    g.addiu %k, void, 16
+    g.mul   %j, %j, %k
+    g.addiu %k, void, (lo(x) % 16)
+    g.add   %j, %j, %k
+    add     %i, %i, %j
+
+----------------------------------------
+
+HOW TO construct N-bit integer?
+
+i8:
+    addi %i, x
+
+i16:
+    addi %i, x
+
+i32:
+    g.addi %j, void, ((lo(x) - (lo(x) % 16)) / 16)
+    g.addi %k, void, 16
+    g.mul  %j, %j, %k
+    addi   %k, void, (lo(x) % 16)
+
+u8:
+    addiu %i, x
+
+u16:
+    addiu %i, x
+
+u32:
+    g.addiu %j, void, ((lo(x) - (lo(x) % 16)) / 16)
+    g.addiu %k, void, 16
+    g.mul   %j, %j, %k
+    addiu   %k, void, (lo(x) % 16)
