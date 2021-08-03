@@ -30,9 +30,21 @@ CXXFLAGS=\
 
 
 ################################################################################
-# Targets
+# High-level targets
 all: \
 	$(BUILD)/codec
+
+install: all
+	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
+	cp -v ./build/codec $(PREFIX)/lib/viua/core/bin/viua-vm
+
+install-binfmt:
+	mkdir -p $(PREFIX)/lib/binfmt.d
+	cp -v ./binfmt.d/viua-exec.conf $(PREFIX)/lib/binfmt.d
+	if [[ -f /proc/sys/fs/binfmt_misc/viua-exec ]]; then \
+		echo -1 > /proc/sys/fs/binfmt_misc/viua-exec ; \
+	fi
+	cat ./binfmt.d/viua-exec.conf /proc/sys/fs/binfmt_misc/register
 
 
 ################################################################################
