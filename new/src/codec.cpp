@@ -1357,11 +1357,12 @@ auto main(int argc, char* argv[]) -> int
                 write(a_out, &interpreter, sizeof(interpreter));
 
                 Elf64_Phdr text_segment {};
-                text_segment.p_type = PT_NULL;
+                text_segment.p_type = PT_LOAD;
                 text_segment.p_offset = text_offset;
                 text_segment.p_filesz = text_size;
                 text_segment.p_memsz = text_size;
                 text_segment.p_flags = PF_R|PF_X;
+                text_segment.p_align = sizeof(viua::arch::instruction_type);
                 write(a_out, &text_segment, sizeof(text_segment));
 
                 write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
