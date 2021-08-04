@@ -1315,6 +1315,10 @@ auto main(int argc, char* argv[]) -> int
             {
                 auto const ops_count = (ip - text.begin());
                 auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
+                auto const text_offset = (
+                      sizeof(Elf64_Ehdr)
+                    + (3 * sizeof(Elf64_Phdr))
+                    + (VIUAVM_INTERP.size() + 1));
 
                 // see elf(5)
                 Elf64_Ehdr elf_header {};
@@ -1330,7 +1334,7 @@ auto main(int argc, char* argv[]) -> int
                 elf_header.e_type = ET_EXEC;
                 elf_header.e_machine = ET_NONE;
                 elf_header.e_version = elf_header.e_ident[EI_VERSION];
-                elf_header.e_entry = 0; // FIXME start of the main function
+                elf_header.e_entry = text_offset;
                 elf_header.e_phoff = sizeof(elf_header);
                 elf_header.e_phentsize = sizeof(Elf64_Phdr);
                 elf_header.e_phnum = 3;
@@ -1354,10 +1358,7 @@ auto main(int argc, char* argv[]) -> int
 
                 Elf64_Phdr text_segment {};
                 text_segment.p_type = PT_NULL;
-                text_segment.p_offset = (
-                      sizeof(elf_header)
-                    + (3 * sizeof(Elf64_Phdr))
-                    + (VIUAVM_INTERP.size() + 1));
+                text_segment.p_offset = text_offset;
                 text_segment.p_filesz = text_size;
                 text_segment.p_memsz = text_size;
                 text_segment.p_flags = PF_R|PF_X;
