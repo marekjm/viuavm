@@ -1269,33 +1269,35 @@ auto main(int argc, char* argv[]) -> int
             std::array<viua::arch::instruction_type, 32> text {};
             auto ip = text.data();
 
-            ip = op_li(ip, 0xdeadbeefdeadbeef);
-            *ip++ = codec::formats::S{
-                (viua::arch::ops::GREEDY |
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-                , codec::formats::make_local_access(2)
-            }.encode();
-            *ip++ = codec::formats::S{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-                , codec::formats::make_local_access(3)
-            }.encode();
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+            {
+                ip = op_li(ip, 0xdeadbeefdeadbeef);
+                *ip++ = codec::formats::S{
+                    (viua::arch::ops::GREEDY |
+                      static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
+                    , codec::formats::make_local_access(2)
+                }.encode();
+                *ip++ = codec::formats::S{
+                      static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
+                    , codec::formats::make_local_access(3)
+                }.encode();
+                *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
 
-            ip = op_li(ip, 42l);
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+                ip = op_li(ip, 42l);
+                *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
 
-            ip = op_li(ip, -1l);
-            *ip++ = codec::formats::S{
-                (viua::arch::ops::GREEDY |
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-                , codec::formats::make_local_access(2)
-            }.encode();
-            *ip++ = codec::formats::S{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-                , codec::formats::make_local_access(3)
-            }.encode();
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
+                ip = op_li(ip, -1l);
+                *ip++ = codec::formats::S{
+                    (viua::arch::ops::GREEDY |
+                      static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
+                    , codec::formats::make_local_access(2)
+                }.encode();
+                *ip++ = codec::formats::S{
+                      static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
+                    , codec::formats::make_local_access(3)
+                }.encode();
+                *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+                *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
+            }
 
             auto const a_out = open(
                   "./a.out"
