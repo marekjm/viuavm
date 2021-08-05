@@ -94,6 +94,41 @@ namespace viua::arch {
         PARAMETER,
     };
     using RS = REGISTER_SET;
+
+    struct Register_access {
+        using rs_type = viua::arch::REGISTER_SET;
+
+        rs_type const set;
+        bool const direct;
+        uint8_t const index;
+
+        Register_access();
+        Register_access(rs_type const, bool const, uint8_t const);
+
+        static auto decode(uint16_t const) -> Register_access;
+        auto encode() const -> uint16_t;
+
+        auto operator==(Register_access const& other) const -> bool
+        {
+            return (set == other.set) and (direct == other.direct) and (index == other.index);
+        }
+
+        inline auto is_legal() const -> bool
+        {
+            if (is_void() and not direct and index != 0) {
+                return false;
+            }
+            return true;
+        }
+
+        inline auto is_void() const -> bool
+        {
+            return (set == rs_type::VOID);
+        }
+
+        static auto make_local(uint8_t const, bool const = true) -> Register_access;
+        static auto make_void() -> Register_access;
+    };
 }
 
 #endif

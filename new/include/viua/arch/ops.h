@@ -56,6 +56,146 @@ namespace viua::arch::ops {
         R = FORMAT_R,
     };
 
+    /*
+     * Three-way (triple) register access.
+     */
+    struct T {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+        Register_access const lhs;
+        Register_access const rhs;
+
+        T(
+              viua::arch::opcode_type const
+            , Register_access const
+            , Register_access const
+            , Register_access const
+        );
+
+        static auto decode(instruction_type const) -> T;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * Two-way (double) register access.
+     */
+    struct D {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+        Register_access const in;
+
+        D(
+              viua::arch::opcode_type const
+            , Register_access const
+            , Register_access const
+        );
+
+        static auto decode(instruction_type const) -> D;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * One-way (single) register access.
+     */
+    struct S {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+
+        S(
+              viua::arch::opcode_type const
+            , Register_access const
+        );
+
+        static auto decode(instruction_type const) -> S;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * One-way register access with 32-bit wide immediate value.
+     * "F" because it is used for eg, floats.
+     */
+    struct F {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+        uint32_t const immediate;
+
+        F(
+              viua::arch::opcode_type const op
+            , Register_access const o
+            , uint32_t const i
+        );
+
+        template<typename T>
+        static auto make(
+              viua::arch::opcode_type const op
+            , Register_access const o
+            , T const v
+        ) -> F
+        {
+            static_assert(sizeof(T) == sizeof(uint32_t));
+            auto imm = uint32_t{};
+            memcpy(&imm, &v, sizeof(imm));
+            return F{op, o, imm};
+        }
+
+        static auto decode(instruction_type const) -> F;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * One-way register access with 36-bit wide immediate value.
+     * "E" because it is "extended" immediate, 4 bits longer than the F format.
+     */
+    struct E {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+        uint64_t const immediate;
+
+        E(
+              viua::arch::opcode_type const op
+            , Register_access const o
+            , uint64_t const i
+        );
+
+        static auto decode(instruction_type const) -> E;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * Two-way register access with 24-bit wide immediate value.
+     * "R" because it is "reduced" immediate, 8 bits shorter than the F format.
+     */
+    struct R {
+        viua::arch::opcode_type opcode;
+        Register_access const out;
+        Register_access const in;
+        uint32_t const immediate;
+
+        R(
+              viua::arch::opcode_type const
+            , Register_access const
+            , Register_access const
+            , uint32_t const
+        );
+
+        static auto decode(instruction_type const) -> R;
+        auto encode() const -> instruction_type;
+    };
+
+    /*
+     * No operands.
+     */
+    struct N {
+        viua::arch::opcode_type opcode;
+
+        N(
+              viua::arch::opcode_type const
+        );
+
+        static auto decode(instruction_type const) -> N;
+        auto encode() const -> instruction_type;
+    };
+
     constexpr auto GREEDY = opcode_type{0x8000};
     constexpr auto OPCODE_MASK = opcode_type{0x7fff};
     constexpr auto FORMAT_MASK = opcode_type{0x7000};

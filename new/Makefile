@@ -32,11 +32,13 @@ CXXFLAGS=\
 ################################################################################
 # High-level targets
 all: \
-	$(BUILD)/codec
+	$(BUILD)/tools/asm \
+	$(BUILD)/tools/vm
 
 install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
-	cp -v ./build/codec $(PREFIX)/lib/viua/core/bin/viua-vm
+	@cp -v ./build/tools/asm $(PREFIX)/lib/viua/core/bin/viua-asm
+	@cp -v ./build/tools/vm $(PREFIX)/lib/viua/core/bin/viua-vm
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
@@ -59,4 +61,10 @@ $(BUILD)/%.o: $(SOURCE)/%.cpp
 
 ################################################################################
 # Explicit dependencies
-$(BUILD)/codec: build/arch/ops.o
+$(BUILD)/tools/asm: \
+	build/arch/arch.o \
+	build/arch/ops.o
+
+$(BUILD)/tools/vm: \
+	build/arch/arch.o \
+	build/arch/ops.o
