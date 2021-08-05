@@ -2,17 +2,19 @@
 #include <viua/arch/ops.h>
 #include <viua/arch/ins.h>
 
-#include <iostream>
-#include <iomanip>
 #include <chrono>
+#include <functional>
+#include <iomanip>
+#include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <string_view>
-#include <variant>
-#include <vector>
-#include <utility>
 #include <thread>
 #include <type_traits>
+#include <utility>
+#include <variant>
+#include <vector>
 
 #include <elf.h>
 #include <fcntl.h>
