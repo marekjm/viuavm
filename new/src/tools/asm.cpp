@@ -368,6 +368,8 @@ auto main(int argc, char*[]) -> int
      * binary produced.
      */
     if (argc == 1) {
+        auto strings = std::vector<uint8_t>{};
+
         std::array<viua::arch::instruction_type, 32> text {};
         auto ip = text.data();
 
@@ -417,10 +419,12 @@ auto main(int argc, char*[]) -> int
         {
             auto const ops_count = (ip - text.begin());
             auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
+
             auto const text_offset = (
                   sizeof(Elf64_Ehdr)
-                + (3 * sizeof(Elf64_Phdr))
+                + (4 * sizeof(Elf64_Phdr))
                 + (VIUAVM_INTERP.size() + 1));
+            auto const strings_offset = (text_offset + text_size);
 
             // see elf(5)
             Elf64_Ehdr elf_header {};
@@ -439,7 +443,7 @@ auto main(int argc, char*[]) -> int
             elf_header.e_entry = text_offset;
             elf_header.e_phoff = sizeof(elf_header);
             elf_header.e_phentsize = sizeof(Elf64_Phdr);
-            elf_header.e_phnum = 3;
+            elf_header.e_phnum = 4;
             elf_header.e_shoff = 0; // FIXME section header table
             elf_header.e_flags = 0; // processor-specific flags, should be 0
             elf_header.e_ehsize = sizeof(elf_header);
@@ -453,7 +457,7 @@ auto main(int argc, char*[]) -> int
 
             Elf64_Phdr interpreter {};
             interpreter.p_type = PT_INTERP;
-            interpreter.p_offset = (sizeof(elf_header) + 3 * sizeof(Elf64_Phdr));
+            interpreter.p_offset = (sizeof(elf_header) + 4 * sizeof(Elf64_Phdr));
             interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
             interpreter.p_flags = PF_R;
             write(a_out, &interpreter, sizeof(interpreter));
@@ -467,9 +471,20 @@ auto main(int argc, char*[]) -> int
             text_segment.p_align = sizeof(viua::arch::instruction_type);
             write(a_out, &text_segment, sizeof(text_segment));
 
+            Elf64_Phdr strings_segment {};
+            strings_segment.p_type = PT_LOAD;
+            strings_segment.p_offset = strings_offset;
+            strings_segment.p_filesz = strings.size();
+            strings_segment.p_memsz = strings.size();
+            strings_segment.p_flags = PF_R;
+            strings_segment.p_align = sizeof(viua::arch::instruction_type);
+            write(a_out, &strings_segment, sizeof(strings_segment));
+
             write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
             write(a_out, text.data(), text_size);
+
+            write(a_out, strings.data(), strings.size());
         }
 
         close(a_out);

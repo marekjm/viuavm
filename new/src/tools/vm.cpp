@@ -46,7 +46,7 @@ struct Value {
 };
 
 namespace machine::core::ins {
-    auto execute(std::vector<Value>& registers, viua::arch::ins::ADD const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::ADD const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto& lhs = registers.at(op.instruction.lhs.index);
@@ -61,7 +61,7 @@ namespace machine::core::ins {
             + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
-    auto execute(std::vector<Value>& registers, viua::arch::ins::SUB const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::SUB const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto& lhs = registers.at(op.instruction.lhs.index);
@@ -76,7 +76,7 @@ namespace machine::core::ins {
             + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
-    auto execute(std::vector<Value>& registers, viua::arch::ins::MUL const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::MUL const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto& lhs = registers.at(op.instruction.lhs.index);
@@ -91,7 +91,7 @@ namespace machine::core::ins {
             + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
-    auto execute(std::vector<Value>& registers, viua::arch::ins::DIV const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::DIV const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto& lhs = registers.at(op.instruction.lhs.index);
@@ -107,7 +107,7 @@ namespace machine::core::ins {
             + "\n";
     }
 
-    auto execute(std::vector<Value>& registers, viua::arch::ins::DELETE const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::DELETE const op) -> void
     {
         auto& target = registers.at(op.instruction.out.index);
 
@@ -119,7 +119,7 @@ namespace machine::core::ins {
             + "\n";
     }
 
-    auto execute(std::vector<Value>& registers, viua::arch::ins::LUI const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::LUI const op) -> void
     {
         auto& value = registers.at(op.instruction.out.index);
         value.type_of_unboxed = Value::Unboxed_type::Integer_signed;
@@ -130,7 +130,7 @@ namespace machine::core::ins {
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
     }
-    auto execute(std::vector<Value>& registers, viua::arch::ins::LUIU const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::LUIU const op) -> void
     {
         auto& value = registers.at(op.instruction.out.index);
         value.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
@@ -142,7 +142,7 @@ namespace machine::core::ins {
             + "\n";
     }
 
-    auto execute(std::vector<Value>& registers, viua::arch::ins::ADDI const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::ADDI const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto const base = (op.instruction.in.is_void()
@@ -158,7 +158,7 @@ namespace machine::core::ins {
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
     }
-    auto execute(std::vector<Value>& registers, viua::arch::ins::ADDIU const op) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::ADDIU const op) -> void
     {
         auto& out = registers.at(op.instruction.out.index);
         auto const base = (op.instruction.in.is_void()
@@ -175,7 +175,7 @@ namespace machine::core::ins {
             + "\n";
     }
 
-    auto execute(std::vector<Value>& registers, viua::arch::ins::EBREAK const) -> void
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::EBREAK const) -> void
     {
         for (auto i = size_t{0}; i < registers.size(); ++i) {
             auto const& each = registers.at(i);
@@ -254,7 +254,7 @@ namespace machine::core::ins {
         }
     }
 
-    auto execute(std::vector<Value>& registers, viua::arch::instruction_type const* const ip)
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const& strings, viua::arch::instruction_type const* const ip)
         -> viua::arch::instruction_type const*
     {
         auto const raw = *ip;
@@ -268,10 +268,10 @@ namespace machine::core::ins {
                 auto instruction = viua::arch::ops::T::decode(raw);
                 switch (static_cast<viua::arch::ops::OPCODE_T>(opcode)) {
                     case viua::arch::ops::OPCODE_T::ADD:
-                        execute(registers, viua::arch::ins::ADD{instruction});
+                        execute(registers, strings, viua::arch::ins::ADD{instruction});
                         break;
                     case viua::arch::ops::OPCODE_T::MUL:
-                        execute(registers, viua::arch::ins::MUL{instruction});
+                        execute(registers, strings, viua::arch::ins::MUL{instruction});
                         break;
                     default:
                         std::cerr << "unimplemented T instruction\n";
@@ -284,7 +284,7 @@ namespace machine::core::ins {
                 auto instruction = viua::arch::ops::S::decode(raw);
                 switch (static_cast<viua::arch::ops::OPCODE_S>(opcode)) {
                     case viua::arch::ops::OPCODE_S::DELETE:
-                        execute(registers, viua::arch::ins::DELETE{instruction});
+                        execute(registers, strings, viua::arch::ins::DELETE{instruction});
                         break;
                     default:
                         std::cerr << "unimplemented S instruction\n";
@@ -297,10 +297,10 @@ namespace machine::core::ins {
                 auto instruction = viua::arch::ops::E::decode(raw);
                 switch (static_cast<viua::arch::ops::OPCODE_E>(opcode)) {
                     case viua::arch::ops::OPCODE_E::LUI:
-                        execute(registers, viua::arch::ins::LUI{instruction});
+                        execute(registers, strings, viua::arch::ins::LUI{instruction});
                         break;
                     case viua::arch::ops::OPCODE_E::LUIU:
-                        execute(registers, viua::arch::ins::LUIU{instruction});
+                        execute(registers, strings, viua::arch::ins::LUIU{instruction});
                         break;
                 }
                 break;
@@ -310,10 +310,10 @@ namespace machine::core::ins {
                 auto instruction = viua::arch::ops::R::decode(raw);
                 switch (static_cast<viua::arch::ops::OPCODE_R>(opcode)) {
                     case viua::arch::ops::OPCODE_R::ADDI:
-                        execute(registers, viua::arch::ins::ADDI{instruction});
+                        execute(registers, strings, viua::arch::ins::ADDI{instruction});
                         break;
                     case viua::arch::ops::OPCODE_R::ADDIU:
-                        execute(registers, viua::arch::ins::ADDIU{instruction});
+                        execute(registers, strings, viua::arch::ins::ADDIU{instruction});
                         break;
                 }
                 break;
@@ -327,7 +327,7 @@ namespace machine::core::ins {
                     case viua::arch::ops::OPCODE_N::HALT:
                         return nullptr;
                     case viua::arch::ops::OPCODE_N::EBREAK:
-                        execute(registers, viua::arch::ins::EBREAK{
+                        execute(registers, strings, viua::arch::ins::EBREAK{
                             viua::arch::ops::N::decode(raw)});
                         break;
                 }
@@ -346,12 +346,16 @@ namespace machine::core::ins {
 }
 
 namespace {
-    auto run_instruction(std::vector<Value>& registers, uint64_t const* ip) -> uint64_t const*
+    auto run_instruction(
+          std::vector<Value>& registers
+        , std::vector<uint8_t> const& strings
+        , viua::arch::instruction_type const* ip
+    ) -> viua::arch::instruction_type const*
     {
-        auto instruction = uint64_t{};
+        auto instruction = viua::arch::instruction_type{};
         do {
             instruction = *ip;
-            ip = machine::core::ins::execute(registers, ip);
+            ip = machine::core::ins::execute(registers, strings, ip);
         } while ((ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
         return ip;
@@ -359,8 +363,12 @@ namespace {
 
     auto run(
           std::vector<Value>& registers
-        , uint64_t const* ip
-        , std::tuple<std::string_view const, uint64_t const*, uint64_t const*> ip_range
+        , std::vector<uint8_t> const& strings
+        , viua::arch::instruction_type const* ip
+        , std::tuple<
+              std::string_view const
+            , viua::arch::instruction_type const*
+            , viua::arch::instruction_type const*> ip_range
     ) -> void
     {
         auto const [ module, ip_begin, ip_end ] = ip_range;
@@ -391,7 +399,7 @@ namespace {
                     << std::hex << std::setw(2) << std::setfill('0')
                     << i << std::dec << "\n";
 
-                ip = run_instruction(registers, ip);
+                ip = run_instruction(registers, strings, ip);
 
                 /*
                  * Halting instruction returns nullptr because it does not know
@@ -441,7 +449,10 @@ auto main(int argc, char* argv[]) -> int
     auto const executable_path = std::string{(argc > 1)
         ? argv[1]
         : "./a.out"};
-    std::array<viua::arch::instruction_type, 128> text {};
+
+    auto strings = std::vector<uint8_t>{};
+    auto text = std::vector<viua::arch::instruction_type>{};
+
     {
         auto const a_out = open(executable_path.c_str(), O_RDONLY);
         if (a_out == -1) {
@@ -452,37 +463,59 @@ auto main(int argc, char* argv[]) -> int
         Elf64_Ehdr elf_header {};
         read(a_out, &elf_header, sizeof(elf_header));
 
+        Elf64_Phdr program_header {};
+
         /*
          * We need to skip a few program headers which are just used to make
          * the file a proper ELF as recognised by file(1) and readelf(1).
          */
-        Elf64_Phdr program_header {};
         read(a_out, &program_header, sizeof(program_header)); // skip magic PT_NULL
         read(a_out, &program_header, sizeof(program_header)); // skip PT_INTERP
 
         /*
-         * Then comes the actually useful program header describing PT_LOAD
-         * segment with .text section containing the instructions we need to
-         * run the program.
+         * Then come the actually useful program headers describing PT_LOAD
+         * segments with .text section (containing the instructions we need to
+         * run the program), and .rodata (containing the strings representing
+         * strings and symbols).
          */
-        read(a_out, &program_header, sizeof(program_header));
+        Elf64_Phdr text_header {};
+        read(a_out, &text_header, sizeof(text_header));
 
-        lseek(a_out, program_header.p_offset, SEEK_SET);
-        read(a_out, text.data(), program_header.p_filesz);
+        Elf64_Phdr strings_header {};
+        read(a_out, &strings_header, sizeof(strings_header));
+
+        lseek(a_out, text_header.p_offset, SEEK_SET);
+        text.resize(
+            text_header.p_filesz / sizeof(viua::arch::instruction_type));
+        read(a_out, text.data(), text_header.p_filesz);
+
+        if (strings_header.p_filesz) {
+            lseek(a_out, strings_header.p_offset, SEEK_SET);
+            strings.resize(
+                strings_header.p_filesz / sizeof(viua::arch::instruction_type));
+            read(a_out, strings.data(), strings_header.p_filesz);
+        }
 
         std::cout
-            << "[vm] loaded " << program_header.p_filesz
+            << "[vm] loaded " << text_header.p_filesz
             << " byte(s) of .text section from PT_LOAD segment of "
             << executable_path << "\n";
         std::cout
-            << "[vm] loaded " << (program_header.p_filesz / sizeof(decltype(text)::value_type))
+            << "[vm] loaded " << (text_header.p_filesz / sizeof(decltype(text)::value_type))
             << " instructions\n";
+        std::cout
+            << "[vm] loaded " << strings_header.p_filesz
+            << " byte(s) of .rodata (strings) section from PT_LOAD segment of "
+            << executable_path << "\n";
 
         close(a_out);
     }
 
     auto registers = std::vector<Value>(256);
-    run(registers, text.data(), { (executable_path + "[.text]"), text.begin(), text.end() });
+
+    auto const ip_begin = &text[0];
+    auto const ip_end = (ip_begin + text.size());
+    run(registers, strings, text.data(), { (executable_path + "[.text]"), ip_begin, ip_end });
 
     return 0;
 }
