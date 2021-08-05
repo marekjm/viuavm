@@ -23,6 +23,28 @@
 #include <unistd.h>
 
 
+namespace viua::vm::types {
+    struct Value {
+        virtual auto type_name() const -> std::string = 0;
+        virtual ~Value();
+    };
+
+    struct String : Value {
+        std::string content;
+
+        auto type_name() const -> std::string override;
+    };
+}
+
+namespace viua::vm::types {
+    Value::~Value() {}
+
+    auto String::type_name() const -> std::string
+    {
+        return "string";
+    }
+}
+
 struct Value {
     enum class Unboxed_type : uint8_t {
         Void = 0,
@@ -33,15 +55,22 @@ struct Value {
         Float_double,
     };
     Unboxed_type type_of_unboxed;
-    std::variant<uint64_t, void*> value;
+
+    using boxed_type = std::unique_ptr<viua::vm::types::Value>;
+    std::variant<uint64_t, boxed_type> value;
 
     auto is_boxed() const -> bool
     {
-        return std::holds_alternative<void*>(value);
+        return std::holds_alternative<boxed_type>(value);
     }
     auto is_void() const -> bool
     {
         return ((not is_boxed()) and type_of_unboxed == Value::Unboxed_type::Void);
+    }
+
+    auto boxed_value() const -> boxed_type const&
+    {
+        return std::get<boxed_type>(value);
     }
 };
 
@@ -119,6 +148,33 @@ namespace machine::core::ins {
             + "\n";
     }
 
+    auto execute(std::vector<Value>& registers, std::vector<uint8_t> const& strings, viua::arch::ins::STRING const op) -> void
+    {
+        auto& target = registers.at(op.instruction.out.index);
+
+        auto const data_offset = std::get<uint64_t>(target.value);
+        auto const data_size = [strings, data_offset]() -> uint64_t
+        {
+            auto const size_offset = (data_offset - sizeof(uint64_t));
+            auto tmp = uint64_t{};
+            memcpy(&tmp, &strings[size_offset], sizeof(uint64_t));
+            return le64toh(tmp);
+        }();
+
+        auto s = std::make_unique<viua::vm::types::String>();
+        s->content = std::string{
+              reinterpret_cast<char const*>(&strings[0] + data_offset)
+            , data_size
+        };
+
+        target.type_of_unboxed = Value::Unboxed_type::Void;
+        target.value = std::move(s);
+
+        std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + "\n";
+    }
+
     auto execute(std::vector<Value>& registers, std::vector<uint8_t> const&, viua::arch::ins::LUI const op) -> void
     {
         auto& value = registers.at(op.instruction.out.index);
@@ -186,7 +242,9 @@ namespace machine::core::ins {
             std::cerr << "[" << std::setw(3) << i << "] ";
 
             if (each.is_boxed()) {
-                std::cerr << "<boxed>\n";
+                auto const& value = *each.boxed_value();
+                std::cerr << "<boxed> " << value.type_name();
+                std::cerr << "\n";
                 continue;
             }
 
@@ -286,9 +344,9 @@ namespace machine::core::ins {
                     case viua::arch::ops::OPCODE_S::DELETE:
                         execute(registers, strings, viua::arch::ins::DELETE{instruction});
                         break;
-                    default:
-                        std::cerr << "unimplemented S instruction\n";
-                        return nullptr;
+                    case viua::arch::ops::OPCODE_S::STRING:
+                        execute(registers, strings, viua::arch::ins::STRING{instruction});
+                        break;
                 }
                 break;
             }

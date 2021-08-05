@@ -69,6 +69,12 @@ namespace viua::arch::ins {
         DELETE(viua::arch::ops::S i): instruction{i} {}
     };
 
+    struct STRING : Instruction {
+        viua::arch::ops::S instruction;
+
+        STRING(viua::arch::ops::S i): instruction{i} {}
+    };
+
     /*
      * LUI loads upper bits of a 64-bit value, sign-extending it to register
      * width. It produces a signed integer.

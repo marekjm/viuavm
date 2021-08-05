@@ -211,6 +211,7 @@ namespace viua::arch::ops {
         DIV    = (FORMAT_T | 0x0004),
 
         DELETE = (FORMAT_S | 0x0001),
+        STRING = (FORMAT_S | 0x0002),
 
         LUI    = (FORMAT_E | 0x0001),
         LUIU   = (FORMAT_E | 0x0002),
@@ -232,6 +233,7 @@ namespace viua::arch::ops {
     };
     enum class OPCODE_S : opcode_type {
         DELETE = static_cast<opcode_type>(OPCODE::DELETE),
+        STRING = static_cast<opcode_type>(OPCODE::STRING),
     };
     enum class OPCODE_E : opcode_type {
         LUI  = static_cast<opcode_type>(OPCODE::LUI),

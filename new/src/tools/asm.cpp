@@ -14,6 +14,7 @@
 #include <type_traits>
 
 #include <elf.h>
+#include <endian.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
@@ -202,6 +203,19 @@ namespace {
 
         return instructions;
     }
+
+    auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
+        -> size_t
+    {
+        auto const data_size = htole64(static_cast<uint64_t>(data.size()));
+        strings.resize(strings.size() + sizeof(data_size));
+        memcpy((strings.data() + strings.size() - sizeof(data_size)), &data_size, sizeof(data_size));
+
+        auto const saved_location = strings.size();
+        std::copy(data.begin(), data.end(), std::back_inserter(strings));
+
+        return saved_location;
+    }
 }
 
 auto main(int argc, char*[]) -> int
@@ -370,6 +384,8 @@ auto main(int argc, char*[]) -> int
     if (argc == 1) {
         auto strings = std::vector<uint8_t>{};
 
+        auto const hello_world_at = save_string(strings, "Hello, World!\n");
+
         std::array<viua::arch::instruction_type, 32> text {};
         auto ip = text.data();
 
@@ -400,6 +416,14 @@ auto main(int argc, char*[]) -> int
                 , viua::arch::Register_access::make_local(3)
             }.encode();
             *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+
+            ip = op_li(ip, hello_world_at);
+            *ip++ = viua::arch::ops::S{
+                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::STRING)
+                , viua::arch::Register_access::make_local(1)
+            }.encode();
+            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
+
             *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
         }
 

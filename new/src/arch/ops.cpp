@@ -245,6 +245,8 @@ namespace viua::arch::ops {
                 return greedy + "div";
             case OPCODE::DELETE:
                 return greedy + "delete";
+            case OPCODE::STRING:
+                return greedy + "string";
             case OPCODE::LUI:
                 return greedy + "lui";
             case OPCODE::LUIU:
