@@ -56,9 +56,9 @@ namespace machine::core::ins {
         out.value = (std::get<uint64_t>(lhs.value) + std::get<uint64_t>(rhs.value));
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.lhs.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.rhs.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.lhs.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
     auto execute(std::vector<Value>& registers, viua::arch::ins::SUB const op) -> void
@@ -71,9 +71,9 @@ namespace machine::core::ins {
         out.value = (std::get<uint64_t>(lhs.value) - std::get<uint64_t>(rhs.value));
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.lhs.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.rhs.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.lhs.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
     auto execute(std::vector<Value>& registers, viua::arch::ins::MUL const op) -> void
@@ -86,9 +86,9 @@ namespace machine::core::ins {
         out.value = (std::get<uint64_t>(lhs.value) * std::get<uint64_t>(rhs.value));
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.lhs.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.rhs.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.lhs.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
     auto execute(std::vector<Value>& registers, viua::arch::ins::DIV const op) -> void
@@ -101,9 +101,9 @@ namespace machine::core::ins {
         out.value = (std::get<uint64_t>(lhs.value) / std::get<uint64_t>(rhs.value));
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.lhs.index))
-            + ", %" + std::to_string(static_cast<int>(op.instruction.rhs.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.lhs.index))
+            + ", $" + std::to_string(static_cast<int>(op.instruction.rhs.index))
             + "\n";
     }
 
@@ -115,7 +115,7 @@ namespace machine::core::ins {
         target.value = uint64_t{0};
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + ", %" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
             + "\n";
     }
 
@@ -126,7 +126,7 @@ namespace machine::core::ins {
         value.value = (op.instruction.immediate << 28);
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
     }
@@ -137,7 +137,7 @@ namespace machine::core::ins {
         value.value = (op.instruction.immediate << 28);
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
     }
@@ -153,7 +153,7 @@ namespace machine::core::ins {
         out.value = (base + op.instruction.immediate);
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
             + ", void" // FIXME it's not always void
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
@@ -169,7 +169,7 @@ namespace machine::core::ins {
         out.value = (base + op.instruction.immediate);
 
         std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
-            + " %" + std::to_string(static_cast<int>(op.instruction.out.index))
+            + " $" + std::to_string(static_cast<int>(op.instruction.out.index))
             + ", void" // FIXME it's not always void
             + ", " + std::to_string(op.instruction.immediate)
             + "\n";
