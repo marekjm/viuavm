@@ -24,15 +24,58 @@
 
 
 namespace viua::vm::types {
+    namespace traits {
+        struct To_string {
+            virtual auto to_string() const -> std::string = 0;
+            virtual ~To_string();
+
+            static auto quote_and_escape(std::string_view const sv) -> std::string
+            {
+                auto out = std::ostringstream{};
+                out << std::quoted(sv);
+
+                auto const tmp = out.str();
+                out.str("");
+
+                for (auto const each : tmp) {
+                    if (each == '\n') {
+                        out << "\\n";
+                    } else {
+                        out << each;
+                    }
+                }
+
+                return out.str();
+            }
+        };
+    }
+
     struct Value {
         virtual auto type_name() const -> std::string = 0;
         virtual ~Value();
+
+        template<typename Trait>
+        auto as_trait(std::function<void(Trait const&)> fn) const -> void
+        {
+            if (not has_trait<Trait>()) {
+                return;
+            }
+
+            fn(*dynamic_cast<Trait const*>(this));
+        }
+
+        template<typename Trait>
+        auto has_trait() const -> bool
+        {
+            return (dynamic_cast<Trait const*>(this) != nullptr);
+        }
     };
 
-    struct String : Value {
+    struct String : Value, traits::To_string {
         std::string content;
 
         auto type_name() const -> std::string override;
+        auto to_string() const -> std::string override;
     };
 }
 
@@ -43,6 +86,13 @@ namespace viua::vm::types {
     {
         return "string";
     }
+    auto String::to_string() const -> std::string
+    {
+        return viua::vm::types::traits::To_string::quote_and_escape(content);
+    }
+}
+namespace viua::vm::types::traits {
+    To_string::~To_string() {}
 }
 
 struct Value {
@@ -244,6 +294,10 @@ namespace machine::core::ins {
             if (each.is_boxed()) {
                 auto const& value = *each.boxed_value();
                 std::cerr << "<boxed> " << value.type_name();
+                value.as_trait<viua::vm::types::traits::To_string>([](viua::vm::types::traits::To_string const& val) -> void
+                {
+                    std::cerr << " = " << val.to_string();
+                });
                 std::cerr << "\n";
                 continue;
             }
