@@ -62,9 +62,13 @@ $(BUILD)/%.o: $(SOURCE)/%.cpp
 ################################################################################
 # Explicit dependencies
 $(BUILD)/tools/asm: \
-	build/arch/arch.o \
-	build/arch/ops.o
+	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/vm: \
-	build/arch/arch.o \
-	build/arch/ops.o
+	$(BUILD)/arch/arch.o \
+	$(BUILD)/arch/ops.o
+
+$(BUILD)/arch/ops.o: \
+	./include/viua/arch/arch.h \
+	./include/viua/arch/ops.h
