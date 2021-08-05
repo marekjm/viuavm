@@ -270,7 +270,7 @@ eg, delete, self, throw, struct, buffer
 ## 1-way register access, 32-bit wide immediate (F format)
 
 eg, float
-eg, iuw (Insert Upper Word), ilw (Insert Lower Word)
+eg, muw (Mask Upper Word), mlw (Mask Lower Word)
 
 - 16 bits opcode
 - 12 bits output register
