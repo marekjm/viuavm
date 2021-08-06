@@ -1,13 +1,18 @@
 ################################################################################
 # Base directories
-SOURCE=./src
 BUILD=./build
 PREFIX=~/.local
+
+BUILD_EXEC_DIR=$(BUILD)/tools/exec
+CORE_DIR=$(PREFIX)/lib/viua/core
+CORE_BIN_DIR=$(CORE_DIR)/bin
+CORE_LIB_DIR=$(CORE_DIR)/lib
+CORE_MAN_DIR=$(CORE_DIR)/man
 
 
 ################################################################################
 # Compilation flags
-CXX = g++
+CXX=g++
 CXXSTD=c++20
 
 CXXFLAGS_OPTIMISATION=-g
@@ -32,13 +37,13 @@ CXXFLAGS=\
 ################################################################################
 # High-level targets
 all: \
-	$(BUILD)/tools/asm \
-	$(BUILD)/tools/vm
+	$(BUILD)/tools/exec/asm \
+	$(BUILD)/tools/exec/vm
 
 install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
-	@cp -v ./build/tools/asm $(PREFIX)/lib/viua/core/bin/viua-asm
-	@cp -v ./build/tools/vm $(PREFIX)/lib/viua/core/bin/viua-vm
+	@cp -v $(BUILD_EXEC_DIR)/asm $(CORE_BIN_DIR)/viua-asm
+	@cp -v $(BUILD_EXEC_DIR)/vm $(CORE_BIN_DIR)/viua-vm
 
 install-binfmt:
 	mkdir -p $(PREFIX)/lib/binfmt.d
@@ -54,18 +59,18 @@ install-binfmt:
 $(BUILD)/%: $(BUILD)/%.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(BUILD)/%.o: $(SOURCE)/%.cpp
+$(BUILD)/%.o: ./src/%.cpp
 	@mkdir -p $(shell dirname $@)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 
 ################################################################################
 # Explicit dependencies
-$(BUILD)/tools/asm: \
+$(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
-$(BUILD)/tools/vm: \
+$(BUILD)/tools/exec/vm: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
