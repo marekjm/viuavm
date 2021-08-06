@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 
@@ -218,7 +219,7 @@ namespace {
     }
 }
 
-auto main(int argc, char*[]) -> int
+auto main(int argc, char* argv[]) -> int
 {
     if constexpr (false) {
         {
@@ -376,12 +377,15 @@ auto main(int argc, char*[]) -> int
         std::cout << viua::arch::ops::to_string(0x5001) << "\n";
     }
 
+    auto args = std::vector<std::string_view>{};
+    std::copy(argv + 1, argv + argc, std::back_inserter(args));
+
     /*
-     * If invoked directly, emit a sample executable binary. This makes
-     * testing easy as we always can have a sample, working, known-good
+     * If invoked without any arguments, emit a sample executable binary. This
+     * makes testing easy as we always can have a sample, working, known-good
      * binary produced.
      */
-    if (argc == 1) {
+    if (args.empty()) {
         auto strings = std::vector<uint8_t>{};
 
         auto const hello_world_at = save_string(strings, "Hello, World!\n");
@@ -514,6 +518,34 @@ auto main(int argc, char*[]) -> int
         close(a_out);
 
         return 0;
+    }
+
+    /*
+     * If invoked *with* some arguments, find the path to the source file and
+     * assemble it - converting assembly source code into binary. Produced
+     * binary may be:
+     *
+     *  - executable (default): an ELF executable, suitable to be run by Viua VM
+     *    kernel
+     *  - linkable (with -c flag): an ELF relocatable object file, which should
+     *    be linked with other object files to produce a final executable or
+     *    shared object
+     */
+    auto const source_path = args.back();
+    auto source_text = std::string{};
+    {
+        auto const source_fd = open(source_path.data(), O_RDONLY);
+
+        struct stat source_stat {};
+        fstat(source_fd, &source_stat);
+
+        std::cerr << source_stat.st_size
+            << " byte(s) of source code to process from "
+            << source_path << "\n";
+
+        source_text.resize(source_stat.st_size);
+        read(source_fd, source_text.data(), source_text.size());
+        close(source_fd);
     }
 
     return 0;
