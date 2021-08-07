@@ -1,3 +1,4 @@
+#include <viua/support/string.h>
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 #include <viua/arch/ins.h>
@@ -31,21 +32,7 @@ namespace viua::vm::types {
 
             static auto quote_and_escape(std::string_view const sv) -> std::string
             {
-                auto out = std::ostringstream{};
-                out << std::quoted(sv);
-
-                auto const tmp = out.str();
-                out.str("");
-
-                for (auto const each : tmp) {
-                    if (each == '\n') {
-                        out << "\\n";
-                    } else {
-                        out << each;
-                    }
-                }
-
-                return out.str();
+                return viua::support::string::quoted(sv);
             }
         };
     }
