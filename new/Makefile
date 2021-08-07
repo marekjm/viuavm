@@ -67,13 +67,23 @@ $(BUILD)/%.o: ./src/%.cpp
 ################################################################################
 # Explicit dependencies
 $(BUILD)/tools/exec/asm: \
+	$(BUILD)/support/string.o \
+	$(BUILD)/support/tty.o \
+	$(BUILD)/tools/libs/lexer.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
+$(BUILD)/tools/exec/asm.o: \
+	./include/viua/support/tty.h
+
 $(BUILD)/tools/exec/vm: \
+	$(BUILD)/support/string.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/arch/ops.o: \
 	./include/viua/arch/arch.h \
 	./include/viua/arch/ops.h
+
+$(BUILD)/tools/libs/lexer.o: \
+	./include/viua/libs/lexer.h

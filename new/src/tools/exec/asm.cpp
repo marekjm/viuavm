@@ -1,3 +1,5 @@
+#include <viua/support/tty.h>
+#include <viua/libs/lexer.h>
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 
@@ -546,6 +548,45 @@ auto main(int argc, char* argv[]) -> int
         source_text.resize(source_stat.st_size);
         read(source_fd, source_text.data(), source_text.size());
         close(source_fd);
+    }
+
+    auto lexemes = std::vector<viua::libs::lexer::Lexeme>{};
+    try {
+        lexemes = viua::libs::lexer::lex(source_text);
+    } catch (viua::libs::lexer::Location const& e) {
+        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::COLOR_FG_RED;
+        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::send_escape_seq;
+
+        constexpr auto esc = send_escape_seq;
+
+        std::cerr
+            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+            << ':'<< esc(2, COLOR_FG_WHITE) << (e.line + 1) << esc(2, ATTR_RESET)
+            << ':'<< esc(2, COLOR_FG_WHITE) << (e.character + 1) << esc(2, ATTR_RESET)
+            << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+            << "no token match\n";
+        return 1;
+    }
+
+    std::cerr << "found " << lexemes.size() << " lexeme(s)\n";
+    for (auto const& each : lexemes) {
+        std::cerr << "  "
+            << viua::libs::lexer::to_string(each.token);
+
+        using viua::libs::lexer::TOKEN;
+        auto const printable =
+               (each.token == TOKEN::LITERAL_STRING)
+            or (each.token == TOKEN::LITERAL_INTEGER)
+            or (each.token == TOKEN::LITERAL_FLOAT)
+            or (each.token == TOKEN::LITERAL_ATOM)
+            or (each.token == TOKEN::OPCODE);
+        if (printable) {
+            std::cerr << " " << each.text;
+        }
+
+        std::cerr << "\n";
     }
 
     return 0;
