@@ -92,9 +92,12 @@ namespace viua::libs::lexer {
 
     const auto WHITESPACE = std::regex{"^[ \t]+"};
 
+    const auto RA_DIRECT = std::regex{"^\\$"};
+    const auto RA_PTR_DEREF = std::regex{"^\\*"};
     const auto RA_VOID = std::regex{"^\\bvoid\\b"};
 
     const auto OPCODE = std::regex{"^(?:g.)?[a-z][a-z0-9_]*(?:.[stw])?\\b"};
+    const auto COMMA = std::regex{"^,"};
 
     const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
     const auto LITERAL_INTEGER = std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)\\b"};
@@ -106,6 +109,7 @@ namespace viua::libs::lexer {
         auto line = size_t{};
         auto character = size_t{};
         auto offset = size_t{};
+
         while (not source_text.empty()) {
             if (source_text[0] == '\n') {
                 lexemes.emplace_back("\n", TOKEN::TERMINATOR, Location{ line, character, offset });
@@ -129,34 +133,6 @@ namespace viua::libs::lexer {
 
                 continue;
             }
-            if (source_text[0] == '$') {
-                lexemes.emplace_back("$", TOKEN::RA_DIRECT, Location{ line, character, offset });
-
-                character += 1;
-                offset += 1;
-                source_text.remove_prefix(1);
-
-                continue;
-            }
-            if (source_text[0] == '*') {
-                lexemes.emplace_back("*", TOKEN::RA_DIRECT, Location{ line, character, offset });
-
-                character += 1;
-                offset += 1;
-                source_text.remove_prefix(1);
-
-                continue;
-            }
-            if (source_text[0] == ',') {
-                lexemes.emplace_back(",", TOKEN::COMMA, Location{ line, character, offset });
-
-                character += 1;
-                offset += 1;
-                source_text.remove_prefix(1);
-
-                continue;
-            }
-
             if (source_text[0] == '"') {
                 auto ss = std::stringstream{};
                 ss << std::string_view{
@@ -218,7 +194,10 @@ namespace viua::libs::lexer {
 
             if (try_match(WHITESPACE, TOKEN::WHITESPACE)) { continue; }
             if (try_match(COMMENT, TOKEN::COMMENT)) { continue; }
+            if (try_match(COMMA, TOKEN::COMMA)) { continue; }
             if (try_match(RA_VOID, TOKEN::RA_VOID)) { continue; }
+            if (try_match(RA_DIRECT, TOKEN::RA_DIRECT)) { continue; }
+            if (try_match(RA_PTR_DEREF, TOKEN::RA_PTR_DEREF)) { continue; }
             if (try_match(OPCODE, TOKEN::OPCODE)) { continue; }
             if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) { continue; }
             if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) { continue; }
