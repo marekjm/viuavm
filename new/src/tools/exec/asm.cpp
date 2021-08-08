@@ -221,6 +221,23 @@ namespace {
     }
 }
 
+namespace ast {
+auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
+    -> std::vector<viua::libs::lexer::Lexeme>
+{
+    auto cooked = std::vector<viua::libs::lexer::Lexeme>{};
+    for (auto& each : raw) {
+        using viua::libs::lexer::TOKEN;
+        if (each.token == TOKEN::WHITESPACE or each.token == TOKEN::COMMENT) {
+            continue;
+        }
+
+        cooked.push_back(std::move(each));
+    }
+    return cooked;
+}
+}
+
 auto main(int argc, char* argv[]) -> int
 {
     if constexpr (false) {
@@ -570,7 +587,7 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    std::cerr << "found " << lexemes.size() << " lexeme(s)\n";
+    std::cerr << lexemes.size() << " raw lexeme(s)\n";
     for (auto const& each : lexemes) {
         std::cerr << "  "
             << viua::libs::lexer::to_string(each.token);
@@ -588,6 +605,9 @@ auto main(int argc, char* argv[]) -> int
 
         std::cerr << "\n";
     }
+
+    auto cooked_lexemes = ast::remove_noise(std::move(lexemes));
+    std::cerr << cooked_lexemes.size() << " cooked lexeme(s)\n";
 
     return 0;
 }
