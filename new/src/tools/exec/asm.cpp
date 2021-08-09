@@ -230,15 +230,34 @@ struct Node {
 auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
     -> std::vector<viua::libs::lexer::Lexeme>
 {
-    auto cooked = std::vector<viua::libs::lexer::Lexeme>{};
+    using viua::libs::lexer::TOKEN;
+    auto tmp = std::vector<viua::libs::lexer::Lexeme>{};
     for (auto& each : raw) {
-        using viua::libs::lexer::TOKEN;
         if (each.token == TOKEN::WHITESPACE or each.token == TOKEN::COMMENT) {
+            continue;
+        }
+
+        tmp.push_back(std::move(each));
+    }
+
+    while ((not tmp.empty()) and tmp.front().token == TOKEN::TERMINATOR) {
+        tmp.erase(tmp.begin());
+    }
+
+    auto cooked = std::vector<viua::libs::lexer::Lexeme>{};
+    for (auto& each : tmp) {
+        if (each.token != TOKEN::TERMINATOR or cooked.empty()) {
+            cooked.push_back(std::move(each));
+            continue;
+        }
+
+        if (cooked.back().token == TOKEN::TERMINATOR) {
             continue;
         }
 
         cooked.push_back(std::move(each));
     }
+
     return cooked;
 }
 }
