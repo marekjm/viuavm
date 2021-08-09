@@ -74,7 +74,8 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/asm.o: \
-	./include/viua/support/tty.h
+	./include/viua/support/tty.h \
+	./include/viua/support/vector.h
 
 $(BUILD)/tools/exec/vm: \
 	$(BUILD)/support/string.o \
