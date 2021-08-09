@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <iostream>
 #include <regex>
+#include <set>
 #include <string_view>
 #include <vector>
 
@@ -102,6 +103,39 @@ namespace viua::libs::lexer {
     const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
     const auto LITERAL_INTEGER = std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)\\b"};
 
+    auto const OPCODE_NAMES = std::set<std::string>{
+        "noop",
+        "halt",
+        "ebreak",
+
+        "add",
+        "g.add",
+        "sub",
+        "g.sub",
+        "mul",
+        "g.mul",
+        "div",
+        "g.div",
+
+        "delete",
+        "g.delete",
+        "string",
+
+        "lui",
+        "g.lui",
+        "luiu",
+        "g.luiu",
+
+        "addi",
+        "g.addi",
+        "addiu",
+        "g.addiu",
+
+        "framei",
+        "g.framei",
+        "tailcall",
+    };
+
     auto lex(std::string_view source_text) -> std::vector<Lexeme>
     {
         auto lexemes = std::vector<Lexeme>{};
@@ -134,6 +168,7 @@ namespace viua::libs::lexer {
                 continue;
             }
             if (source_text[0] == '"') {
+                if constexpr (false) {
                 auto ss = std::stringstream{};
                 ss << std::string_view{
                       source_text.begin()
@@ -164,15 +199,45 @@ namespace viua::libs::lexer {
                  */
                 auto const shift_by = (extracted_string.size() + 2);
 
+                lexemes.emplace_back(
+                      std::move(extracted_string)
+                    , TOKEN::LITERAL_STRING
+                    , Location{ line, character, offset }
+                );
+
                 character += shift_by;
                 offset += shift_by;
                 source_text.remove_prefix(shift_by);
+                }
+
+                auto ss = std::ostringstream{};
+                auto escaped = bool{false};
+                constexpr auto DELIMITER = '"';
+
+                ss << source_text.front();
+                for (auto i = size_t{1}; i < source_text.size(); ++i) {
+                    auto const c = source_text[i];
+                    ss << c;
+
+                    if (c == DELIMITER and not escaped) {
+                        break;
+                    }
+
+                    escaped = (c == '\\') ? (not escaped) : false;
+                }
+
+                auto extracted_string = ss.str();
+                auto const shift_by = extracted_string.size();
 
                 lexemes.emplace_back(
                       std::move(extracted_string)
-                    , TOKEN::COMMA
+                    , TOKEN::LITERAL_STRING
                     , Location{ line, character, offset }
                 );
+
+                character += shift_by;
+                offset += shift_by;
+                source_text.remove_prefix(shift_by);
 
                 continue;
             }
@@ -198,7 +263,15 @@ namespace viua::libs::lexer {
             if (try_match(RA_VOID, TOKEN::RA_VOID)) { continue; }
             if (try_match(RA_DIRECT, TOKEN::RA_DIRECT)) { continue; }
             if (try_match(RA_PTR_DEREF, TOKEN::RA_PTR_DEREF)) { continue; }
-            if (try_match(OPCODE, TOKEN::OPCODE)) { continue; }
+            if (try_match(OPCODE, TOKEN::OPCODE)) {
+                if (OPCODE_NAMES.count(lexemes.back().text) == 0) {
+                    auto lx = std::move(lexemes.back());
+                    lexemes.pop_back();
+
+                    lexemes.emplace_back(lx.text, TOKEN::LITERAL_ATOM, lx.location);
+                }
+                continue;
+            }
             if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) { continue; }
             if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) { continue; }
             if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) { continue; }
