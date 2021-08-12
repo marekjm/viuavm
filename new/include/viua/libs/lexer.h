@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -87,6 +88,9 @@ namespace viua::libs::lexer {
         std::string text;
         TOKEN token;
         Location location;
+
+        auto operator==(TOKEN const) const -> bool;
+        auto operator==(std::string_view const) const -> bool;
     };
 
     auto lex(std::string_view) -> std::vector<Lexeme>;

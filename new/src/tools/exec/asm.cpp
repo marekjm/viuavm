@@ -290,7 +290,7 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
         << ' ' << fn_name.text << "\n";
 
     auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
-    while ((not lexemes.empty()) and lexemes.front().token != TOKEN::END) {
+    while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         auto opcode = consume_token_of(TOKEN::OPCODE, lexemes);
         std::cerr << "  " << opcode.text << "\n";
 
@@ -298,12 +298,12 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
          * Special case for instructions with no operands. It is here to make
          * the loop that extracts the operands simpler.
          */
-        if (lexemes.front().token == TOKEN::TERMINATOR) {
+        if (lexemes.front() == TOKEN::TERMINATOR) {
             consume_token_of(TOKEN::TERMINATOR, lexemes);
             continue;
         }
 
-        while ((not lexemes.empty()) and lexemes.front().token != TOKEN::END) {
+        while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
             if (lexemes.front().token == TOKEN::END) {
                 break;
             }
@@ -314,12 +314,12 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
              * of if-else should handle valid operands - and ONLY operands, not
              * their separators.
              */
-            if (lexemes.front().token == TOKEN::RA_VOID) {
+            if (lexemes.front() == TOKEN::RA_VOID) {
                 std::cerr
                     << "    "
                     << viua::libs::lexer::to_string(consume_token_of(TOKEN::RA_VOID, lexemes).token)
                     << "\n";
-            } else if (lexemes.front().token == TOKEN::RA_DIRECT) {
+            } else if (lexemes.front() == TOKEN::RA_DIRECT) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
                 auto const index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 std::cerr
@@ -327,21 +327,21 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     << viua::libs::lexer::to_string(access.token)
                     << ' ' << access.text << index.text
                     << "\n";
-            } else if (lexemes.front().token == TOKEN::LITERAL_INTEGER) {
+            } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
                 auto const value = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 std::cerr
                     << "    "
                     << viua::libs::lexer::to_string(value.token)
                     << ' ' << value.text
                     << "\n";
-            } else if (lexemes.front().token == TOKEN::LITERAL_STRING) {
+            } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
                 auto const value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
                 std::cerr
                     << "    "
                     << viua::libs::lexer::to_string(value.token)
                     << ' ' << value.text
                     << "\n";
-            } else if (lexemes.front().token == TOKEN::LITERAL_ATOM) {
+            } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
                 auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
                 std::cerr
                     << "    "
@@ -357,11 +357,11 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
              * operands), or a terminator (meaning that there will be no more
              * operands).
              */
-            if (lexemes.front().token == TOKEN::COMMA) {
+            if (lexemes.front() == TOKEN::COMMA) {
                 consume_token_of(TOKEN::COMMA, lexemes);
                 continue;
             }
-            if (lexemes.front().token == TOKEN::TERMINATOR) {
+            if (lexemes.front() == TOKEN::TERMINATOR) {
                 consume_token_of(TOKEN::TERMINATOR, lexemes);
                 break;
             }

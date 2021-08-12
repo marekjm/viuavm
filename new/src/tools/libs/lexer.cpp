@@ -31,6 +31,15 @@
 
 
 namespace viua::libs::lexer {
+    auto Lexeme::operator==(TOKEN const tk) const -> bool
+    {
+        return (token == tk);
+    }
+    auto Lexeme::operator==(std::string_view const sv) const -> bool
+    {
+        return (text == sv);
+    }
+
     auto to_string(TOKEN const token) -> std::string
     {
         switch (token) {
