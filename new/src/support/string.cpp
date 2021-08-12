@@ -17,6 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <viua/support/string.h>
+
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -40,6 +42,13 @@ namespace viua::support::string {
             }
         }
 
+        return out.str();
+    }
+
+    auto quote_squares(std::string_view const sv) -> std::string
+    {
+        auto out = std::ostringstream{};
+        out << CORNER_QUOTE_LL << sv << CORNER_QUOTE_UR;
         return out.str();
     }
 }
