@@ -225,8 +225,24 @@ namespace {
 
 namespace ast {
 struct Node {
-    std::vector<viua::libs::lexer::Lexeme> lexemes;
+    virtual auto to_string() const -> std::string = 0;
+    ~Node() = default;
 };
+
+struct Fn_def : Node {
+    viua::libs::lexer::Lexeme name;
+    std::vector<viua::libs::lexer::Lexeme> instructions;
+
+    auto to_string() const -> std::string override;
+};
+auto Fn_def::to_string() const -> std::string
+{
+    return viua::libs::lexer::to_string(viua::libs::lexer::TOKEN::DEF_FUNCTION)
+        + ' ' + std::to_string(name.location.line + 1)
+        + ':' + std::to_string(name.location.character + 1)
+        + '-' + std::to_string(name.location.character + name.text.size())
+        + ' ' + name.text;
+}
 
 auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
     -> std::vector<viua::libs::lexer::Lexeme>
