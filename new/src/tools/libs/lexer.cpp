@@ -149,6 +149,11 @@ namespace viua::libs::lexer {
         "framei",
         "g.framei",
         "tailcall",
+
+        /*
+         * Pseudoinstructions listed below.
+         */
+        "li",
     };
 
     auto lex(std::string_view source_text) -> std::vector<Lexeme>
