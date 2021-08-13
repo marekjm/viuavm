@@ -46,9 +46,10 @@ namespace viua::libs::lexer {
          * Control characters.
          */
         COMMA,
+        EQ,
         TERMINATOR,
-        ATTR_OPEN,
-        ATTR_CLOSE,
+        ATTR_LIST_OPEN,
+        ATTR_LIST_CLOSE,
         PAREN_OPEN,
         PAREN_CLOSE,
         BRACE_OPEN,

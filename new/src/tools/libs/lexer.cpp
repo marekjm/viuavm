@@ -51,12 +51,14 @@ namespace viua::libs::lexer {
             return "OPCODE";
         case TOKEN::COMMA:
             return "COMMA";
+        case TOKEN::EQ:
+            return "EQ";
         case TOKEN::TERMINATOR:
             return "TERMINATOR";
-        case TOKEN::ATTR_OPEN:
-            return "ATTR_OPEN";
-        case TOKEN::ATTR_CLOSE:
-            return "ATTR_CLOSE";
+        case TOKEN::ATTR_LIST_OPEN:
+            return "ATTR_LIST_OPEN";
+        case TOKEN::ATTR_LIST_CLOSE:
+            return "ATTR_LIST_CLOSE";
         case TOKEN::PAREN_OPEN:
             return "PAREN_OPEN";
         case TOKEN::PAREN_CLOSE:
@@ -107,7 +109,11 @@ namespace viua::libs::lexer {
     const auto RA_VOID = std::regex{"^\\bvoid\\b"};
 
     const auto OPCODE = std::regex{"^(?:g.)?[a-z][a-z0-9_]*(?:.[stw])?\\b"};
+
     const auto COMMA = std::regex{"^,"};
+    const auto EQ = std::regex{"^="};
+    const auto ATTR_LIST_OPEN = std::regex{"^\\[\\["};
+    const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 
     const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
     const auto LITERAL_INTEGER = std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)\\b"};
@@ -285,6 +291,9 @@ namespace viua::libs::lexer {
             if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) { continue; }
             if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) { continue; }
             if (try_match(END, TOKEN::END)) { continue; }
+            if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) { continue; }
+            if (try_match(ATTR_LIST_CLOSE, TOKEN::ATTR_LIST_CLOSE)) { continue; }
+            if (try_match(EQ, TOKEN::EQ)) { continue; }
 
             std::cerr << viua::support::string::quoted(source_text.substr(0, 40)) << "\n";
             throw Location{line, character, offset};

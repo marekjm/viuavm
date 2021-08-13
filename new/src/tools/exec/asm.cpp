@@ -12,6 +12,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <optional>
 #include <variant>
 #include <vector>
 #include <utility>
@@ -226,9 +227,34 @@ namespace {
 
 namespace ast {
 struct Node {
+    using Lexeme = viua::libs::lexer::Lexeme;
+    using attribute_type = std::pair<Lexeme, std::optional<Lexeme>>;
+    std::vector<attribute_type> attributes;
+
+    auto has_attr(std::string_view const) const -> bool;
+    auto attr(std::string_view const) const -> std::optional<Lexeme>;
+
     virtual auto to_string() const -> std::string = 0;
     ~Node() = default;
 };
+auto Node::has_attr(std::string_view const key) const -> bool
+{
+    for (auto const& each : attributes) {
+        if (each.first == key) {
+            return true;
+        }
+    }
+    return false;
+}
+auto Node::attr(std::string_view const key) const -> std::optional<Lexeme>
+{
+    for (auto const& each : attributes) {
+        if (each.first == key) {
+            return each.second;
+        }
+    }
+    return {};
+}
 
 struct Fn_def : Node {
     viua::libs::lexer::Lexeme name;
@@ -292,15 +318,70 @@ auto consume_token_of(
     lexemes.remove_prefix(1);
     return lx;
 }
+auto consume_token_of(
+      std::set<viua::libs::lexer::TOKEN> const ts
+    , viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes
+) -> viua::libs::lexer::Lexeme
+{
+    if (ts.count(lexemes.front().token) == 0) {
+        throw lexemes.front();
+    }
+    auto lx  = std::move(lexemes.front());
+    lexemes.remove_prefix(1);
+    return lx;
+}
 
+auto look_ahead(
+      viua::libs::lexer::TOKEN const tk
+    , viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes
+) -> bool
+{
+    return (not lexemes.empty()) and (lexemes.front() == tk);
+}
+
+auto parse_attr_list(viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+    -> std::vector<ast::Node::attribute_type>
+{
+    auto attrs = std::vector<ast::Node::attribute_type>{};
+
+    using viua::libs::lexer::TOKEN;
+    consume_token_of(TOKEN::ATTR_LIST_OPEN, lexemes);
+    while ((not lexemes.empty()) and lexemes.front() != TOKEN::ATTR_LIST_CLOSE) {
+        auto key = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+        auto value = std::optional<viua::libs::lexer::Lexeme>{};
+
+        if (look_ahead(TOKEN::EQ, lexemes)) {
+            consume_token_of(TOKEN::EQ, lexemes);
+
+            if (look_ahead(TOKEN::LITERAL_INTEGER, lexemes)) {
+                value = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+            } else if (look_ahead(TOKEN::LITERAL_STRING, lexemes)) {
+                value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
+            } else if (look_ahead(TOKEN::LITERAL_ATOM, lexemes)) {
+                value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+            } else {
+                throw lexemes.front();
+            }
+        }
+
+        attrs.emplace_back(std::move(key), std::move(value));
+    }
+    consume_token_of(TOKEN::ATTR_LIST_CLOSE, lexemes);
+
+    return attrs;
+}
 auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> std::unique_ptr<ast::Node>
 {
     using viua::libs::lexer::TOKEN;
-
     auto const leader = consume_token_of(TOKEN::DEF_FUNCTION, lexemes);
 
-    auto fn_name = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+    auto fn = std::make_unique<ast::Fn_def>();
+    if (look_ahead(TOKEN::ATTR_LIST_OPEN, lexemes)) {
+        fn->attributes = parse_attr_list(lexemes);
+    }
+
+    auto fn_name = consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
     std::cerr
@@ -324,6 +405,15 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
         while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
             if (lexemes.front().token == TOKEN::END) {
                 break;
+            }
+
+            /*
+             * Attributes come before the element they describe, so let's try to
+             * parse them before an operand.
+             */
+            auto attrs = std::vector<ast::Node::attribute_type>{};
+            if (lexemes.front() == TOKEN::ATTR_LIST_OPEN) {
+                attrs = parse_attr_list(lexemes);
             }
 
             /*
@@ -390,7 +480,9 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
     consume_token_of(TOKEN::END, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
-    return std::unique_ptr<ast::Node>();
+    fn->name = std::move(fn_name);
+
+    return fn;
 }
 
 auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
@@ -988,6 +1080,51 @@ auto main(int argc, char* argv[]) -> int
             << "unexpected token: " << viua::libs::lexer::to_string(e.token) << "\n";
 
         return 1;
+    }
+
+    {
+        auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
+
+        for (auto const& each : nodes) {
+            std::cerr << each->to_string() << "\n";
+            if (each->has_attr("entry_point")) {
+                entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
+            }
+        }
+
+        if (not entry_point_fn.has_value()) {
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::COLOR_FG_CYAN;
+            using viua::support::tty::COLOR_FG_RED;
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            std::cerr
+                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+                << " no entry point function defined\n";
+            std::cerr
+                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                << ": " << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET) << ": "
+                << " the entry function should have the [[entry_point]] attribute\n";
+            return 1;
+        } else {
+            using viua::support::tty::COLOR_FG_WHITE;
+            using viua::support::tty::ATTR_RESET;
+            using viua::support::tty::send_escape_seq;
+            constexpr auto esc = send_escape_seq;
+
+            auto const location = entry_point_fn.value().location;
+
+            std::cerr
+                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
+                << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
+                << ": found entry function: "
+                << esc(2, COLOR_FG_WHITE) << entry_point_fn.value().text << esc(2, ATTR_RESET)
+                << "\n";
+        }
     }
 
     return 0;

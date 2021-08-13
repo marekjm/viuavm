@@ -74,6 +74,7 @@ $(BUILD)/tools/exec/asm: \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/asm.o: \
+	./include/viua/libs/lexer.h \
 	./include/viua/support/tty.h \
 	./include/viua/support/vector.h
 
