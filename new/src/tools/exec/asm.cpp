@@ -256,9 +256,52 @@ auto Node::attr(std::string_view const key) const -> std::optional<Lexeme>
     return {};
 }
 
+struct Operand : Node {
+    std::vector<viua::libs::lexer::Lexeme> ingredients;
+
+    auto to_string() const -> std::string override;
+};
+auto Operand::to_string() const -> std::string
+{
+    auto out = std::ostringstream{};
+    for (auto const& each : ingredients) {
+        out << each.text;
+    }
+    return out.str();
+}
+
+struct Instruction : Node {
+    viua::libs::lexer::Lexeme opcode;
+    std::vector<Operand> operands;
+
+    auto to_string() const -> std::string override;
+};
+auto Instruction::to_string() const -> std::string
+{
+    auto out = std::ostringstream{};
+    out << opcode.text;
+    for (auto const& each : operands) {
+        out << ' ' << each.to_string() << ',';
+    }
+
+    auto s = out.str();
+    if (not operands.empty()) {
+        /*
+         * If the instruction had any operands then the string will end with a
+         * comma (to make the formatting code for operands simpler). We don't
+         * want this because this would emit syntactically incorrect assembly
+         * code.
+         *
+         * Thus, if there were any operands - we just remove the final comma.
+         */
+        s = s.erase(s.rfind(','));
+    }
+    return s;
+}
+
 struct Fn_def : Node {
     viua::libs::lexer::Lexeme name;
-    std::vector<viua::libs::lexer::Lexeme> instructions;
+    std::vector<Instruction> instructions;
 
     auto to_string() const -> std::string override;
 };
@@ -390,8 +433,10 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
 
     auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
-        auto opcode = consume_token_of(TOKEN::OPCODE, lexemes);
-        std::cerr << "  " << opcode.text << "\n";
+        auto instruction = ast::Instruction{};
+
+        instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
+        std::cerr << "  " << instruction.opcode.text << "\n";
 
         /*
          * Special case for instructions with no operands. It is here to make
@@ -399,6 +444,7 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
          */
         if (lexemes.front() == TOKEN::TERMINATOR) {
             consume_token_of(TOKEN::TERMINATOR, lexemes);
+            fn->instructions.push_back(std::move(instruction));
             continue;
         }
 
@@ -407,13 +453,14 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                 break;
             }
 
+            auto operand = ast::Operand{};
+
             /*
              * Attributes come before the element they describe, so let's try to
              * parse them before an operand.
              */
-            auto attrs = std::vector<ast::Node::attribute_type>{};
             if (lexemes.front() == TOKEN::ATTR_LIST_OPEN) {
-                attrs = parse_attr_list(lexemes);
+                operand.attributes = parse_attr_list(lexemes);
             }
 
             /*
@@ -423,9 +470,12 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
              * their separators.
              */
             if (lexemes.front() == TOKEN::RA_VOID) {
+                operand.ingredients.push_back(
+                    consume_token_of(TOKEN::RA_VOID, lexemes));
                 std::cerr
                     << "    "
-                    << viua::libs::lexer::to_string(consume_token_of(TOKEN::RA_VOID, lexemes).token)
+                    << viua::libs::lexer::to_string(
+                        operand.ingredients.back().token)
                     << "\n";
             } else if (lexemes.front() == TOKEN::RA_DIRECT) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
@@ -435,6 +485,8 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     << viua::libs::lexer::to_string(access.token)
                     << ' ' << access.text << index.text
                     << "\n";
+                operand.ingredients.push_back(access);
+                operand.ingredients.push_back(index);
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
                 auto const value = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 std::cerr
@@ -442,6 +494,7 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     << viua::libs::lexer::to_string(value.token)
                     << ' ' << value.text
                     << "\n";
+                operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
                 auto const value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
                 std::cerr
@@ -449,6 +502,7 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     << viua::libs::lexer::to_string(value.token)
                     << ' ' << value.text
                     << "\n";
+                operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
                 auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
                 std::cerr
@@ -456,9 +510,12 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     << viua::libs::lexer::to_string(value.token)
                     << ' ' << value.text
                     << "\n";
+                operand.ingredients.push_back(value);
             } else {
                 throw lexemes.front();
             }
+
+            instruction.operands.push_back(std::move(operand));
 
             /*
              * Consume either a comma (meaning that there will be some more
@@ -475,6 +532,8 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
             }
             throw lexemes.front();
         }
+
+        fn->instructions.push_back(std::move(instruction));
     }
 
     consume_token_of(TOKEN::END, lexemes);
@@ -1082,11 +1141,23 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto const& fn = static_cast<ast::Fn_def const&>(*each);
+        std::cerr << "FN " << fn.to_string()
+            << " with " << fn.instructions.size() << " op(s)\n";
+        for (auto const& op : fn.instructions) {
+            std::cerr << "  " << op.to_string() << "\n";
+        }
+    }
+
     {
         auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
 
         for (auto const& each : nodes) {
-            std::cerr << each->to_string() << "\n";
             if (each->has_attr("entry_point")) {
                 entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
             }
