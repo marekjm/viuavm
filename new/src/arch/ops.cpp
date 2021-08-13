@@ -20,7 +20,10 @@
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
 
+#include <stdexcept>
 #include <string>
+#include <string_view>
+
 
 namespace viua::arch::ops {
     T::T(
@@ -258,5 +261,45 @@ namespace viua::arch::ops {
         }
 
         return "<unknown>";
+    }
+    auto parse_opcode(std::string_view const raw) -> opcode_type
+    {
+        auto sv = raw;
+
+        auto greedy = sv.starts_with("g.");
+        if (greedy) {
+            sv.remove_prefix(2);
+        }
+
+        auto op = (greedy ? GREEDY : opcode_type{});
+        if (sv == "noop") {
+            return (op & static_cast<opcode_type>(OPCODE::NOOP));
+        } else if (sv == "halt") {
+            return (op & static_cast<opcode_type>(OPCODE::HALT));
+        } else if (sv == "ebreak") {
+            return (op & static_cast<opcode_type>(OPCODE::EBREAK));
+        } else if (sv == "add") {
+            return (op & static_cast<opcode_type>(OPCODE::ADD));
+        } else if (sv == "sub") {
+            return (op & static_cast<opcode_type>(OPCODE::SUB));
+        } else if (sv == "mul") {
+            return (op & static_cast<opcode_type>(OPCODE::MUL));
+        } else if (sv == "div") {
+            return (op & static_cast<opcode_type>(OPCODE::DIV));
+        } else if (sv == "delete") {
+            return (op & static_cast<opcode_type>(OPCODE::DELETE));
+        } else if (sv == "string") {
+            return (op & static_cast<opcode_type>(OPCODE::STRING));
+        } else if (sv == "lui") {
+            return (op & static_cast<opcode_type>(OPCODE::LUI));
+        } else if (sv == "luiu") {
+            return (op & static_cast<opcode_type>(OPCODE::LUIU));
+        } else if (sv == "addi") {
+            return (op & static_cast<opcode_type>(OPCODE::ADDI));
+        } else if (sv == "addiu") {
+            return (op & static_cast<opcode_type>(OPCODE::ADDIU));
+        } else {
+            throw std::invalid_argument{"viua::arch::ops::parse_opcode: " + std::string{raw}};
+        }
     }
 }

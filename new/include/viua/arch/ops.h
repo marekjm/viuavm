@@ -220,6 +220,7 @@ namespace viua::arch::ops {
         ADDIU  = (FORMAT_R | 0x0002),
     };
     auto to_string(opcode_type const) -> std::string;
+    auto parse_opcode(std::string_view) -> opcode_type;
 
     /*
      * These are helper enums to provide exhaustiveness checks for switch
