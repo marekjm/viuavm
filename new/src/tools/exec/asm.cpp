@@ -28,6 +28,9 @@
 #include <unistd.h>
 
 
+constexpr auto DEBUG = true;
+
+
 auto to_loading_parts_unsigned(uint64_t const value)
     -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>
 {
@@ -1140,6 +1143,13 @@ auto main(int argc, char* argv[]) -> int
         close(source_fd);
     }
 
+    /*
+     * Lexical analysis (lexing).
+     *
+     * Split the loaded source code into a stream of lexemes for easier
+     * processing later. The first point at which errors are detected eg, if
+     * illegal characters are used, strings are unclosed, etc.
+     */
     auto lexemes = std::vector<viua::libs::lexer::Lexeme>{};
     try {
         lexemes = viua::libs::lexer::lex(source_text);
@@ -1274,6 +1284,14 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
+    /*
+     * Syntactical analysis (parsing).
+     *
+     * Convert raw stream of lexemes into an abstract syntax tree structure that
+     * groups lexemes representing a single entity (eg, a register access
+     * specification) into a single object, and represents the relationships
+     * between such objects.
+     */
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
     try {
         nodes = parse(lexemes);
@@ -1353,16 +1371,68 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
+    /*
+     * String table preparation.
+     *
+     * Replace string literals in operands with offsets into the string table.
+     * We want all instructions to fit into 64 bits, so having variable-size
+     * operands is not an option.
+     *
+     * Don't move the strings table preparation after the pseudoinstruction
+     * expansion stage. li pseudoinstructions are emitted during strings table
+     * preparation so they need to be expanded.
+     */
+    auto strings_table = std::vector<uint8_t>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
         }
 
         auto& fn = static_cast<ast::Fn_def&>(*each);
-        std::cerr << "FN " << fn.to_string()
-            << " with " << fn.instructions.size() << " raw, ";
+        auto cooked = std::vector<ast::Instruction>{};
+        for (auto& insn : fn.instructions) {
+            if (insn.opcode == "string" or insn.opcode == "g.string") {
+                auto const saved_at = save_string(
+                      strings_table
+                    , insn.operands.back().ingredients.front().text
+                );
+
+                auto synth = ast::Instruction{};
+                synth.opcode = insn.opcode;
+                synth.opcode.text = "li";
+
+                synth.operands.push_back(insn.operands.front());
+                synth.operands.push_back(insn.operands.back());
+                synth.operands.back().ingredients.front().text = std::to_string(saved_at);
+
+                cooked.push_back(synth);
+
+                insn.operands.back() = synth.operands.front();
+                cooked.push_back(std::move(insn));
+            } else {
+                cooked.push_back(std::move(insn));
+            }
+        }
+        fn.instructions = std::move(cooked);
+    }
+
+    /*
+     * Pseudoinstruction- and macro-expansion.
+     *
+     * Replace pseudoinstructions (eg, li) with sequences of real instructions
+     * that will have the same effect. Ditto for macros.
+     */
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+        auto const raw_ops_count = fn.instructions.size();
         fn.instructions = expand_pseudoinstructions(std::move(fn.instructions));
-        std::cerr
+
+        std::cerr << "FN " << fn.to_string()
+            << " with " << raw_ops_count << " raw, "
             << fn.instructions.size()
             << " cooked op(s)\n";
         for (auto const& op : fn.instructions) {
@@ -1370,48 +1440,53 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
-    {
-        auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
-
-        for (auto const& each : nodes) {
-            if (each->has_attr("entry_point")) {
-                entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
-            }
+    /*
+     * Detect entry point function.
+     *
+     * We're not handling relocatable files (shared libs, etc) yet so it makes
+     * sense to enforce entry function presence in all cases. Once the
+     * relocatables and separate compilation is supported again, this should be
+     * hidden behind a flag.
+     */
+    auto entry_point_fn = std::optional<viua::libs::lexer::Lexeme>{};
+    for (auto const& each : nodes) {
+        if (each->has_attr("entry_point")) {
+            entry_point_fn = static_cast<ast::Fn_def&>(*each).name;
         }
+    }
+    if (not entry_point_fn.has_value()) {
+        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::COLOR_FG_CYAN;
+        using viua::support::tty::COLOR_FG_RED;
+        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::send_escape_seq;
+        constexpr auto esc = send_escape_seq;
 
-        if (not entry_point_fn.has_value()) {
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::COLOR_FG_CYAN;
-            using viua::support::tty::COLOR_FG_RED;
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
+        std::cerr
+            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+            << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+            << " no entry point function defined\n";
+        std::cerr
+            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+            << ": " << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET) << ": "
+            << " the entry function should have the [[entry_point]] attribute\n";
+        return 1;
+    }
+    if constexpr (DEBUG) {
+        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::send_escape_seq;
+        constexpr auto esc = send_escape_seq;
 
-            std::cerr
-                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-                << " no entry point function defined\n";
-            std::cerr
-                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                << ": " << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET) << ": "
-                << " the entry function should have the [[entry_point]] attribute\n";
-            return 1;
-        } else {
-            using viua::support::tty::COLOR_FG_WHITE;
-            using viua::support::tty::ATTR_RESET;
-            using viua::support::tty::send_escape_seq;
-            constexpr auto esc = send_escape_seq;
+        auto const location = entry_point_fn.value().location;
 
-            auto const location = entry_point_fn.value().location;
-
-            std::cerr
-                << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
-                << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
-                << ": found entry function: "
-                << esc(2, COLOR_FG_WHITE) << entry_point_fn.value().text << esc(2, ATTR_RESET)
-                << "\n";
-        }
+        std::cerr
+            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+            << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
+            << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
+            << ": found entry function: "
+            << esc(2, COLOR_FG_WHITE) << entry_point_fn.value().text << esc(2, ATTR_RESET)
+            << "\n";
     }
 
     return 0;
