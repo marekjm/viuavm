@@ -273,31 +273,31 @@ namespace viua::arch::ops {
 
         auto op = (greedy ? GREEDY : opcode_type{});
         if (sv == "noop") {
-            return (op & static_cast<opcode_type>(OPCODE::NOOP));
+            return (op | static_cast<opcode_type>(OPCODE::NOOP));
         } else if (sv == "halt") {
-            return (op & static_cast<opcode_type>(OPCODE::HALT));
+            return (op | static_cast<opcode_type>(OPCODE::HALT));
         } else if (sv == "ebreak") {
-            return (op & static_cast<opcode_type>(OPCODE::EBREAK));
+            return (op | static_cast<opcode_type>(OPCODE::EBREAK));
         } else if (sv == "add") {
-            return (op & static_cast<opcode_type>(OPCODE::ADD));
+            return (op | static_cast<opcode_type>(OPCODE::ADD));
         } else if (sv == "sub") {
-            return (op & static_cast<opcode_type>(OPCODE::SUB));
+            return (op | static_cast<opcode_type>(OPCODE::SUB));
         } else if (sv == "mul") {
-            return (op & static_cast<opcode_type>(OPCODE::MUL));
+            return (op | static_cast<opcode_type>(OPCODE::MUL));
         } else if (sv == "div") {
-            return (op & static_cast<opcode_type>(OPCODE::DIV));
+            return (op | static_cast<opcode_type>(OPCODE::DIV));
         } else if (sv == "delete") {
-            return (op & static_cast<opcode_type>(OPCODE::DELETE));
+            return (op | static_cast<opcode_type>(OPCODE::DELETE));
         } else if (sv == "string") {
-            return (op & static_cast<opcode_type>(OPCODE::STRING));
+            return (op | static_cast<opcode_type>(OPCODE::STRING));
         } else if (sv == "lui") {
-            return (op & static_cast<opcode_type>(OPCODE::LUI));
+            return (op | static_cast<opcode_type>(OPCODE::LUI));
         } else if (sv == "luiu") {
-            return (op & static_cast<opcode_type>(OPCODE::LUIU));
+            return (op | static_cast<opcode_type>(OPCODE::LUIU));
         } else if (sv == "addi") {
-            return (op & static_cast<opcode_type>(OPCODE::ADDI));
+            return (op | static_cast<opcode_type>(OPCODE::ADDI));
         } else if (sv == "addiu") {
-            return (op & static_cast<opcode_type>(OPCODE::ADDIU));
+            return (op | static_cast<opcode_type>(OPCODE::ADDIU));
         } else {
             throw std::invalid_argument{"viua::arch::ops::parse_opcode: " + std::string{raw}};
         }
