@@ -474,7 +474,7 @@ namespace {
 
         constexpr auto PREEMPTION_THRESHOLD = size_t{2};
 
-        while (ip != ip_end) {
+        while ((ip < ip_end) and (ip >= ip_begin)) {
             auto const ip_before = ip;
 
             std::cerr << "cycle at " << module << "+0x"
@@ -533,6 +533,15 @@ namespace {
                 using namespace std::literals;
                 std::this_thread::sleep_for(160ms);
             }
+        }
+
+        if ((ip > ip_end) or (ip < ip_begin)) {
+            std::cerr
+                << "[vm] ip "
+                << std::hex << std::setw(8) << std::setfill('0')
+                << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
+                << std::dec
+                << " outside of valid range\n";
         }
     }
 }
