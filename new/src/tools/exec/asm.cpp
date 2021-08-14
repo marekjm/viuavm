@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <chrono>
 #include <map>
+#include <numeric>
 #include <set>
 #include <string>
 #include <string_view>
@@ -28,9 +29,12 @@
 #include <unistd.h>
 
 
-constexpr auto DEBUG = true;
+constexpr auto DEBUG_ELF = false;
+constexpr auto DEBUG_LEX = false;
+constexpr auto DEBUG_EXPANSION = false;
 
 
+namespace {
 auto to_loading_parts_unsigned(uint64_t const value)
     -> std::pair<uint64_t, std::pair<std::pair<uint32_t, uint32_t>, uint32_t>>
 {
@@ -60,173 +64,19 @@ auto to_loading_parts_unsigned(uint64_t const value)
     return { high_part, { { base, multiplier }, remainder } };
 }
 
-namespace {
-    auto op_li(uint64_t* instructions, uint64_t const value) -> uint64_t*
-    {
-        auto const parts = to_loading_parts_unsigned(value);
+auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
+    -> size_t
+{
+    auto const data_size = htole64(static_cast<uint64_t>(data.size()));
+    strings.resize(strings.size() + sizeof(data_size));
+    memcpy((strings.data() + strings.size() - sizeof(data_size)), &data_size, sizeof(data_size));
 
-        /*
-         * Only use the lui instruction of there's a reason to ie, if some of
-         * the highest 36 bits are set. Otherwise, the lui is just overhead.
-         */
-        if (parts.first) {
-            *instructions++ = viua::arch::ops::E{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::LUIU))
-                , viua::arch::Register_access::make_local(1)
-                , parts.first
-            }.encode();
-        }
+    auto const saved_location = strings.size();
+    std::copy(data.begin(), data.end(), std::back_inserter(strings));
 
-        auto const base = parts.second.first.first;
-        auto const multiplier = parts.second.first.second;
-
-        if (multiplier != 0) {
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDIU))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_void()
-                , base
-            }.encode();
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDIU))
-                , viua::arch::Register_access::make_local(3)
-                , viua::arch::Register_access::make_void()
-                , multiplier
-            }.encode();
-            *instructions++ = viua::arch::ops::T{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::MUL))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-
-            auto const remainder = parts.second.second;
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDIU))
-                , viua::arch::Register_access::make_local(3)
-                , viua::arch::Register_access::make_void()
-                , remainder
-            }.encode();
-            *instructions++ = viua::arch::ops::T{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADD))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-
-            *instructions++ = viua::arch::ops::T{
-                 static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADD)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_local(2)
-            }.encode();
-        } else {
-            *instructions++ = viua::arch::ops::R{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDIU)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_void()
-                , base
-            }.encode();
-        }
-
-        return instructions;
-    }
-    auto op_li(uint64_t* instructions, int64_t const value) -> uint64_t*
-    {
-        auto const parts = to_loading_parts_unsigned(value);
-
-        /*
-         * Only use the lui instruction of there's a reason to ie, if some of
-         * the highest 36 bits are set. Otherwise, the lui is just overhead.
-         */
-        if (parts.first) {
-            *instructions++ = viua::arch::ops::E{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::LUI))
-                , viua::arch::Register_access::make_local(1)
-                , parts.first
-            }.encode();
-        }
-
-        auto const base = parts.second.first.first;
-        auto const multiplier = parts.second.first.second;
-
-        if (multiplier != 0) {
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDI))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_void()
-                , base
-            }.encode();
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDI))
-                , viua::arch::Register_access::make_local(3)
-                , viua::arch::Register_access::make_void()
-                , multiplier
-            }.encode();
-            *instructions++ = viua::arch::ops::T{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::MUL))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-
-            auto const remainder = parts.second.second;
-            *instructions++ = viua::arch::ops::R{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDI))
-                , viua::arch::Register_access::make_local(3)
-                , viua::arch::Register_access::make_void()
-                , remainder
-            }.encode();
-            *instructions++ = viua::arch::ops::T{
-                (viua::arch::ops::GREEDY
-                 | static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADD))
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(2)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-
-            *instructions++ = viua::arch::ops::T{
-                 static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADD)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_local(2)
-            }.encode();
-        } else {
-            *instructions++ = viua::arch::ops::R{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::ADDI)
-                , viua::arch::Register_access::make_local(1)
-                , viua::arch::Register_access::make_void()
-                , base
-            }.encode();
-        }
-
-        return instructions;
-    }
-
-    auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
-        -> size_t
-    {
-        auto const data_size = htole64(static_cast<uint64_t>(data.size()));
-        strings.resize(strings.size() + sizeof(data_size));
-        memcpy((strings.data() + strings.size() - sizeof(data_size)), &data_size, sizeof(data_size));
-
-        auto const saved_location = strings.size();
-        std::copy(data.begin(), data.end(), std::back_inserter(strings));
-
-        return saved_location;
-    }
+    return saved_location;
 }
+} // anonymous namespace
 
 namespace ast {
 struct Node {
@@ -263,6 +113,8 @@ struct Operand : Node {
     std::vector<viua::libs::lexer::Lexeme> ingredients;
 
     auto to_string() const -> std::string override;
+
+    auto make_access() const -> viua::arch::Register_access;
 };
 auto Operand::to_string() const -> std::string
 {
@@ -272,12 +124,20 @@ auto Operand::to_string() const -> std::string
     }
     return out.str();
 }
+auto Operand::make_access() const -> viua::arch::Register_access
+{
+    if (ingredients.front() == "void") {
+        return viua::arch::Register_access{};
+    }
+    return viua::arch::Register_access::make_local(std::stoul(ingredients.back().text));
+}
 
 struct Instruction : Node {
     viua::libs::lexer::Lexeme opcode;
     std::vector<Operand> operands;
 
     auto to_string() const -> std::string override;
+    auto parse_opcode() const -> viua::arch::opcode_type;
 };
 auto Instruction::to_string() const -> std::string
 {
@@ -300,6 +160,10 @@ auto Instruction::to_string() const -> std::string
         s = s.erase(s.rfind(','));
     }
     return s;
+}
+auto Instruction::parse_opcode() const -> viua::arch::opcode_type
+{
+    return viua::arch::ops::parse_opcode(opcode.text);
 }
 
 struct Fn_def : Node {
@@ -430,16 +294,11 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
     auto fn_name = consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
-    std::cerr
-        << viua::libs::lexer::to_string(leader.token)
-        << ' ' << fn_name.text << "\n";
-
     auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         auto instruction = ast::Instruction{};
 
         instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
-        std::cerr << "  " << instruction.opcode.text << "\n";
 
         /*
          * Special case for instructions with no operands. It is here to make
@@ -475,44 +334,19 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
             if (lexemes.front() == TOKEN::RA_VOID) {
                 operand.ingredients.push_back(
                     consume_token_of(TOKEN::RA_VOID, lexemes));
-                std::cerr
-                    << "    "
-                    << viua::libs::lexer::to_string(
-                        operand.ingredients.back().token)
-                    << "\n";
             } else if (lexemes.front() == TOKEN::RA_DIRECT) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
                 auto const index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
-                std::cerr
-                    << "    "
-                    << viua::libs::lexer::to_string(access.token)
-                    << ' ' << access.text << index.text
-                    << "\n";
                 operand.ingredients.push_back(access);
                 operand.ingredients.push_back(index);
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
                 auto const value = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
-                std::cerr
-                    << "    "
-                    << viua::libs::lexer::to_string(value.token)
-                    << ' ' << value.text
-                    << "\n";
                 operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
                 auto const value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
-                std::cerr
-                    << "    "
-                    << viua::libs::lexer::to_string(value.token)
-                    << ' ' << value.text
-                    << "\n";
                 operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
                 auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
-                std::cerr
-                    << "    "
-                    << viua::libs::lexer::to_string(value.token)
-                    << ' ' << value.text
-                    << "\n";
                 operand.ingredients.push_back(value);
             } else {
                 throw lexemes.front();
@@ -764,8 +598,6 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
 {
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
 
-    std::cerr << "parse(): " << lexemes.size() << " lexeme(s)\n";
-
     while (not lexemes.empty()) {
         auto const& each = lexemes.front();
 
@@ -812,308 +644,12 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
 
     return sv;
 }
-}
+} // anonymous namespace
 
 auto main(int argc, char* argv[]) -> int
 {
-    if constexpr (false) {
-        {
-            auto const tm = viua::arch::ops::T{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x02}
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::T::decode(tm.encode());
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << (tm.lhs == td.lhs)
-                << (tm.rhs == td.rhs)
-                << "\n";
-        }
-        {
-            auto const tm = viua::arch::ops::D{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x01}
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::D::decode(tm.encode());
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << (tm.in == td.in)
-                << "\n";
-        }
-        {
-            auto const tm = viua::arch::ops::S{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::S::decode(tm.encode());
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << "\n";
-        }
-        {
-            constexpr auto original_value = 3.14f;
-
-            auto imm_in = uint32_t{};
-            memcpy(&imm_in, &original_value, sizeof(imm_in));
-
-            auto const tm = viua::arch::ops::F{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-                , imm_in
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::F::decode(tm.encode());
-
-            auto imm_out = float{};
-            memcpy(&imm_out, &td.immediate, sizeof(imm_out));
-
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << (tm.immediate == td.immediate)
-                << (imm_out == original_value)
-                << "\n";
-        }
-        {
-            auto const tm = viua::arch::ops::E{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0xff}
-                , 0xabcdef012
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::E::decode(tm.encode());
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << (tm.immediate == td.immediate)
-                << "\n";
-        }
-        {
-            auto const tm = viua::arch::ops::R{
-                  0xdead
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x55}
-                , viua::arch::Register_access{viua::arch::REGISTER_SET::LOCAL, true, 0x22}
-                , 0xabcdef
-            };
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << tm.encode() << "\n";
-            auto const td = viua::arch::ops::R::decode(tm.encode());
-            std::cout
-                << (tm.opcode == td.opcode)
-                << (tm.out == td.out)
-                << (tm.in == td.in)
-                << (tm.immediate == td.immediate)
-                << "\n";
-        }
-    }
-
-    if constexpr (false) {
-        auto const test_these = std::vector<uint64_t>{
-              0x0000000000000000
-            , 0x0000000000000001
-            , 0x0000000000bedead /* low 24 */
-            , 0x00000000deadbeef /* low 32 */
-            , 0xdeadbeefd0adbeef /* high 36 and low 24 (special case) */
-            , 0xdeadbeefd1adbeef /* all bits */
-            , 0xdeadbeefd2adbeef /* all bits */
-            , 0xdeadbeefd3adbeef /* all bits */
-            , 0xdeadbeefd4adbeef /* all bits */
-            , 0xdeadbeefd5adbeef /* all bits */
-            , 0xdeadbeefd6adbeef /* all bits */
-            , 0xdeadbeefd7adbeef /* all bits */
-            , 0xdeadbeefd8adbeef /* all bits */
-            , 0xdeadbeefd9adbeef /* all bits */
-            , 0xdeadbeefdaadbeef /* all bits */
-            , 0xdeadbeefdbadbeef /* all bits */
-            , 0xdeadbeefdcadbeef /* all bits */
-            , 0xdeadbeefddadbeef /* all bits */
-            , 0xdeadbeefdeadbeef /* all bits */
-            , 0xdeadbeeffdadbeef /* all bits */
-            , 0xffffffffffffffff
-        };
-
-        for (auto const wanted : test_these) {
-            std::cout << "\n";
-
-            auto const parts = to_loading_parts_unsigned(wanted);
-
-            auto high = (parts.first << 28);
-            auto const low = (parts.second.first.second != 0)
-                ?  ((parts.second.first.first * parts.second.first.second)
-                 + parts.second.second)
-                : parts.second.first.first;
-            auto const got = (high | low);
-
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << wanted << "\n";
-            std::cout << std::hex << std::setw(16) << std::setfill('0') << got << "\n";
-            if (wanted != got) {
-                std::cerr << "BAD BAD BAD!\n";
-                break;
-            }
-        }
-    }
-
-    if constexpr (false) {
-        std::cout << viua::arch::ops::to_string(0x0000) << "\n";
-        std::cout << viua::arch::ops::to_string(0x0001) << "\n";
-        std::cout << viua::arch::ops::to_string(0x1001) << "\n";
-        std::cout << viua::arch::ops::to_string(0x9001) << "\n";
-        std::cout << viua::arch::ops::to_string(0x1002) << "\n";
-        std::cout << viua::arch::ops::to_string(0x1003) << "\n";
-        std::cout << viua::arch::ops::to_string(0x1004) << "\n";
-        std::cout << viua::arch::ops::to_string(0x5001) << "\n";
-    }
-
     auto args = std::vector<std::string_view>{};
     std::copy(argv + 1, argv + argc, std::back_inserter(args));
-
-    /*
-     * If invoked without any arguments, emit a sample executable binary. This
-     * makes testing easy as we always can have a sample, working, known-good
-     * binary produced.
-     */
-    if (args.empty()) {
-        auto strings = std::vector<uint8_t>{};
-
-        auto const hello_world_at = save_string(strings, "Hello, World!\n");
-
-        std::array<viua::arch::instruction_type, 32> text {};
-        auto ip = text.data();
-
-        {
-            ip = op_li(ip, 0xdeadbeefdeadbeef);
-            *ip++ = viua::arch::ops::S{
-                (viua::arch::ops::GREEDY |
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-                , viua::arch::Register_access::make_local(2)
-            }.encode();
-            *ip++ = viua::arch::ops::S{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-
-            ip = op_li(ip, 42l);
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-
-            ip = op_li(ip, -1l);
-            *ip++ = viua::arch::ops::S{
-                (viua::arch::ops::GREEDY |
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE))
-                , viua::arch::Register_access::make_local(2)
-            }.encode();
-            *ip++ = viua::arch::ops::S{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::DELETE)
-                , viua::arch::Register_access::make_local(3)
-            }.encode();
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-
-            ip = op_li(ip, hello_world_at);
-            *ip++ = viua::arch::ops::S{
-                  static_cast<viua::arch::opcode_type>(viua::arch::ops::OPCODE::STRING)
-                , viua::arch::Register_access::make_local(1)
-            }.encode();
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::EBREAK);
-
-            *ip++ = static_cast<uint64_t>(viua::arch::ops::OPCODE::HALT);
-        }
-
-        auto const a_out = open(
-              "./a.out"
-            , O_CREAT|O_TRUNC|O_WRONLY
-            , S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH
-        );
-        if (a_out == -1) {
-            close(a_out);
-            exit(1);
-        }
-
-        constexpr auto VIUA_MAGIC[[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-        auto const VIUAVM_INTERP = std::string{"viua-vm"};
-
-        {
-            auto const ops_count = (ip - text.begin());
-            auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
-
-            auto const text_offset = (
-                  sizeof(Elf64_Ehdr)
-                + (4 * sizeof(Elf64_Phdr))
-                + (VIUAVM_INTERP.size() + 1));
-            auto const strings_offset = (text_offset + text_size);
-
-            // see elf(5)
-            Elf64_Ehdr elf_header {};
-            elf_header.e_ident[EI_MAG0] = '\x7f';
-            elf_header.e_ident[EI_MAG1] = 'E';
-            elf_header.e_ident[EI_MAG2] = 'L';
-            elf_header.e_ident[EI_MAG3] = 'F';
-            elf_header.e_ident[EI_CLASS] = ELFCLASS64;
-            elf_header.e_ident[EI_DATA] = ELFDATA2LSB;
-            elf_header.e_ident[EI_VERSION] = EV_CURRENT;
-            elf_header.e_ident[EI_OSABI] = ELFOSABI_STANDALONE;
-            elf_header.e_ident[EI_ABIVERSION] = 0;
-            elf_header.e_type = ET_EXEC;
-            elf_header.e_machine = ET_NONE;
-            elf_header.e_version = elf_header.e_ident[EI_VERSION];
-            elf_header.e_entry = text_offset;
-            elf_header.e_phoff = sizeof(elf_header);
-            elf_header.e_phentsize = sizeof(Elf64_Phdr);
-            elf_header.e_phnum = 4;
-            elf_header.e_shoff = 0; // FIXME section header table
-            elf_header.e_flags = 0; // processor-specific flags, should be 0
-            elf_header.e_ehsize = sizeof(elf_header);
-            write(a_out, &elf_header, sizeof(elf_header));
-
-            Elf64_Phdr magic_for_binfmt_misc {};
-            magic_for_binfmt_misc.p_type = PT_NULL;
-            magic_for_binfmt_misc.p_offset = 0;
-            memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
-            write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
-
-            Elf64_Phdr interpreter {};
-            interpreter.p_type = PT_INTERP;
-            interpreter.p_offset = (sizeof(elf_header) + 4 * sizeof(Elf64_Phdr));
-            interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
-            interpreter.p_flags = PF_R;
-            write(a_out, &interpreter, sizeof(interpreter));
-
-            Elf64_Phdr text_segment {};
-            text_segment.p_type = PT_LOAD;
-            text_segment.p_offset = text_offset;
-            text_segment.p_filesz = text_size;
-            text_segment.p_memsz = text_size;
-            text_segment.p_flags = PF_R|PF_X;
-            text_segment.p_align = sizeof(viua::arch::instruction_type);
-            write(a_out, &text_segment, sizeof(text_segment));
-
-            Elf64_Phdr strings_segment {};
-            strings_segment.p_type = PT_LOAD;
-            strings_segment.p_offset = strings_offset;
-            strings_segment.p_filesz = strings.size();
-            strings_segment.p_memsz = strings.size();
-            strings_segment.p_flags = PF_R;
-            strings_segment.p_align = sizeof(viua::arch::instruction_type);
-            write(a_out, &strings_segment, sizeof(strings_segment));
-
-            write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
-
-            write(a_out, text.data(), text_size);
-
-            write(a_out, strings.data(), strings.size());
-        }
-
-        close(a_out);
-
-        return 0;
-    }
 
     /*
      * If invoked *with* some arguments, find the path to the source file and
@@ -1235,32 +771,8 @@ auto main(int argc, char* argv[]) -> int
         return 1;
     }
 
-    std::cerr << lexemes.size() << " raw lexeme(s)\n";
-    for (auto const& each : lexemes) {
-        std::cerr << "  "
-            << viua::libs::lexer::to_string(each.token)
-            << ' ' << each.location.line
-            << ':' << each.location.character
-            << '-' << (each.location.character + each.text.size() - 1)
-            << " +" << each.location.offset;
-
-        using viua::libs::lexer::TOKEN;
-        auto const printable =
-               (each.token == TOKEN::LITERAL_STRING)
-            or (each.token == TOKEN::LITERAL_INTEGER)
-            or (each.token == TOKEN::LITERAL_FLOAT)
-            or (each.token == TOKEN::LITERAL_ATOM)
-            or (each.token == TOKEN::OPCODE);
-        if (printable) {
-            std::cerr << " " << each.text;
-        }
-
-        std::cerr << "\n";
-    }
-
-    lexemes = ast::remove_noise(std::move(lexemes));
-    std::cerr << lexemes.size() << " cooked lexeme(s)\n";
-    if constexpr (false) {
+    if constexpr (DEBUG_LEX) {
+        std::cerr << lexemes.size() << " raw lexeme(s)\n";
         for (auto const& each : lexemes) {
             std::cerr << "  "
                 << viua::libs::lexer::to_string(each.token)
@@ -1284,6 +796,35 @@ auto main(int argc, char* argv[]) -> int
         }
     }
 
+    lexemes = ast::remove_noise(std::move(lexemes));
+
+    if constexpr (DEBUG_LEX) {
+        std::cerr << lexemes.size() << " cooked lexeme(s)\n";
+        if constexpr (false) {
+            for (auto const& each : lexemes) {
+                std::cerr << "  "
+                    << viua::libs::lexer::to_string(each.token)
+                    << ' ' << each.location.line
+                    << ':' << each.location.character
+                    << '-' << (each.location.character + each.text.size() - 1)
+                    << " +" << each.location.offset;
+
+                using viua::libs::lexer::TOKEN;
+                auto const printable =
+                       (each.token == TOKEN::LITERAL_STRING)
+                    or (each.token == TOKEN::LITERAL_INTEGER)
+                    or (each.token == TOKEN::LITERAL_FLOAT)
+                    or (each.token == TOKEN::LITERAL_ATOM)
+                    or (each.token == TOKEN::OPCODE);
+                if (printable) {
+                    std::cerr << " " << each.text;
+                }
+
+                std::cerr << "\n";
+            }
+        }
+    }
+
     /*
      * Syntactical analysis (parsing).
      *
@@ -1295,7 +836,6 @@ auto main(int argc, char* argv[]) -> int
     auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
     try {
         nodes = parse(lexemes);
-        std::cerr << nodes.size() << " top-level AST node(s)\n";
     } catch (viua::libs::lexer::Lexeme const& e) {
         using viua::support::tty::COLOR_FG_WHITE;
         using viua::support::tty::COLOR_FG_ORANGE_RED_1;
@@ -1434,12 +974,14 @@ auto main(int argc, char* argv[]) -> int
         auto const raw_ops_count = fn.instructions.size();
         fn.instructions = expand_pseudoinstructions(std::move(fn.instructions));
 
-        std::cerr << "FN " << fn.to_string()
-            << " with " << raw_ops_count << " raw, "
-            << fn.instructions.size()
-            << " cooked op(s)\n";
-        for (auto const& op : fn.instructions) {
-            std::cerr << "  " << op.to_string() << "\n";
+        if constexpr (DEBUG_EXPANSION) {
+            std::cerr << "FN " << fn.to_string()
+                << " with " << raw_ops_count << " raw, "
+                << fn.instructions.size()
+                << " cooked op(s)\n";
+            for (auto const& op : fn.instructions) {
+                std::cerr << "  " << op.to_string() << "\n";
+            }
         }
     }
 
@@ -1475,21 +1017,196 @@ auto main(int argc, char* argv[]) -> int
             << " the entry function should have the [[entry_point]] attribute\n";
         return 1;
     }
-    if constexpr (DEBUG) {
-        using viua::support::tty::COLOR_FG_WHITE;
-        using viua::support::tty::ATTR_RESET;
-        using viua::support::tty::send_escape_seq;
-        constexpr auto esc = send_escape_seq;
 
-        auto const location = entry_point_fn.value().location;
+    /*
+     * Bytecode emission.
+     */
+    auto const ops_count = std::accumulate(nodes.begin(), nodes.end(), size_t{0}
+        , [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t
+        {
+            if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+                return 0;
+            }
 
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
-            << ": found entry function: "
-            << esc(2, COLOR_FG_WHITE) << entry_point_fn.value().text << esc(2, ATTR_RESET)
-            << "\n";
+            auto& fn = static_cast<ast::Fn_def&>(*each);
+            return (acc + fn.instructions.size());
+        });
+
+    auto text = std::vector<viua::arch::instruction_type>{};
+    text.reserve(ops_count);
+    text.resize(ops_count);
+
+    auto ip = text.data();
+    auto fn_addresses = std::map<std::string, size_t>{};
+
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+
+        fn_addresses[fn.name.text] = (ip - &text[0]);
+
+        for (auto const& insn : fn.instructions) {
+            using viua::arch::ops::FORMAT;
+            using viua::arch::ops::FORMAT_MASK;
+
+            auto const opcode = insn.parse_opcode();
+            auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+            switch (format) {
+            case FORMAT::N:
+                *ip++ = static_cast<uint64_t>(opcode);
+                break;
+            case FORMAT::T:
+                *ip++ = viua::arch::ops::T{
+                      opcode
+                    , insn.operands.at(0).make_access()
+                    , insn.operands.at(1).make_access()
+                    , insn.operands.at(2).make_access()
+                }.encode();
+                break;
+            case FORMAT::D:
+                *ip++ = viua::arch::ops::D{
+                      opcode
+                    , insn.operands.at(0).make_access()
+                    , insn.operands.at(1).make_access()
+                }.encode();
+                break;
+            case FORMAT::S:
+                *ip++ = viua::arch::ops::S{
+                      opcode
+                    , insn.operands.at(0).make_access()
+                }.encode();
+                break;
+            case FORMAT::F:
+                break; // FIXME
+            case FORMAT::E:
+                *ip++ = viua::arch::ops::E{
+                      opcode
+                    , insn.operands.front().make_access()
+                    , std::stoull(insn.operands.back().ingredients.front().text)
+                }.encode();
+                break;
+            case FORMAT::R:
+                *ip++ = viua::arch::ops::R{
+                      opcode
+                    , insn.operands.at(0).make_access()
+                    , insn.operands.at(1).make_access()
+                    , static_cast<uint32_t>(std::stoul(insn.operands.back().ingredients.front().text))
+                }.encode();
+                break;
+            }
+        }
+    }
+
+    /*
+     * ELF emission.
+     */
+    {
+        auto const a_out = open(
+              "./a.out"
+            , O_CREAT|O_TRUNC|O_WRONLY
+            , S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH
+        );
+        if (a_out == -1) {
+            close(a_out);
+            exit(1);
+        }
+
+        constexpr auto VIUA_MAGIC[[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
+        auto const VIUAVM_INTERP = std::string{"viua-vm"};
+
+        {
+            auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
+            auto const text_offset = (
+                  sizeof(Elf64_Ehdr)
+                + (4 * sizeof(Elf64_Phdr))
+                + (VIUAVM_INTERP.size() + 1));
+            auto const strings_offset = (text_offset + text_size);
+
+            if constexpr (DEBUG_ELF) {
+                using viua::support::tty::COLOR_FG_WHITE;
+                using viua::support::tty::ATTR_RESET;
+                using viua::support::tty::send_escape_seq;
+                constexpr auto esc = send_escape_seq;
+
+                auto const location = entry_point_fn.value().location;
+
+                std::cerr
+                    << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                    << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
+                    << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
+                    << ": text segment size: "
+                    << esc(2, COLOR_FG_WHITE) << text_size << esc(2, ATTR_RESET)
+                    << " byte(s)"
+                    << "\n";
+            }
+
+            // see elf(5)
+            Elf64_Ehdr elf_header {};
+            elf_header.e_ident[EI_MAG0] = '\x7f';
+            elf_header.e_ident[EI_MAG1] = 'E';
+            elf_header.e_ident[EI_MAG2] = 'L';
+            elf_header.e_ident[EI_MAG3] = 'F';
+            elf_header.e_ident[EI_CLASS] = ELFCLASS64;
+            elf_header.e_ident[EI_DATA] = ELFDATA2LSB;
+            elf_header.e_ident[EI_VERSION] = EV_CURRENT;
+            elf_header.e_ident[EI_OSABI] = ELFOSABI_STANDALONE;
+            elf_header.e_ident[EI_ABIVERSION] = 0;
+            elf_header.e_type = ET_EXEC;
+            elf_header.e_machine = ET_NONE;
+            elf_header.e_version = elf_header.e_ident[EI_VERSION];
+            elf_header.e_entry = text_offset +
+                (fn_addresses[entry_point_fn.value().text]
+                 * sizeof(viua::arch::instruction_type));
+            elf_header.e_phoff = sizeof(elf_header);
+            elf_header.e_phentsize = sizeof(Elf64_Phdr);
+            elf_header.e_phnum = 4;
+            elf_header.e_shoff = 0; // FIXME section header table
+            elf_header.e_flags = 0; // processor-specific flags, should be 0
+            elf_header.e_ehsize = sizeof(elf_header);
+            write(a_out, &elf_header, sizeof(elf_header));
+
+            Elf64_Phdr magic_for_binfmt_misc {};
+            magic_for_binfmt_misc.p_type = PT_NULL;
+            magic_for_binfmt_misc.p_offset = 0;
+            memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
+            write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
+
+            Elf64_Phdr interpreter {};
+            interpreter.p_type = PT_INTERP;
+            interpreter.p_offset = (sizeof(elf_header) + 4 * sizeof(Elf64_Phdr));
+            interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
+            interpreter.p_flags = PF_R;
+            write(a_out, &interpreter, sizeof(interpreter));
+
+            Elf64_Phdr text_segment {};
+            text_segment.p_type = PT_LOAD;
+            text_segment.p_offset = text_offset;
+            text_segment.p_filesz = text_size;
+            text_segment.p_memsz = text_size;
+            text_segment.p_flags = PF_R|PF_X;
+            text_segment.p_align = sizeof(viua::arch::instruction_type);
+            write(a_out, &text_segment, sizeof(text_segment));
+
+            Elf64_Phdr strings_segment {};
+            strings_segment.p_type = PT_LOAD;
+            strings_segment.p_offset = strings_offset;
+            strings_segment.p_filesz = strings_table.size();
+            strings_segment.p_memsz = strings_table.size();
+            strings_segment.p_flags = PF_R;
+            strings_segment.p_align = sizeof(viua::arch::instruction_type);
+            write(a_out, &strings_segment, sizeof(strings_segment));
+
+            write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
+
+            write(a_out, text.data(), text_size);
+
+            write(a_out, strings_table.data(), strings_table.size());
+        }
+
+        close(a_out);
     }
 
     return 0;
