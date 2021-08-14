@@ -561,6 +561,8 @@ auto main(int argc, char* argv[]) -> int
     auto strings = std::vector<uint8_t>{};
     auto text = std::vector<viua::arch::instruction_type>{};
 
+    auto entry_addr = size_t{0};
+
     {
         auto const a_out = open(executable_path.c_str(), O_RDONLY);
         if (a_out == -1) {
@@ -603,6 +605,8 @@ auto main(int argc, char* argv[]) -> int
             read(a_out, strings.data(), strings_header.p_filesz);
         }
 
+        entry_addr = (elf_header.e_entry - text_header.p_offset) / sizeof(viua::arch::instruction_type);
+
         std::cout
             << "[vm] loaded " << text_header.p_filesz
             << " byte(s) of .text section from PT_LOAD segment of "
@@ -610,6 +614,12 @@ auto main(int argc, char* argv[]) -> int
         std::cout
             << "[vm] loaded " << (text_header.p_filesz / sizeof(decltype(text)::value_type))
             << " instructions\n";
+        std::cout
+            << "[vm] entry address at 0x" << std::hex << std::setw(8)
+            << std::setfill('0')
+            << (entry_addr * sizeof(viua::arch::instruction_type))
+            << std::dec
+            << "\n";
         std::cout
             << "[vm] loaded " << strings_header.p_filesz
             << " byte(s) of .rodata (strings) section from PT_LOAD segment of "
@@ -622,7 +632,12 @@ auto main(int argc, char* argv[]) -> int
 
     auto const ip_begin = &text[0];
     auto const ip_end = (ip_begin + text.size());
-    run(registers, strings, text.data(), { (executable_path + "[.text]"), ip_begin, ip_end });
+    run(
+          registers
+        , strings
+        , (text.data() + entry_addr)
+        , { (executable_path + "[.text]"), ip_begin, ip_end }
+    );
 
     return 0;
 }
