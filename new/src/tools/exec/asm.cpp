@@ -508,10 +508,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                         std::to_string(std::stoul(
                             synth.operands.back().ingredients.back().text) + 1);
 
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                    synth.operands.push_back(synth.operands.back());
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
@@ -526,14 +523,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                     synth.opcode.text = "g.add";
 
                     synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text));
-
                     synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text));
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
