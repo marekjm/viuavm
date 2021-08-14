@@ -940,7 +940,7 @@ auto main(int argc, char* argv[]) -> int
 
                 cooked.push_back(synth);
 
-                insn.operands.back() = synth.operands.front();
+                insn.operands.pop_back();
                 cooked.push_back(std::move(insn));
             } else {
                 cooked.push_back(std::move(insn));
