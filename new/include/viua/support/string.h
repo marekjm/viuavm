@@ -27,4 +27,6 @@ namespace viua::support::string {
 
     auto quoted(std::string_view const) -> std::string;
     auto quote_squares(std::string_view const) -> std::string;
+
+    auto unescape(std::string_view const) -> std::string;
 }

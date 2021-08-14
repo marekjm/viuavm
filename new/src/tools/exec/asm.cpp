@@ -1392,9 +1392,12 @@ auto main(int argc, char* argv[]) -> int
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
             if (insn.opcode == "string" or insn.opcode == "g.string") {
+                auto s = insn.operands.back().ingredients.front().text;
+                s = s.substr(1, s.size() - 2);
+                s = viua::support::string::unescape(s);
                 auto const saved_at = save_string(
                       strings_table
-                    , insn.operands.back().ingredients.front().text
+                    , s
                 );
 
                 auto synth = ast::Instruction{};
