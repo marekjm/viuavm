@@ -40,6 +40,10 @@ all: \
 	$(BUILD)/tools/exec/asm \
 	$(BUILD)/tools/exec/vm
 
+clean:
+	find $(BUILD) -type f -delete
+	find $(BUILD) -mindepth 1 -type d -delete
+
 install: all
 	mkdir -p $(PREFIX)/lib/viua/{core,site}/{bin,lib,share,man}
 	@cp -v $(BUILD_EXEC_DIR)/asm $(CORE_BIN_DIR)/viua-asm
