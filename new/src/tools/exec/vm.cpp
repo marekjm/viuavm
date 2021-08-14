@@ -590,8 +590,7 @@ auto main(int argc, char* argv[]) -> int
 
         if (strings_header.p_filesz) {
             lseek(a_out, strings_header.p_offset, SEEK_SET);
-            strings.resize(
-                strings_header.p_filesz / sizeof(viua::arch::instruction_type));
+            strings.resize(strings_header.p_filesz);
             read(a_out, strings.data(), strings_header.p_filesz);
         }
 
