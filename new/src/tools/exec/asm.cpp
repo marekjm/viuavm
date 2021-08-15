@@ -683,6 +683,7 @@ auto main(int argc, char* argv[]) -> int
         using viua::support::tty::COLOR_FG_WHITE;
         using viua::support::tty::COLOR_FG_ORANGE_RED_1;
         using viua::support::tty::COLOR_FG_RED;
+        using viua::support::tty::COLOR_FG_RED_1;
         using viua::support::tty::ATTR_RESET;
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
@@ -733,7 +734,7 @@ auto main(int argc, char* argv[]) -> int
              * newline), because a newline character will be added anyway.
              */
             if (not line.empty()) {
-                source_line << esc(2, COLOR_FG_RED) << e.text << esc(2, ATTR_RESET);
+                source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
                 line.remove_prefix(e.text.size());
             }
             highlight_line << esc(2, COLOR_FG_RED) << '^';
@@ -830,6 +831,7 @@ auto main(int argc, char* argv[]) -> int
         using viua::support::tty::COLOR_FG_WHITE;
         using viua::support::tty::COLOR_FG_ORANGE_RED_1;
         using viua::support::tty::COLOR_FG_RED;
+        using viua::support::tty::COLOR_FG_RED_1;
         using viua::support::tty::ATTR_RESET;
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
@@ -877,7 +879,7 @@ auto main(int argc, char* argv[]) -> int
              * newline), because a newline character will be added anyway.
              */
             if (not line.empty()) {
-                source_line << esc(2, COLOR_FG_RED) << e.text << esc(2, ATTR_RESET);
+                source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
                 line.remove_prefix(e.text.size());
             }
             highlight_line << esc(2, COLOR_FG_RED) << '^';
