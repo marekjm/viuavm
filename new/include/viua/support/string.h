@@ -19,6 +19,8 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
+#include <set>
 
 
 namespace viua::support::string {
@@ -29,4 +31,14 @@ namespace viua::support::string {
     auto quote_squares(std::string_view const) -> std::string;
 
     auto unescape(std::string_view const) -> std::string;
+
+using LevenshteinDistance = std::string::size_type;
+using DistancePair        = std::pair<LevenshteinDistance, std::string>;
+auto levenshtein(std::string const, std::string const) -> LevenshteinDistance;
+auto levenshtein_filter(std::string const,
+                        std::set<std::string> const&,
+                        LevenshteinDistance const = LevenshteinDistance{0xffffffffffffffff})
+    -> std::set<DistancePair>;
+auto levenshtein_best(std::string const, std::set<DistancePair> const&,
+                      LevenshteinDistance const) -> DistancePair;
 }

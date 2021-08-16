@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 #include <string_view>
+#include <vector>
 
 
 namespace viua::support::string {
@@ -117,4 +118,80 @@ namespace viua::support::string {
         }
         return decoded.str();
     }
+
+auto levenshtein(std::string const source, std::string const target)
+    -> LevenshteinDistance
+{
+    if (not source.size()) {
+        return target.size();
+    }
+    if (not target.size()) {
+        return source.size();
+    }
+
+    auto distance_matrix = std::vector<std::vector<LevenshteinDistance>>{};
+
+    distance_matrix.reserve(source.size());
+    for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+        auto row = decltype(distance_matrix)::value_type{};
+        row.reserve(target.size());
+        for (auto j = LevenshteinDistance{0}; j < target.size() + 1; ++j) {
+            row.push_back(0);
+        }
+        distance_matrix.push_back(std::move(row));
+    }
+    for (auto i = LevenshteinDistance{0}; i < source.size() + 1; ++i) {
+        distance_matrix.at(i).at(0) = i;
+    }
+    for (auto i = LevenshteinDistance{0}; i < target.size() + 1; ++i) {
+        distance_matrix.at(0).at(i) = i;
+    }
+
+    for (auto i = LevenshteinDistance{1}; i < source.size() + 1; ++i) {
+        for (auto j = LevenshteinDistance{1}; j < target.size() + 1; ++j) {
+            auto cost = LevenshteinDistance{0};
+
+            cost = (source.at(i - 1) != target.at(j - 1));
+
+            auto deletion     = distance_matrix.at(i - 1).at(j) + 1;
+            auto insertion    = distance_matrix.at(i).at(j - 1) + 1;
+            auto substitution = distance_matrix.at(i - 1).at(j - 1) + cost;
+
+            distance_matrix.at(i).at(j) =
+                std::min(std::min(deletion, insertion), substitution);
+        }
+    }
+
+    return distance_matrix.at(source.size() - 1).at(target.size() - 1);
+}
+auto levenshtein_filter(std::string const source,
+                        std::set<std::string> const& candidates,
+                        LevenshteinDistance const limit)
+    -> std::set<DistancePair>
+{
+    auto matched = std::set<DistancePair>{};
+
+    for (auto const& each : candidates) {
+        if (auto distance = levenshtein(source, each); distance <= limit) {
+            matched.emplace(distance, each);
+        }
+    }
+
+    return matched;
+}
+auto levenshtein_best(std::string const source,
+        std::set<DistancePair> const& candidates,
+                      LevenshteinDistance const limit) -> DistancePair
+{
+    auto best = DistancePair{0xffffffffffffffff, source};
+
+    for (auto const& each : candidates) {
+        if (each.first <= limit and each.first < best.first) {
+            best = each;
+            continue;
+        }
+    }
+
+    return best;
+}
 }
