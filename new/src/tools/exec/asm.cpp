@@ -77,6 +77,22 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
 
     return saved_location;
 }
+auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn, uint64_t const offset)
+    -> size_t
+{
+    auto const fn_size = htole64(static_cast<uint64_t>(fn.size()));
+    strings.resize(strings.size() + sizeof(fn_size));
+    memcpy((strings.data() + strings.size() - sizeof(fn_size)), &fn_size, sizeof(fn_size));
+
+    auto const saved_location = strings.size();
+    std::copy(fn.begin(), fn.end(), std::back_inserter(strings));
+
+    auto const fn_off = htole64(offset);
+    strings.resize(strings.size() + sizeof(offset));
+    memcpy((strings.data() + strings.size() - sizeof(offset)), &fn_off, sizeof(fn_off));
+
+    return saved_location;
+}
 } // anonymous namespace
 
 namespace ast {
@@ -1242,6 +1258,10 @@ auto main(int argc, char* argv[]) -> int
 
     /*
      * Bytecode emission.
+     *
+     * This stage is also responsible for preparing the function table. It is a
+     * table mapping function names to the offsets inside the .text section, at
+     * which their entry points reside.
      */
     auto const ops_count = std::accumulate(nodes.begin(), nodes.end(), size_t{0}
         , [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t
@@ -1258,17 +1278,31 @@ auto main(int argc, char* argv[]) -> int
     text.reserve(ops_count);
     text.resize(ops_count);
 
-    auto ip = text.data();
     auto fn_addresses = std::map<std::string, size_t>{};
+    auto fn_table = std::vector<uint8_t>{};
 
+    auto ip = text.data();
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
         }
 
         auto& fn = static_cast<ast::Fn_def&>(*each);
-
-        fn_addresses[fn.name.text] = (ip - &text[0]);
+        {
+            /*
+             * Save the function's address (offset into the .text section,
+             * really) in the functions table. This is needed not only for
+             * debugging, but also because the functions' addresses are resolved
+             * dynamically for call and similar instructions. Why dynamically?
+             *
+             * Because there is a strong distinction between calls to bytecode
+             * and foreign functions. At compile time, we don't yet know,
+             * though, which function is foreign and which is bytecode.
+             */
+            auto const fn_offset = (ip - &text[0]);
+            fn_addresses[fn.name.text] = fn_offset;
+            save_fn_address(fn_table, fn.name.text, fn_offset);
+        }
 
         for (auto const& insn : fn.instructions) {
             using viua::arch::opcode_type;
@@ -1420,12 +1454,15 @@ auto main(int argc, char* argv[]) -> int
         auto const VIUAVM_INTERP = std::string{"viua-vm"};
 
         {
+            constexpr auto NO_OF_ELF_PHDR_USED = 5;
+
             auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
             auto const text_offset = (
                   sizeof(Elf64_Ehdr)
-                + (4 * sizeof(Elf64_Phdr))
+                + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
                 + (VIUAVM_INTERP.size() + 1));
             auto const strings_offset = (text_offset + text_size);
+            auto const fn_offset = (strings_offset + strings_table.size());
 
             if constexpr (DEBUG_ELF) {
                 using viua::support::tty::COLOR_FG_WHITE;
@@ -1464,7 +1501,7 @@ auto main(int argc, char* argv[]) -> int
                  * sizeof(viua::arch::instruction_type));
             elf_header.e_phoff = sizeof(elf_header);
             elf_header.e_phentsize = sizeof(Elf64_Phdr);
-            elf_header.e_phnum = 4;
+            elf_header.e_phnum = NO_OF_ELF_PHDR_USED;
             elf_header.e_shoff = 0; // FIXME section header table
             elf_header.e_flags = 0; // processor-specific flags, should be 0
             elf_header.e_ehsize = sizeof(elf_header);
@@ -1478,7 +1515,8 @@ auto main(int argc, char* argv[]) -> int
 
             Elf64_Phdr interpreter {};
             interpreter.p_type = PT_INTERP;
-            interpreter.p_offset = (sizeof(elf_header) + 4 * sizeof(Elf64_Phdr));
+            interpreter.p_offset =
+                (sizeof(elf_header) + NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
             interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
             interpreter.p_flags = PF_R;
             write(a_out, &interpreter, sizeof(interpreter));
@@ -1501,11 +1539,22 @@ auto main(int argc, char* argv[]) -> int
             strings_segment.p_align = sizeof(viua::arch::instruction_type);
             write(a_out, &strings_segment, sizeof(strings_segment));
 
+            Elf64_Phdr fn_segment {};
+            fn_segment.p_type = PT_LOAD;
+            fn_segment.p_offset = fn_offset;
+            fn_segment.p_filesz = fn_table.size();
+            fn_segment.p_memsz = fn_table.size();
+            fn_segment.p_flags = PF_R;
+            fn_segment.p_align = sizeof(viua::arch::instruction_type);
+            write(a_out, &fn_segment, sizeof(fn_segment));
+
             write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);
 
             write(a_out, text.data(), text_size);
 
             write(a_out, strings_table.data(), strings_table.size());
+
+            write(a_out, fn_table.data(), fn_table.size());
         }
 
         close(a_out);
