@@ -256,7 +256,45 @@ namespace viua::libs::lexer {
                 continue;
             }
             if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) { continue; }
-            if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) { continue; }
+            if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {
+                try {
+                    auto const sv = std::string_view{lexemes.back().text};
+                    if (sv.starts_with("0x")) {
+                        std::stoull(lexemes.back().text, nullptr, 16);
+                    } else if (sv.starts_with("0o")) {
+                        std::stoull(lexemes.back().text, nullptr, 8);
+                    } else if (sv.starts_with("0b")) {
+                        std::stoull(lexemes.back().text, nullptr, 2);
+                    } else {
+                        std::stoull(lexemes.back().text, nullptr);
+                    }
+                } catch (std::out_of_range const&) {
+                    auto bits_needed = size_t{0};
+                    auto const sv = std::string_view{lexemes.back().text};
+                    if (sv.starts_with("0x")) {
+                        bits_needed = ((sv.size() - 2) * 4);
+                    } else if (sv.starts_with("0o")) {
+                        bits_needed = ((sv.size() - 2) * 3);
+                    } else if (sv.starts_with("0b")) {
+                        bits_needed = (sv.size() - 2);
+                    } else {
+                        // FIXME number of bits for a decimal integer
+                    }
+
+                    using viua::libs::errors::compile_time::Error;
+                    using viua::libs::errors::compile_time::Cause;
+                    throw Error{
+                          lexemes.back()
+                        , Cause::Value_out_of_range
+                    }.aside(
+                        "register width is 64 bits"
+                        + (bits_needed
+                            ? (", but this value needs "
+                                + std::to_string(bits_needed))
+                            : ""));
+                }
+                continue;
+            }
             if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) { continue; }
             if (try_match(END, TOKEN::END)) { continue; }
             if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) { continue; }
