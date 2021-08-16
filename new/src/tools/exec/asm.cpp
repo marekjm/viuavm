@@ -377,7 +377,29 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     consume_token_of(TOKEN::RA_VOID, lexemes));
             } else if (lexemes.front() == TOKEN::RA_DIRECT) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
-                auto const index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+                auto index = viua::libs::lexer::Lexeme{};
+                try {
+                    index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+                } catch (viua::libs::lexer::Lexeme const& e) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{e, Cause::Invalid_register_access}
+                        .add(access)
+                        .aside("register index must be an integer");
+                }
+                try {
+                    auto const n = std::stoul(index.text);
+                    if (n > viua::arch::MAX_REGISTER_INDEX) {
+                        throw std::out_of_range{""};
+                    }
+                } catch (std::out_of_range const&) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{index, Cause::Invalid_register_access}
+                        .add(access)
+                        .aside("register index range is 0-"
+                                + std::to_string(viua::arch::MAX_REGISTER_INDEX));
+                }
                 operand.ingredients.push_back(access);
                 operand.ingredients.push_back(index);
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
@@ -797,6 +819,26 @@ auto display_error_and_exit[[noreturn]](
     exit(1);
 }
 
+auto cook_spans(std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
+    -> std::vector<std::tuple<bool, size_t, size_t>>
+{
+    auto cooked = std::vector<std::tuple<bool, size_t, size_t>>{};
+    if (std::get<1>(raw.front()) != 0) {
+        cooked.emplace_back(false, 0, raw.front().first);
+    }
+    for (auto const& each : raw) {
+        auto const& [hl, offset, size] = cooked.back();
+        if ((offset + size) != each.first) {
+            cooked.emplace_back(
+                  false
+                , (offset + size)
+                , (each.first - (offset + size)));
+        }
+        cooked.emplace_back(true, each.first, each.second);
+    }
+
+    return cooked;
+}
 auto display_error_and_exit[[noreturn]](
       std::string_view source_path
     , std::string_view source_text
@@ -839,7 +881,7 @@ auto display_error_and_exit[[noreturn]](
     auto source_line = std::ostringstream{};
     auto highlight_line = std::ostringstream{};
 
-    {
+    if constexpr (false) {
         auto line = view_line_of(source_text, e.location());
 
         source_line
@@ -885,6 +927,51 @@ auto display_error_and_exit[[noreturn]](
             << esc(2, COLOR_FG_WHITE)
             << line
             << esc(2, ATTR_RESET);
+    }
+
+    {
+        auto line = view_line_of(source_text, e.location());
+
+        source_line
+            << esc(2, COLOR_FG_RED)
+            << ERROR_MARKER
+            << std::setw(LINE_NO_WIDTH)
+            << (e.line() + 1)
+            << esc(2, COLOR_FG_WHITE)
+            << SEPARATOR_SOURCE;
+        highlight_line
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::string(LINE_NO_WIDTH, ' ')
+            << SEPARATOR_SOURCE;
+
+        auto const spans = cook_spans(e.spans());
+        for (auto const& each : spans) {
+            auto const& [hl, offset, size] = each;
+            if (hl and offset == e.character()) {
+                source_line << esc(2, COLOR_FG_RED_1);
+                highlight_line
+                    << esc(2, COLOR_FG_RED_1)
+                    << '^'
+                    << esc(2, COLOR_FG_RED)
+                    << std::string(size - 1, '~');
+            } else if (hl) {
+                source_line << esc(2, COLOR_FG_RED);
+                highlight_line
+                    << esc(2, COLOR_FG_RED)
+                    << std::string(size, '~');
+            } else {
+                source_line << esc(2, COLOR_FG_WHITE);
+                highlight_line
+                    << std::string(size, ' ');
+            }
+            source_line << line.substr(offset, size);
+        }
+        source_line
+            << esc(2, COLOR_FG_WHITE)
+            << line.substr(std::get<1>(spans.back()) + std::get<2>(spans.back()));
+
+        source_line << esc(2, ATTR_RESET);
+        highlight_line << esc(2, ATTR_RESET);
     }
 
     std::cerr << source_line.str() << "\n";

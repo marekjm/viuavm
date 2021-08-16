@@ -24,6 +24,7 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
 
 
 namespace viua::libs::errors::compile_time {
@@ -41,6 +42,7 @@ enum class Cause {
 
     Unknown_opcode,
     Value_out_of_range,
+    Invalid_register_access,
 };
 auto to_string(Cause const) -> std::string_view;
 
@@ -142,6 +144,10 @@ public:
 
     auto aside(std::string) -> Error&;
     auto aside() const -> std::string_view;
+
+    auto add(Lexeme) -> Error&;
+    using span_type = std::pair<std::string::size_type, std::string::size_type>;
+    auto spans() const -> std::vector<span_type>;
 
     /*
      * Location of the main point of error.

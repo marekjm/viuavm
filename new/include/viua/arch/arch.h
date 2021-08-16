@@ -95,6 +95,9 @@ namespace viua::arch {
     };
     using RS = REGISTER_SET;
 
+    using register_index_type = uint8_t;
+    constexpr auto MAX_REGISTER_INDEX = register_index_type{255};
+
     struct Register_access {
         using rs_type = viua::arch::REGISTER_SET;
 

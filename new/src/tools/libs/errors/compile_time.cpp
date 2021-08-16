@@ -19,6 +19,7 @@
 
 #include <viua/libs/errors/compile_time.h>
 
+#include <algorithm>
 #include <sstream>
 
 
@@ -34,6 +35,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "unknown opcode";
     case Cause::Value_out_of_range:
         return "value out of range";
+    case Cause::Invalid_register_access:
+        return "invalid register access";
     }
     return "illegal error";
 }
@@ -52,6 +55,22 @@ auto Error::aside(std::string s) -> Error&
 auto Error::aside() const -> std::string_view
 {
     return aside_note;
+}
+
+auto Error::add(Lexeme lx) -> Error&
+{
+    detail_lexemes.push_back(lx);
+    return *this;
+}
+auto Error::spans() const -> std::vector<span_type>
+{
+    auto ss = std::vector<span_type>{};
+    ss.emplace_back(main_lexeme.location.character, main_lexeme.text.size());
+    for (auto const& each : detail_lexemes) {
+        ss.emplace_back(each.location.character, each.text.size());
+    }
+    std::sort(ss.begin(), ss.end());
+    return ss;
 }
 
 auto Error::what() const -> std::string_view
