@@ -55,7 +55,7 @@ install-binfmt:
 	if [[ -f /proc/sys/fs/binfmt_misc/viua-exec ]]; then \
 		echo -1 > /proc/sys/fs/binfmt_misc/viua-exec ; \
 	fi
-	cat ./binfmt.d/viua-exec.conf /proc/sys/fs/binfmt_misc/register
+	cat ./binfmt.d/viua-exec.conf > /proc/sys/fs/binfmt_misc/register
 
 
 ################################################################################
