@@ -73,11 +73,13 @@ $(BUILD)/%.o: ./src/%.cpp
 $(BUILD)/tools/exec/asm: \
 	$(BUILD)/support/string.o \
 	$(BUILD)/support/tty.o \
+	$(BUILD)/tools/libs/errors/compile_time.o \
 	$(BUILD)/tools/libs/lexer.o \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
 $(BUILD)/tools/exec/asm.o: \
+	./include/viua/libs/errors/compile_time.h \
 	./include/viua/libs/lexer.h \
 	./include/viua/support/tty.h \
 	./include/viua/support/vector.h
@@ -93,3 +95,6 @@ $(BUILD)/arch/ops.o: \
 
 $(BUILD)/tools/libs/lexer.o: \
 	./include/viua/libs/lexer.h
+
+$(BUILD)/tools/libs/errors/compile_time.o: \
+	./include/viua/libs/errors/compile_time.h

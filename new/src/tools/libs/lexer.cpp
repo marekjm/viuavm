@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/support/string.h>
 
@@ -117,44 +118,6 @@ namespace viua::libs::lexer {
 
     const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
     const auto LITERAL_INTEGER = std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)\\b"};
-
-    auto const OPCODE_NAMES = std::set<std::string>{
-        "noop",
-        "halt",
-        "ebreak",
-
-        "add",
-        "g.add",
-        "sub",
-        "g.sub",
-        "mul",
-        "g.mul",
-        "div",
-        "g.div",
-
-        "delete",
-        "g.delete",
-        "string",
-
-        "lui",
-        "g.lui",
-        "luiu",
-        "g.luiu",
-
-        "addi",
-        "g.addi",
-        "addiu",
-        "g.addiu",
-
-        "framei",
-        "g.framei",
-        "tailcall",
-
-        /*
-         * Pseudoinstructions listed below.
-         */
-        "li",
-    };
 
     auto lex(std::string_view source_text) -> std::vector<Lexeme>
     {

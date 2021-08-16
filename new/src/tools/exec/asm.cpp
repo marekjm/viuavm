@@ -1,6 +1,7 @@
 #include <viua/support/string.h>
 #include <viua/support/tty.h>
 #include <viua/support/vector.h>
+#include <viua/libs/errors/compile_time.h>
 #include <viua/libs/lexer.h>
 #include <viua/arch/arch.h>
 #include <viua/arch/ops.h>
@@ -298,7 +299,31 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
     while ((not lexemes.empty()) and lexemes.front() != TOKEN::END) {
         auto instruction = ast::Instruction{};
 
-        instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
+        try {
+            instruction.opcode = consume_token_of(TOKEN::OPCODE, lexemes);
+        } catch (viua::libs::lexer::Lexeme const& e) {
+            if (e.token != viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                throw;
+            }
+
+            using viua::support::string::levenshtein_filter;
+            using viua::libs::lexer::OPCODE_NAMES;
+            auto misspell_candidates = levenshtein_filter(e.text, OPCODE_NAMES);
+            if (misspell_candidates.empty()) {
+                throw;
+            }
+
+            using viua::support::string::levenshtein_best;
+            auto best_candidate = levenshtein_best(e.text, misspell_candidates, (e.text.size() / 2));
+            if (best_candidate.second == e.text) {
+                throw;
+            }
+
+            using viua::libs::errors::compile_time::Error;
+            using viua::libs::errors::compile_time::Cause;
+            throw Error{e, Cause::Unknown_opcode, e.text}
+                .aside("did you mean \"" + best_candidate.second + "\"?");
+        }
 
         /*
          * Special case for instructions with no operands. It is here to make
@@ -634,6 +659,279 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
 
     return sv;
 }
+
+auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
+    -> std::string_view
+{
+    auto line_end = size_t{0};
+    auto line_begin = size_t{0};
+
+    line_end = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
+    if (line_end != std::string::npos) {
+        sv.remove_suffix(sv.size() - line_end);
+    }
+
+    line_begin = sv.rfind('\n');
+    if (line_begin != std::string::npos) {
+        sv.remove_prefix(line_begin + 1);
+    }
+
+    return sv;
+}
+
+auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
+    -> std::string_view
+{
+    auto line_end = size_t{0};
+    auto line_begin = size_t{0};
+
+    line_begin = sv.find('\n', loc.offset);
+    if (line_begin != std::string::npos) {
+        sv.remove_prefix(line_begin + 1);
+    }
+
+    line_end = sv.find('\n');
+    if (line_end != std::string::npos) {
+        sv.remove_suffix(sv.size() - line_end);
+    }
+
+    return sv;
+}
+} // anonymous namespace
+
+namespace {
+auto display_error_and_exit[[noreturn]](
+      std::string_view source_path
+    , std::string_view source_text
+    , viua::libs::lexer::Lexeme const& e
+) -> void
+{
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    auto const SEPARATOR = std::string{" |  "};
+    constexpr auto LINE_NO_WIDTH = size_t{5};
+
+    auto source_line = std::ostringstream{};
+    auto highlight_line = std::ostringstream{};
+
+    std::cerr
+        << std::string(LINE_NO_WIDTH, ' ')
+        << SEPARATOR << "\n";
+
+    {
+        auto const location = e.location;
+
+        auto line = view_line_of(source_text, location);
+
+        source_line
+            << esc(2, COLOR_FG_RED)
+            << std::setw(LINE_NO_WIDTH)
+            << (location.line + 1)
+            << esc(2, ATTR_RESET)
+            << SEPARATOR;
+        highlight_line
+            << std::string(LINE_NO_WIDTH, ' ')
+            << SEPARATOR;
+
+        source_line << std::string_view{line.data(), location.character};
+        highlight_line << std::string(location.character, ' ');
+        line.remove_prefix(location.character);
+
+        /*
+         * This if is required because of TERMINATOR tokens in unexpected
+         * places. In case a TERMINATOR token is the cause of the error it
+         * will not appear in line. If we attempted to shift line's head, it
+         * would be removing a prefix from an empty std::string_view which
+         * is undefined behaviour.
+         *
+         * I think the "bad TERMINATOR" is the only situation when this is
+         * important.
+         *
+         * When it happens, we just don't print the terminator (which is a
+         * newline), because a newline character will be added anyway.
+         */
+        if (not line.empty()) {
+            source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
+            line.remove_prefix(e.text.size());
+        }
+        highlight_line << esc(2, COLOR_FG_RED) << '^';
+        highlight_line
+            << esc(2, COLOR_FG_ORANGE_RED_1)
+            << std::string((e.text.size() - 1), '~');
+
+        source_line << line;
+    }
+
+    std::cerr << source_line.str() << "\n";
+    std::cerr << highlight_line.str() << "\n";
+
+    std::cerr
+        << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.line + 1) << esc(2, ATTR_RESET)
+        << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.character + 1) << esc(2, ATTR_RESET)
+        << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+        << "unexpected token: " << viua::libs::lexer::to_string(e.token) << "\n";
+
+    exit(1);
+}
+
+auto display_error_and_exit[[noreturn]](
+      std::string_view source_path
+    , std::string_view source_text
+    , viua::libs::errors::compile_time::Error const& e
+) -> void
+{
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::COLOR_FG_CYAN;
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
+    constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
+    constexpr auto ERROR_MARKER = std::string_view{" => "};
+    auto const LINE_NO_WIDTH = std::to_string(std::max(e.line(), e.line() + 1)).size();
+
+    /*
+     * The separator to put some space between the command and the error
+     * report.
+     */
+    std::cerr
+        << std::string(ERROR_MARKER.size(), ' ')
+        << std::string(LINE_NO_WIDTH, ' ')
+        << SEPARATOR_SOURCE << "\n";
+
+    if (e.line()) {
+        std::cerr
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::setw(LINE_NO_WIDTH)
+            << e.line()
+            << SEPARATOR_SOURCE
+            << view_line_before(source_text, e.location())
+            << "\n";
+    }
+
+    auto source_line = std::ostringstream{};
+    auto highlight_line = std::ostringstream{};
+
+    {
+        auto line = view_line_of(source_text, e.location());
+
+        source_line
+            << esc(2, COLOR_FG_RED)
+            << ERROR_MARKER
+            << std::setw(LINE_NO_WIDTH)
+            << (e.line() + 1)
+            << esc(2, COLOR_FG_WHITE)
+            << SEPARATOR_SOURCE;
+        highlight_line
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::string(LINE_NO_WIDTH, ' ')
+            << SEPARATOR_SOURCE;
+
+        source_line << std::string_view{line.data(), e.character()};
+        highlight_line << std::string(e.character(), ' ');
+        line.remove_prefix(e.character());
+
+        /*
+         * This if is required because of TERMINATOR tokens in unexpected
+         * places. In case a TERMINATOR token is the cause of the error it
+         * will not appear in line. If we attempted to shift line's head, it
+         * would be removing a prefix from an empty std::string_view which
+         * is undefined behaviour.
+         *
+         * I think the "bad TERMINATOR" is the only situation when this is
+         * important.
+         *
+         * When it happens, we just don't print the terminator (which is a
+         * newline), because a newline character will be added anyway.
+         */
+        if (not line.empty()) {
+            source_line << esc(2, COLOR_FG_RED_1) << e.main().text << esc(2, ATTR_RESET);
+            line.remove_prefix(e.main().text.size());
+        }
+        highlight_line << esc(2, COLOR_FG_RED) << '^';
+        highlight_line
+            << esc(2, COLOR_FG_ORANGE_RED_1)
+            << std::string((e.main().text.size() - 1), '~')
+            << esc(2, ATTR_RESET);
+
+        source_line
+            << esc(2, COLOR_FG_WHITE)
+            << line
+            << esc(2, ATTR_RESET);
+    }
+
+    std::cerr << source_line.str() << "\n";
+    std::cerr << highlight_line.str() << "\n";
+
+    if (not e.aside().empty()) {
+        std::cerr
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::string(LINE_NO_WIDTH, ' ')
+            << esc(2, COLOR_FG_CYAN)
+            << SEPARATOR_ASIDE
+            << std::string(e.character(), ' ')
+            << '|'
+            << esc(2, ATTR_RESET)
+            << "\n";
+        std::cerr
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::string(LINE_NO_WIDTH, ' ')
+            << esc(2, COLOR_FG_CYAN)
+            << SEPARATOR_ASIDE
+            << std::string(e.character(), ' ')
+            << "`- "
+            << e.aside()
+            << esc(2, ATTR_RESET)
+            << "\n";
+        std::cerr
+            << esc(2, COLOR_FG_CYAN)
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::string(LINE_NO_WIDTH, ' ')
+            << SEPARATOR_ASIDE
+            << esc(2, ATTR_RESET)
+            << "\n";
+    }
+
+    {
+        std::cerr
+            << std::string(ERROR_MARKER.size(), ' ')
+            << std::setw(LINE_NO_WIDTH)
+            << (e.line() + 2)
+            << SEPARATOR_SOURCE
+            << view_line_after(source_text, e.location())
+            << "\n";
+    }
+
+    /*
+     * The separator to put some space between the source code dump,
+     * highlight, etc and the error message.
+     */
+    std::cerr
+        << std::string(ERROR_MARKER.size(), ' ')
+        << std::string(LINE_NO_WIDTH, ' ')
+        << SEPARATOR_SOURCE << "\n";
+
+    std::cerr
+        << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+        << ':'<< esc(2, COLOR_FG_WHITE) << (e.line() + 1) << esc(2, ATTR_RESET)
+        << ':'<< esc(2, COLOR_FG_WHITE) << (e.character() + 1) << esc(2, ATTR_RESET)
+        << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+        << e.str()
+        << "\n";
+
+    exit(1);
+}
 } // anonymous namespace
 
 auto main(int argc, char* argv[]) -> int
@@ -760,6 +1058,8 @@ auto main(int argc, char* argv[]) -> int
             << "\n";
 
         return 1;
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        display_error_and_exit(source_path, source_text, e);
     }
 
     if constexpr (DEBUG_LEX) {
@@ -828,79 +1128,9 @@ auto main(int argc, char* argv[]) -> int
     try {
         nodes = parse(lexemes);
     } catch (viua::libs::lexer::Lexeme const& e) {
-        using viua::support::tty::COLOR_FG_WHITE;
-        using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-        using viua::support::tty::COLOR_FG_RED;
-        using viua::support::tty::COLOR_FG_RED_1;
-        using viua::support::tty::ATTR_RESET;
-        using viua::support::tty::send_escape_seq;
-        constexpr auto esc = send_escape_seq;
-
-        auto const SEPARATOR = std::string{" |  "};
-        constexpr auto LINE_NO_WIDTH = size_t{5};
-
-        auto source_line = std::ostringstream{};
-        auto highlight_line = std::ostringstream{};
-
-        std::cerr
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR << "\n";
-
-        {
-            auto const location = e.location;
-
-            auto line = view_line_of(source_text, location);
-
-            source_line
-                << esc(2, COLOR_FG_RED)
-                << std::setw(LINE_NO_WIDTH)
-                << (location.line + 1)
-                << esc(2, ATTR_RESET)
-                << SEPARATOR;
-            highlight_line
-                << std::string(LINE_NO_WIDTH, ' ')
-                << SEPARATOR;
-
-            source_line << std::string_view{line.data(), location.character};
-            highlight_line << std::string(location.character, ' ');
-            line.remove_prefix(location.character);
-
-            /*
-             * This if is required because of TERMINATOR tokens in unexpected
-             * places. In case a TERMINATOR token is the cause of the error it
-             * will not appear in line. If we attempted to shift line's head, it
-             * would be removing a prefix from an empty std::string_view which
-             * is undefined behaviour.
-             *
-             * I think the "bad TERMINATOR" is the only situation when this is
-             * important.
-             *
-             * When it happens, we just don't print the terminator (which is a
-             * newline), because a newline character will be added anyway.
-             */
-            if (not line.empty()) {
-                source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
-                line.remove_prefix(e.text.size());
-            }
-            highlight_line << esc(2, COLOR_FG_RED) << '^';
-            highlight_line
-                << esc(2, COLOR_FG_ORANGE_RED_1)
-                << std::string((e.text.size() - 1), '~');
-
-            source_line << line;
-        }
-
-        std::cerr << source_line.str() << "\n";
-        std::cerr << highlight_line.str() << "\n";
-
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.line + 1) << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.character + 1) << esc(2, ATTR_RESET)
-            << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-            << "unexpected token: " << viua::libs::lexer::to_string(e.token) << "\n";
-
-        return 1;
+        display_error_and_exit(source_path, source_text, e);
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        display_error_and_exit(source_path, source_text, e);
     }
 
     /*

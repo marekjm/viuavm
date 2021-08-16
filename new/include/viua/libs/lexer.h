@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -92,6 +93,57 @@ namespace viua::libs::lexer {
 
         auto operator==(TOKEN const) const -> bool;
         auto operator==(std::string_view const) const -> bool;
+    };
+
+    /*
+     * The "inline" specifier is used to avoid multiple definition errors.
+     * Usually, things should only be declared, and not defined in the header
+     * files because the linker will probably see multiple definitions of such
+     * defined symbol and refuse to link the object code.
+     *
+     * However, with the "inline" specifier in place we assure the linker that
+     * all definitions are the same so it can choose whichever it likes (eg, the
+     * first one it found).
+     *
+     * With this one trick we can now feel free to define variables in header
+     * files. Neat!
+     */
+    inline auto const OPCODE_NAMES = std::set<std::string>{
+        "noop",
+        "halt",
+        "ebreak",
+
+        "add",
+        "g.add",
+        "sub",
+        "g.sub",
+        "mul",
+        "g.mul",
+        "div",
+        "g.div",
+
+        "delete",
+        "g.delete",
+        "string",
+
+        "lui",
+        "g.lui",
+        "luiu",
+        "g.luiu",
+
+        "addi",
+        "g.addi",
+        "addiu",
+        "g.addiu",
+
+        "framei",
+        "g.framei",
+        "tailcall",
+
+        /*
+         * Pseudoinstructions listed below.
+         */
+        "li",
     };
 
     auto lex(std::string_view) -> std::vector<Lexeme>;
