@@ -1,0 +1,74 @@
+/*
+ *  Copyright (C) 2018, 2021 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <viua/libs/errors/compile_time.h>
+
+#include <sstream>
+
+
+namespace viua::libs::errors::compile_time {
+auto to_string(Cause const ce) -> std::string_view
+{
+    switch (ce) {
+    case Cause::Unknown:
+        return "unknown error";
+    case Cause::None:
+        return "";
+    case Cause::Unknown_opcode:
+        return "unknown opcode";
+    case Cause::Value_out_of_range:
+        return "value out of range";
+    }
+    return "illegal error";
+}
+
+Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
+    : cause{ce}
+    , message{std::move(m)}
+    , main_lexeme{lx}
+{}
+
+auto Error::aside(std::string s) -> Error&
+{
+    aside_note = std::move(s);
+    return *this;
+}
+auto Error::aside() const -> std::string_view
+{
+    return aside_note;
+}
+
+auto Error::what() const -> std::string_view
+{
+    return to_string(cause);
+}
+
+auto Error::str() const -> std::string
+{
+    auto out = std::ostringstream{};
+    if (cause != Cause::None) {
+        out << to_string(cause);
+        if (not message.empty()) {
+            out << ": ";
+        }
+    }
+    out << message;
+    return out.str();
+}
+}
