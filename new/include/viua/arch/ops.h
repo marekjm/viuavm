@@ -195,6 +195,7 @@ enum class OPCODE : opcode_type {
 
     DELETE = (FORMAT_S | 0x0001),
     STRING = (FORMAT_S | 0x0002),
+    FRAME  = (FORMAT_S | 0x0003),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0002),

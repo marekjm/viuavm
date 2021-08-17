@@ -136,8 +136,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "addiu",
     "g.addiu",
 
-    "framei",
-    "g.framei",
+    "frame",
+    "g.frame",
     "tailcall",
 
     /*

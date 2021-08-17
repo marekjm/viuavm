@@ -219,6 +219,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "delete";
     case OPCODE::STRING:
         return greedy + "string";
+    case OPCODE::FRAME:
+        return greedy + "frame";
     case OPCODE::LUI:
         return greedy + "lui";
     case OPCODE::LUIU:
@@ -259,6 +261,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "string") {
         return (op | static_cast<opcode_type>(OPCODE::STRING));
+    } else if (sv == "frame") {
+        return (op | static_cast<opcode_type>(OPCODE::FRAME));
     } else if (sv == "lui") {
         return (op | static_cast<opcode_type>(OPCODE::LUI));
     } else if (sv == "luiu") {
