@@ -131,6 +131,10 @@ struct Register_access {
     }
 
     static auto make_local(uint8_t const, bool const = true) -> Register_access;
+    static auto make_argument(uint8_t const, bool const = true)
+        -> Register_access;
+    static auto make_parameter(uint8_t const, bool const = true)
+        -> Register_access;
     static auto make_void() -> Register_access;
 };
 }  // namespace viua::arch

@@ -50,6 +50,16 @@ auto Register_access::make_local(uint8_t const index, bool const direct)
 {
     return Register_access{viua::arch::REGISTER_SET::LOCAL, direct, index};
 }
+auto Register_access::make_argument(uint8_t const index, bool const direct)
+    -> Register_access
+{
+    return Register_access{viua::arch::REGISTER_SET::ARGUMENT, direct, index};
+}
+auto Register_access::make_parameter(uint8_t const index, bool const direct)
+    -> Register_access
+{
+    return Register_access{viua::arch::REGISTER_SET::PARAMETER, direct, index};
+}
 auto Register_access::make_void() -> Register_access
 {
     return Register_access{viua::arch::REGISTER_SET::VOID, true, 0};
