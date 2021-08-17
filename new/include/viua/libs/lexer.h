@@ -47,6 +47,7 @@ enum class TOKEN {
      * Control characters.
      */
     COMMA,
+    DOT,
     EQ,
     TERMINATOR,
     ATTR_LIST_OPEN,

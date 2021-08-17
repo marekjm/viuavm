@@ -52,6 +52,8 @@ auto to_string(TOKEN const token) -> std::string
         return "OPCODE";
     case TOKEN::COMMA:
         return "COMMA";
+    case TOKEN::DOT:
+        return "DOT";
     case TOKEN::EQ:
         return "EQ";
     case TOKEN::TERMINATOR:
@@ -112,6 +114,7 @@ const auto RA_VOID      = std::regex{"^\\bvoid\\b"};
 const auto OPCODE = std::regex{"^(?:g.)?[a-z][a-z0-9_]*(?:.[stw])?\\b"};
 
 const auto COMMA           = std::regex{"^,"};
+const auto DOT             = std::regex{"^\\."};
 const auto EQ              = std::regex{"^="};
 const auto ATTR_LIST_OPEN  = std::regex{"^\\[\\["};
 const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
@@ -245,7 +248,16 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
         if (try_match(COMMENT, TOKEN::COMMENT)) {
             continue;
         }
+        if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) {
+            continue;
+        }
+        if (try_match(END, TOKEN::END)) {
+            continue;
+        }
         if (try_match(COMMA, TOKEN::COMMA)) {
+            continue;
+        }
+        if (try_match(DOT, TOKEN::DOT)) {
             continue;
         }
         if (try_match(RA_VOID, TOKEN::RA_VOID)) {
@@ -302,12 +314,6 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
                                       + std::to_string(bits_needed))
                                    : ""));
             }
-            continue;
-        }
-        if (try_match(DEF_FUNCTION, TOKEN::DEF_FUNCTION)) {
-            continue;
-        }
-        if (try_match(END, TOKEN::END)) {
             continue;
         }
         if (try_match(ATTR_LIST_OPEN, TOKEN::ATTR_LIST_OPEN)) {

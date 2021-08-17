@@ -153,8 +153,28 @@ auto Operand::make_access() const -> viua::arch::Register_access
     if (ingredients.front() == "void") {
         return viua::arch::Register_access{};
     }
-    return viua::arch::Register_access::make_local(
-        std::stoul(ingredients.back().text));
+    auto const index = std::stoul(ingredients.at(1).text);
+    if (ingredients.size() == 2) {
+        return viua::arch::Register_access::make_local(index);
+    }
+
+    auto const rs = ingredients.back();
+    if (rs == "l") {
+        return viua::arch::Register_access::make_local(index);
+    } else if (rs == "a") {
+        return viua::arch::Register_access::make_argument(index);
+    } else if (rs == "p") {
+        return viua::arch::Register_access::make_parameter(index);
+    } else {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ingredients.back(), Cause::Invalid_register_access}
+            .add(ingredients.at(0))
+            .add(ingredients.at(1))
+            .add(ingredients.at(2))
+            .aside("invalid register set specifier")
+            .note("valid register set specifiers are 'l', 'a', and 'p'");
+    }
 }
 
 struct Instruction : Node {
@@ -388,7 +408,7 @@ auto parse_function_definition(
             if (lexemes.front() == TOKEN::RA_VOID) {
                 operand.ingredients.push_back(
                     consume_token_of(TOKEN::RA_VOID, lexemes));
-            } else if (lexemes.front() == TOKEN::RA_DIRECT) {
+            } else if (look_ahead(TOKEN::RA_DIRECT, lexemes)) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
                 auto index        = viua::libs::lexer::Lexeme{};
                 try {
@@ -416,6 +436,13 @@ auto parse_function_definition(
                 }
                 operand.ingredients.push_back(access);
                 operand.ingredients.push_back(index);
+
+                if (look_ahead(TOKEN::DOT, lexemes)) {
+                    operand.ingredients.push_back(
+                        consume_token_of(TOKEN::DOT, lexemes));
+                    operand.ingredients.push_back(
+                        consume_token_of(TOKEN::LITERAL_ATOM, lexemes));
+                }
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
                 auto const value =
                     consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
@@ -1377,137 +1404,144 @@ auto main(int argc, char* argv[]) -> int
             save_fn_address(fn_table, fn.name.text, fn_offset);
         }
 
-        for (auto const& insn : fn.instructions) {
-            using viua::arch::opcode_type;
-            using viua::arch::ops::FORMAT;
-            using viua::arch::ops::FORMAT_MASK;
+        try {
+            for (auto const& insn : fn.instructions) {
+                using viua::arch::opcode_type;
+                using viua::arch::ops::FORMAT;
+                using viua::arch::ops::FORMAT_MASK;
 
-            auto opcode = opcode_type{};
-            try {
-                opcode = insn.parse_opcode();
-            } catch (std::invalid_argument const&) {
-                auto const e = insn.opcode;
+                auto opcode = opcode_type{};
+                try {
+                    opcode = insn.parse_opcode();
+                } catch (std::invalid_argument const&) {
+                    auto const e = insn.opcode;
 
-                using viua::support::tty::ATTR_RESET;
-                using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-                using viua::support::tty::COLOR_FG_RED;
-                using viua::support::tty::COLOR_FG_RED_1;
-                using viua::support::tty::COLOR_FG_WHITE;
-                using viua::support::tty::send_escape_seq;
-                constexpr auto esc = send_escape_seq;
+                    using viua::support::tty::ATTR_RESET;
+                    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+                    using viua::support::tty::COLOR_FG_RED;
+                    using viua::support::tty::COLOR_FG_RED_1;
+                    using viua::support::tty::COLOR_FG_WHITE;
+                    using viua::support::tty::send_escape_seq;
+                    constexpr auto esc = send_escape_seq;
 
-                auto const SEPARATOR         = std::string{" |  "};
-                constexpr auto LINE_NO_WIDTH = size_t{5};
+                    auto const SEPARATOR         = std::string{" |  "};
+                    constexpr auto LINE_NO_WIDTH = size_t{5};
 
-                auto source_line    = std::ostringstream{};
-                auto highlight_line = std::ostringstream{};
+                    auto source_line    = std::ostringstream{};
+                    auto highlight_line = std::ostringstream{};
 
-                std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR
-                          << "\n";
+                    std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR
+                              << "\n";
 
-                {
-                    auto const location = e.location;
+                    {
+                        auto const location = e.location;
 
-                    auto line = view_line_of(source_text, location);
+                        auto line = view_line_of(source_text, location);
 
-                    source_line << esc(2, COLOR_FG_RED)
-                                << std::setw(LINE_NO_WIDTH)
-                                << (location.line + 1) << esc(2, ATTR_RESET)
-                                << SEPARATOR;
-                    highlight_line << std::string(LINE_NO_WIDTH, ' ')
-                                   << SEPARATOR;
+                        source_line << esc(2, COLOR_FG_RED)
+                                    << std::setw(LINE_NO_WIDTH)
+                                    << (location.line + 1) << esc(2, ATTR_RESET)
+                                    << SEPARATOR;
+                        highlight_line << std::string(LINE_NO_WIDTH, ' ')
+                                       << SEPARATOR;
 
-                    source_line
-                        << std::string_view{line.data(), location.character};
-                    highlight_line << std::string(location.character, ' ');
-                    line.remove_prefix(location.character);
+                        source_line << std::string_view{line.data(),
+                                                        location.character};
+                        highlight_line << std::string(location.character, ' ');
+                        line.remove_prefix(location.character);
 
-                    /*
-                     * This if is required because of TERMINATOR tokens in
-                     * unexpected places. In case a TERMINATOR token is the
-                     * cause of the error it will not appear in line. If we
-                     * attempted to shift line's head, it would be removing a
-                     * prefix from an empty std::string_view which is undefined
-                     * behaviour.
-                     *
-                     * I think the "bad TERMINATOR" is the only situation when
-                     * this is important.
-                     *
-                     * When it happens, we just don't print the terminator
-                     * (which is a newline), because a newline character will be
-                     * added anyway.
-                     */
-                    if (not line.empty()) {
-                        source_line << esc(2, COLOR_FG_RED_1) << e.text
-                                    << esc(2, ATTR_RESET);
-                        line.remove_prefix(e.text.size());
+                        /*
+                         * This if is required because of TERMINATOR tokens in
+                         * unexpected places. In case a TERMINATOR token is the
+                         * cause of the error it will not appear in line. If we
+                         * attempted to shift line's head, it would be removing
+                         * a prefix from an empty std::string_view which is
+                         * undefined behaviour.
+                         *
+                         * I think the "bad TERMINATOR" is the only situation
+                         * when this is important.
+                         *
+                         * When it happens, we just don't print the terminator
+                         * (which is a newline), because a newline character
+                         * will be added anyway.
+                         */
+                        if (not line.empty()) {
+                            source_line << esc(2, COLOR_FG_RED_1) << e.text
+                                        << esc(2, ATTR_RESET);
+                            line.remove_prefix(e.text.size());
+                        }
+                        highlight_line << esc(2, COLOR_FG_RED) << '^';
+                        highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                                       << std::string((e.text.size() - 1), '~');
+
+                        source_line << line;
                     }
-                    highlight_line << esc(2, COLOR_FG_RED) << '^';
-                    highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
-                                   << std::string((e.text.size() - 1), '~');
 
-                    source_line << line;
+                    std::cerr << source_line.str() << "\n";
+                    std::cerr << highlight_line.str() << "\n";
+
+                    std::cerr
+                        << esc(2, COLOR_FG_WHITE) << source_path
+                        << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                        << (e.location.line + 1) << esc(2, ATTR_RESET) << ':'
+                        << esc(2, COLOR_FG_WHITE) << (e.location.character + 1)
+                        << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
+                        << "error" << esc(2, ATTR_RESET) << ": "
+                        << "unimplemented instruction: " << e.text << "\n";
+
+                    return 1;
                 }
-
-                std::cerr << source_line.str() << "\n";
-                std::cerr << highlight_line.str() << "\n";
-
-                std::cerr << esc(2, COLOR_FG_WHITE) << source_path
-                          << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                          << (e.location.line + 1) << esc(2, ATTR_RESET) << ':'
-                          << esc(2, COLOR_FG_WHITE)
-                          << (e.location.character + 1) << esc(2, ATTR_RESET)
-                          << ": " << esc(2, COLOR_FG_RED) << "error"
-                          << esc(2, ATTR_RESET) << ": "
-                          << "unimplemented instruction: " << e.text << "\n";
-
-                return 1;
-            }
-            auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
-            switch (format) {
-            case FORMAT::N:
-                *ip++ = static_cast<uint64_t>(opcode);
-                break;
-            case FORMAT::T:
-                *ip++ = viua::arch::ops::T{opcode,
+                auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+                switch (format) {
+                case FORMAT::N:
+                    *ip++ = static_cast<uint64_t>(opcode);
+                    break;
+                case FORMAT::T:
+                    *ip++ =
+                        viua::arch::ops::T{opcode,
                                            insn.operands.at(0).make_access(),
                                            insn.operands.at(1).make_access(),
                                            insn.operands.at(2).make_access()}
                             .encode();
-                break;
-            case FORMAT::D:
-                *ip++ = viua::arch::ops::D{opcode,
+                    break;
+                case FORMAT::D:
+                    *ip++ =
+                        viua::arch::ops::D{opcode,
                                            insn.operands.at(0).make_access(),
                                            insn.operands.at(1).make_access()}
                             .encode();
-                break;
-            case FORMAT::S:
-                *ip++ = viua::arch::ops::S{opcode,
+                    break;
+                case FORMAT::S:
+                    *ip++ =
+                        viua::arch::ops::S{opcode,
                                            insn.operands.at(0).make_access()}
                             .encode();
-                break;
-            case FORMAT::F:
-                break;  // FIXME
-            case FORMAT::E:
-                *ip++ =
-                    viua::arch::ops::E{
-                        opcode,
-                        insn.operands.front().make_access(),
-                        std::stoull(
-                            insn.operands.back().ingredients.front().text)}
-                        .encode();
-                break;
-            case FORMAT::R:
-                *ip++ =
-                    viua::arch::ops::R{
-                        opcode,
-                        insn.operands.at(0).make_access(),
-                        insn.operands.at(1).make_access(),
-                        static_cast<uint32_t>(std::stoul(
-                            insn.operands.back().ingredients.front().text))}
-                        .encode();
-                break;
+                    break;
+                case FORMAT::F:
+                    break;  // FIXME
+                case FORMAT::E:
+                    *ip++ =
+                        viua::arch::ops::E{
+                            opcode,
+                            insn.operands.front().make_access(),
+                            std::stoull(
+                                insn.operands.back().ingredients.front().text)}
+                            .encode();
+                    break;
+                case FORMAT::R:
+                    *ip++ =
+                        viua::arch::ops::R{
+                            opcode,
+                            insn.operands.at(0).make_access(),
+                            insn.operands.at(1).make_access(),
+                            static_cast<uint32_t>(std::stoul(
+                                insn.operands.back().ingredients.front().text))}
+                            .encode();
+                    break;
+                }
             }
+        } catch (viua::libs::errors::compile_time::Error const& e) {
+            display_error_and_exit(source_path, source_text, e);
         }
     }
 
