@@ -1059,7 +1059,29 @@ auto display_error_and_exit
 
     exit(1);
 }
-}  // anonymous namespace
+
+auto display_error_in_function(std::string_view source_path,
+                               viua::libs::errors::compile_time::Error const& e,
+                               std::string_view const fn_name) -> void
+{
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_CYAN;
+    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
+    using viua::support::tty::COLOR_FG_RED;
+    using viua::support::tty::COLOR_FG_RED_1;
+    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::send_escape_seq;
+    constexpr auto esc = send_escape_seq;
+
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+              << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
+              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+              << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
+              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+              << ": in function " << esc(2, COLOR_FG_WHITE) << fn_name
+              << esc(2, ATTR_RESET) << ":\n";
+}
+}  // namespace
 
 auto main(int argc, char* argv[]) -> int
 {
@@ -1541,6 +1563,7 @@ auto main(int argc, char* argv[]) -> int
                 }
             }
         } catch (viua::libs::errors::compile_time::Error const& e) {
+            display_error_in_function(source_path, e, fn.name.text);
             display_error_and_exit(source_path, source_text, e);
         }
     }
