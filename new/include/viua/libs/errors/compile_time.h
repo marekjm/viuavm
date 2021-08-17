@@ -146,6 +146,9 @@ class Error {
     auto aside(std::string) -> Error&;
     auto aside() const -> std::string_view;
 
+    auto note(std::string) -> Error&;
+    auto notes() const -> std::vector<std::string> const&;
+
     auto add(Lexeme) -> Error&;
     using span_type = std::pair<std::string::size_type, std::string::size_type>;
     auto spans() const -> std::vector<span_type>;

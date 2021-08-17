@@ -1021,6 +1021,15 @@ auto display_error_and_exit
               << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
               << e.str() << "\n";
 
+    for (auto const& each : e.notes()) {
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                  << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
+                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                  << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
+                  << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET)
+                  << ": " << each << "\n";
+    }
+
     exit(1);
 }
 }  // anonymous namespace

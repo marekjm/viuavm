@@ -55,6 +55,16 @@ auto Error::aside() const -> std::string_view
     return aside_note;
 }
 
+auto Error::note(std::string s) -> Error&
+{
+    attached_notes.emplace_back(std::move(s));
+    return *this;
+}
+auto Error::notes() const -> std::vector<std::string> const&
+{
+    return attached_notes;
+}
+
 auto Error::add(Lexeme lx) -> Error&
 {
     detail_lexemes.push_back(lx);
