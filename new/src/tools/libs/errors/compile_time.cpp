@@ -17,10 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/libs/errors/compile_time.h>
-
 #include <algorithm>
 #include <sstream>
+
+#include <viua/libs/errors/compile_time.h>
 
 
 namespace viua::libs::errors::compile_time {
@@ -42,9 +42,7 @@ auto to_string(Cause const ce) -> std::string_view
 }
 
 Error::Error(viua::libs::lexer::Lexeme lx, Cause const ce, std::string m)
-    : cause{ce}
-    , message{std::move(m)}
-    , main_lexeme{lx}
+        : cause{ce}, message{std::move(m)}, main_lexeme{lx}
 {}
 
 auto Error::aside(std::string s) -> Error&
@@ -90,4 +88,4 @@ auto Error::str() const -> std::string
     out << message;
     return out.str();
 }
-}
+}  // namespace viua::libs::errors::compile_time

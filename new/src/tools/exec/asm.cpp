@@ -1,26 +1,3 @@
-#include <viua/support/string.h>
-#include <viua/support/tty.h>
-#include <viua/support/vector.h>
-#include <viua/libs/errors/compile_time.h>
-#include <viua/libs/lexer.h>
-#include <viua/arch/arch.h>
-#include <viua/arch/ops.h>
-
-#include <iostream>
-#include <iomanip>
-#include <chrono>
-#include <map>
-#include <numeric>
-#include <set>
-#include <string>
-#include <string_view>
-#include <optional>
-#include <variant>
-#include <vector>
-#include <utility>
-#include <thread>
-#include <type_traits>
-
 #include <elf.h>
 #include <endian.h>
 #include <fcntl.h>
@@ -29,9 +6,32 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <numeric>
+#include <optional>
+#include <set>
+#include <string>
+#include <string_view>
+#include <thread>
+#include <type_traits>
+#include <utility>
+#include <variant>
+#include <vector>
 
-constexpr auto DEBUG_ELF = false;
-constexpr auto DEBUG_LEX = false;
+#include <viua/arch/arch.h>
+#include <viua/arch/ops.h>
+#include <viua/libs/errors/compile_time.h>
+#include <viua/libs/lexer.h>
+#include <viua/support/string.h>
+#include <viua/support/tty.h>
+#include <viua/support/vector.h>
+
+
+constexpr auto DEBUG_ELF       = false;
+constexpr auto DEBUG_LEX       = false;
 constexpr auto DEBUG_EXPANSION = false;
 
 
@@ -43,7 +43,7 @@ auto to_loading_parts_unsigned(uint64_t const value)
     constexpr auto HIGH_36 = uint64_t{0xfffffffff0000000};
 
     auto const high_part = ((value & HIGH_36) >> 28);
-    auto const low_part = static_cast<uint32_t>(value & ~HIGH_36);
+    auto const low_part  = static_cast<uint32_t>(value & ~HIGH_36);
 
     /*
      * If the low part consists of only 24 bits we can use just two
@@ -55,14 +55,14 @@ auto to_loading_parts_unsigned(uint64_t const value)
      * This reduces the overhead of loading 64-bit values.
      */
     if ((low_part & LOW_24) == low_part) {
-        return { high_part, { { low_part, 0 }, 0 } };
+        return {high_part, {{low_part, 0}, 0}};
     }
 
     auto const multiplier = 16;
-    auto const remainder = (low_part % multiplier);
-    auto const base = (low_part - remainder) / multiplier;
+    auto const remainder  = (low_part % multiplier);
+    auto const base       = (low_part - remainder) / multiplier;
 
-    return { high_part, { { base, multiplier }, remainder } };
+    return {high_part, {{base, multiplier}, remainder}};
 }
 
 auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
@@ -70,34 +70,41 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
 {
     auto const data_size = htole64(static_cast<uint64_t>(data.size()));
     strings.resize(strings.size() + sizeof(data_size));
-    memcpy((strings.data() + strings.size() - sizeof(data_size)), &data_size, sizeof(data_size));
+    memcpy((strings.data() + strings.size() - sizeof(data_size)),
+           &data_size,
+           sizeof(data_size));
 
     auto const saved_location = strings.size();
     std::copy(data.begin(), data.end(), std::back_inserter(strings));
 
     return saved_location;
 }
-auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn, uint64_t const offset)
-    -> size_t
+auto save_fn_address(std::vector<uint8_t>& strings,
+                     std::string_view const fn,
+                     uint64_t const offset) -> size_t
 {
     auto const fn_size = htole64(static_cast<uint64_t>(fn.size()));
     strings.resize(strings.size() + sizeof(fn_size));
-    memcpy((strings.data() + strings.size() - sizeof(fn_size)), &fn_size, sizeof(fn_size));
+    memcpy((strings.data() + strings.size() - sizeof(fn_size)),
+           &fn_size,
+           sizeof(fn_size));
 
     auto const saved_location = strings.size();
     std::copy(fn.begin(), fn.end(), std::back_inserter(strings));
 
     auto const fn_off = htole64(offset);
     strings.resize(strings.size() + sizeof(offset));
-    memcpy((strings.data() + strings.size() - sizeof(offset)), &fn_off, sizeof(fn_off));
+    memcpy((strings.data() + strings.size() - sizeof(offset)),
+           &fn_off,
+           sizeof(fn_off));
 
     return saved_location;
 }
-} // anonymous namespace
+}  // anonymous namespace
 
 namespace ast {
 struct Node {
-    using Lexeme = viua::libs::lexer::Lexeme;
+    using Lexeme         = viua::libs::lexer::Lexeme;
     using attribute_type = std::pair<Lexeme, std::optional<Lexeme>>;
     std::vector<attribute_type> attributes;
 
@@ -105,7 +112,7 @@ struct Node {
     auto attr(std::string_view const) const -> std::optional<Lexeme>;
 
     virtual auto to_string() const -> std::string = 0;
-    ~Node() = default;
+    ~Node()                                       = default;
 };
 auto Node::has_attr(std::string_view const key) const -> bool
 {
@@ -146,7 +153,8 @@ auto Operand::make_access() const -> viua::arch::Register_access
     if (ingredients.front() == "void") {
         return viua::arch::Register_access{};
     }
-    return viua::arch::Register_access::make_local(std::stoul(ingredients.back().text));
+    return viua::arch::Register_access::make_local(
+        std::stoul(ingredients.back().text));
 }
 
 struct Instruction : Node {
@@ -192,10 +200,10 @@ struct Fn_def : Node {
 auto Fn_def::to_string() const -> std::string
 {
     return viua::libs::lexer::to_string(viua::libs::lexer::TOKEN::DEF_FUNCTION)
-        + ' ' + std::to_string(name.location.line + 1)
-        + ':' + std::to_string(name.location.character + 1)
-        + '-' + std::to_string(name.location.character + name.text.size())
-        + ' ' + name.text;
+           + ' ' + std::to_string(name.location.line + 1) + ':'
+           + std::to_string(name.location.character + 1) + '-'
+           + std::to_string(name.location.character + name.text.size()) + ' '
+           + name.text;
 }
 
 auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
@@ -231,50 +239,52 @@ auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
 
     return cooked;
 }
-}
+}  // namespace ast
 namespace {
 auto consume_token_of(
-      viua::libs::lexer::TOKEN const tt
-    , viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes
-) -> viua::libs::lexer::Lexeme
+    viua::libs::lexer::TOKEN const tt,
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+    -> viua::libs::lexer::Lexeme
 {
     if (lexemes.front().token != tt) {
         throw lexemes.front();
     }
-    auto lx  = std::move(lexemes.front());
+    auto lx = std::move(lexemes.front());
     lexemes.remove_prefix(1);
     return lx;
 }
 auto consume_token_of(
-      std::set<viua::libs::lexer::TOKEN> const ts
-    , viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes
-) -> viua::libs::lexer::Lexeme
+    std::set<viua::libs::lexer::TOKEN> const ts,
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+    -> viua::libs::lexer::Lexeme
 {
     if (ts.count(lexemes.front().token) == 0) {
         throw lexemes.front();
     }
-    auto lx  = std::move(lexemes.front());
+    auto lx = std::move(lexemes.front());
     lexemes.remove_prefix(1);
     return lx;
 }
 
 auto look_ahead(
-      viua::libs::lexer::TOKEN const tk
-    , viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes
-) -> bool
+    viua::libs::lexer::TOKEN const tk,
+    viua::support::vector_view<viua::libs::lexer::Lexeme> const& lexemes)
+    -> bool
 {
     return (not lexemes.empty()) and (lexemes.front() == tk);
 }
 
-auto parse_attr_list(viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+auto parse_attr_list(
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> std::vector<ast::Node::attribute_type>
 {
     auto attrs = std::vector<ast::Node::attribute_type>{};
 
     using viua::libs::lexer::TOKEN;
     consume_token_of(TOKEN::ATTR_LIST_OPEN, lexemes);
-    while ((not lexemes.empty()) and lexemes.front() != TOKEN::ATTR_LIST_CLOSE) {
-        auto key = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+    while ((not lexemes.empty())
+           and lexemes.front() != TOKEN::ATTR_LIST_CLOSE) {
+        auto key   = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
         auto value = std::optional<viua::libs::lexer::Lexeme>{};
 
         if (look_ahead(TOKEN::EQ, lexemes)) {
@@ -297,7 +307,8 @@ auto parse_attr_list(viua::support::vector_view<viua::libs::lexer::Lexeme>& lexe
 
     return attrs;
 }
-auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
+auto parse_function_definition(
+    viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> std::unique_ptr<ast::Node>
 {
     using viua::libs::lexer::TOKEN;
@@ -308,7 +319,8 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
         fn->attributes = parse_attr_list(lexemes);
     }
 
-    auto fn_name = consume_token_of({ TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING }, lexemes);
+    auto fn_name =
+        consume_token_of({TOKEN::LITERAL_ATOM, TOKEN::LITERAL_STRING}, lexemes);
     consume_token_of(TOKEN::TERMINATOR, lexemes);
 
     auto instructions = std::vector<std::unique_ptr<ast::Node>>{};
@@ -322,23 +334,24 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                 throw;
             }
 
-            using viua::support::string::levenshtein_filter;
             using viua::libs::lexer::OPCODE_NAMES;
+            using viua::support::string::levenshtein_filter;
             auto misspell_candidates = levenshtein_filter(e.text, OPCODE_NAMES);
             if (misspell_candidates.empty()) {
                 throw;
             }
 
             using viua::support::string::levenshtein_best;
-            auto best_candidate = levenshtein_best(e.text, misspell_candidates, (e.text.size() / 2));
+            auto best_candidate = levenshtein_best(
+                e.text, misspell_candidates, (e.text.size() / 2));
             if (best_candidate.second == e.text) {
                 throw;
             }
 
-            using viua::libs::errors::compile_time::Error;
             using viua::libs::errors::compile_time::Cause;
-            throw Error{e, Cause::Unknown_opcode, e.text}
-                .aside("did you mean \"" + best_candidate.second + "\"?");
+            using viua::libs::errors::compile_time::Error;
+            throw Error{e, Cause::Unknown_opcode, e.text}.aside(
+                "did you mean \"" + best_candidate.second + "\"?");
         }
 
         /*
@@ -377,7 +390,7 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     consume_token_of(TOKEN::RA_VOID, lexemes));
             } else if (lexemes.front() == TOKEN::RA_DIRECT) {
                 auto const access = consume_token_of(TOKEN::RA_DIRECT, lexemes);
-                auto index = viua::libs::lexer::Lexeme{};
+                auto index        = viua::libs::lexer::Lexeme{};
                 try {
                     index = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 } catch (viua::libs::lexer::Lexeme const& e) {
@@ -397,19 +410,23 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
                     using viua::libs::errors::compile_time::Error;
                     throw Error{index, Cause::Invalid_register_access}
                         .add(access)
-                        .aside("register index range is 0-"
-                                + std::to_string(viua::arch::MAX_REGISTER_INDEX));
+                        .aside(
+                            "register index range is 0-"
+                            + std::to_string(viua::arch::MAX_REGISTER_INDEX));
                 }
                 operand.ingredients.push_back(access);
                 operand.ingredients.push_back(index);
             } else if (lexemes.front() == TOKEN::LITERAL_INTEGER) {
-                auto const value = consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
+                auto const value =
+                    consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
-                auto const value = consume_token_of(TOKEN::LITERAL_STRING, lexemes);
+                auto const value =
+                    consume_token_of(TOKEN::LITERAL_STRING, lexemes);
                 operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_ATOM) {
-                auto const value = consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
+                auto const value =
+                    consume_token_of(TOKEN::LITERAL_ATOM, lexemes);
                 operand.ingredients.push_back(value);
             } else {
                 throw lexemes.front();
@@ -443,13 +460,14 @@ auto parse_function_definition(viua::support::vector_view<viua::libs::lexer::Lex
 
     return fn;
 }
-auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector<ast::Instruction>
+auto expand_pseudoinstructions(std::vector<ast::Instruction> raw)
+    -> std::vector<ast::Instruction>
 {
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         if (each.opcode == "li") {
             auto const& raw_value = each.operands.at(1).ingredients.front();
-            auto value = uint64_t{};
+            auto value            = uint64_t{};
             if (raw_value.text.find("0x") == 0) {
                 value = std::stoull(raw_value.text, nullptr, 16);
             } else if (raw_value.text.find("0o") == 0) {
@@ -467,25 +485,28 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
              * overhead.
              */
             if (parts.first) {
-                auto synth = each;
+                auto synth        = each;
                 synth.opcode.text = "g.luiu";
-                synth.operands.at(1).ingredients.front().text = std::to_string(parts.first);
+                synth.operands.at(1).ingredients.front().text =
+                    std::to_string(parts.first);
                 cooked.push_back(synth);
             }
 
-            auto const base = parts.second.first.first;
+            auto const base       = parts.second.first.first;
             auto const multiplier = parts.second.first.second;
 
             if (multiplier != 0) {
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.addiu";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.front().text = "void";
@@ -498,14 +519,16 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                     cooked.push_back(synth);
                 }
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.addiu";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 2);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 2);
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.front().text = "void";
@@ -518,38 +541,46 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                     cooked.push_back(synth);
                 }
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.mul";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 2);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 2);
 
                     cooked.push_back(synth);
                 }
 
                 auto const remainder = parts.second.second;
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.addiu";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 2);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 2);
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.front().text = "void";
@@ -562,27 +593,31 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                     cooked.push_back(synth);
                 }
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.add";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     synth.operands.push_back(synth.operands.back());
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 2);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 2);
 
                     cooked.push_back(synth);
                 }
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.add";
 
                     synth.operands.push_back(each.operands.front());
@@ -590,39 +625,45 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     cooked.push_back(synth);
                 }
 
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "g.delete";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 1);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 1);
 
                     cooked.push_back(synth);
                 }
                 {
-                    auto synth = ast::Instruction{};
-                    synth.opcode = each.opcode;
+                    auto synth        = ast::Instruction{};
+                    synth.opcode      = each.opcode;
                     synth.opcode.text = "delete";
 
                     synth.operands.push_back(each.operands.front());
                     synth.operands.back().ingredients.back().text =
-                        std::to_string(std::stoul(
-                            synth.operands.back().ingredients.back().text) + 2);
+                        std::to_string(
+                            std::stoul(
+                                synth.operands.back().ingredients.back().text)
+                            + 2);
 
                     cooked.push_back(synth);
                 }
             } else {
-                auto synth = ast::Instruction{};
-                synth.opcode = each.opcode;
+                auto synth        = ast::Instruction{};
+                synth.opcode      = each.opcode;
                 synth.opcode.text = "addiu";
 
                 synth.operands.push_back(each.operands.front());
@@ -632,7 +673,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw) -> std::vector
                 synth.operands.back().ingredients.pop_back();
 
                 synth.operands.push_back(each.operands.back());
-                synth.operands.back().ingredients.front().text = std::to_string(base);
+                synth.operands.back().ingredients.front().text =
+                    std::to_string(base);
 
                 cooked.push_back(synth);
             }
@@ -665,7 +707,7 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
 
     return nodes;
 }
-}
+}  // namespace
 
 namespace {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
@@ -677,7 +719,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
     //     << ")\n";
     {
         auto line_end = size_t{0};
-        line_end = sv.find('\n', loc.offset);
+        line_end      = sv.find('\n', loc.offset);
         // std::cerr << "  ends at " << line_end << "\n";
 
         if (line_end != std::string::npos) {
@@ -686,7 +728,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
     }
     {
         auto line_begin = size_t{0};
-        line_begin = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
+        line_begin      = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
         if (line_begin == std::string::npos) {
             line_begin = 0;
         }
@@ -701,7 +743,7 @@ auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
 auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
     -> std::string_view
 {
-    auto line_end = size_t{0};
+    auto line_end   = size_t{0};
     auto line_begin = size_t{0};
 
     line_end = sv.rfind('\n', (loc.offset ? (loc.offset - 1) : 0));
@@ -720,7 +762,7 @@ auto view_line_before(std::string_view sv, viua::libs::lexer::Location loc)
 auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
     -> std::string_view
 {
-    auto line_end = size_t{0};
+    auto line_end   = size_t{0};
     auto line_begin = size_t{0};
 
     line_begin = sv.find('\n', loc.offset);
@@ -735,47 +777,38 @@ auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
 
     return sv;
 }
-} // anonymous namespace
+}  // anonymous namespace
 
 namespace {
-auto display_error_and_exit[[noreturn]](
-      std::string_view source_path
-    , std::string_view source_text
-    , viua::libs::lexer::Lexeme const& e
-) -> void
+auto display_error_and_exit [[noreturn]] (std::string_view source_path,
+                                          std::string_view source_text,
+                                          viua::libs::lexer::Lexeme const& e)
+-> void
 {
-    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::ATTR_RESET;
     using viua::support::tty::COLOR_FG_ORANGE_RED_1;
     using viua::support::tty::COLOR_FG_RED;
     using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_WHITE;
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
-    auto const SEPARATOR = std::string{" |  "};
+    auto const SEPARATOR         = std::string{" |  "};
     constexpr auto LINE_NO_WIDTH = size_t{5};
 
-    auto source_line = std::ostringstream{};
+    auto source_line    = std::ostringstream{};
     auto highlight_line = std::ostringstream{};
 
-    std::cerr
-        << std::string(LINE_NO_WIDTH, ' ')
-        << SEPARATOR << "\n";
+    std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR << "\n";
 
     {
         auto const location = e.location;
 
         auto line = view_line_of(source_text, location);
 
-        source_line
-            << esc(2, COLOR_FG_RED)
-            << std::setw(LINE_NO_WIDTH)
-            << (location.line + 1)
-            << esc(2, ATTR_RESET)
-            << SEPARATOR;
-        highlight_line
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR;
+        source_line << esc(2, COLOR_FG_RED) << std::setw(LINE_NO_WIDTH)
+                    << (location.line + 1) << esc(2, ATTR_RESET) << SEPARATOR;
+        highlight_line << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR;
 
         source_line << std::string_view{line.data(), location.character};
         highlight_line << std::string(location.character, ' ');
@@ -795,13 +828,13 @@ auto display_error_and_exit[[noreturn]](
          * newline), because a newline character will be added anyway.
          */
         if (not line.empty()) {
-            source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
+            source_line << esc(2, COLOR_FG_RED_1) << e.text
+                        << esc(2, ATTR_RESET);
             line.remove_prefix(e.text.size());
         }
         highlight_line << esc(2, COLOR_FG_RED) << '^';
-        highlight_line
-            << esc(2, COLOR_FG_ORANGE_RED_1)
-            << std::string((e.text.size() - 1), '~');
+        highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                       << std::string((e.text.size() - 1), '~');
 
         source_line << line;
     }
@@ -809,17 +842,19 @@ auto display_error_and_exit[[noreturn]](
     std::cerr << source_line.str() << "\n";
     std::cerr << highlight_line.str() << "\n";
 
-    std::cerr
-        << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-        << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.line + 1) << esc(2, ATTR_RESET)
-        << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.character + 1) << esc(2, ATTR_RESET)
-        << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-        << "unexpected token: " << viua::libs::lexer::to_string(e.token) << "\n";
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+              << ':' << esc(2, COLOR_FG_WHITE) << (e.location.line + 1)
+              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+              << (e.location.character + 1) << esc(2, ATTR_RESET) << ": "
+              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+              << "unexpected token: " << viua::libs::lexer::to_string(e.token)
+              << "\n";
 
     exit(1);
 }
 
-auto cook_spans(std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
+auto cook_spans(
+    std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
     -> std::vector<std::tuple<bool, size_t, size_t>>
 {
     auto cooked = std::vector<std::tuple<bool, size_t, size_t>>{};
@@ -830,71 +865,57 @@ auto cook_spans(std::vector<viua::libs::errors::compile_time::Error::span_type> 
         auto const& [hl, offset, size] = cooked.back();
         if ((offset + size) != each.first) {
             cooked.emplace_back(
-                  false
-                , (offset + size)
-                , (each.first - (offset + size)));
+                false, (offset + size), (each.first - (offset + size)));
         }
         cooked.emplace_back(true, each.first, each.second);
     }
 
     return cooked;
 }
-auto display_error_and_exit[[noreturn]](
-      std::string_view source_path
-    , std::string_view source_text
-    , viua::libs::errors::compile_time::Error const& e
-) -> void
+auto display_error_and_exit
+    [[noreturn]] (std::string_view source_path,
+                  std::string_view source_text,
+                  viua::libs::errors::compile_time::Error const& e) -> void
 {
-    using viua::support::tty::COLOR_FG_WHITE;
+    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_CYAN;
     using viua::support::tty::COLOR_FG_ORANGE_RED_1;
     using viua::support::tty::COLOR_FG_RED;
     using viua::support::tty::COLOR_FG_RED_1;
-    using viua::support::tty::COLOR_FG_CYAN;
-    using viua::support::tty::ATTR_RESET;
+    using viua::support::tty::COLOR_FG_WHITE;
     using viua::support::tty::send_escape_seq;
     constexpr auto esc = send_escape_seq;
 
     constexpr auto SEPARATOR_SOURCE = std::string_view{" | "};
     constexpr auto SEPARATOR_ASIDE  = std::string_view{" . "};
-    constexpr auto ERROR_MARKER = std::string_view{" => "};
-    auto const LINE_NO_WIDTH = std::to_string(std::max(e.line(), e.line() + 1)).size();
+    constexpr auto ERROR_MARKER     = std::string_view{" => "};
+    auto const LINE_NO_WIDTH =
+        std::to_string(std::max(e.line(), e.line() + 1)).size();
 
     /*
      * The separator to put some space between the command and the error
      * report.
      */
-    std::cerr
-        << std::string(ERROR_MARKER.size(), ' ')
-        << std::string(LINE_NO_WIDTH, ' ')
-        << SEPARATOR_SOURCE << "\n";
+    std::cerr << std::string(ERROR_MARKER.size(), ' ')
+              << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
 
     if (e.line()) {
-        std::cerr
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::setw(LINE_NO_WIDTH)
-            << e.line()
-            << SEPARATOR_SOURCE
-            << view_line_before(source_text, e.location())
-            << "\n";
+        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+                  << std::setw(LINE_NO_WIDTH) << e.line() << SEPARATOR_SOURCE
+                  << view_line_before(source_text, e.location()) << "\n";
     }
 
-    auto source_line = std::ostringstream{};
+    auto source_line    = std::ostringstream{};
     auto highlight_line = std::ostringstream{};
 
     if constexpr (false) {
         auto line = view_line_of(source_text, e.location());
 
-        source_line
-            << esc(2, COLOR_FG_RED)
-            << ERROR_MARKER
-            << std::setw(LINE_NO_WIDTH)
-            << (e.line() + 1)
-            << esc(2, COLOR_FG_WHITE)
-            << SEPARATOR_SOURCE;
-        highlight_line
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR_SOURCE;
+        source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
+                    << std::setw(LINE_NO_WIDTH) << (e.line() + 1)
+                    << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
+        highlight_line << std::string(ERROR_MARKER.size(), ' ')
+                       << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE;
 
         source_line << std::string_view{line.data(), e.character()};
         highlight_line << std::string(e.character(), ' ');
@@ -914,61 +935,48 @@ auto display_error_and_exit[[noreturn]](
          * newline), because a newline character will be added anyway.
          */
         if (not line.empty()) {
-            source_line << esc(2, COLOR_FG_RED_1) << e.main().text << esc(2, ATTR_RESET);
+            source_line << esc(2, COLOR_FG_RED_1) << e.main().text
+                        << esc(2, ATTR_RESET);
             line.remove_prefix(e.main().text.size());
         }
         highlight_line << esc(2, COLOR_FG_RED) << '^';
-        highlight_line
-            << esc(2, COLOR_FG_ORANGE_RED_1)
-            << std::string((e.main().text.size() - 1), '~')
-            << esc(2, ATTR_RESET);
+        highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                       << std::string((e.main().text.size() - 1), '~')
+                       << esc(2, ATTR_RESET);
 
-        source_line
-            << esc(2, COLOR_FG_WHITE)
-            << line
-            << esc(2, ATTR_RESET);
+        source_line << esc(2, COLOR_FG_WHITE) << line << esc(2, ATTR_RESET);
     }
 
     {
         auto line = view_line_of(source_text, e.location());
 
-        source_line
-            << esc(2, COLOR_FG_RED)
-            << ERROR_MARKER
-            << std::setw(LINE_NO_WIDTH)
-            << (e.line() + 1)
-            << esc(2, COLOR_FG_WHITE)
-            << SEPARATOR_SOURCE;
-        highlight_line
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR_SOURCE;
+        source_line << esc(2, COLOR_FG_RED) << ERROR_MARKER
+                    << std::setw(LINE_NO_WIDTH) << (e.line() + 1)
+                    << esc(2, COLOR_FG_WHITE) << SEPARATOR_SOURCE;
+        highlight_line << std::string(ERROR_MARKER.size(), ' ')
+                       << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE;
 
         auto const spans = cook_spans(e.spans());
         for (auto const& each : spans) {
             auto const& [hl, offset, size] = each;
             if (hl and offset == e.character()) {
                 source_line << esc(2, COLOR_FG_RED_1);
-                highlight_line
-                    << esc(2, COLOR_FG_RED_1)
-                    << '^'
-                    << esc(2, COLOR_FG_RED)
-                    << std::string(size - 1, '~');
+                highlight_line << esc(2, COLOR_FG_RED_1) << '^'
+                               << esc(2, COLOR_FG_RED)
+                               << std::string(size - 1, '~');
             } else if (hl) {
                 source_line << esc(2, COLOR_FG_RED);
-                highlight_line
-                    << esc(2, COLOR_FG_RED)
-                    << std::string(size, '~');
+                highlight_line << esc(2, COLOR_FG_RED)
+                               << std::string(size, '~');
             } else {
                 source_line << esc(2, COLOR_FG_WHITE);
-                highlight_line
-                    << std::string(size, ' ');
+                highlight_line << std::string(size, ' ');
             }
             source_line << line.substr(offset, size);
         }
-        source_line
-            << esc(2, COLOR_FG_WHITE)
-            << line.substr(std::get<1>(spans.back()) + std::get<2>(spans.back()));
+        source_line << esc(2, COLOR_FG_WHITE)
+                    << line.substr(std::get<1>(spans.back())
+                                   + std::get<2>(spans.back()));
 
         source_line << esc(2, ATTR_RESET);
         highlight_line << esc(2, ATTR_RESET);
@@ -978,64 +986,44 @@ auto display_error_and_exit[[noreturn]](
     std::cerr << highlight_line.str() << "\n";
 
     if (not e.aside().empty()) {
-        std::cerr
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::string(LINE_NO_WIDTH, ' ')
-            << esc(2, COLOR_FG_CYAN)
-            << SEPARATOR_ASIDE
-            << std::string(e.character(), ' ')
-            << '|'
-            << esc(2, ATTR_RESET)
-            << "\n";
-        std::cerr
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::string(LINE_NO_WIDTH, ' ')
-            << esc(2, COLOR_FG_CYAN)
-            << SEPARATOR_ASIDE
-            << std::string(e.character(), ' ')
-            << "`- "
-            << e.aside()
-            << esc(2, ATTR_RESET)
-            << "\n";
-        std::cerr
-            << esc(2, COLOR_FG_CYAN)
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR_ASIDE
-            << esc(2, ATTR_RESET)
-            << "\n";
+        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+                  << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
+                  << SEPARATOR_ASIDE << std::string(e.character(), ' ') << '|'
+                  << esc(2, ATTR_RESET) << "\n";
+        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+                  << std::string(LINE_NO_WIDTH, ' ') << esc(2, COLOR_FG_CYAN)
+                  << SEPARATOR_ASIDE << std::string(e.character(), ' ') << "`- "
+                  << e.aside() << esc(2, ATTR_RESET) << "\n";
+        std::cerr << esc(2, COLOR_FG_CYAN)
+                  << std::string(ERROR_MARKER.size(), ' ')
+                  << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_ASIDE
+                  << esc(2, ATTR_RESET) << "\n";
     }
 
     {
-        std::cerr
-            << std::string(ERROR_MARKER.size(), ' ')
-            << std::setw(LINE_NO_WIDTH)
-            << (e.line() + 2)
-            << SEPARATOR_SOURCE
-            << view_line_after(source_text, e.location())
-            << "\n";
+        std::cerr << std::string(ERROR_MARKER.size(), ' ')
+                  << std::setw(LINE_NO_WIDTH) << (e.line() + 2)
+                  << SEPARATOR_SOURCE
+                  << view_line_after(source_text, e.location()) << "\n";
     }
 
     /*
      * The separator to put some space between the source code dump,
      * highlight, etc and the error message.
      */
-    std::cerr
-        << std::string(ERROR_MARKER.size(), ' ')
-        << std::string(LINE_NO_WIDTH, ' ')
-        << SEPARATOR_SOURCE << "\n";
+    std::cerr << std::string(ERROR_MARKER.size(), ' ')
+              << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR_SOURCE << "\n";
 
-    std::cerr
-        << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-        << ':'<< esc(2, COLOR_FG_WHITE) << (e.line() + 1) << esc(2, ATTR_RESET)
-        << ':'<< esc(2, COLOR_FG_WHITE) << (e.character() + 1) << esc(2, ATTR_RESET)
-        << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-        << e.str()
-        << "\n";
+    std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+              << ':' << esc(2, COLOR_FG_WHITE) << (e.line() + 1)
+              << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+              << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
+              << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
+              << e.str() << "\n";
 
     exit(1);
 }
-} // anonymous namespace
+}  // anonymous namespace
 
 auto main(int argc, char* argv[]) -> int
 {
@@ -1054,16 +1042,17 @@ auto main(int argc, char* argv[]) -> int
      *    shared object
      */
     auto const source_path = args.back();
-    auto source_text = std::string{};
+    auto source_text       = std::string{};
     {
         auto const source_fd = open(source_path.data(), O_RDONLY);
 
-        struct stat source_stat {};
+        struct stat source_stat {
+        };
         fstat(source_fd, &source_stat);
 
         std::cerr << source_stat.st_size
-            << " byte(s) of source code to process from "
-            << source_path << "\n";
+                  << " byte(s) of source code to process from " << source_path
+                  << "\n";
 
         source_text.resize(source_stat.st_size);
         read(source_fd, source_text.data(), source_text.size());
@@ -1081,23 +1070,21 @@ auto main(int argc, char* argv[]) -> int
     try {
         lexemes = viua::libs::lexer::lex(source_text);
     } catch (viua::libs::lexer::Location const& location) {
-        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::ATTR_RESET;
         using viua::support::tty::COLOR_FG_ORANGE_RED_1;
         using viua::support::tty::COLOR_FG_RED;
         using viua::support::tty::COLOR_FG_RED_1;
-        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::COLOR_FG_WHITE;
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
 
-        auto const SEPARATOR = std::string{" |  "};
+        auto const SEPARATOR         = std::string{" |  "};
         constexpr auto LINE_NO_WIDTH = size_t{5};
 
-        auto source_line = std::ostringstream{};
+        auto source_line    = std::ostringstream{};
         auto highlight_line = std::ostringstream{};
 
-        std::cerr
-            << std::string(LINE_NO_WIDTH, ' ')
-            << SEPARATOR << "\n";
+        std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR << "\n";
 
         struct {
             std::string text;
@@ -1107,15 +1094,10 @@ auto main(int argc, char* argv[]) -> int
         {
             auto line = view_line_of(source_text, location);
 
-            source_line
-                << esc(2, COLOR_FG_RED)
-                << std::setw(LINE_NO_WIDTH)
-                << (location.line + 1)
-                << esc(2, ATTR_RESET)
-                << SEPARATOR;
-            highlight_line
-                << std::string(LINE_NO_WIDTH, ' ')
-                << SEPARATOR;
+            source_line << esc(2, COLOR_FG_RED) << std::setw(LINE_NO_WIDTH)
+                        << (location.line + 1) << esc(2, ATTR_RESET)
+                        << SEPARATOR;
+            highlight_line << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR;
 
             source_line << std::string_view{line.data(), location.character};
             highlight_line << std::string(location.character, ' ');
@@ -1135,13 +1117,13 @@ auto main(int argc, char* argv[]) -> int
              * newline), because a newline character will be added anyway.
              */
             if (not line.empty()) {
-                source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
+                source_line << esc(2, COLOR_FG_RED_1) << e.text
+                            << esc(2, ATTR_RESET);
                 line.remove_prefix(e.text.size());
             }
             highlight_line << esc(2, COLOR_FG_RED) << '^';
-            highlight_line
-                << esc(2, COLOR_FG_ORANGE_RED_1)
-                << std::string((e.text.size() - 1), '~');
+            highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                           << std::string((e.text.size() - 1), '~');
 
             source_line << line;
         }
@@ -1149,16 +1131,16 @@ auto main(int argc, char* argv[]) -> int
         std::cerr << source_line.str() << "\n";
         std::cerr << highlight_line.str() << "\n";
 
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
-            << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
-            << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-            << "no token match at character "
-            << viua::support::string::CORNER_QUOTE_LL
-            << esc(2, COLOR_FG_WHITE) << e.text << esc(2, ATTR_RESET)
-            << viua::support::string::CORNER_QUOTE_UR
-            << "\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                  << ':' << esc(2, COLOR_FG_WHITE) << (location.line + 1)
+                  << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                  << (location.character + 1) << esc(2, ATTR_RESET) << ": "
+                  << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET)
+                  << ": "
+                  << "no token match at character "
+                  << viua::support::string::CORNER_QUOTE_LL
+                  << esc(2, COLOR_FG_WHITE) << e.text << esc(2, ATTR_RESET)
+                  << viua::support::string::CORNER_QUOTE_UR << "\n";
 
         return 1;
     } catch (viua::libs::errors::compile_time::Error const& e) {
@@ -1168,20 +1150,17 @@ auto main(int argc, char* argv[]) -> int
     if constexpr (DEBUG_LEX) {
         std::cerr << lexemes.size() << " raw lexeme(s)\n";
         for (auto const& each : lexemes) {
-            std::cerr << "  "
-                << viua::libs::lexer::to_string(each.token)
-                << ' ' << each.location.line
-                << ':' << each.location.character
-                << '-' << (each.location.character + each.text.size() - 1)
-                << " +" << each.location.offset;
+            std::cerr << "  " << viua::libs::lexer::to_string(each.token) << ' '
+                      << each.location.line << ':' << each.location.character
+                      << '-' << (each.location.character + each.text.size() - 1)
+                      << " +" << each.location.offset;
 
             using viua::libs::lexer::TOKEN;
-            auto const printable =
-                   (each.token == TOKEN::LITERAL_STRING)
-                or (each.token == TOKEN::LITERAL_INTEGER)
-                or (each.token == TOKEN::LITERAL_FLOAT)
-                or (each.token == TOKEN::LITERAL_ATOM)
-                or (each.token == TOKEN::OPCODE);
+            auto const printable = (each.token == TOKEN::LITERAL_STRING)
+                                   or (each.token == TOKEN::LITERAL_INTEGER)
+                                   or (each.token == TOKEN::LITERAL_FLOAT)
+                                   or (each.token == TOKEN::LITERAL_ATOM)
+                                   or (each.token == TOKEN::OPCODE);
             if (printable) {
                 std::cerr << " " << each.text;
             }
@@ -1196,20 +1175,18 @@ auto main(int argc, char* argv[]) -> int
         std::cerr << lexemes.size() << " cooked lexeme(s)\n";
         if constexpr (false) {
             for (auto const& each : lexemes) {
-                std::cerr << "  "
-                    << viua::libs::lexer::to_string(each.token)
-                    << ' ' << each.location.line
-                    << ':' << each.location.character
-                    << '-' << (each.location.character + each.text.size() - 1)
-                    << " +" << each.location.offset;
+                std::cerr << "  " << viua::libs::lexer::to_string(each.token)
+                          << ' ' << each.location.line << ':'
+                          << each.location.character << '-'
+                          << (each.location.character + each.text.size() - 1)
+                          << " +" << each.location.offset;
 
                 using viua::libs::lexer::TOKEN;
-                auto const printable =
-                       (each.token == TOKEN::LITERAL_STRING)
-                    or (each.token == TOKEN::LITERAL_INTEGER)
-                    or (each.token == TOKEN::LITERAL_FLOAT)
-                    or (each.token == TOKEN::LITERAL_ATOM)
-                    or (each.token == TOKEN::OPCODE);
+                auto const printable = (each.token == TOKEN::LITERAL_STRING)
+                                       or (each.token == TOKEN::LITERAL_INTEGER)
+                                       or (each.token == TOKEN::LITERAL_FLOAT)
+                                       or (each.token == TOKEN::LITERAL_ATOM)
+                                       or (each.token == TOKEN::OPCODE);
                 if (printable) {
                     std::cerr << " " << each.text;
                 }
@@ -1253,25 +1230,23 @@ auto main(int argc, char* argv[]) -> int
             continue;
         }
 
-        auto& fn = static_cast<ast::Fn_def&>(*each);
+        auto& fn    = static_cast<ast::Fn_def&>(*each);
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
             if (insn.opcode == "string" or insn.opcode == "g.string") {
                 auto s = insn.operands.back().ingredients.front().text;
-                s = s.substr(1, s.size() - 2);
-                s = viua::support::string::unescape(s);
-                auto const saved_at = save_string(
-                      strings_table
-                    , s
-                );
+                s      = s.substr(1, s.size() - 2);
+                s      = viua::support::string::unescape(s);
+                auto const saved_at = save_string(strings_table, s);
 
-                auto synth = ast::Instruction{};
-                synth.opcode = insn.opcode;
+                auto synth        = ast::Instruction{};
+                synth.opcode      = insn.opcode;
                 synth.opcode.text = "li";
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
-                synth.operands.back().ingredients.front().text = std::to_string(saved_at);
+                synth.operands.back().ingredients.front().text =
+                    std::to_string(saved_at);
 
                 cooked.push_back(synth);
 
@@ -1295,15 +1270,14 @@ auto main(int argc, char* argv[]) -> int
             continue;
         }
 
-        auto& fn = static_cast<ast::Fn_def&>(*each);
+        auto& fn                 = static_cast<ast::Fn_def&>(*each);
         auto const raw_ops_count = fn.instructions.size();
         fn.instructions = expand_pseudoinstructions(std::move(fn.instructions));
 
         if constexpr (DEBUG_EXPANSION) {
-            std::cerr << "FN " << fn.to_string()
-                << " with " << raw_ops_count << " raw, "
-                << fn.instructions.size()
-                << " cooked op(s)\n";
+            std::cerr << "FN " << fn.to_string() << " with " << raw_ops_count
+                      << " raw, " << fn.instructions.size()
+                      << " cooked op(s)\n";
             for (auto const& op : fn.instructions) {
                 std::cerr << "  " << op.to_string() << "\n";
             }
@@ -1325,21 +1299,22 @@ auto main(int argc, char* argv[]) -> int
         }
     }
     if (not entry_point_fn.has_value()) {
-        using viua::support::tty::COLOR_FG_WHITE;
+        using viua::support::tty::ATTR_RESET;
         using viua::support::tty::COLOR_FG_CYAN;
         using viua::support::tty::COLOR_FG_RED;
-        using viua::support::tty::ATTR_RESET;
+        using viua::support::tty::COLOR_FG_WHITE;
         using viua::support::tty::send_escape_seq;
         constexpr auto esc = send_escape_seq;
 
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-            << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-            << " no entry point function defined\n";
-        std::cerr
-            << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-            << ": " << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET) << ": "
-            << " the entry function should have the [[entry_point]] attribute\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                  << ": " << esc(2, COLOR_FG_RED) << "error"
+                  << esc(2, ATTR_RESET) << ": "
+                  << " no entry point function defined\n";
+        std::cerr << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
+                  << ": " << esc(2, COLOR_FG_CYAN) << "note"
+                  << esc(2, ATTR_RESET) << ": "
+                  << " the entry function should have the [[entry_point]] "
+                     "attribute\n";
         return 1;
     }
 
@@ -1350,9 +1325,11 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto const ops_count = std::accumulate(nodes.begin(), nodes.end(), size_t{0}
-        , [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t
-        {
+    auto const ops_count = std::accumulate(
+        nodes.begin(),
+        nodes.end(),
+        size_t{0},
+        [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t {
             if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
                 return 0;
             }
@@ -1366,7 +1343,7 @@ auto main(int argc, char* argv[]) -> int
     text.resize(ops_count);
 
     auto fn_addresses = std::map<std::string, size_t>{};
-    auto fn_table = std::vector<uint8_t>{};
+    auto fn_table     = std::vector<uint8_t>{};
 
     auto ip = text.data();
     for (auto const& each : nodes) {
@@ -1386,7 +1363,7 @@ auto main(int argc, char* argv[]) -> int
              * and foreign functions. At compile time, we don't yet know,
              * though, which function is foreign and which is bytecode.
              */
-            auto const fn_offset = (ip - &text[0]);
+            auto const fn_offset       = (ip - &text[0]);
             fn_addresses[fn.name.text] = fn_offset;
             save_fn_address(fn_table, fn.name.text, fn_offset);
         }
@@ -1402,64 +1379,63 @@ auto main(int argc, char* argv[]) -> int
             } catch (std::invalid_argument const&) {
                 auto const e = insn.opcode;
 
-                using viua::support::tty::COLOR_FG_WHITE;
+                using viua::support::tty::ATTR_RESET;
                 using viua::support::tty::COLOR_FG_ORANGE_RED_1;
                 using viua::support::tty::COLOR_FG_RED;
                 using viua::support::tty::COLOR_FG_RED_1;
-                using viua::support::tty::ATTR_RESET;
+                using viua::support::tty::COLOR_FG_WHITE;
                 using viua::support::tty::send_escape_seq;
                 constexpr auto esc = send_escape_seq;
 
-                auto const SEPARATOR = std::string{" |  "};
+                auto const SEPARATOR         = std::string{" |  "};
                 constexpr auto LINE_NO_WIDTH = size_t{5};
 
-                auto source_line = std::ostringstream{};
+                auto source_line    = std::ostringstream{};
                 auto highlight_line = std::ostringstream{};
 
-                std::cerr
-                    << std::string(LINE_NO_WIDTH, ' ')
-                    << SEPARATOR << "\n";
+                std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR
+                          << "\n";
 
                 {
                     auto const location = e.location;
 
                     auto line = view_line_of(source_text, location);
 
-                    source_line
-                        << esc(2, COLOR_FG_RED)
-                        << std::setw(LINE_NO_WIDTH)
-                        << (location.line + 1)
-                        << esc(2, ATTR_RESET)
-                        << SEPARATOR;
-                    highlight_line
-                        << std::string(LINE_NO_WIDTH, ' ')
-                        << SEPARATOR;
+                    source_line << esc(2, COLOR_FG_RED)
+                                << std::setw(LINE_NO_WIDTH)
+                                << (location.line + 1) << esc(2, ATTR_RESET)
+                                << SEPARATOR;
+                    highlight_line << std::string(LINE_NO_WIDTH, ' ')
+                                   << SEPARATOR;
 
-                    source_line << std::string_view{line.data(), location.character};
+                    source_line
+                        << std::string_view{line.data(), location.character};
                     highlight_line << std::string(location.character, ' ');
                     line.remove_prefix(location.character);
 
                     /*
-                     * This if is required because of TERMINATOR tokens in unexpected
-                     * places. In case a TERMINATOR token is the cause of the error it
-                     * will not appear in line. If we attempted to shift line's head, it
-                     * would be removing a prefix from an empty std::string_view which
-                     * is undefined behaviour.
+                     * This if is required because of TERMINATOR tokens in
+                     * unexpected places. In case a TERMINATOR token is the
+                     * cause of the error it will not appear in line. If we
+                     * attempted to shift line's head, it would be removing a
+                     * prefix from an empty std::string_view which is undefined
+                     * behaviour.
                      *
-                     * I think the "bad TERMINATOR" is the only situation when this is
-                     * important.
+                     * I think the "bad TERMINATOR" is the only situation when
+                     * this is important.
                      *
-                     * When it happens, we just don't print the terminator (which is a
-                     * newline), because a newline character will be added anyway.
+                     * When it happens, we just don't print the terminator
+                     * (which is a newline), because a newline character will be
+                     * added anyway.
                      */
                     if (not line.empty()) {
-                        source_line << esc(2, COLOR_FG_RED_1) << e.text << esc(2, ATTR_RESET);
+                        source_line << esc(2, COLOR_FG_RED_1) << e.text
+                                    << esc(2, ATTR_RESET);
                         line.remove_prefix(e.text.size());
                     }
                     highlight_line << esc(2, COLOR_FG_RED) << '^';
-                    highlight_line
-                        << esc(2, COLOR_FG_ORANGE_RED_1)
-                        << std::string((e.text.size() - 1), '~');
+                    highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
+                                   << std::string((e.text.size() - 1), '~');
 
                     source_line << line;
                 }
@@ -1467,12 +1443,14 @@ auto main(int argc, char* argv[]) -> int
                 std::cerr << source_line.str() << "\n";
                 std::cerr << highlight_line.str() << "\n";
 
-                std::cerr
-                    << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                    << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.line + 1) << esc(2, ATTR_RESET)
-                    << ':'<< esc(2, COLOR_FG_WHITE) << (e.location.character + 1) << esc(2, ATTR_RESET)
-                    << ": " << esc(2, COLOR_FG_RED) << "error" << esc(2, ATTR_RESET) << ": "
-                    << "unimplemented instruction: " << e.text << "\n";
+                std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                          << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                          << (e.location.line + 1) << esc(2, ATTR_RESET) << ':'
+                          << esc(2, COLOR_FG_WHITE)
+                          << (e.location.character + 1) << esc(2, ATTR_RESET)
+                          << ": " << esc(2, COLOR_FG_RED) << "error"
+                          << esc(2, ATTR_RESET) << ": "
+                          << "unimplemented instruction: " << e.text << "\n";
 
                 return 1;
             }
@@ -1482,42 +1460,43 @@ auto main(int argc, char* argv[]) -> int
                 *ip++ = static_cast<uint64_t>(opcode);
                 break;
             case FORMAT::T:
-                *ip++ = viua::arch::ops::T{
-                      opcode
-                    , insn.operands.at(0).make_access()
-                    , insn.operands.at(1).make_access()
-                    , insn.operands.at(2).make_access()
-                }.encode();
+                *ip++ = viua::arch::ops::T{opcode,
+                                           insn.operands.at(0).make_access(),
+                                           insn.operands.at(1).make_access(),
+                                           insn.operands.at(2).make_access()}
+                            .encode();
                 break;
             case FORMAT::D:
-                *ip++ = viua::arch::ops::D{
-                      opcode
-                    , insn.operands.at(0).make_access()
-                    , insn.operands.at(1).make_access()
-                }.encode();
+                *ip++ = viua::arch::ops::D{opcode,
+                                           insn.operands.at(0).make_access(),
+                                           insn.operands.at(1).make_access()}
+                            .encode();
                 break;
             case FORMAT::S:
-                *ip++ = viua::arch::ops::S{
-                      opcode
-                    , insn.operands.at(0).make_access()
-                }.encode();
+                *ip++ = viua::arch::ops::S{opcode,
+                                           insn.operands.at(0).make_access()}
+                            .encode();
                 break;
             case FORMAT::F:
-                break; // FIXME
+                break;  // FIXME
             case FORMAT::E:
-                *ip++ = viua::arch::ops::E{
-                      opcode
-                    , insn.operands.front().make_access()
-                    , std::stoull(insn.operands.back().ingredients.front().text)
-                }.encode();
+                *ip++ =
+                    viua::arch::ops::E{
+                        opcode,
+                        insn.operands.front().make_access(),
+                        std::stoull(
+                            insn.operands.back().ingredients.front().text)}
+                        .encode();
                 break;
             case FORMAT::R:
-                *ip++ = viua::arch::ops::R{
-                      opcode
-                    , insn.operands.at(0).make_access()
-                    , insn.operands.at(1).make_access()
-                    , static_cast<uint32_t>(std::stoul(insn.operands.back().ingredients.front().text))
-                }.encode();
+                *ip++ =
+                    viua::arch::ops::R{
+                        opcode,
+                        insn.operands.at(0).make_access(),
+                        insn.operands.at(1).make_access(),
+                        static_cast<uint32_t>(std::stoul(
+                            insn.operands.back().ingredients.front().text))}
+                        .encode();
                 break;
             }
         }
@@ -1527,112 +1506,111 @@ auto main(int argc, char* argv[]) -> int
      * ELF emission.
      */
     {
-        auto const a_out = open(
-              "./a.out"
-            , O_CREAT|O_TRUNC|O_WRONLY
-            , S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH
-        );
+        auto const a_out =
+            open("./a.out",
+                 O_CREAT | O_TRUNC | O_WRONLY,
+                 S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
         if (a_out == -1) {
             close(a_out);
             exit(1);
         }
 
-        constexpr auto VIUA_MAGIC[[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
-        auto const VIUAVM_INTERP = std::string{"viua-vm"};
+        constexpr auto VIUA_MAGIC [[maybe_unused]] = "\x7fVIUA\x00\x00\x00";
+        auto const VIUAVM_INTERP                   = std::string{"viua-vm"};
 
         {
             constexpr auto NO_OF_ELF_PHDR_USED = 5;
 
-            auto const text_size = (ops_count * sizeof(decltype(text)::value_type));
-            auto const text_offset = (
-                  sizeof(Elf64_Ehdr)
-                + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
-                + (VIUAVM_INTERP.size() + 1));
+            auto const text_size =
+                (ops_count * sizeof(decltype(text)::value_type));
+            auto const text_offset =
+                (sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
+                 + (VIUAVM_INTERP.size() + 1));
             auto const strings_offset = (text_offset + text_size);
-            auto const fn_offset = (strings_offset + strings_table.size());
+            auto const fn_offset      = (strings_offset + strings_table.size());
 
             if constexpr (DEBUG_ELF) {
-                using viua::support::tty::COLOR_FG_WHITE;
                 using viua::support::tty::ATTR_RESET;
+                using viua::support::tty::COLOR_FG_WHITE;
                 using viua::support::tty::send_escape_seq;
                 constexpr auto esc = send_escape_seq;
 
                 auto const location = entry_point_fn.value().location;
 
-                std::cerr
-                    << esc(2, COLOR_FG_WHITE) << source_path << esc(2, ATTR_RESET)
-                    << ':'<< esc(2, COLOR_FG_WHITE) << (location.line + 1) << esc(2, ATTR_RESET)
-                    << ':'<< esc(2, COLOR_FG_WHITE) << (location.character + 1) << esc(2, ATTR_RESET)
-                    << ": text segment size: "
-                    << esc(2, COLOR_FG_WHITE) << text_size << esc(2, ATTR_RESET)
-                    << " byte(s)"
-                    << "\n";
+                std::cerr << esc(2, COLOR_FG_WHITE) << source_path
+                          << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
+                          << (location.line + 1) << esc(2, ATTR_RESET) << ':'
+                          << esc(2, COLOR_FG_WHITE) << (location.character + 1)
+                          << esc(2, ATTR_RESET)
+                          << ": text segment size: " << esc(2, COLOR_FG_WHITE)
+                          << text_size << esc(2, ATTR_RESET) << " byte(s)"
+                          << "\n";
             }
 
             // see elf(5)
-            Elf64_Ehdr elf_header {};
-            elf_header.e_ident[EI_MAG0] = '\x7f';
-            elf_header.e_ident[EI_MAG1] = 'E';
-            elf_header.e_ident[EI_MAG2] = 'L';
-            elf_header.e_ident[EI_MAG3] = 'F';
-            elf_header.e_ident[EI_CLASS] = ELFCLASS64;
-            elf_header.e_ident[EI_DATA] = ELFDATA2LSB;
-            elf_header.e_ident[EI_VERSION] = EV_CURRENT;
-            elf_header.e_ident[EI_OSABI] = ELFOSABI_STANDALONE;
+            Elf64_Ehdr elf_header{};
+            elf_header.e_ident[EI_MAG0]       = '\x7f';
+            elf_header.e_ident[EI_MAG1]       = 'E';
+            elf_header.e_ident[EI_MAG2]       = 'L';
+            elf_header.e_ident[EI_MAG3]       = 'F';
+            elf_header.e_ident[EI_CLASS]      = ELFCLASS64;
+            elf_header.e_ident[EI_DATA]       = ELFDATA2LSB;
+            elf_header.e_ident[EI_VERSION]    = EV_CURRENT;
+            elf_header.e_ident[EI_OSABI]      = ELFOSABI_STANDALONE;
             elf_header.e_ident[EI_ABIVERSION] = 0;
-            elf_header.e_type = ET_EXEC;
-            elf_header.e_machine = ET_NONE;
-            elf_header.e_version = elf_header.e_ident[EI_VERSION];
-            elf_header.e_entry = text_offset +
-                (fn_addresses[entry_point_fn.value().text]
-                 * sizeof(viua::arch::instruction_type));
-            elf_header.e_phoff = sizeof(elf_header);
+            elf_header.e_type                 = ET_EXEC;
+            elf_header.e_machine              = ET_NONE;
+            elf_header.e_version              = elf_header.e_ident[EI_VERSION];
+            elf_header.e_entry                = text_offset
+                                 + (fn_addresses[entry_point_fn.value().text]
+                                    * sizeof(viua::arch::instruction_type));
+            elf_header.e_phoff     = sizeof(elf_header);
             elf_header.e_phentsize = sizeof(Elf64_Phdr);
-            elf_header.e_phnum = NO_OF_ELF_PHDR_USED;
-            elf_header.e_shoff = 0; // FIXME section header table
-            elf_header.e_flags = 0; // processor-specific flags, should be 0
+            elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
+            elf_header.e_shoff     = 0;  // FIXME section header table
+            elf_header.e_flags  = 0;  // processor-specific flags, should be 0
             elf_header.e_ehsize = sizeof(elf_header);
             write(a_out, &elf_header, sizeof(elf_header));
 
-            Elf64_Phdr magic_for_binfmt_misc {};
-            magic_for_binfmt_misc.p_type = PT_NULL;
+            Elf64_Phdr magic_for_binfmt_misc{};
+            magic_for_binfmt_misc.p_type   = PT_NULL;
             magic_for_binfmt_misc.p_offset = 0;
             memcpy(&magic_for_binfmt_misc.p_offset, VIUA_MAGIC, 8);
             write(a_out, &magic_for_binfmt_misc, sizeof(magic_for_binfmt_misc));
 
-            Elf64_Phdr interpreter {};
+            Elf64_Phdr interpreter{};
             interpreter.p_type = PT_INTERP;
             interpreter.p_offset =
                 (sizeof(elf_header) + NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr));
             interpreter.p_filesz = VIUAVM_INTERP.size() + 1;
-            interpreter.p_flags = PF_R;
+            interpreter.p_flags  = PF_R;
             write(a_out, &interpreter, sizeof(interpreter));
 
-            Elf64_Phdr text_segment {};
-            text_segment.p_type = PT_LOAD;
+            Elf64_Phdr text_segment{};
+            text_segment.p_type   = PT_LOAD;
             text_segment.p_offset = text_offset;
             text_segment.p_filesz = text_size;
-            text_segment.p_memsz = text_size;
-            text_segment.p_flags = PF_R|PF_X;
-            text_segment.p_align = sizeof(viua::arch::instruction_type);
+            text_segment.p_memsz  = text_size;
+            text_segment.p_flags  = PF_R | PF_X;
+            text_segment.p_align  = sizeof(viua::arch::instruction_type);
             write(a_out, &text_segment, sizeof(text_segment));
 
-            Elf64_Phdr strings_segment {};
-            strings_segment.p_type = PT_LOAD;
+            Elf64_Phdr strings_segment{};
+            strings_segment.p_type   = PT_LOAD;
             strings_segment.p_offset = strings_offset;
             strings_segment.p_filesz = strings_table.size();
-            strings_segment.p_memsz = strings_table.size();
-            strings_segment.p_flags = PF_R;
-            strings_segment.p_align = sizeof(viua::arch::instruction_type);
+            strings_segment.p_memsz  = strings_table.size();
+            strings_segment.p_flags  = PF_R;
+            strings_segment.p_align  = sizeof(viua::arch::instruction_type);
             write(a_out, &strings_segment, sizeof(strings_segment));
 
-            Elf64_Phdr fn_segment {};
-            fn_segment.p_type = PT_LOAD;
+            Elf64_Phdr fn_segment{};
+            fn_segment.p_type   = PT_LOAD;
             fn_segment.p_offset = fn_offset;
             fn_segment.p_filesz = fn_table.size();
-            fn_segment.p_memsz = fn_table.size();
-            fn_segment.p_flags = PF_R;
-            fn_segment.p_align = sizeof(viua::arch::instruction_type);
+            fn_segment.p_memsz  = fn_table.size();
+            fn_segment.p_flags  = PF_R;
+            fn_segment.p_align  = sizeof(viua::arch::instruction_type);
             write(a_out, &fn_segment, sizeof(fn_segment));
 
             write(a_out, VIUAVM_INTERP.c_str(), VIUAVM_INTERP.size() + 1);

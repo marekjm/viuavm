@@ -29,124 +29,124 @@
 
 
 namespace viua::libs::lexer {
-    struct Location {
-        size_t line {};
-        size_t character {};
-        size_t offset {};
-    };
+struct Location {
+    size_t line{};
+    size_t character{};
+    size_t offset{};
+};
 
-    enum class TOKEN {
-        /*
-         * Compiler and assembler directives, instructions.
-         */
-        IMPORT,
-        EXPORT,
-        OPCODE,
-
-        /*
-         * Control characters.
-         */
-        COMMA,
-        EQ,
-        TERMINATOR,
-        ATTR_LIST_OPEN,
-        ATTR_LIST_CLOSE,
-        PAREN_OPEN,
-        PAREN_CLOSE,
-        BRACE_OPEN,
-        BRACE_CLOSE,
-
-        /*
-         * Register access sigils.
-         */
-        RA_VOID,
-        RA_DIRECT,
-        RA_PTR_DEREF,
-
-        /*
-         * Literals.
-         */
-        LITERAL_STRING,
-        LITERAL_INTEGER,
-        LITERAL_FLOAT,
-        LITERAL_ATOM,
-
-        /*
-         * Definitions.
-         */
-        DEF_FUNCTION,
-        DEF_BLOCK,
-        END,
-
-        /*
-         * Fluff.
-         */
-        WHITESPACE,
-        COMMENT,
-    };
-    auto to_string(TOKEN const) -> std::string;
-
-    struct Lexeme {
-        std::string text;
-        TOKEN token;
-        Location location;
-
-        auto operator==(TOKEN const) const -> bool;
-        auto operator==(std::string_view const) const -> bool;
-    };
+enum class TOKEN {
+    /*
+     * Compiler and assembler directives, instructions.
+     */
+    IMPORT,
+    EXPORT,
+    OPCODE,
 
     /*
-     * The "inline" specifier is used to avoid multiple definition errors.
-     * Usually, things should only be declared, and not defined in the header
-     * files because the linker will probably see multiple definitions of such
-     * defined symbol and refuse to link the object code.
-     *
-     * However, with the "inline" specifier in place we assure the linker that
-     * all definitions are the same so it can choose whichever it likes (eg, the
-     * first one it found).
-     *
-     * With this one trick we can now feel free to define variables in header
-     * files. Neat!
+     * Control characters.
      */
-    inline auto const OPCODE_NAMES = std::set<std::string>{
-        "noop",
-        "halt",
-        "ebreak",
+    COMMA,
+    EQ,
+    TERMINATOR,
+    ATTR_LIST_OPEN,
+    ATTR_LIST_CLOSE,
+    PAREN_OPEN,
+    PAREN_CLOSE,
+    BRACE_OPEN,
+    BRACE_CLOSE,
 
-        "add",
-        "g.add",
-        "sub",
-        "g.sub",
-        "mul",
-        "g.mul",
-        "div",
-        "g.div",
+    /*
+     * Register access sigils.
+     */
+    RA_VOID,
+    RA_DIRECT,
+    RA_PTR_DEREF,
 
-        "delete",
-        "g.delete",
-        "string",
+    /*
+     * Literals.
+     */
+    LITERAL_STRING,
+    LITERAL_INTEGER,
+    LITERAL_FLOAT,
+    LITERAL_ATOM,
 
-        "lui",
-        "g.lui",
-        "luiu",
-        "g.luiu",
+    /*
+     * Definitions.
+     */
+    DEF_FUNCTION,
+    DEF_BLOCK,
+    END,
 
-        "addi",
-        "g.addi",
-        "addiu",
-        "g.addiu",
+    /*
+     * Fluff.
+     */
+    WHITESPACE,
+    COMMENT,
+};
+auto to_string(TOKEN const) -> std::string;
 
-        "framei",
-        "g.framei",
-        "tailcall",
+struct Lexeme {
+    std::string text;
+    TOKEN token;
+    Location location;
 
-        /*
-         * Pseudoinstructions listed below.
-         */
-        "li",
-    };
+    auto operator==(TOKEN const) const -> bool;
+    auto operator==(std::string_view const) const -> bool;
+};
 
-    auto lex(std::string_view) -> std::vector<Lexeme>;
-}
+/*
+ * The "inline" specifier is used to avoid multiple definition errors.
+ * Usually, things should only be declared, and not defined in the header
+ * files because the linker will probably see multiple definitions of such
+ * defined symbol and refuse to link the object code.
+ *
+ * However, with the "inline" specifier in place we assure the linker that
+ * all definitions are the same so it can choose whichever it likes (eg, the
+ * first one it found).
+ *
+ * With this one trick we can now feel free to define variables in header
+ * files. Neat!
+ */
+inline auto const OPCODE_NAMES = std::set<std::string>{
+    "noop",
+    "halt",
+    "ebreak",
+
+    "add",
+    "g.add",
+    "sub",
+    "g.sub",
+    "mul",
+    "g.mul",
+    "div",
+    "g.div",
+
+    "delete",
+    "g.delete",
+    "string",
+
+    "lui",
+    "g.lui",
+    "luiu",
+    "g.luiu",
+
+    "addi",
+    "g.addi",
+    "addiu",
+    "g.addiu",
+
+    "framei",
+    "g.framei",
+    "tailcall",
+
+    /*
+     * Pseudoinstructions listed below.
+     */
+    "li",
+};
+
+auto lex(std::string_view) -> std::vector<Lexeme>;
+}  // namespace viua::libs::lexer
 
 #endif

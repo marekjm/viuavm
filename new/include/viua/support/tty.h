@@ -32,4 +32,4 @@ constexpr auto COLOR_FG_ORANGE_RED_1 = std::string_view{"\x1b[38;5;202m"};
 constexpr auto ATTR_RESET            = std::string_view{"\x1b[0m"};
 
 auto send_escape_seq(int const, std::string_view const) -> std::string_view;
-}
+}  // namespace viua::support::tty

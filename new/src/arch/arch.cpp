@@ -22,37 +22,36 @@
 
 
 namespace viua::arch {
-    Register_access::Register_access()
-        : set{viua::arch::REGISTER_SET::VOID}
-        , direct{true}
-        , index{0}
-    {}
-    Register_access::Register_access(viua::arch::REGISTER_SET const s, bool const d, uint8_t const i)
-        : set{s}
-        , direct{d}
-        , index{i}
-    {}
-    auto Register_access::decode(uint16_t const raw) -> Register_access
-    {
-        auto set = static_cast<viua::arch::REGISTER_SET>((raw & 0x0e00) >> 9);
-        auto direct = static_cast<bool>(raw & 0x0100);
-        auto index = static_cast<uint8_t>(raw & 0x00ff);
-        return Register_access{set, direct, index};
-    }
-    auto Register_access::encode() const -> uint16_t
-    {
-        auto base = uint16_t{index};
-        auto mode = static_cast<uint16_t>(direct);
-        auto rset = static_cast<uint16_t>(set);
-        return base | (mode << 8) | (rset << 9);
-    }
-
-    auto Register_access::make_local(uint8_t const index, bool const direct) -> Register_access
-    {
-        return Register_access{viua::arch::REGISTER_SET::LOCAL, direct, index};
-    }
-    auto Register_access::make_void() -> Register_access
-    {
-        return Register_access{viua::arch::REGISTER_SET::VOID, true, 0};
-    }
+Register_access::Register_access()
+        : set{viua::arch::REGISTER_SET::VOID}, direct{true}, index{0}
+{}
+Register_access::Register_access(viua::arch::REGISTER_SET const s,
+                                 bool const d,
+                                 uint8_t const i)
+        : set{s}, direct{d}, index{i}
+{}
+auto Register_access::decode(uint16_t const raw) -> Register_access
+{
+    auto set    = static_cast<viua::arch::REGISTER_SET>((raw & 0x0e00) >> 9);
+    auto direct = static_cast<bool>(raw & 0x0100);
+    auto index  = static_cast<uint8_t>(raw & 0x00ff);
+    return Register_access{set, direct, index};
 }
+auto Register_access::encode() const -> uint16_t
+{
+    auto base = uint16_t{index};
+    auto mode = static_cast<uint16_t>(direct);
+    auto rset = static_cast<uint16_t>(set);
+    return base | (mode << 8) | (rset << 9);
+}
+
+auto Register_access::make_local(uint8_t const index, bool const direct)
+    -> Register_access
+{
+    return Register_access{viua::arch::REGISTER_SET::LOCAL, direct, index};
+}
+auto Register_access::make_void() -> Register_access
+{
+    return Register_access{viua::arch::REGISTER_SET::VOID, true, 0};
+}
+}  // namespace viua::arch

@@ -17,43 +17,36 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stddef.h>
+
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
 #include <vector>
 
-#include <stddef.h>
-
 
 namespace viua::support {
-template<typename T>
-struct vector_view {
-    using value_type = T;
-    using pointer = T*;
-    using const_pointer = T const*;
-    using reference = T&;
+template<typename T> struct vector_view {
+    using value_type      = T;
+    using pointer         = T*;
+    using const_pointer   = T const*;
+    using reference       = T&;
     using const_reference = T const&;
-    using const_iterator = std::vector<T>::const_iterator;
-    using iterator = std::vector<T>::iterator;
-    using size_type = size_t;
+    using const_iterator  = std::vector<T>::const_iterator;
+    using iterator        = std::vector<T>::iterator;
+    using size_type       = size_t;
     using difference_type = ptrdiff_t;
 
-private:
-    const_pointer base { nullptr };
-    const_pointer finish { nullptr };
+  private:
+    const_pointer base{nullptr};
+    const_pointer finish{nullptr};
 
-public:
-    vector_view(std::vector<T> const& v)
-        : base{&v[0]}
-        , finish{base + v.size()}
+  public:
+    vector_view(std::vector<T> const& v) : base{&v[0]}, finish{base + v.size()}
     {}
-    vector_view(vector_view<T> const& v)
-        : base{v.base}
-        , finish{v.finish}
+    vector_view(vector_view<T> const& v) : base{v.base}, finish{v.finish}
     {}
-    vector_view(T const* b, size_t const c)
-        : base{b}
-        , finish{b + c}
+    vector_view(T const* b, size_t const c) : base{b}, finish{b + c}
     {}
 
     constexpr auto begin() const noexcept -> const_pointer
@@ -65,7 +58,8 @@ public:
         return finish;
     }
 
-    constexpr auto operator[](size_type const i) const noexcept -> const_reference
+    constexpr auto operator[](size_type const i) const noexcept
+        -> const_reference
     {
         return *(base + i);
     }
@@ -105,16 +99,18 @@ public:
     constexpr auto remove_prefix(size_type const n) -> void
     {
         if (n > size()) {
-            throw std::out_of_range{"viua::support::vector_view::remove_prefix"};
+            throw std::out_of_range{
+                "viua::support::vector_view::remove_prefix"};
         }
         base += n;
     }
     constexpr auto remove_suffix(size_type const n) -> void
     {
         if (n > size()) {
-            throw std::out_of_range{"viua::support::vector_view::remove_prefix"};
+            throw std::out_of_range{
+                "viua::support::vector_view::remove_prefix"};
         }
         finish -= n;
     }
 };
-}
+}  // namespace viua::support

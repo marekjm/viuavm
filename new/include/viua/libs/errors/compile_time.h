@@ -20,11 +20,11 @@
 #ifndef VIUA_LIBS_ERRORS_COMPILE_TIME_H
 #define VIUA_LIBS_ERRORS_COMPILE_TIME_H
 
-#include <viua/libs/lexer.h>
-
 #include <string>
 #include <string_view>
 #include <utility>
+
+#include <viua/libs/lexer.h>
 
 
 namespace viua::libs::errors::compile_time {
@@ -55,7 +55,7 @@ class Error {
      * The message may be empty if the error cause is self-explanatory when
      * taken together with the highlighted lexemes.
      */
-    Cause const cause { Cause::Unknown };
+    Cause const cause{Cause::Unknown};
     std::string message;
 
     /*
@@ -138,8 +138,9 @@ class Error {
     std::string aside_note;
     viua::libs::lexer::Lexeme aside_lexeme;
 
-public:
-    inline Error(viua::libs::lexer::Lexeme lx): Error{lx, Cause::Unknown} {}
+  public:
+    inline Error(viua::libs::lexer::Lexeme lx) : Error{lx, Cause::Unknown}
+    {}
     Error(viua::libs::lexer::Lexeme, Cause const, std::string = "");
 
     auto aside(std::string) -> Error&;
@@ -152,14 +153,26 @@ public:
     /*
      * Location of the main point of error.
      */
-    inline auto main() const -> Lexeme { return main_lexeme; }
+    inline auto main() const -> Lexeme
+    {
+        return main_lexeme;
+    }
     inline auto location() const -> viua::libs::lexer::Location
     {
         return main().location;
     }
-    inline auto line() const -> size_t { return location().line; }
-    inline auto character() const -> size_t { return location().character; }
-    inline auto offset() const -> size_t { return location().offset; }
+    inline auto line() const -> size_t
+    {
+        return location().line;
+    }
+    inline auto character() const -> size_t
+    {
+        return location().character;
+    }
+    inline auto offset() const -> size_t
+    {
+        return location().offset;
+    }
 
     /*
      * Error message formatting.
@@ -167,7 +180,7 @@ public:
     auto what() const -> std::string_view;
     auto str() const -> std::string;
 };
-}
+}  // namespace viua::libs::errors::compile_time
 
 
 #endif

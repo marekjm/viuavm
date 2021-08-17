@@ -17,107 +17,107 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/support/string.h>
-
 #include <iomanip>
-#include <string>
 #include <sstream>
+#include <string>
 #include <string_view>
 #include <vector>
 
+#include <viua/support/string.h>
+
 
 namespace viua::support::string {
-    auto quoted(std::string_view const sv) -> std::string
-    {
-        auto out = std::ostringstream{};
-        out << std::quoted(sv);
+auto quoted(std::string_view const sv) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << std::quoted(sv);
 
-        auto const tmp = out.str();
-        out.str("");
+    auto const tmp = out.str();
+    out.str("");
 
-        for (auto const each : tmp) {
-            if (each == '\n') {
-                out << "\\n";
-            } else {
-                out << each;
+    for (auto const each : tmp) {
+        if (each == '\n') {
+            out << "\\n";
+        } else {
+            out << each;
+        }
+    }
+
+    return out.str();
+}
+
+auto quote_squares(std::string_view const sv) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << CORNER_QUOTE_LL << sv << CORNER_QUOTE_UR;
+    return out.str();
+}
+
+auto unescape(std::string_view const sv) -> std::string
+{
+    /*
+     * Decode escape sequences in strings.
+     *
+     * This function recognizes escape sequences as listed on:
+     * http://en.cppreference.com/w/cpp/language/escape
+     * The function does not recognize sequences for:
+     *     - arbitrary octal numbers (escape: \nnn),
+     *     - arbitrary hexadecimal numbers (escape: \xnn),
+     *     - short arbitrary Unicode values (escape: \unnnn),
+     *     - long arbitrary Unicode values (escape: \Unnnnnnnn),
+     *
+     * If a character that does not encode an escape sequence is
+     * preceded by a backslash (\\) the function consumes the backslash and
+     * leaves only the "escaped" character in the output std::string.
+     */
+    auto decoded = std::ostringstream{};
+    auto c       = char{};
+    for (auto i = std::string::size_type{0}; i < sv.size(); ++i) {
+        c = sv[i];
+        if (c == '\\' and i < (sv.size() - 1)) {
+            ++i;
+            switch (sv[i]) {
+            case '\'':
+                c = '\'';
+                break;
+            case '"':
+                c = '"';
+                break;
+            case '?':
+                c = '?';
+                break;
+            case '\\':
+                c = '\\';
+                break;
+            case 'a':
+                c = '\a';
+                break;
+            case 'b':
+                c = '\b';
+                break;
+            case 'f':
+                c = '\f';
+                break;
+            case 'n':
+                c = '\n';
+                break;
+            case 'r':
+                c = '\r';
+                break;
+            case 't':
+                c = '\t';
+                break;
+            case 'v':
+                c = '\v';
+                break;
+            default:
+                c = sv[i];
             }
         }
-
-        return out.str();
+        decoded << c;
     }
-
-    auto quote_squares(std::string_view const sv) -> std::string
-    {
-        auto out = std::ostringstream{};
-        out << CORNER_QUOTE_LL << sv << CORNER_QUOTE_UR;
-        return out.str();
-    }
-
-    auto unescape(std::string_view const sv) -> std::string
-    {
-        /*
-         * Decode escape sequences in strings.
-         *
-         * This function recognizes escape sequences as listed on:
-         * http://en.cppreference.com/w/cpp/language/escape
-         * The function does not recognize sequences for:
-         *     - arbitrary octal numbers (escape: \nnn),
-         *     - arbitrary hexadecimal numbers (escape: \xnn),
-         *     - short arbitrary Unicode values (escape: \unnnn),
-         *     - long arbitrary Unicode values (escape: \Unnnnnnnn),
-         *
-         * If a character that does not encode an escape sequence is
-         * preceded by a backslash (\\) the function consumes the backslash and
-         * leaves only the "escaped" character in the output std::string.
-         */
-        auto decoded = std::ostringstream{};
-        auto c       = char{};
-        for (auto i = std::string::size_type{0}; i < sv.size(); ++i) {
-            c = sv[i];
-            if (c == '\\' and i < (sv.size() - 1)) {
-                ++i;
-                switch (sv[i]) {
-                case '\'':
-                    c = '\'';
-                    break;
-                case '"':
-                    c = '"';
-                    break;
-                case '?':
-                    c = '?';
-                    break;
-                case '\\':
-                    c = '\\';
-                    break;
-                case 'a':
-                    c = '\a';
-                    break;
-                case 'b':
-                    c = '\b';
-                    break;
-                case 'f':
-                    c = '\f';
-                    break;
-                case 'n':
-                    c = '\n';
-                    break;
-                case 'r':
-                    c = '\r';
-                    break;
-                case 't':
-                    c = '\t';
-                    break;
-                case 'v':
-                    c = '\v';
-                    break;
-                default:
-                    c = sv[i];
-                }
-            }
-            decoded << c;
-        }
-        return decoded.str();
-    }
+    return decoded.str();
+}
 
 auto levenshtein(std::string const source, std::string const target)
     -> LevenshteinDistance
@@ -180,7 +180,7 @@ auto levenshtein_filter(std::string const source,
     return matched;
 }
 auto levenshtein_best(std::string const source,
-        std::set<DistancePair> const& candidates,
+                      std::set<DistancePair> const& candidates,
                       LevenshteinDistance const limit) -> DistancePair
 {
     auto best = DistancePair{0xffffffffffffffff, source};
@@ -194,4 +194,4 @@ auto levenshtein_best(std::string const source,
 
     return best;
 }
-}
+}  // namespace viua::support::string
