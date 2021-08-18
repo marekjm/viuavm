@@ -487,224 +487,196 @@ auto parse_function_definition(
 
     return fn;
 }
+
+auto expand_li(std::vector<ast::Instruction>& cooked,
+               ast::Instruction const& each) -> void
+{
+    auto const& raw_value = each.operands.at(1).ingredients.front();
+    auto value            = uint64_t{};
+    if (raw_value.text.find("0x") == 0) {
+        value = std::stoull(raw_value.text, nullptr, 16);
+    } else if (raw_value.text.find("0o") == 0) {
+        value = std::stoull(raw_value.text, nullptr, 8);
+    } else if (raw_value.text.find("0b") == 0) {
+        value = std::stoull(raw_value.text, nullptr, 2);
+    } else {
+        value = std::stoull(raw_value.text);
+    }
+    auto parts = to_loading_parts_unsigned(value);
+
+    /*
+     * Only use the luiu instruction of there's a reason to ie, if some
+     * of the highest 36 bits are set. Otherwise, the lui is just
+     * overhead.
+     */
+    if (parts.first) {
+        auto synth        = each;
+        synth.opcode.text = "g.luiu";
+        synth.operands.at(1).ingredients.front().text =
+            std::to_string(parts.first);
+        cooked.push_back(synth);
+    }
+
+    auto const base       = parts.second.first.first;
+    auto const multiplier = parts.second.first.second;
+
+    if (multiplier != 0) {
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.addiu";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.front().text = "void";
+            synth.operands.back().ingredients.pop_back();
+
+            synth.operands.push_back(each.operands.back());
+            synth.operands.back().ingredients.back().text =
+                std::to_string(base);
+
+            cooked.push_back(synth);
+        }
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.addiu";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.front().text = "void";
+            synth.operands.back().ingredients.pop_back();
+
+            synth.operands.push_back(each.operands.back());
+            synth.operands.back().ingredients.back().text =
+                std::to_string(multiplier);
+
+            cooked.push_back(synth);
+        }
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.mul";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+
+            cooked.push_back(synth);
+        }
+
+        auto const remainder = parts.second.second;
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.addiu";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.front().text = "void";
+            synth.operands.back().ingredients.pop_back();
+
+            synth.operands.push_back(each.operands.back());
+            synth.operands.back().ingredients.back().text =
+                std::to_string(remainder);
+
+            cooked.push_back(synth);
+        }
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.add";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            synth.operands.push_back(synth.operands.back());
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+
+            cooked.push_back(synth);
+        }
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.add";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.push_back(each.operands.front());
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            cooked.push_back(synth);
+        }
+
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "g.delete";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
+
+            cooked.push_back(synth);
+        }
+        {
+            auto synth        = ast::Instruction{};
+            synth.opcode      = each.opcode;
+            synth.opcode.text = "delete";
+
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.at(1).text = std::to_string(
+                std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
+
+            cooked.push_back(synth);
+        }
+    } else {
+        auto synth        = ast::Instruction{};
+        synth.opcode      = each.opcode;
+        synth.opcode.text = "addiu";
+
+        synth.operands.push_back(each.operands.front());
+
+        synth.operands.push_back(each.operands.front());
+        synth.operands.back().ingredients.front().text = "void";
+        synth.operands.back().ingredients.pop_back();
+
+        synth.operands.push_back(each.operands.back());
+        synth.operands.back().ingredients.front().text = std::to_string(base);
+
+        cooked.push_back(synth);
+    }
+}
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw)
     -> std::vector<ast::Instruction>
 {
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         if (each.opcode == "li") {
-            auto const& raw_value = each.operands.at(1).ingredients.front();
-            auto value            = uint64_t{};
-            if (raw_value.text.find("0x") == 0) {
-                value = std::stoull(raw_value.text, nullptr, 16);
-            } else if (raw_value.text.find("0o") == 0) {
-                value = std::stoull(raw_value.text, nullptr, 8);
-            } else if (raw_value.text.find("0b") == 0) {
-                value = std::stoull(raw_value.text, nullptr, 2);
-            } else {
-                value = std::stoull(raw_value.text);
-            }
-            auto parts = to_loading_parts_unsigned(value);
-
-            /*
-             * Only use the luiu instruction of there's a reason to ie, if some
-             * of the highest 36 bits are set. Otherwise, the lui is just
-             * overhead.
-             */
-            if (parts.first) {
-                auto synth        = each;
-                synth.opcode.text = "g.luiu";
-                synth.operands.at(1).ingredients.front().text =
-                    std::to_string(parts.first);
-                cooked.push_back(synth);
-            }
-
-            auto const base       = parts.second.first.first;
-            auto const multiplier = parts.second.first.second;
-
-            if (multiplier != 0) {
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.addiu";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.front().text = "void";
-                    synth.operands.back().ingredients.pop_back();
-
-                    synth.operands.push_back(each.operands.back());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(base);
-
-                    cooked.push_back(synth);
-                }
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.addiu";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 2);
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.front().text = "void";
-                    synth.operands.back().ingredients.pop_back();
-
-                    synth.operands.push_back(each.operands.back());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(multiplier);
-
-                    cooked.push_back(synth);
-                }
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.mul";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 2);
-
-                    cooked.push_back(synth);
-                }
-
-                auto const remainder = parts.second.second;
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.addiu";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 2);
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.front().text = "void";
-                    synth.operands.back().ingredients.pop_back();
-
-                    synth.operands.push_back(each.operands.back());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(remainder);
-
-                    cooked.push_back(synth);
-                }
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.add";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    synth.operands.push_back(synth.operands.back());
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 2);
-
-                    cooked.push_back(synth);
-                }
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.add";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.push_back(each.operands.front());
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    cooked.push_back(synth);
-                }
-
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "g.delete";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 1);
-
-                    cooked.push_back(synth);
-                }
-                {
-                    auto synth        = ast::Instruction{};
-                    synth.opcode      = each.opcode;
-                    synth.opcode.text = "delete";
-
-                    synth.operands.push_back(each.operands.front());
-                    synth.operands.back().ingredients.back().text =
-                        std::to_string(
-                            std::stoul(
-                                synth.operands.back().ingredients.back().text)
-                            + 2);
-
-                    cooked.push_back(synth);
-                }
-            } else {
-                auto synth        = ast::Instruction{};
-                synth.opcode      = each.opcode;
-                synth.opcode.text = "addiu";
-
-                synth.operands.push_back(each.operands.front());
-
-                synth.operands.push_back(each.operands.front());
-                synth.operands.back().ingredients.front().text = "void";
-                synth.operands.back().ingredients.pop_back();
-
-                synth.operands.push_back(each.operands.back());
-                synth.operands.back().ingredients.front().text =
-                    std::to_string(base);
-
-                cooked.push_back(synth);
-            }
+            expand_li(cooked, each);
         } else {
             /*
              * Real instructions should be pushed without any modification.
