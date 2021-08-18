@@ -194,6 +194,28 @@ auto N::encode() const -> instruction_type
 }  // namespace viua::arch::ops
 
 namespace viua::arch::ops {
+auto to_string(FORMAT const raw) -> std::string
+{
+    switch (raw) {
+    case FORMAT::N:
+        return "N";
+    case FORMAT::T:
+        return "T";
+    case FORMAT::D:
+        return "D";
+    case FORMAT::S:
+        return "S";
+    case FORMAT::F:
+        return "F";
+    case FORMAT::E:
+        return "E";
+    case FORMAT::R:
+        return "R";
+    }
+
+    return "<unknown>";
+}
+
 auto to_string(opcode_type const raw) -> std::string
 {
     auto const greedy =

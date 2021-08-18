@@ -55,6 +55,7 @@ enum class FORMAT : opcode_type {
     E = FORMAT_E,
     R = FORMAT_R,
 };
+auto to_string(FORMAT const) -> std::string;
 
 /*
  * Three-way (triple) register access.
