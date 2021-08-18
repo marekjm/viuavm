@@ -82,6 +82,13 @@ struct STRING : Instruction {
     {}
 };
 
+struct FRAME : Instruction {
+    viua::arch::ops::S instruction;
+
+    FRAME(viua::arch::ops::S i) : instruction{i}
+    {}
+};
+
 /*
  * LUI loads upper bits of a 64-bit value, sign-extending it to register
  * width. It produces a signed integer.

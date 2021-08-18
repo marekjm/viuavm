@@ -99,14 +99,14 @@ using register_index_type         = uint8_t;
 constexpr auto MAX_REGISTER_INDEX = register_index_type{255};
 
 struct Register_access {
-    using rs_type = viua::arch::REGISTER_SET;
+    using set_type = viua::arch::REGISTER_SET;
 
-    rs_type const set;
+    set_type const set;
     bool const direct;
     uint8_t const index;
 
     Register_access();
-    Register_access(rs_type const, bool const, uint8_t const);
+    Register_access(set_type const, bool const, uint8_t const);
 
     static auto decode(uint16_t const) -> Register_access;
     auto encode() const -> uint16_t;
@@ -127,7 +127,7 @@ struct Register_access {
 
     inline auto is_void() const -> bool
     {
-        return (set == rs_type::VOID);
+        return (set == set_type::VOID);
     }
 
     static auto make_local(uint8_t const, bool const = true) -> Register_access;

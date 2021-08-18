@@ -115,6 +115,43 @@ struct Value {
     }
 };
 
+struct Frame {
+    using addr_type = viua::arch::instruction_type const*;
+
+    std::vector<Value> registers;
+    addr_type const entry_address;
+    addr_type const return_address;
+
+    inline Frame(size_t const sz, addr_type const e, addr_type const r)
+        : registers(sz)
+        , entry_address{e}
+        , return_address{r}
+    {}
+};
+
+struct Stack {
+    using addr_type = viua::arch::instruction_type const*;
+
+    std::vector<Frame> frames;
+    std::vector<Value> args;
+
+    inline auto push(size_t const sz, addr_type const e, addr_type const r) -> void
+    {
+        frames.emplace_back(sz, e, r);
+    }
+
+    inline auto back() -> decltype(frames)::reference
+    {
+        return frames.back();
+    }
+    inline auto back() const -> decltype(frames)::const_reference
+    {
+        return frames.back();
+    }
+};
+
+struct abort_execution {};
+
 namespace machine::core::ins {
 auto execute(std::vector<Value>& registers,
              std::vector<uint8_t> const&,
@@ -237,6 +274,34 @@ auto execute(std::vector<Value>& registers,
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
                + "\n";
+}
+
+auto execute(Stack& stack,
+             std::vector<uint8_t> const&,
+             viua::arch::instruction_type const* const /* ip */,
+             viua::arch::ins::FRAME const op) -> void
+{
+    auto const index = op.instruction.out.index;
+    auto const rs    = op.instruction.out.set;
+
+    auto capacity = viua::arch::register_index_type{};
+    if (rs == viua::arch::RS::LOCAL) {
+        capacity = static_cast<viua::arch::register_index_type>(std::get<uint64_t>(stack.back().registers.at(index).value));
+    } else if (rs == viua::arch::RS::ARGUMENT) {
+        capacity = index;
+    } else {
+        throw abort_execution{};
+    }
+
+    stack.args = std::vector<Value>(capacity);
+
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " $" + std::to_string(static_cast<int>(index)) + '.'
+                     + ((rs == viua::arch::RS::LOCAL)      ? 'l'
+                        : (rs == viua::arch::RS::ARGUMENT) ? 'a'
+                                                           : 'p')
+                     + " (frame with args capacity " + std::to_string(capacity)
+                     + ")" + "\n";
 }
 
 auto execute(std::vector<Value>& registers,
@@ -365,7 +430,7 @@ auto execute(std::vector<Value>& registers,
     }
 }
 
-auto execute(std::vector<Value>& registers,
+auto execute(Stack& stack,
              std::vector<uint8_t> const& strings,
              viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
@@ -383,10 +448,10 @@ auto execute(std::vector<Value>& registers,
         auto instruction = viua::arch::ops::T::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_T>(opcode)) {
         case viua::arch::ops::OPCODE_T::ADD:
-            execute(registers, strings, viua::arch::ins::ADD{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::ADD{instruction});
             break;
         case viua::arch::ops::OPCODE_T::MUL:
-            execute(registers, strings, viua::arch::ins::MUL{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::MUL{instruction});
             break;
         default:
             std::cerr << "unimplemented T instruction\n";
@@ -399,10 +464,13 @@ auto execute(std::vector<Value>& registers,
         auto instruction = viua::arch::ops::S::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_S>(opcode)) {
         case viua::arch::ops::OPCODE_S::DELETE:
-            execute(registers, strings, viua::arch::ins::DELETE{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::DELETE{instruction});
             break;
         case viua::arch::ops::OPCODE_S::STRING:
-            execute(registers, strings, viua::arch::ins::STRING{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::STRING{instruction});
+            break;
+        case viua::arch::ops::OPCODE_S::FRAME:
+            execute(stack, strings, ip, viua::arch::ins::FRAME{instruction});
             break;
         }
         break;
@@ -412,10 +480,10 @@ auto execute(std::vector<Value>& registers,
         auto instruction = viua::arch::ops::E::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_E>(opcode)) {
         case viua::arch::ops::OPCODE_E::LUI:
-            execute(registers, strings, viua::arch::ins::LUI{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::LUI{instruction});
             break;
         case viua::arch::ops::OPCODE_E::LUIU:
-            execute(registers, strings, viua::arch::ins::LUIU{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::LUIU{instruction});
             break;
         }
         break;
@@ -425,10 +493,10 @@ auto execute(std::vector<Value>& registers,
         auto instruction = viua::arch::ops::R::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_R>(opcode)) {
         case viua::arch::ops::OPCODE_R::ADDI:
-            execute(registers, strings, viua::arch::ins::ADDI{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::ADDI{instruction});
             break;
         case viua::arch::ops::OPCODE_R::ADDIU:
-            execute(registers, strings, viua::arch::ins::ADDIU{instruction});
+            execute(stack.back().registers, strings, viua::arch::ins::ADDIU{instruction});
             break;
         }
         break;
@@ -442,7 +510,7 @@ auto execute(std::vector<Value>& registers,
         case viua::arch::ops::OPCODE_N::HALT:
             return nullptr;
         case viua::arch::ops::OPCODE_N::EBREAK:
-            execute(registers,
+            execute(stack.back().registers,
                     strings,
                     viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
             break;
@@ -461,7 +529,7 @@ auto execute(std::vector<Value>& registers,
 }  // namespace machine::core::ins
 
 namespace {
-auto run_instruction(std::vector<Value>& registers,
+auto run_instruction(Stack& stack,
                      std::vector<uint8_t> const& strings,
                      viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
@@ -469,13 +537,13 @@ auto run_instruction(std::vector<Value>& registers,
     auto instruction = viua::arch::instruction_type{};
     do {
         instruction = *ip;
-        ip          = machine::core::ins::execute(registers, strings, ip);
+        ip          = machine::core::ins::execute(stack, strings, ip);
     } while ((ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
     return ip;
 }
 
-auto run(std::vector<Value>& registers,
+auto run(Stack& stack,
          std::vector<uint8_t> const& strings,
          viua::arch::instruction_type const* ip,
          std::tuple<std::string_view const,
@@ -509,7 +577,7 @@ auto run(std::vector<Value>& registers,
                       << std::hex << std::setw(2) << std::setfill('0') << i
                       << std::dec << "\n";
 
-            ip = run_instruction(registers, strings, ip);
+            ip = run_instruction(stack, strings, ip);
 
             /*
              * Halting instruction returns nullptr because it does not know
@@ -633,13 +701,15 @@ auto main(int argc, char* argv[]) -> int
         close(a_out);
     }
 
-    auto registers = std::vector<Value>(256);
+
+    auto stack = Stack{};
+    stack.push(256, (text.data() + entry_addr), nullptr);
 
     auto const ip_begin = &text[0];
     auto const ip_end   = (ip_begin + text.size());
-    run(registers,
+    run(stack,
         strings,
-        (text.data() + entry_addr),
+        stack.back().entry_address,
         {(executable_path + "[.text]"), ip_begin, ip_end});
 
     return 0;

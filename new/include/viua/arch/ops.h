@@ -220,6 +220,7 @@ enum class OPCODE_T : opcode_type {
 enum class OPCODE_S : opcode_type {
     DELETE = static_cast<opcode_type>(OPCODE::DELETE),
     STRING = static_cast<opcode_type>(OPCODE::STRING),
+    FRAME  = static_cast<opcode_type>(OPCODE::FRAME),
 };
 enum class OPCODE_E : opcode_type {
     LUI  = static_cast<opcode_type>(OPCODE::LUI),
