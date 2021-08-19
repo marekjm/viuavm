@@ -1398,11 +1398,18 @@ auto main(int argc, char* argv[]) -> int
         });
 
     auto text = std::vector<viua::arch::instruction_type>{};
-    text.reserve(ops_count);
-    text.resize(ops_count);
+    {
+        text.reserve(ops_count + 1);
+        text.resize(ops_count + 1);
 
-    auto ip = text.data();
+        using viua::arch::ops::N;
+        using viua::arch::instruction_type;
+        using viua::arch::ops::OPCODE;
+        text.at(0) = N{static_cast<instruction_type>(OPCODE::HALT)}.encode();
+    }
+
     auto fn_addresses = std::map<std::string, uint64_t>{};
+    auto ip = (text.data() + 1);
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
