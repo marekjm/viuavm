@@ -633,6 +633,7 @@ auto main(int argc, char* argv[]) -> int
     auto const executable_path = std::string{(argc > 1) ? argv[1] : "./a.out"};
 
     auto strings = std::vector<uint8_t>{};
+    auto fn_table = std::vector<uint8_t>{};
     auto text    = std::vector<viua::arch::instruction_type>{};
 
     auto entry_addr = size_t{0};
@@ -669,6 +670,9 @@ auto main(int argc, char* argv[]) -> int
         Elf64_Phdr strings_header{};
         read(a_out, &strings_header, sizeof(strings_header));
 
+        Elf64_Phdr fn_header{};
+        read(a_out, &fn_header, sizeof(fn_header));
+
         lseek(a_out, text_header.p_offset, SEEK_SET);
         text.resize(text_header.p_filesz
                     / sizeof(viua::arch::instruction_type));
@@ -678,6 +682,11 @@ auto main(int argc, char* argv[]) -> int
             lseek(a_out, strings_header.p_offset, SEEK_SET);
             strings.resize(strings_header.p_filesz);
             read(a_out, strings.data(), strings_header.p_filesz);
+        }
+        if (fn_header.p_filesz) {
+            lseek(a_out, fn_header.p_offset, SEEK_SET);
+            fn_table.resize(fn_header.p_filesz);
+            read(a_out, fn_table.data(), fn_header.p_filesz);
         }
 
         entry_addr = (elf_header.e_entry - text_header.p_offset)
@@ -696,6 +705,10 @@ auto main(int argc, char* argv[]) -> int
         std::cout
             << "[vm] loaded " << strings_header.p_filesz
             << " byte(s) of .rodata (strings) section from PT_LOAD segment of "
+            << executable_path << "\n";
+        std::cout
+            << "[vm] loaded " << fn_header.p_filesz
+            << " byte(s) of .rodata (fn table) section from PT_LOAD segment of "
             << executable_path << "\n";
 
         close(a_out);

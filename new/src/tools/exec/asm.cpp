@@ -80,8 +80,7 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
     return saved_location;
 }
 auto save_fn_address(std::vector<uint8_t>& strings,
-                     std::string_view const fn,
-                     uint64_t const offset) -> size_t
+                     std::string_view const fn) -> size_t
 {
     auto const fn_size = htole64(static_cast<uint64_t>(fn.size()));
     strings.resize(strings.size() + sizeof(fn_size));
@@ -92,13 +91,24 @@ auto save_fn_address(std::vector<uint8_t>& strings,
     auto const saved_location = strings.size();
     std::copy(fn.begin(), fn.end(), std::back_inserter(strings));
 
-    auto const fn_off = htole64(offset);
-    strings.resize(strings.size() + sizeof(offset));
-    memcpy((strings.data() + strings.size() - sizeof(offset)),
-           &fn_off,
-           sizeof(fn_off));
+    auto const fn_addr = uint64_t{0};
+    strings.resize(strings.size() + sizeof(fn_addr));
+    memcpy((strings.data() + strings.size() - sizeof(fn_addr)),
+           &fn_addr,
+           sizeof(fn_addr));
 
     return saved_location;
+}
+auto patch_fn_address(std::vector<uint8_t>& strings,
+                      size_t const fn_offset,
+                      uint64_t fn_addr) -> void
+{
+    auto fn_size = uint64_t{};
+    memcpy(&fn_size, (strings.data() + fn_offset - sizeof(fn_size)), sizeof(fn_size));
+    fn_size = le64toh(fn_size);
+
+    fn_addr = htole64(fn_addr);
+    memcpy((strings.data() + fn_offset + fn_size), &fn_addr, sizeof(fn_addr));
 }
 }  // anonymous namespace
 
@@ -1270,12 +1280,16 @@ auto main(int argc, char* argv[]) -> int
      * preparation so they need to be expanded.
      */
     auto strings_table = std::vector<uint8_t>{};
+    auto fn_table     = std::vector<uint8_t>{};
+    auto fn_offsets = std::map<std::string, size_t>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
         }
 
-        auto& fn    = static_cast<ast::Fn_def&>(*each);
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+        fn_offsets.emplace(fn.name.text, save_fn_address(fn_table, fn.name.text));
+
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
             if (insn.opcode == "string" or insn.opcode == "g.string") {
@@ -1387,10 +1401,8 @@ auto main(int argc, char* argv[]) -> int
     text.reserve(ops_count);
     text.resize(ops_count);
 
-    auto fn_addresses = std::map<std::string, size_t>{};
-    auto fn_table     = std::vector<uint8_t>{};
-
     auto ip = text.data();
+    auto fn_addresses = std::map<std::string, uint64_t>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
@@ -1408,9 +1420,9 @@ auto main(int argc, char* argv[]) -> int
              * and foreign functions. At compile time, we don't yet know,
              * though, which function is foreign and which is bytecode.
              */
-            auto const fn_offset       = (ip - &text[0]);
-            fn_addresses[fn.name.text] = fn_offset;
-            save_fn_address(fn_table, fn.name.text, fn_offset);
+            auto const fn_addr       = (ip - &text[0]);
+            fn_addresses[fn.name.text] = fn_addr;
+            patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
         }
 
         try {
