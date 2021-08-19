@@ -1420,7 +1420,12 @@ auto main(int argc, char* argv[]) -> int
 
         auto& fn                 = static_cast<ast::Fn_def&>(*each);
         auto const raw_ops_count = fn.instructions.size();
-        fn.instructions = expand_pseudoinstructions(std::move(fn.instructions));
+        try {
+            fn.instructions = expand_pseudoinstructions(std::move(fn.instructions), fn_offsets);
+        } catch (viua::libs::errors::compile_time::Error const& e) {
+            display_error_in_function(source_path, e, fn.name.text);
+            display_error_and_exit(source_path, source_text, e);
+        }
 
         if constexpr (DEBUG_EXPANSION) {
             std::cerr << "FN " << fn.to_string() << " with " << raw_ops_count
