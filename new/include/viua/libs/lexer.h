@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -92,8 +93,14 @@ struct Lexeme {
     TOKEN token;
     Location location;
 
+    std::optional<std::tuple<std::string, TOKEN, Location>> synthesized_from {};
+
     auto operator==(TOKEN const) const -> bool;
     auto operator==(std::string_view const) const -> bool;
+
+    auto make_synth(std::string, TOKEN const) const -> Lexeme;
+    auto is_synth() const -> bool;
+    auto synthed_from() const -> Lexeme;
 };
 
 /*

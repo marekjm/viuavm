@@ -40,6 +40,26 @@ auto Lexeme::operator==(std::string_view const sv) const -> bool
 {
     return (text == sv);
 }
+auto Lexeme::make_synth(std::string sv, TOKEN const tk) const -> Lexeme
+{
+    auto sy = *this;
+    sy.text = std::move(sv);
+    sy.token = tk;
+    sy.synthesized_from = { text, token, location };
+    return sy;
+}
+auto Lexeme::is_synth() const -> bool
+{
+    return synthesized_from.has_value();
+}
+auto Lexeme::synthed_from() const -> Lexeme
+{
+    auto l = Lexeme{};
+    l.text = std::get<0>(*synthesized_from);
+    l.token = std::get<1>(*synthesized_from);
+    l.location = std::get<2>(*synthesized_from);
+    return l;
+}
 
 auto to_string(TOKEN const token) -> std::string
 {
