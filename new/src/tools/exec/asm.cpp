@@ -172,7 +172,7 @@ auto Operand::make_access() const -> viua::arch::Register_access
             .add(ingredients.at(0))
             .add(ingredients.at(1))
             .add(ingredients.at(2))
-            .aside("invalid register set specifier")
+            .aside("invalid register set specifier: " + viua::support::string::quote_squares(rs.text))
             .note("valid register set specifiers are 'l', 'a', and 'p'");
     }
 }
