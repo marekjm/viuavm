@@ -130,6 +130,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "div",
     "g.div",
 
+    "call",
+
     "delete",
     "g.delete",
     "string",

@@ -680,13 +680,102 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         cooked.push_back(synth);
     }
 }
-auto expand_pseudoinstructions(std::vector<ast::Instruction> raw)
+auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::string, size_t> const& fn_offsets)
     -> std::vector<ast::Instruction>
 {
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         if (each.opcode == "li") {
             expand_li(cooked, each);
+        } else if (each.opcode == "call") {
+            /*
+             * Call instructions expansion is simple.
+             *
+             * First, a li pseudoinstruction containing the offset of the
+             * function in the function table is synthesized and expanded. The
+             * call pseudoinstruction is then replaced by a real call
+             * instruction in D format - first register tells it where to put
+             * the return value, and the second tells it from which register to
+             * take the function table offset value.
+             *
+             * If the return register is not void, it is used by the li
+             * pseudoinstruction as base. If it is void, the li
+             * pseudoinstruction has a base register allocated from a free
+             * range.
+             *
+             * In effect, the following pseudoinstruction:
+             *
+             *      call $1, foo
+             *
+             * ...is expanded into this sequence:
+             *
+             *      li $1, fn_tbl_offset(foo)
+             *      call $1, $1
+             */
+            auto const ret = each.operands.front();
+            auto fn_offset = ret;
+            if (ret.ingredients.front() == "void") {
+                /*
+                 * If the return register is void we need a completely synthetic
+                 * register to store the function offset. The li
+                 * pseudoinstruction uses at most three registers to do its job
+                 * so we can use register 253 as the base to avoid disturbing
+                 * user code.
+                 */
+                fn_offset = ast::Operand{};
+
+                using viua::libs::lexer::TOKEN;
+                auto const& lx = ret.ingredients.front();
+                fn_offset.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
+                fn_offset.ingredients.push_back(lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+                fn_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
+                fn_offset.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+            }
+
+            /*
+             * Synthesize loading the function offset first. It will emit a
+             * sequence of instructions that will load the offset of the
+             * function, which will then be used by the call instruction to
+             * invoke the function.
+             */
+            auto li = ast::Instruction{};
+            {
+                li.opcode = each.opcode;
+                li.opcode.text = "li";
+
+                li.operands.push_back(fn_offset);
+                li.operands.push_back(fn_offset);
+
+                auto const fn_name = each.operands.back().ingredients.front();
+                if (fn_offsets.count(fn_name.text) == 0) {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{fn_name, Cause::Unknown, "internal compiler bamboozling"};
+                }
+
+                auto const fn_off = fn_offsets.at(fn_name.text);
+                li.operands.back().ingredients.front().text = std::to_string(fn_off);
+            }
+            expand_li(cooked, li);
+
+            /*
+             * Then, synthesize the actual call instruction. This means
+             * simply replacing the function name with the register
+             * containing its loaded offset, ie, changing this code:
+             *
+             *      call $42, foo
+             *
+             * to this:
+             *
+             *      call $42, $42
+             */
+            auto call = ast::Instruction{};
+            {
+                call.opcode = each.opcode;
+                call.operands.push_back(ret);
+                call.operands.push_back(fn_offset);
+            }
+            cooked.push_back(call);
         } else {
             /*
              * Real instructions should be pushed without any modification.

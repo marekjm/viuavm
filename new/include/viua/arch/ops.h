@@ -194,6 +194,8 @@ enum class OPCODE : opcode_type {
     MUL = (FORMAT_T | 0x0003),
     DIV = (FORMAT_T | 0x0004),
 
+    CALL = (FORMAT_D | 0x0001),
+
     DELETE = (FORMAT_S | 0x0001),
     STRING = (FORMAT_S | 0x0002),
     FRAME  = (FORMAT_S | 0x0003),

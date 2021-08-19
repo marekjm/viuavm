@@ -237,6 +237,8 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "mul";
     case OPCODE::DIV:
         return greedy + "div";
+    case OPCODE::CALL:
+        return greedy + "call";
     case OPCODE::DELETE:
         return greedy + "delete";
     case OPCODE::STRING:
@@ -279,6 +281,8 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::MUL));
     } else if (sv == "div") {
         return (op | static_cast<opcode_type>(OPCODE::DIV));
+    } else if (sv == "call") {
+        return (op | static_cast<opcode_type>(OPCODE::CALL));
     } else if (sv == "delete") {
         return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "string") {
