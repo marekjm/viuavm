@@ -856,17 +856,32 @@ auto cook_spans(
     std::vector<viua::libs::errors::compile_time::Error::span_type> raw)
     -> std::vector<std::tuple<bool, size_t, size_t>>
 {
+    /*
+     * In case of synthesized lexemes, there may be several of them that have
+     * the same offset. Naively including all of them in spans produces... weird
+     * results when the output is formatted for an error report.
+     *
+     * Let's only use the first span at a given offset.
+     */
+    auto seen_offsets = std::set<size_t>{};
+
     auto cooked = std::vector<std::tuple<bool, size_t, size_t>>{};
     if (std::get<1>(raw.front()) != 0) {
         cooked.emplace_back(false, 0, raw.front().first);
+        seen_offsets.insert(0);
     }
     for (auto const& each : raw) {
         auto const& [hl, offset, size] = cooked.back();
-        if ((offset + size) != each.first) {
-            cooked.emplace_back(
-                false, (offset + size), (each.first - (offset + size)));
+        if (auto const want = (offset + size); want < each.first) {
+            if (not seen_offsets.contains(want)) {
+                cooked.emplace_back(false, want, (each.first - want));
+                seen_offsets.insert(want);
+            }
         }
-        cooked.emplace_back(true, each.first, each.second);
+        if (not seen_offsets.contains(each.first)) {
+            cooked.emplace_back(true, each.first, each.second);
+            seen_offsets.insert(each.first);
+        }
     }
 
     return cooked;
