@@ -1538,80 +1538,9 @@ auto main(int argc, char* argv[]) -> int
                 } catch (std::invalid_argument const&) {
                     auto const e = insn.opcode;
 
-                    using viua::support::tty::ATTR_RESET;
-                    using viua::support::tty::COLOR_FG_ORANGE_RED_1;
-                    using viua::support::tty::COLOR_FG_RED;
-                    using viua::support::tty::COLOR_FG_RED_1;
-                    using viua::support::tty::COLOR_FG_WHITE;
-                    using viua::support::tty::send_escape_seq;
-                    constexpr auto esc = send_escape_seq;
-
-                    auto const SEPARATOR         = std::string{" |  "};
-                    constexpr auto LINE_NO_WIDTH = size_t{5};
-
-                    auto source_line    = std::ostringstream{};
-                    auto highlight_line = std::ostringstream{};
-
-                    std::cerr << std::string(LINE_NO_WIDTH, ' ') << SEPARATOR
-                              << "\n";
-
-                    {
-                        auto const location = e.location;
-
-                        auto line = view_line_of(source_text, location);
-
-                        source_line << esc(2, COLOR_FG_RED)
-                                    << std::setw(LINE_NO_WIDTH)
-                                    << (location.line + 1) << esc(2, ATTR_RESET)
-                                    << SEPARATOR;
-                        highlight_line << std::string(LINE_NO_WIDTH, ' ')
-                                       << SEPARATOR;
-
-                        source_line << std::string_view{line.data(),
-                                                        location.character};
-                        highlight_line << std::string(location.character, ' ');
-                        line.remove_prefix(location.character);
-
-                        /*
-                         * This if is required because of TERMINATOR tokens in
-                         * unexpected places. In case a TERMINATOR token is the
-                         * cause of the error it will not appear in line. If we
-                         * attempted to shift line's head, it would be removing
-                         * a prefix from an empty std::string_view which is
-                         * undefined behaviour.
-                         *
-                         * I think the "bad TERMINATOR" is the only situation
-                         * when this is important.
-                         *
-                         * When it happens, we just don't print the terminator
-                         * (which is a newline), because a newline character
-                         * will be added anyway.
-                         */
-                        if (not line.empty()) {
-                            source_line << esc(2, COLOR_FG_RED_1) << e.text
-                                        << esc(2, ATTR_RESET);
-                            line.remove_prefix(e.text.size());
-                        }
-                        highlight_line << esc(2, COLOR_FG_RED) << '^';
-                        highlight_line << esc(2, COLOR_FG_ORANGE_RED_1)
-                                       << std::string((e.text.size() - 1), '~');
-
-                        source_line << line;
-                    }
-
-                    std::cerr << source_line.str() << "\n";
-                    std::cerr << highlight_line.str() << "\n";
-
-                    std::cerr
-                        << esc(2, COLOR_FG_WHITE) << source_path
-                        << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
-                        << (e.location.line + 1) << esc(2, ATTR_RESET) << ':'
-                        << esc(2, COLOR_FG_WHITE) << (e.location.character + 1)
-                        << esc(2, ATTR_RESET) << ": " << esc(2, COLOR_FG_RED)
-                        << "error" << esc(2, ATTR_RESET) << ": "
-                        << "unimplemented instruction: " << e.text << "\n";
-
-                    return 1;
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{e, Cause::Unknown};
                 }
                 auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
                 switch (format) {
