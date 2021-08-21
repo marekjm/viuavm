@@ -150,7 +150,21 @@ struct Stack {
     }
 };
 
-struct abort_execution {};
+struct abort_execution {
+    using ip_type = viua::arch::instruction_type const*;
+    ip_type const ip;
+    std::string message;
+
+    inline abort_execution(ip_type const i, std::string m = "")
+        : ip{i}
+        , message{std::move(m)}
+    {}
+
+    inline auto what() const -> std::string_view
+    {
+        return message;
+    }
+};
 
 namespace machine::core::ins {
 auto execute(std::vector<Value>& registers,
@@ -272,7 +286,7 @@ auto execute(std::vector<Value>& registers,
 }
 
 auto execute(Stack& stack,
-             viua::arch::instruction_type const* const /* ip */,
+             viua::arch::instruction_type const* const ip,
              viua::arch::ins::FRAME const op) -> void
 {
     auto const index = op.instruction.out.index;
@@ -284,7 +298,7 @@ auto execute(Stack& stack,
     } else if (rs == viua::arch::RS::ARGUMENT) {
         capacity = index;
     } else {
-        throw abort_execution{};
+        throw abort_execution{ip, "args count must come from local or argument register set"};
     }
 
     stack.args = std::vector<Value>(capacity);
@@ -710,10 +724,15 @@ auto main(int argc, char* argv[]) -> int
 
     auto const ip_begin = &text[0];
     auto const ip_end   = (ip_begin + text.size());
-    run(stack,
-        strings,
-        stack.back().entry_address,
-        {(executable_path + "[.text]"), ip_begin, ip_end});
+    try {
+        run(stack,
+            env,
+            stack.back().entry_address,
+            {(executable_path + "[.text]"), ip_begin, ip_end});
+    } catch (abort_execution const& e) {
+        std::cerr << "Aborted execution: " << e.what() << "\n";
+        return 1;
+    }
 
     return 0;
 }
