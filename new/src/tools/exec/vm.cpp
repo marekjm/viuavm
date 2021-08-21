@@ -334,6 +334,42 @@ auto execute(Stack& stack,
                      + ")" + "\n";
 }
 
+auto execute(Stack& stack,
+             Env const& env,
+             viua::arch::instruction_type const* const ip,
+             viua::arch::ins::CALL const op) -> viua::arch::instruction_type const*
+{
+    auto fn_name = std::string{};
+    auto fn_addr = size_t{};
+    {
+        auto const fn_index = op.instruction.in.index;
+        auto const& fn_offset = stack.frames.back().registers.at(fn_index);
+        if (fn_offset.is_void()) {
+            throw abort_execution{ip, "fn offset cannot be void"};
+        }
+        if (fn_offset.is_boxed()) {
+            // FIXME only unboxed integers allowed for now
+            throw abort_execution{ip, "fn offset cannot be boxed"};
+        }
+
+        std::tie(fn_name, fn_addr) = env.function_at(std::get<uint64_t>(fn_offset.value));
+    }
+
+    std::cerr << "    "
+        << viua::arch::ops::to_string(op.instruction.opcode)
+        << ", "
+        << fn_name
+        << " (at +0x" << std::hex << std::setw(8) << std::setfill('0')
+        << fn_addr << std::dec << ")"
+        << "\n";
+
+    if (fn_addr % sizeof(viua::arch::instruction_type)) {
+        throw abort_execution{ip, "invalid IP after call"};
+    }
+
+    return (env.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
+}
+
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::LUI const op) -> void
 {
@@ -544,6 +580,22 @@ auto execute(Stack& stack,
         break;
     }
     case viua::arch::ops::FORMAT::D:
+    {
+        auto instruction = viua::arch::ops::D::decode(raw);
+        switch (static_cast<viua::arch::ops::OPCODE_D>(opcode)) {
+        case viua::arch::ops::OPCODE_D::CALL:
+            /*
+             * Call is a special instruction. It transfers the IP to a
+             * semi-random location, instead of just increasing it to the next
+             * unit.
+             *
+             * This is why we return here, and not use the default behaviour for
+             * most of the other instructions.
+             */
+            return execute(stack, env, ip, viua::arch::ins::CALL{instruction});
+        }
+        break;
+    }
     case viua::arch::ops::FORMAT::F:
         std::cerr << "unimplemented instruction: "
                   << viua::arch::ops::to_string(opcode) << "\n";

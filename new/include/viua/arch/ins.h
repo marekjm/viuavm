@@ -63,6 +63,13 @@ struct MOD : Instruction {
     viua::arch::ops::T instruction;
 };
 
+struct CALL : Instruction {
+    viua::arch::ops::D instruction;
+
+    CALL(viua::arch::ops::D i) : instruction{i}
+    {}
+};
+
 /*
  * DELETE clears a register and deletes a value that it contained. For
  * unboxed values the bit-pattern is simply deleted; for boxed values their

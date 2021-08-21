@@ -219,6 +219,9 @@ enum class OPCODE_T : opcode_type {
     MUL = static_cast<opcode_type>(OPCODE::MUL),
     DIV = static_cast<opcode_type>(OPCODE::DIV),
 };
+enum class OPCODE_D : opcode_type {
+    CALL = static_cast<opcode_type>(OPCODE::CALL),
+};
 enum class OPCODE_S : opcode_type {
     DELETE = static_cast<opcode_type>(OPCODE::DELETE),
     STRING = static_cast<opcode_type>(OPCODE::STRING),
