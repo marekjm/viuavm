@@ -1521,7 +1521,7 @@ auto main(int argc, char* argv[]) -> int
              * and foreign functions. At compile time, we don't yet know,
              * though, which function is foreign and which is bytecode.
              */
-            auto const fn_addr       = (ip - &text[0]);
+            auto const fn_addr       = (ip - &text[0]) * sizeof(viua::arch::instruction_type);
             fn_addresses[fn.name.text] = fn_addr;
             patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
         }
