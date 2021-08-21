@@ -150,6 +150,28 @@ struct Stack {
     }
 };
 
+struct Env {
+    std::vector<uint8_t> strings_table;
+    std::vector<uint8_t> functions_table;
+    viua::arch::instruction_type const* ip_base;
+
+    auto function_at(size_t const) const -> std::pair<std::string, size_t>;
+};
+auto Env::function_at(size_t const offset) const -> std::pair<std::string, size_t>
+{
+    auto sz = uint64_t{};
+    memcpy(&sz, (functions_table.data() + offset - sizeof(sz)), sizeof(sz));
+    sz = le64toh(sz);
+
+    auto name = std::string{reinterpret_cast<char const*>(functions_table.data()) + offset, sz};
+
+    auto addr = uint64_t{};
+    memcpy(&addr, (functions_table.data() + offset + sz), sizeof(addr));
+    addr = le64toh(addr);
+
+    return { name, addr };
+}
+
 struct abort_execution {
     using ip_type = viua::arch::instruction_type const*;
     ip_type const ip;
@@ -259,22 +281,22 @@ auto execute(std::vector<Value>& registers,
 }
 
 auto execute(std::vector<Value>& registers,
-             std::vector<uint8_t> const& strings,
+             Env const& env,
              viua::arch::ins::STRING const op) -> void
 {
     auto& target = registers.at(op.instruction.out.index);
 
     auto const data_offset = std::get<uint64_t>(target.value);
-    auto const data_size   = [strings, data_offset]() -> uint64_t {
+    auto const data_size   = [env, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &strings[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto s     = std::make_unique<viua::vm::types::String>();
     s->content = std::string{
-        reinterpret_cast<char const*>(&strings[0] + data_offset), data_size};
+        reinterpret_cast<char const*>(&env.strings_table[0] + data_offset), data_size};
 
     target.type_of_unboxed = Value::Unboxed_type::Void;
     target.value           = std::move(s);
@@ -375,7 +397,7 @@ auto execute(std::vector<Value>& registers,
 }
 
 auto execute(std::vector<Value>& registers,
-             std::vector<uint8_t> const&,
+             Env const&,
              viua::arch::ins::EBREAK const) -> void
 {
     for (auto i = size_t{0}; i < registers.size(); ++i) {
@@ -435,7 +457,7 @@ auto execute(std::vector<Value>& registers,
 }
 
 auto execute(Stack& stack,
-             std::vector<uint8_t> const& strings,
+             Env& env,
              viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
 {
@@ -471,7 +493,7 @@ auto execute(Stack& stack,
             execute(stack.back().registers, viua::arch::ins::DELETE{instruction});
             break;
         case viua::arch::ops::OPCODE_S::STRING:
-            execute(stack.back().registers, strings, viua::arch::ins::STRING{instruction});
+            execute(stack.back().registers, env, viua::arch::ins::STRING{instruction});
             break;
         case viua::arch::ops::OPCODE_S::FRAME:
             execute(stack, ip, viua::arch::ins::FRAME{instruction});
@@ -515,7 +537,7 @@ auto execute(Stack& stack,
             return nullptr;
         case viua::arch::ops::OPCODE_N::EBREAK:
             execute(stack.back().registers,
-                    strings,
+                    env,
                     viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
             break;
         }
@@ -534,21 +556,21 @@ auto execute(Stack& stack,
 
 namespace {
 auto run_instruction(Stack& stack,
-                     std::vector<uint8_t> const& strings,
+                     Env& env,
                      viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
     do {
         instruction = *ip;
-        ip          = machine::core::ins::execute(stack, strings, ip);
+        ip          = machine::core::ins::execute(stack, env, ip);
     } while ((ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
     return ip;
 }
 
 auto run(Stack& stack,
-         std::vector<uint8_t> const& strings,
+         Env& env,
          viua::arch::instruction_type const* ip,
          std::tuple<std::string_view const,
                     viua::arch::instruction_type const*,
@@ -581,7 +603,7 @@ auto run(Stack& stack,
                       << std::hex << std::setw(2) << std::setfill('0') << i
                       << std::dec << "\n";
 
-            ip = run_instruction(stack, strings, ip);
+            ip = run_instruction(stack, env, ip);
 
             /*
              * Halting instruction returns nullptr because it does not know
@@ -718,6 +740,10 @@ auto main(int argc, char* argv[]) -> int
         close(a_out);
     }
 
+    auto env = Env{};
+    env.strings_table = std::move(strings);
+    env.functions_table = std::move(fn_table);
+    env.ip_base = &text[0];
 
     auto stack = Stack{};
     stack.push(256, (text.data() + entry_addr), nullptr);
