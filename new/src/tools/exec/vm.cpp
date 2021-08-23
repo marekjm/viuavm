@@ -699,8 +699,6 @@ auto run(Stack& stack,
     constexpr auto PREEMPTION_THRESHOLD = size_t{2};
 
     while ((ip < ip_end) and (ip >= ip_begin)) {
-        auto const ip_before = ip;
-
         std::cerr << "cycle at " << module << "+0x" << std::hex << std::setw(8)
                   << std::setfill('0')
                   << ((ip - ip_begin) * sizeof(viua::arch::instruction_type))
@@ -716,10 +714,6 @@ auto run(Stack& stack,
              */
             auto const greedy    = (*ip & viua::arch::ops::GREEDY);
             auto const bundle_ip = ip;
-
-            std::cerr << "  " << (greedy ? "bundle" : "single") << " "
-                      << std::hex << std::setw(2) << std::setfill('0') << i
-                      << std::dec << "\n";
 
             ip = run_instruction(stack, env, ip);
 
@@ -743,8 +737,6 @@ auto run(Stack& stack,
         if (ip == ip_end) {
             std::cerr << "halted\n";
             break;
-        } else {
-            std::cerr << "preempted after " << (ip - ip_before) << " ops\n";
         }
 
         if constexpr (false) {
@@ -842,7 +834,15 @@ auto main(int argc, char* argv[]) -> int
         std::cout << "[vm] loaded "
                   << (text_header.p_filesz / sizeof(decltype(text)::value_type))
                   << " instructions\n";
-        std::cout << "[vm] entry address at 0x" << std::hex << std::setw(8)
+        std::cout << "[vm] .text address at +0x" << std::hex << std::setw(8)
+                  << std::setfill('0')
+                  << text_header.p_offset
+                  << std::dec << "\n";
+        std::cout << "[vm] ELF entry address at +0x" << std::hex << std::setw(8)
+                  << std::setfill('0')
+                  << elf_header.e_entry
+                  << std::dec << "\n";
+        std::cout << "[vm] entry address at [.text]+0x" << std::hex << std::setw(8)
                   << std::setfill('0')
                   << (entry_addr * sizeof(viua::arch::instruction_type))
                   << std::dec << "\n";
