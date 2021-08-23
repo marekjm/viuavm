@@ -118,6 +118,7 @@ struct Value {
 struct Frame {
     using addr_type = viua::arch::instruction_type const*;
 
+    std::vector<Value> parameters;
     std::vector<Value> registers;
     addr_type const entry_address;
     addr_type const return_address;
@@ -432,62 +433,127 @@ auto execute(std::vector<Value>& registers,
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
 
-auto execute(std::vector<Value>& registers,
+auto execute(Stack const& stack,
              Env const&,
              viua::arch::ins::EBREAK const) -> void
 {
-    for (auto i = size_t{0}; i < registers.size(); ++i) {
-        auto const& each = registers.at(i);
-        if (each.is_void()) {
-            continue;
+    std::cerr << "[ebreak.stack]\n";
+    std::cerr << "  depth = " << stack.frames.size() << "\n";
+
+    {
+        std::cerr << "[ebreak.parameters]\n";
+        auto const& registers = stack.frames.back().parameters;
+        for (auto i = size_t{0}; i < registers.size(); ++i) {
+            auto const& each = registers.at(i);
+            if (each.is_void()) {
+                continue;
+            }
+
+            std::cerr << "  [" << std::setw(3) << i << "] ";
+
+            if (each.is_boxed()) {
+                auto const& value = *each.boxed_value();
+                std::cerr << "<boxed> " << value.type_name();
+                value.as_trait<viua::vm::types::traits::To_string>(
+                    [](viua::vm::types::traits::To_string const& val) -> void {
+                        std::cerr << " = " << val.to_string();
+                    });
+                std::cerr << "\n";
+                continue;
+            }
+
+            switch (each.type_of_unboxed) {
+            case Value::Unboxed_type::Void:
+                break;
+            case Value::Unboxed_type::Byte:
+                std::cerr << "by " << std::hex << std::setw(2) << std::setfill('0')
+                          << static_cast<uint8_t>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Integer_signed:
+                std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << static_cast<int64_t>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Integer_unsigned:
+                std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << std::get<uint64_t>(each.value) << "\n";
+                break;
+            case Value::Unboxed_type::Float_single:
+                std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Float_double:
+                std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            }
         }
+    }
+    {
+        std::cerr << "[ebreak.registers]\n";
+        auto const& registers = stack.frames.back().registers;
+        for (auto i = size_t{0}; i < registers.size(); ++i) {
+            auto const& each = registers.at(i);
+            if (each.is_void()) {
+                continue;
+            }
 
-        std::cerr << "[" << std::setw(3) << i << "] ";
+            std::cerr << "  [" << std::setw(3) << i << "] ";
 
-        if (each.is_boxed()) {
-            auto const& value = *each.boxed_value();
-            std::cerr << "<boxed> " << value.type_name();
-            value.as_trait<viua::vm::types::traits::To_string>(
-                [](viua::vm::types::traits::To_string const& val) -> void {
-                    std::cerr << " = " << val.to_string();
-                });
-            std::cerr << "\n";
-            continue;
-        }
+            if (each.is_boxed()) {
+                auto const& value = *each.boxed_value();
+                std::cerr << "<boxed> " << value.type_name();
+                value.as_trait<viua::vm::types::traits::To_string>(
+                    [](viua::vm::types::traits::To_string const& val) -> void {
+                        std::cerr << " = " << val.to_string();
+                    });
+                std::cerr << "\n";
+                continue;
+            }
 
-        switch (each.type_of_unboxed) {
-        case Value::Unboxed_type::Void:
-            break;
-        case Value::Unboxed_type::Byte:
-            std::cerr << "by " << std::hex << std::setw(2) << std::setfill('0')
-                      << static_cast<uint8_t>(std::get<uint64_t>(each.value))
-                      << "\n";
-            break;
-        case Value::Unboxed_type::Integer_signed:
-            std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
-                      << std::get<uint64_t>(each.value) << " " << std::dec
-                      << static_cast<int64_t>(std::get<uint64_t>(each.value))
-                      << "\n";
-            break;
-        case Value::Unboxed_type::Integer_unsigned:
-            std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
-                      << std::get<uint64_t>(each.value) << " " << std::dec
-                      << std::get<uint64_t>(each.value) << "\n";
-            break;
-        case Value::Unboxed_type::Float_single:
-            std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
-                      << static_cast<float>(std::get<uint64_t>(each.value))
-                      << " " << std::dec
-                      << static_cast<float>(std::get<uint64_t>(each.value))
-                      << "\n";
-            break;
-        case Value::Unboxed_type::Float_double:
-            std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
-                      << static_cast<double>(std::get<uint64_t>(each.value))
-                      << " " << std::dec
-                      << static_cast<double>(std::get<uint64_t>(each.value))
-                      << "\n";
-            break;
+            switch (each.type_of_unboxed) {
+            case Value::Unboxed_type::Void:
+                break;
+            case Value::Unboxed_type::Byte:
+                std::cerr << "by " << std::hex << std::setw(2) << std::setfill('0')
+                          << static_cast<uint8_t>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Integer_signed:
+                std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << static_cast<int64_t>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Integer_unsigned:
+                std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << std::get<uint64_t>(each.value) << "\n";
+                break;
+            case Value::Unboxed_type::Float_single:
+                std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            case Value::Unboxed_type::Float_double:
+                std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << "\n";
+                break;
+            }
         }
     }
 }
@@ -572,7 +638,7 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_N::HALT:
             return nullptr;
         case viua::arch::ops::OPCODE_N::EBREAK:
-            execute(stack.back().registers,
+            execute(stack,
                     env,
                     viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
             break;
