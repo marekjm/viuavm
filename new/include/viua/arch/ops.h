@@ -188,6 +188,7 @@ enum class OPCODE : opcode_type {
     NOOP   = (FORMAT_N | 0x0000),
     HALT   = (FORMAT_N | 0x0001),
     EBREAK = (FORMAT_N | 0x0002),
+    RETURN = (FORMAT_N | 0x0003),
 
     ADD = (FORMAT_T | 0x0001),
     SUB = (FORMAT_T | 0x0002),
@@ -239,6 +240,7 @@ enum class OPCODE_N : opcode_type {
     NOOP   = static_cast<opcode_type>(OPCODE::NOOP),
     HALT   = static_cast<opcode_type>(OPCODE::HALT),
     EBREAK = static_cast<opcode_type>(OPCODE::EBREAK),
+    RETURN = static_cast<opcode_type>(OPCODE::RETURN),
 };
 }  // namespace viua::arch::ops
 

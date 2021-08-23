@@ -120,8 +120,11 @@ struct Frame {
 
     std::vector<Value> parameters;
     std::vector<Value> registers;
+
     addr_type const entry_address;
     addr_type const return_address;
+
+    viua::arch::Register_access result_to;
 
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
         : registers(sz)
@@ -368,7 +371,18 @@ auto execute(Stack& stack,
         throw abort_execution{ip, "invalid IP after call"};
     }
 
-    return (env.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
+    auto const fr_return = (ip + 1);
+    auto const fr_entry = (env.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
+
+    stack.frames.emplace_back(
+          viua::arch::MAX_REGISTER_INDEX
+        , fr_entry
+        , fr_return
+    );
+    stack.frames.back().parameters = std::move(stack.args);
+    stack.frames.back().result_to = op.instruction.out;
+
+    return fr_entry;
 }
 
 auto execute(std::vector<Value>& registers,
@@ -559,6 +573,23 @@ auto execute(Stack const& stack,
 }
 
 auto execute(Stack& stack,
+             Env const&,
+             viua::arch::ins::RETURN const) -> viua::arch::instruction_type const*
+{
+    auto fr = std::move(stack.frames.back());
+    stack.frames.pop_back();
+
+    if (auto const& rt = fr.result_to; not rt.is_void()) {
+        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(0));
+    }
+
+    std::cerr << "return to " << std::hex << std::setw(8) << std::setfill('0')
+        << fr.return_address << std::dec << "\n";
+
+    return fr.return_address;
+}
+
+auto execute(Stack& stack,
              Env& env,
              viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
@@ -642,6 +673,10 @@ auto execute(Stack& stack,
                     env,
                     viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
             break;
+        case viua::arch::ops::OPCODE_N::RETURN:
+            return execute(stack,
+                    env,
+                    viua::arch::ins::RETURN{viua::arch::ops::N::decode(raw)});
         }
         break;
     }

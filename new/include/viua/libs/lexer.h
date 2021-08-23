@@ -120,6 +120,7 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "noop",
     "halt",
     "ebreak",
+    "return",
 
     "add",
     "g.add",

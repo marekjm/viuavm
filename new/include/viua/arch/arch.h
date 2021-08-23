@@ -101,9 +101,9 @@ constexpr auto MAX_REGISTER_INDEX = register_index_type{255};
 struct Register_access {
     using set_type = viua::arch::REGISTER_SET;
 
-    set_type const set;
-    bool const direct;
-    uint8_t const index;
+    set_type set;
+    bool direct;
+    uint8_t index;
 
     Register_access();
     Register_access(set_type const, bool const, uint8_t const);

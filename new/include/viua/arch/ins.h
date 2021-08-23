@@ -40,6 +40,12 @@ struct EBREAK : Instruction {
     EBREAK(viua::arch::ops::N i) : instruction{i}
     {}
 };
+struct RETURN : Instruction {
+    viua::arch::ops::N instruction;
+
+    RETURN(viua::arch::ops::N i) : instruction{i}
+    {}
+};
 
 struct ADD : Instruction {
     viua::arch::ops::T instruction;
