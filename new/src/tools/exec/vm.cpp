@@ -825,8 +825,7 @@ auto main(int argc, char* argv[]) -> int
             read(a_out, fn_table.data(), fn_header.p_filesz);
         }
 
-        entry_addr = (elf_header.e_entry - text_header.p_offset)
-                     / sizeof(viua::arch::instruction_type);
+        entry_addr = ((elf_header.e_entry - text_header.p_offset) / sizeof(viua::arch::instruction_type));
 
         std::cout << "[vm] loaded " << text_header.p_filesz
                   << " byte(s) of .text section from PT_LOAD segment of "

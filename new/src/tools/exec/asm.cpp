@@ -1478,7 +1478,7 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto const ops_count = std::accumulate(
+    auto const ops_count = 1 + std::accumulate(
         nodes.begin(),
         nodes.end(),
         size_t{0},
@@ -1493,8 +1493,8 @@ auto main(int argc, char* argv[]) -> int
 
     auto text = std::vector<viua::arch::instruction_type>{};
     {
-        text.reserve(ops_count + 1);
-        text.resize(ops_count + 1);
+        text.reserve(ops_count);
+        text.resize(ops_count);
 
         using viua::arch::ops::N;
         using viua::arch::instruction_type;
@@ -1657,8 +1657,7 @@ auto main(int argc, char* argv[]) -> int
             elf_header.e_machine              = ET_NONE;
             elf_header.e_version              = elf_header.e_ident[EI_VERSION];
             elf_header.e_entry                = text_offset
-                                 + (fn_addresses[entry_point_fn.value().text]
-                                    * sizeof(viua::arch::instruction_type));
+                + fn_addresses[entry_point_fn.value().text];
             elf_header.e_phoff     = sizeof(elf_header);
             elf_header.e_phentsize = sizeof(Elf64_Phdr);
             elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;
