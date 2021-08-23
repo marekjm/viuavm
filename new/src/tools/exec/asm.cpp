@@ -750,7 +750,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
                 if (fn_offsets.count(fn_name.text) == 0) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{fn_name, Cause::Unknown, "internal compiler bamboozling"};
+                    throw Error{fn_name, Cause::Call_to_undefined_function};
                 }
 
                 auto const fn_off = fn_offsets.at(fn_name.text);

@@ -37,6 +37,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "value out of range";
     case Cause::Invalid_register_access:
         return "invalid register access";
+    case Cause::Call_to_undefined_function:
+        return "call to undefined function";
     }
     return "illegal error";
 }
