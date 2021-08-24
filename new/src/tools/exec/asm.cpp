@@ -225,6 +225,9 @@ struct Fn_def : Node {
     viua::libs::lexer::Lexeme name;
     std::vector<Instruction> instructions;
 
+    viua::libs::lexer::Lexeme start;
+    viua::libs::lexer::Lexeme end;
+
     auto to_string() const -> std::string override;
 };
 auto Fn_def::to_string() const -> std::string
@@ -270,6 +273,7 @@ auto remove_noise(std::vector<viua::libs::lexer::Lexeme> raw)
     return cooked;
 }
 }  // namespace ast
+
 namespace {
 auto consume_token_of(
     viua::libs::lexer::TOKEN const tt,
@@ -341,10 +345,11 @@ auto parse_function_definition(
     viua::support::vector_view<viua::libs::lexer::Lexeme>& lexemes)
     -> std::unique_ptr<ast::Node>
 {
-    using viua::libs::lexer::TOKEN;
-    auto const leader = consume_token_of(TOKEN::DEF_FUNCTION, lexemes);
-
     auto fn = std::make_unique<ast::Fn_def>();
+
+    using viua::libs::lexer::TOKEN;
+    fn->start = consume_token_of(TOKEN::DEF_FUNCTION, lexemes);
+
     if (look_ahead(TOKEN::ATTR_LIST_OPEN, lexemes)) {
         fn->attributes = parse_attr_list(lexemes);
     }
@@ -491,11 +496,31 @@ auto parse_function_definition(
     }
 
     consume_token_of(TOKEN::END, lexemes);
-    consume_token_of(TOKEN::TERMINATOR, lexemes);
+    fn->end = consume_token_of(TOKEN::TERMINATOR, lexemes);
 
     fn->name = std::move(fn_name);
 
     return fn;
+}
+
+auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
+    -> std::vector<std::unique_ptr<ast::Node>>
+{
+    auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
+
+    while (not lexemes.empty()) {
+        auto const& each = lexemes.front();
+
+        using viua::libs::lexer::TOKEN;
+        if (each.token == TOKEN::DEF_FUNCTION) {
+            auto node = parse_function_definition(lexemes);
+            nodes.push_back(std::move(node));
+        } else {
+            throw each;
+        }
+    }
+
+    return nodes;
 }
 
 auto expand_li(std::vector<ast::Instruction>& cooked,
@@ -799,27 +824,127 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
     }
     return cooked;
 }
+}  // namespace
 
-auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
-    -> std::vector<std::unique_ptr<ast::Node>>
+namespace {
+auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::vector<viua::arch::instruction_type>& text, std::vector<uint8_t>& fn_table, std::map<std::string, size_t> const& fn_offsets) -> std::map<std::string, uint64_t>
 {
-    auto nodes = std::vector<std::unique_ptr<ast::Node>>{};
+    auto const ops_count = 1 + std::accumulate(
+        nodes.begin(),
+        nodes.end(),
+        size_t{0},
+        [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t {
+            if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+                return 0;
+            }
 
-    while (not lexemes.empty()) {
-        auto const& each = lexemes.front();
+            auto& fn = static_cast<ast::Fn_def&>(*each);
+            return (acc + fn.instructions.size());
+        });
 
-        using viua::libs::lexer::TOKEN;
-        if (each.token == TOKEN::DEF_FUNCTION) {
-            auto node = parse_function_definition(lexemes);
-            nodes.push_back(std::move(node));
-        } else {
-            throw each;
+    {
+        text.reserve(ops_count);
+        text.resize(ops_count);
+
+        using viua::arch::ops::N;
+        using viua::arch::instruction_type;
+        using viua::arch::ops::OPCODE;
+        text.at(0) = N{static_cast<instruction_type>(OPCODE::HALT)}.encode();
+    }
+
+    auto fn_addresses = std::map<std::string, uint64_t>{};
+    auto ip = (text.data() + 1);
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            continue;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+        {
+            /*
+             * Save the function's address (offset into the .text section,
+             * really) in the functions table. This is needed not only for
+             * debugging, but also because the functions' addresses are resolved
+             * dynamically for call and similar instructions. Why dynamically?
+             *
+             * Because there is a strong distinction between calls to bytecode
+             * and foreign functions. At compile time, we don't yet know,
+             * though, which function is foreign and which is bytecode.
+             */
+            auto const fn_addr       = (ip - &text[0]) * sizeof(viua::arch::instruction_type);
+            fn_addresses[fn.name.text] = fn_addr;
+            patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
+        }
+
+        for (auto const& insn : fn.instructions) {
+            using viua::arch::opcode_type;
+            using viua::arch::ops::FORMAT;
+            using viua::arch::ops::FORMAT_MASK;
+
+            auto opcode = opcode_type{};
+            try {
+                opcode = insn.parse_opcode();
+            } catch (std::invalid_argument const&) {
+                auto const e = insn.opcode;
+
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{e, Cause::Unknown};
+            }
+            auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
+            switch (format) {
+            case FORMAT::N:
+                *ip++ = static_cast<uint64_t>(opcode);
+                break;
+            case FORMAT::T:
+                *ip++ =
+                    viua::arch::ops::T{opcode,
+                                       insn.operands.at(0).make_access(),
+                                       insn.operands.at(1).make_access(),
+                                       insn.operands.at(2).make_access()}
+                        .encode();
+                break;
+            case FORMAT::D:
+                *ip++ =
+                    viua::arch::ops::D{opcode,
+                                       insn.operands.at(0).make_access(),
+                                       insn.operands.at(1).make_access()}
+                        .encode();
+                break;
+            case FORMAT::S:
+                *ip++ =
+                    viua::arch::ops::S{opcode,
+                                       insn.operands.at(0).make_access()}
+                        .encode();
+                break;
+            case FORMAT::F:
+                break;  // FIXME
+            case FORMAT::E:
+                *ip++ =
+                    viua::arch::ops::E{
+                        opcode,
+                        insn.operands.front().make_access(),
+                        std::stoull(
+                            insn.operands.back().ingredients.front().text)}
+                        .encode();
+                break;
+            case FORMAT::R:
+                *ip++ =
+                    viua::arch::ops::R{
+                        opcode,
+                        insn.operands.at(0).make_access(),
+                        insn.operands.at(1).make_access(),
+                        static_cast<uint32_t>(std::stoul(
+                            insn.operands.back().ingredients.front().text))}
+                        .encode();
+                break;
+            }
         }
     }
 
-    return nodes;
+    return fn_addresses;
 }
-}  // namespace
+}
 
 namespace {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
@@ -889,9 +1014,7 @@ auto view_line_after(std::string_view sv, viua::libs::lexer::Location loc)
 
     return sv;
 }
-}  // anonymous namespace
 
-namespace {
 auto display_error_and_exit [[noreturn]] (std::string_view source_path,
                                           std::string_view source_text,
                                           viua::libs::lexer::Lexeme const& e)
@@ -1372,6 +1495,22 @@ auto main(int argc, char* argv[]) -> int
     }
 
     /*
+     * Calculate function spans in source code for error reporting. This way an
+     * error offset can be matched to a function without the error having to
+     * carry the function name.
+     */
+    auto fn_spans = std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
+    for (auto const& each : nodes) {
+        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+            return 0;
+        }
+
+        auto& fn = static_cast<ast::Fn_def&>(*each);
+        fn_spans.emplace_back(fn.name.text,
+                std::pair<size_t, size_t>{ fn.start.location.offset, fn.end.location.offset });
+    }
+
+    /*
      * String table preparation.
      *
      * Replace string literals in operands with offsets into the string table.
@@ -1492,123 +1631,25 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto const ops_count = 1 + std::accumulate(
-        nodes.begin(),
-        nodes.end(),
-        size_t{0},
-        [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t {
-            if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-                return 0;
-            }
-
-            auto& fn = static_cast<ast::Fn_def&>(*each);
-            return (acc + fn.instructions.size());
-        });
-
     auto text = std::vector<viua::arch::instruction_type>{};
-    {
-        text.reserve(ops_count);
-        text.resize(ops_count);
-
-        using viua::arch::ops::N;
-        using viua::arch::instruction_type;
-        using viua::arch::ops::OPCODE;
-        text.at(0) = N{static_cast<instruction_type>(OPCODE::HALT)}.encode();
-    }
-
     auto fn_addresses = std::map<std::string, uint64_t>{};
-    auto ip = (text.data() + 1);
-    for (auto const& each : nodes) {
-        if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-            continue;
-        }
+    try {
+        fn_addresses = emit_bytecode(nodes, text, fn_table, fn_offsets);
+    } catch (viua::libs::errors::compile_time::Error const& e) {
+        auto fn_name = std::optional<std::string>{};
 
-        auto& fn = static_cast<ast::Fn_def&>(*each);
-        {
-            /*
-             * Save the function's address (offset into the .text section,
-             * really) in the functions table. This is needed not only for
-             * debugging, but also because the functions' addresses are resolved
-             * dynamically for call and similar instructions. Why dynamically?
-             *
-             * Because there is a strong distinction between calls to bytecode
-             * and foreign functions. At compile time, we don't yet know,
-             * though, which function is foreign and which is bytecode.
-             */
-            auto const fn_addr       = (ip - &text[0]) * sizeof(viua::arch::instruction_type);
-            fn_addresses[fn.name.text] = fn_addr;
-            patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
-        }
-
-        try {
-            for (auto const& insn : fn.instructions) {
-                using viua::arch::opcode_type;
-                using viua::arch::ops::FORMAT;
-                using viua::arch::ops::FORMAT_MASK;
-
-                auto opcode = opcode_type{};
-                try {
-                    opcode = insn.parse_opcode();
-                } catch (std::invalid_argument const&) {
-                    auto const e = insn.opcode;
-
-                    using viua::libs::errors::compile_time::Cause;
-                    using viua::libs::errors::compile_time::Error;
-                    throw Error{e, Cause::Unknown};
-                }
-                auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
-                switch (format) {
-                case FORMAT::N:
-                    *ip++ = static_cast<uint64_t>(opcode);
-                    break;
-                case FORMAT::T:
-                    *ip++ =
-                        viua::arch::ops::T{opcode,
-                                           insn.operands.at(0).make_access(),
-                                           insn.operands.at(1).make_access(),
-                                           insn.operands.at(2).make_access()}
-                            .encode();
-                    break;
-                case FORMAT::D:
-                    *ip++ =
-                        viua::arch::ops::D{opcode,
-                                           insn.operands.at(0).make_access(),
-                                           insn.operands.at(1).make_access()}
-                            .encode();
-                    break;
-                case FORMAT::S:
-                    *ip++ =
-                        viua::arch::ops::S{opcode,
-                                           insn.operands.at(0).make_access()}
-                            .encode();
-                    break;
-                case FORMAT::F:
-                    break;  // FIXME
-                case FORMAT::E:
-                    *ip++ =
-                        viua::arch::ops::E{
-                            opcode,
-                            insn.operands.front().make_access(),
-                            std::stoull(
-                                insn.operands.back().ingredients.front().text)}
-                            .encode();
-                    break;
-                case FORMAT::R:
-                    *ip++ =
-                        viua::arch::ops::R{
-                            opcode,
-                            insn.operands.at(0).make_access(),
-                            insn.operands.at(1).make_access(),
-                            static_cast<uint32_t>(std::stoul(
-                                insn.operands.back().ingredients.front().text))}
-                            .encode();
-                    break;
-                }
+        for (auto const& [ name, offs ] : fn_spans) {
+            auto const [ low, high ] = offs;
+            auto const off = e.location().offset;
+            if ((off >= low) and (off <= high)) {
+                fn_name = name;
             }
-        } catch (viua::libs::errors::compile_time::Error const& e) {
-            display_error_in_function(source_path, e, fn.name.text);
-            display_error_and_exit(source_path, source_text, e);
         }
+
+        if (fn_name.has_value()) {
+            display_error_in_function(source_path, e, *fn_name);
+        }
+        display_error_and_exit(source_path, source_text, e);
     }
 
     /*
@@ -1631,7 +1672,7 @@ auto main(int argc, char* argv[]) -> int
             constexpr auto NO_OF_ELF_PHDR_USED = 5;
 
             auto const text_size =
-                (ops_count * sizeof(decltype(text)::value_type));
+                (text.size() * sizeof(decltype(text)::value_type));
             auto const text_offset =
                 (sizeof(Elf64_Ehdr) + (NO_OF_ELF_PHDR_USED * sizeof(Elf64_Phdr))
                  + (VIUAVM_INTERP.size() + 1));
