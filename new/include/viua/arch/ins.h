@@ -41,9 +41,9 @@ struct EBREAK : Instruction {
     {}
 };
 struct RETURN : Instruction {
-    viua::arch::ops::N instruction;
+    viua::arch::ops::S instruction;
 
-    RETURN(viua::arch::ops::N i) : instruction{i}
+    RETURN(viua::arch::ops::S i) : instruction{i}
     {}
 };
 

@@ -776,6 +776,20 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
                 call.operands.push_back(fn_offset);
             }
             cooked.push_back(call);
+        } else if (each.opcode == "return") {
+            if (each.operands.empty()) {
+                /*
+                 * Return instruction takes a single register operand, but this
+                 * operand can be omitted. As in C, if omitted it defaults to
+                 * void.
+                 */
+                auto operand = ast::Operand{};
+                operand.ingredients.push_back(each.opcode);
+                operand.ingredients.back().text = "void";
+                each.operands.push_back(operand);
+            }
+
+            cooked.push_back(std::move(each));
         } else {
             /*
              * Real instructions should be pushed without any modification.

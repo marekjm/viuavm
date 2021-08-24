@@ -573,14 +573,19 @@ auto execute(Stack const& stack,
 }
 
 auto execute(Stack& stack,
+             viua::arch::instruction_type const* const ip,
              Env const&,
-             viua::arch::ins::RETURN const) -> viua::arch::instruction_type const*
+             viua::arch::ins::RETURN const ins) -> viua::arch::instruction_type const*
 {
     auto fr = std::move(stack.frames.back());
     stack.frames.pop_back();
 
     if (auto const& rt = fr.result_to; not rt.is_void()) {
-        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(0));
+        if (ins.instruction.out.is_void()) {
+            throw abort_execution{ip, "return value requested from function returning void"};
+        }
+        auto const index = ins.instruction.out.index;
+        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(index));
     }
 
     std::cerr << "return to " << std::hex << std::setw(8) << std::setfill('0')
@@ -631,6 +636,11 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_S::FRAME:
             execute(stack, ip, viua::arch::ins::FRAME{instruction});
             break;
+        case viua::arch::ops::OPCODE_S::RETURN:
+            return execute(stack,
+                    ip,
+                    env,
+                    viua::arch::ins::RETURN{instruction});
         }
         break;
     }
@@ -673,10 +683,6 @@ auto execute(Stack& stack,
                     env,
                     viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
             break;
-        case viua::arch::ops::OPCODE_N::RETURN:
-            return execute(stack,
-                    env,
-                    viua::arch::ins::RETURN{viua::arch::ops::N::decode(raw)});
         }
         break;
     }
@@ -769,6 +775,10 @@ auto run(Stack& stack,
             }
         }
 
+        if (stack.frames.empty()) {
+            std::cerr << "exited\n";
+            break;
+        }
         if (ip == ip_end) {
             std::cerr << "halted\n";
             break;
