@@ -181,6 +181,7 @@ struct N {
 };
 
 constexpr auto GREEDY      = opcode_type{0x8000};
+constexpr auto UNSIGNED    = opcode_type{0x0800};
 constexpr auto OPCODE_MASK = opcode_type{0x7fff};
 constexpr auto FORMAT_MASK = opcode_type{0x7000};
 
@@ -203,16 +204,16 @@ enum class OPCODE : opcode_type {
     RETURN = (FORMAT_S | 0x0004),
 
     LUI  = (FORMAT_E | 0x0001),
-    LUIU = (FORMAT_E | 0x0002),
+    LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
 
     ADDI  = (FORMAT_R | 0x0001),
-    ADDIU = (FORMAT_R | 0x0002),
-    SUBI  = (FORMAT_R | 0x0003),
-    SUBIU = (FORMAT_R | 0x0004),
-    MULI  = (FORMAT_R | 0x0005),
-    MULIU = (FORMAT_R | 0x0006),
-    DIVI  = (FORMAT_R | 0x0007),
-    DIVIU = (FORMAT_R | 0x0008),
+    ADDIU = (FORMAT_R | 0x0001 | UNSIGNED),
+    SUBI  = (FORMAT_R | 0x0002),
+    SUBIU = (FORMAT_R | 0x0002 | UNSIGNED),
+    MULI  = (FORMAT_R | 0x0003),
+    MULIU = (FORMAT_R | 0x0003 | UNSIGNED),
+    DIVI  = (FORMAT_R | 0x0004),
+    DIVIU = (FORMAT_R | 0x0004 | UNSIGNED),
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
