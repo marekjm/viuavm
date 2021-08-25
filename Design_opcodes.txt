@@ -346,7 +346,7 @@ These instructions operate on register-bits wide integers. Their operands are
 raw integers, but each instruction may choose to interpret them as signed or
 unsigned.
 
-- integer %rx, <val>    Constructs an integer with value <val> in register rx.
+- li %rx, <val>         Constructs an integer with value <val> in register rx.
                         The value is sign-extended to match register width.
                         Values too big to be stored cause a compilation error.
 
