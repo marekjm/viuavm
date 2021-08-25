@@ -1277,7 +1277,29 @@ auto display_error_and_exit
                   << esc(2, ATTR_RESET) << ':' << esc(2, COLOR_FG_WHITE)
                   << (e.character() + 1) << esc(2, ATTR_RESET) << ": "
                   << esc(2, COLOR_FG_CYAN) << "note" << esc(2, ATTR_RESET)
-                  << ": " << each << "\n";
+                  << ": ";
+        if (each.find('\n') == std::string::npos) {
+            std::cerr << each << "\n";
+        } else {
+            auto const prefix_length
+                = source_path.size()
+                + std::to_string(e.line() + 1).size()
+                + std::to_string(e.character() + 1).size()
+                + 6 // for ": note"
+                + 2 // for ":" after source path and line number
+                ;
+
+            auto sv = std::string_view{each};
+            std::cerr << sv.substr(0, sv.find('\n')) << '\n';
+
+            do {
+                sv.remove_prefix(sv.find('\n') + 1);
+                std::cerr
+                    << std::string(prefix_length, ' ')
+                    << "| "
+                    << sv.substr(0, sv.find('\n')) << '\n';
+            } while (sv.find('\n') != std::string::npos);
+        }
     }
 
     exit(1);
