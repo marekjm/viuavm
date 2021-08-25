@@ -429,8 +429,8 @@ auto execute(std::vector<Value>& registers,
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADDI const op) -> void
+template<typename Op>
+auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op) -> void
 {
     auto& out = registers.at(op.instruction.out.index);
     auto const base =
@@ -438,140 +438,60 @@ auto execute(std::vector<Value>& registers,
              ? 0
              : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
 
-    out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    out.value           = (base + op.instruction.immediate);
+    if constexpr (std::is_signed_v<typename Op::value_type>) {
+        out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
+    } else {
+        out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
+    }
+    out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, op.instruction.immediate));
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
+               + (op.instruction.in.is_void()
+                   ? "void"
+                   : std::to_string(static_cast<int>(op.instruction.in.index)))
                + ", " + std::to_string(op.instruction.immediate) + "\n";
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::ADDI const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::ADDIU const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
-    out.value           = (base + op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::SUBI const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    out.value           = (base - op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::SUBIU const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
-    out.value           = (base - op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::MULI const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    out.value           = (base * op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::MULIU const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
-    out.value           = (base * op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DIVI const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    out.value           = (base / op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DIVIU const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
-
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
-    out.value           = (base / op.instruction.immediate);
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", void"  // FIXME it's not always void
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+    execute_arithmetic_immediate_op(registers, op);
 }
 
 auto execute(Stack const& stack,

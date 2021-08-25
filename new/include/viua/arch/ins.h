@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+#include <functional>
 #include <string>
 
 #include <viua/arch/arch.h>
@@ -137,48 +138,72 @@ struct LUIU : Instruction {
  * integer.
  */
 struct ADDI : Instruction {
+    using value_type = int64_t;
+    using functor_type = std::plus<value_type>;
+
     viua::arch::ops::R instruction;
 
     ADDI(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct ADDIU : Instruction {
+    using value_type = uint64_t;
+    using functor_type = std::plus<value_type>;
+
     viua::arch::ops::R instruction;
 
     ADDIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct SUBI : Instruction {
+    using value_type = int64_t;
+    using functor_type = std::minus<value_type>;
+
     viua::arch::ops::R instruction;
 
     SUBI(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct SUBIU : Instruction {
+    using value_type = uint64_t;
+    using functor_type = std::minus<value_type>;
+
     viua::arch::ops::R instruction;
 
     SUBIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct MULI : Instruction {
+    using value_type = int64_t;
+    using functor_type = std::multiplies<value_type>;
+
     viua::arch::ops::R instruction;
 
     MULI(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct MULIU : Instruction {
+    using value_type = uint64_t;
+    using functor_type = std::multiplies<value_type>;
+
     viua::arch::ops::R instruction;
 
     MULIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct DIVI : Instruction {
+    using value_type = int64_t;
+    using functor_type = std::divides<value_type>;
+
     viua::arch::ops::R instruction;
 
     DIVI(viua::arch::ops::R i) : instruction{i}
     {}
 };
 struct DIVIU : Instruction {
+    using value_type = uint64_t;
+    using functor_type = std::divides<value_type>;
+
     viua::arch::ops::R instruction;
 
     DIVIU(viua::arch::ops::R i) : instruction{i}
