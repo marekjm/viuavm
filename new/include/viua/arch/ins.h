@@ -55,6 +55,9 @@ struct ADD : Instruction {
 };
 struct SUB : Instruction {
     viua::arch::ops::T instruction;
+
+    SUB(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct MUL : Instruction {
     viua::arch::ops::T instruction;
@@ -64,9 +67,15 @@ struct MUL : Instruction {
 };
 struct DIV : Instruction {
     viua::arch::ops::T instruction;
+
+    DIV(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct MOD : Instruction {
     viua::arch::ops::T instruction;
+
+    MOD(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 
 struct CALL : Instruction {
@@ -127,16 +136,52 @@ struct LUIU : Instruction {
  * converted to an unsigned integer, and the value produced is an unsigned
  * integer.
  */
+struct ADDI : Instruction {
+    viua::arch::ops::R instruction;
+
+    ADDI(viua::arch::ops::R i) : instruction{i}
+    {}
+};
 struct ADDIU : Instruction {
     viua::arch::ops::R instruction;
 
     ADDIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
-struct ADDI : Instruction {
+struct SUBI : Instruction {
     viua::arch::ops::R instruction;
 
-    ADDI(viua::arch::ops::R i) : instruction{i}
+    SUBI(viua::arch::ops::R i) : instruction{i}
+    {}
+};
+struct SUBIU : Instruction {
+    viua::arch::ops::R instruction;
+
+    SUBIU(viua::arch::ops::R i) : instruction{i}
+    {}
+};
+struct MULI : Instruction {
+    viua::arch::ops::R instruction;
+
+    MULI(viua::arch::ops::R i) : instruction{i}
+    {}
+};
+struct MULIU : Instruction {
+    viua::arch::ops::R instruction;
+
+    MULIU(viua::arch::ops::R i) : instruction{i}
+    {}
+};
+struct DIVI : Instruction {
+    viua::arch::ops::R instruction;
+
+    DIVI(viua::arch::ops::R i) : instruction{i}
+    {}
+};
+struct DIVIU : Instruction {
+    viua::arch::ops::R instruction;
+
+    DIVIU(viua::arch::ops::R i) : instruction{i}
     {}
 };
 }  // namespace viua::arch::ins

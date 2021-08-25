@@ -193,6 +193,7 @@ enum class OPCODE : opcode_type {
     SUB = (FORMAT_T | 0x0002),
     MUL = (FORMAT_T | 0x0003),
     DIV = (FORMAT_T | 0x0004),
+    MOD = (FORMAT_T | 0x0005),
 
     CALL = (FORMAT_D | 0x0001),
 
@@ -206,6 +207,12 @@ enum class OPCODE : opcode_type {
 
     ADDI  = (FORMAT_R | 0x0001),
     ADDIU = (FORMAT_R | 0x0002),
+    SUBI  = (FORMAT_R | 0x0003),
+    SUBIU = (FORMAT_R | 0x0004),
+    MULI  = (FORMAT_R | 0x0005),
+    MULIU = (FORMAT_R | 0x0006),
+    DIVI  = (FORMAT_R | 0x0007),
+    DIVIU = (FORMAT_R | 0x0008),
 };
 auto to_string(opcode_type const) -> std::string;
 auto parse_opcode(std::string_view) -> opcode_type;
@@ -219,6 +226,7 @@ enum class OPCODE_T : opcode_type {
     SUB = static_cast<opcode_type>(OPCODE::SUB),
     MUL = static_cast<opcode_type>(OPCODE::MUL),
     DIV = static_cast<opcode_type>(OPCODE::DIV),
+    MOD = static_cast<opcode_type>(OPCODE::MOD),
 };
 enum class OPCODE_D : opcode_type {
     CALL = static_cast<opcode_type>(OPCODE::CALL),
@@ -236,6 +244,12 @@ enum class OPCODE_E : opcode_type {
 enum class OPCODE_R : opcode_type {
     ADDI  = static_cast<opcode_type>(OPCODE::ADDI),
     ADDIU = static_cast<opcode_type>(OPCODE::ADDIU),
+    SUBI  = static_cast<opcode_type>(OPCODE::SUBI),
+    SUBIU = static_cast<opcode_type>(OPCODE::SUBIU),
+    MULI  = static_cast<opcode_type>(OPCODE::MULI),
+    MULIU = static_cast<opcode_type>(OPCODE::MULIU),
+    DIVI  = static_cast<opcode_type>(OPCODE::DIVI),
+    DIVIU = static_cast<opcode_type>(OPCODE::DIVIU),
 };
 enum class OPCODE_N : opcode_type {
     NOOP   = static_cast<opcode_type>(OPCODE::NOOP),

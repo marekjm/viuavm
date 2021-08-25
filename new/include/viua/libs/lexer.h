@@ -130,6 +130,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.mul",
     "div",
     "g.div",
+    "mod",
+    "g.mod",
 
     "call",
 
@@ -146,6 +148,18 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.addi",
     "addiu",
     "g.addiu",
+    "subi",
+    "g.subi",
+    "subiu",
+    "g.subiu",
+    "muli",
+    "g.muli",
+    "muliu",
+    "g.muliu",
+    "divi",
+    "g.divi",
+    "diviu",
+    "g.diviu",
 
     "frame",
     "g.frame",

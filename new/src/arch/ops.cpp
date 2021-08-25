@@ -239,8 +239,10 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "mul";
     case OPCODE::DIV:
         return greedy + "div";
+    case OPCODE::MOD:
+        return greedy + "mod";
     case OPCODE::CALL:
-        return greedy + "call";
+        return "call";
     case OPCODE::DELETE:
         return greedy + "delete";
     case OPCODE::STRING:
@@ -255,6 +257,18 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "addi";
     case OPCODE::ADDIU:
         return greedy + "addiu";
+    case OPCODE::SUBI:
+        return greedy + "subi";
+    case OPCODE::SUBIU:
+        return greedy + "subiu";
+    case OPCODE::MULI:
+        return greedy + "muli";
+    case OPCODE::MULIU:
+        return greedy + "muliu";
+    case OPCODE::DIVI:
+        return greedy + "divi";
+    case OPCODE::DIVIU:
+        return greedy + "diviu";
     }
 
     return "<unknown>";
@@ -285,8 +299,10 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::MUL));
     } else if (sv == "div") {
         return (op | static_cast<opcode_type>(OPCODE::DIV));
+    } else if (sv == "mod") {
+        return (op | static_cast<opcode_type>(OPCODE::MOD));
     } else if (sv == "call") {
-        return (op | static_cast<opcode_type>(OPCODE::CALL));
+        return static_cast<opcode_type>(OPCODE::CALL);
     } else if (sv == "delete") {
         return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "string") {
@@ -301,6 +317,18 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::ADDI));
     } else if (sv == "addiu") {
         return (op | static_cast<opcode_type>(OPCODE::ADDIU));
+    } else if (sv == "subi") {
+        return (op | static_cast<opcode_type>(OPCODE::SUBI));
+    } else if (sv == "subiu") {
+        return (op | static_cast<opcode_type>(OPCODE::SUBIU));
+    } else if (sv == "muli") {
+        return (op | static_cast<opcode_type>(OPCODE::MULI));
+    } else if (sv == "muliu") {
+        return (op | static_cast<opcode_type>(OPCODE::MULIU));
+    } else if (sv == "divi") {
+        return (op | static_cast<opcode_type>(OPCODE::DIVI));
+    } else if (sv == "diviu") {
+        return (op | static_cast<opcode_type>(OPCODE::DIVIU));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};
