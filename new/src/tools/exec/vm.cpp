@@ -443,7 +443,15 @@ auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op)
     } else {
         out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     }
-    out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, op.instruction.immediate));
+
+    auto const raw_immediate = op.instruction.immediate;
+    if constexpr (std::is_signed_v<typename Op::value_type>) {
+        auto const useful_immediate = (static_cast<int32_t>(raw_immediate << 8) >> 8);
+        out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
+    } else {
+        auto const useful_immediate = raw_immediate;
+        out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
