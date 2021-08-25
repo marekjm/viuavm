@@ -929,15 +929,29 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
                         .encode();
                 break;
             case FORMAT::R:
+            {
+                auto const imm = insn.operands.back().ingredients.front();
+                auto const is_unsigned = (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
+                if (is_unsigned and imm.text.at(0) == '-' and imm.text != "-1") {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{imm
+                        , Cause::Value_out_of_range
+                        , "signed integer used for unsigned immediate"
+                    }.note("the only signed value allowed in this context is -1, and\n"
+                           "it is used a symbol for maximum unsigned immediate value");
+                }
                 *ip++ =
                     viua::arch::ops::R{
                         opcode,
                         insn.operands.at(0).make_access(),
                         insn.operands.at(1).make_access(),
-                        static_cast<uint32_t>(std::stoul(
-                            insn.operands.back().ingredients.front().text))}
+                        (is_unsigned
+                         ? static_cast<uint32_t>(std::stoul(imm.text))
+                         : static_cast<uint32_t>(std::stoi(imm.text)))}
                         .encode();
                 break;
+            }
             }
         }
     }
