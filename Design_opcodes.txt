@@ -470,8 +470,8 @@ an integer the output will be a bit vector.
 The following code will extract bits [4,11] from a 16-bit vector:
 
     bits %1, %0 parameters
-    integer %2, 4
-    integer %3, 8
+    li %2, 4
+    li %3, 8
     bitcut %1, %2, %3
 
 --------------------------------------------------------------------------------
