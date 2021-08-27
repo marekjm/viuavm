@@ -291,18 +291,59 @@ auto execute(std::vector<Value>& registers,
 
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+    out.value = (std::get<uint64_t>(lhs.value) << std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+    out.value = (std::get<uint64_t>(lhs.value) >> std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+
+    auto const tmp = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
+    out.value = static_cast<uint64_t>(tmp >> std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITROL const op) -> void
 {
@@ -316,23 +357,72 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITROR const op) ->
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+    out.value = (std::get<uint64_t>(lhs.value) & std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+    out.value = (std::get<uint64_t>(lhs.value) | std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.type_of_unboxed = lhs.type_of_unboxed;
+    out.value = (std::get<uint64_t>(lhs.value) ^ std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
+    auto& out = registers.at(op.instruction.out.index);
+    auto& in = registers.at(op.instruction.in.index);
+
+    out.type_of_unboxed = in.type_of_unboxed;
+    out.value = ~std::get<uint64_t>(in.value);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
 }
 
 auto execute(std::vector<Value>& registers,
