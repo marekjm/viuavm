@@ -196,7 +196,17 @@ enum class OPCODE : opcode_type {
     DIV = (FORMAT_T | 0x0004),
     MOD = (FORMAT_T | 0x0005),
 
-    CALL = (FORMAT_D | 0x0001),
+    BITSHL  = (FORMAT_T | 0x0006),
+    BITSHR  = (FORMAT_T | 0x0007),
+    BITASHR = (FORMAT_T | 0x0008),
+    BITROL  = (FORMAT_T | 0x0009),
+    BITROR  = (FORMAT_T | 0x000a),
+    BITAND  = (FORMAT_T | 0x000b),
+    BITOR   = (FORMAT_T | 0x000c),
+    BITXOR  = (FORMAT_T | 0x000d),
+
+    CALL   = (FORMAT_D | 0x0001),
+    BITNOT = (FORMAT_D | 0x0002),
 
     DELETE = (FORMAT_S | 0x0001),
     STRING = (FORMAT_S | 0x0002),

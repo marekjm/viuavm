@@ -241,8 +241,26 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "div";
     case OPCODE::MOD:
         return greedy + "mod";
+    case OPCODE::BITSHL:
+        return greedy + "bitshl";
+    case OPCODE::BITSHR:
+        return greedy + "bitshr";
+    case OPCODE::BITASHR:
+        return greedy + "bitashr";
+    case OPCODE::BITROL:
+        return greedy + "bitrol";
+    case OPCODE::BITROR:
+        return greedy + "bitror";
+    case OPCODE::BITAND:
+        return greedy + "bitand";
+    case OPCODE::BITOR:
+        return greedy + "bitor";
+    case OPCODE::BITXOR:
+        return greedy + "bitxor";
     case OPCODE::CALL:
         return "call";
+    case OPCODE::BITNOT:
+        return greedy + "bitnot";
     case OPCODE::DELETE:
         return greedy + "delete";
     case OPCODE::STRING:
@@ -301,8 +319,26 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::DIV));
     } else if (sv == "mod") {
         return (op | static_cast<opcode_type>(OPCODE::MOD));
+    } else if (sv == "bitshl") {
+        return (op | static_cast<opcode_type>(OPCODE::BITSHL));
+    } else if (sv == "bitshr") {
+        return (op | static_cast<opcode_type>(OPCODE::BITSHR));
+    } else if (sv == "bitashr") {
+        return (op | static_cast<opcode_type>(OPCODE::BITASHR));
+    } else if (sv == "bitrol") {
+        return (op | static_cast<opcode_type>(OPCODE::BITROL));
+    } else if (sv == "bitror") {
+        return (op | static_cast<opcode_type>(OPCODE::BITROR));
+    } else if (sv == "bitand") {
+        return (op | static_cast<opcode_type>(OPCODE::BITAND));
+    } else if (sv == "bitor") {
+        return (op | static_cast<opcode_type>(OPCODE::BITOR));
+    } else if (sv == "bitxor") {
+        return (op | static_cast<opcode_type>(OPCODE::BITXOR));
     } else if (sv == "call") {
         return static_cast<opcode_type>(OPCODE::CALL);
+    } else if (sv == "bitnot") {
+        return (op | static_cast<opcode_type>(OPCODE::BITNOT));
     } else if (sv == "delete") {
         return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "string") {
