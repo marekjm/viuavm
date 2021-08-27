@@ -33,12 +33,14 @@ auto to_string(Cause const ce) -> std::string_view
         return "";
     case Cause::Unknown_opcode:
         return "unknown opcode";
-    case Cause::Value_out_of_range:
-        return "value out of range";
     case Cause::Invalid_register_access:
         return "invalid register access";
+    case Cause::Too_few_operands:
+        return "too few operands";
     case Cause::Call_to_undefined_function:
         return "call to undefined function";
+    case Cause::Value_out_of_range:
+        return "value out of range";
     }
     return "illegal error";
 }

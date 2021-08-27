@@ -41,10 +41,12 @@ enum class Cause {
     None,
 
     Unknown_opcode,
-    Value_out_of_range,
     Invalid_register_access,
+    Too_few_operands,
 
     Call_to_undefined_function,
+
+    Value_out_of_range,
 };
 auto to_string(Cause const) -> std::string_view;
 

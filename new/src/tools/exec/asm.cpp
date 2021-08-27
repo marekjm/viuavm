@@ -827,6 +827,17 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
 }  // namespace
 
 namespace {
+auto operand_or_throw(ast::Instruction const& insn, size_t const index) -> ast::Operand const&
+{
+    try {
+        return insn.operands.at(index);
+    } catch (std::out_of_range const&) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{insn.opcode, Cause::Too_few_operands, ("operand " + std::to_string(index) + " not found")};
+    }
+}
+
 auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::vector<viua::arch::instruction_type>& text, std::vector<uint8_t>& fn_table, std::map<std::string, size_t> const& fn_offsets) -> std::map<std::string, uint64_t>
 {
     auto const ops_count = 1 + std::accumulate(
@@ -899,22 +910,22 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
             case FORMAT::T:
                 *ip++ =
                     viua::arch::ops::T{opcode,
-                                       insn.operands.at(0).make_access(),
-                                       insn.operands.at(1).make_access(),
-                                       insn.operands.at(2).make_access()}
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access(),
+                                       operand_or_throw(insn, 2).make_access()}
                         .encode();
                 break;
             case FORMAT::D:
                 *ip++ =
                     viua::arch::ops::D{opcode,
-                                       insn.operands.at(0).make_access(),
-                                       insn.operands.at(1).make_access()}
+                                       operand_or_throw(insn, 0).make_access(),
+                                       operand_or_throw(insn, 1).make_access()}
                         .encode();
                 break;
             case FORMAT::S:
                 *ip++ =
                     viua::arch::ops::S{opcode,
-                                       insn.operands.at(0).make_access()}
+                                       operand_or_throw(insn, 0).make_access()}
                         .encode();
                 break;
             case FORMAT::F:
@@ -923,9 +934,9 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
                 *ip++ =
                     viua::arch::ops::E{
                         opcode,
-                        insn.operands.front().make_access(),
+                        operand_or_throw(insn, 0).make_access(),
                         std::stoull(
-                            insn.operands.back().ingredients.front().text)}
+                            operand_or_throw(insn, 1).ingredients.front().text)}
                         .encode();
                 break;
             case FORMAT::R:
