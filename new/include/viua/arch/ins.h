@@ -78,12 +78,57 @@ struct MOD : Instruction {
     MOD(viua::arch::ops::T i) : instruction{i}
     {}
 };
+struct BITSHL : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITSHL(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITSHR : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITSHR(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITASHR : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITASHR(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITROL : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITROL(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITROR : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITROR(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITAND : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITAND(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITOR : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITOR(viua::arch::ops::T i): instruction{i} {}
+};
+struct BITXOR : Instruction {
+    viua::arch::ops::T instruction;
+
+    BITXOR(viua::arch::ops::T i): instruction{i} {}
+};
 
 struct CALL : Instruction {
     viua::arch::ops::D instruction;
 
     CALL(viua::arch::ops::D i) : instruction{i}
     {}
+};
+struct BITNOT : Instruction {
+    viua::arch::ops::D instruction;
+
+    BITNOT(viua::arch::ops::D i): instruction{i} {}
 };
 
 /*

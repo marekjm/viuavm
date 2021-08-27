@@ -289,6 +289,52 @@ auto execute(std::vector<Value>& registers,
                + "\n";
 }
 
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITROL const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITROR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DELETE const op) -> void
 {
@@ -682,6 +728,30 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_T::MOD:
             execute(stack.back().registers, viua::arch::ins::MOD{instruction});
             break;
+        case viua::arch::ops::OPCODE_T::BITSHL:
+            execute(stack.back().registers, viua::arch::ins::BITSHL{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITSHR:
+            execute(stack.back().registers, viua::arch::ins::BITSHR{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITASHR:
+            execute(stack.back().registers, viua::arch::ins::BITASHR{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITROL:
+            execute(stack.back().registers, viua::arch::ins::BITROL{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITROR:
+            execute(stack.back().registers, viua::arch::ins::BITROR{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITAND:
+            execute(stack.back().registers, viua::arch::ins::BITAND{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITOR:
+            execute(stack.back().registers, viua::arch::ins::BITOR{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::BITXOR:
+            execute(stack.back().registers, viua::arch::ins::BITXOR{instruction});
+            break;
         }
         break;
     }
@@ -780,6 +850,9 @@ auto execute(Stack& stack,
              * most of the other instructions.
              */
             return execute(stack, env, ip, viua::arch::ins::CALL{instruction});
+        case viua::arch::ops::OPCODE_D::BITNOT:
+            execute(stack.back().registers, viua::arch::ins::BITNOT{instruction});
+            break;
         }
         break;
     }

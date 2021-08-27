@@ -238,9 +238,18 @@ enum class OPCODE_T : opcode_type {
     MUL = static_cast<opcode_type>(OPCODE::MUL),
     DIV = static_cast<opcode_type>(OPCODE::DIV),
     MOD = static_cast<opcode_type>(OPCODE::MOD),
+    BITSHL = static_cast<opcode_type>(OPCODE::BITSHL),
+    BITSHR = static_cast<opcode_type>(OPCODE::BITSHR),
+    BITASHR = static_cast<opcode_type>(OPCODE::BITASHR),
+    BITROL = static_cast<opcode_type>(OPCODE::BITROL),
+    BITROR = static_cast<opcode_type>(OPCODE::BITROR),
+    BITAND = static_cast<opcode_type>(OPCODE::BITAND),
+    BITOR = static_cast<opcode_type>(OPCODE::BITOR),
+    BITXOR = static_cast<opcode_type>(OPCODE::BITXOR),
 };
 enum class OPCODE_D : opcode_type {
     CALL = static_cast<opcode_type>(OPCODE::CALL),
+    BITNOT = static_cast<opcode_type>(OPCODE::BITNOT),
 };
 enum class OPCODE_S : opcode_type {
     DELETE = static_cast<opcode_type>(OPCODE::DELETE),
