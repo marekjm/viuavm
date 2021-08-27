@@ -539,6 +539,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     }
     auto parts = to_loading_parts_unsigned(value);
 
+    auto const base       = parts.second.first.first;
+    auto const multiplier = parts.second.first.second;
+
     /*
      * Only use the luiu instruction of there's a reason to ie, if some
      * of the highest 36 bits are set. Otherwise, the lui is just
@@ -546,14 +549,19 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
      */
     if (parts.first) {
         auto synth        = each;
-        synth.opcode.text = "g.luiu";
+        synth.opcode.text = ((multiplier or base) ? "g.luiu" : "luiu");
         synth.operands.at(1).ingredients.front().text =
             std::to_string(parts.first);
         cooked.push_back(synth);
     }
 
-    auto const base       = parts.second.first.first;
-    auto const multiplier = parts.second.first.second;
+    /*
+     * No reason to emit further instructions of both multiplier or base are
+     * zero. All of them would amount to a very expensive no-op.
+     */
+    if (not (multiplier or base)) {
+        return;
+    }
 
     if (multiplier != 0) {
         {
@@ -695,9 +703,21 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 
         synth.operands.push_back(each.operands.front());
 
-        synth.operands.push_back(each.operands.front());
-        synth.operands.back().ingredients.front().text = "void";
-        synth.operands.back().ingredients.pop_back();
+        /*
+         * If the first part of the load (the high 36 bits) was zero then it
+         * means we don't have anything to add to so the source (left-hand side
+         * operand) should be void ie, the default value.
+         *
+         * Otherwise, we should increase the value stored by the lui
+         * instruction.
+         */
+        if (parts.first == 0) {
+            synth.operands.push_back(each.operands.front());
+            synth.operands.back().ingredients.front().text = "void";
+            synth.operands.back().ingredients.pop_back();
+        } else {
+            synth.operands.push_back(each.operands.front());
+        }
 
         synth.operands.push_back(each.operands.back());
         synth.operands.back().ingredients.front().text = std::to_string(base);
