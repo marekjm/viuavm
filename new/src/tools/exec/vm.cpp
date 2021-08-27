@@ -456,9 +456,10 @@ auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op)
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", "
                + (op.instruction.in.is_void()
                    ? "void"
-                   : std::to_string(static_cast<int>(op.instruction.in.index)))
+                   : ('$' + std::to_string(static_cast<int>(op.instruction.in.index))))
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
 auto execute(std::vector<Value>& registers,
