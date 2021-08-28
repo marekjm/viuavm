@@ -138,6 +138,16 @@ struct CMP : Instruction {
 
     CMP(viua::arch::ops::T i): instruction{i} {}
 };
+struct AND : Instruction {
+    viua::arch::ops::T instruction;
+
+    AND(viua::arch::ops::T i): instruction{i} {}
+};
+struct OR : Instruction {
+    viua::arch::ops::T instruction;
+
+    OR(viua::arch::ops::T i): instruction{i} {}
+};
 
 struct CALL : Instruction {
     viua::arch::ops::D instruction;
@@ -149,6 +159,11 @@ struct BITNOT : Instruction {
     viua::arch::ops::D instruction;
 
     BITNOT(viua::arch::ops::D i): instruction{i} {}
+};
+struct NOT : Instruction {
+    viua::arch::ops::D instruction;
+
+    NOT(viua::arch::ops::D i): instruction{i} {}
 };
 
 /*

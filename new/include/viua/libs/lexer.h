@@ -161,6 +161,13 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "cmp",
     "g.cmp",
 
+    "and",
+    "g.and",
+    "or",
+    "g.or",
+    "not",
+    "g.not",
+
     "call",
 
     "delete",

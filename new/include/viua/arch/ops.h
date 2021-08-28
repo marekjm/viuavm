@@ -209,9 +209,12 @@ enum class OPCODE : opcode_type {
     LT      = (FORMAT_T | 0x000f),
     GT      = (FORMAT_T | 0x0010),
     CMP     = (FORMAT_T | 0x0011),
+    AND     = (FORMAT_T | 0x0012),
+    OR      = (FORMAT_T | 0x0013),
 
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
+    NOT    = (FORMAT_D | 0x0003),
 
     DELETE = (FORMAT_S | 0x0001),
     STRING = (FORMAT_S | 0x0002),
@@ -255,10 +258,13 @@ enum class OPCODE_T : opcode_type {
     LT = static_cast<opcode_type>(OPCODE::LT),
     GT = static_cast<opcode_type>(OPCODE::GT),
     CMP = static_cast<opcode_type>(OPCODE::CMP),
+    AND = static_cast<opcode_type>(OPCODE::AND),
+    OR = static_cast<opcode_type>(OPCODE::OR),
 };
 enum class OPCODE_D : opcode_type {
     CALL = static_cast<opcode_type>(OPCODE::CALL),
     BITNOT = static_cast<opcode_type>(OPCODE::BITNOT),
+    NOT = static_cast<opcode_type>(OPCODE::NOT),
 };
 enum class OPCODE_S : opcode_type {
     DELETE = static_cast<opcode_type>(OPCODE::DELETE),

@@ -265,10 +265,16 @@ auto to_string(opcode_type const raw) -> std::string
         return "gt";
     case OPCODE::CMP:
         return "cmp";
+    case OPCODE::AND:
+        return "and";
+    case OPCODE::OR:
+        return "or";
     case OPCODE::CALL:
         return "call";
     case OPCODE::BITNOT:
         return greedy + "bitnot";
+    case OPCODE::NOT:
+        return greedy + "not";
     case OPCODE::DELETE:
         return greedy + "delete";
     case OPCODE::STRING:
@@ -351,10 +357,16 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::GT));
     } else if (sv == "cmp") {
         return (op | static_cast<opcode_type>(OPCODE::CMP));
+    } else if (sv == "and") {
+        return (op | static_cast<opcode_type>(OPCODE::AND));
+    } else if (sv == "or") {
+        return (op | static_cast<opcode_type>(OPCODE::OR));
     } else if (sv == "call") {
         return static_cast<opcode_type>(OPCODE::CALL);
     } else if (sv == "bitnot") {
         return (op | static_cast<opcode_type>(OPCODE::BITNOT));
+    } else if (sv == "not") {
+        return (op | static_cast<opcode_type>(OPCODE::NOT));
     } else if (sv == "delete") {
         return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "string") {
