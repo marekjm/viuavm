@@ -464,10 +464,30 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) ->
 
 auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = *lhs.boxed_value();
+
+        using viua::vm::types::traits::Eq;
+        if (lhs_value.has_trait<Eq>()) {
+            out = lhs_value.as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
+            {
+                return (val == *rhs.boxed_value());
+            }, false);
+        } else {
+            out = false;
+        }
+    } else {
+        out = (std::get<uint64_t>(lhs.value) == std::get<uint64_t>(rhs.value));
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -480,10 +500,30 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = *lhs.boxed_value();
+
+        using viua::vm::types::traits::Lt;
+        if (lhs_value.has_trait<Lt>()) {
+            out = lhs_value.as_trait<Lt, bool>([&rhs](Lt const& val) -> bool
+            {
+                return (val < *rhs.boxed_value());
+            }, false);
+        } else {
+            out = false;
+        }
+    } else {
+        out = (std::get<uint64_t>(lhs.value) < std::get<uint64_t>(rhs.value));
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -496,10 +536,30 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = *lhs.boxed_value();
+
+        using viua::vm::types::traits::Gt;
+        if (lhs_value.has_trait<Gt>()) {
+            out = lhs_value.as_trait<Gt, bool>([&rhs](Gt const& val) -> bool
+            {
+                return (val > *rhs.boxed_value());
+            }, false);
+        } else {
+            out = false;
+        }
+    } else {
+        out = (std::get<uint64_t>(lhs.value) > std::get<uint64_t>(rhs.value));
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
