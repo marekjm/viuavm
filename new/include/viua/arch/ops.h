@@ -205,6 +205,11 @@ enum class OPCODE : opcode_type {
     BITOR   = (FORMAT_T | 0x000c),
     BITXOR  = (FORMAT_T | 0x000d),
 
+    EQ      = (FORMAT_T | 0x000e),
+    LT      = (FORMAT_T | 0x000f),
+    GT      = (FORMAT_T | 0x0010),
+    CMP     = (FORMAT_T | 0x0011),
+
     CALL   = (FORMAT_D | 0x0001),
     BITNOT = (FORMAT_D | 0x0002),
 
@@ -246,6 +251,10 @@ enum class OPCODE_T : opcode_type {
     BITAND = static_cast<opcode_type>(OPCODE::BITAND),
     BITOR = static_cast<opcode_type>(OPCODE::BITOR),
     BITXOR = static_cast<opcode_type>(OPCODE::BITXOR),
+    EQ = static_cast<opcode_type>(OPCODE::EQ),
+    LT = static_cast<opcode_type>(OPCODE::LT),
+    GT = static_cast<opcode_type>(OPCODE::GT),
+    CMP = static_cast<opcode_type>(OPCODE::CMP),
 };
 enum class OPCODE_D : opcode_type {
     CALL = static_cast<opcode_type>(OPCODE::CALL),

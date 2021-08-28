@@ -425,6 +425,71 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) ->
                + "\n";
 }
 
+auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> void
+{
+    static_cast<void>(registers);
+    /* auto& out = registers.at(op.instruction.out.index); */
+    /* auto& lhs = registers.at(op.instruction.lhs.index); */
+    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> void
+{
+    static_cast<void>(registers);
+    /* auto& out = registers.at(op.instruction.out.index); */
+    /* auto& lhs = registers.at(op.instruction.lhs.index); */
+    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> void
+{
+    static_cast<void>(registers);
+    /* auto& out = registers.at(op.instruction.out.index); */
+    /* auto& lhs = registers.at(op.instruction.lhs.index); */
+    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> void
+{
+    static_cast<void>(registers);
+    /* auto& out = registers.at(op.instruction.out.index); */
+    /* auto& lhs = registers.at(op.instruction.lhs.index); */
+    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DELETE const op) -> void
 {
@@ -841,6 +906,18 @@ auto execute(Stack& stack,
             break;
         case viua::arch::ops::OPCODE_T::BITXOR:
             execute(stack.back().registers, viua::arch::ins::BITXOR{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::EQ:
+            execute(stack.back().registers, viua::arch::ins::EQ{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::GT:
+            execute(stack.back().registers, viua::arch::ins::GT{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::LT:
+            execute(stack.back().registers, viua::arch::ins::LT{instruction});
+            break;
+        case viua::arch::ops::OPCODE_T::CMP:
+            execute(stack.back().registers, viua::arch::ins::CMP{instruction});
             break;
         }
         break;

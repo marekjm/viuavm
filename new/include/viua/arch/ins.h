@@ -118,6 +118,26 @@ struct BITXOR : Instruction {
 
     BITXOR(viua::arch::ops::T i): instruction{i} {}
 };
+struct EQ : Instruction {
+    viua::arch::ops::T instruction;
+
+    EQ(viua::arch::ops::T i): instruction{i} {}
+};
+struct LT : Instruction {
+    viua::arch::ops::T instruction;
+
+    LT(viua::arch::ops::T i): instruction{i} {}
+};
+struct GT : Instruction {
+    viua::arch::ops::T instruction;
+
+    GT(viua::arch::ops::T i): instruction{i} {}
+};
+struct CMP : Instruction {
+    viua::arch::ops::T instruction;
+
+    CMP(viua::arch::ops::T i): instruction{i} {}
+};
 
 struct CALL : Instruction {
     viua::arch::ops::D instruction;

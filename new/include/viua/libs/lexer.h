@@ -152,6 +152,15 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "bitnot",
     "g.bitnot",
 
+    "eq",
+    "g.eq",
+    "lt",
+    "g.lt",
+    "gt",
+    "g.gt",
+    "cmp",
+    "g.cmp",
+
     "call",
 
     "delete",

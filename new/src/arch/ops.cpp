@@ -257,6 +257,14 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "bitor";
     case OPCODE::BITXOR:
         return greedy + "bitxor";
+    case OPCODE::EQ:
+        return "eq";
+    case OPCODE::LT:
+        return "lt";
+    case OPCODE::GT:
+        return "gt";
+    case OPCODE::CMP:
+        return "cmp";
     case OPCODE::CALL:
         return "call";
     case OPCODE::BITNOT:
@@ -335,6 +343,14 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BITOR));
     } else if (sv == "bitxor") {
         return (op | static_cast<opcode_type>(OPCODE::BITXOR));
+    } else if (sv == "eq") {
+        return (op | static_cast<opcode_type>(OPCODE::EQ));
+    } else if (sv == "lt") {
+        return (op | static_cast<opcode_type>(OPCODE::LT));
+    } else if (sv == "gt") {
+        return (op | static_cast<opcode_type>(OPCODE::GT));
+    } else if (sv == "cmp") {
+        return (op | static_cast<opcode_type>(OPCODE::CMP));
     } else if (sv == "call") {
         return static_cast<opcode_type>(OPCODE::CALL);
     } else if (sv == "bitnot") {
