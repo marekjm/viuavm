@@ -537,8 +537,8 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     } else {
         value = std::stoull(raw_value.text);
     }
-    auto parts = to_loading_parts_unsigned(value);
 
+    auto parts = to_loading_parts_unsigned(value);
     auto const base       = parts.second.first.first;
     auto const multiplier = parts.second.first.second;
 
@@ -553,14 +553,6 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         synth.operands.at(1).ingredients.front().text =
             std::to_string(parts.first);
         cooked.push_back(synth);
-    }
-
-    /*
-     * No reason to emit further instructions of both multiplier or base are
-     * zero. All of them would amount to a very expensive no-op.
-     */
-    if (not (multiplier or base)) {
-        return;
     }
 
     if (multiplier != 0) {
