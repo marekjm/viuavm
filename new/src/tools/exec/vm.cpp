@@ -129,6 +129,13 @@ struct Value {
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
     std::variant<uint64_t, boxed_type> value;
 
+    auto operator=(uint64_t const v) -> Value&
+    {
+        value = v;
+        type_of_unboxed = Unboxed_type::Integer_unsigned;
+        return *this;
+    }
+
     auto is_boxed() const -> bool
     {
         return std::holds_alternative<boxed_type>(value);
