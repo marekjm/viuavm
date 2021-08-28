@@ -461,7 +461,8 @@ an integer the output will be a bit vector.
 
 - bitcut %rt, %rb, %re  Extract a slice of the bit vector %rt and store the
                         result in the same register. The slice contains bits
-                        from index B and the next E positions, so from [B, B+E].
+                        from index B and the next E, more significant,
+                        positions, so from [B, B+E].
                         B is an unsigned integer loaded from register %rb. E is
                         an unsigned integer loaded from register %re.
                         If %rb is void, B is 0.
