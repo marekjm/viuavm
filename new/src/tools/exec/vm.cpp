@@ -25,18 +25,6 @@
 
 
 namespace viua::vm::types {
-namespace traits {
-struct To_string {
-    virtual auto to_string() const -> std::string = 0;
-    virtual ~To_string();
-
-    static auto quote_and_escape(std::string_view const sv) -> std::string
-    {
-        return viua::support::string::quoted(sv);
-    }
-};
-}  // namespace traits
-
 struct Value {
     virtual auto type_name() const -> std::string = 0;
     virtual ~Value();
@@ -51,11 +39,46 @@ struct Value {
         fn(*dynamic_cast<Trait const*>(this));
     }
 
+    template<typename Trait, typename Rt>
+    auto as_trait(std::function<Rt(Trait const&)> fn, Rt rv) const -> Rt
+    {
+        if (not has_trait<Trait>()) {
+            return rv;
+        }
+
+        return fn(*dynamic_cast<Trait const*>(this));
+    }
+
     template<typename Trait> auto has_trait() const -> bool
     {
         return (dynamic_cast<Trait const*>(this) != nullptr);
     }
 };
+
+namespace traits {
+struct To_string {
+    virtual auto to_string() const -> std::string = 0;
+    virtual ~To_string();
+
+    static auto quote_and_escape(std::string_view const sv) -> std::string
+    {
+        return viua::support::string::quoted(sv);
+    }
+};
+
+struct Eq {
+    virtual auto operator==(Value const&) const -> bool = 0;
+    virtual ~Eq();
+};
+struct Lt {
+    virtual auto operator<(Value const&) const -> bool = 0;
+    virtual ~Lt();
+};
+struct Gt {
+    virtual auto operator>(Value const&) const -> bool = 0;
+    virtual ~Gt();
+};
+}  // namespace traits
 
 struct String
         : Value
@@ -82,6 +105,13 @@ auto String::to_string() const -> std::string
 }  // namespace viua::vm::types
 namespace viua::vm::types::traits {
 To_string::~To_string()
+{}
+
+Eq::~Eq()
+{}
+Lt::~Lt()
+{}
+Gt::~Gt()
 {}
 }  // namespace viua::vm::types::traits
 
