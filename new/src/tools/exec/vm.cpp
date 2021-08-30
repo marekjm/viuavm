@@ -492,7 +492,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
         throw abort_execution{nullptr, "eq: unboxed lhs cannot be used with boxed rhs"};
     }
 
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     if (lhs.is_boxed()) {
         auto const& lhs_value = *lhs.boxed_value();
 
@@ -506,7 +505,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
             out = false;
         }
     } else {
-        out = (std::get<uint64_t>(lhs.value) == std::get<uint64_t>(rhs.value));
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv == rv);
     }
 
     std::cerr
@@ -541,8 +542,14 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
         } else {
             out = false;
         }
+    } else if (lhs.type_of_unboxed == Value::Unboxed_type::Integer_signed) {
+        auto const lv = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
+        auto const rv = (rhs.is_void() ? 0 : static_cast<int64_t>(std::get<uint64_t>(rhs.value)));
+        out = (lv < rv);
     } else {
-        out = (std::get<uint64_t>(lhs.value) < std::get<uint64_t>(rhs.value));
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv < rv);
     }
 
     std::cerr
@@ -577,8 +584,14 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
         } else {
             out = false;
         }
+    } else if (lhs.type_of_unboxed == Value::Unboxed_type::Integer_signed) {
+        auto const lv = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
+        auto const rv = (rhs.is_void() ? 0 : static_cast<int64_t>(std::get<uint64_t>(rhs.value)));
+        out = (lv > rv);
     } else {
-        out = (std::get<uint64_t>(lhs.value) > std::get<uint64_t>(rhs.value));
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv > rv);
     }
 
     std::cerr
