@@ -489,7 +489,7 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
     auto& rhs = registers.at(op.instruction.rhs.index);
 
     if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+        throw abort_execution{nullptr, "eq: unboxed lhs cannot be used with boxed rhs"};
     }
 
     out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
@@ -525,7 +525,7 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
     auto& rhs = registers.at(op.instruction.rhs.index);
 
     if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+        throw abort_execution{nullptr, "lt: unboxed lhs cannot be used with boxed rhs"};
     }
 
     out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
@@ -561,7 +561,7 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
     auto& rhs = registers.at(op.instruction.rhs.index);
 
     if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "unboxed lhs cannot be used with boxed rhs"};
+        throw abort_execution{nullptr, "gt: unboxed lhs cannot be used with boxed rhs"};
     }
 
     out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
