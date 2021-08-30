@@ -78,6 +78,14 @@ struct Gt {
     virtual auto operator>(Value const&) const -> bool = 0;
     virtual ~Gt();
 };
+struct Cmp {
+    static constexpr int64_t CMP_EQ = 0;
+    static constexpr int64_t CMP_GT = 1;
+    static constexpr int64_t CMP_LT = -1;
+
+    virtual auto cmp(Value const&) const -> int64_t = 0;
+    virtual ~Cmp();
+};
 }  // namespace traits
 
 struct String
@@ -112,6 +120,8 @@ Eq::~Eq()
 Lt::~Lt()
 {}
 Gt::~Gt()
+{}
+Cmp::~Cmp()
 {}
 }  // namespace viua::vm::types::traits
 
@@ -582,10 +592,40 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "cmp: unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    using viua::vm::types::traits::Cmp;
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = *lhs.boxed_value();
+
+        if (lhs_value.has_trait<Cmp>()) {
+            out = lhs_value.as_trait<Cmp, int64_t>([&rhs](Cmp const& val) -> int64_t
+            {
+                auto const& rv = *rhs.boxed_value();
+                return val.cmp(rv);
+            }, Cmp::CMP_LT);
+        } else {
+            out = Cmp::CMP_LT;
+        }
+    } else {
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = std::get<uint64_t>(rhs.value);
+        if (lv == rv) {
+            out = Cmp::CMP_EQ;
+        } else if (lv > rv) {
+            out = Cmp::CMP_GT;
+        } else if (lv < rv) {
+            out = Cmp::CMP_LT;
+        } else {
+            throw abort_execution{nullptr, "cmp: incomparable unboxed values"};
+        }
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
