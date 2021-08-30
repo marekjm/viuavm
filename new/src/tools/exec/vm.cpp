@@ -129,6 +129,16 @@ struct Value {
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
     std::variant<uint64_t, boxed_type> value;
 
+    auto operator=(bool const v) -> Value&
+    {
+        return (*this = static_cast<uint64_t>(v));
+    }
+    auto operator=(int64_t const v) -> Value&
+    {
+        value = static_cast<uint64_t>(v);
+        type_of_unboxed = Unboxed_type::Integer_signed;
+        return *this;
+    }
     auto operator=(uint64_t const v) -> Value&
     {
         value = v;
