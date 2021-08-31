@@ -86,6 +86,11 @@ struct Cmp {
     virtual auto cmp(Value const&) const -> int64_t = 0;
     virtual ~Cmp();
 };
+
+struct Bool {
+    virtual operator bool() const = 0;
+    virtual ~Bool();
+};
 }  // namespace traits
 
 struct String
@@ -122,6 +127,9 @@ Lt::~Lt()
 Gt::~Gt()
 {}
 Cmp::~Cmp()
+{}
+
+Bool::~Bool()
 {}
 }  // namespace viua::vm::types::traits
 
@@ -651,10 +659,25 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> vo
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    using viua::vm::types::traits::Bool;
+    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "and: cannot used boxed value without Bool trait"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const use_lhs = not lhs.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    } else {
+        auto const use_lhs = (std::get<uint64_t>(lhs.value) == 0);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -667,10 +690,25 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> vo
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& lhs = registers.at(op.instruction.lhs.index); */
-    /* auto& rhs = registers.at(op.instruction.rhs.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    using viua::vm::types::traits::Bool;
+    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "or: cannot used boxed value without Bool trait"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const use_lhs = lhs.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    } else {
+        auto const use_lhs = (std::get<uint64_t>(lhs.value) != 0);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -683,9 +721,22 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> voi
 }
 auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> void
 {
-    static_cast<void>(registers);
-    /* auto& out = registers.at(op.instruction.out.index); */
-    /* auto& in = registers.at(op.instruction.in.index); */
+    auto& out = registers.at(op.instruction.out.index);
+    auto& in = registers.at(op.instruction.in.index);
+
+    using viua::vm::types::traits::Bool;
+    if (in.is_boxed() and not in.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "not: cannot used boxed value without Bool trait"};
+    }
+
+    if (in.is_boxed()) {
+        out = in.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+    } else {
+        out = static_cast<bool>(std::get<uint64_t>(in.value));
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
