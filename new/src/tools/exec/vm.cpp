@@ -166,9 +166,9 @@ struct Value {
                 and type_of_unboxed == Value::Unboxed_type::Void);
     }
 
-    auto boxed_value() const -> boxed_type const&
+    auto boxed_value() const -> boxed_type::element_type const&
     {
-        return std::get<boxed_type>(value);
+        return *std::get<boxed_type>(value);
     }
 };
 
@@ -493,13 +493,13 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
     }
 
     if (lhs.is_boxed()) {
-        auto const& lhs_value = *lhs.boxed_value();
+        auto const& lhs_value = lhs.boxed_value();
 
         using viua::vm::types::traits::Eq;
         if (lhs_value.has_trait<Eq>()) {
             out = lhs_value.as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
             {
-                return (val == *rhs.boxed_value());
+                return (val == rhs.boxed_value());
             }, false);
         } else {
             out = false;
@@ -531,13 +531,13 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
 
     out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     if (lhs.is_boxed()) {
-        auto const& lhs_value = *lhs.boxed_value();
+        auto const& lhs_value = lhs.boxed_value();
 
         using viua::vm::types::traits::Lt;
         if (lhs_value.has_trait<Lt>()) {
             out = lhs_value.as_trait<Lt, bool>([&rhs](Lt const& val) -> bool
             {
-                return (val < *rhs.boxed_value());
+                return (val < rhs.boxed_value());
             }, false);
         } else {
             out = false;
@@ -573,13 +573,13 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
 
     out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     if (lhs.is_boxed()) {
-        auto const& lhs_value = *lhs.boxed_value();
+        auto const& lhs_value = lhs.boxed_value();
 
         using viua::vm::types::traits::Gt;
         if (lhs_value.has_trait<Gt>()) {
             out = lhs_value.as_trait<Gt, bool>([&rhs](Gt const& val) -> bool
             {
-                return (val > *rhs.boxed_value());
+                return (val > rhs.boxed_value());
             }, false);
         } else {
             out = false;
@@ -615,12 +615,12 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> vo
 
     using viua::vm::types::traits::Cmp;
     if (lhs.is_boxed()) {
-        auto const& lhs_value = *lhs.boxed_value();
+        auto const& lhs_value = lhs.boxed_value();
 
         if (lhs_value.has_trait<Cmp>()) {
             out = lhs_value.as_trait<Cmp, int64_t>([&rhs](Cmp const& val) -> int64_t
             {
-                auto const& rv = *rhs.boxed_value();
+                auto const& rv = rhs.boxed_value();
                 return val.cmp(rv);
             }, Cmp::CMP_LT);
         } else {
@@ -928,7 +928,7 @@ auto execute(Stack const& stack,
             std::cerr << "  [" << std::setw(3) << i << "] ";
 
             if (each.is_boxed()) {
-                auto const& value = *each.boxed_value();
+                auto const& value = each.boxed_value();
                 std::cerr << "<boxed> " << value.type_name();
                 value.as_trait<viua::vm::types::traits::To_string>(
                     [](viua::vm::types::traits::To_string const& val) -> void {
@@ -986,7 +986,7 @@ auto execute(Stack const& stack,
             std::cerr << "  [" << std::setw(3) << i << "] ";
 
             if (each.is_boxed()) {
-                auto const& value = *each.boxed_value();
+                auto const& value = each.boxed_value();
                 std::cerr << "<boxed> " << value.type_name();
                 value.as_trait<viua::vm::types::traits::To_string>(
                     [](viua::vm::types::traits::To_string const& val) -> void {
