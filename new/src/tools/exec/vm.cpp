@@ -95,11 +95,13 @@ struct Bool {
 
 struct String
         : Value
-        , traits::To_string {
+        , traits::To_string
+        , traits::Bool {
     std::string content;
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
+    operator bool () const override;
 };
 }  // namespace viua::vm::types
 
@@ -114,6 +116,10 @@ auto String::type_name() const -> std::string
 auto String::to_string() const -> std::string
 {
     return viua::vm::types::traits::To_string::quote_and_escape(content);
+}
+String::operator bool () const
+{
+    return (not content.empty());
 }
 }  // namespace viua::vm::types
 namespace viua::vm::types::traits {
