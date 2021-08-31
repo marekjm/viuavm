@@ -147,6 +147,22 @@ struct Value {
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
     std::variant<uint64_t, boxed_type> value;
 
+    Value() = default;
+    Value(Value const&) = delete;
+    Value(Value&&) = delete;
+    auto operator=(Value const&) -> Value& = delete;
+    auto operator=(Value&& that) -> Value&
+    {
+        type_of_unboxed = std::move(that.type_of_unboxed);
+        value = std::move(that.value);
+
+        that.value = uint64_t{0};
+        that.type_of_unboxed = Unboxed_type::Void;
+
+        return *this;
+    }
+    ~Value() = default;
+
     auto operator=(bool const v) -> Value&
     {
         return (*this = static_cast<uint64_t>(v));
