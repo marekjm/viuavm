@@ -57,6 +57,8 @@ struct Value {
 
 namespace traits {
 struct To_string {
+    static constexpr bool allows_primitive = false;
+
     virtual auto to_string() const -> std::string = 0;
     virtual ~To_string();
 
@@ -67,18 +69,26 @@ struct To_string {
 };
 
 struct Eq {
+    static constexpr bool allows_primitive = false;
+
     virtual auto operator==(Value const&) const -> bool = 0;
     virtual ~Eq();
 };
 struct Lt {
+    static constexpr bool allows_primitive = false;
+
     virtual auto operator<(Value const&) const -> bool = 0;
     virtual ~Lt();
 };
 struct Gt {
+    static constexpr bool allows_primitive = false;
+
     virtual auto operator>(Value const&) const -> bool = 0;
     virtual ~Gt();
 };
 struct Cmp {
+    static constexpr bool allows_primitive = false;
+
     static constexpr int64_t CMP_EQ = 0;
     static constexpr int64_t CMP_GT = 1;
     static constexpr int64_t CMP_LT = -1;
@@ -88,6 +98,8 @@ struct Cmp {
 };
 
 struct Bool {
+    static constexpr bool allows_primitive = false;
+
     virtual operator bool() const = 0;
     virtual ~Bool();
 };
@@ -199,6 +211,15 @@ struct Value {
     auto boxed_value() const -> boxed_type::element_type const&
     {
         return *std::get<boxed_type>(value);
+    }
+
+    template<typename Tr>
+    auto has_trait() const -> bool
+    {
+        if (is_boxed() and boxed_value().has_trait<Tr>()) {
+            return true;
+        }
+        return Tr::allows_primitive;
     }
 };
 
@@ -522,18 +543,14 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
         throw abort_execution{nullptr, "eq: unboxed lhs cannot be used with boxed rhs"};
     }
 
-    if (lhs.is_boxed()) {
-        auto const& lhs_value = lhs.boxed_value();
-
-        using viua::vm::types::traits::Eq;
-        if (lhs_value.has_trait<Eq>()) {
-            out = lhs_value.as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
-            {
-                return (val == rhs.boxed_value());
-            }, false);
-        } else {
-            out = false;
-        }
+    using viua::vm::types::traits::Eq;
+    if (lhs.has_trait<Eq>()) {
+        out = lhs.boxed_value().as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
+        {
+            return (val == rhs.boxed_value());
+        }, false);
+    } else if (lhs.is_boxed()) {
+        out = false;
     } else {
         auto const lv = std::get<uint64_t>(lhs.value);
         auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
