@@ -541,6 +541,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     auto parts = to_loading_parts_unsigned(value);
     auto const base       = parts.second.first.first;
     auto const multiplier = parts.second.first.second;
+    auto const is_greedy  = (each.opcode.text.find("g.") == 0);
 
     /*
      * Only use the luiu instruction of there's a reason to ie, if some
@@ -548,8 +549,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
      * overhead.
      */
     if (parts.first) {
+        using namespace std::string_literals;
         auto synth        = each;
-        synth.opcode.text = ((multiplier or base) ? "g.luiu" : "luiu");
+        synth.opcode.text = ((multiplier or base or is_greedy) ? "g.luiu" : "luiu");
         synth.operands.at(1).ingredients.front().text =
             std::to_string(parts.first);
         cooked.push_back(synth);
@@ -678,9 +680,10 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
         {
+            using namespace std::string_literals;
             auto synth        = ast::Instruction{};
             synth.opcode      = each.opcode;
-            synth.opcode.text = "delete";
+            synth.opcode.text = (is_greedy ? "g." : "") + "delete"s;
 
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.at(1).text = std::to_string(
@@ -689,9 +692,10 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             cooked.push_back(synth);
         }
     } else {
+        using namespace std::string_literals;
         auto synth        = ast::Instruction{};
         synth.opcode      = each.opcode;
-        synth.opcode.text = "addiu";
+        synth.opcode.text = (is_greedy ? "g." : "") + "addi"s;
 
         synth.operands.push_back(each.operands.front());
 
@@ -722,7 +726,9 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
 {
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
-        if (each.opcode == "li") {
+        // FIXME remove checking for "g.li" here to test errors with synthesized
+        // instructions
+        if (each.opcode == "li" or each.opcode == "g.li") {
             expand_li(cooked, each);
         } else if (each.opcode == "call") {
             /*
@@ -912,7 +918,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
 
                 using viua::libs::errors::compile_time::Cause;
                 using viua::libs::errors::compile_time::Error;
-                throw Error{e, Cause::Unknown};
+                throw Error{e, Cause::Unknown, "invalid opcode: " + e.text};
             }
             auto format = static_cast<FORMAT>(opcode & FORMAT_MASK);
             switch (format) {
@@ -1601,7 +1607,7 @@ auto main(int argc, char* argv[]) -> int
 
                 auto synth        = ast::Instruction{};
                 synth.opcode      = insn.opcode;
-                synth.opcode.text = "li";
+                synth.opcode.text = "g.li";
 
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());

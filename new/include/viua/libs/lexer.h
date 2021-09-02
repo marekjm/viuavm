@@ -204,6 +204,7 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
      * Pseudoinstructions listed below.
      */
     "li",
+    "g.li",
 };
 
 auto lex(std::string_view) -> std::vector<Lexeme>;
