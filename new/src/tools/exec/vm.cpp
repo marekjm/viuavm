@@ -25,7 +25,8 @@
 
 
 namespace viua::vm::types {
-struct Value {
+class Value {
+public:
     virtual auto type_name() const -> std::string = 0;
     virtual ~Value();
 
@@ -163,7 +164,7 @@ struct Value {
     Unboxed_type type_of_unboxed;
 
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
-    std::variant<uint64_t, boxed_type> value;
+    std::variant<uint64_t, float, double, boxed_type> value;
 
     Value() = default;
     Value(Value const&) = delete;
@@ -1106,19 +1107,29 @@ auto execute(Stack const& stack,
                           << std::get<uint64_t>(each.value) << "\n";
                 break;
             case Value::Unboxed_type::Float_single:
-                std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
-                          << static_cast<float>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<float>(std::get<uint64_t>(each.value))
+            {
+                auto const precision = std::cerr.precision();
+                std::cerr << "fl " << std::hexfloat
+                          << std::get<float>(each.value)
+                          << " " << std::defaultfloat
+                          << std::setprecision(std::numeric_limits<float>::digits10 + 1)
+                          << std::get<float>(each.value)
                           << "\n";
+                std::cerr << std::setprecision(precision);
                 break;
+            }
             case Value::Unboxed_type::Float_double:
-                std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
-                          << static_cast<double>(std::get<uint64_t>(each.value))
-                          << " " << std::dec
-                          << static_cast<double>(std::get<uint64_t>(each.value))
+            {
+                auto const precision = std::cerr.precision();
+                std::cerr << "db " << std::hexfloat
+                          << std::get<double>(each.value)
+                          << " " << std::defaultfloat
+                          << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+                          << std::get<double>(each.value)
                           << "\n";
+                std::cerr << std::setprecision(precision);
                 break;
+            }
             }
         }
     }
