@@ -220,6 +220,8 @@ enum class OPCODE : opcode_type {
     STRING = (FORMAT_S | 0x0002),
     FRAME  = (FORMAT_S | 0x0003),
     RETURN = (FORMAT_S | 0x0004),
+    FLOAT  = (FORMAT_S | 0x0005),
+    DOUBLE = (FORMAT_S | 0x0006),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -271,6 +273,8 @@ enum class OPCODE_S : opcode_type {
     STRING = static_cast<opcode_type>(OPCODE::STRING),
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),
     RETURN = static_cast<opcode_type>(OPCODE::RETURN),
+    FLOAT = static_cast<opcode_type>(OPCODE::FLOAT),
+    DOUBLE = static_cast<opcode_type>(OPCODE::DOUBLE),
 };
 enum class OPCODE_E : opcode_type {
     LUI  = static_cast<opcode_type>(OPCODE::LUI),

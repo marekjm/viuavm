@@ -142,6 +142,8 @@ const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
 const auto LITERAL_INTEGER =
     std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?\\b"};
+const auto LITERAL_FLOAT =
+    std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};
 
 auto lex(std::string_view source_text) -> std::vector<Lexeme>
 {
@@ -299,6 +301,16 @@ auto lex(std::string_view source_text) -> std::vector<Lexeme>
             continue;
         }
         if (try_match(LITERAL_ATOM, TOKEN::LITERAL_ATOM)) {
+            continue;
+        }
+        if (try_match(LITERAL_FLOAT, TOKEN::LITERAL_FLOAT)) {
+            try {
+                std::stod(lexemes.back().text);
+            } catch (std::out_of_range const&) {
+                using viua::libs::errors::compile_time::Cause;
+                using viua::libs::errors::compile_time::Error;
+                throw Error{lexemes.back(), Cause::Value_out_of_range};
+            }
             continue;
         }
         if (try_match(LITERAL_INTEGER, TOKEN::LITERAL_INTEGER)) {

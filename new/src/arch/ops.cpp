@@ -301,6 +301,10 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "divi";
     case OPCODE::DIVIU:
         return greedy + "diviu";
+    case OPCODE::FLOAT:
+        return greedy + "float";
+    case OPCODE::DOUBLE:
+        return greedy + "double";
     }
 
     return "<unknown>";
@@ -393,6 +397,10 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::DIVI));
     } else if (sv == "diviu") {
         return (op | static_cast<opcode_type>(OPCODE::DIVIU));
+    } else if (sv == "float") {
+        return (op | static_cast<opcode_type>(OPCODE::FLOAT));
+    } else if (sv == "double") {
+        return (op | static_cast<opcode_type>(OPCODE::DOUBLE));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

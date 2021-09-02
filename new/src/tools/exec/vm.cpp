@@ -926,6 +926,71 @@ auto execute(std::vector<Value>& registers,
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
 
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const,
+             Env const& env,
+             viua::arch::ins::FLOAT const op) -> void
+{
+    auto& registers = stack.back().registers;
+
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto tmp = uint32_t{};
+    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    tmp = le32toh(tmp);
+
+    auto v = float{};
+    memcpy(&v, &tmp, data_size);
+
+    target.type_of_unboxed = Value::Unboxed_type::Float_single;
+    target.value           = v;
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const,
+             Env const& env,
+             viua::arch::ins::DOUBLE const op) -> void
+{
+    auto& registers = stack.back().registers;
+
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto tmp = uint32_t{};
+    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    tmp = le32toh(tmp);
+
+    auto v = double{};
+    memcpy(&v, &tmp, data_size);
+
+    target.type_of_unboxed = Value::Unboxed_type::Float_double;
+    target.value           = v;
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+
 template<typename Op>
 auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op) -> void
 {
@@ -1252,6 +1317,18 @@ auto execute(Stack& stack,
                     ip,
                     env,
                     viua::arch::ins::RETURN{instruction});
+        case viua::arch::ops::OPCODE_S::FLOAT:
+            execute(stack,
+                    ip,
+                    env,
+                    viua::arch::ins::FLOAT{instruction});
+            break;
+        case viua::arch::ops::OPCODE_S::DOUBLE:
+            execute(stack,
+                    ip,
+                    env,
+                    viua::arch::ins::DOUBLE{instruction});
+            break;
         }
         break;
     }

@@ -462,6 +462,10 @@ auto parse_function_definition(
                 auto const value =
                     consume_token_of(TOKEN::LITERAL_INTEGER, lexemes);
                 operand.ingredients.push_back(value);
+            } else if (lexemes.front() == TOKEN::LITERAL_FLOAT) {
+                auto const value =
+                    consume_token_of(TOKEN::LITERAL_FLOAT, lexemes);
+                operand.ingredients.push_back(value);
             } else if (lexemes.front() == TOKEN::LITERAL_STRING) {
                 auto const value =
                     consume_token_of(TOKEN::LITERAL_STRING, lexemes);
@@ -1614,6 +1618,46 @@ auto main(int argc, char* argv[]) -> int
                 auto s = insn.operands.back().ingredients.front().text;
                 s      = s.substr(1, s.size() - 2);
                 s      = viua::support::string::unescape(s);
+                auto const saved_at = save_string(strings_table, s);
+
+                auto synth        = ast::Instruction{};
+                synth.opcode      = insn.opcode;
+                synth.opcode.text = "g.li";
+
+                synth.operands.push_back(insn.operands.front());
+                synth.operands.push_back(insn.operands.back());
+                synth.operands.back().ingredients.front().text =
+                    std::to_string(saved_at) + 'u';
+
+                cooked.push_back(synth);
+
+                insn.operands.pop_back();
+                cooked.push_back(std::move(insn));
+            } else if (insn.opcode == "float" or insn.opcode == "g.float") {
+                constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
+                auto f = std::stof(insn.operands.back().ingredients.front().text);
+                auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
+                memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
+                auto const saved_at = save_string(strings_table, s);
+
+                auto synth        = ast::Instruction{};
+                synth.opcode      = insn.opcode;
+                synth.opcode.text = "g.li";
+
+                synth.operands.push_back(insn.operands.front());
+                synth.operands.push_back(insn.operands.back());
+                synth.operands.back().ingredients.front().text =
+                    std::to_string(saved_at) + 'u';
+
+                cooked.push_back(synth);
+
+                insn.operands.pop_back();
+                cooked.push_back(std::move(insn));
+            } else if (insn.opcode == "double" or insn.opcode == "g.double") {
+                constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
+                auto f = std::stod(insn.operands.back().ingredients.front().text);
+                auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
+                memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
                 auto const saved_at = save_string(strings_table, s);
 
                 auto synth        = ast::Instruction{};

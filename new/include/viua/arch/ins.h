@@ -192,6 +192,19 @@ struct FRAME : Instruction {
     {}
 };
 
+struct FLOAT : Instruction {
+    viua::arch::ops::S instruction;
+
+    FLOAT(viua::arch::ops::S i) : instruction{i}
+    {}
+};
+struct DOUBLE : Instruction {
+    viua::arch::ops::S instruction;
+
+    DOUBLE(viua::arch::ops::S i) : instruction{i}
+    {}
+};
+
 /*
  * LUI loads upper bits of a 64-bit value, sign-extending it to register
  * width. It produces a signed integer.
