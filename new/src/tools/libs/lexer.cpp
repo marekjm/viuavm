@@ -141,7 +141,7 @@ const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 
 const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
 const auto LITERAL_INTEGER =
-    std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)\\b"};
+    std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?\\b"};
 
 auto lex(std::string_view source_text) -> std::vector<Lexeme>
 {

@@ -543,6 +543,8 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     auto const multiplier = parts.second.first.second;
     auto const is_greedy  = (each.opcode.text.find("g.") == 0);
 
+    auto const is_unsigned = (raw_value.text.back() == 'u');
+
     /*
      * Only use the luiu instruction of there's a reason to ie, if some
      * of the highest 36 bits are set. Otherwise, the lui is just
@@ -551,7 +553,13 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
     if (parts.first) {
         using namespace std::string_literals;
         auto synth        = each;
-        synth.opcode.text = ((multiplier or base or is_greedy) ? "g.luiu" : "luiu");
+        synth.opcode.text = ((multiplier or base or is_greedy) ? "g.lui" : "lui");
+        if (is_unsigned) {
+            // FIXME loading signed values is ridiculously expensive and always
+            // takes the most pessmisitic route - write a signed version of the
+            // algorithm
+            synth.opcode.text += 'u';
+        }
         synth.operands.at(1).ingredients.front().text =
             std::to_string(parts.first);
         cooked.push_back(synth);
@@ -696,6 +704,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         auto synth        = ast::Instruction{};
         synth.opcode      = each.opcode;
         synth.opcode.text = (is_greedy ? "g." : "") + "addi"s;
+        if (is_unsigned) {
+            synth.opcode.text += 'u';
+        }
 
         synth.operands.push_back(each.operands.front());
 
@@ -1612,7 +1623,7 @@ auto main(int argc, char* argv[]) -> int
                 synth.operands.push_back(insn.operands.front());
                 synth.operands.push_back(insn.operands.back());
                 synth.operands.back().ingredients.front().text =
-                    std::to_string(saved_at);
+                    std::to_string(saved_at) + 'u';
 
                 cooked.push_back(synth);
 
