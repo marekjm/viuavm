@@ -50,6 +50,16 @@ public:
 
         return fn(*dynamic_cast<Trait const*>(this));
     }
+    template<typename Trait>
+    auto as_trait(Register_cell const& cell) const -> Register_cell
+    {
+        if (not has_trait<Trait>()) {
+            throw std::runtime_error{type_name() + " does not implement required trait"};
+        }
+
+        auto const& tr = *dynamic_cast<Trait const*>(this);
+        return tr(Trait::tag, cell);
+    }
 
     template<typename Trait> auto has_trait() const -> bool
     {
@@ -105,6 +115,16 @@ struct Bool {
     virtual operator bool() const = 0;
     virtual ~Bool();
 };
+
+struct Plus {
+    static constexpr bool allows_primitive = false;
+
+    struct tag_type {};
+    static constexpr tag_type tag {};
+
+    virtual auto operator() (tag_type const, Register_cell const&) const -> Register_cell = 0;
+    virtual ~Plus();
+};
 }  // namespace traits
 
 struct String
@@ -150,6 +170,9 @@ Cmp::~Cmp()
 {}
 
 Bool::~Bool()
+{}
+
+Plus::~Plus()
 {}
 }  // namespace viua::vm::types::traits
 
@@ -342,6 +365,36 @@ struct abort_execution {
 };
 
 namespace machine::core::ins {
+template<typename Op, typename Trait>
+auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+
+    if (lhs.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), rhs.template cast_to<int64_t>());
+    } else if (lhs.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value), rhs.template cast_to<uint64_t>());
+    } else if (lhs.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(lhs.value), rhs.template cast_to<float>());
+    } else if (lhs.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(lhs.value), rhs.template cast_to<double>());
+    } else if (lhs.template has_trait<Trait>()) {
+        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+    }
+}
 template<typename Op>
 auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
 {
@@ -358,10 +411,6 @@ auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 
-    if (lhs.is_boxed() or rhs.is_boxed()) {
-        throw abort_execution{nullptr, "boxed values not supported for arithmetic operations"};
-    }
-
     if (lhs.template holds<int64_t>()) {
         out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), rhs.template cast_to<int64_t>());
     } else if (lhs.template holds<uint64_t>()) {
@@ -377,7 +426,7 @@ auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::ADD const op) -> void
 {
-    execute_arithmetic_op(registers, op);
+    execute_arithmetic_op<viua::arch::ins::ADD, viua::vm::types::traits::Plus>(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::SUB const op) -> void
