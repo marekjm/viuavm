@@ -342,28 +342,12 @@ struct abort_execution {
 };
 
 namespace machine::core::ins {
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADD const op) -> void
+template<typename Op>
+auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
 {
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
-
-    if (lhs.is_boxed() or rhs.is_boxed()) {
-        throw abort_execution{nullptr, "add: boxed values not supported"};
-    }
-
-    if (std::holds_alternative<int64_t>(lhs.value)) {
-        out.value = (std::get<int64_t>(lhs.value) + rhs.cast_to<int64_t>());
-    } else if (std::holds_alternative<uint64_t>(lhs.value)) {
-        out.value = (std::get<uint64_t>(lhs.value) + rhs.cast_to<uint64_t>());
-    } else if (std::holds_alternative<float>(lhs.value)) {
-        out.value = (std::get<float>(lhs.value) + rhs.cast_to<float>());
-    } else if (std::holds_alternative<double>(lhs.value)) {
-        out.value = (std::get<double>(lhs.value) + rhs.cast_to<double>());
-    } else {
-        throw abort_execution{nullptr, "add: unsupported operand types"};
-    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -373,60 +357,42 @@ auto execute(std::vector<Value>& registers,
                + ", $"
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
+
+    if (lhs.is_boxed() or rhs.is_boxed()) {
+        throw abort_execution{nullptr, "boxed values not supported for arithmetic operations"};
+    }
+
+    if (lhs.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), rhs.template cast_to<int64_t>());
+    } else if (lhs.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value), rhs.template cast_to<uint64_t>());
+    } else if (lhs.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(lhs.value), rhs.template cast_to<float>());
+    } else if (lhs.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(lhs.value), rhs.template cast_to<double>());
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+    }
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::ADD const op) -> void
+{
+    execute_arithmetic_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::SUB const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto& lhs = registers.at(op.instruction.lhs.index);
-    auto& rhs = registers.at(op.instruction.rhs.index);
-
-    out.value = (std::get<uint64_t>(lhs.value) - std::get<uint64_t>(rhs.value));
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.lhs.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.rhs.index))
-               + "\n";
+    execute_arithmetic_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::MUL const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto& lhs = registers.at(op.instruction.lhs.index);
-    auto& rhs = registers.at(op.instruction.rhs.index);
-
-    out.value = (std::get<uint64_t>(lhs.value) * std::get<uint64_t>(rhs.value));
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.lhs.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.rhs.index))
-               + "\n";
+    execute_arithmetic_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DIV const op) -> void
 {
-    auto& out = registers.at(op.instruction.out.index);
-    auto& lhs = registers.at(op.instruction.lhs.index);
-    auto& rhs = registers.at(op.instruction.rhs.index);
-
-    out.value = (std::get<uint64_t>(lhs.value) / std::get<uint64_t>(rhs.value));
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.lhs.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.rhs.index))
-               + "\n";
+    execute_arithmetic_op(registers, op);
 }
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::MOD const op) -> void
@@ -435,8 +401,6 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.value = (std::get<uint64_t>(lhs.value) % std::get<uint64_t>(rhs.value));
-
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
@@ -445,6 +409,18 @@ auto execute(std::vector<Value>& registers,
                + ", $"
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
+
+    if (lhs.is_boxed() or rhs.is_boxed()) {
+        throw abort_execution{nullptr, "boxed values not supported for modulo operations"};
+    }
+
+    if (lhs.holds<int64_t>()) {
+        out = std::get<int64_t>(lhs.value) % rhs.cast_to<int64_t>();
+    } else if (lhs.holds<uint64_t>()) {
+        out = std::get<uint64_t>(lhs.value) % rhs.cast_to<uint64_t>();
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for modulo operation"};
+    }
 }
 
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void

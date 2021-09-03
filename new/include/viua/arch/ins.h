@@ -49,30 +49,40 @@ struct RETURN : Instruction {
 };
 
 struct ADD : Instruction {
+    using functor_type = std::plus<>;
+
     viua::arch::ops::T instruction;
 
     ADD(viua::arch::ops::T i) : instruction{i}
     {}
 };
 struct SUB : Instruction {
+    using functor_type = std::minus<>;
+
     viua::arch::ops::T instruction;
 
     SUB(viua::arch::ops::T i) : instruction{i}
     {}
 };
 struct MUL : Instruction {
+    using functor_type = std::multiplies<>;
+
     viua::arch::ops::T instruction;
 
     MUL(viua::arch::ops::T i) : instruction{i}
     {}
 };
 struct DIV : Instruction {
+    using functor_type = std::divides<>;
+
     viua::arch::ops::T instruction;
 
     DIV(viua::arch::ops::T i) : instruction{i}
     {}
 };
 struct MOD : Instruction {
+    using functor_type = std::modulus<>;
+
     viua::arch::ops::T instruction;
 
     MOD(viua::arch::ops::T i) : instruction{i}
