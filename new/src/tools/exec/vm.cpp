@@ -183,6 +183,16 @@ struct Value {
         value = v;
         return *this;
     }
+    auto operator=(float const v) -> Value&
+    {
+        value = v;
+        return *this;
+    }
+    auto operator=(double const v) -> Value&
+    {
+        value = v;
+        return *this;
+    }
 
     auto is_boxed() const -> bool
     {
