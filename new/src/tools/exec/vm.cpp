@@ -25,6 +25,8 @@
 
 
 namespace viua::vm::types {
+using Register_cell = std::variant<std::monostate, int64_t, uint64_t, float, double, std::unique_ptr<class Value>>;
+
 class Value {
 public:
     virtual auto type_name() const -> std::string = 0;
@@ -39,7 +41,6 @@ public:
 
         fn(*dynamic_cast<Trait const*>(this));
     }
-
     template<typename Trait, typename Rt>
     auto as_trait(std::function<Rt(Trait const&)> fn, Rt rv) const -> Rt
     {
@@ -153,18 +154,9 @@ Bool::~Bool()
 }  // namespace viua::vm::types::traits
 
 struct Value {
-    enum class Unboxed_type : uint8_t {
-        Void = 0,
-        Byte,
-        Integer_signed,
-        Integer_unsigned,
-        Float_single,
-        Float_double,
-    };
-    Unboxed_type type_of_unboxed;
-
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
-    std::variant<uint64_t, float, double, boxed_type> value;
+    using value_type = viua::vm::types::Register_cell;
+    value_type value;
 
     Value() = default;
     Value(Value const&) = delete;
@@ -172,12 +164,7 @@ struct Value {
     auto operator=(Value const&) -> Value& = delete;
     auto operator=(Value&& that) -> Value&
     {
-        type_of_unboxed = std::move(that.type_of_unboxed);
         value = std::move(that.value);
-
-        that.value = uint64_t{0};
-        that.type_of_unboxed = Unboxed_type::Void;
-
         return *this;
     }
     ~Value() = default;
@@ -188,14 +175,12 @@ struct Value {
     }
     auto operator=(int64_t const v) -> Value&
     {
-        value = static_cast<uint64_t>(v);
-        type_of_unboxed = Unboxed_type::Integer_signed;
+        value = v;
         return *this;
     }
     auto operator=(uint64_t const v) -> Value&
     {
         value = v;
-        type_of_unboxed = Unboxed_type::Integer_unsigned;
         return *this;
     }
 
@@ -205,13 +190,58 @@ struct Value {
     }
     auto is_void() const -> bool
     {
-        return ((not is_boxed())
-                and type_of_unboxed == Value::Unboxed_type::Void);
+        return std::holds_alternative<std::monostate>(value);
     }
 
     auto boxed_value() const -> boxed_type::element_type const&
     {
         return *std::get<boxed_type>(value);
+    }
+
+    template<typename T>
+    auto holds() const -> bool
+    {
+        if (std::is_same_v<T, void> and std::holds_alternative<std::monostate>(value)) {
+            return true;
+        }
+        if (std::is_same_v<T, int64_t> and std::holds_alternative<int64_t>(value)) {
+            return true;
+        }
+        if (std::is_same_v<T, uint64_t> and std::holds_alternative<uint64_t>(value)) {
+            return true;
+        }
+        if (std::is_same_v<T, float> and std::holds_alternative<float>(value)) {
+            return true;
+        }
+        if (std::is_same_v<T, double> and std::holds_alternative<double>(value)) {
+            return true;
+        }
+        if (std::is_same_v<T, boxed_type> and std::holds_alternative<boxed_type>(value)) {
+            return true;
+        }
+        return false;
+    }
+    template<typename T>
+    auto cast_to() const -> T
+    {
+        if (std::holds_alternative<T>(value)) {
+            return std::get<T>(value);
+        }
+
+        if (std::holds_alternative<int64_t>(value)) {
+            return static_cast<T>(std::get<int64_t>(value));
+        }
+        if (std::holds_alternative<uint64_t>(value)) {
+            return static_cast<T>(std::get<uint64_t>(value));
+        }
+        if (std::holds_alternative<float>(value)) {
+            return static_cast<T>(std::get<float>(value));
+        }
+        if (std::holds_alternative<double>(value)) {
+            return static_cast<T>(std::get<double>(value));
+        }
+
+        throw std::bad_cast{};
     }
 
     template<typename Tr>
@@ -309,8 +339,21 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
-    out.value = (std::get<uint64_t>(lhs.value) + std::get<uint64_t>(rhs.value));
+    if (lhs.is_boxed() or rhs.is_boxed()) {
+        throw abort_execution{nullptr, "add: boxed values not supported"};
+    }
+
+    if (std::holds_alternative<int64_t>(lhs.value)) {
+        out.value = (std::get<int64_t>(lhs.value) + rhs.cast_to<int64_t>());
+    } else if (std::holds_alternative<uint64_t>(lhs.value)) {
+        out.value = (std::get<uint64_t>(lhs.value) + rhs.cast_to<uint64_t>());
+    } else if (std::holds_alternative<float>(lhs.value)) {
+        out.value = (std::get<float>(lhs.value) + rhs.cast_to<float>());
+    } else if (std::holds_alternative<double>(lhs.value)) {
+        out.value = (std::get<double>(lhs.value) + rhs.cast_to<double>());
+    } else {
+        throw abort_execution{nullptr, "add: unsupported operand types"};
+    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -328,7 +371,6 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) - std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -347,7 +389,6 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) * std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -366,7 +407,6 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) / std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -385,7 +425,6 @@ auto execute(std::vector<Value>& registers,
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) % std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -404,7 +443,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) ->
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) << std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -422,7 +460,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) ->
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) >> std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -439,8 +476,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
-
-    out.type_of_unboxed = lhs.type_of_unboxed;
 
     auto const tmp = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
     out.value = static_cast<uint64_t>(tmp >> std::get<uint64_t>(rhs.value));
@@ -470,7 +505,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) ->
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) & std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -488,7 +522,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> 
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) | std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -506,7 +539,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) ->
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
 
-    out.type_of_unboxed = lhs.type_of_unboxed;
     out.value = (std::get<uint64_t>(lhs.value) ^ std::get<uint64_t>(rhs.value));
 
     std::cerr
@@ -523,7 +555,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) ->
     auto& out = registers.at(op.instruction.out.index);
     auto& in = registers.at(op.instruction.in.index);
 
-    out.type_of_unboxed = in.type_of_unboxed;
     out.value = ~std::get<uint64_t>(in.value);
 
     std::cerr
@@ -577,7 +608,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
         throw abort_execution{nullptr, "lt: unboxed lhs cannot be used with boxed rhs"};
     }
 
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     if (lhs.is_boxed()) {
         auto const& lhs_value = lhs.boxed_value();
 
@@ -590,9 +620,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
         } else {
             out = false;
         }
-    } else if (lhs.type_of_unboxed == Value::Unboxed_type::Integer_signed) {
-        auto const lv = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
-        auto const rv = (rhs.is_void() ? 0 : static_cast<int64_t>(std::get<uint64_t>(rhs.value)));
+    } else if (std::holds_alternative<int64_t>(lhs.value)) {
+        auto const lv = std::get<int64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
         out = (lv < rv);
     } else {
         auto const lv = std::get<uint64_t>(lhs.value);
@@ -619,7 +649,6 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
         throw abort_execution{nullptr, "gt: unboxed lhs cannot be used with boxed rhs"};
     }
 
-    out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     if (lhs.is_boxed()) {
         auto const& lhs_value = lhs.boxed_value();
 
@@ -632,9 +661,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
         } else {
             out = false;
         }
-    } else if (lhs.type_of_unboxed == Value::Unboxed_type::Integer_signed) {
-        auto const lv = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
-        auto const rv = (rhs.is_void() ? 0 : static_cast<int64_t>(std::get<uint64_t>(rhs.value)));
+    } else if (std::holds_alternative<int64_t>(lhs.value)) {
+        auto const lv = std::get<int64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
         out = (lv > rv);
     } else {
         auto const lv = std::get<uint64_t>(lhs.value);
@@ -791,8 +820,7 @@ auto execute(std::vector<Value>& registers,
 {
     auto& target = registers.at(op.instruction.out.index);
 
-    target.type_of_unboxed = Value::Unboxed_type::Void;
-    target.value           = uint64_t{0};
+    target.value           = std::monostate{};
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -818,7 +846,6 @@ auto execute(std::vector<Value>& registers,
     s->content = std::string{
         reinterpret_cast<char const*>(&env.strings_table[0] + data_offset), data_size};
 
-    target.type_of_unboxed = Value::Unboxed_type::Void;
     target.value           = std::move(s);
 
     std::cerr
@@ -905,8 +932,7 @@ auto execute(std::vector<Value>& registers,
              viua::arch::ins::LUI const op) -> void
 {
     auto& value           = registers.at(op.instruction.out.index);
-    value.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    value.value           = (op.instruction.immediate << 28);
+    value.value           = static_cast<int64_t>(op.instruction.immediate << 28);
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -917,7 +943,6 @@ auto execute(std::vector<Value>& registers,
              viua::arch::ins::LUIU const op) -> void
 {
     auto& value           = registers.at(op.instruction.out.index);
-    value.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
     value.value           = (op.instruction.immediate << 28);
 
     std::cerr
@@ -950,7 +975,6 @@ auto execute(Stack& stack,
     auto v = float{};
     memcpy(&v, &tmp, data_size);
 
-    target.type_of_unboxed = Value::Unboxed_type::Float_single;
     target.value           = v;
 
     std::cerr
@@ -982,7 +1006,6 @@ auto execute(Stack& stack,
     auto v = double{};
     memcpy(&v, &tmp, data_size);
 
-    target.type_of_unboxed = Value::Unboxed_type::Float_double;
     target.value           = v;
 
     std::cerr
@@ -1000,16 +1023,10 @@ auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op)
              ? 0
              : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
 
-    if constexpr (std::is_signed_v<typename Op::value_type>) {
-        out.type_of_unboxed = Value::Unboxed_type::Integer_signed;
-    } else {
-        out.type_of_unboxed = Value::Unboxed_type::Integer_unsigned;
-    }
-
     auto const raw_immediate = op.instruction.immediate;
     if constexpr (std::is_signed_v<typename Op::value_type>) {
         auto const useful_immediate = (static_cast<int32_t>(raw_immediate << 8) >> 8);
-        out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
+        out.value = (typename Op::functor_type{}(base, useful_immediate));
     } else {
         auto const useful_immediate = raw_immediate;
         out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
@@ -1094,39 +1111,29 @@ auto execute(Stack const& stack,
                 continue;
             }
 
-            switch (each.type_of_unboxed) {
-            case Value::Unboxed_type::Void:
-                break;
-            case Value::Unboxed_type::Byte:
-                std::cerr << "by " << std::hex << std::setw(2) << std::setfill('0')
-                          << static_cast<uint8_t>(std::get<uint64_t>(each.value))
-                          << "\n";
-                break;
-            case Value::Unboxed_type::Integer_signed:
+            if (each.is_void()) {
+                /* do nothing */
+            } else if (each.holds<int64_t>()) {
                 std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
                           << std::get<uint64_t>(each.value) << " " << std::dec
                           << static_cast<int64_t>(std::get<uint64_t>(each.value))
                           << "\n";
-                break;
-            case Value::Unboxed_type::Integer_unsigned:
+            } else if (each.holds<uint64_t>()) {
                 std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
                           << std::get<uint64_t>(each.value) << " " << std::dec
                           << std::get<uint64_t>(each.value) << "\n";
-                break;
-            case Value::Unboxed_type::Float_single:
+            } else if (each.holds<float>()) {
                 std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
                           << static_cast<float>(std::get<uint64_t>(each.value))
                           << " " << std::dec
                           << static_cast<float>(std::get<uint64_t>(each.value))
                           << "\n";
-                break;
-            case Value::Unboxed_type::Float_double:
+            } else if (each.holds<double>()) {
                 std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
                           << static_cast<double>(std::get<uint64_t>(each.value))
                           << " " << std::dec
                           << static_cast<double>(std::get<uint64_t>(each.value))
                           << "\n";
-                break;
             }
         }
     }
@@ -1152,27 +1159,18 @@ auto execute(Stack const& stack,
                 continue;
             }
 
-            switch (each.type_of_unboxed) {
-            case Value::Unboxed_type::Void:
-                break;
-            case Value::Unboxed_type::Byte:
-                std::cerr << "by " << std::hex << std::setw(2) << std::setfill('0')
-                          << static_cast<uint8_t>(std::get<uint64_t>(each.value))
-                          << "\n";
-                break;
-            case Value::Unboxed_type::Integer_signed:
+            if (each.is_void()) {
+                /* do nothing */
+            } else if (each.holds<int64_t>()) {
                 std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
-                          << std::get<uint64_t>(each.value) << " " << std::dec
-                          << static_cast<int64_t>(std::get<uint64_t>(each.value))
+                          << std::get<int64_t>(each.value) << " " << std::dec
+                          << std::get<int64_t>(each.value)
                           << "\n";
-                break;
-            case Value::Unboxed_type::Integer_unsigned:
+            } else if (each.holds<uint64_t>()) {
                 std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
                           << std::get<uint64_t>(each.value) << " " << std::dec
                           << std::get<uint64_t>(each.value) << "\n";
-                break;
-            case Value::Unboxed_type::Float_single:
-            {
+            } else if (each.holds<float>()) {
                 auto const precision = std::cerr.precision();
                 std::cerr << "fl " << std::hexfloat
                           << std::get<float>(each.value)
@@ -1181,10 +1179,7 @@ auto execute(Stack const& stack,
                           << std::get<float>(each.value)
                           << "\n";
                 std::cerr << std::setprecision(precision);
-                break;
-            }
-            case Value::Unboxed_type::Float_double:
-            {
+            } else if (each.holds<double>()) {
                 auto const precision = std::cerr.precision();
                 std::cerr << "db " << std::hexfloat
                           << std::get<double>(each.value)
@@ -1193,8 +1188,6 @@ auto execute(Stack const& stack,
                           << std::get<double>(each.value)
                           << "\n";
                 std::cerr << std::setprecision(precision);
-                break;
-            }
             }
         }
     }
