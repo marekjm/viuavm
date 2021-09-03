@@ -130,12 +130,14 @@ struct Plus {
 struct String
         : Value
         , traits::To_string
-        , traits::Bool {
+        , traits::Bool
+        , traits::Plus {
     std::string content;
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
     operator bool () const override;
+    auto operator() (traits::Plus::tag_type const, Register_cell const&) const -> Register_cell override;
 };
 }  // namespace viua::vm::types
 
@@ -154,6 +156,22 @@ auto String::to_string() const -> std::string
 String::operator bool () const
 {
     return (not content.empty());
+}
+auto String::operator()(traits::Plus::tag_type const, Register_cell const& c) const -> Register_cell
+{
+    if (not std::holds_alternative<std::unique_ptr<Value>>(c)) {
+        throw std::runtime_error{"cannot add unboxed value to String"};
+    }
+
+    auto const v = dynamic_cast<String*>(std::get<std::unique_ptr<Value>>(c).get());
+    if (not v) {
+        throw std::runtime_error{"cannot add "
+            + std::get<std::unique_ptr<Value>>(c)->type_name() + " value to String"};
+    }
+
+    auto s = std::make_unique<String>();
+    s->content = (content + v->content);
+    return s;
 }
 }  // namespace viua::vm::types
 namespace viua::vm::types::traits {
