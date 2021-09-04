@@ -182,6 +182,10 @@ struct Stack {
     std::vector<Value> args;
 
     explicit inline Stack(Env const& env): environment{env} {}
+    Stack(Stack const&) = delete;
+    Stack(Stack&&) = default;
+    auto operator=(Stack const&) -> Stack& = delete;
+    auto operator=(Stack&&) -> Stack& = default;
 
     inline auto push(size_t const sz, addr_type const e, addr_type const r) -> void
     {
