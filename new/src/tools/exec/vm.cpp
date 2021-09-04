@@ -60,24 +60,25 @@ auto execute(Stack& stack,
 
     switch (format) {
     using viua::vm::ins::execute;
+    using namespace viua::arch::ins;
     case viua::arch::ops::FORMAT::T:
     {
         auto instruction = viua::arch::ops::T::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_T>(opcode)) {
         case viua::arch::ops::OPCODE_T::ADD:
-            execute(stack.back().registers, viua::arch::ins::ADD{instruction});
+            execute(ADD{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::SUB:
-            execute(stack.back().registers, viua::arch::ins::SUB{instruction});
+            execute(SUB{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::MUL:
-            execute(stack.back().registers, viua::arch::ins::MUL{instruction});
+            execute(MUL{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::DIV:
-            execute(stack.back().registers, viua::arch::ins::DIV{instruction});
+            execute(DIV{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::MOD:
-            execute(stack.back().registers, viua::arch::ins::MOD{instruction});
+            execute(MOD{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITSHL:
             execute(stack.back().registers, viua::arch::ins::BITSHL{instruction});

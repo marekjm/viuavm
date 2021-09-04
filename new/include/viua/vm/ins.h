@@ -27,16 +27,20 @@
 
 
 namespace viua::vm::ins {
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADD const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUB const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MUL const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIV const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MOD const op) -> void;
+#define Base_instruction(it) \
+    auto execute(viua::arch::ins::it const, Stack&, viua::arch::instruction_type const* const)
+
+#define Work_instruction(it) \
+    Base_instruction(it) -> void
+#define Flow_instruction(it) \
+    Base_instruction(it) -> viua::arch::instruction_type const*
+
+
+Work_instruction(ADD);
+Work_instruction(SUB);
+Work_instruction(MUL);
+Work_instruction(DIV);
+Work_instruction(MOD);
 
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void;
 auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void;

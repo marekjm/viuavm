@@ -28,9 +28,14 @@
 
 
 namespace viua::vm::ins {
+using namespace viua::arch::ins;
+using viua::vm::Stack;
+using ip_type = viua::arch::instruction_type const*;
+
 template<typename Op, typename Trait>
-auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
+auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -55,12 +60,13 @@ auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
     } else if (lhs.template has_trait<Trait>()) {
         out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
     } else {
-        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+        throw abort_execution{ip, "unsupported operand types for arithmetic operation"};
     }
 }
 template<typename Op>
-auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
+auto execute_arithmetic_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -83,32 +89,29 @@ auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
     } else if (lhs.template holds<double>()) {
         out = typename Op::functor_type{}(std::get<double>(lhs.value), rhs.template cast_to<double>());
     } else {
-        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+        throw abort_execution{ip, "unsupported operand types for arithmetic operation"};
     }
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADD const op) -> void
+
+auto execute(ADD const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op<viua::arch::ins::ADD, viua::vm::types::traits::Plus>(registers, op);
+    execute_arithmetic_op<ADD, viua::vm::types::traits::Plus>(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUB const op) -> void
+auto execute(SUB const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(registers, op);
+    execute_arithmetic_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MUL const op) -> void
+auto execute(MUL const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(registers, op);
+    execute_arithmetic_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIV const op) -> void
+auto execute(DIV const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_op(registers, op);
+    execute_arithmetic_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MOD const op) -> void
+auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -131,7 +134,7 @@ auto execute(std::vector<Value>& registers,
     } else if (lhs.holds<uint64_t>()) {
         out = std::get<uint64_t>(lhs.value) % rhs.cast_to<uint64_t>();
     } else {
-        throw abort_execution{nullptr, "unsupported operand types for modulo operation"};
+        throw abort_execution{ip, "unsupported operand types for modulo operation"};
     }
 }
 
