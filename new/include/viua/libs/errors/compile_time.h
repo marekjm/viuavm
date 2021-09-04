@@ -47,6 +47,7 @@ enum class Cause {
     Call_to_undefined_function,
 
     Value_out_of_range,
+    Invalid_operand,
 };
 auto to_string(Cause const) -> std::string_view;
 

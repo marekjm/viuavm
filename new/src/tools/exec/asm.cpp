@@ -538,14 +538,20 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 {
     auto const& raw_value = each.operands.at(1).ingredients.front();
     auto value            = uint64_t{};
-    if (raw_value.text.find("0x") == 0) {
-        value = std::stoull(raw_value.text, nullptr, 16);
-    } else if (raw_value.text.find("0o") == 0) {
-        value = std::stoull(raw_value.text, nullptr, 8);
-    } else if (raw_value.text.find("0b") == 0) {
-        value = std::stoull(raw_value.text, nullptr, 2);
-    } else {
-        value = std::stoull(raw_value.text);
+    try {
+        if (raw_value.text.find("0x") == 0) {
+            value = std::stoull(raw_value.text, nullptr, 16);
+        } else if (raw_value.text.find("0o") == 0) {
+            value = std::stoull(raw_value.text, nullptr, 8);
+        } else if (raw_value.text.find("0b") == 0) {
+            value = std::stoull(raw_value.text, nullptr, 2);
+        } else {
+            value = std::stoull(raw_value.text);
+        }
+    } catch (std::invalid_argument const&) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{raw_value, Cause::Invalid_operand, "expected integer"};
     }
 
     auto parts = to_loading_parts_unsigned(value);

@@ -41,6 +41,8 @@ auto to_string(Cause const ce) -> std::string_view
         return "call to undefined function";
     case Cause::Value_out_of_range:
         return "value out of range";
+    case Cause::Invalid_operand:
+        return "invalid operand";
     }
     return "illegal error";
 }
