@@ -17,6 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef VIUA_SUPPORT_STRING_H
+#define VIUA_SUPPORT_STRING_H
+
 #include <set>
 #include <string>
 #include <string_view>
@@ -43,3 +46,5 @@ auto levenshtein_best(std::string const,
                       std::set<DistancePair> const&,
                       LevenshteinDistance const) -> DistancePair;
 }  // namespace viua::support::string
+
+#endif
