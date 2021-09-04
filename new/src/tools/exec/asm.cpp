@@ -751,6 +751,17 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
 auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::string, size_t> const& fn_offsets)
     -> std::vector<ast::Instruction>
 {
+    auto const immediate_signed_arithmetic = std::set<std::string>{
+        "addi",
+        "g.addi",
+        "subi",
+        "g.subi",
+        "muli",
+        "g.muli",
+        "divi",
+        "g.divi",
+    };
+
     auto cooked = std::vector<ast::Instruction>{};
     for (auto& each : raw) {
         // FIXME remove checking for "g.li" here to test errors with synthesized
@@ -859,6 +870,11 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
                 each.operands.push_back(operand);
             }
 
+            cooked.push_back(std::move(each));
+        } else if (immediate_signed_arithmetic.count(each.opcode.text)) {
+            if (each.operands.back().ingredients.back().text.back() == 'u') {
+                each.opcode.text += 'u';
+            }
             cooked.push_back(std::move(each));
         } else {
             /*
@@ -988,7 +1004,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
             {
                 auto const imm = insn.operands.back().ingredients.front();
                 auto const is_unsigned = (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
-                if (is_unsigned and imm.text.at(0) == '-' and imm.text != "-1") {
+                if (is_unsigned and imm.text.at(0) == '-' and (imm.text != "-1" and imm.text != "-1u")) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
                     throw Error{imm
@@ -996,6 +1012,14 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
                         , "signed integer used for unsigned immediate"
                     }.note("the only signed value allowed in this context is -1, and\n"
                            "it is used a symbol for maximum unsigned immediate value");
+                }
+                if ((not is_unsigned) and imm.text.back() == 'u') {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{imm
+                        , Cause::Value_out_of_range
+                        , "unsigned integer used for signed immediate"
+                    };
                 }
                 *ip++ =
                     viua::arch::ops::R{

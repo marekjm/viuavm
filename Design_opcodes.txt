@@ -523,25 +523,6 @@ div: viua::traits::operators::Slash
 
 --------------------------------------------------------------------------------
 
-# Conversions between primitive types
-
-Floats, integers, booleans, timepoints, timevals.
-
-- integer_of_float %rr, %rs
-                        Convert floating-point value (single- or
-                        double-precision) in register %rs to an integer value,
-                        and put the result in register %rr.
-- float_of_integer %rr, %rs
-                        Convert integer value in register %rs to a
-                        single-precision floating-point value, and put the
-                        result in register %rr.
-- double_of_integer %rr, %rs
-                        Convert integer value in register %rs to a
-                        double-precision floating-point value, and put the
-                        result in register %rr.
-
---------------------------------------------------------------------------------
-
 # Operations on atoms
 
 There are only two useful operations on atoms themselves: creating them and
