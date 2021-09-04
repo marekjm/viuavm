@@ -122,7 +122,7 @@ struct Node {
     auto attr(std::string_view const) const -> std::optional<Lexeme>;
 
     virtual auto to_string() const -> std::string = 0;
-    ~Node()                                       = default;
+    virtual ~Node()                               = default;
 };
 auto Node::has_attr(std::string_view const key) const -> bool
 {
@@ -149,6 +149,8 @@ struct Operand : Node {
     auto to_string() const -> std::string override;
 
     auto make_access() const -> viua::arch::Register_access;
+
+    virtual ~Operand() = default;
 };
 auto Operand::to_string() const -> std::string
 {
@@ -193,6 +195,8 @@ struct Instruction : Node {
 
     auto to_string() const -> std::string override;
     auto parse_opcode() const -> viua::arch::opcode_type;
+
+    virtual ~Instruction() = default;
 };
 auto Instruction::to_string() const -> std::string
 {
@@ -229,6 +233,8 @@ struct Fn_def : Node {
     viua::libs::lexer::Lexeme end;
 
     auto to_string() const -> std::string override;
+
+    virtual ~Fn_def() = default;
 };
 auto Fn_def::to_string() const -> std::string
 {
