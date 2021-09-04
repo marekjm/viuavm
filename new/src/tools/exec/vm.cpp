@@ -117,10 +117,10 @@ auto execute(Stack& stack,
             execute(CMP{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::AND:
-            execute(stack.back().registers, viua::arch::ins::AND{instruction});
+            execute(AND{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::OR:
-            execute(stack.back().registers, viua::arch::ins::OR{instruction});
+            execute(OR{instruction}, stack, ip);
             break;
         }
         break;
@@ -231,7 +231,7 @@ auto execute(Stack& stack,
             execute(BITNOT{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_D::NOT:
-            execute(stack.back().registers, viua::arch::ins::NOT{instruction});
+            execute(NOT{instruction}, stack, ip);
             break;
         }
         break;

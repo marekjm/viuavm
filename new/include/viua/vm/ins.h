@@ -52,13 +52,13 @@ Work_instruction(BITOR);
 Work_instruction(BITXOR);
 Work_instruction(BITNOT);
 
-auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> void;
 Work_instruction(EQ);
 Work_instruction(LT);
 Work_instruction(GT);
 Work_instruction(CMP);
+Work_instruction(AND);
+Work_instruction(OR);
+Work_instruction(NOT);
 
 Work_instruction(DELETE);
 

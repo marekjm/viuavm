@@ -432,8 +432,9 @@ auto execute(CMP const op, Stack& stack, ip_type const) -> void
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> void
+auto execute(AND const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -463,8 +464,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> vo
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> void
+auto execute(OR const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -494,8 +496,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> voi
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> void
+auto execute(NOT const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& in = registers.at(op.instruction.in.index);
 
