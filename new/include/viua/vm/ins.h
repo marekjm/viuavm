@@ -64,14 +64,9 @@ Work_instruction(DELETE);
 
 Work_instruction(STRING);
 
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const ip,
-             viua::arch::ins::FRAME const op) -> void;
-
-auto execute(Stack& stack,
-             Env const& env,
-             viua::arch::instruction_type const* const ip,
-             viua::arch::ins::CALL const op) -> viua::arch::instruction_type const*;
+Work_instruction(FRAME);
+Flow_instruction(CALL);
+Flow_instruction(RETURN);
 
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::LUI const op) -> void;
@@ -97,11 +92,6 @@ Work_instruction(DIVI);
 Work_instruction(DIVIU);
 
 Work_instruction(EBREAK);
-
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const ip,
-             Env const&,
-             viua::arch::ins::RETURN const ins) -> viua::arch::instruction_type const*;
 }
 
 #endif

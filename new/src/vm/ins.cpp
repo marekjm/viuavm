@@ -555,9 +555,7 @@ auto execute(STRING const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const ip,
-             viua::arch::ins::FRAME const op) -> void
+auto execute(FRAME const op, Stack& stack, ip_type const ip) -> void
 {
     auto const index = op.instruction.out.index;
     auto const rs    = op.instruction.out.set;
@@ -582,10 +580,7 @@ auto execute(Stack& stack,
                      + ")" + "\n";
 }
 
-auto execute(Stack& stack,
-             Env const& env,
-             viua::arch::instruction_type const* const ip,
-             viua::arch::ins::CALL const op) -> viua::arch::instruction_type const*
+auto execute(CALL const op, Stack& stack, ip_type const ip) -> ip_type
 {
     auto fn_name = std::string{};
     auto fn_addr = size_t{};
@@ -600,7 +595,7 @@ auto execute(Stack& stack,
             throw abort_execution{ip, "fn offset cannot be boxed"};
         }
 
-        std::tie(fn_name, fn_addr) = env.function_at(std::get<uint64_t>(fn_offset.value));
+        std::tie(fn_name, fn_addr) = stack.environment.function_at(std::get<uint64_t>(fn_offset.value));
     }
 
     std::cerr << "    "
@@ -616,7 +611,7 @@ auto execute(Stack& stack,
     }
 
     auto const fr_return = (ip + 1);
-    auto const fr_entry = (env.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
+    auto const fr_entry = (stack.environment.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
 
     stack.frames.emplace_back(
           viua::arch::MAX_REGISTER_INDEX
@@ -627,6 +622,25 @@ auto execute(Stack& stack,
     stack.frames.back().result_to = op.instruction.out;
 
     return fr_entry;
+}
+
+auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
+{
+    auto fr = std::move(stack.frames.back());
+    stack.frames.pop_back();
+
+    if (auto const& rt = fr.result_to; not rt.is_void()) {
+        if (op.instruction.out.is_void()) {
+            throw abort_execution{ip, "return value requested from function returning void"};
+        }
+        auto const index = op.instruction.out.index;
+        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(index));
+    }
+
+    std::cerr << "return to " << std::hex << std::setw(16) << std::setfill('0')
+        << fr.return_address << std::dec << "\n";
+
+    return fr.return_address;
 }
 
 auto execute(std::vector<Value>& registers,
@@ -891,25 +905,4 @@ auto execute(EBREAK const, Stack& stack, ip_type const) -> void
     }
 }
 
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const ip,
-             Env const&,
-             viua::arch::ins::RETURN const ins) -> viua::arch::instruction_type const*
-{
-    auto fr = std::move(stack.frames.back());
-    stack.frames.pop_back();
-
-    if (auto const& rt = fr.result_to; not rt.is_void()) {
-        if (ins.instruction.out.is_void()) {
-            throw abort_execution{ip, "return value requested from function returning void"};
-        }
-        auto const index = ins.instruction.out.index;
-        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(index));
-    }
-
-    std::cerr << "return to " << std::hex << std::setw(8) << std::setfill('0')
-        << fr.return_address << std::dec << "\n";
-
-    return fr.return_address;
-}
 }

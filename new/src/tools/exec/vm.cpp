@@ -136,13 +136,10 @@ auto execute(Stack& stack,
             execute(STRING{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::FRAME:
-            execute(stack, ip, viua::arch::ins::FRAME{instruction});
+            execute(FRAME{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::RETURN:
-            return execute(stack,
-                    ip,
-                    env,
-                    viua::arch::ins::RETURN{instruction});
+            return execute(RETURN{instruction}, stack, ip);
         case viua::arch::ops::OPCODE_S::FLOAT:
             execute(stack,
                     ip,
@@ -229,7 +226,7 @@ auto execute(Stack& stack,
              * This is why we return here, and not use the default behaviour for
              * most of the other instructions.
              */
-            return execute(stack, env, ip, viua::arch::ins::CALL{instruction});
+            return execute(CALL{instruction}, stack, ip);
         case viua::arch::ops::OPCODE_D::BITNOT:
             execute(stack.back().registers, viua::arch::ins::BITNOT{instruction});
             break;
