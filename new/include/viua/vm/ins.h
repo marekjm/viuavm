@@ -42,15 +42,15 @@ Work_instruction(MUL);
 Work_instruction(DIV);
 Work_instruction(MOD);
 
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITROL const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITROR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) -> void;
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) -> void;
+Work_instruction(BITSHL);
+Work_instruction(BITSHR);
+Work_instruction(BITASHR);
+Work_instruction(BITROL);
+Work_instruction(BITROR);
+Work_instruction(BITAND);
+Work_instruction(BITOR);
+Work_instruction(BITXOR);
+Work_instruction(BITNOT);
 
 auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> void;
 auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> void;

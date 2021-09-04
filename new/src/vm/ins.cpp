@@ -138,8 +138,9 @@ auto execute(MOD const op, Stack& stack, ip_type const ip) -> void
     }
 }
 
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void
+auto execute(BITSHL const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -155,8 +156,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) ->
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void
+auto execute(BITSHR const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -172,8 +174,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) ->
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -> void
+auto execute(BITASHR const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -190,18 +193,13 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITROL const op) -> void
+auto execute(BITROL const, Stack&, ip_type const) -> void
+{}
+auto execute(BITROR const, Stack&, ip_type const) -> void
+{}
+auto execute(BITAND const op, Stack& stack, ip_type const) -> void
 {
-    static_cast<void>(registers);
-    static_cast<void>(op);
-}
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITROR const op) -> void
-{
-    static_cast<void>(registers);
-    static_cast<void>(op);
-}
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) -> void
-{
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -217,8 +215,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) ->
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> void
+auto execute(BITOR const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -234,8 +233,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> 
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) -> void
+auto execute(BITXOR const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -251,8 +251,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) ->
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) -> void
+auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& in = registers.at(op.instruction.in.index);
 

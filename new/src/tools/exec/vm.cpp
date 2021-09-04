@@ -81,28 +81,28 @@ auto execute(Stack& stack,
             execute(MOD{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITSHL:
-            execute(stack.back().registers, viua::arch::ins::BITSHL{instruction});
+            execute(BITSHL{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITSHR:
-            execute(stack.back().registers, viua::arch::ins::BITSHR{instruction});
+            execute(BITSHR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITASHR:
-            execute(stack.back().registers, viua::arch::ins::BITASHR{instruction});
+            execute(BITASHR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITROL:
-            execute(stack.back().registers, viua::arch::ins::BITROL{instruction});
+            execute(BITROL{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITROR:
-            execute(stack.back().registers, viua::arch::ins::BITROR{instruction});
+            execute(BITROR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITAND:
-            execute(stack.back().registers, viua::arch::ins::BITAND{instruction});
+            execute(BITAND{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITOR:
-            execute(stack.back().registers, viua::arch::ins::BITOR{instruction});
+            execute(BITOR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::BITXOR:
-            execute(stack.back().registers, viua::arch::ins::BITXOR{instruction});
+            execute(BITXOR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::EQ:
             execute(stack.back().registers, viua::arch::ins::EQ{instruction});
@@ -228,7 +228,7 @@ auto execute(Stack& stack,
              */
             return execute(CALL{instruction}, stack, ip);
         case viua::arch::ops::OPCODE_D::BITNOT:
-            execute(stack.back().registers, viua::arch::ins::BITNOT{instruction});
+            execute(BITNOT{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_D::NOT:
             execute(stack.back().registers, viua::arch::ins::NOT{instruction});
