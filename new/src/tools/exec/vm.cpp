@@ -47,7 +47,6 @@ auto Env::function_at(size_t const offset) const -> std::pair<std::string, size_
 
 namespace {
 auto execute(Stack& stack,
-             Env& env,
              viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
 {
@@ -143,13 +142,13 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_S::FLOAT:
             execute(stack,
                     ip,
-                    env,
+                    stack.environment,
                     viua::arch::ins::FLOAT{instruction});
             break;
         case viua::arch::ops::OPCODE_S::DOUBLE:
             execute(stack,
                     ip,
-                    env,
+                    stack.environment,
                     viua::arch::ins::DOUBLE{instruction});
             break;
         }
@@ -246,21 +245,19 @@ auto execute(Stack& stack,
 }
 
 auto run_instruction(Stack& stack,
-                     Env& env,
                      viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
     do {
         instruction = *ip;
-        ip          = execute(stack, env, ip);
+        ip          = execute(stack, ip);
     } while ((ip != nullptr) and (instruction & viua::arch::ops::GREEDY));
 
     return ip;
 }
 
 auto run(Stack& stack,
-         Env& env,
          viua::arch::instruction_type const* ip,
          std::tuple<std::string_view const,
                     viua::arch::instruction_type const*,
@@ -287,7 +284,7 @@ auto run(Stack& stack,
             auto const greedy    = (*ip & viua::arch::ops::GREEDY);
             auto const bundle_ip = ip;
 
-            ip = run_instruction(stack, env, ip);
+            ip = run_instruction(stack, ip);
 
             /*
              * Halting instruction returns nullptr because it does not know
@@ -445,7 +442,6 @@ auto main(int argc, char* argv[]) -> int
     auto const ip_end   = (ip_begin + text.size());
     try {
         run(stack,
-            env,
             stack.back().entry_address,
             {(executable_path + "[.text]"), ip_begin, ip_end});
     } catch (viua::vm::abort_execution const& e) {
