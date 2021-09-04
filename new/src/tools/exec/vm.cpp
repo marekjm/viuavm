@@ -176,28 +176,28 @@ auto execute(Stack& stack,
         auto instruction = viua::arch::ops::R::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_R>(opcode)) {
         case viua::arch::ops::OPCODE_R::ADDI:
-            execute(stack.back().registers, viua::arch::ins::ADDI{instruction});
+            execute(ADDI{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::ADDIU:
-            execute(stack.back().registers, viua::arch::ins::ADDIU{instruction});
+            execute(ADDIU{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::SUBI:
-            execute(stack.back().registers, viua::arch::ins::SUBI{instruction});
+            execute(SUBI{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::SUBIU:
-            execute(stack.back().registers, viua::arch::ins::SUBIU{instruction});
+            execute(SUBIU{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::MULI:
-            execute(stack.back().registers, viua::arch::ins::MULI{instruction});
+            execute(MULI{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::MULIU:
-            execute(stack.back().registers, viua::arch::ins::MULIU{instruction});
+            execute(MULIU{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::DIVI:
-            execute(stack.back().registers, viua::arch::ins::DIVI{instruction});
+            execute(DIVI{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_R::DIVIU:
-            execute(stack.back().registers, viua::arch::ins::DIVIU{instruction});
+            execute(DIVIU{instruction}, stack, ip);
             break;
         }
         break;

@@ -90,22 +90,14 @@ auto execute(Stack& stack,
              Env const& env,
              viua::arch::ins::DOUBLE const op) -> void;
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADDI const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADDIU const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUBI const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUBIU const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MULI const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MULIU const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIVI const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIVIU const op) -> void;
+Work_instruction(ADDI);
+Work_instruction(ADDIU);
+Work_instruction(SUBI);
+Work_instruction(SUBIU);
+Work_instruction(MULI);
+Work_instruction(MULIU);
+Work_instruction(DIVI);
+Work_instruction(DIVIU);
 
 auto execute(Stack const& stack,
              Env const&,

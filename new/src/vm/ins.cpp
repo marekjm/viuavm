@@ -716,71 +716,70 @@ auto execute(Stack& stack,
 }
 
 template<typename Op>
-auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op) -> void
+auto execute_arithmetic_immediate_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
-    auto const base =
-        (op.instruction.in.is_void()
-             ? 0
-             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
+    auto& in = registers.at(op.instruction.in.index);
 
-    auto const raw_immediate = op.instruction.immediate;
-    if constexpr (std::is_signed_v<typename Op::value_type>) {
-        auto const useful_immediate = (static_cast<int32_t>(raw_immediate << 8) >> 8);
-        out.value = (typename Op::functor_type{}(base, useful_immediate));
-    } else {
-        auto const useful_immediate = raw_immediate;
-        out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
-    }
+    auto const immediate = (std::is_signed_v<typename Op::value_type>
+        ? (static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
+        : op.instruction.immediate);
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
                + ", "
-               + (op.instruction.in.is_void()
+               + (in.template holds<void>()
                    ? "void"
                    : ('$' + std::to_string(static_cast<int>(op.instruction.in.index))))
                + ", " + std::to_string(op.instruction.immediate) + "\n";
+
+    if (in.template holds<void>()) {
+        out = typename Op::functor_type{}(0, immediate);
+    } else if (in.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(in.value), immediate);
+    } else if (in.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(in.value), immediate);
+    } else if (in.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(in.value), immediate);
+    } else if (in.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(in.value), immediate);
+    } else {
+        throw abort_execution{ip, "unsupported operand types for immediate arithmetic operation"};
+    }
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADDI const op) -> void
+auto execute(ADDI const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::ADDIU const op) -> void
+auto execute(ADDIU const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUBI const op) -> void
+auto execute(SUBI const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::SUBIU const op) -> void
+auto execute(SUBIU const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MULI const op) -> void
+auto execute(MULI const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::MULIU const op) -> void
+auto execute(MULIU const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIVI const op) -> void
+auto execute(DIVI const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DIVIU const op) -> void
+auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
 {
-    execute_arithmetic_immediate_op(registers, op);
+    execute_arithmetic_immediate_op(op, stack, ip);
 }
 
 auto execute(Stack const& stack,
