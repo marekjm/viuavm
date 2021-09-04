@@ -651,9 +651,9 @@ auto execute(RETURN const op, Stack& stack, ip_type const ip) -> ip_type
     return fr.return_address;
 }
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::LUI const op) -> void
+auto execute(LUI const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& value           = registers.at(op.instruction.out.index);
     value.value           = static_cast<int64_t>(op.instruction.immediate << 28);
 
@@ -662,9 +662,9 @@ auto execute(std::vector<Value>& registers,
                + std::to_string(static_cast<int>(op.instruction.out.index))
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::LUIU const op) -> void
+auto execute(LUIU const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& value           = registers.at(op.instruction.out.index);
     value.value           = (op.instruction.immediate << 28);
 

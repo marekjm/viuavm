@@ -160,10 +160,10 @@ auto execute(Stack& stack,
         auto instruction = viua::arch::ops::E::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_E>(opcode)) {
         case viua::arch::ops::OPCODE_E::LUI:
-            execute(stack.back().registers, viua::arch::ins::LUI{instruction});
+            execute(LUI{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_E::LUIU:
-            execute(stack.back().registers, viua::arch::ins::LUIU{instruction});
+            execute(LUIU{instruction}, stack, ip);
             break;
         }
         break;

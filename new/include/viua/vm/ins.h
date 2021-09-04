@@ -68,10 +68,8 @@ Work_instruction(FRAME);
 Flow_instruction(CALL);
 Flow_instruction(RETURN);
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::LUI const op) -> void;
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::LUIU const op) -> void;
+Work_instruction(LUI);
+Work_instruction(LUIU);
 
 auto execute(Stack& stack,
              viua::arch::instruction_type const* const,
