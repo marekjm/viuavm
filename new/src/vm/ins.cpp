@@ -267,8 +267,9 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
-auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> void
+auto execute(EQ const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -300,8 +301,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> voi
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> void
+auto execute(LT const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -341,8 +343,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> voi
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> void
+auto execute(GT const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
@@ -382,8 +385,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> voi
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
 }
-auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> void
+auto execute(CMP const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);

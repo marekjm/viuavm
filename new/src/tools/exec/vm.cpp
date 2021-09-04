@@ -105,16 +105,16 @@ auto execute(Stack& stack,
             execute(BITXOR{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::EQ:
-            execute(stack.back().registers, viua::arch::ins::EQ{instruction});
+            execute(EQ{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::GT:
-            execute(stack.back().registers, viua::arch::ins::GT{instruction});
+            execute(GT{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::LT:
-            execute(stack.back().registers, viua::arch::ins::LT{instruction});
+            execute(LT{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::CMP:
-            execute(stack.back().registers, viua::arch::ins::CMP{instruction});
+            execute(CMP{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_T::AND:
             execute(stack.back().registers, viua::arch::ins::AND{instruction});
