@@ -130,7 +130,7 @@ auto execute(Stack& stack,
         auto instruction = viua::arch::ops::S::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_S>(opcode)) {
         case viua::arch::ops::OPCODE_S::DELETE:
-            execute(stack.back().registers, viua::arch::ins::DELETE{instruction});
+            execute(DELETE{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::STRING:
             execute(STRING{instruction}, stack, ip);
@@ -211,9 +211,7 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_N::HALT:
             return nullptr;
         case viua::arch::ops::OPCODE_N::EBREAK:
-            execute(stack,
-                    env,
-                    viua::arch::ins::EBREAK{viua::arch::ops::N::decode(raw)});
+            execute(EBREAK{viua::arch::ops::N::decode(raw)}, stack, ip);
             break;
         }
         break;

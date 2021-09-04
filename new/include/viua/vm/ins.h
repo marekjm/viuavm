@@ -60,8 +60,7 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> vo
 auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> void;
 auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> void;
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DELETE const op) -> void;
+Work_instruction(DELETE);
 
 Work_instruction(STRING);
 
@@ -97,9 +96,7 @@ Work_instruction(MULIU);
 Work_instruction(DIVI);
 Work_instruction(DIVIU);
 
-auto execute(Stack const& stack,
-             Env const&,
-             viua::arch::ins::EBREAK const) -> void;
+Work_instruction(EBREAK);
 
 auto execute(Stack& stack,
              viua::arch::instruction_type const* const ip,

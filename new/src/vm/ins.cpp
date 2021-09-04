@@ -516,9 +516,9 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> vo
                + "\n";
 }
 
-auto execute(std::vector<Value>& registers,
-             viua::arch::ins::DELETE const op) -> void
+auto execute(DELETE const op, Stack& stack, ip_type const) -> void
 {
+    auto& registers = stack.frames.back().registers;
     auto& target = registers.at(op.instruction.out.index);
 
     target.value           = std::monostate{};
@@ -782,9 +782,7 @@ auto execute(DIVIU const op, Stack& stack, ip_type const ip) -> void
     execute_arithmetic_immediate_op(op, stack, ip);
 }
 
-auto execute(Stack const& stack,
-             Env const&,
-             viua::arch::ins::EBREAK const) -> void
+auto execute(EBREAK const, Stack& stack, ip_type const) -> void
 {
     std::cerr << "[ebreak.stack]\n";
     std::cerr << "  depth = " << stack.frames.size() << "\n";
