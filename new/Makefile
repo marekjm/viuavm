@@ -95,6 +95,13 @@ $(BUILD)/tools/exec/vm: \
 	$(BUILD)/arch/arch.o \
 	$(BUILD)/arch/ops.o
 
+$(BUILD)/tools/exec/vm: \
+	./include/viua/vm/core.h
+
+$(BUILD)/vm/ins.o: \
+	./include/viua/vm/ins.h \
+	./include/viua/vm/core.h
+
 $(BUILD)/arch/ops.o: \
 	./include/viua/arch/arch.h \
 	./include/viua/arch/ops.h
