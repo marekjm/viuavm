@@ -37,6 +37,14 @@
 
 
 namespace viua::vm {
+struct Env {
+    std::vector<uint8_t> strings_table;
+    std::vector<uint8_t> functions_table;
+    viua::arch::instruction_type const* ip_base;
+
+    auto function_at(size_t const) const -> std::pair<std::string, size_t>;
+};
+
 struct Value {
     using boxed_type = std::unique_ptr<viua::vm::types::Value>;
     using value_type = viua::vm::types::Register_cell;
@@ -169,8 +177,11 @@ struct Frame {
 struct Stack {
     using addr_type = viua::arch::instruction_type const*;
 
+    Env const& environment;
     std::vector<Frame> frames;
     std::vector<Value> args;
+
+    explicit inline Stack(Env const& env): environment{env} {}
 
     inline auto push(size_t const sz, addr_type const e, addr_type const r) -> void
     {
@@ -185,14 +196,6 @@ struct Stack {
     {
         return frames.back();
     }
-};
-
-struct Env {
-    std::vector<uint8_t> strings_table;
-    std::vector<uint8_t> functions_table;
-    viua::arch::instruction_type const* ip_base;
-
-    auto function_at(size_t const) const -> std::pair<std::string, size_t>;
 };
 
 struct abort_execution {

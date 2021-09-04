@@ -442,7 +442,7 @@ auto main(int argc, char* argv[]) -> int
     env.functions_table = std::move(fn_table);
     env.ip_base = &text[0];
 
-    auto stack = Stack{};
+    auto stack = Stack{env};
     stack.push(256, (text.data() + entry_addr), nullptr);
 
     auto const ip_begin = &text[0];
