@@ -63,9 +63,7 @@ auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> vo
 auto execute(std::vector<Value>& registers,
              viua::arch::ins::DELETE const op) -> void;
 
-auto execute(std::vector<Value>& registers,
-             Env const& env,
-             viua::arch::ins::STRING const op) -> void;
+Work_instruction(STRING);
 
 auto execute(Stack& stack,
              viua::arch::instruction_type const* const ip,

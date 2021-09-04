@@ -133,7 +133,7 @@ auto execute(Stack& stack,
             execute(stack.back().registers, viua::arch::ins::DELETE{instruction});
             break;
         case viua::arch::ops::OPCODE_S::STRING:
-            execute(stack.back().registers, env, viua::arch::ins::STRING{instruction});
+            execute(STRING{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::FRAME:
             execute(stack, ip, viua::arch::ins::FRAME{instruction});
