@@ -140,16 +140,10 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_S::RETURN:
             return execute(RETURN{instruction}, stack, ip);
         case viua::arch::ops::OPCODE_S::FLOAT:
-            execute(stack,
-                    ip,
-                    stack.environment,
-                    viua::arch::ins::FLOAT{instruction});
+            execute(FLOAT{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::DOUBLE:
-            execute(stack,
-                    ip,
-                    stack.environment,
-                    viua::arch::ins::DOUBLE{instruction});
+            execute(DOUBLE{instruction}, stack, ip);
             break;
         }
         break;

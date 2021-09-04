@@ -71,14 +71,8 @@ Flow_instruction(RETURN);
 Work_instruction(LUI);
 Work_instruction(LUIU);
 
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const,
-             Env const& env,
-             viua::arch::ins::FLOAT const op) -> void;
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const,
-             Env const& env,
-             viua::arch::ins::DOUBLE const op) -> void;
+Work_instruction(FLOAT);
+Work_instruction(DOUBLE);
 
 Work_instruction(ADDI);
 Work_instruction(ADDIU);

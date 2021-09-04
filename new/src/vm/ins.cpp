@@ -674,56 +674,50 @@ auto execute(LUIU const op, Stack& stack, ip_type const) -> void
                + ", " + std::to_string(op.instruction.immediate) + "\n";
 }
 
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const,
-             Env const& env,
-             viua::arch::ins::FLOAT const op) -> void
+auto execute(FLOAT const op, Stack& stack, ip_type const) -> void
 {
     auto& registers = stack.back().registers;
 
     auto& target = registers.at(op.instruction.out.index);
 
     auto const data_offset = std::get<uint64_t>(target.value);
-    auto const data_size   = [env, data_offset]() -> uint64_t {
+    auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &stack.environment.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&stack.environment.strings_table[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = float{};
     memcpy(&v, &tmp, data_size);
 
-    target.value           = v;
+    target.value = v;
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
                + std::to_string(static_cast<int>(op.instruction.out.index))
                + "\n";
 }
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const,
-             Env const& env,
-             viua::arch::ins::DOUBLE const op) -> void
+auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
 {
     auto& registers = stack.back().registers;
 
     auto& target = registers.at(op.instruction.out.index);
 
     auto const data_offset = std::get<uint64_t>(target.value);
-    auto const data_size   = [env, data_offset]() -> uint64_t {
+    auto const data_size   = [&stack, data_offset]() -> uint64_t {
         auto const size_offset = (data_offset - sizeof(uint64_t));
         auto tmp               = uint64_t{};
-        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        memcpy(&tmp, &stack.environment.strings_table[size_offset], sizeof(uint64_t));
         return le64toh(tmp);
     }();
 
     auto tmp = uint32_t{};
-    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    memcpy(&tmp, (&stack.environment.strings_table[0] + data_offset), data_size);
     tmp = le32toh(tmp);
 
     auto v = double{};
