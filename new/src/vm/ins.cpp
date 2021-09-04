@@ -1,0 +1,915 @@
+/*
+ *  Copyright (C) 2021 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <limits>
+#include <functional>
+#include <vector>
+#include <iostream>
+#include <iomanip>
+
+#include <viua/vm/ins.h>
+#include <viua/arch/arch.h>
+
+
+namespace viua::vm::ins {
+template<typename Op, typename Trait>
+auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+
+    if (lhs.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), rhs.template cast_to<int64_t>());
+    } else if (lhs.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value), rhs.template cast_to<uint64_t>());
+    } else if (lhs.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(lhs.value), rhs.template cast_to<float>());
+    } else if (lhs.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(lhs.value), rhs.template cast_to<double>());
+    } else if (lhs.template has_trait<Trait>()) {
+        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+    }
+}
+template<typename Op>
+auto execute_arithmetic_op(std::vector<Value>& registers, Op const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+
+    if (lhs.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), rhs.template cast_to<int64_t>());
+    } else if (lhs.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value), rhs.template cast_to<uint64_t>());
+    } else if (lhs.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(lhs.value), rhs.template cast_to<float>());
+    } else if (lhs.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(lhs.value), rhs.template cast_to<double>());
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for arithmetic operation"};
+    }
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::ADD const op) -> void
+{
+    execute_arithmetic_op<viua::arch::ins::ADD, viua::vm::types::traits::Plus>(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::SUB const op) -> void
+{
+    execute_arithmetic_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::MUL const op) -> void
+{
+    execute_arithmetic_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::DIV const op) -> void
+{
+    execute_arithmetic_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::MOD const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+
+    if (lhs.is_boxed() or rhs.is_boxed()) {
+        throw abort_execution{nullptr, "boxed values not supported for modulo operations"};
+    }
+
+    if (lhs.holds<int64_t>()) {
+        out = std::get<int64_t>(lhs.value) % rhs.cast_to<int64_t>();
+    } else if (lhs.holds<uint64_t>()) {
+        out = std::get<uint64_t>(lhs.value) % rhs.cast_to<uint64_t>();
+    } else {
+        throw abort_execution{nullptr, "unsupported operand types for modulo operation"};
+    }
+}
+
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHL const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.value = (std::get<uint64_t>(lhs.value) << std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITSHR const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.value = (std::get<uint64_t>(lhs.value) >> std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITASHR const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    auto const tmp = static_cast<int64_t>(std::get<uint64_t>(lhs.value));
+    out.value = static_cast<uint64_t>(tmp >> std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITROL const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITROR const op) -> void
+{
+    static_cast<void>(registers);
+    static_cast<void>(op);
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITAND const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.value = (std::get<uint64_t>(lhs.value) & std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITOR const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.value = (std::get<uint64_t>(lhs.value) | std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITXOR const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    out.value = (std::get<uint64_t>(lhs.value) ^ std::get<uint64_t>(rhs.value));
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::BITNOT const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& in = registers.at(op.instruction.in.index);
+
+    out.value = ~std::get<uint64_t>(in.value);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+}
+
+auto execute(std::vector<Value>& registers, viua::arch::ins::EQ const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "eq: unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    using viua::vm::types::traits::Eq;
+    if (lhs.has_trait<Eq>()) {
+        out = lhs.boxed_value().as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
+        {
+            return (val == rhs.boxed_value());
+        }, false);
+    } else if (lhs.is_boxed()) {
+        out = false;
+    } else {
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv == rv);
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::LT const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "lt: unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = lhs.boxed_value();
+
+        using viua::vm::types::traits::Lt;
+        if (lhs_value.has_trait<Lt>()) {
+            out = lhs_value.as_trait<Lt, bool>([&rhs](Lt const& val) -> bool
+            {
+                return (val < rhs.boxed_value());
+            }, false);
+        } else {
+            out = false;
+        }
+    } else if (std::holds_alternative<int64_t>(lhs.value)) {
+        auto const lv = std::get<int64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
+        out = (lv < rv);
+    } else {
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv < rv);
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::GT const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "gt: unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = lhs.boxed_value();
+
+        using viua::vm::types::traits::Gt;
+        if (lhs_value.has_trait<Gt>()) {
+            out = lhs_value.as_trait<Gt, bool>([&rhs](Gt const& val) -> bool
+            {
+                return (val > rhs.boxed_value());
+            }, false);
+        } else {
+            out = false;
+        }
+    } else if (std::holds_alternative<int64_t>(lhs.value)) {
+        auto const lv = std::get<int64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
+        out = (lv > rv);
+    } else {
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
+        out = (lv > rv);
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::CMP const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
+        throw abort_execution{nullptr, "cmp: unboxed lhs cannot be used with boxed rhs"};
+    }
+
+    using viua::vm::types::traits::Cmp;
+    if (lhs.is_boxed()) {
+        auto const& lhs_value = lhs.boxed_value();
+
+        if (lhs_value.has_trait<Cmp>()) {
+            out = lhs_value.as_trait<Cmp, int64_t>([&rhs](Cmp const& val) -> int64_t
+            {
+                auto const& rv = rhs.boxed_value();
+                return val.cmp(rv);
+            }, Cmp::CMP_LT);
+        } else {
+            out = Cmp::CMP_LT;
+        }
+    } else {
+        auto const lv = std::get<uint64_t>(lhs.value);
+        auto const rv = std::get<uint64_t>(rhs.value);
+        if (lv == rv) {
+            out = Cmp::CMP_EQ;
+        } else if (lv > rv) {
+            out = Cmp::CMP_GT;
+        } else if (lv < rv) {
+            out = Cmp::CMP_LT;
+        } else {
+            throw abort_execution{nullptr, "cmp: incomparable unboxed values"};
+        }
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::AND const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    using viua::vm::types::traits::Bool;
+    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "and: cannot used boxed value without Bool trait"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const use_lhs = not lhs.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    } else {
+        auto const use_lhs = (std::get<uint64_t>(lhs.value) == 0);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::OR const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& lhs = registers.at(op.instruction.lhs.index);
+    auto& rhs = registers.at(op.instruction.rhs.index);
+
+    using viua::vm::types::traits::Bool;
+    if (lhs.is_boxed() and not lhs.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "or: cannot used boxed value without Bool trait"};
+    }
+
+    if (lhs.is_boxed()) {
+        auto const use_lhs = lhs.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    } else {
+        auto const use_lhs = (std::get<uint64_t>(lhs.value) != 0);
+        out = use_lhs ? std::move(lhs) : std::move(rhs);
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.lhs.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.rhs.index))
+               + "\n";
+}
+auto execute(std::vector<Value>& registers, viua::arch::ins::NOT const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto& in = registers.at(op.instruction.in.index);
+
+    using viua::vm::types::traits::Bool;
+    if (in.is_boxed() and not in.boxed_value().has_trait<Bool>()) {
+        throw abort_execution{nullptr, "not: cannot used boxed value without Bool trait"};
+    }
+
+    if (in.is_boxed()) {
+        out = in.boxed_value().as_trait<Bool, bool>([](Bool const& v) -> bool
+        {
+            return static_cast<bool>(v);
+        }, false);
+    } else {
+        out = static_cast<bool>(std::get<uint64_t>(in.value));
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+}
+
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::DELETE const op) -> void
+{
+    auto& target = registers.at(op.instruction.out.index);
+
+    target.value           = std::monostate{};
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+
+auto execute(std::vector<Value>& registers,
+             Env const& env,
+             viua::arch::ins::STRING const op) -> void
+{
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto s     = std::make_unique<viua::vm::types::String>();
+    s->content = std::string{
+        reinterpret_cast<char const*>(&env.strings_table[0] + data_offset), data_size};
+
+    target.value           = std::move(s);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const ip,
+             viua::arch::ins::FRAME const op) -> void
+{
+    auto const index = op.instruction.out.index;
+    auto const rs    = op.instruction.out.set;
+
+    auto capacity = viua::arch::register_index_type{};
+    if (rs == viua::arch::RS::LOCAL) {
+        capacity = static_cast<viua::arch::register_index_type>(std::get<uint64_t>(stack.back().registers.at(index).value));
+    } else if (rs == viua::arch::RS::ARGUMENT) {
+        capacity = index;
+    } else {
+        throw abort_execution{ip, "args count must come from local or argument register set"};
+    }
+
+    stack.args = std::vector<Value>(capacity);
+
+    std::cerr << "    " + viua::arch::ops::to_string(op.instruction.opcode)
+                     + " $" + std::to_string(static_cast<int>(index)) + '.'
+                     + ((rs == viua::arch::RS::LOCAL)      ? 'l'
+                        : (rs == viua::arch::RS::ARGUMENT) ? 'a'
+                                                           : 'p')
+                     + " (frame with args capacity " + std::to_string(capacity)
+                     + ")" + "\n";
+}
+
+auto execute(Stack& stack,
+             Env const& env,
+             viua::arch::instruction_type const* const ip,
+             viua::arch::ins::CALL const op) -> viua::arch::instruction_type const*
+{
+    auto fn_name = std::string{};
+    auto fn_addr = size_t{};
+    {
+        auto const fn_index = op.instruction.in.index;
+        auto const& fn_offset = stack.frames.back().registers.at(fn_index);
+        if (fn_offset.is_void()) {
+            throw abort_execution{ip, "fn offset cannot be void"};
+        }
+        if (fn_offset.is_boxed()) {
+            // FIXME only unboxed integers allowed for now
+            throw abort_execution{ip, "fn offset cannot be boxed"};
+        }
+
+        std::tie(fn_name, fn_addr) = env.function_at(std::get<uint64_t>(fn_offset.value));
+    }
+
+    std::cerr << "    "
+        << viua::arch::ops::to_string(op.instruction.opcode)
+        << ", "
+        << fn_name
+        << " (at +0x" << std::hex << std::setw(8) << std::setfill('0')
+        << fn_addr << std::dec << ")"
+        << "\n";
+
+    if (fn_addr % sizeof(viua::arch::instruction_type)) {
+        throw abort_execution{ip, "invalid IP after call"};
+    }
+
+    auto const fr_return = (ip + 1);
+    auto const fr_entry = (env.ip_base + (fn_addr / sizeof(viua::arch::instruction_type)));
+
+    stack.frames.emplace_back(
+          viua::arch::MAX_REGISTER_INDEX
+        , fr_entry
+        , fr_return
+    );
+    stack.frames.back().parameters = std::move(stack.args);
+    stack.frames.back().result_to = op.instruction.out;
+
+    return fr_entry;
+}
+
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::LUI const op) -> void
+{
+    auto& value           = registers.at(op.instruction.out.index);
+    value.value           = static_cast<int64_t>(op.instruction.immediate << 28);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", " + std::to_string(op.instruction.immediate) + "\n";
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::LUIU const op) -> void
+{
+    auto& value           = registers.at(op.instruction.out.index);
+    value.value           = (op.instruction.immediate << 28);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", " + std::to_string(op.instruction.immediate) + "\n";
+}
+
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const,
+             Env const& env,
+             viua::arch::ins::FLOAT const op) -> void
+{
+    auto& registers = stack.back().registers;
+
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto tmp = uint32_t{};
+    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    tmp = le32toh(tmp);
+
+    auto v = float{};
+    memcpy(&v, &tmp, data_size);
+
+    target.value           = v;
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const,
+             Env const& env,
+             viua::arch::ins::DOUBLE const op) -> void
+{
+    auto& registers = stack.back().registers;
+
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto tmp = uint32_t{};
+    memcpy(&tmp, (&env.strings_table[0] + data_offset), data_size);
+    tmp = le32toh(tmp);
+
+    auto v = double{};
+    memcpy(&v, &tmp, data_size);
+
+    target.value           = v;
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+
+template<typename Op>
+auto execute_arithmetic_immediate_op(std::vector<Value>& registers, Op const op) -> void
+{
+    auto& out = registers.at(op.instruction.out.index);
+    auto const base =
+        (op.instruction.in.is_void()
+             ? 0
+             : std::get<uint64_t>(registers.at(op.instruction.in.index).value));
+
+    auto const raw_immediate = op.instruction.immediate;
+    if constexpr (std::is_signed_v<typename Op::value_type>) {
+        auto const useful_immediate = (static_cast<int32_t>(raw_immediate << 8) >> 8);
+        out.value = (typename Op::functor_type{}(base, useful_immediate));
+    } else {
+        auto const useful_immediate = raw_immediate;
+        out.value = static_cast<uint64_t>(typename Op::functor_type{}(base, useful_immediate));
+    }
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", "
+               + (op.instruction.in.is_void()
+                   ? "void"
+                   : ('$' + std::to_string(static_cast<int>(op.instruction.in.index))))
+               + ", " + std::to_string(op.instruction.immediate) + "\n";
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::ADDI const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::ADDIU const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::SUBI const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::SUBIU const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::MULI const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::MULIU const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::DIVI const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+auto execute(std::vector<Value>& registers,
+             viua::arch::ins::DIVIU const op) -> void
+{
+    execute_arithmetic_immediate_op(registers, op);
+}
+
+auto execute(Stack const& stack,
+             Env const&,
+             viua::arch::ins::EBREAK const) -> void
+{
+    std::cerr << "[ebreak.stack]\n";
+    std::cerr << "  depth = " << stack.frames.size() << "\n";
+
+    {
+        std::cerr << "[ebreak.parameters]\n";
+        auto const& registers = stack.frames.back().parameters;
+        for (auto i = size_t{0}; i < registers.size(); ++i) {
+            auto const& each = registers.at(i);
+            if (each.is_void()) {
+                continue;
+            }
+
+            std::cerr << "  [" << std::setw(3) << i << "] ";
+
+            if (each.is_boxed()) {
+                auto const& value = each.boxed_value();
+                std::cerr << "<boxed> " << value.type_name();
+                value.as_trait<viua::vm::types::traits::To_string>(
+                    [](viua::vm::types::traits::To_string const& val) -> void {
+                        std::cerr << " = " << val.to_string();
+                    });
+                std::cerr << "\n";
+                continue;
+            }
+
+            if (each.is_void()) {
+                /* do nothing */
+            } else if (each.holds<int64_t>()) {
+                std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << static_cast<int64_t>(std::get<uint64_t>(each.value))
+                          << "\n";
+            } else if (each.holds<uint64_t>()) {
+                std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << std::get<uint64_t>(each.value) << "\n";
+            } else if (each.holds<float>()) {
+                std::cerr << "fl " << std::hex << std::setw(8) << std::setfill('0')
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<float>(std::get<uint64_t>(each.value))
+                          << "\n";
+            } else if (each.holds<double>()) {
+                std::cerr << "db " << std::hex << std::setw(16) << std::setfill('0')
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << " " << std::dec
+                          << static_cast<double>(std::get<uint64_t>(each.value))
+                          << "\n";
+            }
+        }
+    }
+    {
+        std::cerr << "[ebreak.registers]\n";
+        auto const& registers = stack.frames.back().registers;
+        for (auto i = size_t{0}; i < registers.size(); ++i) {
+            auto const& each = registers.at(i);
+            if (each.is_void()) {
+                continue;
+            }
+
+            std::cerr << "  [" << std::setw(3) << i << "] ";
+
+            if (each.is_boxed()) {
+                auto const& value = each.boxed_value();
+                std::cerr << "<boxed> " << value.type_name();
+                value.as_trait<viua::vm::types::traits::To_string>(
+                    [](viua::vm::types::traits::To_string const& val) -> void {
+                        std::cerr << " = " << val.to_string();
+                    });
+                std::cerr << "\n";
+                continue;
+            }
+
+            if (each.is_void()) {
+                /* do nothing */
+            } else if (each.holds<int64_t>()) {
+                std::cerr << "is " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<int64_t>(each.value) << " " << std::dec
+                          << std::get<int64_t>(each.value)
+                          << "\n";
+            } else if (each.holds<uint64_t>()) {
+                std::cerr << "iu " << std::hex << std::setw(16) << std::setfill('0')
+                          << std::get<uint64_t>(each.value) << " " << std::dec
+                          << std::get<uint64_t>(each.value) << "\n";
+            } else if (each.holds<float>()) {
+                auto const precision = std::cerr.precision();
+                std::cerr << "fl " << std::hexfloat
+                          << std::get<float>(each.value)
+                          << " " << std::defaultfloat
+                          << std::setprecision(std::numeric_limits<float>::digits10 + 1)
+                          << std::get<float>(each.value)
+                          << "\n";
+                std::cerr << std::setprecision(precision);
+            } else if (each.holds<double>()) {
+                auto const precision = std::cerr.precision();
+                std::cerr << "db " << std::hexfloat
+                          << std::get<double>(each.value)
+                          << " " << std::defaultfloat
+                          << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+                          << std::get<double>(each.value)
+                          << "\n";
+                std::cerr << std::setprecision(precision);
+            }
+        }
+    }
+}
+
+auto execute(Stack& stack,
+             viua::arch::instruction_type const* const ip,
+             Env const&,
+             viua::arch::ins::RETURN const ins) -> viua::arch::instruction_type const*
+{
+    auto fr = std::move(stack.frames.back());
+    stack.frames.pop_back();
+
+    if (auto const& rt = fr.result_to; not rt.is_void()) {
+        if (ins.instruction.out.is_void()) {
+            throw abort_execution{ip, "return value requested from function returning void"};
+        }
+        auto const index = ins.instruction.out.index;
+        stack.frames.back().registers.at(rt.index) = std::move(fr.registers.at(index));
+    }
+
+    std::cerr << "return to " << std::hex << std::setw(8) << std::setfill('0')
+        << fr.return_address << std::dec << "\n";
+
+    return fr.return_address;
+}
+}
