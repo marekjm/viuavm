@@ -738,9 +738,11 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack, ip_type const ip
     auto& out = registers.at(op.instruction.out.index);
     auto& in = registers.at(op.instruction.in.index);
 
-    auto const immediate = (std::is_signed_v<typename Op::value_type>
-        ? (static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
-        : op.instruction.immediate);
+    constexpr auto const signed_immediate = std::is_signed_v<typename Op::value_type>;
+    using immediate_type = std::conditional<signed_immediate, int64_t, uint64_t>::type;
+    auto const immediate = (signed_immediate
+        ? static_cast<immediate_type>(static_cast<int32_t>(op.instruction.immediate << 8) >> 8)
+        : static_cast<immediate_type>(op.instruction.immediate));
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -749,7 +751,9 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack, ip_type const ip
                + (in.template holds<void>()
                    ? "void"
                    : ('$' + std::to_string(static_cast<int>(op.instruction.in.index))))
-               + ", " + std::to_string(op.instruction.immediate) + "\n";
+               + ", " + std::to_string(op.instruction.immediate)
+               + (signed_immediate ? "" : "u")
+               + "\n";
 
     if (in.template holds<void>()) {
         out = typename Op::functor_type{}(0, immediate);
