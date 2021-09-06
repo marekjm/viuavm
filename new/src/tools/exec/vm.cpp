@@ -131,9 +131,6 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_S::DELETE:
             execute(DELETE{instruction}, stack, ip);
             break;
-        case viua::arch::ops::OPCODE_S::STRING:
-            execute(STRING{instruction}, stack, ip);
-            break;
         case viua::arch::ops::OPCODE_S::FRAME:
             execute(FRAME{instruction}, stack, ip);
             break;
@@ -141,6 +138,9 @@ auto execute(Stack& stack,
             return execute(RETURN{instruction}, stack, ip);
         case viua::arch::ops::OPCODE_S::ATOM:
             execute(ATOM{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_S::STRING:
+            execute(STRING{instruction}, stack, ip);
             break;
         case viua::arch::ops::OPCODE_S::FLOAT:
             execute(FLOAT{instruction}, stack, ip);

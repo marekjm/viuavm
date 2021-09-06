@@ -217,12 +217,12 @@ enum class OPCODE : opcode_type {
     NOT    = (FORMAT_D | 0x0003),
 
     DELETE = (FORMAT_S | 0x0001),
-    STRING = (FORMAT_S | 0x0002),
-    FRAME  = (FORMAT_S | 0x0003),
-    RETURN = (FORMAT_S | 0x0004),
-    FLOAT  = (FORMAT_S | 0x0005),
-    DOUBLE = (FORMAT_S | 0x0006),
-    ATOM   = (FORMAT_S | 0x0007),
+    FRAME  = (FORMAT_S | 0x0002),
+    RETURN = (FORMAT_S | 0x0003),
+    ATOM   = (FORMAT_S | 0x0004),
+    STRING = (FORMAT_S | 0x0005),
+    FLOAT  = (FORMAT_S | 0x0006),
+    DOUBLE = (FORMAT_S | 0x0007),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -274,6 +274,7 @@ enum class OPCODE_S : opcode_type {
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),
     RETURN = static_cast<opcode_type>(OPCODE::RETURN),
     ATOM = static_cast<opcode_type>(OPCODE::ATOM),
+    STRING = static_cast<opcode_type>(OPCODE::STRING),
     FLOAT = static_cast<opcode_type>(OPCODE::FLOAT),
     DOUBLE = static_cast<opcode_type>(OPCODE::DOUBLE),
 };
