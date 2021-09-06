@@ -267,30 +267,13 @@ auto execute(BITNOT const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
-auto execute(EQ const op, Stack& stack, ip_type const) -> void
+template<typename Op, typename Trait>
+auto execute_cmp_op(Op const op, Stack& stack, ip_type const ip) -> void
 {
     auto& registers = stack.frames.back().registers;
     auto& out = registers.at(op.instruction.out.index);
     auto& lhs = registers.at(op.instruction.lhs.index);
     auto& rhs = registers.at(op.instruction.rhs.index);
-
-    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "eq: unboxed lhs cannot be used with boxed rhs"};
-    }
-
-    using viua::vm::types::traits::Eq;
-    if (lhs.has_trait<Eq>()) {
-        out = lhs.boxed_value().as_trait<Eq, bool>([&rhs](Eq const& val) -> bool
-        {
-            return (val == rhs.boxed_value());
-        }, false);
-    } else if (lhs.is_boxed()) {
-        out = false;
-    } else {
-        auto const lv = std::get<uint64_t>(lhs.value);
-        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
-        out = (lv == rv);
-    }
 
     std::cerr
         << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
@@ -300,90 +283,32 @@ auto execute(EQ const op, Stack& stack, ip_type const) -> void
                + ", $"
                + std::to_string(static_cast<int>(op.instruction.rhs.index))
                + "\n";
+
+    if (lhs.template holds<int64_t>()) {
+        out = typename Op::functor_type{}(std::get<int64_t>(lhs.value), std::get<int64_t>(rhs.value));
+    } else if (lhs.template holds<uint64_t>()) {
+        out = typename Op::functor_type{}(std::get<uint64_t>(lhs.value), std::get<uint64_t>(rhs.value));
+    } else if (lhs.template holds<float>()) {
+        out = typename Op::functor_type{}(std::get<float>(lhs.value), std::get<float>(rhs.value));
+    } else if (lhs.template holds<double>()) {
+        out = typename Op::functor_type{}(std::get<double>(lhs.value), std::get<double>(rhs.value));
+    } else if (lhs.template has_trait<Trait>()) {
+        out.value = lhs.boxed_value().template as_trait<Trait>(rhs.value);
+    } else {
+        throw abort_execution{ip, "unsupported operand types for compare operation"};
+    }
 }
-auto execute(LT const op, Stack& stack, ip_type const) -> void
+auto execute(EQ const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out = registers.at(op.instruction.out.index);
-    auto& lhs = registers.at(op.instruction.lhs.index);
-    auto& rhs = registers.at(op.instruction.rhs.index);
-
-    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "lt: unboxed lhs cannot be used with boxed rhs"};
-    }
-
-    if (lhs.is_boxed()) {
-        auto const& lhs_value = lhs.boxed_value();
-
-        using viua::vm::types::traits::Lt;
-        if (lhs_value.has_trait<Lt>()) {
-            out = lhs_value.as_trait<Lt, bool>([&rhs](Lt const& val) -> bool
-            {
-                return (val < rhs.boxed_value());
-            }, false);
-        } else {
-            out = false;
-        }
-    } else if (std::holds_alternative<int64_t>(lhs.value)) {
-        auto const lv = std::get<int64_t>(lhs.value);
-        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
-        out = (lv < rv);
-    } else {
-        auto const lv = std::get<uint64_t>(lhs.value);
-        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
-        out = (lv < rv);
-    }
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.lhs.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.rhs.index))
-               + "\n";
+    execute_cmp_op<EQ, viua::vm::types::traits::Eq>(op, stack, ip);
 }
-auto execute(GT const op, Stack& stack, ip_type const) -> void
+auto execute(LT const op, Stack& stack, ip_type const ip) -> void
 {
-    auto& registers = stack.frames.back().registers;
-    auto& out = registers.at(op.instruction.out.index);
-    auto& lhs = registers.at(op.instruction.lhs.index);
-    auto& rhs = registers.at(op.instruction.rhs.index);
-
-    if ((not lhs.is_boxed()) and rhs.is_boxed()) {
-        throw abort_execution{nullptr, "gt: unboxed lhs cannot be used with boxed rhs"};
-    }
-
-    if (lhs.is_boxed()) {
-        auto const& lhs_value = lhs.boxed_value();
-
-        using viua::vm::types::traits::Gt;
-        if (lhs_value.has_trait<Gt>()) {
-            out = lhs_value.as_trait<Gt, bool>([&rhs](Gt const& val) -> bool
-            {
-                return (val > rhs.boxed_value());
-            }, false);
-        } else {
-            out = false;
-        }
-    } else if (std::holds_alternative<int64_t>(lhs.value)) {
-        auto const lv = std::get<int64_t>(lhs.value);
-        auto const rv = (rhs.is_void() ? 0 : std::get<int64_t>(rhs.value));
-        out = (lv > rv);
-    } else {
-        auto const lv = std::get<uint64_t>(lhs.value);
-        auto const rv = (rhs.is_void() ? 0 : std::get<uint64_t>(rhs.value));
-        out = (lv > rv);
-    }
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.lhs.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.rhs.index))
-               + "\n";
+    execute_cmp_op<LT, viua::vm::types::traits::Lt>(op, stack, ip);
+}
+auto execute(GT const op, Stack& stack, ip_type const ip) -> void
+{
+    execute_cmp_op<GT, viua::vm::types::traits::Gt>(op, stack, ip);
 }
 auto execute(CMP const op, Stack& stack, ip_type const) -> void
 {

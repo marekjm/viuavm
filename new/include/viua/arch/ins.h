@@ -129,16 +129,22 @@ struct BITXOR : Instruction {
     BITXOR(viua::arch::ops::T i): instruction{i} {}
 };
 struct EQ : Instruction {
+    using functor_type = std::equal_to<>;
+
     viua::arch::ops::T instruction;
 
     EQ(viua::arch::ops::T i): instruction{i} {}
 };
 struct LT : Instruction {
+    using functor_type = std::less<>;
+
     viua::arch::ops::T instruction;
 
     LT(viua::arch::ops::T i): instruction{i} {}
 };
 struct GT : Instruction {
+    using functor_type = std::greater<>;
+
     viua::arch::ops::T instruction;
 
     GT(viua::arch::ops::T i): instruction{i} {}
