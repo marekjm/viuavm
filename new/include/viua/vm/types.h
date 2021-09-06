@@ -28,6 +28,7 @@ struct String
         : Value
         , traits::To_string
         , traits::Bool
+        , traits::Eq
         , traits::Plus {
     std::string content;
 
@@ -35,6 +36,7 @@ struct String
     auto to_string() const -> std::string override;
     operator bool () const override;
     auto operator() (traits::Plus::tag_type const, Register_cell const&) const -> Register_cell override;
+    auto operator() (traits::Eq::tag_type const, Register_cell const&) const -> Register_cell override;
 };
 }  // namespace viua::vm::types
 

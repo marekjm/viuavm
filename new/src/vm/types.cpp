@@ -34,4 +34,18 @@ auto String::operator()(traits::Plus::tag_type const, Register_cell const& c) co
     s->content = (content + v->content);
     return s;
 }
+auto String::operator()(traits::Eq::tag_type const, Register_cell const& c) const -> Register_cell
+{
+    if (not std::holds_alternative<std::unique_ptr<Value>>(c)) {
+        throw std::runtime_error{"cannot compare unboxed value to String"};
+    }
+
+    auto const v = dynamic_cast<String*>(std::get<std::unique_ptr<Value>>(c).get());
+    if (not v) {
+        throw std::runtime_error{"cannot compare "
+            + std::get<std::unique_ptr<Value>>(c)->type_name() + " value to String"};
+    }
+
+    return static_cast<uint64_t>(v->content == content);
+}
 }  // namespace viua::vm::types
