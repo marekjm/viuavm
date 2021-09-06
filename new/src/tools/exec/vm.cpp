@@ -139,6 +139,9 @@ auto execute(Stack& stack,
             break;
         case viua::arch::ops::OPCODE_S::RETURN:
             return execute(RETURN{instruction}, stack, ip);
+        case viua::arch::ops::OPCODE_S::ATOM:
+            execute(ATOM{instruction}, stack, ip);
+            break;
         case viua::arch::ops::OPCODE_S::FLOAT:
             execute(FLOAT{instruction}, stack, ip);
             break;

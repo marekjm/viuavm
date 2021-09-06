@@ -1650,7 +1650,35 @@ auto main(int argc, char* argv[]) -> int
 
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
-            if (insn.opcode == "string" or insn.opcode == "g.string") {
+            if (insn.opcode == "atom" or insn.opcode == "g.atom") {
+                auto const lx = insn.operands.back().ingredients.front();
+                auto s = lx.text;
+                if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
+                    s      = s.substr(1, s.size() - 2);
+                    s      = viua::support::string::unescape(s);
+                } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
+                    // do nothing
+                } else {
+                    using viua::libs::errors::compile_time::Cause;
+                    using viua::libs::errors::compile_time::Error;
+                    throw Error{lx, Cause::Invalid_operand, "expected atom or string"};
+                }
+                auto const saved_at = save_string(strings_table, s);
+
+                auto synth        = ast::Instruction{};
+                synth.opcode      = insn.opcode;
+                synth.opcode.text = "g.li";
+
+                synth.operands.push_back(insn.operands.front());
+                synth.operands.push_back(insn.operands.back());
+                synth.operands.back().ingredients.front().text =
+                    std::to_string(saved_at) + 'u';
+
+                cooked.push_back(synth);
+
+                insn.operands.pop_back();
+                cooked.push_back(std::move(insn));
+            } else if (insn.opcode == "string" or insn.opcode == "g.string") {
                 auto s = insn.operands.back().ingredients.front().text;
                 s      = s.substr(1, s.size() - 2);
                 s      = viua::support::string::unescape(s);

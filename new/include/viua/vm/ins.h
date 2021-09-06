@@ -62,6 +62,7 @@ Work_instruction(NOT);
 
 Work_instruction(DELETE);
 
+Work_instruction(ATOM);
 Work_instruction(STRING);
 
 Work_instruction(FRAME);

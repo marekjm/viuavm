@@ -172,6 +172,9 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 
     "delete",
     "g.delete",
+
+    "atom",
+    "g.atom",
     "string",
 
     "lui",

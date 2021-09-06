@@ -462,6 +462,31 @@ auto execute(DELETE const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
+auto execute(ATOM const op, Stack& stack, ip_type const) -> void
+{
+    auto& registers = stack.frames.back().registers;
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto const& env = stack.environment;
+    auto const data_offset = std::get<uint64_t>(target.value);
+    auto const data_size   = [env, data_offset]() -> uint64_t {
+        auto const size_offset = (data_offset - sizeof(uint64_t));
+        auto tmp               = uint64_t{};
+        memcpy(&tmp, &env.strings_table[size_offset], sizeof(uint64_t));
+        return le64toh(tmp);
+    }();
+
+    auto s     = std::make_unique<viua::vm::types::Atom>();
+    s->content = std::string{
+        reinterpret_cast<char const*>(&env.strings_table[0] + data_offset), data_size};
+
+    target.value           = std::move(s);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
 auto execute(STRING const op, Stack& stack, ip_type const) -> void
 {
     auto& registers = stack.frames.back().registers;

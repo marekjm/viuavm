@@ -194,6 +194,12 @@ struct DELETE : Instruction {
     {}
 };
 
+struct ATOM : Instruction {
+    viua::arch::ops::S instruction;
+
+    ATOM(viua::arch::ops::S i) : instruction{i}
+    {}
+};
 struct STRING : Instruction {
     viua::arch::ops::S instruction;
 
