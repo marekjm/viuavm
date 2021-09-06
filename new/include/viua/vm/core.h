@@ -149,10 +149,7 @@ struct Value {
     template<typename Tr>
     auto has_trait() const -> bool
     {
-        if (is_boxed() and boxed_value().has_trait<Tr>()) {
-            return true;
-        }
-        return Tr::allows_primitive;
+        return (is_boxed() and boxed_value().has_trait<Tr>());
     }
 };
 

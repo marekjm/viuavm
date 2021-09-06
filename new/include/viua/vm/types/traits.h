@@ -29,8 +29,6 @@
 
 namespace viua::vm::types::traits {
 struct To_string {
-    static constexpr bool allows_primitive = false;
-
     virtual auto to_string() const -> std::string = 0;
     virtual ~To_string();
 
@@ -41,26 +39,18 @@ struct To_string {
 };
 
 struct Eq {
-    static constexpr bool allows_primitive = false;
-
     virtual auto operator==(Value const&) const -> bool = 0;
     virtual ~Eq();
 };
 struct Lt {
-    static constexpr bool allows_primitive = false;
-
     virtual auto operator<(Value const&) const -> bool = 0;
     virtual ~Lt();
 };
 struct Gt {
-    static constexpr bool allows_primitive = false;
-
     virtual auto operator>(Value const&) const -> bool = 0;
     virtual ~Gt();
 };
 struct Cmp {
-    static constexpr bool allows_primitive = false;
-
     static constexpr int64_t CMP_EQ = 0;
     static constexpr int64_t CMP_GT = 1;
     static constexpr int64_t CMP_LT = -1;
@@ -70,15 +60,11 @@ struct Cmp {
 };
 
 struct Bool {
-    static constexpr bool allows_primitive = false;
-
     virtual operator bool() const = 0;
     virtual ~Bool();
 };
 
 struct Plus {
-    static constexpr bool allows_primitive = false;
-
     struct tag_type {};
     static constexpr tag_type tag {};
 
