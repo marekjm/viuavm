@@ -28,6 +28,20 @@
 
 
 namespace viua::vm::types::traits {
+#define VIUA_TRAIT_TAG() \
+    struct tag_type {}; \
+    static constexpr tag_type tag {}
+
+#define VIUA_TRAIT_BODY(Trait) \
+    VIUA_TRAIT_TAG(); \
+    virtual auto operator() (tag_type const, Register_cell const&) const -> Register_cell = 0; \
+    virtual ~Trait() = default
+
+#define VIUA_TRAIT(Trait) \
+    struct Trait { \
+        VIUA_TRAIT_BODY(Trait); \
+    }
+
 struct To_string {
     virtual auto to_string() const -> std::string = 0;
     virtual ~To_string();
@@ -38,18 +52,15 @@ struct To_string {
     }
 };
 
-struct Eq {
-    virtual auto operator==(Value const&) const -> bool = 0;
-    virtual ~Eq();
+struct Bool {
+    virtual operator bool() const = 0;
+    virtual ~Bool();
 };
-struct Lt {
-    virtual auto operator<(Value const&) const -> bool = 0;
-    virtual ~Lt();
-};
-struct Gt {
-    virtual auto operator>(Value const&) const -> bool = 0;
-    virtual ~Gt();
-};
+
+VIUA_TRAIT(Eq);
+VIUA_TRAIT(Lt);
+VIUA_TRAIT(Gt);
+
 struct Cmp {
     static constexpr int64_t CMP_EQ = 0;
     static constexpr int64_t CMP_GT = 1;
@@ -59,18 +70,11 @@ struct Cmp {
     virtual ~Cmp();
 };
 
-struct Bool {
-    virtual operator bool() const = 0;
-    virtual ~Bool();
-};
+VIUA_TRAIT(Plus);
 
-struct Plus {
-    struct tag_type {};
-    static constexpr tag_type tag {};
-
-    virtual auto operator() (tag_type const, Register_cell const&) const -> Register_cell = 0;
-    virtual ~Plus();
-};
+#undef VIUA_TRAIT
+#undef VIUA_TRAIT_BODY
+#undef VIUA_TRAIT_TAG
 }  // namespace viua::vm::types::traits
 
 #endif
