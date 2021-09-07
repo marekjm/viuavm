@@ -779,7 +779,9 @@ auto execute_arithmetic_immediate_op(Op const op, Stack& stack, ip_type const ip
     } else if (in.template holds<double>()) {
         out = typename Op::functor_type{}(std::get<double>(in.value), immediate);
     } else {
-        throw abort_execution{ip, "unsupported operand types for immediate arithmetic operation"};
+        throw abort_execution{ip,
+            "unsupported operand type for immediate arithmetic operation: "
+            + type_name(in.value)};
     }
 }
 auto execute(ADDI const op, Stack& stack, ip_type const ip) -> void
