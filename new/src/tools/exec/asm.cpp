@@ -843,7 +843,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
                 }
 
                 auto const fn_off = fn_offsets.at(fn_name.text);
-                li.operands.back().ingredients.front().text = std::to_string(fn_off);
+                li.operands.back().ingredients.front().text = std::to_string(fn_off) + 'u';
             }
             expand_li(cooked, li);
 
