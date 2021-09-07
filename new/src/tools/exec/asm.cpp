@@ -830,7 +830,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
             auto li = ast::Instruction{};
             {
                 li.opcode = each.opcode;
-                li.opcode.text = "li";
+                li.opcode.text = "g.li";
 
                 li.operands.push_back(fn_offset);
                 li.operands.push_back(fn_offset);
