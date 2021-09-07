@@ -216,6 +216,10 @@ enum class OPCODE : opcode_type {
     BITNOT = (FORMAT_D | 0x0002),
     NOT    = (FORMAT_D | 0x0003),
 
+    COPY   = (FORMAT_D | 0x0004),
+    MOVE   = (FORMAT_D | 0x0005),
+    SWAP   = (FORMAT_D | 0x0006),
+
     DELETE = (FORMAT_S | 0x0001),
     FRAME  = (FORMAT_S | 0x0002),
     RETURN = (FORMAT_S | 0x0003),
@@ -268,6 +272,9 @@ enum class OPCODE_D : opcode_type {
     CALL = static_cast<opcode_type>(OPCODE::CALL),
     BITNOT = static_cast<opcode_type>(OPCODE::BITNOT),
     NOT = static_cast<opcode_type>(OPCODE::NOT),
+    COPY = static_cast<opcode_type>(OPCODE::COPY),
+    MOVE = static_cast<opcode_type>(OPCODE::MOVE),
+    SWAP = static_cast<opcode_type>(OPCODE::SWAP),
 };
 enum class OPCODE_S : opcode_type {
     DELETE = static_cast<opcode_type>(OPCODE::DELETE),

@@ -200,6 +200,13 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
     "g.frame",
     "tailcall",
 
+    "copy",
+    "g.copy",
+    "move",
+    "g.move",
+    "swap",
+    "g.swap",
+
     /*
      * Pseudoinstructions listed below.
      */

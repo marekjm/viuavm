@@ -307,6 +307,12 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "float";
     case OPCODE::DOUBLE:
         return greedy + "double";
+    case OPCODE::COPY:
+        return greedy + "copy";
+    case OPCODE::MOVE:
+        return greedy + "move";
+    case OPCODE::SWAP:
+        return greedy + "swap";
     }
 
     return "<unknown>";
@@ -405,6 +411,12 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::FLOAT));
     } else if (sv == "double") {
         return (op | static_cast<opcode_type>(OPCODE::DOUBLE));
+    } else if (sv == "copy") {
+        return (op | static_cast<opcode_type>(OPCODE::COPY));
+    } else if (sv == "move") {
+        return (op | static_cast<opcode_type>(OPCODE::MOVE));
+    } else if (sv == "swap") {
+        return (op | static_cast<opcode_type>(OPCODE::SWAP));
     } else {
         throw std::invalid_argument{"viua::arch::ops::parse_opcode: "
                                     + std::string{raw}};

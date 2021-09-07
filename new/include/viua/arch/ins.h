@@ -182,6 +182,21 @@ struct NOT : Instruction {
     NOT(viua::arch::ops::D i): instruction{i} {}
 };
 
+struct COPY : Instruction {
+    viua::arch::ops::D instruction;
+
+    COPY(viua::arch::ops::D i): instruction{i} {}
+};
+struct MOVE : Instruction {
+    viua::arch::ops::D instruction;
+
+    MOVE(viua::arch::ops::D i): instruction{i} {}
+};
+struct SWAP : Instruction {
+    viua::arch::ops::D instruction;
+
+    SWAP(viua::arch::ops::D i): instruction{i} {}
+};
 /*
  * DELETE clears a register and deletes a value that it contained. For
  * unboxed values the bit-pattern is simply deleted; for boxed values their

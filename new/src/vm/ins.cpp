@@ -17,11 +17,13 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <limits>
+#include <algorithm>
 #include <functional>
-#include <vector>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include <viua/vm/ins.h>
 #include <viua/arch/arch.h>
@@ -449,6 +451,67 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
+auto execute(COPY const op, Stack& stack, ip_type const) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto& registers = stack.frames.back().registers;
+    auto& in = registers.at(op.instruction.in.index);
+    auto& out = registers.at(op.instruction.out.index);
+
+    using viua::vm::types::traits::Copy;
+    if (in.is_boxed() and not in.boxed_value().has_trait<Copy>()) {
+        throw abort_execution{nullptr, "value of type " + in.boxed_value().type_name() + " is not copyable"};
+    }
+
+    if (in.holds<int64_t>()) {
+        out = std::get<int64_t>(in.value);
+    } else if (in.holds<uint64_t>()) {
+        out = std::get<uint64_t>(in.value);
+    } else if (in.holds<float>()) {
+        out = std::get<float>(in.value);
+    } else if (in.holds<double>()) {
+        out = std::get<double>(in.value);
+    } else {
+        out.value = in.boxed_value().as_trait<Copy>().copy();
+    }
+}
+auto execute(MOVE const op, Stack& stack, ip_type const) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto& registers = stack.frames.back().registers;
+    auto& in = registers.at(op.instruction.in.index);
+    auto& out = registers.at(op.instruction.out.index);
+
+    out = std::move(in);
+    in.value = std::monostate{};
+}
+auto execute(SWAP const op, Stack& stack, ip_type const) -> void
+{
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + ", $"
+               + std::to_string(static_cast<int>(op.instruction.in.index))
+               + "\n";
+
+    auto& registers = stack.frames.back().registers;
+    auto& lhs = registers.at(op.instruction.in.index);
+    auto& rhs = registers.at(op.instruction.out.index);
+
+    std::swap(lhs.value, rhs.value);
+}
 auto execute(DELETE const op, Stack& stack, ip_type const) -> void
 {
     auto& registers = stack.frames.back().registers;

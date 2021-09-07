@@ -65,6 +65,11 @@ public:
         auto const& tr = *dynamic_cast<Trait const*>(this);
         return tr(Trait::tag, cell);
     }
+    template<typename Trait>
+    auto as_trait() const -> Trait const&
+    {
+        return *dynamic_cast<Trait const*>(this);
+    }
 
     template<typename Trait> auto has_trait() const -> bool
     {

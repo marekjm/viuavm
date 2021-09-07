@@ -229,6 +229,15 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_D::NOT:
             execute(NOT{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_D::COPY:
+            execute(COPY{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_D::MOVE:
+            execute(MOVE{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_D::SWAP:
+            execute(SWAP{instruction}, stack, ip);
+            break;
         }
         break;
     }

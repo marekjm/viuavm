@@ -57,6 +57,11 @@ struct Bool {
     virtual ~Bool();
 };
 
+struct Copy {
+    virtual auto copy() const -> std::unique_ptr<Value> = 0;
+    virtual ~Copy() = default;
+};
+
 VIUA_TRAIT(Eq);
 VIUA_TRAIT(Lt);
 VIUA_TRAIT(Gt);
