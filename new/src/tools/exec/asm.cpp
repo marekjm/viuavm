@@ -165,6 +165,14 @@ auto Operand::make_access() const -> viua::arch::Register_access
     if (ingredients.front() == "void") {
         return viua::arch::Register_access{};
     }
+
+    using viua::libs::lexer::TOKEN;
+    if ((ingredients.front().token != TOKEN::RA_DIRECT) and (ingredients.front().token != TOKEN::RA_DIRECT)) {
+        using viua::libs::errors::compile_time::Cause;
+        using viua::libs::errors::compile_time::Error;
+        throw Error{ingredients.front(), Cause::Invalid_register_access};
+    }
+
     auto const index = std::stoul(ingredients.at(1).text);
     if (ingredients.size() == 2) {
         return viua::arch::Register_access::make_local(index);
@@ -737,7 +745,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         if (parts.first == 0) {
             synth.operands.push_back(each.operands.front());
             synth.operands.back().ingredients.front().text = "void";
-            synth.operands.back().ingredients.pop_back();
+            synth.operands.back().ingredients.resize(1);
         } else {
             synth.operands.push_back(each.operands.front());
         }
