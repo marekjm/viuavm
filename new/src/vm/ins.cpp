@@ -24,6 +24,7 @@
 #include <limits>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include <viua/vm/ins.h>
 #include <viua/arch/arch.h>
@@ -451,6 +452,61 @@ auto execute(NOT const op, Stack& stack, ip_type const) -> void
                + "\n";
 }
 
+namespace {
+auto type_name(viua::vm::types::Register_cell const& c) -> std::string
+{
+    if (std::holds_alternative<std::monostate>(c)) {
+        return "void";
+    } else if (std::holds_alternative<int64_t>(c)) {
+        return "int";
+    } else if (std::holds_alternative<uint64_t>(c)) {
+        return "uint";
+    } else if (std::holds_alternative<float>(c)) {
+        return "float";
+    } else if (std::holds_alternative<double>(c)) {
+        return "double";
+    } else {
+        return std::get<std::unique_ptr<viua::vm::types::Value>>(c)->type_name();
+    }
+}
+auto to_string(viua::arch::Register_access const ra) -> std::string
+{
+    auto out = std::ostringstream{};
+    out << (ra.direct ? '$' : '*') << static_cast<int>(ra.index);
+    switch (ra.set) {
+        using enum viua::arch::RS;
+        case VOID:
+            return "void";
+        case LOCAL:
+            out << ".l";
+            break;
+        case ARGUMENT:
+            out << ".a";
+            break;
+        case PARAMETER:
+            out << ".p";
+            break;
+    }
+    return out.str();
+}
+auto get_slot(viua::arch::Register_access const ra, Stack& stack, ip_type const ip)
+    -> std::optional<viua::vm::Value*>
+{
+    switch (ra.set) {
+        using enum viua::arch::RS;
+        case VOID:
+            return {};
+        case LOCAL:
+            return &stack.frames.back().registers.at(ra.index);
+        case ARGUMENT:
+            return &stack.args.at(ra.index);
+        case PARAMETER:
+            return &stack.frames.back().parameters.at(ra.index);
+    }
+
+    throw abort_execution{ip, "impossible"};
+}
+}
 auto execute(COPY const op, Stack& stack, ip_type const) -> void
 {
     std::cerr
@@ -481,21 +537,25 @@ auto execute(COPY const op, Stack& stack, ip_type const) -> void
         out.value = in.boxed_value().as_trait<Copy>().copy();
     }
 }
-auto execute(MOVE const op, Stack& stack, ip_type const) -> void
+auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
 {
     std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + ", $"
-               + std::to_string(static_cast<int>(op.instruction.in.index))
-               + "\n";
+        << "    "
+        + viua::arch::ops::to_string(op.instruction.opcode)
+        + " " + to_string(op.instruction.out)
+        + ", " + to_string(op.instruction.in)
+        + "\n";
 
-    auto& registers = stack.frames.back().registers;
-    auto& in = registers.at(op.instruction.in.index);
-    auto& out = registers.at(op.instruction.out.index);
+    auto in = get_slot(op.instruction.in, stack, ip);
+    auto out = get_slot(op.instruction.out, stack, ip);
 
-    out = std::move(in);
-    in.value = std::monostate{};
+    if (not in.has_value()) {
+        throw abort_execution{ip, "cannot move out of void"};
+    }
+    if (out.has_value()) {
+        **out = std::move(**in);
+    }
+    (*in)->value = std::monostate{};
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
