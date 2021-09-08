@@ -98,78 +98,92 @@ struct MOD : Instruction {
 struct BITSHL : Instruction {
     viua::arch::ops::T instruction;
 
-    BITSHL(viua::arch::ops::T i): instruction{i} {}
+    BITSHL(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITSHR : Instruction {
     viua::arch::ops::T instruction;
 
-    BITSHR(viua::arch::ops::T i): instruction{i} {}
+    BITSHR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITASHR : Instruction {
     viua::arch::ops::T instruction;
 
-    BITASHR(viua::arch::ops::T i): instruction{i} {}
+    BITASHR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITROL : Instruction {
     viua::arch::ops::T instruction;
 
-    BITROL(viua::arch::ops::T i): instruction{i} {}
+    BITROL(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITROR : Instruction {
     viua::arch::ops::T instruction;
 
-    BITROR(viua::arch::ops::T i): instruction{i} {}
+    BITROR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITAND : Instruction {
     viua::arch::ops::T instruction;
 
-    BITAND(viua::arch::ops::T i): instruction{i} {}
+    BITAND(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITOR : Instruction {
     viua::arch::ops::T instruction;
 
-    BITOR(viua::arch::ops::T i): instruction{i} {}
+    BITOR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct BITXOR : Instruction {
     viua::arch::ops::T instruction;
 
-    BITXOR(viua::arch::ops::T i): instruction{i} {}
+    BITXOR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct EQ : Instruction {
     using functor_type = std::equal_to<>;
 
     viua::arch::ops::T instruction;
 
-    EQ(viua::arch::ops::T i): instruction{i} {}
+    EQ(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct LT : Instruction {
     using functor_type = std::less<>;
 
     viua::arch::ops::T instruction;
 
-    LT(viua::arch::ops::T i): instruction{i} {}
+    LT(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct GT : Instruction {
     using functor_type = std::greater<>;
 
     viua::arch::ops::T instruction;
 
-    GT(viua::arch::ops::T i): instruction{i} {}
+    GT(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct CMP : Instruction {
     viua::arch::ops::T instruction;
 
-    CMP(viua::arch::ops::T i): instruction{i} {}
+    CMP(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct AND : Instruction {
     viua::arch::ops::T instruction;
 
-    AND(viua::arch::ops::T i): instruction{i} {}
+    AND(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 struct OR : Instruction {
     viua::arch::ops::T instruction;
 
-    OR(viua::arch::ops::T i): instruction{i} {}
+    OR(viua::arch::ops::T i) : instruction{i}
+    {}
 };
 
 struct CALL : Instruction {
@@ -181,28 +195,33 @@ struct CALL : Instruction {
 struct BITNOT : Instruction {
     viua::arch::ops::D instruction;
 
-    BITNOT(viua::arch::ops::D i): instruction{i} {}
+    BITNOT(viua::arch::ops::D i) : instruction{i}
+    {}
 };
 struct NOT : Instruction {
     viua::arch::ops::D instruction;
 
-    NOT(viua::arch::ops::D i): instruction{i} {}
+    NOT(viua::arch::ops::D i) : instruction{i}
+    {}
 };
 
 struct COPY : Instruction {
     viua::arch::ops::D instruction;
 
-    COPY(viua::arch::ops::D i): instruction{i} {}
+    COPY(viua::arch::ops::D i) : instruction{i}
+    {}
 };
 struct MOVE : Instruction {
     viua::arch::ops::D instruction;
 
-    MOVE(viua::arch::ops::D i): instruction{i} {}
+    MOVE(viua::arch::ops::D i) : instruction{i}
+    {}
 };
 struct SWAP : Instruction {
     viua::arch::ops::D instruction;
 
-    SWAP(viua::arch::ops::D i): instruction{i} {}
+    SWAP(viua::arch::ops::D i) : instruction{i}
+    {}
 };
 
 struct ATOM : Instruction {
@@ -268,7 +287,7 @@ struct LUIU : Instruction {
  * integer.
  */
 struct ADDI : Instruction {
-    using value_type = int64_t;
+    using value_type   = int64_t;
     using functor_type = std::plus<value_type>;
 
     viua::arch::ops::R instruction;
@@ -277,7 +296,7 @@ struct ADDI : Instruction {
     {}
 };
 struct ADDIU : Instruction {
-    using value_type = uint64_t;
+    using value_type   = uint64_t;
     using functor_type = std::plus<value_type>;
 
     viua::arch::ops::R instruction;
@@ -286,7 +305,7 @@ struct ADDIU : Instruction {
     {}
 };
 struct SUBI : Instruction {
-    using value_type = int64_t;
+    using value_type   = int64_t;
     using functor_type = std::minus<value_type>;
 
     viua::arch::ops::R instruction;
@@ -295,7 +314,7 @@ struct SUBI : Instruction {
     {}
 };
 struct SUBIU : Instruction {
-    using value_type = uint64_t;
+    using value_type   = uint64_t;
     using functor_type = std::minus<value_type>;
 
     viua::arch::ops::R instruction;
@@ -304,7 +323,7 @@ struct SUBIU : Instruction {
     {}
 };
 struct MULI : Instruction {
-    using value_type = int64_t;
+    using value_type   = int64_t;
     using functor_type = std::multiplies<value_type>;
 
     viua::arch::ops::R instruction;
@@ -313,7 +332,7 @@ struct MULI : Instruction {
     {}
 };
 struct MULIU : Instruction {
-    using value_type = uint64_t;
+    using value_type   = uint64_t;
     using functor_type = std::multiplies<value_type>;
 
     viua::arch::ops::R instruction;
@@ -322,7 +341,7 @@ struct MULIU : Instruction {
     {}
 };
 struct DIVI : Instruction {
-    using value_type = int64_t;
+    using value_type   = int64_t;
     using functor_type = std::divides<value_type>;
 
     viua::arch::ops::R instruction;
@@ -331,7 +350,7 @@ struct DIVI : Instruction {
     {}
 };
 struct DIVIU : Instruction {
-    using value_type = uint64_t;
+    using value_type   = uint64_t;
     using functor_type = std::divides<value_type>;
 
     viua::arch::ops::R instruction;

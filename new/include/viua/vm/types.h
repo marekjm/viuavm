@@ -20,8 +20,8 @@
 #ifndef VIUA_VM_TYPES_H
 #define VIUA_VM_TYPES_H
 
-#include <viua/vm/types/value.h>
 #include <viua/vm/types/traits.h>
+#include <viua/vm/types/value.h>
 
 namespace viua::vm::types {
 struct String
@@ -34,9 +34,11 @@ struct String
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
-    operator bool () const override;
-    auto operator() (traits::Plus::tag_type const, Register_cell const&) const -> Register_cell override;
-    auto operator() (traits::Eq::tag_type const, Register_cell const&) const -> Register_cell override;
+    operator bool() const override;
+    auto operator()(traits::Plus::tag_type const, Register_cell const&) const
+        -> Register_cell override;
+    auto operator()(traits::Eq::tag_type const, Register_cell const&) const
+        -> Register_cell override;
 };
 
 struct Atom
@@ -47,7 +49,8 @@ struct Atom
 
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
-    auto operator() (traits::Eq::tag_type const, Register_cell const&) const -> Register_cell override;
+    auto operator()(traits::Eq::tag_type const, Register_cell const&) const
+        -> Register_cell override;
 };
 
 struct Struct

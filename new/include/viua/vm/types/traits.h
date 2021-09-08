@@ -23,22 +23,25 @@
 #include <string>
 #include <string_view>
 
-#include <viua/vm/types/value.h>
 #include <viua/support/string.h>
+#include <viua/vm/types/value.h>
 
 
 namespace viua::vm::types::traits {
-#define VIUA_TRAIT_TAG() \
-    struct tag_type {}; \
-    static constexpr tag_type tag {}
+#define VIUA_TRAIT_TAG()          \
+    struct tag_type {             \
+    };                            \
+    static constexpr tag_type tag \
+    {}
 
-#define VIUA_TRAIT_BODY(Trait) \
-    VIUA_TRAIT_TAG(); \
-    virtual auto operator() (tag_type const, Register_cell const&) const -> Register_cell = 0; \
-    virtual ~Trait() = default
+#define VIUA_TRAIT_BODY(Trait)                                    \
+    VIUA_TRAIT_TAG();                                             \
+    virtual auto operator()(tag_type const, Register_cell const&) \
+        const->Register_cell = 0;                                 \
+    virtual ~Trait()         = default
 
-#define VIUA_TRAIT(Trait) \
-    struct Trait { \
+#define VIUA_TRAIT(Trait)       \
+    struct Trait {              \
         VIUA_TRAIT_BODY(Trait); \
     }
 
@@ -59,7 +62,7 @@ struct Bool {
 
 struct Copy {
     virtual auto copy() const -> std::unique_ptr<Value> = 0;
-    virtual ~Copy() = default;
+    virtual ~Copy()                                     = default;
 };
 
 VIUA_TRAIT(Eq);

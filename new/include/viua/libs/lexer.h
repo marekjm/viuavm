@@ -93,7 +93,7 @@ struct Lexeme {
     TOKEN token;
     Location location;
 
-    std::optional<std::tuple<std::string, TOKEN, Location>> synthesized_from {};
+    std::optional<std::tuple<std::string, TOKEN, Location>> synthesized_from{};
 
     auto operator==(TOKEN const) const -> bool;
     auto operator==(std::string_view const) const -> bool;

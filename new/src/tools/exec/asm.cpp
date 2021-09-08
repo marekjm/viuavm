@@ -79,8 +79,8 @@ auto save_string(std::vector<uint8_t>& strings, std::string_view const data)
 
     return saved_location;
 }
-auto save_fn_address(std::vector<uint8_t>& strings,
-                     std::string_view const fn) -> size_t
+auto save_fn_address(std::vector<uint8_t>& strings, std::string_view const fn)
+    -> size_t
 {
     auto const fn_size = htole64(static_cast<uint64_t>(fn.size()));
     strings.resize(strings.size() + sizeof(fn_size));
@@ -104,7 +104,9 @@ auto patch_fn_address(std::vector<uint8_t>& strings,
                       uint64_t fn_addr) -> void
 {
     auto fn_size = uint64_t{};
-    memcpy(&fn_size, (strings.data() + fn_offset - sizeof(fn_size)), sizeof(fn_size));
+    memcpy(&fn_size,
+           (strings.data() + fn_offset - sizeof(fn_size)),
+           sizeof(fn_size));
     fn_size = le64toh(fn_size);
 
     fn_addr = htole64(fn_addr);
@@ -167,7 +169,8 @@ auto Operand::make_access() const -> viua::arch::Register_access
     }
 
     using viua::libs::lexer::TOKEN;
-    if ((ingredients.front().token != TOKEN::RA_DIRECT) and (ingredients.front().token != TOKEN::RA_DIRECT)) {
+    if ((ingredients.front().token != TOKEN::RA_DIRECT)
+        and (ingredients.front().token != TOKEN::RA_DIRECT)) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
         throw Error{ingredients.front(), Cause::Invalid_register_access};
@@ -192,7 +195,8 @@ auto Operand::make_access() const -> viua::arch::Register_access
             .add(ingredients.at(0))
             .add(ingredients.at(1))
             .add(ingredients.at(2))
-            .aside("invalid register set specifier: " + viua::support::string::quote_squares(rs.text))
+            .aside("invalid register set specifier: "
+                   + viua::support::string::quote_squares(rs.text))
             .note("valid register set specifiers are 'l', 'a', and 'p'");
     }
 }
@@ -542,11 +546,11 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
 }
 
 auto expand_delete(std::vector<ast::Instruction>& cooked,
-               ast::Instruction const& raw) -> void
+                   ast::Instruction const& raw) -> void
 {
     using namespace std::string_literals;
-    auto synth = ast::Instruction{};
-    synth.opcode = raw.opcode;
+    auto synth        = ast::Instruction{};
+    synth.opcode      = raw.opcode;
     synth.opcode.text = (raw.opcode.text.find("g.") == 0 ? "g." : "") + "move"s;
 
     synth.operands.push_back(raw.operands.front());
@@ -578,7 +582,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         throw Error{raw_value, Cause::Invalid_operand, "expected integer"};
     }
 
-    auto parts = to_loading_parts_unsigned(value);
+    auto parts            = to_loading_parts_unsigned(value);
     auto const base       = parts.second.first.first;
     auto const multiplier = parts.second.first.second;
     auto const is_greedy  = (each.opcode.text.find("g.") == 0);
@@ -592,8 +596,9 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
      */
     if (parts.first) {
         using namespace std::string_literals;
-        auto synth        = each;
-        synth.opcode.text = ((multiplier or base or is_greedy) ? "g.lui" : "lui");
+        auto synth = each;
+        synth.opcode.text =
+            ((multiplier or base or is_greedy) ? "g.lui" : "lui");
         if (is_unsigned) {
             // FIXME loading signed values is ridiculously expensive and always
             // takes the most pessmisitic route - write a signed version of the
@@ -772,7 +777,8 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
         cooked.push_back(synth);
     }
 }
-auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::string, size_t> const& fn_offsets)
+auto expand_pseudoinstructions(std::vector<ast::Instruction> raw,
+                               std::map<std::string, size_t> const& fn_offsets)
     -> std::vector<ast::Instruction>
 {
     auto const immediate_signed_arithmetic = std::set<std::string>{
@@ -833,10 +839,13 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
 
                 using viua::libs::lexer::TOKEN;
                 auto const& lx = ret.ingredients.front();
-                fn_offset.ingredients.push_back(lx.make_synth("$", TOKEN::RA_DIRECT));
-                fn_offset.ingredients.push_back(lx.make_synth("253", TOKEN::LITERAL_INTEGER));
+                fn_offset.ingredients.push_back(
+                    lx.make_synth("$", TOKEN::RA_DIRECT));
+                fn_offset.ingredients.push_back(
+                    lx.make_synth("253", TOKEN::LITERAL_INTEGER));
                 fn_offset.ingredients.push_back(lx.make_synth(".", TOKEN::DOT));
-                fn_offset.ingredients.push_back(lx.make_synth("l", TOKEN::LITERAL_ATOM));
+                fn_offset.ingredients.push_back(
+                    lx.make_synth("l", TOKEN::LITERAL_ATOM));
             }
 
             /*
@@ -847,7 +856,7 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
              */
             auto li = ast::Instruction{};
             {
-                li.opcode = each.opcode;
+                li.opcode      = each.opcode;
                 li.opcode.text = "g.li";
 
                 li.operands.push_back(fn_offset);
@@ -861,7 +870,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
                 }
 
                 auto const fn_off = fn_offsets.at(fn_name.text);
-                li.operands.back().ingredients.front().text = std::to_string(fn_off) + 'u';
+                li.operands.back().ingredients.front().text =
+                    std::to_string(fn_off) + 'u';
             }
             expand_li(cooked, li);
 
@@ -914,44 +924,54 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
 }  // namespace
 
 namespace {
-auto operand_or_throw(ast::Instruction const& insn, size_t const index) -> ast::Operand const&
+auto operand_or_throw(ast::Instruction const& insn, size_t const index)
+    -> ast::Operand const&
 {
     try {
         return insn.operands.at(index);
     } catch (std::out_of_range const&) {
         using viua::libs::errors::compile_time::Cause;
         using viua::libs::errors::compile_time::Error;
-        throw Error{insn.opcode, Cause::Too_few_operands, ("operand " + std::to_string(index) + " not found")};
+        throw Error{insn.opcode,
+                    Cause::Too_few_operands,
+                    ("operand " + std::to_string(index) + " not found")};
     }
 }
 
-auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::vector<viua::arch::instruction_type>& text, std::vector<uint8_t>& fn_table, std::map<std::string, size_t> const& fn_offsets) -> std::map<std::string, uint64_t>
+auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes,
+                   std::vector<viua::arch::instruction_type>& text,
+                   std::vector<uint8_t>& fn_table,
+                   std::map<std::string, size_t> const& fn_offsets)
+    -> std::map<std::string, uint64_t>
 {
-    auto const ops_count = 1 + std::accumulate(
-        nodes.begin(),
-        nodes.end(),
-        size_t{0},
-        [](size_t const acc, std::unique_ptr<ast::Node> const& each) -> size_t {
-            if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
-                return 0;
-            }
+    auto const ops_count =
+        1
+        + std::accumulate(
+            nodes.begin(),
+            nodes.end(),
+            size_t{0},
+            [](size_t const acc,
+               std::unique_ptr<ast::Node> const& each) -> size_t {
+                if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
+                    return 0;
+                }
 
-            auto& fn = static_cast<ast::Fn_def&>(*each);
-            return (acc + fn.instructions.size());
-        });
+                auto& fn = static_cast<ast::Fn_def&>(*each);
+                return (acc + fn.instructions.size());
+            });
 
     {
         text.reserve(ops_count);
         text.resize(ops_count);
 
-        using viua::arch::ops::N;
         using viua::arch::instruction_type;
+        using viua::arch::ops::N;
         using viua::arch::ops::OPCODE;
         text.at(0) = N{static_cast<instruction_type>(OPCODE::HALT)}.encode();
     }
 
     auto fn_addresses = std::map<std::string, uint64_t>{};
-    auto ip = (text.data() + 1);
+    auto ip           = (text.data() + 1);
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
@@ -969,7 +989,8 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
              * and foreign functions. At compile time, we don't yet know,
              * though, which function is foreign and which is bytecode.
              */
-            auto const fn_addr       = (ip - &text[0]) * sizeof(viua::arch::instruction_type);
+            auto const fn_addr =
+                (ip - &text[0]) * sizeof(viua::arch::instruction_type);
             fn_addresses[fn.name.text] = fn_addr;
             patch_fn_address(fn_table, fn_offsets.at(fn.name.text), fn_addr);
         }
@@ -1029,23 +1050,26 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
             case FORMAT::R:
             {
                 auto const imm = insn.operands.back().ingredients.front();
-                auto const is_unsigned = (static_cast<opcode_type>(opcode) & viua::arch::ops::UNSIGNED);
-                if (is_unsigned and imm.text.at(0) == '-' and (imm.text != "-1" and imm.text != "-1u")) {
+                auto const is_unsigned = (static_cast<opcode_type>(opcode)
+                                          & viua::arch::ops::UNSIGNED);
+                if (is_unsigned and imm.text.at(0) == '-'
+                    and (imm.text != "-1" and imm.text != "-1u")) {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{imm
-                        , Cause::Value_out_of_range
-                        , "signed integer used for unsigned immediate"
-                    }.note("the only signed value allowed in this context is -1, and\n"
-                           "it is used a symbol for maximum unsigned immediate value");
+                    throw Error{imm,
+                                Cause::Value_out_of_range,
+                                "signed integer used for unsigned immediate"}
+                        .note("the only signed value allowed in this context "
+                              "is -1, and\n"
+                              "it is used a symbol for maximum unsigned "
+                              "immediate value");
                 }
                 if ((not is_unsigned) and imm.text.back() == 'u') {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{imm
-                        , Cause::Value_out_of_range
-                        , "unsigned integer used for signed immediate"
-                    };
+                    throw Error{imm,
+                                Cause::Value_out_of_range,
+                                "unsigned integer used for signed immediate"};
                 }
                 *ip++ =
                     viua::arch::ops::R{
@@ -1053,8 +1077,8 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
                         insn.operands.at(0).make_access(),
                         insn.operands.at(1).make_access(),
                         (is_unsigned
-                         ? static_cast<uint32_t>(std::stoul(imm.text))
-                         : static_cast<uint32_t>(std::stoi(imm.text)))}
+                             ? static_cast<uint32_t>(std::stoul(imm.text))
+                             : static_cast<uint32_t>(std::stoi(imm.text)))}
                         .encode();
                 break;
             }
@@ -1064,7 +1088,7 @@ auto emit_bytecode(std::vector<std::unique_ptr<ast::Node>> const& nodes, std::ve
 
     return fn_addresses;
 }
-}
+}  // namespace
 
 namespace {
 auto view_line_of(std::string_view sv, viua::libs::lexer::Location loc)
@@ -1401,12 +1425,10 @@ auto display_error_and_exit
         if (each.find('\n') == std::string::npos) {
             std::cerr << each << "\n";
         } else {
-            auto const prefix_length
-                = source_path.size()
-                + std::to_string(e.line() + 1).size()
-                + std::to_string(e.character() + 1).size()
-                + 6 // for ": note"
-                + 2 // for ":" after source path and line number
+            auto const prefix_length =
+                source_path.size() + std::to_string(e.line() + 1).size()
+                + std::to_string(e.character() + 1).size() + 6  // for ": note"
+                + 2  // for ":" after source path and line number
                 ;
 
             auto sv = std::string_view{each};
@@ -1414,10 +1436,8 @@ auto display_error_and_exit
 
             do {
                 sv.remove_prefix(sv.find('\n') + 1);
-                std::cerr
-                    << std::string(prefix_length, ' ')
-                    << "| "
-                    << sv.substr(0, sv.find('\n')) << '\n';
+                std::cerr << std::string(prefix_length, ' ') << "| "
+                          << sv.substr(0, sv.find('\n')) << '\n';
             } while (sv.find('\n') != std::string::npos);
         }
     }
@@ -1641,15 +1661,18 @@ auto main(int argc, char* argv[]) -> int
      * error offset can be matched to a function without the error having to
      * carry the function name.
      */
-    auto fn_spans = std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
+    auto fn_spans =
+        std::vector<std::pair<std::string, std::pair<size_t, size_t>>>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             return 0;
         }
 
         auto& fn = static_cast<ast::Fn_def&>(*each);
-        fn_spans.emplace_back(fn.name.text,
-                std::pair<size_t, size_t>{ fn.start.location.offset, fn.end.location.offset });
+        fn_spans.emplace_back(
+            fn.name.text,
+            std::pair<size_t, size_t>{fn.start.location.offset,
+                                      fn.end.location.offset});
     }
 
     /*
@@ -1664,30 +1687,32 @@ auto main(int argc, char* argv[]) -> int
      * preparation so they need to be expanded.
      */
     auto strings_table = std::vector<uint8_t>{};
-    auto fn_table     = std::vector<uint8_t>{};
-    auto fn_offsets = std::map<std::string, size_t>{};
+    auto fn_table      = std::vector<uint8_t>{};
+    auto fn_offsets    = std::map<std::string, size_t>{};
     for (auto const& each : nodes) {
         if (dynamic_cast<ast::Fn_def*>(each.get()) == nullptr) {
             continue;
         }
 
         auto& fn = static_cast<ast::Fn_def&>(*each);
-        fn_offsets.emplace(fn.name.text, save_fn_address(fn_table, fn.name.text));
+        fn_offsets.emplace(fn.name.text,
+                           save_fn_address(fn_table, fn.name.text));
 
         auto cooked = std::vector<ast::Instruction>{};
         for (auto& insn : fn.instructions) {
             if (insn.opcode == "atom" or insn.opcode == "g.atom") {
                 auto const lx = insn.operands.back().ingredients.front();
-                auto s = lx.text;
+                auto s        = lx.text;
                 if (lx.token == viua::libs::lexer::TOKEN::LITERAL_STRING) {
-                    s      = s.substr(1, s.size() - 2);
-                    s      = viua::support::string::unescape(s);
+                    s = s.substr(1, s.size() - 2);
+                    s = viua::support::string::unescape(s);
                 } else if (lx.token == viua::libs::lexer::TOKEN::LITERAL_ATOM) {
                     // do nothing
                 } else {
                     using viua::libs::errors::compile_time::Cause;
                     using viua::libs::errors::compile_time::Error;
-                    throw Error{lx, Cause::Invalid_operand, "expected atom or string"};
+                    throw Error{
+                        lx, Cause::Invalid_operand, "expected atom or string"};
                 }
                 auto const saved_at = save_string(strings_table, s);
 
@@ -1725,7 +1750,8 @@ auto main(int argc, char* argv[]) -> int
                 cooked.push_back(std::move(insn));
             } else if (insn.opcode == "float" or insn.opcode == "g.float") {
                 constexpr auto SIZE_OF_SINGLE_PRECISION_FLOAT = size_t{4};
-                auto f = std::stof(insn.operands.back().ingredients.front().text);
+                auto f =
+                    std::stof(insn.operands.back().ingredients.front().text);
                 auto s = std::string(SIZE_OF_SINGLE_PRECISION_FLOAT, '\0');
                 memcpy(s.data(), &f, SIZE_OF_SINGLE_PRECISION_FLOAT);
                 auto const saved_at = save_string(strings_table, s);
@@ -1745,7 +1771,8 @@ auto main(int argc, char* argv[]) -> int
                 cooked.push_back(std::move(insn));
             } else if (insn.opcode == "double" or insn.opcode == "g.double") {
                 constexpr auto SIZE_OF_DOUBLE_PRECISION_FLOAT = size_t{8};
-                auto f = std::stod(insn.operands.back().ingredients.front().text);
+                auto f =
+                    std::stod(insn.operands.back().ingredients.front().text);
                 auto s = std::string(SIZE_OF_DOUBLE_PRECISION_FLOAT, '\0');
                 memcpy(s.data(), &f, SIZE_OF_DOUBLE_PRECISION_FLOAT);
                 auto const saved_at = save_string(strings_table, s);
@@ -1784,7 +1811,8 @@ auto main(int argc, char* argv[]) -> int
         auto& fn                 = static_cast<ast::Fn_def&>(*each);
         auto const raw_ops_count = fn.instructions.size();
         try {
-            fn.instructions = expand_pseudoinstructions(std::move(fn.instructions), fn_offsets);
+            fn.instructions = expand_pseudoinstructions(
+                std::move(fn.instructions), fn_offsets);
         } catch (viua::libs::errors::compile_time::Error const& e) {
             display_error_in_function(source_path, e, fn.name.text);
             display_error_and_exit(source_path, source_text, e);
@@ -1841,16 +1869,16 @@ auto main(int argc, char* argv[]) -> int
      * table mapping function names to the offsets inside the .text section, at
      * which their entry points reside.
      */
-    auto text = std::vector<viua::arch::instruction_type>{};
+    auto text         = std::vector<viua::arch::instruction_type>{};
     auto fn_addresses = std::map<std::string, uint64_t>{};
     try {
         fn_addresses = emit_bytecode(nodes, text, fn_table, fn_offsets);
     } catch (viua::libs::errors::compile_time::Error const& e) {
         auto fn_name = std::optional<std::string>{};
 
-        for (auto const& [ name, offs ] : fn_spans) {
-            auto const [ low, high ] = offs;
-            auto const off = e.location().offset;
+        for (auto const& [name, offs] : fn_spans) {
+            auto const [low, high] = offs;
+            auto const off         = e.location().offset;
             if ((off >= low) and (off <= high)) {
                 fn_name = name;
             }
@@ -1921,8 +1949,8 @@ auto main(int argc, char* argv[]) -> int
             elf_header.e_type                 = ET_EXEC;
             elf_header.e_machine              = ET_NONE;
             elf_header.e_version              = elf_header.e_ident[EI_VERSION];
-            elf_header.e_entry                = text_offset
-                + fn_addresses[entry_point_fn.value().text];
+            elf_header.e_entry =
+                text_offset + fn_addresses[entry_point_fn.value().text];
             elf_header.e_phoff     = sizeof(elf_header);
             elf_header.e_phentsize = sizeof(Elf64_Phdr);
             elf_header.e_phnum     = NO_OF_ELF_PHDR_USED;

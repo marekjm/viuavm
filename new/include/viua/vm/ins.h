@@ -27,13 +27,14 @@
 
 
 namespace viua::vm::ins {
-#define Base_instruction(it) \
-    auto execute(viua::arch::ins::it const, Stack&, viua::arch::instruction_type const* const)
+#define Base_instruction(it)                \
+    auto execute(viua::arch::ins::it const, \
+                 Stack&,                    \
+                 viua::arch::instruction_type const* const)
 
-#define Work_instruction(it) \
-    Base_instruction(it) -> void
+#define Work_instruction(it) Base_instruction(it)->void
 #define Flow_instruction(it) \
-    Base_instruction(it) -> viua::arch::instruction_type const*
+    Base_instruction(it)->viua::arch::instruction_type const*
 
 
 Work_instruction(ADD);
@@ -89,6 +90,6 @@ Work_instruction(DIVI);
 Work_instruction(DIVIU);
 
 Work_instruction(EBREAK);
-}
+}  // namespace viua::vm::ins
 
 #endif

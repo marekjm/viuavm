@@ -42,10 +42,10 @@ auto Lexeme::operator==(std::string_view const sv) const -> bool
 }
 auto Lexeme::make_synth(std::string sv, TOKEN const tk) const -> Lexeme
 {
-    auto sy = *this;
-    sy.text = std::move(sv);
-    sy.token = tk;
-    sy.synthesized_from = { text, token, location };
+    auto sy             = *this;
+    sy.text             = std::move(sv);
+    sy.token            = tk;
+    sy.synthesized_from = {text, token, location};
     return sy;
 }
 auto Lexeme::is_synth() const -> bool
@@ -54,9 +54,9 @@ auto Lexeme::is_synth() const -> bool
 }
 auto Lexeme::synthed_from() const -> Lexeme
 {
-    auto l = Lexeme{};
-    l.text = std::get<0>(*synthesized_from);
-    l.token = std::get<1>(*synthesized_from);
+    auto l     = Lexeme{};
+    l.text     = std::get<0>(*synthesized_from);
+    l.token    = std::get<1>(*synthesized_from);
     l.location = std::get<2>(*synthesized_from);
     return l;
 }
@@ -142,8 +142,7 @@ const auto ATTR_LIST_CLOSE = std::regex{"^\\]\\]"};
 const auto LITERAL_ATOM = std::regex{"^[A-Za-z_][A-Za-z0-9:_/()<>]+\\b"};
 const auto LITERAL_INTEGER =
     std::regex{"^-?(?:0x[a-f0-9]+|0o[0-7]+|0b[01]+|0|[1-9][0-9]*)u?\\b"};
-const auto LITERAL_FLOAT =
-    std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};
+const auto LITERAL_FLOAT = std::regex{"^-?(?:0|[1-9][0-9]*)?\\.[0-9]+\\b"};
 
 auto lex(std::string_view source_text) -> std::vector<Lexeme>
 {

@@ -23,31 +23,32 @@
 #include <viua/arch/ops.h>
 #include <viua/support/string.h>
 #include <viua/vm/core.h>
-#include <viua/vm/types.h>
 #include <viua/vm/ins.h>
+#include <viua/vm/types.h>
 
 
-using viua::vm::Stack;
 using viua::vm::Env;
+using viua::vm::Stack;
 
-auto Env::function_at(size_t const offset) const -> std::pair<std::string, size_t>
+auto Env::function_at(size_t const offset) const
+    -> std::pair<std::string, size_t>
 {
     auto sz = uint64_t{};
     memcpy(&sz, (functions_table.data() + offset - sizeof(sz)), sizeof(sz));
     sz = le64toh(sz);
 
-    auto name = std::string{reinterpret_cast<char const*>(functions_table.data()) + offset, sz};
+    auto name = std::string{
+        reinterpret_cast<char const*>(functions_table.data()) + offset, sz};
 
     auto addr = uint64_t{};
     memcpy(&addr, (functions_table.data() + offset + sz), sizeof(addr));
     addr = le64toh(addr);
 
-    return { name, addr };
+    return {name, addr};
 }
 
 namespace {
-auto execute(Stack& stack,
-             viua::arch::instruction_type const* const ip)
+auto execute(Stack& stack, viua::arch::instruction_type const* const ip)
     -> viua::arch::instruction_type const*
 {
     auto const raw = *ip;
@@ -58,8 +59,8 @@ auto execute(Stack& stack,
         opcode & viua::arch::ops::FORMAT_MASK);
 
     switch (format) {
-    using viua::vm::ins::execute;
-    using namespace viua::arch::ins;
+        using viua::vm::ins::execute;
+        using namespace viua::arch::ins;
     case viua::arch::ops::FORMAT::T:
     {
         auto instruction = viua::arch::ops::T::decode(raw);
@@ -253,8 +254,7 @@ auto execute(Stack& stack,
     return (ip + 1);
 }
 
-auto run_instruction(Stack& stack,
-                     viua::arch::instruction_type const* ip)
+auto run_instruction(Stack& stack, viua::arch::instruction_type const* ip)
     -> viua::arch::instruction_type const*
 {
     auto instruction = viua::arch::instruction_type{};
@@ -350,9 +350,9 @@ auto main(int argc, char* argv[]) -> int
      */
     auto const executable_path = std::string{(argc > 1) ? argv[1] : "./a.out"};
 
-    auto strings = std::vector<uint8_t>{};
+    auto strings  = std::vector<uint8_t>{};
     auto fn_table = std::vector<uint8_t>{};
-    auto text    = std::vector<viua::arch::instruction_type>{};
+    auto text     = std::vector<viua::arch::instruction_type>{};
 
     auto entry_addr = size_t{0};
 
@@ -407,7 +407,8 @@ auto main(int argc, char* argv[]) -> int
             read(a_out, fn_table.data(), fn_header.p_filesz);
         }
 
-        entry_addr = ((elf_header.e_entry - text_header.p_offset) / sizeof(viua::arch::instruction_type));
+        entry_addr = ((elf_header.e_entry - text_header.p_offset)
+                      / sizeof(viua::arch::instruction_type));
 
         std::cout << "[vm] loaded " << text_header.p_filesz
                   << " byte(s) of .text section from PT_LOAD segment of "
@@ -416,15 +417,13 @@ auto main(int argc, char* argv[]) -> int
                   << (text_header.p_filesz / sizeof(decltype(text)::value_type))
                   << " instructions\n";
         std::cout << "[vm] .text address at +0x" << std::hex << std::setw(8)
-                  << std::setfill('0')
-                  << text_header.p_offset
-                  << std::dec << "\n";
+                  << std::setfill('0') << text_header.p_offset << std::dec
+                  << "\n";
         std::cout << "[vm] ELF entry address at +0x" << std::hex << std::setw(8)
-                  << std::setfill('0')
-                  << elf_header.e_entry
-                  << std::dec << "\n";
-        std::cout << "[vm] entry address at [.text]+0x" << std::hex << std::setw(8)
-                  << std::setfill('0')
+                  << std::setfill('0') << elf_header.e_entry << std::dec
+                  << "\n";
+        std::cout << "[vm] entry address at [.text]+0x" << std::hex
+                  << std::setw(8) << std::setfill('0')
                   << (entry_addr * sizeof(viua::arch::instruction_type))
                   << std::dec << "\n";
         std::cout
@@ -439,10 +438,10 @@ auto main(int argc, char* argv[]) -> int
         close(a_out);
     }
 
-    auto env = Env{};
-    env.strings_table = std::move(strings);
+    auto env            = Env{};
+    env.strings_table   = std::move(strings);
     env.functions_table = std::move(fn_table);
-    env.ip_base = &text[0];
+    env.ip_base         = &text[0];
 
     auto stack = Stack{env};
     stack.push(256, (text.data() + entry_addr), nullptr);

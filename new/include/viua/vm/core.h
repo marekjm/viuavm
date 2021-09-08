@@ -25,12 +25,12 @@
 
 #include <exception>
 #include <memory>
-#include <type_traits>
-#include <variant>
-#include <vector>
-#include <utility>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
+#include <variant>
+#include <vector>
 
 #include <viua/arch/arch.h>
 #include <viua/vm/types.h>
@@ -50,11 +50,11 @@ struct Value {
     using value_type = viua::vm::types::Register_cell;
     value_type value;
 
-    Value() = default;
+    Value()             = default;
     Value(Value const&) = delete;
-    Value(Value&&) = delete;
+    Value(Value&&)      = delete;
     auto operator=(Value const&) -> Value& = delete;
-    inline auto operator=(Value&& that) -> Value&
+    inline auto operator                   =(Value&& that) -> Value&
     {
         value = std::move(that.value);
         return *this;
@@ -100,31 +100,38 @@ struct Value {
         return *std::get<boxed_type>(value);
     }
 
-    template<typename T>
-    auto holds() const -> bool
+    template<typename T> auto holds() const -> bool
     {
-        if (std::is_same_v<T, void> and std::holds_alternative<std::monostate>(value)) {
+        if (std::is_same_v<
+                T,
+                void> and std::holds_alternative<std::monostate>(value)) {
             return true;
         }
-        if (std::is_same_v<T, int64_t> and std::holds_alternative<int64_t>(value)) {
+        if (std::is_same_v<
+                T,
+                int64_t> and std::holds_alternative<int64_t>(value)) {
             return true;
         }
-        if (std::is_same_v<T, uint64_t> and std::holds_alternative<uint64_t>(value)) {
+        if (std::is_same_v<
+                T,
+                uint64_t> and std::holds_alternative<uint64_t>(value)) {
             return true;
         }
         if (std::is_same_v<T, float> and std::holds_alternative<float>(value)) {
             return true;
         }
-        if (std::is_same_v<T, double> and std::holds_alternative<double>(value)) {
+        if (std::is_same_v<T,
+                           double> and std::holds_alternative<double>(value)) {
             return true;
         }
-        if (std::is_same_v<T, boxed_type> and std::holds_alternative<boxed_type>(value)) {
+        if (std::is_same_v<
+                T,
+                boxed_type> and std::holds_alternative<boxed_type>(value)) {
             return true;
         }
         return false;
     }
-    template<typename T>
-    auto cast_to() const -> T
+    template<typename T> auto cast_to() const -> T
     {
         if (std::holds_alternative<T>(value)) {
             return std::get<T>(value);
@@ -146,8 +153,7 @@ struct Value {
         throw std::bad_cast{};
     }
 
-    template<typename Tr>
-    auto has_trait() const -> bool
+    template<typename Tr> auto has_trait() const -> bool
     {
         return (is_boxed() and boxed_value().has_trait<Tr>());
     }
@@ -165,9 +171,7 @@ struct Frame {
     viua::arch::Register_access result_to;
 
     inline Frame(size_t const sz, addr_type const e, addr_type const r)
-        : registers(sz)
-        , entry_address{e}
-        , return_address{r}
+            : registers(sz), entry_address{e}, return_address{r}
     {}
 };
 
@@ -178,13 +182,15 @@ struct Stack {
     std::vector<Frame> frames;
     std::vector<Value> args;
 
-    explicit inline Stack(Env const& env): environment{env} {}
+    explicit inline Stack(Env const& env) : environment{env}
+    {}
     Stack(Stack const&) = delete;
-    Stack(Stack&&) = default;
+    Stack(Stack&&)      = default;
     auto operator=(Stack const&) -> Stack& = delete;
     auto operator=(Stack&&) -> Stack& = default;
 
-    inline auto push(size_t const sz, addr_type const e, addr_type const r) -> void
+    inline auto push(size_t const sz, addr_type const e, addr_type const r)
+        -> void
     {
         frames.emplace_back(sz, e, r);
     }
@@ -205,8 +211,7 @@ struct abort_execution {
     std::string message;
 
     inline abort_execution(ip_type const i, std::string m = "")
-        : ip{i}
-        , message{std::move(m)}
+            : ip{i}, message{std::move(m)}
     {}
 
     inline auto what() const -> std::string_view
@@ -214,6 +219,6 @@ struct abort_execution {
         return message;
     }
 };
-}
+}  // namespace viua::vm
 
 #endif

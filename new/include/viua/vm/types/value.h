@@ -30,10 +30,15 @@
 
 
 namespace viua::vm::types {
-using Register_cell = std::variant<std::monostate, int64_t, uint64_t, float, double, std::unique_ptr<class Value>>;
+using Register_cell = std::variant<std::monostate,
+                                   int64_t,
+                                   uint64_t,
+                                   float,
+                                   double,
+                                   std::unique_ptr<class Value>>;
 
 class Value {
-public:
+  public:
     virtual auto type_name() const -> std::string = 0;
     virtual ~Value();
 
@@ -59,14 +64,14 @@ public:
     auto as_trait(Register_cell const& cell) const -> Register_cell
     {
         if (not has_trait<Trait>()) {
-            throw std::runtime_error{type_name() + " does not implement required trait"};
+            throw std::runtime_error{type_name()
+                                     + " does not implement required trait"};
         }
 
         auto const& tr = *dynamic_cast<Trait const*>(this);
         return tr(Trait::tag, cell);
     }
-    template<typename Trait>
-    auto as_trait() const -> Trait const&
+    template<typename Trait> auto as_trait() const -> Trait const&
     {
         return *dynamic_cast<Trait const*>(this);
     }
