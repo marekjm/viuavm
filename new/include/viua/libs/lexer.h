@@ -170,9 +170,6 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
 
     "call",
 
-    "delete",
-    "g.delete",
-
     "atom",
     "g.atom",
     "string",
@@ -212,6 +209,8 @@ inline auto const OPCODE_NAMES = std::set<std::string>{
      */
     "li",
     "g.li",
+    "delete",
+    "g.delete",
 };
 
 auto lex(std::string_view) -> std::vector<Lexeme>;

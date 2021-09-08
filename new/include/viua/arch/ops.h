@@ -220,7 +220,6 @@ enum class OPCODE : opcode_type {
     MOVE   = (FORMAT_D | 0x0005),
     SWAP   = (FORMAT_D | 0x0006),
 
-    DELETE = (FORMAT_S | 0x0001),
     FRAME  = (FORMAT_S | 0x0002),
     RETURN = (FORMAT_S | 0x0003),
     ATOM   = (FORMAT_S | 0x0004),
@@ -277,7 +276,6 @@ enum class OPCODE_D : opcode_type {
     SWAP = static_cast<opcode_type>(OPCODE::SWAP),
 };
 enum class OPCODE_S : opcode_type {
-    DELETE = static_cast<opcode_type>(OPCODE::DELETE),
     FRAME  = static_cast<opcode_type>(OPCODE::FRAME),
     RETURN = static_cast<opcode_type>(OPCODE::RETURN),
     ATOM = static_cast<opcode_type>(OPCODE::ATOM),

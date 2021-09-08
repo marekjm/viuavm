@@ -197,17 +197,6 @@ struct SWAP : Instruction {
 
     SWAP(viua::arch::ops::D i): instruction{i} {}
 };
-/*
- * DELETE clears a register and deletes a value that it contained. For
- * unboxed values the bit-pattern is simply deleted; for boxed values their
- * destructor is invoked.
- */
-struct DELETE : Instruction {
-    viua::arch::ops::S instruction;
-
-    DELETE(viua::arch::ops::S i) : instruction{i}
-    {}
-};
 
 struct ATOM : Instruction {
     viua::arch::ops::S instruction;

@@ -275,8 +275,6 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "bitnot";
     case OPCODE::NOT:
         return greedy + "not";
-    case OPCODE::DELETE:
-        return greedy + "delete";
     case OPCODE::ATOM:
         return greedy + "atom";
     case OPCODE::STRING:
@@ -379,8 +377,6 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::BITNOT));
     } else if (sv == "not") {
         return (op | static_cast<opcode_type>(OPCODE::NOT));
-    } else if (sv == "delete") {
-        return (op | static_cast<opcode_type>(OPCODE::DELETE));
     } else if (sv == "atom") {
         return (op | static_cast<opcode_type>(OPCODE::ATOM));
     } else if (sv == "string") {

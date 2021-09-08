@@ -63,7 +63,6 @@ Work_instruction(NOT);
 Work_instruction(COPY);
 Work_instruction(MOVE);
 Work_instruction(SWAP);
-Work_instruction(DELETE);
 
 Work_instruction(ATOM);
 Work_instruction(STRING);

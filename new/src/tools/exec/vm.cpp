@@ -128,9 +128,6 @@ auto execute(Stack& stack,
     {
         auto instruction = viua::arch::ops::S::decode(raw);
         switch (static_cast<viua::arch::ops::OPCODE_S>(opcode)) {
-        case viua::arch::ops::OPCODE_S::DELETE:
-            execute(DELETE{instruction}, stack, ip);
-            break;
         case viua::arch::ops::OPCODE_S::FRAME:
             execute(FRAME{instruction}, stack, ip);
             break;

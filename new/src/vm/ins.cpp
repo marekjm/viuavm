@@ -572,18 +572,6 @@ auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 
     std::swap(lhs.value, rhs.value);
 }
-auto execute(DELETE const op, Stack& stack, ip_type const) -> void
-{
-    auto& registers = stack.frames.back().registers;
-    auto& target = registers.at(op.instruction.out.index);
-
-    target.value           = std::monostate{};
-
-    std::cerr
-        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
-               + std::to_string(static_cast<int>(op.instruction.out.index))
-               + "\n";
-}
 
 auto execute(ATOM const op, Stack& stack, ip_type const) -> void
 {

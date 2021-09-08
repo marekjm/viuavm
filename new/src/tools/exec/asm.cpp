@@ -541,6 +541,22 @@ auto parse(viua::support::vector_view<viua::libs::lexer::Lexeme> lexemes)
     return nodes;
 }
 
+auto expand_delete(std::vector<ast::Instruction>& cooked,
+               ast::Instruction const& raw) -> void
+{
+    using namespace std::string_literals;
+    auto synth = ast::Instruction{};
+    synth.opcode = raw.opcode;
+    synth.opcode.text = (raw.opcode.text.find("g.") == 0 ? "g." : "") + "move"s;
+
+    synth.operands.push_back(raw.operands.front());
+    synth.operands.push_back(raw.operands.front());
+
+    synth.operands.front().ingredients.front().text = "void";
+    synth.operands.front().ingredients.resize(1);
+
+    cooked.push_back(synth);
+}
 auto expand_li(std::vector<ast::Instruction>& cooked,
                ast::Instruction const& each) -> void
 {
@@ -709,7 +725,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             synth.operands.back().ingredients.at(1).text = std::to_string(
                 std::stoul(synth.operands.back().ingredients.at(1).text) + 1);
 
-            cooked.push_back(synth);
+            expand_delete(cooked, synth);
         }
         {
             using namespace std::string_literals;
@@ -721,7 +737,7 @@ auto expand_li(std::vector<ast::Instruction>& cooked,
             synth.operands.back().ingredients.at(1).text = std::to_string(
                 std::stoul(synth.operands.back().ingredients.at(1).text) + 2);
 
-            cooked.push_back(synth);
+            expand_delete(cooked, synth);
         }
     } else {
         using namespace std::string_literals;
@@ -776,6 +792,8 @@ auto expand_pseudoinstructions(std::vector<ast::Instruction> raw, std::map<std::
         // instructions
         if (each.opcode == "li" or each.opcode == "g.li") {
             expand_li(cooked, each);
+        } else if (each.opcode == "delete" or each.opcode == "g.delete") {
+            expand_delete(cooked, each);
         } else if (each.opcode == "call") {
             /*
              * Call instructions expansion is simple.
