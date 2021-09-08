@@ -220,12 +220,12 @@ enum class OPCODE : opcode_type {
     MOVE   = (FORMAT_D | 0x0005),
     SWAP   = (FORMAT_D | 0x0006),
 
-    FRAME  = (FORMAT_S | 0x0002),
-    RETURN = (FORMAT_S | 0x0003),
-    ATOM   = (FORMAT_S | 0x0004),
-    STRING = (FORMAT_S | 0x0005),
-    FLOAT  = (FORMAT_S | 0x0006),
-    DOUBLE = (FORMAT_S | 0x0007),
+    FRAME  = (FORMAT_S | 0x0001),
+    RETURN = (FORMAT_S | 0x0002),
+    ATOM   = (FORMAT_S | 0x0003),
+    STRING = (FORMAT_S | 0x0004),
+    FLOAT  = (FORMAT_S | 0x0005),
+    DOUBLE = (FORMAT_S | 0x0006),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
