@@ -226,6 +226,8 @@ enum class OPCODE : opcode_type {
     STRING = (FORMAT_S | 0x0004),
     FLOAT  = (FORMAT_S | 0x0005),
     DOUBLE = (FORMAT_S | 0x0006),
+    STRUCT = (FORMAT_S | 0x0007),
+    BUFFER = (FORMAT_S | 0x0008),
 
     LUI  = (FORMAT_E | 0x0001),
     LUIU = (FORMAT_E | 0x0001 | UNSIGNED),
@@ -282,6 +284,8 @@ enum class OPCODE_S : opcode_type {
     STRING = static_cast<opcode_type>(OPCODE::STRING),
     FLOAT = static_cast<opcode_type>(OPCODE::FLOAT),
     DOUBLE = static_cast<opcode_type>(OPCODE::DOUBLE),
+    STRUCT = static_cast<opcode_type>(OPCODE::STRUCT),
+    BUFFER = static_cast<opcode_type>(OPCODE::BUFFER),
 };
 enum class OPCODE_E : opcode_type {
     LUI  = static_cast<opcode_type>(OPCODE::LUI),

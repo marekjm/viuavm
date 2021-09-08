@@ -41,6 +41,13 @@ struct EBREAK : Instruction {
     EBREAK(viua::arch::ops::N i) : instruction{i}
     {}
 };
+
+struct FRAME : Instruction {
+    viua::arch::ops::S instruction;
+
+    FRAME(viua::arch::ops::S i) : instruction{i}
+    {}
+};
 struct RETURN : Instruction {
     viua::arch::ops::S instruction;
 
@@ -210,14 +217,6 @@ struct STRING : Instruction {
     STRING(viua::arch::ops::S i) : instruction{i}
     {}
 };
-
-struct FRAME : Instruction {
-    viua::arch::ops::S instruction;
-
-    FRAME(viua::arch::ops::S i) : instruction{i}
-    {}
-};
-
 struct FLOAT : Instruction {
     viua::arch::ops::S instruction;
 
@@ -228,6 +227,18 @@ struct DOUBLE : Instruction {
     viua::arch::ops::S instruction;
 
     DOUBLE(viua::arch::ops::S i) : instruction{i}
+    {}
+};
+struct STRUCT : Instruction {
+    viua::arch::ops::S instruction;
+
+    STRUCT(viua::arch::ops::S i) : instruction{i}
+    {}
+};
+struct BUFFER : Instruction {
+    viua::arch::ops::S instruction;
+
+    BUFFER(viua::arch::ops::S i) : instruction{i}
     {}
 };
 

@@ -145,6 +145,12 @@ auto execute(Stack& stack,
         case viua::arch::ops::OPCODE_S::DOUBLE:
             execute(DOUBLE{instruction}, stack, ip);
             break;
+        case viua::arch::ops::OPCODE_S::STRUCT:
+            execute(STRUCT{instruction}, stack, ip);
+            break;
+        case viua::arch::ops::OPCODE_S::BUFFER:
+            execute(BUFFER{instruction}, stack, ip);
+            break;
         }
         break;
     }

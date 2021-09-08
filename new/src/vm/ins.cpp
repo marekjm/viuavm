@@ -791,6 +791,32 @@ auto execute(DOUBLE const op, Stack& stack, ip_type const) -> void
                + std::to_string(static_cast<int>(op.instruction.out.index))
                + "\n";
 }
+auto execute(STRUCT const op, Stack& stack, ip_type const) -> void
+{
+    auto& registers = stack.back().registers;
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto s       = std::make_unique<viua::vm::types::Struct>();
+    target.value = std::move(s);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
+auto execute(BUFFER const op, Stack& stack, ip_type const) -> void
+{
+    auto& registers = stack.back().registers;
+    auto& target = registers.at(op.instruction.out.index);
+
+    auto s       = std::make_unique<viua::vm::types::Buffer>();
+    target.value = std::move(s);
+
+    std::cerr
+        << "    " + viua::arch::ops::to_string(op.instruction.opcode) + " $"
+               + std::to_string(static_cast<int>(op.instruction.out.index))
+               + "\n";
+}
 
 template<typename Op>
 auto execute_arithmetic_immediate_op(Op const op, Stack& stack, ip_type const ip) -> void

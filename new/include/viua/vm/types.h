@@ -49,6 +49,20 @@ struct Atom
     auto to_string() const -> std::string override;
     auto operator() (traits::Eq::tag_type const, Register_cell const&) const -> Register_cell override;
 };
+
+struct Struct
+        : Value
+        , traits::To_string {
+    auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
+};
+
+struct Buffer
+        : Value
+        , traits::To_string {
+    auto type_name() const -> std::string override;
+    auto to_string() const -> std::string override;
+};
 }  // namespace viua::vm::types
 
 #endif

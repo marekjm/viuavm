@@ -66,6 +66,8 @@ Work_instruction(SWAP);
 
 Work_instruction(ATOM);
 Work_instruction(STRING);
+Work_instruction(STRUCT);
+Work_instruction(BUFFER);
 
 Work_instruction(FRAME);
 Flow_instruction(CALL);

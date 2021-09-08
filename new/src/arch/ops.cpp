@@ -279,6 +279,10 @@ auto to_string(opcode_type const raw) -> std::string
         return greedy + "atom";
     case OPCODE::STRING:
         return greedy + "string";
+    case OPCODE::STRUCT:
+        return greedy + "struct";
+    case OPCODE::BUFFER:
+        return greedy + "buffer";
     case OPCODE::FRAME:
         return greedy + "frame";
     case OPCODE::LUI:
@@ -381,6 +385,10 @@ auto parse_opcode(std::string_view const raw) -> opcode_type
         return (op | static_cast<opcode_type>(OPCODE::ATOM));
     } else if (sv == "string") {
         return (op | static_cast<opcode_type>(OPCODE::STRING));
+    } else if (sv == "struct") {
+        return (op | static_cast<opcode_type>(OPCODE::STRUCT));
+    } else if (sv == "buffer") {
+        return (op | static_cast<opcode_type>(OPCODE::BUFFER));
     } else if (sv == "frame") {
         return (op | static_cast<opcode_type>(OPCODE::FRAME));
     } else if (sv == "lui") {

@@ -71,4 +71,22 @@ auto Atom::operator()(traits::Eq::tag_type const, Register_cell const& c) const 
 
     return static_cast<uint64_t>(v->content == content);
 }
+
+auto Struct::type_name() const -> std::string
+{
+    return "struct";
+}
+auto Struct::to_string() const -> std::string
+{
+    return "{}";
+}
+
+auto Buffer::type_name() const -> std::string
+{
+    return "buffer";
+}
+auto Buffer::to_string() const -> std::string
+{
+    return "[]";
+}
 }  // namespace viua::vm::types
