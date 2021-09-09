@@ -94,6 +94,10 @@ struct Value {
     {
         return std::holds_alternative<std::monostate>(value);
     }
+    inline auto make_void() -> void
+    {
+        value = std::monostate{};
+    }
 
     inline auto boxed_value() const -> boxed_type::element_type const&
     {

@@ -574,7 +574,7 @@ auto execute(MOVE const op, Stack& stack, ip_type const ip) -> void
     if (out.has_value()) {
         **out = std::move(**in);
     }
-    (*in)->value = std::monostate{};
+    in.value()->make_void();
 }
 auto execute(SWAP const op, Stack& stack, ip_type const) -> void
 {
