@@ -1,3 +1,4 @@
+#include <sstream>
 #include <string>
 
 #include <viua/vm/types.h>
@@ -90,12 +91,58 @@ auto Struct::to_string() const -> std::string
     return "{}";
 }
 
+auto stringify_cell(Value_cell const& vc) -> std::string
+{
+    if (std::holds_alternative<int64_t>(vc)) {
+        return std::to_string(std::get<int64_t>(vc));
+    } else if (std::holds_alternative<uint64_t>(vc)) {
+        return std::to_string(std::get<uint64_t>(vc));
+    } else if (std::holds_alternative<float>(vc)) {
+        return std::to_string(std::get<float>(vc));
+    } else if (std::holds_alternative<double>(vc)) {
+        return std::to_string(std::get<double>(vc));
+    } else {
+        auto const* v = std::get<std::unique_ptr<viua::vm::types::Value>>(vc).get();
+        auto const* s = dynamic_cast<viua::vm::types::traits::To_string const*>(v);
+        if (s) {
+            return s->to_string();
+        } else {
+            return ("<value of " + v->type_name() + ">");
+        }
+    }
+}
+
 auto Buffer::type_name() const -> std::string
 {
     return "buffer";
 }
 auto Buffer::to_string() const -> std::string
 {
-    return "[]";
+    if (values.empty()) {
+        return "[]";
+    }
+
+    auto out = std::ostringstream{};
+    out << "[";
+    out << stringify_cell(values.front());
+    for (auto i = size_t{1}; i < values.size(); ++i) {
+        out << ", " << stringify_cell(values.at(i));
+    }
+    out << "]";
+    return out.str();
+}
+auto Buffer::push(Value_cell&& v) -> void
+{
+    values.push_back(std::move(v));
+}
+auto Buffer::pop(size_t const n) -> Value_cell
+{
+    auto v = std::move(values.at(n));
+    values.erase(values.begin() + n);
+    return v;
+}
+auto Buffer::size() const -> size_type
+{
+    return values.size();
 }
 }  // namespace viua::vm::types

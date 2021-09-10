@@ -66,6 +66,10 @@ struct Buffer
     std::vector<Value_cell> values;
     using size_type = decltype(values)::size_type;
 
+    auto push(Value_cell&&) -> void;
+    auto pop(size_type) -> Value_cell;
+    auto size() const -> size_type;
+
     auto type_name() const -> std::string override;
     auto to_string() const -> std::string override;
 };
